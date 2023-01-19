@@ -1,7 +1,6 @@
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 
 const Animations = {
-  //相机移动实现漫游等动画
   animateCamera: (camera, controls, newP, newT, time = 2000, callBack) => {
     var tween = new TWEEN.Tween({
       x1: camera.position.x, // 相机x

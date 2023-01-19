@@ -5,20 +5,20 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { Sky } from "three/examples/jsm/objects/Sky";
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
-import {
-  Lensflare,
-  LensflareElement,
-} from "three/examples/jsm/objects/Lensflare.js";
 
 import islandModel from "./models/lanzarote.glb";
 import balloonModel from "./models/balloon.glb";
+import cloudModel from "./models/low_poly_cloud.glb";
+import hgModel from "./models/hang_glider_-_low_poly.glb";
+import cloudModel2 from "./models/clouds.glb";
+
 import Animations from "./utils/animations";
+import Models from "./utils/models";
 import "./index.css";
 
 class App extends React.Component {
   constructor() {
     super();
-    this.mixers = [];
   }
 
   state = {
@@ -57,16 +57,16 @@ class App extends React.Component {
       55,
       sizes.width / sizes.height,
       1,
-      20000
+      2000
     );
-    camera.position.set(0, 600, 1600);
+    camera.position.set(0, 600, 1200);
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.target.set(0, 0, 0);
     controls.enableDamping = true;
     controls.enablePan = true;
     controls.maxPolarAngle = 1.5;
-    controls.minDistance = 50;
+    controls.minDistance = 10;
     controls.maxDistance = 1200;
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
@@ -104,8 +104,8 @@ class App extends React.Component {
 
     const sun = new THREE.Vector3();
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
-    const phi = THREE.MathUtils.degToRad(88);
-    const theta = THREE.MathUtils.degToRad(180);
+    const phi = THREE.MathUtils.degToRad(89);
+    const theta = THREE.MathUtils.degToRad(280);
     sun.setFromSphericalCoords(1, phi, theta);
     sky.material.uniforms["sunPosition"].value.copy(sun);
     scene.environment = pmremGenerator.fromScene(sky).texture;
@@ -114,21 +114,22 @@ class App extends React.Component {
     manager.onProgress = async (url, loaded, total) => {
       if (Math.floor((loaded / total) * 100) === 100) {
         this.setState({ loadingProcess: Math.floor((loaded / total) * 100) });
-        navigateFamara(4000);
-        this.setState({ sceneReady: true });
+        navigateFamara(4000, () => {
+          this.setState({ sceneReady: true });
+        });
       } else {
         this.setState({ loadingProcess: Math.floor((loaded / total) * 100) });
       }
     };
 
-    // 岛
     const loader = new GLTFLoader(manager);
+
     loader.load(islandModel, (mesh) => {
       mesh.scene.traverse((child) => {
         if (child.isMesh) {
           // child.material.metalness = 0.4;
           // child.material.roughness = 0.6;
-          child.material = new THREE.MeshLambertMaterial({ color: 0xf2f2f2 });
+          child.material = new THREE.MeshPhongMaterial({ color: 0x808080});
         }
       });
       mesh.scene.position.set(0, 0, 0);
@@ -136,14 +137,18 @@ class App extends React.Component {
       scene.add(mesh.scene);
     });
 
-    loader.load(balloonModel, (gltf) => {
-      const scale = 0.0008;
-      const mesh = gltf.scene.children[0];
-      mesh.scale.set(scale, scale, scale);
-      mesh.position.set(0, 20, 0);
-      mesh.castShadow = true;
-      mesh.rotation.x = -Math.PI / 2;
-      scene.add(mesh);
+    Models.load(scene, balloonModel, 0.0008, {x: 21, y: 32, z: 9}, {x: -Math.PI/2})
+    Models.load(scene, hgModel, 0.03, {x: 21, y: 32, z: 29})
+    Models.load(scene, cloudModel2, 0.03, {x: 1, y: 42, z: 29})
+
+    const clouds = [
+      { scale: 0.3, location : { x: 0, y: 10, z: 0} },
+      { scale: 0.2, location : { x: 10, y: 20, z: 0} },
+      { scale: 0.1, location : { x: 12, y: 20, z: 0} },
+    ];
+
+    clouds.forEach(cloud => {
+      Models.load(scene, cloudModel, cloud.scale, cloud.location)
     });
 
     const raycaster = new THREE.Raycaster();
@@ -215,14 +220,6 @@ class App extends React.Component {
               navigateTenesar();
               break;
             default:
-              Animations.animateCamera(
-                camera,
-                controls,
-                { x: 2000, y: 940, z: 440 },
-                { x: 900, y: 320, z: 500 },
-                1600,
-                () => {}
-              );
               break;
           }
         },
@@ -233,14 +230,9 @@ class App extends React.Component {
     const animate = () => {
       requestAnimationFrame(animate);
       controls && controls.update();
-      const delta = clock.getDelta();
-      this.mixers &&
-        this.mixers.forEach((item) => {
-          item.update(delta);
-        });
       const timer = Date.now() * 0.0005;
       TWEEN && TWEEN.update();
-      camera && (camera.position.y += Math.sin(timer) * 0.01);
+      camera && (camera.position.y += Math.sin(timer) * 0.004);
       renderer.render(scene, camera);
     };
     animate();
