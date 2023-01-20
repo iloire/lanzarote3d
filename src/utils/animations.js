@@ -10,7 +10,8 @@ const Animations = {
       y2: controls.target.y, // 控制点的中心点y
       z2: controls.target.z, // 控制点的中心点z
     });
-    tween.to({
+    tween.to(
+      {
         x1: newP.x,
         y1: newP.y,
         z1: newP.z,
@@ -36,5 +37,5 @@ const Animations = {
     tween.easing(TWEEN.Easing.Cubic.InOut);
     tween.start();
   },
-}
+};
 export default Animations;

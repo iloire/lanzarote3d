@@ -31,6 +31,17 @@ module.exports = {
         ],
       },
       {
+        test: /\.(png|jpg)$/,
+        use: [
+          {
+            loader: "file-loader",
+            options: {
+              outputPath: "./images/",
+            },
+          },
+        ],
+      },
+      {
         test: /\.(glb|gltf)$/,
         use: [
           {

@@ -13,8 +13,10 @@ import hgModel from "./models/hang_glider_-_low_poly.glb";
 import cloudModel2 from "./models/clouds.glb";
 
 import Animations from "./utils/animations";
+import Lights from "./utils/lights.js";
 import Models from "./utils/models";
 import "./index.css";
+import sand from "./textures/sand.jpg";
 
 class App extends React.Component {
   constructor() {
@@ -69,19 +71,7 @@ class App extends React.Component {
     controls.minDistance = 10;
     controls.maxDistance = 1200;
 
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
-    scene.add(ambientLight);
-
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1);
-    dirLight.color.setHSL(0.1, 1, 0.95);
-    dirLight.position.set(-1, 1.75, 1);
-    dirLight.position.multiplyScalar(30);
-    scene.add(dirLight);
-
-    const pointLight = new THREE.PointLight(0xffffff, 1.2, 20);
-    pointLight.color.setHSL(0.995, 0.5, 0.9);
-    pointLight.position.set(0, 45, -2000);
-    scene.add(pointLight);
+    Lights.addLightsToScene(scene);
 
     window.addEventListener(
       "resize",
@@ -104,7 +94,7 @@ class App extends React.Component {
 
     const sun = new THREE.Vector3();
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
-    const phi = THREE.MathUtils.degToRad(89);
+    const phi = THREE.MathUtils.degToRad(88);
     const theta = THREE.MathUtils.degToRad(280);
     sun.setFromSphericalCoords(1, phi, theta);
     sky.material.uniforms["sunPosition"].value.copy(sun);
@@ -114,7 +104,7 @@ class App extends React.Component {
     manager.onProgress = async (url, loaded, total) => {
       if (Math.floor((loaded / total) * 100) === 100) {
         this.setState({ loadingProcess: Math.floor((loaded / total) * 100) });
-        navigateFamara(4000, () => {
+        navigateFamara(1000, () => {
           this.setState({ sceneReady: true });
         });
       } else {
@@ -124,31 +114,39 @@ class App extends React.Component {
 
     const loader = new GLTFLoader(manager);
 
-    loader.load(islandModel, (mesh) => {
-      mesh.scene.traverse((child) => {
-        if (child.isMesh) {
-          // child.material.metalness = 0.4;
-          // child.material.roughness = 0.6;
-          child.material = new THREE.MeshPhongMaterial({ color: 0x808080});
-        }
+    const texture = new THREE.TextureLoader().load(sand, function (texture) {
+      loader.load(islandModel, (mesh) => {
+        mesh.scene.traverse((child) => {
+          if (child.isMesh) {
+            console.log(texture);
+            child.material = new THREE.MeshPhongMaterial({ color: 0x808080 });
+            // child.material = new THREE.MeshBasicMaterial({ map: texture });
+          }
+        });
+        mesh.scene.position.set(0, 0, 0);
+        mesh.scene.scale.set(100, 100, 100);
+        scene.add(mesh.scene);
       });
-      mesh.scene.position.set(0, 0, 0);
-      mesh.scene.scale.set(100, 100, 100);
-      scene.add(mesh.scene);
     });
 
-    Models.load(scene, balloonModel, 0.0008, {x: 21, y: 32, z: 9}, {x: -Math.PI/2})
-    Models.load(scene, hgModel, 0.03, {x: 21, y: 32, z: 29})
-    Models.load(scene, cloudModel2, 0.03, {x: 1, y: 42, z: 29})
+    Models.load(
+      scene,
+      balloonModel,
+      0.0008,
+      { x: 21, y: 32, z: 9 },
+      { x: -Math.PI / 2 }
+    );
+    Models.load(scene, hgModel, 0.03, { x: 21, y: 32, z: 29 });
+    Models.load(scene, cloudModel2, 0.03, { x: 1, y: 42, z: 29 });
 
     const clouds = [
-      { scale: 0.3, location : { x: 0, y: 10, z: 0} },
-      { scale: 0.2, location : { x: 10, y: 20, z: 0} },
-      { scale: 0.1, location : { x: 12, y: 20, z: 0} },
+      { scale: 0.3, location: { x: 0, y: 10, z: 0 } },
+      { scale: 0.2, location: { x: 10, y: 20, z: 0 } },
+      { scale: 0.1, location: { x: 12, y: 20, z: 0 } },
     ];
 
-    clouds.forEach(cloud => {
-      Models.load(scene, cloudModel, cloud.scale, cloud.location)
+    clouds.forEach((cloud) => {
+      Models.load(scene, cloudModel, cloud.scale, cloud.location);
     });
 
     const raycaster = new THREE.Raycaster();
@@ -176,7 +174,7 @@ class App extends React.Component {
         t || 1600,
         cb || (() => {})
       );
-    }
+    };
 
     const navigateMacher = (t, cb) => {
       Animations.animateCamera(
@@ -187,7 +185,7 @@ class App extends React.Component {
         t || 1600,
         cb || (() => {})
       );
-    }
+    };
 
     const navigateTenesar = (t, cb) => {
       Animations.animateCamera(
@@ -198,7 +196,7 @@ class App extends React.Component {
         t || 1600,
         cb || (() => {})
       );
-    }
+    };
 
     document.querySelectorAll(".point").forEach((item) => {
       item.addEventListener(
@@ -272,4 +270,4 @@ class App extends React.Component {
   }
 }
 
-ReactDOM.render(<App /> , document.getElementById("root"));
+ReactDOM.render(<App />, document.getElementById("root"));
