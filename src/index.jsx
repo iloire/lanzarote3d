@@ -16,7 +16,7 @@ import Animations from "./utils/animations";
 import Lights from "./utils/lights.js";
 import Models from "./utils/models";
 import "./index.css";
-import sand from "./textures/sand.jpg";
+import textureImg from "./textures/granite1.jpg";
 
 class App extends React.Component {
   constructor() {
@@ -87,7 +87,7 @@ class App extends React.Component {
     sky.scale.setScalar(10000);
     scene.add(sky);
     const skyUniforms = sky.material.uniforms;
-    skyUniforms["turbidity"].value = 20;
+    skyUniforms["turbidity"].value= 20;
     skyUniforms["rayleigh"].value = 2;
     skyUniforms["mieCoefficient"].value = 0.005;
     skyUniforms["mieDirectionalG"].value = 0.8;
@@ -114,13 +114,13 @@ class App extends React.Component {
 
     const loader = new GLTFLoader(manager);
 
-    const texture = new THREE.TextureLoader().load(sand, function (texture) {
+    new THREE.TextureLoader().load(textureImg, function (texture) {
       loader.load(islandModel, (mesh) => {
         mesh.scene.traverse((child) => {
           if (child.isMesh) {
             console.log(texture);
             child.material = new THREE.MeshPhongMaterial({ color: 0x808080 });
-            // child.material = new THREE.MeshBasicMaterial({ map: texture });
+            child.material = new THREE.MeshStandardMaterial({ map: texture });
           }
         });
         mesh.scene.position.set(0, 0, 0);
