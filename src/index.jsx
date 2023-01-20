@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { Sky } from "three/examples/jsm/objects/Sky";
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
@@ -14,7 +13,9 @@ import cloudModel2 from "./models/clouds.glb";
 
 import Animations from "./utils/animations";
 import Lights from "./utils/lights.js";
+import Controls from "./utils/controls.js";
 import Models from "./utils/models";
+import Navigation from "./utils/navigation";
 import "./index.css";
 import textureImg from "./textures/granite1.jpg";
 
@@ -63,13 +64,7 @@ class App extends React.Component {
     );
     camera.position.set(0, 600, 1200);
 
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.target.set(0, 0, 0);
-    controls.enableDamping = true;
-    controls.enablePan = true;
-    controls.maxPolarAngle = 1.5;
-    controls.minDistance = 10;
-    controls.maxDistance = 1200;
+    const controls = Controls.createControls(camera, renderer)
 
     Lights.addLightsToScene(scene);
 
@@ -100,11 +95,13 @@ class App extends React.Component {
     sky.material.uniforms["sunPosition"].value.copy(sun);
     scene.environment = pmremGenerator.fromScene(sky).texture;
 
+    const navigator = Navigation(camera, controls);
+
     const manager = new THREE.LoadingManager();
     manager.onProgress = async (url, loaded, total) => {
       if (Math.floor((loaded / total) * 100) === 100) {
         this.setState({ loadingProcess: Math.floor((loaded / total) * 100) });
-        navigateFamara(1000, () => {
+        navigator.famara(1000, () => {
           this.setState({ sceneReady: true });
         });
       } else {
@@ -152,50 +149,6 @@ class App extends React.Component {
     // var axesHelper = new THREE.AxesHelper(25);
     // scene.add(axesHelper);
 
-    const navigateFamara = (t, cb) => {
-      Animations.animateCamera(
-        camera,
-        controls,
-        { x: -40, y: 20, z: -10 },
-        { x: 50, y: 0, z: 0 },
-        t || 1600,
-        cb || (() => {})
-      );
-    };
-
-    const navigateOrzola = (t, cb) => {
-      Animations.animateCamera(
-        camera,
-        controls,
-        { x: 120, y: 10, z: -70 },
-        { x: 20, y: 0, z: -30 },
-        t || 1600,
-        cb || (() => {})
-      );
-    };
-
-    const navigateMacher = (t, cb) => {
-      Animations.animateCamera(
-        camera,
-        controls,
-        { x: 30, y: 10, z: 100 },
-        { x: -20, y: 0, z: 0 },
-        t || 1600,
-        cb || (() => {})
-      );
-    };
-
-    const navigateTenesar = (t, cb) => {
-      Animations.animateCamera(
-        camera,
-        controls,
-        { x: -30, y: 5, z: -20 },
-        { x: -20, y: 0, z: 0 },
-        t || 1600,
-        cb || (() => {})
-      );
-    };
-
     document.querySelectorAll(".point").forEach((item) => {
       item.addEventListener(
         "click",
@@ -204,16 +157,16 @@ class App extends React.Component {
             event.target.classList[event.target.classList.length - 1];
           switch (className) {
             case "label-0": // famara
-              navigateFamara();
+              navigator.famara();
               break;
             case "label-1": // mirador Orzola
-              navigateOrzola();
+              navigator.orzola();
               break;
             case "label-2": // macher
-              navigateMacher();
+              navigator.macher();
               break;
             case "label-3": // Tenesar
-              navigateTenesar();
+              navigator.tenesar();
               break;
             default:
               break;
@@ -228,7 +181,7 @@ class App extends React.Component {
       controls && controls.update();
       const timer = Date.now() * 0.0005;
       TWEEN && TWEEN.update();
-      camera && (camera.position.y += Math.sin(timer) * 0.004);
+      camera && (camera.position.y += Math.sin(timer) * 0.001);
       renderer.render(scene, camera);
     };
     animate();
