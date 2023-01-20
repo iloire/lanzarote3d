@@ -118,8 +118,6 @@ class App extends React.Component {
       loader.load(islandModel, (mesh) => {
         mesh.scene.traverse((child) => {
           if (child.isMesh) {
-            console.log(texture);
-            child.material = new THREE.MeshPhongMaterial({ color: 0x808080 });
             child.material = new THREE.MeshStandardMaterial({ map: texture });
           }
         });
