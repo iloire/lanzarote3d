@@ -17,7 +17,7 @@ import Controls from "./utils/controls.js";
 import Models from "./utils/models";
 import Navigation from "./utils/navigation";
 import Helpers from "./utils/helpers";
-
+import { Water } from 'three/examples/jsm/objects/Water';
 import Balloon from "./elements/balloon";
 import Cloud from "./elements/cloud1";
 import HG from "./elements/hg";
@@ -85,6 +85,22 @@ class App extends React.Component {
     );
 
     Helpers.createHelpers(scene);
+
+    const waterGeometry = new THREE.PlaneGeometry(10000, 10000);
+    const water = new Water(waterGeometry, {
+      textureWidth: 512,
+      textureHeight: 512,
+      // waterNormals: new THREE.TextureLoader().load(waterTexture,  texture => {
+      //   texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+      // }),
+      sunDirection: new THREE.Vector3(),
+      sunColor: 0xffffff,
+      waterColor: 0x0072ff,
+      distortionScale: 4,
+      fog: scene.fog !== undefined
+    });
+    water.rotation.x = - Math.PI / 2;
+    scene.add(water);
 
     const sky = new Sky();
     sky.scale.setScalar(10000);
