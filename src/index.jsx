@@ -115,7 +115,7 @@ class App extends React.Component {
       loader.load(islandModel, (mesh) => {
         mesh.scene.traverse((child) => {
           if (child.isMesh) {
-            child.material = new THREE.MeshStandardMaterial({ map: texture });
+            // child.material = new THREE.MeshStandardMaterial({ map: texture });
           }
         });
         mesh.scene.position.set(0, 0, 0);
@@ -124,12 +124,18 @@ class App extends React.Component {
       });
     });
 
+    const animateBallon= (mesh) => {
+      mesh.position.y = mesh.position.y + 0.003;
+      requestAnimationFrame(() => animateBallon(mesh));
+    }
+
     Models.load(
       scene,
       balloonModel,
       0.0008,
       { x: 21, y: 32, z: 9 },
-      { x: -Math.PI / 2 }
+      { x: -Math.PI / 2 },
+      animateBallon
     );
     Models.load(scene, hgModel, 0.03, { x: 21, y: 32, z: 29 });
     Models.load(scene, cloudModel2, 0.03, { x: 1, y: 42, z: 29 });
