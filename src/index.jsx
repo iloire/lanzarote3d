@@ -23,7 +23,7 @@ import Cloud from "./elements/cloud1";
 import HG from "./elements/hg";
 
 import "./index.css";
-import textureImg from "./textures/granite1.jpg";
+import textureImg from "./textures/mars1.jpg";
 
 class App extends React.Component {
   constructor() {
@@ -123,7 +123,7 @@ class App extends React.Component {
       loader.load(islandModel, (mesh) => {
         mesh.scene.traverse((child) => {
           if (child.isMesh) {
-            // child.material = new THREE.MeshStandardMaterial({ map: texture });
+            child.material = new THREE.MeshStandardMaterial({ map: texture });
           }
         });
         mesh.scene.position.set(0, 0, 0);
@@ -147,10 +147,10 @@ class App extends React.Component {
     scene.add(hg);
 
     const clouds = [
-      { type: 0, scale: 0.3, location: { x: 0, y: 10, z: 0 } },
+      { type: 0, scale: 0.3, location: { x: 0, y: 30, z: 34} },
       { type: 0, scale: 0.2, location: { x: 10, y: 20, z: 0 } },
       { type: 0, scale: 0.1, location: { x: 12, y: 20, z: 0 } },
-      { type: 1, scale: 0.01, location: { x: 12, y: 20, z: 0 } },
+      { type: 1, scale: 0.01, location: { x: 50, y: 10, z: -40 } },
     ];
 
     clouds.forEach(async (cloud) => {
