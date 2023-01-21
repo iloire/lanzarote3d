@@ -16,6 +16,8 @@ import Lights from "./utils/lights.js";
 import Controls from "./utils/controls.js";
 import Models from "./utils/models";
 import Navigation from "./utils/navigation";
+import Helpers from "./utils/helpers";
+
 import Balloon from "./elements/balloon";
 import Cloud from "./elements/cloud1";
 import HG from "./elements/hg";
@@ -82,6 +84,8 @@ class App extends React.Component {
       false
     );
 
+    Helpers.createHelpers(scene);
+
     const sky = new Sky();
     sky.scale.setScalar(10000);
     scene.add(sky);
@@ -139,8 +143,8 @@ class App extends React.Component {
       scene.add(balloon);
     });
 
-    const hg  = await HG.load(0.02, {x: 0, y: 10, z: 10});
-    scene.add(hg)
+    const hg = await HG.load(0.02, { x: 0, y: 10, z: 10 });
+    scene.add(hg);
 
     const clouds = [
       { type: 0, scale: 0.3, location: { x: 0, y: 10, z: 0 } },
@@ -151,15 +155,12 @@ class App extends React.Component {
 
     clouds.forEach(async (cloud) => {
       const c = await Cloud.load(cloud.type, cloud.scale, cloud.location);
-      console.log(c)
-      scene.add(c)
+      console.log(c);
+      scene.add(c);
     });
-
 
     const raycaster = new THREE.Raycaster();
 
-    // var axesHelper = new THREE.AxesHelper(25);
-    // scene.add(axesHelper);
 
     document.querySelectorAll(".point").forEach((item) => {
       item.addEventListener(
