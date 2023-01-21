@@ -12,7 +12,7 @@ const Models = {
       mesh.position.set(pos.x, pos.y, pos.z);
       if (rotation && rotation.x) mesh.rotation.x = rotation.x;
       mesh.castShadow = true;
-      scene.add(mesh);
+      scene && scene.add(mesh);
       cb && cb(mesh);
     });
   },

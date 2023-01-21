@@ -16,6 +16,8 @@ import Lights from "./utils/lights.js";
 import Controls from "./utils/controls.js";
 import Models from "./utils/models";
 import Navigation from "./utils/navigation";
+import Balloon from "./elements/balloon";
+
 import "./index.css";
 import textureImg from "./textures/granite1.jpg";
 
@@ -64,7 +66,7 @@ class App extends React.Component {
     );
     camera.position.set(0, 600, 1200);
 
-    const controls = Controls.createControls(camera, renderer)
+    const controls = Controls.createControls(camera, renderer);
 
     Lights.addLightsToScene(scene);
 
@@ -82,7 +84,7 @@ class App extends React.Component {
     sky.scale.setScalar(10000);
     scene.add(sky);
     const skyUniforms = sky.material.uniforms;
-    skyUniforms["turbidity"].value= 20;
+    skyUniforms["turbidity"].value = 20;
     skyUniforms["rayleigh"].value = 2;
     skyUniforms["mieCoefficient"].value = 0.005;
     skyUniforms["mieDirectionalG"].value = 0.8;
@@ -124,19 +126,11 @@ class App extends React.Component {
       });
     });
 
-    const animateBallon= (mesh) => {
-      mesh.position.y = mesh.position.y + 0.003;
-      requestAnimationFrame(() => animateBallon(mesh));
-    }
 
-    Models.load(
-      scene,
-      balloonModel,
-      0.0008,
-      { x: 21, y: 32, z: 9 },
-      { x: -Math.PI / 2 },
-      animateBallon
-    );
+    Balloon.load({ x: 34, y: 3, z: 9 }, (mesh) => {
+      scene.add(mesh)
+    })
+
     Models.load(scene, hgModel, 0.03, { x: 21, y: 32, z: 29 });
     Models.load(scene, cloudModel2, 0.03, { x: 1, y: 42, z: 29 });
 
