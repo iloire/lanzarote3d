@@ -5,6 +5,7 @@ const HG = {
   load: async (scale, pos) => {
     const animate = (mesh) => {
       mesh.position.y = mesh.position.y + 0.003;
+      mesh.position.x = mesh.position.x + 0.03;
       requestAnimationFrame(() => animate(mesh));
     };
 
