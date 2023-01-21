@@ -16,8 +16,8 @@ const Models = {
     const mesh = gltf.scene.children[0];
     mesh.scale.set(scale, scale, scale);
     mesh.position.set(pos.x, pos.y, pos.z);
-    if (rotation && rotation.x) mesh.rotation.x = rotation.x;
     mesh.castShadow = true;
+    if (rotation && rotation.x) mesh.rotation.x = rotation.x;
     return mesh;
   },
 };

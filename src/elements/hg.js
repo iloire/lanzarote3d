@@ -1,14 +1,14 @@
-import balloonModel from "../models/balloon.glb";
+import model from "../models/hang_glider_-_low_poly.glb";
 import Models from "../utils/models";
 
-const Balloon = {
+const HG = {
   load: async (scale, pos) => {
     const animate = (mesh) => {
       mesh.position.y = mesh.position.y + 0.003;
       requestAnimationFrame(() => animate(mesh));
     };
 
-    const mesh = await Models.load(balloonModel, scale, pos, {
+    const mesh = await Models.load(model, scale, pos, {
       x: -Math.PI / 2,
     });
 
@@ -17,4 +17,4 @@ const Balloon = {
   },
 };
 
-export default Balloon;
+export default HG;

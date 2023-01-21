@@ -17,6 +17,8 @@ import Controls from "./utils/controls.js";
 import Models from "./utils/models";
 import Navigation from "./utils/navigation";
 import Balloon from "./elements/balloon";
+import Cloud from "./elements/cloud1";
+import HG from "./elements/hg";
 
 import "./index.css";
 import textureImg from "./textures/granite1.jpg";
@@ -126,23 +128,33 @@ class App extends React.Component {
       });
     });
 
-    const balloonMesh = await Balloon.load({ x: 34, y: 3, z: 9 });
-    scene.add(balloonMesh);
+    const balloonScale = 0.0005;
+    const balloons = [
+      { scale: balloonScale, location: { x: 0, y: 10, z: 0 } },
+      { scale: balloonScale, location: { x: 10, y: 20, z: 0 } },
+      { scale: balloonScale, location: { x: 12, y: 40, z: 0 } },
+    ];
+    balloons.forEach(async (b) => {
+      const balloon = await Balloon.load(b.scale, b.location);
+      scene.add(balloon);
+    });
 
-    const balloonMesh2 = await Balloon.load({ x: 4, y: 13, z: 19 });
-    scene.add(balloonMesh2);
-    // Models.load(scene, hgModel, 0.03, { x: 21, y: 32, z: 29 });
-    // Models.load(scene, cloudModel2, 0.03, { x: 1, y: 42, z: 29 });
-    //
-    // const clouds = [
-    //   { scale: 0.3, location: { x: 0, y: 10, z: 0 } },
-    //   { scale: 0.2, location: { x: 10, y: 20, z: 0 } },
-    //   { scale: 0.1, location: { x: 12, y: 20, z: 0 } },
-    // ];
-    //
-    // clouds.forEach((cloud) => {
-    //   Models.load(scene, cloudModel, cloud.scale, cloud.location);
-    // });
+    const hg  = await HG.load(0.02, {x: 0, y: 10, z: 10});
+    scene.add(hg)
+
+    const clouds = [
+      { type: 0, scale: 0.3, location: { x: 0, y: 10, z: 0 } },
+      { type: 0, scale: 0.2, location: { x: 10, y: 20, z: 0 } },
+      { type: 0, scale: 0.1, location: { x: 12, y: 20, z: 0 } },
+      { type: 1, scale: 0.01, location: { x: 12, y: 20, z: 0 } },
+    ];
+
+    clouds.forEach(async (cloud) => {
+      const c = await Cloud.load(cloud.type, cloud.scale, cloud.location);
+      console.log(c)
+      scene.add(c)
+    });
+
 
     const raycaster = new THREE.Raycaster();
 
