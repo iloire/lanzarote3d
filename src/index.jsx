@@ -41,7 +41,7 @@ class App extends React.Component {
     };
   }
 
-  initThree = () => {
+  initThree = async () => {
     const clock = new THREE.Clock();
 
     const sizes = {
@@ -126,23 +126,23 @@ class App extends React.Component {
       });
     });
 
+    const balloonMesh = await Balloon.load({ x: 34, y: 3, z: 9 });
+    scene.add(balloonMesh);
 
-    Balloon.load({ x: 34, y: 3, z: 9 }, (mesh) => {
-      scene.add(mesh)
-    })
-
-    Models.load(scene, hgModel, 0.03, { x: 21, y: 32, z: 29 });
-    Models.load(scene, cloudModel2, 0.03, { x: 1, y: 42, z: 29 });
-
-    const clouds = [
-      { scale: 0.3, location: { x: 0, y: 10, z: 0 } },
-      { scale: 0.2, location: { x: 10, y: 20, z: 0 } },
-      { scale: 0.1, location: { x: 12, y: 20, z: 0 } },
-    ];
-
-    clouds.forEach((cloud) => {
-      Models.load(scene, cloudModel, cloud.scale, cloud.location);
-    });
+    const balloonMesh2 = await Balloon.load({ x: 4, y: 13, z: 19 });
+    scene.add(balloonMesh2);
+    // Models.load(scene, hgModel, 0.03, { x: 21, y: 32, z: 29 });
+    // Models.load(scene, cloudModel2, 0.03, { x: 1, y: 42, z: 29 });
+    //
+    // const clouds = [
+    //   { scale: 0.3, location: { x: 0, y: 10, z: 0 } },
+    //   { scale: 0.2, location: { x: 10, y: 20, z: 0 } },
+    //   { scale: 0.1, location: { x: 12, y: 20, z: 0 } },
+    // ];
+    //
+    // clouds.forEach((cloud) => {
+    //   Models.load(scene, cloudModel, cloud.scale, cloud.location);
+    // });
 
     const raycaster = new THREE.Raycaster();
 
