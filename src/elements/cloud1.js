@@ -6,8 +6,8 @@ const Cloud = {
   load: async (type, scale, pos) => {
     const animate = (mesh) => {
       const timer = Date.now() * 0.0005;
-      mesh.position.x = mesh.position.x + 0.003;
-      mesh.position.y = mesh.position.y + Math.sin(timer) * 0.005;
+      mesh.position.x = mesh.position.x + 0.0003;
+      mesh.position.y = mesh.position.y + Math.sin(timer) * 0.001;
       requestAnimationFrame(() => animate(mesh));
     };
 

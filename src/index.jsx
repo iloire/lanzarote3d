@@ -26,6 +26,8 @@ import HG from "./elements/hg";
 import "./index.css";
 import textureImg from "./textures/mars1.jpg";
 
+const SHOW_HELPERS = false;
+
 class App extends React.Component {
   constructor() {
     super();
@@ -73,7 +75,7 @@ class App extends React.Component {
 
     const controls = Controls.createControls(camera, renderer);
 
-    Lights.addLightsToScene(scene);
+    Lights.addLightsToScene(scene, SHOW_HELPERS);
 
     window.addEventListener(
       "resize",
@@ -85,7 +87,9 @@ class App extends React.Component {
       false
     );
 
-    Helpers.createHelpers(scene);
+    if (SHOW_HELPERS) {
+      Helpers.createHelpers(scene);
+    }
 
     const water = Water.load();
     scene.add(water);
@@ -139,8 +143,8 @@ class App extends React.Component {
     const balloonScale = 0.0005;
     const balloons = [
       { scale: balloonScale, location: { x: 0, y: 10, z: 0 } },
-      { scale: balloonScale, location: { x: 10, y: 20, z: 0 } },
-      { scale: balloonScale, location: { x: 12, y: 40, z: 0 } },
+      { scale: balloonScale * 1.2, location: { x: 10, y: 20, z: 0 } },
+      { scale: balloonScale * 1.4, location: { x: 12, y: 40, z: 0 } },
     ];
     balloons.forEach(async (b) => {
       const balloon = await Balloon.load(b.scale, b.location);

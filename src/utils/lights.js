@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 const Lights = {
-  addLightsToScene: (scene) => {
+  addLightsToScene: (scene, showHelper) => {
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
     scene.add(ambientLight);
 
@@ -9,8 +9,11 @@ const Lights = {
     dirLight.position.set(-1, 0.2, 0);
     dirLight.position.multiplyScalar(120);
     scene.add(dirLight);
-    const helper = new THREE.DirectionalLightHelper(dirLight, 5);
-    scene.add(helper);
+
+    if (showHelper) {
+      const helper = new THREE.DirectionalLightHelper(dirLight, 5);
+      scene.add(helper);
+    }
 
     // const pointLight = new THREE.PointLight(0xffffff, 1.2, 20);
     // pointLight.color.setHSL(0.995, 0.5, 0.9);

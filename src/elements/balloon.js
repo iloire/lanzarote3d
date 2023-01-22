@@ -4,6 +4,7 @@ import Models from "../utils/models";
 const Balloon = {
   load: async (scale, pos) => {
     const animate = (mesh) => {
+      mesh.position.x = mesh.position.x + 0.0003;
       mesh.position.y = mesh.position.y + 0.003;
       requestAnimationFrame(() => animate(mesh));
     };
