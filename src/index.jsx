@@ -113,7 +113,7 @@ class App extends React.Component {
     manager.onProgress = async (url, loaded, total) => {
       if (Math.floor((loaded / total) * 100) === 100) {
         this.setState({ loadingProcess: Math.floor((loaded / total) * 100) });
-        navigator.famara(1000, () => {
+        navigator.default(1000, () => {
           this.setState({ sceneReady: true });
         });
       } else {
@@ -159,7 +159,6 @@ class App extends React.Component {
 
     clouds.forEach(async (cloud) => {
       const c = await Cloud.load(cloud.type, cloud.scale, cloud.location);
-      console.log(c);
       scene.add(c);
     });
 
