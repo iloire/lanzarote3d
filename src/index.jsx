@@ -166,27 +166,6 @@ class App extends React.Component {
       scene.add(c);
     });
 
-    const raycaster = new THREE.Raycaster();
-
-    var xSpeed = 1;
-var ySpeed = 1;
-document.addEventListener("keydown", onDocumentKeyDown, false);
-function onDocumentKeyDown(event) {
-    var keyCode = event.which;
-    if (keyCode == 87) { //w
-      console.log('w')
-        camera.position.y += ySpeed;
-    } else if (keyCode == 83) { //s
-        camera.position.y -= ySpeed;
-    } else if (keyCode == 65) { //a
-        camera.position.x -= xSpeed;
-    } else if (keyCode == 68) {//d
-        camera.position.x += xSpeed;
-    } else if (keyCode == 32) { //space
-        camera.position.set(0, 0, 0);
-    }
-};
-
     const animate = () => {
       requestAnimationFrame(animate);
       controls && controls.update();
