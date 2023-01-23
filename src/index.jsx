@@ -159,6 +159,8 @@ class App extends React.Component {
       { type: 0, scale: 0.2, location: { x: 10, y: 20, z: 0 } },
       { type: 0, scale: 0.1, location: { x: 12, y: 20, z: 0 } },
       { type: 1, scale: 0.01, location: { x: 50, y: 10, z: -40 } },
+      { type: 1, scale: 0.02, location: { x: 60, y: 8, z: -45 } },
+      { type: 0, scale: 0.2, location: { x: 55, y: 9, z: -45 } },
     ];
 
     clouds.forEach(async (cloud) => {
