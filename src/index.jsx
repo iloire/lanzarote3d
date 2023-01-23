@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import * as THREE from "three";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { Sky } from "three/examples/jsm/objects/Sky";
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 
@@ -19,12 +18,12 @@ import Navigation from "./utils/navigation";
 import Helpers from "./utils/helpers";
 import Water from "./utils/water";
 
+import Island from "./elements/island";
 import Balloon from "./elements/balloon";
 import Cloud from "./elements/cloud1";
 import HG from "./elements/hg";
 
 import "./index.css";
-import textureImg from "./textures/mars1.jpg";
 
 const SHOW_HELPERS = true;
 
@@ -125,20 +124,8 @@ class App extends React.Component {
       }
     };
 
-    const loader = new GLTFLoader(manager);
-
-    new THREE.TextureLoader().load(textureImg, function (texture) {
-      loader.load(islandModel, (mesh) => {
-        mesh.scene.traverse((child) => {
-          if (child.isMesh) {
-            child.material = new THREE.MeshStandardMaterial({ map: texture });
-          }
-        });
-        mesh.scene.position.set(0, 0, 0);
-        mesh.scene.scale.set(100, 100, 100);
-        scene.add(mesh.scene);
-      });
-    });
+    const island = await Island.load(100, {x:0, y:0, z:0});
+    scene.add(island);
 
     const balloonScale = 0.0005;
     const balloons = [
