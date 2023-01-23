@@ -1,7 +1,7 @@
 import Animations from "./animations";
 
 const Navigation = (camera, controls) => {
-  return {
+  const nav = {
     default: (t, cb) => {
       Animations.animateCamera(
         camera,
@@ -57,6 +57,58 @@ const Navigation = (camera, controls) => {
       );
     },
   };
+
+  const xSpeed = 1;
+  const ySpeed = 1;
+  document.addEventListener("keydown", onDocumentKeyDown, false);
+  function onDocumentKeyDown(event) {
+    var keyCode = event.which;
+    if (keyCode == 87) {
+      //w
+      camera.position.y += ySpeed;
+    } else if (keyCode == 83) {
+      //s
+      camera.position.y -= ySpeed;
+    } else if (keyCode == 65) {
+      //a
+      camera.position.x -= xSpeed;
+    } else if (keyCode == 68) {
+      //d
+      camera.position.x += xSpeed;
+    } else if (keyCode == 32) {
+      //space
+      camera.position.set(0, 0, 0);
+    }
+  }
+
+  document.querySelectorAll(".point").forEach((item) => {
+    item.addEventListener(
+      "click",
+      (event) => {
+        let className =
+          event.target.classList[event.target.classList.length - 1];
+        switch (className) {
+          case "label-0": // famara
+            nav.famara();
+            break;
+          case "label-1": // mirador Orzola
+            nav.orzola();
+            break;
+          case "label-2": // macher
+            nav.macher();
+            break;
+          case "label-3": // Tenesar
+            nav.tenesar();
+            break;
+          default:
+            break;
+        }
+      },
+      false
+    );
+  });
+
+  return nav;
 };
 
 export default Navigation;

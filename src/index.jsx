@@ -142,9 +142,9 @@ class App extends React.Component {
 
     const balloonScale = 0.0005;
     const balloons = [
-      { scale: balloonScale, location: { x: 0, y: 10, z: 0 } },
+      { scale: balloonScale, location: { x: 0, y: 5, z: 0 } },
       { scale: balloonScale * 1.2, location: { x: 10, y: 20, z: 0 } },
-      { scale: balloonScale * 1.4, location: { x: 12, y: 40, z: 0 } },
+      { scale: balloonScale * 1.4, location: { x: 7, y: 40, z: 0 } },
     ];
     balloons.forEach(async (b) => {
       const balloon = await Balloon.load(b.scale, b.location);
@@ -168,33 +168,24 @@ class App extends React.Component {
 
     const raycaster = new THREE.Raycaster();
 
-
-    document.querySelectorAll(".point").forEach((item) => {
-      item.addEventListener(
-        "click",
-        (event) => {
-          let className =
-            event.target.classList[event.target.classList.length - 1];
-          switch (className) {
-            case "label-0": // famara
-              navigator.famara();
-              break;
-            case "label-1": // mirador Orzola
-              navigator.orzola();
-              break;
-            case "label-2": // macher
-              navigator.macher();
-              break;
-            case "label-3": // Tenesar
-              navigator.tenesar();
-              break;
-            default:
-              break;
-          }
-        },
-        false
-      );
-    });
+    var xSpeed = 1;
+var ySpeed = 1;
+document.addEventListener("keydown", onDocumentKeyDown, false);
+function onDocumentKeyDown(event) {
+    var keyCode = event.which;
+    if (keyCode == 87) { //w
+      console.log('w')
+        camera.position.y += ySpeed;
+    } else if (keyCode == 83) { //s
+        camera.position.y -= ySpeed;
+    } else if (keyCode == 65) { //a
+        camera.position.x -= xSpeed;
+    } else if (keyCode == 68) {//d
+        camera.position.x += xSpeed;
+    } else if (keyCode == 32) { //space
+        camera.position.set(0, 0, 0);
+    }
+};
 
     const animate = () => {
       requestAnimationFrame(animate);
