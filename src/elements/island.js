@@ -5,7 +5,7 @@ import * as THREE from "three";
 
 const Island = {
   load: async (scale, pos) => {
-    const textureLoader = new THREE.TextureLoader();
+    const textureLoader = new THREE.TextureLoader(Models.manager);
     const mesh = await Models.load(model, scale, pos);
 
     const texture = await textureLoader.load(textureImg);
