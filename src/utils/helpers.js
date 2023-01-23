@@ -17,6 +17,17 @@ const Helpers = {
     grid.add(gridV);
 
     scene.add(grid);
+
+    const dir = new THREE.Vector3(10, 0, -2);
+    //normalize the direction vector (convert to vector of length 1)
+    dir.normalize();
+
+    const origin = new THREE.Vector3(-100, 10, 0);
+    const length = 100;
+    const hex = 0xffff00;
+
+    const arrowHelper = new THREE.ArrowHelper(dir, origin, length, hex);
+    scene.add(arrowHelper);
   },
 };
 export default Helpers;
