@@ -6,17 +6,18 @@ const Navigation = (camera, controls) => {
       Animations.animateCamera(
         camera,
         controls,
-        { x: 30, y: 20, z: -140 },
+        { x: 30, y: 10, z: -115 },
         { x: 50, y: 0, z: 0 },
         t || 1600,
         cb || (() => {})
       );
     },
+
     famara: (t, cb) => {
       Animations.animateCamera(
         camera,
         controls,
-        { x: -40, y: 20, z: -10 },
+        { x: -40, y: 10, z: -10 },
         { x: 50, y: 0, z: 0 },
         t || 1600,
         cb || (() => {})
