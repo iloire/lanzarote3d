@@ -77,7 +77,7 @@ const Navigation = (camera, controls) => {
       camera.position.x += xSpeed;
     } else if (keyCode == 32) {
       //space
-      camera.position.set(0, 0, 0);
+      nav.default();
     }
   }
 
