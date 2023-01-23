@@ -1,5 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { createRoot } from 'react-dom/client';
+
 import * as THREE from "three";
 import { Sky } from "three/examples/jsm/objects/Sky";
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
@@ -203,4 +205,7 @@ class App extends React.Component {
   }
 }
 
-ReactDOM.render(<App />, document.getElementById("root"));
+const rootElement = document.getElementById("root");
+const root = createRoot(rootElement);
+
+root.render(<App />);
