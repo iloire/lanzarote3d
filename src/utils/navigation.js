@@ -1,4 +1,5 @@
 import Animations from "./animations";
+import * as THREE from "three";
 
 const Navigation = (camera, controls) => {
   const nav = {
@@ -58,27 +59,50 @@ const Navigation = (camera, controls) => {
     },
   };
 
-  const xSpeed = 1;
-  const ySpeed = 1;
+  function moveForward(speed) {
+    const dir = new THREE.Vector3();
+    camera.getWorldDirection(dir);
+    camera.position.addScaledVector(dir, speed);
+  }
+
+  function moveBackwards(speed) {
+    const dir = new THREE.Vector3();
+    camera.getWorldDirection(dir);
+    camera.position.addScaledVector(dir, -1 * speed);
+  }
+
+  // rotation won't work with OrbitControls enabled
+  function rotateLeft() {
+    camera.rotation.y -= Math.PI / 8;
+  }
+
+  function rotateRight() {
+    camera.rotation.y += Math.PI / 8;
+  }
+
+  const xSpeed = 0.1;
+  const ySpeed = 0.1;
   document.addEventListener("keydown", onDocumentKeyDown, false);
+
   function onDocumentKeyDown(event) {
     var keyCode = event.which;
     if (keyCode == 87) {
       //w
-      camera.position.y += ySpeed;
+      moveForward(xSpeed);
     } else if (keyCode == 83) {
       //s
-      camera.position.y -= ySpeed;
+      moveBackwards(xSpeed);
     } else if (keyCode == 65) {
       //a
-      camera.position.x -= xSpeed;
+      rotateLeft();
     } else if (keyCode == 68) {
       //d
-      camera.position.x += xSpeed;
+      rotateRight();
     } else if (keyCode == 32) {
       //space
       nav.default();
     }
+    controls.update();
   }
 
   document.querySelectorAll(".point").forEach((item) => {

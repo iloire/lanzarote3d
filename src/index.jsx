@@ -26,7 +26,7 @@ import HG from "./elements/hg";
 import "./index.css";
 import textureImg from "./textures/mars1.jpg";
 
-const SHOW_HELPERS = false;
+const SHOW_HELPERS = true;
 
 class App extends React.Component {
   constructor() {
@@ -151,7 +151,7 @@ class App extends React.Component {
       scene.add(balloon);
     });
 
-    const hg = await HG.load(0.02, { x: 0, y: 10, z: 10 });
+    const hg = await HG.load(0.008, { x: 0, y: 10, z: 10 });
     scene.add(hg);
 
     const clouds = [
@@ -173,7 +173,7 @@ class App extends React.Component {
       controls && controls.update();
       const timer = Date.now() * 0.0005;
       TWEEN && TWEEN.update();
-      camera && (camera.position.y += Math.sin(timer) * 0.001);
+      camera && (camera.position.y += Math.sin(timer) * 0.0003);
       renderer.render(scene, camera);
     };
     animate();
