@@ -24,10 +24,11 @@ import Island from "./elements/island";
 import Balloon from "./elements/balloon";
 import Cloud from "./elements/cloud1";
 import HG from "./elements/hg";
+import PG from "./elements/pg";
 
 import "./index.css";
 
-const SHOW_HELPERS = true;
+const SHOW_HELPERS = false;
 
 class App extends React.Component {
   constructor() {
@@ -143,6 +144,20 @@ class App extends React.Component {
     // hang glider
     const hg = await HG.load(0.008, { x: 0, y: 10, z: 10 });
     scene.add(hg);
+
+    // paraglider
+    const pgScale = 0.08;
+    const pgs = [
+      { scale: pgScale, location: { x: 45, y: 10, z: -40 }, speed: {x: 0.0001, y: 0.0002, z: 0.00005 }},
+      { scale: pgScale * 1.2, location: { x: 50, y: 16, z: -45 }, speed: {x: 0.0003, y: 0.0003, z: 0.0001 }},
+      { scale: pgScale * 1.4, location: { x: 55, y: 14, z: -57 }, speed: {x: 0.0001, y: 0.0002, z: 0.0001 }},
+      { scale: pgScale * 1.4, location: { x: 62, y: 13, z: -52 }, speed: {x: 0.0001, y: 0.0002, z: 0.0001 }},
+      { scale: pgScale * 1.4, location: { x: 55, y: 19, z: -53 }, speed: {x: 0.0001, y: 0.0002, z: 0.0001 }},
+    ];
+    pgs.forEach(async (p) => {
+      const pg = await PG.load(p.scale, p.location, p.speed);
+      scene.add(pg);
+    });
 
     // clouds
     const clouds = [
