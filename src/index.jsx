@@ -142,12 +142,12 @@ class App extends React.Component {
 
     const balloonScale = 0.0005;
     const balloons = [
-      { scale: balloonScale, location: { x: 0, y: 5, z: 0 } },
-      { scale: balloonScale * 1.2, location: { x: 10, y: 20, z: 0 } },
-      { scale: balloonScale * 1.4, location: { x: 7, y: 40, z: 0 } },
+      { scale: balloonScale, location: { x: 0, y: 5, z: 10 }, speed: {x: 0.0001, y: 0.0002, z: 0.00005 }},
+      { scale: balloonScale * 1.2, location: { x: 10, y: 22, z: 5 }, speed: {x: 0.0003, y: 0.0003, z: 0.0001 }},
+      { scale: balloonScale * 1.4, location: { x: 7, y: 14, z: 10 }, speed: {x: 0.0001, y: 0.0002, z: 0.0001 }},
     ];
     balloons.forEach(async (b) => {
-      const balloon = await Balloon.load(b.scale, b.location);
+      const balloon = await Balloon.load(b.scale, b.location, b.speed);
       scene.add(balloon);
     });
 
