@@ -112,8 +112,7 @@ class App extends React.Component {
 
     const navigator = Navigation(camera, controls);
 
-    const manager = new THREE.LoadingManager();
-    manager.onProgress = async (url, loaded, total) => {
+    Models.manager.onProgress = async (url, loaded, total) => {
       if (Math.floor((loaded / total) * 100) === 100) {
         this.setState({ loadingProcess: Math.floor((loaded / total) * 100) });
         navigator.default(1000, () => {
@@ -127,6 +126,7 @@ class App extends React.Component {
     const island = await Island.load(100, {x:0, y:0, z:0});
     scene.add(island);
 
+    // balloons
     const balloonScale = 0.0005;
     const balloons = [
       { scale: balloonScale, location: { x: 0, y: 5, z: 10 }, speed: {x: 0.0001, y: 0.0002, z: 0.00005 }},
@@ -138,9 +138,11 @@ class App extends React.Component {
       scene.add(balloon);
     });
 
+    // hang glider
     const hg = await HG.load(0.008, { x: 0, y: 10, z: 10 });
     scene.add(hg);
 
+    // clouds
     const clouds = [
       { type: 0, scale: 0.3, location: { x: 0, y: 30, z: 34} },
       { type: 0, scale: 0.2, location: { x: 10, y: 20, z: 0 } },
@@ -155,6 +157,7 @@ class App extends React.Component {
       scene.add(c);
     });
 
+    // main. animate
     const animate = () => {
       requestAnimationFrame(animate);
       controls && controls.update();
