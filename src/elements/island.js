@@ -1,6 +1,6 @@
 import model from "../models/lanzarote.glb";
 import Models from "../utils/models";
-import textureImg from "../textures/mars1.jpg";
+import textureImg from "../textures/red_laterite_soil_stones_diff_4k.jpg";
 import * as THREE from "three";
 
 const Island = {
