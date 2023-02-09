@@ -26,6 +26,7 @@ import Cloud from "./elements/cloud1";
 import HG from "./elements/hg";
 import PG from "./elements/pg";
 import WindIndicator from "./elements/wind-indicator";
+import Annotations from "./elements/annotations";
 
 import "./index.css";
 
@@ -214,6 +215,14 @@ class App extends React.Component {
       const c = await Cloud.load(cloud.type, cloud.scale, cloud.location);
       scene.add(c);
     });
+
+
+    //annotations
+    const a1 = Annotations.get('1', {x: 1, y:2, z:2}, 4)
+    scene.add(a1);
+
+    const a2 = Annotations.get('2', {x: 12, y:12, z:2}, 4)
+    scene.add(a2);
 
     // main. animate
     const animate = () => {
