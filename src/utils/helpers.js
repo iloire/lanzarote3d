@@ -1,7 +1,26 @@
 import * as THREE from "three";
 
 const Helpers = {
-  createHelpers: (scene) => {
+  drawSphericalPosition: (phiDegrees, thetaDegrees, len, scene) => {
+    const cubeSize = 190;
+    const geometry = new THREE.BoxGeometry(10, 10, 10);
+    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    const phi = THREE.MathUtils.degToRad(phiDegrees);
+    const theta = THREE.MathUtils.degToRad(thetaDegrees);
+
+    console.log("phi", phi);
+    console.log("theta", theta);
+
+    const pos = new THREE.Vector3();
+    pos.setFromSphericalCoords(len, theta, phi);
+    console.log(pos);
+
+    const cube = new THREE.Mesh(geometry, material);
+    cube.position.copy(pos);
+    scene.add(cube);
+  },
+
+  createHelpers: (scene, options) => {
     const grid = new THREE.Object3D();
 
     const gridH = new THREE.GridHelper(100, 10, 0x0000ff, 0x808080);
@@ -18,16 +37,10 @@ const Helpers = {
 
     scene.add(grid);
 
-    const dir = new THREE.Vector3(10, 0, -2);
-    //normalize the direction vector (convert to vector of length 1)
-    dir.normalize();
-
-    const origin = new THREE.Vector3(-100, 10, 0);
-    const length = 100;
-    const hex = 0xffff00;
-
-    const arrowHelper = new THREE.ArrowHelper(dir, origin, length, hex);
-    scene.add(arrowHelper);
+    const axesHelperLength = 100;
+    const axesHelper = new THREE.AxesHelper(axesHelperLength);
+    // The X axis is red. The Y axis is green. The Z axis is blue.
+    scene.add(axesHelper);
   },
 };
 export default Helpers;

@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { createRoot } from 'react-dom/client';
+import { createRoot } from "react-dom/client";
 
 import * as THREE from "three";
 import { Sky } from "three/examples/jsm/objects/Sky";
@@ -25,10 +25,11 @@ import Balloon from "./elements/balloon";
 import Cloud from "./elements/cloud1";
 import HG from "./elements/hg";
 import PG from "./elements/pg";
+import WindIndicator from "./elements/wind-indicator";
 
 import "./index.css";
 
-const SHOW_HELPERS = false;
+const SHOW_HELPERS = true ;
 
 class App extends React.Component {
   constructor() {
@@ -93,8 +94,16 @@ class App extends React.Component {
       Helpers.createHelpers(scene);
     }
 
+    const windIndicator = WindIndicator.load(316, 14, {
+      x: 0,
+      y: 20,
+      z: 0,
+    });
+    scene.add(windIndicator);
+
     const water = Water.load();
     scene.add(water);
+    // Helpers.drawSphericalPosition(30, 90, 100, scene);
 
     const sky = new Sky();
     sky.scale.setScalar(10000);
@@ -118,23 +127,35 @@ class App extends React.Component {
     Models.manager.onProgress = async (url, loaded, total) => {
       if (Math.floor((loaded / total) * 100) === 100) {
         this.setState({ loadingProcess: Math.floor((loaded / total) * 100) });
-        navigator.default(1000, () => {
-          this.setState({ sceneReady: true });
-        });
+        // navigator.default(1000, () => {
+        //   this.setState({ sceneReady: true });
+        // });
       } else {
         this.setState({ loadingProcess: Math.floor((loaded / total) * 100) });
       }
     };
 
-    const island = await Island.load(100, {x:0, y:0, z:0});
+    const island = await Island.load(100, { x: 0, y: 0, z: 0 });
     scene.add(island);
 
     // balloons
     const balloonScale = 0.0005;
     const balloons = [
-      { scale: balloonScale, location: { x: 0, y: 5, z: 10 }, speed: {x: 0.0001, y: 0.0002, z: 0.00005 }},
-      { scale: balloonScale * 1.2, location: { x: 10, y: 22, z: 5 }, speed: {x: 0.0003, y: 0.0003, z: 0.0001 }},
-      { scale: balloonScale * 1.4, location: { x: 7, y: 14, z: 10 }, speed: {x: 0.0001, y: 0.0002, z: 0.0001 }},
+      {
+        scale: balloonScale,
+        location: { x: 0, y: 5, z: 10 },
+        speed: { x: 0.0001, y: 0.0002, z: 0.00005 },
+      },
+      {
+        scale: balloonScale * 1.2,
+        location: { x: 10, y: 22, z: 5 },
+        speed: { x: 0.0003, y: 0.0003, z: 0.0001 },
+      },
+      {
+        scale: balloonScale * 1.4,
+        location: { x: 7, y: 14, z: 10 },
+        speed: { x: 0.0001, y: 0.0002, z: 0.0001 },
+      },
     ];
     balloons.forEach(async (b) => {
       const balloon = await Balloon.load(b.scale, b.location, b.speed);
@@ -146,13 +167,33 @@ class App extends React.Component {
     scene.add(hg);
 
     // paraglider
-    const pgScale = 0.08;
+    const pgScale = 0.02;
     const pgs = [
-      { scale: pgScale, location: { x: 45, y: 10, z: -40 }, speed: {x: 0.0001, y: 0.0002, z: 0.00005 }},
-      { scale: pgScale * 1.2, location: { x: 50, y: 16, z: -45 }, speed: {x: 0.0003, y: 0.0003, z: 0.0001 }},
-      { scale: pgScale * 1.4, location: { x: 55, y: 14, z: -57 }, speed: {x: 0.0001, y: 0.0002, z: 0.0001 }},
-      { scale: pgScale * 1.4, location: { x: 62, y: 13, z: -52 }, speed: {x: 0.0001, y: 0.0002, z: 0.0001 }},
-      { scale: pgScale * 1.4, location: { x: 55, y: 19, z: -53 }, speed: {x: 0.0001, y: 0.0002, z: 0.0001 }},
+      {
+        scale: pgScale,
+        location: { x: 45, y: 10, z: -40 },
+        speed: { x: 0.0001, y: 0.0002, z: 0.00005 },
+      },
+      {
+        scale: pgScale * 1.2,
+        location: { x: 50, y: 16, z: -45 },
+        speed: { x: 0.0003, y: 0.0003, z: 0.0001 },
+      },
+      {
+        scale: pgScale * 1.4,
+        location: { x: 55, y: 14, z: -57 },
+        speed: { x: 0.0001, y: 0.0002, z: 0.0001 },
+      },
+      {
+        scale: pgScale * 1.4,
+        location: { x: 62, y: 13, z: -52 },
+        speed: { x: 0.0001, y: 0.0002, z: 0.0001 },
+      },
+      {
+        scale: pgScale * 1.4,
+        location: { x: 55, y: 19, z: -53 },
+        speed: { x: 0.0001, y: 0.0002, z: 0.0001 },
+      },
     ];
     pgs.forEach(async (p) => {
       const pg = await PG.load(p.scale, p.location, p.speed);
@@ -161,7 +202,7 @@ class App extends React.Component {
 
     // clouds
     const clouds = [
-      { type: 0, scale: 0.3, location: { x: 0, y: 30, z: 34} },
+      { type: 0, scale: 0.3, location: { x: 0, y: 30, z: 34 } },
       { type: 0, scale: 0.2, location: { x: 10, y: 20, z: 0 } },
       { type: 0, scale: 0.1, location: { x: 12, y: 20, z: 0 } },
       { type: 1, scale: 0.01, location: { x: 50, y: 10, z: -40 } },
