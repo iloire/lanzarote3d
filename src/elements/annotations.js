@@ -8,7 +8,7 @@ function createContext(width, height) {
 }
 
 const Annotations = {
-  get: (text, pos, scale) => {
+  create: (text, pos, scale) => {
     const canvas = createContext(64, 64);
     const ctx = canvas.getContext("2d");
     const x = 32;

@@ -218,10 +218,10 @@ class App extends React.Component {
 
 
     //annotations
-    const a1 = Annotations.get('1', {x: 1, y:2, z:2}, 4)
+    const a1 = Annotations.create('1', {x: 1, y:2, z:2}, 4)
     scene.add(a1);
 
-    const a2 = Annotations.get('2', {x: 12, y:12, z:2}, 4)
+    const a2 = Annotations.create('2', {x: 12, y:12, z:2}, 4)
     scene.add(a2);
 
     // main. animate
@@ -234,6 +234,7 @@ class App extends React.Component {
       renderer.render(scene, camera);
     };
     animate();
+    console.log("Number of Triangles :", renderer.info.render.triangles);
   };
 
   render() {

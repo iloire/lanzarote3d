@@ -4,7 +4,6 @@ const MAX_HEIGHT = 40;
 const X_AXIS_ROTATION_DEGREES = -90;
 
 const getOriginApplication = (degreesFromNorth) => {
-  console.log("degreesFromNorth", degreesFromNorth);
   switch (true) {
     case degreesFromNorth < 30:
       return 175;
@@ -136,7 +135,10 @@ const WindIndicator = {
     );
     const windArrow = createWindArrow(directionDegrees, 100, 0xffff00);
     const group = new THREE.Group();
-    group.add(windArrow, circle, windDir, northArrow);
+    group.add(windArrow);
+    group.add(circle);
+    group.add(northArrow);
+    group.add(windDir);
     return group;
   },
 };
