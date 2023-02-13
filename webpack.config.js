@@ -53,6 +53,17 @@ module.exports = {
         ],
       },
       {
+        test: /\.mp3$/,
+        use: [
+          {
+            loader: "file-loader",
+            options: {
+              outputPath: "./sounds/",
+            },
+          },
+        ],
+      },
+      {
         test: /\.css$/,
         use: ["style-loader", "css-loader"],
       },
