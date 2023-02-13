@@ -14,7 +14,7 @@ import Helpers from "./utils/helpers";
 import Water from "./utils/water";
 
 import Island from "./elements/island";
-import Cloud from "./elements/cloud";
+import Clouds from "./elements/clouds";
 import WindIndicator from "./elements/wind-indicator";
 import Annotations from "./elements/annotations";
 
@@ -129,20 +129,11 @@ class App extends React.Component {
     const island = await Island.load(100, { x: 0, y: 0, z: 0 });
     scene.add(island);
 
-    // clouds
-    const clouds = [
-      { type: 0, scale: 0.3, location: { x: 0, y: 30, z: 34 } },
-      { type: 0, scale: 0.2, location: { x: 10, y: 20, z: 0 } },
-      { type: 0, scale: 0.1, location: { x: 12, y: 20, z: 0 } },
-      { type: 1, scale: 0.01, location: { x: 50, y: 10, z: -40 } },
-      { type: 1, scale: 0.02, location: { x: 60, y: 8, z: -45 } },
-      { type: 0, scale: 0.2, location: { x: 55, y: 9, z: -45 } },
-    ];
 
-    clouds.forEach(async (cloud) => {
-      const c = await Cloud.load(cloud.type, cloud.scale, cloud.location);
-      scene.add(c);
-    });
+    const c = await Clouds.load(1, {x: 0, y: 0, z:0});
+    scene.add(c);
+    const c1 = await Clouds.load(1, {x: 60, y: 8, z:-40});
+    scene.add(c1);
 
     // //annotations
     // const a1 = Annotations.create('1', {x: 1, y:2, z:2}, 4)
