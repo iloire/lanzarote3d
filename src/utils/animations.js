@@ -3,12 +3,12 @@ import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 const Animations = {
   animateCamera: (camera, controls, newP, newT, time = 2000, callBack) => {
     var tween = new TWEEN.Tween({
-      x1: camera.position.x, // 相机x
-      y1: camera.position.y, // 相机y
-      z1: camera.position.z, // 相机z
-      x2: controls.target.x, // 控制点的中心点x
-      y2: controls.target.y, // 控制点的中心点y
-      z2: controls.target.z, // 控制点的中心点z
+      x1: camera.position.x,
+      y1: camera.position.y,
+      z1: camera.position.z,
+      x2: controls.target.x,
+      y2: controls.target.y,
+      z2: controls.target.z,
     });
     tween.to(
       {

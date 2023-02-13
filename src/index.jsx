@@ -4,35 +4,36 @@ import { createRoot } from "react-dom/client";
 
 import * as THREE from "three";
 import { Sky } from "three/examples/jsm/objects/Sky";
-import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 
 import islandModel from "./models/lanzarote.glb";
-import balloonModel from "./models/balloon.glb";
-import cloudModel from "./models/low_poly_cloud.glb";
-import hgModel from "./models/hang_glider_-_low_poly.glb";
-import cloudModel2 from "./models/clouds.glb";
 
 import Animations from "./utils/animations";
 import Lights from "./utils/lights.js";
-import Controls from "./utils/controls.js";
 import Models from "./utils/models";
-import Navigation from "./utils/navigation";
 import Helpers from "./utils/helpers";
 import Water from "./utils/water";
 
 import Island from "./elements/island";
-import Balloon from "./elements/balloon";
-import Cloud from "./elements/cloud1";
-import HG from "./elements/hg";
-import PG from "./elements/pg";
+import Cloud from "./elements/cloud";
 import WindIndicator from "./elements/wind-indicator";
 import Annotations from "./elements/annotations";
 
-import Wind from './audio/wind.js'
+import Stories from './stories/index.js'
 
 import "./index.css";
 
-const SHOW_HELPERS = true ;
+const SHOW_HELPERS = false ;
+
+const createRenderer = (sizes) => {
+  const renderer = new THREE.WebGLRenderer({
+    canvas: document.querySelector("canvas.webgl"),
+    antialias: true,
+  });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(sizes.width, sizes.height);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  return renderer;
+}
 
 class App extends React.Component {
   constructor() {
@@ -62,13 +63,7 @@ class App extends React.Component {
       height: window.innerHeight,
     };
 
-    const renderer = new THREE.WebGLRenderer({
-      canvas: document.querySelector("canvas.webgl"),
-      antialias: true,
-    });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(sizes.width, sizes.height);
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    const renderer = createRenderer(sizes)
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(
@@ -77,9 +72,6 @@ class App extends React.Component {
       1,
       2000
     );
-    camera.position.set(0, 600, 1200);
-
-    const controls = Controls.createControls(camera, renderer);
 
     Lights.addLightsToScene(scene, SHOW_HELPERS);
 
@@ -104,8 +96,6 @@ class App extends React.Component {
     });
     scene.add(windIndicator);
 
-    Wind.load(camera);
-
     const water = Water.load();
     scene.add(water);
     // Helpers.drawSphericalPosition(30, 90, 100, scene);
@@ -127,14 +117,10 @@ class App extends React.Component {
     sky.material.uniforms["sunPosition"].value.copy(sun);
     scene.environment = pmremGenerator.fromScene(sky).texture;
 
-    const navigator = Navigation(camera, controls);
-
     Models.manager.onProgress = async (url, loaded, total) => {
       if (Math.floor((loaded / total) * 100) === 100) {
         this.setState({ loadingProcess: Math.floor((loaded / total) * 100) });
-        // navigator.default(1000, () => {
-        //   this.setState({ sceneReady: true });
-        // });
+        this.setState({ sceneReady: true });
       } else {
         this.setState({ loadingProcess: Math.floor((loaded / total) * 100) });
       }
@@ -142,68 +128,6 @@ class App extends React.Component {
 
     const island = await Island.load(100, { x: 0, y: 0, z: 0 });
     scene.add(island);
-
-    // balloons
-    const balloonScale = 0.0005;
-    const balloons = [
-      {
-        scale: balloonScale,
-        location: { x: 0, y: 5, z: 10 },
-        speed: { x: 0.0001, y: 0.0002, z: 0.00005 },
-      },
-      {
-        scale: balloonScale * 1.2,
-        location: { x: 10, y: 22, z: 5 },
-        speed: { x: 0.0003, y: 0.0003, z: 0.0001 },
-      },
-      {
-        scale: balloonScale * 1.4,
-        location: { x: 7, y: 14, z: 10 },
-        speed: { x: 0.0001, y: 0.0002, z: 0.0001 },
-      },
-    ];
-    balloons.forEach(async (b) => {
-      const balloon = await Balloon.load(b.scale, b.location, b.speed);
-      scene.add(balloon);
-    });
-
-    // hang glider
-    const hg = await HG.load(0.008, { x: 0, y: 10, z: 10 });
-    scene.add(hg);
-
-    // paraglider
-    const pgScale = 0.02;
-    const pgs = [
-      {
-        scale: pgScale,
-        location: { x: 45, y: 10, z: -40 },
-        speed: { x: 0.0001, y: 0.0002, z: 0.00005 },
-      },
-      {
-        scale: pgScale * 1.2,
-        location: { x: 50, y: 16, z: -45 },
-        speed: { x: 0.0003, y: 0.0003, z: 0.0001 },
-      },
-      {
-        scale: pgScale * 1.4,
-        location: { x: 55, y: 14, z: -57 },
-        speed: { x: 0.0001, y: 0.0002, z: 0.0001 },
-      },
-      {
-        scale: pgScale * 1.4,
-        location: { x: 62, y: 13, z: -52 },
-        speed: { x: 0.0001, y: 0.0002, z: 0.0001 },
-      },
-      {
-        scale: pgScale * 1.4,
-        location: { x: 55, y: 19, z: -53 },
-        speed: { x: 0.0001, y: 0.0002, z: 0.0001 },
-      },
-    ];
-    pgs.forEach(async (p) => {
-      const pg = await PG.load(p.scale, p.location, p.speed);
-      scene.add(pg);
-    });
 
     // clouds
     const clouds = [
@@ -220,25 +144,14 @@ class App extends React.Component {
       scene.add(c);
     });
 
+    // //annotations
+    // const a1 = Annotations.create('1', {x: 1, y:2, z:2}, 4)
+    // scene.add(a1);
+    //
+    // const a2 = Annotations.create('2', {x: 12, y:12, z:2}, 4)
+    // scene.add(a2);
 
-    //annotations
-    const a1 = Annotations.create('1', {x: 1, y:2, z:2}, 4)
-    scene.add(a1);
-
-    const a2 = Annotations.create('2', {x: 12, y:12, z:2}, 4)
-    scene.add(a2);
-
-    // main. animate
-    const animate = () => {
-      requestAnimationFrame(animate);
-      controls && controls.update();
-      const timer = Date.now() * 0.0005;
-      TWEEN && TWEEN.update();
-      camera && (camera.position.y += Math.sin(timer) * 0.0003);
-      renderer.render(scene, camera);
-    };
-    animate();
-    console.log("Number of Triangles :", renderer.info.render.triangles);
+    await Stories.default (camera, scene, renderer);
   };
 
   render() {
