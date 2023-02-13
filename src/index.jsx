@@ -28,6 +28,8 @@ import PG from "./elements/pg";
 import WindIndicator from "./elements/wind-indicator";
 import Annotations from "./elements/annotations";
 
+import Wind from './audio/wind.js'
+
 import "./index.css";
 
 const SHOW_HELPERS = true ;
@@ -101,6 +103,8 @@ class App extends React.Component {
       z: 0,
     });
     scene.add(windIndicator);
+
+    Wind.load(camera);
 
     const water = Water.load();
     scene.add(water);
