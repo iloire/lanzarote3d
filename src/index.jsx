@@ -56,8 +56,6 @@ class App extends React.Component {
   }
 
   initThree = async () => {
-    const clock = new THREE.Clock();
-
     const sizes = {
       width: window.innerWidth,
       height: window.innerHeight,
@@ -142,7 +140,7 @@ class App extends React.Component {
     // const a2 = Annotations.create('2', {x: 12, y:12, z:2}, 4)
     // scene.add(a2);
 
-    await Stories.default (camera, scene, renderer);
+    await Stories.game (camera, scene, renderer);
   };
 
   render() {
