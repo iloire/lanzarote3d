@@ -16,7 +16,6 @@ import Water from "./utils/water";
 import Island from "./elements/island";
 import Clouds from "./elements/clouds";
 import WindIndicator from "./elements/wind-indicator";
-import Annotations from "./elements/annotations";
 
 import Stories from './stories/index.js'
 
@@ -65,11 +64,12 @@ class App extends React.Component {
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(
-      55,
+      25,
       sizes.width / sizes.height,
       1,
       2000
     );
+    scene.add(camera)
 
     Lights.addLightsToScene(scene, SHOW_HELPERS);
 
@@ -127,18 +127,10 @@ class App extends React.Component {
     const island = await Island.load(100, { x: 0, y: 0, z: 0 });
     scene.add(island);
 
-
-    const c = await Clouds.load(1, {x: 0, y: 0, z:0});
+    const c = await Clouds.load(1, {x: 0, y: 10, z:0});
     scene.add(c);
-    const c1 = await Clouds.load(1, {x: 60, y: 8, z:-40});
+    const c1 = await Clouds.load(1, {x: 60, y: 12, z:-40});
     scene.add(c1);
-
-    // //annotations
-    // const a1 = Annotations.create('1', {x: 1, y:2, z:2}, 4)
-    // scene.add(a1);
-    //
-    // const a2 = Annotations.create('2', {x: 12, y:12, z:2}, 4)
-    // scene.add(a2);
 
     await Stories.game (camera, scene, renderer);
   };
@@ -154,7 +146,7 @@ class App extends React.Component {
             <span className="progress">{this.state.loadingProcess} %</span>
           </div>
         )}
-        <div className="points">
+        <div className="points" style={{display:'none'}}>
           <div className="point point-0">
             <div className="label label-0">Famara/Teguise</div>
             <div className="text">Famara</div>
