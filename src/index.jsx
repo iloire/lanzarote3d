@@ -127,10 +127,10 @@ class App extends React.Component {
     const island = await Island.load(100, { x: 0, y: 0, z: 0 });
     scene.add(island);
 
-    const c = await Clouds.load(1, {x: 0, y: 10, z:0});
-    scene.add(c);
-    const c1 = await Clouds.load(1, {x: 60, y: 12, z:-40});
-    scene.add(c1);
+    // const c = await Clouds.load(1, {x: 0, y: 10, z:0});
+    // scene.add(c);
+    // const c1 = await Clouds.load(1, {x: 60, y: 12, z:-40});
+    // scene.add(c1);
 
     await Stories.game (camera, scene, renderer);
   };
