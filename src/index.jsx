@@ -64,7 +64,7 @@ class App extends React.Component {
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(
-      25,
+      55,
       sizes.width / sizes.height,
       1,
       2000
