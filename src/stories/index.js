@@ -5,21 +5,11 @@ import FlyZones from "./flyzones.js";
 import Game from "./game.js";
 
 const Stories = {
-  default: (camera, scene, renderer) => {
-    Default.load(camera, scene, renderer);
-  },
-  balloons: (camera, scene, renderer) => {
-    Balloons.load(camera, scene, renderer);
-  },
-  hg: (camera, scene, renderer) => {
-    HG.load(camera, scene, renderer);
-  },
-  flyzones: (camera, scene, renderer) => {
-    FlyZones.load(camera, scene, renderer);
-  },
-  game: (camera, scene, renderer) => {
-    Game.load(camera, scene, renderer);
-  },
+  default: Default.load,
+  balloons: Balloons.load,
+  hg: HG.load,
+  flyzones: FlyZones.load,
+  game: Game.load,
 };
 
 export default Stories;
