@@ -137,7 +137,7 @@ const WindIndicator = {
     const group = new THREE.Group();
     group.add(windArrow);
     // group.add(circle);
-    group.add(northArrow);
+    // group.add(northArrow);
     // group.add(windDir);
     return group;
   },

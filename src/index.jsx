@@ -15,7 +15,6 @@ import Water from "./utils/water";
 
 import Island from "./elements/island";
 import Clouds from "./elements/clouds";
-import WindIndicator from "./elements/wind-indicator";
 
 import Stories from './stories/index.js'
 
@@ -87,12 +86,6 @@ class App extends React.Component {
       Helpers.createHelpers(scene);
     }
 
-    const windIndicator = WindIndicator.load(316, 14, {
-      x: 0,
-      y: 20,
-      z: 0,
-    });
-    scene.add(windIndicator);
 
     const water = Water.load();
     scene.add(water);

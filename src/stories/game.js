@@ -4,6 +4,7 @@ import PG from "../elements/pg";
 import GUI from "lil-gui";
 import Controls from "../utils/controls.js";
 import Helpers from "../utils/helpers";
+import WindIndicator from "../elements/wind-indicator";
 
 const gui = new GUI();
 
@@ -14,6 +15,8 @@ const settings = {
   mouseControl: false,
   orbitControl: true,
   followCam: false,
+  windDirectionDegreesFromNorth: 310,
+  windSpeed: 0.0007,
 };
 
 const nav = gui.addFolder("Navigation");
@@ -21,6 +24,7 @@ nav.add(settings, "mouseControl");
 nav.add(settings, "xSpeed", 0, 1);
 nav.add(settings, "rotationSensitivity", 0, 1);
 nav.add(settings, "sensitivity", 0, 1);
+nav.add(settings, "windDirectionDegreesFromNorth", 0, 360);
 
 const getObjectPosition = (obj) => {
   const pos = new THREE.Vector3();
@@ -40,14 +44,29 @@ const getWorldQuaternion = (obj) => {
   return dir;
 };
 
+const getWindDirectionVector = (degreesFromNorth) => {
+  const angleRadiansWind = THREE.MathUtils.degToRad(-degreesFromNorth);
+  const directionWind = new THREE.Vector3().setFromSphericalCoords(
+    1,
+    Math.PI / 2,
+    angleRadiansWind
+  );
+  return directionWind;
+};
+
 const moveForward = (obj, speed) => {
-  const rotation = obj.quaternion.clone();
-  const direction = new THREE.Vector3(0, 1, 0);
-  direction.applyQuaternion(rotation);
-  const velocity = direction.multiplyScalar(speed);
-  console.log(velocity);
+  const rotationPG = obj.quaternion.clone();
+  const directionPG = new THREE.Vector3(0, 1, 0);
+  directionPG.applyQuaternion(rotationPG);
+  const velocity = directionPG.multiplyScalar(speed);
+
+  const windDirection = getWindDirectionVector(
+    settings.windDirectionDegreesFromNorth
+  );
+  const velocityWind = windDirection.multiplyScalar(settings.windSpeed);
+
   obj.position.add(velocity);
-  console.log(obj.position);
+  obj.position.add(velocityWind);
 };
 
 const createArrowHelperForObj = (obj, len, color) => {
@@ -71,7 +90,7 @@ const Game = {
     gui.add(controls, "enabled").name("orbit controls");
 
     const p = {
-      scale: 0.09,
+      scale: 0.01,
       position: { x: 27, y: 4, z: 5 },
     };
 
@@ -91,8 +110,26 @@ const Game = {
     pgGui.add(pg.position, "y", 0, 100).name("pg.position.y");
     pgGui.add(pg.position, "z", -100, 100).name("pg.position.z");
 
-    // const grid = Helpers.createGrid(pg.position);
-    // scene.add(grid);
+    const windIndicator = WindIndicator.load(
+      settings.windDirectionDegreesFromNorth,
+      14,
+      {
+        x: 0,
+        y: 0,
+        z: 0,
+      }
+    );
+    scene.add(windIndicator);
+
+    const windDirection = getWindDirectionVector(
+      settings.windDirectionDegreesFromNorth
+    );
+    const arrowWindDirection = new THREE.ArrowHelper(
+      windDirection,
+      { x: 0, y: 10, z: 0 },
+      10
+    );
+    scene.add(arrowWindDirection);
 
     const arrow = createArrowHelperForObj(pg);
     scene.add(arrow);
@@ -149,7 +186,7 @@ const Game = {
       renderer.render(scene, camera);
     };
 
-    camera.position.set(-10, 10, -23);
+    camera.position.set(-10, 50, -23);
     camera.lookAt(pg.position);
 
     animate();
