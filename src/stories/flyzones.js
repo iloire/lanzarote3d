@@ -1,5 +1,5 @@
 const FlyZones = {
-  load: (camera, scene) => {
+  load: (camera, scene, renderer) => {
 
   },
 };
