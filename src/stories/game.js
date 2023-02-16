@@ -10,9 +10,9 @@ const gui = new GUI();
 const settings = {
   sensitivity: 0.01,
   xSpeed: 0.001,
-  rotationSensitivity: 0.002,
+  rotationSensitivity: 0.007,
   mouseControl: false,
-  orbitControl: false,
+  orbitControl: true,
   followCam: false,
 };
 
@@ -21,12 +21,11 @@ nav.add(settings, "mouseControl");
 nav.add(settings, "xSpeed", 0, 1);
 nav.add(settings, "rotationSensitivity", 0, 1);
 nav.add(settings, "sensitivity", 0, 1);
-nav.add(settings, "followCam");
 
 const getObjectPosition = (obj) => {
-  const objectPosition = new THREE.Vector3();
-  obj.getWorldPosition(objectPosition);
-  return objectPosition;
+  const pos = new THREE.Vector3();
+  obj.getWorldPosition(pos);
+  return pos;
 };
 
 const getWorldDirection = (obj) => {
@@ -35,14 +34,20 @@ const getWorldDirection = (obj) => {
   return dir;
 };
 
-const moveForward = (obj, speed) => {
-  const dir = getWorldDirection(obj);
-  const axis = new THREE.Vector3(1, 0, 0); // rotate around the y-axis
-  const angle = -Math.PI / 2; // rotate by 90 degrees
+const getWorldQuaternion = (obj) => {
+  const dir = new THREE.Quaternion();
+  obj.getWorldQuaternion(dir);
+  return dir;
+};
 
-  const rotatedDir = dir.applyAxisAngle(axis, angle);
-  obj.position.addScaledVector(rotatedDir, speed);
-  return rotatedDir;
+const moveForward = (obj, speed) => {
+  const rotation = obj.quaternion.clone();
+  const direction = new THREE.Vector3(0, 1, 0);
+  direction.applyQuaternion(rotation);
+  const velocity = direction.multiplyScalar(speed);
+  console.log(velocity);
+  obj.position.add(velocity);
+  console.log(obj.position);
 };
 
 const createArrowHelperForObj = (obj, len, color) => {
@@ -55,11 +60,11 @@ const createArrowHelperForObj = (obj, len, color) => {
 
 const Game = {
   load: async (camera, scene, renderer) => {
-
     const cameraGui = gui.addFolder("Camera");
     cameraGui.add(camera.position, "x", -100, 100).name("camera.x");
     cameraGui.add(camera.position, "y", 0, 100).name("camera.y");
     cameraGui.add(camera.position, "z", -100, 100).name("camera.z");
+    cameraGui.add(settings, "followCam");
 
     const controls = Controls.createControls(camera, renderer);
     controls.enabled = settings.orbitControl;
@@ -72,6 +77,10 @@ const Game = {
 
     const pg = await PG.load(p.scale, p.position);
     scene.add(pg);
+    setTimeout(() => {
+      //TODO fix this race condition
+      pg.position.set(p.position.x, p.position.y, p.position.z);
+    }, 1);
 
     const pgGui = gui.addFolder("Paraglider");
     pgGui.add(pg.rotation, "x", -Math.PI, Math.PI).name("pg.rotation.x");
@@ -82,8 +91,8 @@ const Game = {
     pgGui.add(pg.position, "y", 0, 100).name("pg.position.y");
     pgGui.add(pg.position, "z", -100, 100).name("pg.position.z");
 
-    const grid = Helpers.createGrid(pg.position);
-    scene.add(grid);
+    // const grid = Helpers.createGrid(pg.position);
+    // scene.add(grid);
 
     const arrow = createArrowHelperForObj(pg);
     scene.add(arrow);
@@ -116,22 +125,20 @@ const Game = {
     // Wind.load(camera);
     renderer.domElement.addEventListener("mousemove", (event) => {
       if (settings.mouseControl) {
-        console.log(settings);
         camera.quaternion.y -= (event.movementX * settings.sensitivity) / 20;
         camera.quaternion.x -= (event.movementY * settings.sensitivity) / 20;
       }
     });
 
     const animate = () => {
-      // setTimeout(animate, 200);
+      // setTimeout(animate, 1200);
       requestAnimationFrame(animate);
       const timer = Date.now() * 0.0005;
       camera.position.y += Math.sin(timer) * 0.0003;
 
-      const cameraOffset = new THREE.Vector3(-1, 0.5, 1);
-      //   pg.position.addScaledVector(dir, speed);
-      const pgDirection = getWorldDirection(pg);
-      if (controls.followCam) {
+      if (settings.followCam) {
+        const cameraOffset = new THREE.Vector3(1, 0.5, 1);
+        const pgDirection = getWorldDirection(pg);
         camera.position.copy(getObjectPosition(pg)).add(cameraOffset);
         camera.lookAt(pg.position);
       }
@@ -142,7 +149,7 @@ const Game = {
       renderer.render(scene, camera);
     };
 
-    camera.position.set(-50, 30, -30);
+    camera.position.set(-10, 10, -23);
     camera.lookAt(pg.position);
 
     animate();
