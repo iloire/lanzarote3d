@@ -21,16 +21,18 @@ const Helpers = {
   },
 
   createHelpers: function (scene, options) {
-    const grid = this.createGrid({ x: 0, y: 0 });
-    scene.add(grid);
+    const grid = this.getGrid({ x: 0, y: 0 });
+    // scene.add(grid);
 
-    const axesHelperLength = 100;
+    scene.add(this.getAxisHelper(100));
+  },
+  getAxisHelper: function (len) {
+    const axesHelperLength = len;
     const axesHelper = new THREE.AxesHelper(axesHelperLength);
     // The X axis is red. The Y axis is green. The Z axis is blue.
-    scene.add(axesHelper);
+    return axesHelper;
   },
-
-  createGrid: (pos) => {
+  getGrid: (pos) => {
     const grid = new THREE.Object3D();
     const gridH = new THREE.GridHelper(100, 10, 0x0000ff, 0x808080);
     pos.y = 0;

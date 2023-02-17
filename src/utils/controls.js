@@ -8,9 +8,9 @@ const Controls = {
 
     controls.enableDamping = true;
     controls.enablePan = true;
-    controls.maxPolarAngle = 1.5;
-    controls.minDistance = 0.2;
-    controls.maxDistance = 220;
+    // controls.maxPolarAngle = 1.5;
+    // controls.minDistance = 0.2;
+    // controls.maxDistance = 220;
 
     controls.keys = {
       LEFT: "ArrowLeft", //left arrow
