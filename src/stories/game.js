@@ -7,6 +7,7 @@ import Helpers from "../utils/helpers";
 import WindIndicator from "../elements/wind-indicator";
 
 const gui = new GUI();
+const G = 9.82;
 
 const settings = {
   sensitivity: 0.01,
@@ -17,6 +18,9 @@ const settings = {
   followCam: false,
   windDirectionDegreesFromNorth: 310,
   windSpeed: 0.0007,
+  pgKg: 80,
+  pgArea: 24,
+  pgGlidingRatio: 8,
 };
 
 const nav = gui.addFolder("Navigation");
@@ -55,26 +59,41 @@ const getWindDirectionVector = (degreesFromNorth) => {
   return directionWind;
 };
 
-const moveForward = (obj, speed) => {
+const moveForward = (obj, windDirection, settings) => {
+  const weightDirection = new THREE.Vector3(0, -1, 0);
+  const weightForceValue = settings.pgKg * G;
+  const weightForce = weightDirection.multiplyScalar(weightForceValue);
+
+  const speed = settings.xSpeed;
   const rotationPG = obj.quaternion.clone();
   const directionPG = new THREE.Vector3(0, 1, 0);
   directionPG.applyQuaternion(rotationPG);
   const velocity = directionPG.multiplyScalar(speed);
 
-  const windDirection = getWindDirectionVector(
-    settings.windDirectionDegreesFromNorth
-  );
   const velocityWind = windDirection.multiplyScalar(settings.windSpeed);
 
   obj.position.add(velocity);
   obj.position.add(velocityWind);
 };
 
+const moveVertical = (obj, windDirection, windSpeed, terrain) => {
+  console.log(terrain);
+  const lift = getLiftValue(obj, windDirection, windSpeed, terrain);
+  console.log(lift);
+  const liftDirection = new THREE.Vector3(0, 1, 0);
+  const liftVector = liftDirection.multiplyScalar(lift);
+  obj.position.add(liftVector);
+};
+
 const createArrowHelperForObj = (obj, len, color) => {
   const dir = getWorldDirection(obj);
-  const origin = getObjectPosition(obj);
-  const arrow = new THREE.ArrowHelper(dir, origin, len, color || 0xffffff);
-  arrow.rotateX(-Math.PI / 2);
+  const arrow = new THREE.ArrowHelper(
+    dir,
+    { x: 0, y: 0, z: 0 },
+    len,
+    color || 0xffffff
+  );
+  // arrow.rotateX(-Math.PI / 2);
   return arrow;
 };
 
@@ -97,14 +116,86 @@ const getLiftValue = (pg, windDirection, windSpeed, terrain) => {
   }
 };
 
-const moveVertical = (obj, windDirection, windSpeed, terrain) => {
-  console.log(terrain);
-  const lift = getLiftValue(obj, windDirection, windSpeed, terrain);
-  console.log(lift);
-  const liftDirection = new THREE.Vector3(0, 1, 0);
-  const liftVector = liftDirection.multiplyScalar(lift);
-  obj.position.add(liftVector);
-};
+class Paraglider extends THREE.Object3D {
+  gravityDirection = new THREE.Vector3(0, -1, 0);
+
+  constructor(gladingRatio) {
+    super();
+    if (!gladingRatio) {
+      throw new Error("missing glading ratio");
+    }
+    this.gladingRatio = gladingRatio;
+  }
+
+  async loadModel(scale, position) {
+    // const group = new THREE.Group();
+    const mesh = await Models.load(model, scale, pos);
+    const pg = await PG.load(scale, position);
+
+    // TODO: calculate ro3tation in every axis according to velocity vector, not just x
+    const axis = new THREE.Vector3(1, 0, 0);
+    pg.rotateOnAxis(axis, this.getAttackAngleRadians());
+
+    const arrow = createArrowHelperForObj(pg);
+    // group.add(pg);
+    pg.add(arrow);
+    // pg.add(this.getDirectionHelper(pg));
+    pg.add(this.getGravityHelper(pg, 1));
+    this.model = pg;
+  }
+
+  getAttackAngleRadians() {
+    const angle = Math.atan(1 / this.gladingRatio);
+    console.log("angle radians", angle);
+    return angle;
+  }
+
+  addGui(gui) {
+    const pg = this.model;
+    const pgGui = gui.addFolder("Paraglider");
+    pgGui.add(pg.rotation, "x", -Math.PI, Math.PI).name("rotation.x");
+    pgGui.add(pg.rotation, "y", -Math.PI, Math.PI).name("rotation.y");
+    pgGui.add(pg.rotation, "z", -Math.PI, Math.PI).name("rotation.z");
+
+    pgGui.add(pg.position, "x", -100, 100).name("position.x");
+    pgGui.add(pg.position, "y", 0, 100).name("position.y");
+    pgGui.add(pg.position, "z", -100, 100).name("position.z");
+
+    pgGui.add(settings, "pgKg", -100, 100).name("kg");
+    pgGui.add(settings, "pgArea", -100, 100).name("area");
+    return pgGui;
+  }
+
+  rotateLeft() {
+    // const axis = new THREE.Vector3(0, 1, 0);
+    // const localAxis = new THREE.Vector3(0, 1, 0);
+    // localAxis.applyQuaternion(this.model.quaternion);
+
+    // this.model.rotateOnAxis(localAxis, Math.PI * settings.rotationSensitivity);
+    this.model.rotation.z += Math.PI * settings.rotationSensitivity;
+    // this.helper.rotation.y += Math.PI * settings.rotationSensitivity;
+  }
+
+  rotateRight() {
+    this.model.rotation.z -= Math.PI * settings.rotationSensitivity;
+    // this.helper.rotation.y -= Math.PI * settings.rotationSensitivity;
+  }
+
+  getGravityHelper(obj, len, color) {
+    const arrow = new THREE.ArrowHelper(
+      this.gravityDirection,
+      { x: 0, y: 0, z: 0 },
+      len,
+      color || 0x00ffff
+    );
+    return arrow;
+  }
+
+  move() {
+    const weightForceValue = settings.pgKg * G;
+    const weightForce = this.gravityDirection.multiplyScalar(weightForceValue);
+  }
+}
 
 const Game = {
   load: async (camera, scene, renderer, terrain, water) => {
@@ -124,25 +215,14 @@ const Game = {
     gui.add(controls, "enabled").name("orbit controls");
 
     const p = {
-      scale: 0.01,
-      position: { x: 27, y: 4, z: 5 },
+      scale: 1,
+      position: { x: 27, y: 7, z: 5 },
     };
-
-    const pg = await PG.load(p.scale, p.position);
-    scene.add(pg);
-    setTimeout(() => {
-      //TODO fix this race condition
-      pg.position.set(p.position.x, p.position.y, p.position.z);
-    }, 1);
-
-    const pgGui = gui.addFolder("Paraglider");
-    pgGui.add(pg.rotation, "x", -Math.PI, Math.PI).name("pg.rotation.x");
-    pgGui.add(pg.rotation, "y", -Math.PI, Math.PI).name("pg.rotation.y");
-    pgGui.add(pg.rotation, "z", -Math.PI, Math.PI).name("pg.rotation.z");
-
-    pgGui.add(pg.position, "x", -100, 100).name("pg.position.x");
-    pgGui.add(pg.position, "y", 0, 100).name("pg.position.y");
-    pgGui.add(pg.position, "z", -100, 100).name("pg.position.z");
+    console.log(settings);
+    const pg = new Paraglider(settings.pgGlidingRatio);
+    await pg.loadModel(p.scale, p.position);
+    pg.addGui(gui);
+    scene.add(pg.model);
 
     const windIndicator = WindIndicator.load(
       settings.windDirectionDegreesFromNorth,
@@ -155,19 +235,6 @@ const Game = {
     );
     scene.add(windIndicator);
 
-    const arrow = createArrowHelperForObj(pg);
-    scene.add(arrow);
-
-    function rotateLeft() {
-      pg.rotation.z += Math.PI * settings.rotationSensitivity;
-      arrow.rotation.z += Math.PI * settings.rotationSensitivity;
-    }
-
-    function rotateRight() {
-      pg.rotation.z -= Math.PI * settings.rotationSensitivity;
-      arrow.rotation.z -= Math.PI * settings.rotationSensitivity;
-    }
-
     document.addEventListener("keydown", onDocumentKeyDown, false);
 
     function onDocumentKeyDown(event) {
@@ -177,10 +244,10 @@ const Game = {
         // moveForward(xSpeed);
       } else if (keyCode == 65) {
         //a
-        rotateLeft();
+        pg.rotateLeft();
       } else if (keyCode == 68) {
         //d
-        rotateRight();
+        pg.rotateRight();
       }
     }
     // Wind.load(camera);
@@ -229,13 +296,13 @@ const Game = {
       );
       // moveVertical(pg, windDirection, settings.windSpeed, terrain);
       // moveVertical(arrow, windDirection, settings.windSpeed, terrain);
-      moveForward(pg, settings.xSpeed);
-      moveForward(arrow, settings.xSpeed);
+      moveForward(pg.model, windDirection, settings);
+      // moveForward(arrow, windDirection, settings);
 
       renderer.render(scene, camera);
     };
 
-    camera.position.set(-10, 50, -23);
+    camera.position.set(30, 150, 80);
     camera.lookAt(pg.position);
 
     animate();

@@ -20,7 +20,7 @@ const Helpers = {
     scene.add(cube);
   },
 
-  createHelpers: (scene, options) => {
+  createHelpers: function (scene, options) {
     const grid = this.createGrid({ x: 0, y: 0 });
     scene.add(grid);
 

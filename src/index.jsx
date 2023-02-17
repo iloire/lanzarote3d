@@ -20,7 +20,7 @@ import Stories from './stories/index.js'
 
 import "./index.css";
 
-const SHOW_HELPERS = false ;
+const SHOW_HELPERS = true;
 
 const createRenderer = (sizes) => {
   const renderer = new THREE.WebGLRenderer({
@@ -86,9 +86,8 @@ class App extends React.Component {
       Helpers.createHelpers(scene);
     }
 
-
     const water = Water.load();
-    scene.add(water);
+    // scene.add(water);
     // Helpers.drawSphericalPosition(30, 90, 100, scene);
 
     const sky = new Sky();
@@ -117,7 +116,7 @@ class App extends React.Component {
       }
     };
 
-    const island = await Island.load(100, { x: 0, y: 0, z: 0 });
+    const island = await Island.load(100, { x: 0, y: -20, z: 0 });
     scene.add(island);
 
     // const c = await Clouds.load(1, {x: 0, y: 10, z:0});
