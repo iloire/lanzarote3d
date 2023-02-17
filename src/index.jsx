@@ -93,7 +93,7 @@ class App extends React.Component {
 
     const sky = new Sky();
     sky.scale.setScalar(10000);
-    scene.add(sky);
+    // scene.add(sky);
     const skyUniforms = sky.material.uniforms;
     skyUniforms["turbidity"].value = 20;
     skyUniforms["rayleigh"].value = 2;
@@ -125,7 +125,7 @@ class App extends React.Component {
     // const c1 = await Clouds.load(1, {x: 60, y: 12, z:-40});
     // scene.add(c1);
 
-    await Stories.game (camera, scene, renderer);
+    await Stories.game (camera, scene, renderer, island, water);
   };
 
   render() {

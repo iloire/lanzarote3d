@@ -21,10 +21,11 @@ const settings = {
 
 const nav = gui.addFolder("Navigation");
 nav.add(settings, "mouseControl");
-nav.add(settings, "xSpeed", 0, 1);
+nav.add(settings, "xSpeed", 0, 0.01);
 nav.add(settings, "rotationSensitivity", 0, 1);
 nav.add(settings, "sensitivity", 0, 1);
 nav.add(settings, "windDirectionDegreesFromNorth", 0, 360);
+nav.add(settings, "windSpeed", 0, 0.01);
 
 const getObjectPosition = (obj) => {
   const pos = new THREE.Vector3();
@@ -77,12 +78,45 @@ const createArrowHelperForObj = (obj, len, color) => {
   return arrow;
 };
 
+const getLiftValue = (pg, windDirection, windSpeed, terrain) => {
+  const pos = pg.position;
+  const rayVertical = new THREE.Raycaster(
+    pos,
+    new THREE.Vector3(0, -1, 0) // vertical
+  );
+  // console.log(windSpeed, terrain);
+
+  const intersectsFloor = rayVertical.intersectObject(terrain);
+  // console.log(intersectsFloor);
+  if (intersectsFloor.length) {
+    // console.log("intersects, ", intersectsFloor[0].point.y);
+    const terrainBelowHeight = intersectsFloor[0].point.y;
+    return THREE.MathUtils.smoothstep(terrainBelowHeight, 1, 10);
+  } else {
+    return 0;
+  }
+};
+
+const moveVertical = (obj, windDirection, windSpeed, terrain) => {
+  console.log(terrain);
+  const lift = getLiftValue(obj, windDirection, windSpeed, terrain);
+  console.log(lift);
+  const liftDirection = new THREE.Vector3(0, 1, 0);
+  const liftVector = liftDirection.multiplyScalar(lift);
+  obj.position.add(liftVector);
+};
+
 const Game = {
-  load: async (camera, scene, renderer) => {
+  load: async (camera, scene, renderer, terrain, water) => {
     const cameraGui = gui.addFolder("Camera");
-    cameraGui.add(camera.position, "x", -100, 100).name("camera.x");
-    cameraGui.add(camera.position, "y", 0, 100).name("camera.y");
-    cameraGui.add(camera.position, "z", -100, 100).name("camera.z");
+    cameraGui.add(camera.position, "x", -100, 100).name("x");
+    cameraGui.add(camera.position, "y", 0, 100).name("y");
+    cameraGui.add(camera.position, "z", -100, 100).name("z");
+
+    cameraGui.add(camera.rotation, "x", -Math.PI, Math.PI).name("rotation.x");
+    cameraGui.add(camera.rotation, "y", -Math.PI, Math.PI).name("rotation.y");
+    cameraGui.add(camera.rotation, "z", -Math.PI, Math.PI).name("rotation.z");
+
     cameraGui.add(settings, "followCam");
 
     const controls = Controls.createControls(camera, renderer);
@@ -121,16 +155,6 @@ const Game = {
     );
     scene.add(windIndicator);
 
-    const windDirection = getWindDirectionVector(
-      settings.windDirectionDegreesFromNorth
-    );
-    const arrowWindDirection = new THREE.ArrowHelper(
-      windDirection,
-      { x: 0, y: 10, z: 0 },
-      10
-    );
-    scene.add(arrowWindDirection);
-
     const arrow = createArrowHelperForObj(pg);
     scene.add(arrow);
 
@@ -167,6 +191,25 @@ const Game = {
       }
     });
 
+    const windDirection = getWindDirectionVector(
+      settings.windDirectionDegreesFromNorth
+    );
+
+    // const raycaster = getLiftValue(pg.position, terrain);
+    //
+    // scene.add(
+    //   new THREE.ArrowHelper(
+    //     raycaster.ray.direction,
+    //     raycaster.ray.origin,
+    //     300,
+    //     0xff0000
+    //   )
+    // );
+
+    // const dir = new THREE.Vector3(0, -1, 0);
+    // const arrow2 = new THREE.ArrowHelper(dir, pg.position, 10);
+    // scene.add(arrow2);
+
     const animate = () => {
       // setTimeout(animate, 1200);
       requestAnimationFrame(animate);
@@ -174,12 +217,18 @@ const Game = {
       camera.position.y += Math.sin(timer) * 0.0003;
 
       if (settings.followCam) {
-        const cameraOffset = new THREE.Vector3(1, 0.5, 1);
-        const pgDirection = getWorldDirection(pg);
+        const cameraOffset = new THREE.Vector3(-2, 0.5, -2);
         camera.position.copy(getObjectPosition(pg)).add(cameraOffset);
         camera.lookAt(pg.position);
       }
-      controls.update();
+      if (controls.enabled) {
+        controls.update();
+      }
+      const windDirection = getWindDirectionVector(
+        settings.windDirectionDegreesFromNorth
+      );
+      // moveVertical(pg, windDirection, settings.windSpeed, terrain);
+      // moveVertical(arrow, windDirection, settings.windSpeed, terrain);
       moveForward(pg, settings.xSpeed);
       moveForward(arrow, settings.xSpeed);
 
