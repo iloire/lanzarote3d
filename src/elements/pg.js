@@ -2,6 +2,8 @@ import * as THREE from "three";
 import model from "../models/pubg_green_parachute2.glb";
 import Models from "../utils/models";
 
+const SHOW_ARROWS = false;
+
 const PG = {
   load: async (scale, pos, speed) => {
     return Models.load(model, scale, pos);
@@ -50,10 +52,11 @@ class Paraglider {
 
   async loadModel(scale, initialPosition) {
     const pg = await PG.load(scale, initialPosition);
-
-    pg.add(createTrajectoryArrow(this.options.glidingRatio, 30));
-    pg.add(createLiftArrow(this.options.glidingRatio, 300));
-    pg.add(this.getGravityHelper(300));
+    if (SHOW_ARROWS) {
+      pg.add(createTrajectoryArrow(this.options.glidingRatio, 30));
+      pg.add(createLiftArrow(this.options.glidingRatio, 300));
+      pg.add(this.getGravityHelper(300));
+    }
     this.model = pg;
     this.scale = scale;
   }
@@ -61,16 +64,19 @@ class Paraglider {
   addGui(gui) {
     const pg = this.model;
     const pgGui = gui.addFolder("Paraglider");
-    pgGui.add(pg.rotation, "x", -Math.PI, Math.PI).name("rotation.x");
-    pgGui.add(pg.rotation, "y", -Math.PI, Math.PI).name("rotation.y");
-    pgGui.add(pg.rotation, "z", -Math.PI, Math.PI).name("rotation.z");
+    pgGui.add(pg.rotation, "x", -Math.PI, Math.PI).name("rotation.x").listen();
+    pgGui.add(pg.rotation, "y", -Math.PI, Math.PI).name("rotation.y").listen();
+    pgGui.add(pg.rotation, "z", -Math.PI, Math.PI).name("rotation.z").listen();
 
-    pgGui.add(pg.position, "x", -100, 100).name("position.x");
-    pgGui.add(pg.position, "y", 0, 100).name("position.y");
-    pgGui.add(pg.position, "z", -100, 100).name("position.z");
+    pgGui.add(pg.position, "x", -10, 10).name("position.x").listen();
+    pgGui.add(pg.position, "y", 0, 10).name("position.y").listen();
+    pgGui.add(pg.position, "z", -10, 10).name("position.z").listen();
 
-    pgGui.add(this.options, "kg", -100, 100).name("kg");
-    pgGui.add(this.options, "area", -100, 100).name("area");
+    pgGui.add(this.options, "trimSpeed", 20, 70).name("trim speed").listen();
+    pgGui
+      .add(this.options, "glidingRatio", 0, 20)
+      .name("gliding ratio")
+      .listen();
     return pgGui;
   }
 

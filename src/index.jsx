@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { createRoot } from "react-dom/client";
+import GUI from "lil-gui";
 
 import * as THREE from "three";
 import { Sky } from "three/examples/jsm/objects/Sky";
@@ -21,6 +22,8 @@ import Stories from './stories/index.js'
 import "./index.css";
 
 const SHOW_HELPERS = true;
+
+const gui = new GUI();
 
 const createRenderer = (sizes) => {
   const renderer = new THREE.WebGLRenderer({
@@ -70,6 +73,15 @@ class App extends React.Component {
     );
     scene.add(camera)
 
+    const cameraGui = gui.addFolder("Camera");
+    cameraGui.add(camera.position, "x", -100, 100).name("x").listen();
+    cameraGui.add(camera.position, "y", 0, 100).name("y").listen();
+    cameraGui.add(camera.position, "z", -100, 100).name("z").listen();
+
+    cameraGui.add(camera.rotation, "x", -Math.PI, Math.PI).name("rotation.x").listen();
+    cameraGui.add(camera.rotation, "y", -Math.PI, Math.PI).name("rotation.y").listen();
+    cameraGui.add(camera.rotation, "z", -Math.PI, Math.PI).name("rotation.z").listen();
+
     Lights.addLightsToScene(scene, SHOW_HELPERS);
 
     window.addEventListener(
@@ -87,12 +99,12 @@ class App extends React.Component {
     }
 
     const water = Water.load();
-    // scene.add(water);
+    scene.add(water);
     // Helpers.drawSphericalPosition(30, 90, 100, scene);
 
     const sky = new Sky();
     sky.scale.setScalar(10000);
-    // scene.add(sky);
+    scene.add(sky);
     const skyUniforms = sky.material.uniforms;
     skyUniforms["turbidity"].value = 20;
     skyUniforms["rayleigh"].value = 2;
@@ -120,12 +132,12 @@ class App extends React.Component {
     console.log(island)
     scene.add(island);
 
-    // const c = await Clouds.load(1, {x: 0, y: 10, z:0});
-    // scene.add(c);
-    // const c1 = await Clouds.load(1, {x: 60, y: 12, z:-40});
-    // scene.add(c1);
+    const c = await Clouds.load(1, {x: 0, y: 10, z:0});
+    scene.add(c);
+    const c1 = await Clouds.load(1, {x: 60, y: 12, z:-40});
+    scene.add(c1);
 
-    await Stories.game (camera, scene, renderer, island, water);
+    await Stories.game (camera, scene, renderer, island, water, gui);
   };
 
   render() {
