@@ -82,7 +82,7 @@ class App extends React.Component {
     cameraGui.add(camera.rotation, "y", -Math.PI, Math.PI).name("rotation.y").listen();
     cameraGui.add(camera.rotation, "z", -Math.PI, Math.PI).name("rotation.z").listen();
 
-    Lights.addLightsToScene(scene, SHOW_HELPERS);
+    Lights.addLightsToScene(scene, false);
 
     window.addEventListener(
       "resize",
@@ -129,7 +129,6 @@ class App extends React.Component {
     };
 
     const island = await Island.load(100, { x: 0, y: 0, z: 0 });
-    console.log(island)
     scene.add(island);
 
     const c = await Clouds.load(1, {x: 0, y: 10, z:0});

@@ -8,9 +8,6 @@ const Helpers = {
     const phi = THREE.MathUtils.degToRad(phiDegrees);
     const theta = THREE.MathUtils.degToRad(thetaDegrees);
 
-    console.log("phi", phi);
-    console.log("theta", theta);
-
     const pos = new THREE.Vector3();
     pos.setFromSphericalCoords(len, theta, phi);
     console.log(pos);
