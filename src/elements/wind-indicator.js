@@ -30,12 +30,15 @@ const getOriginApplication = (degreesFromNorth) => {
   }
 };
 
-const createWindArrow = (directionDegreesFromNorth, length, color) => {
+const getDirectionFromNorth = (directionDegreesFromNorth) => {
   const dir = new THREE.Vector3();
   const dirPhi = THREE.MathUtils.degToRad(-directionDegreesFromNorth);
   dir.setFromSphericalCoords(1, Math.PI / 2, dirPhi);
   dir.normalize();
+  return dir;
+};
 
+const createWindArrow = (directionDegreesFromNorth, length, color) => {
   const origin = new THREE.Vector3();
   const originDegreesFromNorth = getOriginApplication(
     directionDegreesFromNorth
@@ -44,7 +47,7 @@ const createWindArrow = (directionDegreesFromNorth, length, color) => {
   origin.setFromSphericalCoords(length, Math.PI / 2.1, originPhi);
 
   const arrowHelper = new THREE.ArrowHelper(
-    dir,
+    getDirectionFromNorth(directionDegreesFromNorth),
     origin,
     length,
     color || 0xffffff
@@ -52,95 +55,15 @@ const createWindArrow = (directionDegreesFromNorth, length, color) => {
   return arrowHelper;
 };
 
-const createArrow = (directionDegreesFromNorth, origin, length, color) => {
-  const dir = new THREE.Vector3();
-  const dirPhi = THREE.MathUtils.degToRad(-directionDegreesFromNorth);
-  dir.setFromSphericalCoords(1, Math.PI / 2, dirPhi);
-  dir.normalize();
+class WindIndicator {
+  load(directionDegrees, scale, pos) {
+    this.arrow = createWindArrow(directionDegrees, 100, 0xffff00);
+    return this.arrow;
+  }
 
-  const arrowHelper = new THREE.ArrowHelper(
-    dir,
-    origin || new THREE.Vector3(0, 0, 0),
-    length || 30,
-    color || 0xffffff
-  );
-  return arrowHelper;
-};
-
-const createCompassRose = (scale, pos) => {
-  const extrudeSettings = {
-    depth: 0.2,
-    steps: 1,
-    bevelEnabled: false,
-    curveSegments: 16,
-  };
-
-  const arcShape = new THREE.Shape();
-  arcShape.absarc(0, 0, 1, 0, Math.PI * 2, 0, false);
-
-  const holePath = new THREE.Path();
-  holePath.absarc(0, 0, 0.8, 0, Math.PI * 2, true);
-  arcShape.holes.push(holePath);
-
-  const geometry = new THREE.ExtrudeGeometry(arcShape, extrudeSettings);
-
-  const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-  const mesh = new THREE.Mesh(geometry, material);
-  mesh.scale.set(scale, scale, scale);
-  mesh.position.set(pos.x, pos.y, pos.z);
-  mesh.rotation.x = -Math.PI / 2;
-
-  return mesh;
-};
-
-const createWindDirection = (directionDegreesFromNorth, scale, pos) => {
-  var extrudeSettings = {
-    bevelEnabled: false,
-    steps: 1,
-    depth: 0.3,
-  };
-
-  var shape = new THREE.Shape();
-  var circleRadius = 1.1;
-
-  // shape.moveTo(0, -circleRadius);
-
-  shape.absarc(0, 0, circleRadius, 0, Math.PI / 2, false);
-  shape.lineTo(0, 0);
-  shape.closePath();
-
-  const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-
-  const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
-  const mesh = new THREE.Mesh(geometry, material);
-
-  mesh.scale.set(scale, scale, scale);
-  mesh.position.set(pos.x, pos.y, pos.z);
-  mesh.rotation.x = -Math.PI / 2;
-
-  const rotation = THREE.MathUtils.degToRad(directionDegreesFromNorth);
-  mesh.rotation.z = -rotation;
-  return mesh;
-};
-
-const WindIndicator = {
-  load: (directionDegrees, scale, pos) => {
-    const circle = createCompassRose(scale, pos);
-    const windDir = createWindDirection(directionDegrees, scale, pos);
-    const northArrow = createArrow(
-      0,
-      new THREE.Vector3(0, 30, -50),
-      60,
-      0x000000
-    );
-    const windArrow = createWindArrow(directionDegrees, 100, 0xffff00);
-    const group = new THREE.Group();
-    group.add(windArrow);
-    // group.add(circle);
-    // group.add(northArrow);
-    // group.add(windDir);
-    return group;
-  },
-};
+  update(degrees) {
+    this.arrow.setDirection(getDirectionFromNorth(degrees));
+  }
+}
 
 export default WindIndicator;
