@@ -7,7 +7,7 @@ import WindIndicator from "../elements/wind-indicator";
 
 const settings = {
   sensitivity: 0.01,
-  rotationSensitivity: 0.04,
+  rotationSensitivity: 0.01,
   mouseControl: false,
   orbitControl: true,
   wrapSpeed: 1,
@@ -72,22 +72,20 @@ const moveVertical = (pg, weather, pgOptions, terrain) => {
   const windDirection = getWindDirectionVector(
     weather.windDirectionDegreesFromNorth
   );
-  const lift = getLiftValue(pg, windDirection, weather.windSpeed, terrain);
+  const lift = getLiftValue(pg, weather, terrain);
   const gravityDirection = new THREE.Vector3(0, -1, 0);
   const gravityVector = gravityDirection.multiplyScalar(
     (multipleSpeed * (pgOptions.trimSpeed - weather.windSpeed)) /
       pgOptions.glidingRatio
   );
-  console.log(gravityVector.y);
   pg.position.add(gravityVector);
 
   const liftDirection = new THREE.Vector3(0, 1, 0);
   const liftVector = liftDirection.multiplyScalar(multipleSpeed * lift);
-  console.log(liftVector.y);
   pg.position.add(liftVector);
 };
 
-const getLiftValue = (pg, windDirection, windSpeed, terrain) => {
+const getLiftValue = (pg, weather, terrain) => {
   const pos = pg.position;
   const rayVertical = new THREE.Raycaster(
     pos,
@@ -124,22 +122,24 @@ const Game = {
     pg.addGui(gui);
     scene.add(pg.model);
 
-    const windIndicator = WindIndicator.load(
-      weather.windDirectionDegreesFromNorth,
-      14,
-      {
-        x: 0,
-        y: 0,
-        z: 0,
-      }
-    );
-    scene.add(windIndicator);
+    const windIndicator = new WindIndicator();
+    windIndicator.load(weather.windDirectionDegreesFromNorth, 14, {
+      x: 0,
+      y: 0,
+      z: 0,
+    });
+    scene.add(windIndicator.arrow);
 
     document.addEventListener("keydown", onDocumentKeyDown, false);
 
     function onDocumentKeyDown(event) {
       var keyCode = event.which;
-      if (keyCode == 87) {
+      if (keyCode == 32) {
+        //space
+        pg.jump(terrain);
+      }
+      //w
+      else if (keyCode == 87) {
         //w
         // moveForward(xSpeed);
       } else if (keyCode == 65) {
@@ -150,7 +150,7 @@ const Game = {
         pg.rotateRight(settings.rotationSensitivity);
       }
     }
-    // Wind.load(camera);
+    Wind.load(camera);
     renderer.domElement.addEventListener("mousemove", (event) => {
       if (settings.mouseControl) {
         camera.quaternion.y -= (event.movementX * settings.sensitivity) / 20;
@@ -158,21 +158,18 @@ const Game = {
       }
     });
 
-    const windDirection = getWindDirectionVector(
-      weather.windDirectionDegreesFromNorth
-    );
-
     const animate = () => {
       // setTimeout(animate, 1200);
       requestAnimationFrame(animate);
       const timer = Date.now() * 0.0005;
       // camera.position.y += Math.sin(timer) * 0.0003;
-
       controls.target = pg.position();
       controls.update();
-      moveForward(pg.model, weather, pgOptions);
-      moveVertical(pg.model, weather, pgOptions, terrain);
-
+      if (!pg.hasTouchedGround(terrain)) {
+        moveForward(pg.model, weather, pgOptions);
+        moveVertical(pg.model, weather, pgOptions, terrain);
+      }
+      windIndicator.update(weather.windDirectionDegreesFromNorth);
       renderer.render(scene, camera);
     };
 

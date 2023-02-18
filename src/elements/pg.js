@@ -101,6 +101,27 @@ class Paraglider {
     this.model.rotation.y -= Math.PI * rotationSensitivity;
   }
 
+  jump(terrain) {
+    if (this.hasTouchedGround(terrain)) {
+      this.model.position.y += 0.01;
+    }
+  }
+
+  hasTouchedGround(terrain) {
+    const pos = this.model.position;
+    const rayVertical = new THREE.Raycaster(
+      pos,
+      new THREE.Vector3(0, -1, 0) // vertical
+    );
+
+    const intersectsFloor = rayVertical.intersectObject(terrain);
+    if (intersectsFloor.length) {
+      const terrainBelowHeight = intersectsFloor[0].point.y;
+      return terrainBelowHeight <= 0;
+    }
+    return true;
+  }
+
   getGravityHelper(len, color) {
     const arrow = new THREE.ArrowHelper(
       this.gravityDirection,
