@@ -63,21 +63,34 @@ class Paraglider {
 
   addGui(gui) {
     const pg = this.model;
-    const pgGui = gui.addFolder("Paraglider");
-    pgGui.add(pg.rotation, "x", -Math.PI, Math.PI).name("rotation.x").listen();
-    pgGui.add(pg.rotation, "y", -Math.PI, Math.PI).name("rotation.y").listen();
-    pgGui.add(pg.rotation, "z", -Math.PI, Math.PI).name("rotation.z").listen();
-
+    const pgGui = gui.addFolder("Paraglider position");
     pgGui.add(pg.position, "x", -10, 10).name("position.x").listen();
     pgGui.add(pg.position, "y", 0, 10).name("position.y").listen();
     pgGui.add(pg.position, "z", -10, 10).name("position.z").listen();
 
-    pgGui.add(this.options, "trimSpeed", 20, 70).name("trim speed").listen();
-    pgGui
+    const pgRotationGui = gui.addFolder("Paraglider rotation");
+    pgRotationGui
+      .add(pg.rotation, "x", -Math.PI, Math.PI)
+      .name("rotation.x")
+      .listen();
+    pgRotationGui
+      .add(pg.rotation, "y", -Math.PI, Math.PI)
+      .name("rotation.y")
+      .listen();
+    pgRotationGui
+      .add(pg.rotation, "z", -Math.PI, Math.PI)
+      .name("rotation.z")
+      .listen();
+
+    const pgWindGui = gui.addFolder("Paraglider wing");
+    pgWindGui
+      .add(this.options, "trimSpeed", 20, 70)
+      .name("trim speed")
+      .listen();
+    pgWindGui
       .add(this.options, "glidingRatio", 0, 20)
       .name("gliding ratio")
       .listen();
-    return pgGui;
   }
 
   rotateLeft(rotationSensitivity) {
