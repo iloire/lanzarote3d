@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import model from "../models/pubg_green_parachute2.glb";
 import Models from "../utils/models";
+import MathUtils from "../utils/math.js";
 
 const SHOW_ARROWS = false;
 
@@ -38,6 +39,20 @@ const createTrajectoryArrow = (glidingRatio, len, color) => {
   const axis = new THREE.Vector3(1, 0, 0);
   arrow.rotateOnAxis(axis, -getAttackAngleRadians(glidingRatio));
   return arrow;
+};
+
+const getTerrainHeightBelowPosition = (pos, terrain) => {
+  const rayVertical = new THREE.Raycaster(
+    pos,
+    new THREE.Vector3(0, -1, 0) // vertical
+  );
+  const intersectsFloor = rayVertical.intersectObject(terrain);
+  if (intersectsFloor.length) {
+    const terrainBelowHeight = intersectsFloor[0].point.y;
+    return terrainBelowHeight;
+  } else {
+    return 0;
+  }
 };
 
 class Paraglider {
@@ -122,20 +137,36 @@ class Paraglider {
     return true;
   }
 
-  getLiftValue(terrain) {
-    const pos = this.position();
-    const rayVertical = new THREE.Raycaster(
-      pos,
-      new THREE.Vector3(0, -1, 0) // vertical
-    );
+  getTerrainGradientAgainstWindDirection(terrain, windDirection) {
+    // TODO use barlovento
+    const delta = 0.005; //TODO distance relative to island scale (1 metre)
+    const pos = this.position().clone();
+    const posSotavento = pos.clone().addScaledVector(windDirection, delta);
 
-    const intersectsFloor = rayVertical.intersectObject(terrain);
-    if (intersectsFloor.length) {
-      const terrainBelowHeight = intersectsFloor[0].point.y;
-      return THREE.MathUtils.smoothstep(terrainBelowHeight, 1, 3);
-    } else {
-      return 0;
-    }
+    const heightPos = getTerrainHeightBelowPosition(pos, terrain);
+    const heightPosBarlovento = getTerrainHeightBelowPosition(
+      posSotavento,
+      terrain
+    );
+    const gradient = (heightPosBarlovento - heightPos) / delta;
+    return gradient;
+  }
+
+  getLiftValue(terrain, weather) {
+    const pos = this.position().clone();
+    const windDirection = MathUtils.getWindDirectionVector(
+      weather.windDirectionDegreesFromNorth
+    );
+    const height = getTerrainHeightBelowPosition(pos, terrain);
+    const gradient = this.getTerrainGradientAgainstWindDirection(
+      terrain,
+      windDirection
+    );
+    console.log("----------------------------");
+    console.log("pos lift", pos);
+    console.log("height above ground for pos", height);
+    console.log("----------------------------");
+    return THREE.MathUtils.smoothstep(height, 0, 3);
   }
 
   getGravityHelper(len, color) {
