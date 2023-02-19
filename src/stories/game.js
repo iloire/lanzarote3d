@@ -49,9 +49,10 @@ const getWindDirectionVector = (degreesFromNorth) => {
 };
 
 const moveForward = (pg, weather, pgOptions) => {
+  const pgMesh = pg.model;
   const multipleSpeed = p.scale * settings.wrapSpeed;
   //
-  const rotationPG = pg.quaternion.clone();
+  const rotationPG = pgMesh.quaternion.clone();
   const directionPG = new THREE.Vector3(0, 0, -1);
   directionPG.applyQuaternion(rotationPG);
   const velocity = directionPG.multiplyScalar(
@@ -63,42 +64,27 @@ const moveForward = (pg, weather, pgOptions) => {
   const velocityWind = windDirection.multiplyScalar(
     multipleSpeed * weather.windSpeed
   );
-  pg.position.add(velocity);
-  pg.position.add(velocityWind);
+  pgMesh.position.add(velocity);
+  pgMesh.position.add(velocityWind);
 };
 
 const moveVertical = (pg, weather, pgOptions, terrain) => {
+  const pgMesh = pg.model;
   const multipleSpeed = p.scale * settings.wrapSpeed;
   const windDirection = getWindDirectionVector(
     weather.windDirectionDegreesFromNorth
   );
-  const lift = getLiftValue(pg, weather, terrain);
+  const lift = pg.getLiftValue(terrain);
   const gravityDirection = new THREE.Vector3(0, -1, 0);
   const gravityVector = gravityDirection.multiplyScalar(
     (multipleSpeed * (pgOptions.trimSpeed - weather.windSpeed)) /
       pgOptions.glidingRatio
   );
-  pg.position.add(gravityVector);
+  pgMesh.position.add(gravityVector);
 
   const liftDirection = new THREE.Vector3(0, 1, 0);
   const liftVector = liftDirection.multiplyScalar(multipleSpeed * lift);
-  pg.position.add(liftVector);
-};
-
-const getLiftValue = (pg, weather, terrain) => {
-  const pos = pg.position;
-  const rayVertical = new THREE.Raycaster(
-    pos,
-    new THREE.Vector3(0, -1, 0) // vertical
-  );
-
-  const intersectsFloor = rayVertical.intersectObject(terrain);
-  if (intersectsFloor.length) {
-    const terrainBelowHeight = intersectsFloor[0].point.y;
-    return THREE.MathUtils.smoothstep(terrainBelowHeight, 1, 3);
-  } else {
-    return 0;
-  }
+  pgMesh.position.add(liftVector);
 };
 
 const Game = {
@@ -166,8 +152,8 @@ const Game = {
       controls.target = pg.position();
       controls.update();
       if (!pg.hasTouchedGround(terrain)) {
-        moveForward(pg.model, weather, pgOptions);
-        moveVertical(pg.model, weather, pgOptions, terrain);
+        moveForward(pg, weather, pgOptions);
+        moveVertical(pg, weather, pgOptions, terrain);
       }
       windIndicator.update(weather.windDirectionDegreesFromNorth);
       renderer.render(scene, camera);

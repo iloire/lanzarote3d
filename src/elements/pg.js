@@ -122,6 +122,22 @@ class Paraglider {
     return true;
   }
 
+  getLiftValue(terrain) {
+    const pos = this.position();
+    const rayVertical = new THREE.Raycaster(
+      pos,
+      new THREE.Vector3(0, -1, 0) // vertical
+    );
+
+    const intersectsFloor = rayVertical.intersectObject(terrain);
+    if (intersectsFloor.length) {
+      const terrainBelowHeight = intersectsFloor[0].point.y;
+      return THREE.MathUtils.smoothstep(terrainBelowHeight, 1, 3);
+    } else {
+      return 0;
+    }
+  }
+
   getGravityHelper(len, color) {
     const arrow = new THREE.ArrowHelper(
       this.gravityDirection,
