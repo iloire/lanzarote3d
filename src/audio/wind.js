@@ -3,7 +3,7 @@ import wind1 from "./wind-howl-01.mp3";
 import wind2 from "./hurricane-01.mp3";
 import music from "./the-beat-of-nature-122841.mp3";
 
-const play = (camera, file) => {
+const play = (camera, file, volume) => {
   const listener = new THREE.AudioListener();
   camera.add(listener);
 
@@ -15,15 +15,16 @@ const play = (camera, file) => {
   audioLoader.load(file, function (buffer) {
     sound.setBuffer(buffer);
     sound.setLoop(true);
-    sound.setVolume(0.3);
+    sound.setVolume(volume || 0.3);
     sound.play();
   });
 };
 
 const Wind = {
   load: (camera) => {
-    play(camera, wind1);
-    play(camera, music);
+    play(camera, wind1, 0.3);
+    play(camera, wind2, 0.3);
+    play(camera, music, 0.2);
   },
 };
 
