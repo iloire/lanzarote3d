@@ -1,12 +1,10 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import { createRoot } from "react-dom/client";
 import GUI from "lil-gui";
 
 import * as THREE from "three";
 import { Sky } from "three/examples/jsm/objects/Sky";
 
-import islandModel from "./models/lanzarote.glb";
 
 import Animations from "./utils/animations";
 import Lights from "./utils/lights.js";
@@ -38,7 +36,9 @@ const createRenderer = (sizes) => {
 
 class App extends React.Component {
   constructor() {
+    console.log('app constructor')
     super();
+    this.renderer = null;
   }
 
   state = {
@@ -46,8 +46,11 @@ class App extends React.Component {
     sceneReady: false,
   };
 
-  componentDidMount() {
-    this.initThree();
+  async componentDidMount() {
+    console.log('-=--- did mount ----')
+    if (!this.renderer) {
+      await this.initThree();
+    }
   }
 
   componentWillUnmount() {
@@ -57,26 +60,30 @@ class App extends React.Component {
   }
 
   initThree = async () => {
+    console.log(
+    '------------------------------- THREEJS --------------------------------- '
+    )
     const sizes = {
       width: window.innerWidth,
       height: window.innerHeight,
     };
 
-    const renderer = createRenderer(sizes)
+    const renderer =  createRenderer(sizes)
+    this.renderer = renderer;
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(
-      55,
+      45,
       sizes.width / sizes.height,
       1,
-      2000
+      200000
     );
     scene.add(camera)
 
     const cameraGui = gui.addFolder("Camera");
-    cameraGui.add(camera.position, "x", -100, 100).name("x").listen();
-    cameraGui.add(camera.position, "y", 0, 100).name("y").listen();
-    cameraGui.add(camera.position, "z", -100, 100).name("z").listen();
+    cameraGui.add(camera.position, "x", -1000, 1000).name("x").listen();
+    cameraGui.add(camera.position, "y", 0, 1000).name("y").listen();
+    cameraGui.add(camera.position, "z", -1000, 1000).name("z").listen();
 
     cameraGui.add(camera.rotation, "x", -Math.PI, Math.PI).name("rotation.x").listen();
     cameraGui.add(camera.rotation, "y", -Math.PI, Math.PI).name("rotation.y").listen();
@@ -103,8 +110,9 @@ class App extends React.Component {
     // Helpers.drawSphericalPosition(30, 90, 100, scene);
 
     const sky = new Sky();
-    sky.scale.setScalar(10000);
+    sky.scale.setScalar(1000000);
     scene.add(sky);
+
     const skyUniforms = sky.material.uniforms;
     skyUniforms["turbidity"].value = 20;
     skyUniforms["rayleigh"].value = 2;
@@ -121,14 +129,13 @@ class App extends React.Component {
 
     Models.manager.onProgress = async (url, loaded, total) => {
       if (Math.floor((loaded / total) * 100) === 100) {
-        this.setState({ loadingProcess: Math.floor((loaded / total) * 100) });
         this.setState({ sceneReady: true });
       } else {
         this.setState({ loadingProcess: Math.floor((loaded / total) * 100) });
       }
     };
 
-    const island = await Island.load(100, { x: 0, y: 0, z: 0 });
+    const island = await Island.load(20000, { x: 0, y: 0, z: 0 });
     scene.add(island);
 
     const c = await Clouds.load(1, {x: 0, y: 10, z:0});
@@ -136,6 +143,9 @@ class App extends React.Component {
     const c1 = await Clouds.load(1, {x: 60, y: 12, z:-40});
     scene.add(c1);
 
+    console.log(
+    '================= START main story ==============='
+    )
     await Stories.game (camera, scene, renderer, island, water, gui);
   };
 

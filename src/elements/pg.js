@@ -3,7 +3,7 @@ import model from "../models/pubg_green_parachute2.glb";
 import Models from "../utils/models";
 import MathUtils from "../utils/math.js";
 
-const SHOW_ARROWS = false;
+const settings = { SHOW_ARROWS: true };
 
 const PG = {
   load: async (scale, pos, speed) => {
@@ -67,7 +67,7 @@ class Paraglider {
 
   async loadModel(scale, initialPosition) {
     const pg = await PG.load(scale, initialPosition);
-    if (SHOW_ARROWS) {
+    if (settings.SHOW_ARROWS) {
       pg.add(createTrajectoryArrow(this.options.glidingRatio, 30));
       pg.add(createLiftArrow(this.options.glidingRatio, 300));
       pg.add(this.getGravityHelper(300));
@@ -79,9 +79,10 @@ class Paraglider {
   addGui(gui) {
     const pg = this.model;
     const pgGui = gui.addFolder("Paraglider position");
-    pgGui.add(pg.position, "x", -10, 10).name("position.x").listen();
-    pgGui.add(pg.position, "y", 0, 10).name("position.y").listen();
-    pgGui.add(pg.position, "z", -10, 10).name("position.z").listen();
+    pgGui.add(pg.position, "x", -12000, 12000).name("position.x").listen();
+    pgGui.add(pg.position, "y", 0, 1200).name("position.y").listen();
+    pgGui.add(pg.position, "z", -12000, 12000).name("position.z").listen();
+    pgGui.add(settings, "SHOW_ARROWS", true).name("forces").listen();
 
     const pgRotationGui = gui.addFolder("Paraglider rotation");
     pgRotationGui
@@ -103,6 +104,14 @@ class Paraglider {
       .name("trim speed")
       .listen();
     pgWindGui
+      .add(this.options, "halfSpeedBarSpeed", 0, 70)
+      .name("half speed bar speed")
+      .listen();
+    pgWindGui
+      .add(this.options, "fullSpeedBarSpeed", 0, 70)
+      .name("full speedbar speed")
+      .listen();
+    pgWindGui
       .add(this.options, "glidingRatio", 0, 20)
       .name("gliding ratio")
       .listen();
@@ -118,7 +127,7 @@ class Paraglider {
 
   jump(terrain) {
     if (this.hasTouchedGround(terrain)) {
-      this.model.position.y += 0.01;
+      this.model.position.y += 0.5;
     }
   }
 
@@ -162,10 +171,10 @@ class Paraglider {
       terrain,
       windDirection
     );
-    console.log("----------------------------");
-    console.log("pos lift", pos);
-    console.log("height above ground for pos", height);
-    console.log("----------------------------");
+    // console.log("----------------------------");
+    // console.log("pos lift", pos);
+    // console.log("height above ground for pos", height);
+    // console.log("----------------------------");
     return THREE.MathUtils.smoothstep(height, 0, 3);
   }
 
@@ -182,6 +191,10 @@ class Paraglider {
 
   position() {
     return this.model.position;
+  }
+
+  altitude() {
+    return this.model.position.y;
   }
 
   move() {

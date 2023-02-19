@@ -5,7 +5,7 @@ import Models from "../utils/models";
 
 const WaterEffect = {
   load: () => {
-    const waterGeometry = new THREE.PlaneGeometry(10000, 10000);
+    const waterGeometry = new THREE.PlaneGeometry(100000, 100000);
     const water = new Water(waterGeometry, {
       textureWidth: 512,
       textureHeight: 512,

@@ -1,10 +1,11 @@
 import * as THREE from "three";
-import Wind from "../audio/wind.js";
+import Wind from "../audio/wind";
 import Paraglider from "../elements/pg";
-import Controls from "../utils/controls.js";
+import Controls from "../utils/controls";
 import Helpers from "../utils/helpers";
 import WindIndicator from "../elements/wind-indicator";
-import MathUtils from "../utils/math.js";
+import MathUtils from "../utils/math";
+import Vario from "../audio/vario";
 
 const settings = {
   sensitivity: 0.01,
@@ -29,8 +30,8 @@ const pgOptions = {
 };
 
 const p = {
-  scale: 0.0004,
-  position: { x: 27, y: 5, z: 5 },
+  scale: 0.004,
+  position: { x: 6127, y: 980, z: 5 },
 };
 
 const getObjectPosition = (obj) => {
@@ -80,6 +81,7 @@ const moveVertical = (pg, weather, pgOptions, terrain) => {
 
 const Game = {
   load: async (camera, scene, renderer, terrain, water, gui) => {
+    console.log("============ LOAD GAME ====================== ");
     const nav = gui.addFolder("Navigation");
     nav.add(settings, "mouseControl").listen();
     nav.add(settings, "rotationSensitivity", 0, 1).listen();
@@ -135,6 +137,9 @@ const Game = {
       }
     });
 
+    const vario = new Vario();
+    vario.start();
+
     const animate = () => {
       // setTimeout(animate, 2200);
       requestAnimationFrame(animate);
@@ -145,12 +150,13 @@ const Game = {
       if (!pg.hasTouchedGround(terrain)) {
         moveForward(pg, weather, pgOptions);
         moveVertical(pg, weather, pgOptions, terrain);
+        vario.updateReading(pg.altitude());
       }
       windIndicator.update(weather.windDirectionDegreesFromNorth);
       renderer.render(scene, camera);
     };
 
-    const cameraOffset = new THREE.Vector3(-1.2, -0.1, 1.2);
+    const cameraOffset = new THREE.Vector3(-91.2, 30, 91.2);
     camera.position.copy(getObjectPosition(pg.model)).add(cameraOffset);
     camera.lookAt(pg.position());
 
