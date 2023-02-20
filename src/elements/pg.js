@@ -16,8 +16,6 @@ function getAttackAngleRadians(glidingRatio) {
 }
 
 const createLiftArrow = (glidingRatio, len, color) => {
-  console.log("---- ");
-  console.log(glidingRatio);
   const dir = new THREE.Vector3(0, 1, 0);
   const arrow = new THREE.ArrowHelper(dir, { x: 0, y: 0, z: 0 }, len, color);
   const axis = new THREE.Vector3(1, 0, 0);
