@@ -7,7 +7,7 @@
 - decide if pg can jump
 - fix application of wind arrow
 - speed bar
-- gredient pendiente based on raycaster
+- unit testing
 
 ## Screenshots
 

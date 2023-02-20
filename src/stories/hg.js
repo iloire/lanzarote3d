@@ -1,12 +1,9 @@
 import HG from "../elements/hg";
 import PG from "../elements/pg";
 import * as THREE from "three";
-import Wind from "../audio/wind.js";
 
 const HGStory = {
   load: async (camera, scene, renderer) => {
-    Wind.load(camera);
-    // hang glider
     const hg = await HG.load(0.008, { x: 0, y: 10, z: 10 });
     scene.add(hg);
 

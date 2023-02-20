@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import Wind from "../audio/wind";
+import BackgroundSound from "../audio/background";
 import Paraglider from "../elements/pg";
 import Controls from "../utils/controls";
 import Helpers from "../utils/helpers";
@@ -21,7 +21,7 @@ const weather = {
 };
 
 const pgOptions = {
-  glidingRatio: 10,
+  glidingRatio: 2,
   trimSpeed: 25,
   halfSpeedBarSpeed: 30,
   fullSpeedBarSpeed: 35,
@@ -56,12 +56,11 @@ const moveForward = (pg, weather, pgOptions) => {
   const velocityWind = windDirection.multiplyScalar(
     multipleSpeed * weather.windSpeed
   );
-  pgMesh.position.add(velocity);
-  pgMesh.position.add(velocityWind);
+  pg.move(velocity);
+  pg.move(velocityWind);
 };
 
 const moveVertical = (pg, weather, pgOptions, terrain) => {
-  const pgMesh = pg.model;
   const multipleSpeed = p.scale * settings.wrapSpeed;
   const windDirection = MathUtils.getWindDirectionVector(
     weather.windDirectionDegreesFromNorth
@@ -72,11 +71,11 @@ const moveVertical = (pg, weather, pgOptions, terrain) => {
     (multipleSpeed * (pgOptions.trimSpeed - weather.windSpeed)) /
       pgOptions.glidingRatio
   );
-  pgMesh.position.add(gravityVector);
+  pg.move(gravityVector);
 
   const liftDirection = new THREE.Vector3(0, 1, 0);
   const liftVector = liftDirection.multiplyScalar(multipleSpeed * lift);
-  pgMesh.position.add(liftVector);
+  pg.move(liftVector);
 };
 
 const Game = {
@@ -129,7 +128,7 @@ const Game = {
         pg.rotateRight(settings.rotationSensitivity);
       }
     }
-    Wind.load(camera);
+    // BackgroundSoun.load(camera);
     renderer.domElement.addEventListener("mousemove", (event) => {
       if (settings.mouseControl) {
         camera.quaternion.y -= (event.movementX * settings.sensitivity) / 20;
@@ -137,7 +136,15 @@ const Game = {
       }
     });
 
-    const vario = new Vario();
+    const altitudeUI = document.getElementById("vario-altitude");
+    const deltaUI = document.getElementById("vario-delta");
+    const vario = new Vario(pg);
+    vario.addEventListener("delta", function (event) {
+      deltaUI.innerText = Math.round(event.delta * 100) / 100 + " vertical";
+    });
+    vario.addEventListener("altitude", function (event) {
+      altitudeUI.innerText = Math.round(event.altitude) + " m.";
+    });
     vario.start();
 
     const animate = () => {
@@ -147,16 +154,16 @@ const Game = {
       // camera.position.y += Math.sin(timer) * 0.0003;
       controls.target = pg.position();
       controls.update();
+      vario.updateReading(pg.altitude());
       if (!pg.hasTouchedGround(terrain)) {
         moveForward(pg, weather, pgOptions);
         moveVertical(pg, weather, pgOptions, terrain);
-        vario.updateReading(pg.altitude());
       }
       windIndicator.update(weather.windDirectionDegreesFromNorth);
       renderer.render(scene, camera);
     };
 
-    const cameraOffset = new THREE.Vector3(-91.2, 30, 91.2);
+    const cameraOffset = new THREE.Vector3(-4.2, 10, 11.2);
     camera.position.copy(getObjectPosition(pg.model)).add(cameraOffset);
     camera.lookAt(pg.position());
 

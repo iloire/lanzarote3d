@@ -5,7 +5,6 @@ import GUI from "lil-gui";
 import * as THREE from "three";
 import { Sky } from "three/examples/jsm/objects/Sky";
 
-
 import Animations from "./utils/animations";
 import Lights from "./utils/lights.js";
 import Models from "./utils/models";
@@ -15,7 +14,7 @@ import Water from "./utils/water";
 import Island from "./elements/island";
 import Clouds from "./elements/clouds";
 
-import Stories from './stories/index.js'
+import Stories from "./stories/index.js";
 
 import "./index.css";
 
@@ -32,11 +31,11 @@ const createRenderer = (sizes) => {
   renderer.setSize(sizes.width, sizes.height);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   return renderer;
-}
+};
 
 class App extends React.Component {
   constructor() {
-    console.log('app constructor')
+    console.log("app constructor");
     super();
     this.renderer = null;
   }
@@ -47,7 +46,7 @@ class App extends React.Component {
   };
 
   async componentDidMount() {
-    console.log('-=--- did mount ----')
+    console.log("-=--- did mount ----");
     if (!this.renderer) {
       await this.initThree();
     }
@@ -61,14 +60,14 @@ class App extends React.Component {
 
   initThree = async () => {
     console.log(
-    '------------------------------- THREEJS --------------------------------- '
-    )
+      "------------------------------- THREEJS --------------------------------- "
+    );
     const sizes = {
       width: window.innerWidth,
       height: window.innerHeight,
     };
 
-    const renderer =  createRenderer(sizes)
+    const renderer = createRenderer(sizes);
     this.renderer = renderer;
 
     const scene = new THREE.Scene();
@@ -78,16 +77,25 @@ class App extends React.Component {
       1,
       200000
     );
-    scene.add(camera)
+    scene.add(camera);
 
     const cameraGui = gui.addFolder("Camera");
     cameraGui.add(camera.position, "x", -1000, 1000).name("x").listen();
     cameraGui.add(camera.position, "y", 0, 1000).name("y").listen();
     cameraGui.add(camera.position, "z", -1000, 1000).name("z").listen();
 
-    cameraGui.add(camera.rotation, "x", -Math.PI, Math.PI).name("rotation.x").listen();
-    cameraGui.add(camera.rotation, "y", -Math.PI, Math.PI).name("rotation.y").listen();
-    cameraGui.add(camera.rotation, "z", -Math.PI, Math.PI).name("rotation.z").listen();
+    cameraGui
+      .add(camera.rotation, "x", -Math.PI, Math.PI)
+      .name("rotation.x")
+      .listen();
+    cameraGui
+      .add(camera.rotation, "y", -Math.PI, Math.PI)
+      .name("rotation.y")
+      .listen();
+    cameraGui
+      .add(camera.rotation, "z", -Math.PI, Math.PI)
+      .name("rotation.z")
+      .listen();
 
     Lights.addLightsToScene(scene, false);
 
@@ -138,15 +146,18 @@ class App extends React.Component {
     const island = await Island.load(20000, { x: 0, y: 0, z: 0 });
     scene.add(island);
 
-    const c = await Clouds.load(1, {x: 0, y: 10, z:0});
+    const c = await Clouds.load(1, { x: 0, y: 10, z: 0 });
     scene.add(c);
-    const c1 = await Clouds.load(1, {x: 60, y: 12, z:-40});
+    const c1 = await Clouds.load(1, { x: 60, y: 12, z: -40 });
     scene.add(c1);
 
-    console.log(
-    '================= START main story ==============='
-    )
-    await Stories.game (camera, scene, renderer, island, water, gui);
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    if (urlParams.get("story") === "mechanics") {
+      await Stories.mechanics(camera, scene, renderer, island, water, gui);
+    } else {
+      await Stories.game(camera, scene, renderer, island, water, gui);
+    }
   };
 
   render() {
@@ -160,7 +171,13 @@ class App extends React.Component {
             <span className="progress">{this.state.loadingProcess} %</span>
           </div>
         )}
-        <div className="points" style={{display:'none'}}>
+
+        <div id="vario">
+          <div id="vario-delta" className="delta"></div>
+          <div id="vario-altitude" className="altitude"></div>
+        </div>
+
+        <div className="points" style={{ display: "none" }}>
           <div className="point point-0">
             <div className="label label-0">Famara/Teguise</div>
             <div className="text">Famara</div>

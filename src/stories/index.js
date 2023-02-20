@@ -1,8 +1,9 @@
-import Default from "./default.js";
-import Balloons from "./balloons.js";
-import HG from "./hg.js";
-import FlyZones from "./flyzones.js";
-import Game from "./game.js";
+import Default from "./default";
+import Balloons from "./balloons";
+import HG from "./hg";
+import FlyZones from "./flyzones";
+import Game from "./game";
+import Mechanics from "./mechanics";
 
 const Stories = {
   default: Default.load,
@@ -10,6 +11,7 @@ const Stories = {
   hg: HG.load,
   flyzones: FlyZones.load,
   game: Game.load,
+  mechanics: Mechanics.load,
 };
 
 export default Stories;

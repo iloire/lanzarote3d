@@ -16,13 +16,10 @@ function getAttackAngleRadians(glidingRatio) {
 }
 
 const createLiftArrow = (glidingRatio, len, color) => {
+  console.log("---- ");
+  console.log(glidingRatio);
   const dir = new THREE.Vector3(0, 1, 0);
-  const arrow = new THREE.ArrowHelper(
-    dir,
-    { x: 0, y: 0, z: 0 },
-    len || 2,
-    color || 0xffffff
-  );
+  const arrow = new THREE.ArrowHelper(dir, { x: 0, y: 0, z: 0 }, len, color);
   const axis = new THREE.Vector3(1, 0, 0);
   arrow.rotateOnAxis(axis, -getAttackAngleRadians(glidingRatio));
   return arrow;
@@ -30,12 +27,7 @@ const createLiftArrow = (glidingRatio, len, color) => {
 
 const createTrajectoryArrow = (glidingRatio, len, color) => {
   const dir = new THREE.Vector3(0, 0, -1);
-  const arrow = new THREE.ArrowHelper(
-    dir,
-    { x: 0, y: 0, z: 0 },
-    len || 2,
-    color || 0xffffff
-  );
+  const arrow = new THREE.ArrowHelper(dir, { x: 0, y: 0, z: 0 }, len, color);
   const axis = new THREE.Vector3(1, 0, 0);
   arrow.rotateOnAxis(axis, -getAttackAngleRadians(glidingRatio));
   return arrow;
@@ -55,10 +47,11 @@ const getTerrainHeightBelowPosition = (pos, terrain) => {
   }
 };
 
-class Paraglider {
+class Paraglider extends THREE.EventDispatcher {
   gravityDirection = new THREE.Vector3(0, -1, 0);
 
   constructor(options) {
+    super();
     if (!options.glidingRatio) {
       throw new Error("missing glading ratio");
     }
@@ -68,9 +61,12 @@ class Paraglider {
   async loadModel(scale, initialPosition) {
     const pg = await PG.load(scale, initialPosition);
     if (settings.SHOW_ARROWS) {
-      pg.add(createTrajectoryArrow(this.options.glidingRatio, 30));
-      pg.add(createLiftArrow(this.options.glidingRatio, 300));
-      pg.add(this.getGravityHelper(300));
+      const arrowLen = 700;
+      pg.add(
+        createTrajectoryArrow(this.options.glidingRatio, arrowLen, 0xff00ff)
+      );
+      pg.add(createLiftArrow(this.options.glidingRatio, arrowLen, 0xffffff));
+      pg.add(this.getGravityHelper(arrowLen));
     }
     this.model = pg;
     this.scale = scale;
@@ -112,7 +108,7 @@ class Paraglider {
       .name("full speedbar speed")
       .listen();
     pgWindGui
-      .add(this.options, "glidingRatio", 0, 20)
+      .add(this.options, "glidingRatio", 1, 30)
       .name("gliding ratio")
       .listen();
   }
@@ -148,7 +144,7 @@ class Paraglider {
 
   getTerrainGradientAgainstWindDirection(terrain, windDirection) {
     // TODO use barlovento
-    const delta = 0.005; //TODO distance relative to island scale (1 metre)
+    const delta = 50;
     const pos = this.position().clone();
     const posSotavento = pos.clone().addScaledVector(windDirection, delta);
 
@@ -167,15 +163,15 @@ class Paraglider {
       weather.windDirectionDegreesFromNorth
     );
     const height = getTerrainHeightBelowPosition(pos, terrain);
+    // console.log("----------------------------");
     const gradient = this.getTerrainGradientAgainstWindDirection(
       terrain,
       windDirection
     );
-    // console.log("----------------------------");
-    // console.log("pos lift", pos);
+    // console.log("gradient", gradient);
     // console.log("height above ground for pos", height);
     // console.log("----------------------------");
-    return THREE.MathUtils.smoothstep(height, 0, 3);
+    return THREE.MathUtils.smoothstep(height, 100, 1290) * gradient;
   }
 
   getGravityHelper(len, color) {
@@ -197,9 +193,9 @@ class Paraglider {
     return this.model.position.y;
   }
 
-  move() {
-    const weightForceValue = settings.pgKg * G;
-    const weightForce = this.gravityDirection.multiplyScalar(weightForceValue);
+  move(velocity) {
+    this.model.position.add(velocity);
+    this.dispatchEvent({ type: "position", position: this.model.position });
   }
 }
 
