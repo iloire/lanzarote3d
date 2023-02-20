@@ -1,7 +1,7 @@
 import * as THREE from "three";
-import wind1 from "./wind-howl-01.mp3";
-import wind2 from "./hurricane-01.mp3";
-import music from "./the-beat-of-nature-122841.mp3";
+import wind1 from "./wind/wind-howl-01.mp3";
+import wind2 from "./wind/hurricane-01.mp3";
+import music from "./music/the-beat-of-nature-122841.mp3";
 
 const play = (camera, file, volume) => {
   const listener = new THREE.AudioListener();
@@ -20,7 +20,7 @@ const play = (camera, file, volume) => {
   });
 };
 
-const Wind = {
+const BackgroundSound = {
   load: (camera) => {
     play(camera, wind1, 0.3);
     play(camera, wind2, 0.3);
@@ -28,4 +28,4 @@ const Wind = {
   },
 };
 
-export default Wind;
+export default BackgroundSound;
