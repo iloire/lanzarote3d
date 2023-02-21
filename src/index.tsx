@@ -33,20 +33,29 @@ const createRenderer = (sizes) => {
   return renderer;
 };
 
-class App extends React.Component {
-  constructor() {
+interface AppProps {
+  // Define your component props here
+}
+
+interface AppState {
+  // Define your component state here
+}
+
+class App extends React.Component<AppProps, AppState> {
+  renderer: any;
+
+    state = {
+      loadingProcess: 0,
+      sceneReady: false,
+    };
+  constructor(props: AppProps) {
     console.log("app constructor");
-    super();
+    super(props);
     this.renderer = null;
   }
 
-  state = {
-    loadingProcess: 0,
-    sceneReady: false,
-  };
 
   async componentDidMount() {
-    console.log("-=--- did mount ----");
     if (!this.renderer) {
       await this.initThree();
     }
@@ -59,9 +68,6 @@ class App extends React.Component {
   }
 
   initThree = async () => {
-    console.log(
-      "------------------------------- THREEJS --------------------------------- "
-    );
     const sizes = {
       width: window.innerWidth,
       height: window.innerHeight,
@@ -117,7 +123,7 @@ class App extends React.Component {
     scene.add(water);
     // Helpers.drawSphericalPosition(30, 90, 100, scene);
 
-    const sky = new Sky();
+    const sky: any= new Sky();
     sky.scale.setScalar(1000000);
     scene.add(sky);
 

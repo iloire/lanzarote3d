@@ -3,7 +3,8 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-  entry: "./src/index.jsx",
+  watch: true,
+  entry: "./src/index.tsx",
   output: {
     path: path.join(__dirname, "/dist"),
     filename: "bundle.js",
@@ -13,6 +14,11 @@ module.exports = {
   },
   module: {
     rules: [
+      {
+        test: /\.tsx?$/,
+        loader: "ts-loader",
+        exclude: /node_modules/,
+      },
       {
         test: /\.styl?$/,
         loader: "stylus-loader", // compiles Styl to CSS
@@ -68,6 +74,9 @@ module.exports = {
         use: ["style-loader", "css-loader"],
       },
     ],
+  },
+  resolve: {
+    extensions: [".tsx", ".ts", ".js", ".jsx"],
   },
   plugins: [
     new HtmlWebpackPlugin({
