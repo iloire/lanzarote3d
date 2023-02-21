@@ -1,11 +1,13 @@
 import * as THREE from "three";
 import BackgroundSound from "../audio/background";
-import Paraglider from "../elements/pg";
+import Paraglider, { ParagliderConstructor } from "../elements/pg";
 import Controls from "../utils/controls";
 import Helpers from "../utils/helpers";
 import WindIndicator from "../elements/wind-indicator";
 import MathUtils from "../utils/math";
 import Vario from "../audio/vario";
+
+const KMH_TO_MS = 3.6;
 
 const settings = {
   sensitivity: 0.01,
@@ -17,21 +19,21 @@ const settings = {
 
 const weather = {
   windDirectionDegreesFromNorth: 310,
-  windSpeed: 18,
+  windSpeed: 18 / KMH_TO_MS,
 };
 
-const pgOptions = {
+const pgOptions: ParagliderConstructor = {
   glidingRatio: 2,
-  trimSpeed: 25,
-  halfSpeedBarSpeed: 30,
-  fullSpeedBarSpeed: 35,
-  smallEarsSpeed: 20,
-  bigEarsSpeed: 18,
+  trimSpeed: 25 / KMH_TO_MS,
+  halfSpeedBarSpeed: 30 / KMH_TO_MS,
+  fullSpeedBarSpeed: 35 / KMH_TO_MS,
+  smallEarsSpeed: 20 / KMH_TO_MS,
+  bigEarsSpeed: 18 / KMH_TO_MS,
 };
 
 const p = {
   scale: 0.004,
-  position: { x: 6127, y: 980, z: 5 },
+  position: new THREE.Vector3(6827, 880, -555),
 };
 
 const getObjectPosition = (obj) => {
@@ -40,16 +42,13 @@ const getObjectPosition = (obj) => {
   return pos;
 };
 
-const moveForward = (pg, weather, pgOptions) => {
+const moveForward = (pg: Paraglider, weather) => {
   const pgMesh = pg.model;
-  const multipleSpeed = p.scale * settings.wrapSpeed;
+  const multipleSpeed = settings.wrapSpeed;
   //
-  const rotationPG = pgMesh.quaternion.clone();
-  const directionPG = new THREE.Vector3(0, 0, -1);
-  directionPG.applyQuaternion(rotationPG);
-  const velocity = directionPG.multiplyScalar(
-    multipleSpeed * pgOptions.trimSpeed
-  );
+  const velocity = pg
+    .direction()
+    .multiplyScalar(multipleSpeed * pg.trimSpeed());
   const windDirection = MathUtils.getWindDirectionVector(
     weather.windDirectionDegreesFromNorth
   );
@@ -60,19 +59,19 @@ const moveForward = (pg, weather, pgOptions) => {
   pg.move(velocityWind);
 };
 
-const moveVertical = (pg, weather, pgOptions, terrain) => {
-  const multipleSpeed = p.scale * settings.wrapSpeed;
-  const windDirection = MathUtils.getWindDirectionVector(
-    weather.windDirectionDegreesFromNorth
-  );
-  const lift = pg.getLiftValue(terrain, weather);
-  const gravityDirection = new THREE.Vector3(0, -1, 0);
-  const gravityVector = gravityDirection.multiplyScalar(
-    (multipleSpeed * (pgOptions.trimSpeed - weather.windSpeed)) /
-      pgOptions.glidingRatio
-  );
-  pg.move(gravityVector);
+const moveVertical = (pg: Paraglider, weather, terrain) => {
+  const multipleSpeed = settings.wrapSpeed;
 
+  const gravityDirection = new THREE.Vector3(0, -1, 0);
+  const downSpeed =
+    (multipleSpeed * (pg.trimSpeed() - weather.windSpeed)) / pg.glidingRatio();
+  console.log("downSpeed ", downSpeed);
+
+  const downVector = gravityDirection.multiplyScalar(downSpeed);
+  pg.move(downVector);
+
+  const lift = pg.getLiftValue(terrain, weather);
+  console.log("lift", lift);
   const liftDirection = new THREE.Vector3(0, 1, 0);
   const liftVector = liftDirection.multiplyScalar(multipleSpeed * lift);
   pg.move(liftVector);
@@ -128,7 +127,6 @@ const Game = {
         pg.rotateRight(settings.rotationSensitivity);
       }
     }
-    // BackgroundSoun.load(camera);
     renderer.domElement.addEventListener("mousemove", (event) => {
       if (settings.mouseControl) {
         camera.quaternion.y -= (event.movementX * settings.sensitivity) / 20;
@@ -156,8 +154,8 @@ const Game = {
       controls.update();
       vario.updateReading(pg.altitude());
       if (!pg.hasTouchedGround(terrain)) {
-        moveForward(pg, weather, pgOptions);
-        moveVertical(pg, weather, pgOptions, terrain);
+        moveForward(pg, weather);
+        moveVertical(pg, weather, terrain);
       }
       windIndicator.update(weather.windDirectionDegreesFromNorth);
       renderer.render(scene, camera);

@@ -2,16 +2,16 @@ import beep200 from "./beep/audiocheck.net_sin_200Hz_-3dBFS_0.3s.wav";
 import beep800 from "./beep/audiocheck.net_sin_800Hz_-3dBFS_0.3s.wav";
 import beep1000 from "./beep/audiocheck.net_sin_1000Hz_-3dBFS_0.3s.wav";
 import * as THREE from "three";
+import Paraglider from "../elements/pg";
 
 class Vario extends THREE.EventDispatcher {
-
   sound: any;
-  pg: any;
-  status: any;
+  pg: Paraglider;
+  status: string;
   lastRecord: number;
   high: number;
 
-  constructor(pg) {
+  constructor(pg: Paraglider) {
     super();
     const listener = new THREE.AudioListener();
     this.sound = new THREE.Audio(listener);
@@ -38,9 +38,8 @@ class Vario extends THREE.EventDispatcher {
 
     this.dispatchEvent({ type: "delta", delta });
     this.lastRecord = this.high;
-    console.log(this.status);
     if (this.status === "on") {
-      this.play(1);
+      // this.play(1);
     }
   };
 

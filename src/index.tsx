@@ -6,7 +6,7 @@ import * as THREE from "three";
 import { Sky } from "three/examples/jsm/objects/Sky";
 
 import Animations from "./utils/animations";
-import Lights from "./utils/lights.js";
+import Lights from "./utils/lights";
 import Models from "./utils/models";
 import Helpers from "./utils/helpers";
 import Water from "./utils/water";
@@ -14,7 +14,7 @@ import Water from "./utils/water";
 import Island from "./elements/island";
 import Clouds from "./elements/clouds";
 
-import Stories from "./stories/index.js";
+import Stories from "./stories/index";
 
 import "./index.css";
 
@@ -44,15 +44,14 @@ interface AppState {
 class App extends React.Component<AppProps, AppState> {
   renderer: any;
 
-    state = {
-      loadingProcess: 0,
-      sceneReady: false,
-    };
+  state = {
+    loadingProcess: 0,
+    sceneReady: false,
+  };
   constructor(props: AppProps) {
     super(props);
     this.renderer = null;
   }
-
 
   async componentDidMount() {
     if (!this.renderer) {
@@ -122,7 +121,7 @@ class App extends React.Component<AppProps, AppState> {
     scene.add(water);
     // Helpers.drawSphericalPosition(30, 90, 100, scene);
 
-    const sky: any= new Sky();
+    const sky: any = new Sky();
     sky.scale.setScalar(1000000);
     scene.add(sky);
 
