@@ -49,25 +49,11 @@ module.exports = {
       },
       {
         test: /\.(glb|gltf)$/,
-        use: [
-          {
-            loader: "file-loader",
-            options: {
-              outputPath: "./models/",
-            },
-          },
-        ],
+        type: "asset/resource",
       },
       {
         test: /\.(mp3|wav)$/,
-        use: [
-          {
-            loader: "file-loader",
-            options: {
-              outputPath: "./sounds/",
-            },
-          },
-        ],
+        type: "asset/resource",
       },
       {
         test: /\.css$/,

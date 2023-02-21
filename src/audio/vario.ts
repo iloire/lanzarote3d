@@ -1,6 +1,6 @@
-// import beep200 from "./beep/audiocheck.net_sin_200Hz_-3dBFS_0.3s.wav";
-// import beep800 from "./beep/audiocheck.net_sin_800Hz_-3dBFS_0.3s.wav";
-// import beep1000 from "./beep/audiocheck.net_sin_1000Hz_-3dBFS_0.3s.wav";
+import beep200 from "./beep/audiocheck.net_sin_200Hz_-3dBFS_0.3s.wav";
+import beep800 from "./beep/audiocheck.net_sin_800Hz_-3dBFS_0.3s.wav";
+import beep1000 from "./beep/audiocheck.net_sin_1000Hz_-3dBFS_0.3s.wav";
 import * as THREE from "three";
 
 class Vario extends THREE.EventDispatcher {
@@ -46,11 +46,11 @@ class Vario extends THREE.EventDispatcher {
 
   play(increment) {
     const audioLoader = new THREE.AudioLoader();
-    // audioLoader.load(beep1000, (buffer) => {
-    //   this.sound.setBuffer(buffer);
-    //   this.sound.setVolume(0.01);
-    //   // this.sound.play();
-    // });
+    audioLoader.load(beep1000, (buffer) => {
+      this.sound.setBuffer(buffer);
+      this.sound.setVolume(0.01);
+      this.sound.play();
+    });
   }
 
   updateReading(altitude) {

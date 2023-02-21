@@ -4,9 +4,10 @@ import Models from "../utils/models";
 import MathUtils from "../utils/math.js";
 
 const settings = { SHOW_ARROWS: true };
+const ORIGIN = new THREE.Vector3(0, 0, 0);
 
 const PG = {
-  load: async (scale, pos, speed) => {
+  load: async (scale, pos) => {
     return Models.load(model, scale, pos);
   },
 };
@@ -15,9 +16,9 @@ function getAttackAngleRadians(glidingRatio) {
   return Math.atan(1 / glidingRatio);
 }
 
-const createLiftArrow = (glidingRatio, len, color) => {
+const createLiftArrow = (glidingRatio: number, len: number, color) => {
   const dir = new THREE.Vector3(0, 1, 0);
-  const arrow = new THREE.ArrowHelper(dir, { x: 0, y: 0, z: 0 }, len, color);
+  const arrow = new THREE.ArrowHelper(dir, ORIGIN, len, color);
   const axis = new THREE.Vector3(1, 0, 0);
   arrow.rotateOnAxis(axis, -getAttackAngleRadians(glidingRatio));
   return arrow;
@@ -25,7 +26,7 @@ const createLiftArrow = (glidingRatio, len, color) => {
 
 const createTrajectoryArrow = (glidingRatio, len, color) => {
   const dir = new THREE.Vector3(0, 0, -1);
-  const arrow = new THREE.ArrowHelper(dir, { x: 0, y: 0, z: 0 }, len, color);
+  const arrow = new THREE.ArrowHelper(dir, ORIGIN, len, color);
   const axis = new THREE.Vector3(1, 0, 0);
   arrow.rotateOnAxis(axis, -getAttackAngleRadians(glidingRatio));
   return arrow;
@@ -45,10 +46,16 @@ const getTerrainHeightBelowPosition = (pos, terrain) => {
   }
 };
 
+interface ParaGliderConstructor {
+  glidingRatio: number;
+}
+
 class Paraglider extends THREE.EventDispatcher {
+  options: ParaGliderConstructor;
+  model: THREE.Mesh;
   gravityDirection = new THREE.Vector3(0, -1, 0);
 
-  constructor(options) {
+  constructor(options: ParaGliderConstructor) {
     super();
     if (!options.glidingRatio) {
       throw new Error("missing glading ratio");
@@ -67,7 +74,6 @@ class Paraglider extends THREE.EventDispatcher {
       pg.add(this.getGravityHelper(arrowLen));
     }
     this.model = pg;
-    this.scale = scale;
   }
 
   addGui(gui) {
@@ -172,12 +178,12 @@ class Paraglider extends THREE.EventDispatcher {
     return THREE.MathUtils.smoothstep(height, 100, 1290) * gradient;
   }
 
-  getGravityHelper(len, color) {
+  getGravityHelper(len) {
     const arrow = new THREE.ArrowHelper(
       this.gravityDirection,
-      { x: 0, y: 0, z: 0 },
+      ORIGIN,
       len,
-      color || 0xff0000
+      0xff0000
     );
     // arrow.up.set(0, 0, -1);
     return arrow;

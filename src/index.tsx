@@ -49,7 +49,6 @@ class App extends React.Component<AppProps, AppState> {
       sceneReady: false,
     };
   constructor(props: AppProps) {
-    console.log("app constructor");
     super(props);
     this.renderer = null;
   }

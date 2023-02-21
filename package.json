@@ -37,5 +37,6 @@
     "start": "webpack serve --mode development --open --hot",
     "build": "webpack --mode production"
   },
+  "types": "index.d.ts",
   "author": "ivan l."
 }
