@@ -1,12 +1,13 @@
 import * as THREE from "three";
 import model from "../models/pubg_green_parachute2.glb";
 import Models from "../utils/models";
-import MathUtils from "../utils/math.js";
+import MathUtils from "../utils/math";
+import Weather from "../elements/weather";
 
 const settings = { SHOW_ARROWS: true };
 const ORIGIN = new THREE.Vector3(0, 0, 0);
 
-function getAttackAngleRadians(glidingRatio) {
+function getAttackAngleRadians(glidingRatio: number) {
   return Math.atan(1 / glidingRatio);
 }
 
@@ -62,7 +63,7 @@ export interface ParagliderConstructor {
 
 class Paraglider extends THREE.EventDispatcher {
   options: ParagliderConstructor;
-  weather: any;
+  weather: Weather;
   terrain: any;
   speedBar: boolean;
   currentSpeed: number;
@@ -70,7 +71,7 @@ class Paraglider extends THREE.EventDispatcher {
   model: THREE.Mesh;
   gravityDirection = new THREE.Vector3(0, -1, 0);
 
-  constructor(options: ParagliderConstructor, weather: any, terrain: any) {
+  constructor(options: ParagliderConstructor, weather: Weather, terrain: any) {
     super();
     if (!options.glidingRatio) {
       throw new Error("missing glading ratio");
@@ -98,35 +99,26 @@ class Paraglider extends THREE.EventDispatcher {
 
   tick(multiplier: number) {
     if (!this.hasTouchedGround(this.terrain)) {
-      console.log("----");
       this.moveForward(multiplier);
       this.moveVertical(multiplier);
     }
   }
 
   moveForward(multiplier) {
-    const pgMesh = this.model;
     const velocity = this.direction().multiplyScalar(multiplier * this.speed());
-    const windDirection = MathUtils.getWindDirectionVector(
-      this.weather.windDirectionDegreesFromNorth
-    );
-    const velocityWind = windDirection.multiplyScalar(
-      multiplier * this.weather.windSpeed
-    );
     this.move(velocity);
-    this.move(velocityWind);
+    this.move(this.weather.getWindVelocity(multiplier));
   }
 
   moveVertical(multiplier) {
     const gravityDirection = new THREE.Vector3(0, -1, 0);
     const downSpeed =
-      (multiplier * (this.speed() - this.weather.windSpeed)) /
+      (multiplier * (this.speed() - this.weather.getSpeedMetresPerSecond())) /
       this.glidingRatio();
-    console.log("downSpeed ", downSpeed);
     const downVector = gravityDirection.multiplyScalar(downSpeed);
     this.move(downVector);
 
-    const lift = this.getLiftValue(this.terrain, this.weather);
+    const lift = this.getLiftValue(this.terrain);
     const liftDirection = new THREE.Vector3(0, 1, 0);
     const liftVector = liftDirection.multiplyScalar(multiplier * lift);
     this.move(liftVector);
@@ -221,17 +213,15 @@ class Paraglider extends THREE.EventDispatcher {
     return gradient > 0 ? gradient : 0; // TODO
   }
 
-  getLiftValue(terrain: THREE.Mesh, weather): number {
+  getLiftValue(terrain: THREE.Mesh): number {
     const pos = this.position().clone();
-    const windDirection = MathUtils.getWindDirectionVector(
-      weather.windDirectionDegreesFromNorth
-    );
+    const windDirection = this.weather.getWindDirection();
     const height = getTerrainHeightBelowPosition(pos, terrain);
     const gradient = this.getTerrainGradientAgainstWindDirection(
       terrain,
       windDirection
     );
-    const windSpeed = weather.windSpeed;
+    const windSpeed = this.weather.getSpeedMetresPerSecond();
     const heightLiftComponent = height * 0.001;
     const l = heightLiftComponent * gradient;
     // console.log("windspeed", windSpeed);

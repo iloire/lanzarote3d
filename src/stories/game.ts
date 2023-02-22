@@ -6,6 +6,7 @@ import Helpers from "../utils/helpers";
 import WindIndicator from "../elements/wind-indicator";
 import MathUtils from "../utils/math";
 import Vario from "../audio/vario";
+import Weather from "../elements/weather";
 
 const KMH_TO_MS = 3.6;
 
@@ -17,7 +18,7 @@ const settings = {
   wrapSpeed: 1,
 };
 
-const weather = {
+const WEATHER_SETTINGS = {
   windDirectionDegreesFromNorth: 310,
   windSpeed: 18 / KMH_TO_MS,
 };
@@ -51,13 +52,15 @@ const Game = {
     nav.add(settings, "sensitivity", 0, 1).listen();
     nav.add(settings, "wrapSpeed", 1, 10).listen();
 
-    const weatherGui = gui.addFolder("Weather");
-    weatherGui.add(weather, "windDirectionDegreesFromNorth", 0, 360).listen();
-    weatherGui.add(weather, "windSpeed", 0, 60).listen();
+    // const weatherGui = gui.addFolder("Weather");
+    // weatherGui.add(weather, "windDirectionDegreesFromNorth", 0, 360).listen();
+    // weatherGui.add(weather, "windSpeed", 0, 60).listen();
 
     const controls = Controls.createControls(camera, renderer);
     controls.enabled = settings.orbitControl;
     gui.add(controls, "enabled").name("orbit controls");
+
+    const weather = new Weather(WEATHER_SETTINGS.windDirectionDegreesFromNorth, WEATHER_SETTINGS.windSpeed)
 
     const speedBarUI = document.getElementById("paraglider-speedBar");
     const pg = new Paraglider(pgOptions, weather, terrain);
@@ -68,13 +71,14 @@ const Game = {
     pg.addGui(gui);
     scene.add(pg.model);
 
-    const windIndicator = new WindIndicator();
-    windIndicator.load(weather.windDirectionDegreesFromNorth, 14, {
-      x: 0,
-      y: 0,
-      z: 0,
-    });
-    scene.add(windIndicator.arrow);
+
+    // const windIndicator = new WindIndicator();
+    // windIndicator.load(weather.windDirectionDegreesFromNorth, 14, {
+    //   x: 0,
+    //   y: 0,
+    //   z: 0,
+    // });
+    // scene.add(windIndicator.arrow);
 
     document.addEventListener("keydown", onDocumentKeyDown, false);
 
@@ -122,7 +126,7 @@ const Game = {
       controls.target = pg.position();
       controls.update();
       vario.updateReading(pg.altitude());
-      windIndicator.update(weather.windDirectionDegreesFromNorth);
+      // windIndicator.update(weather.windDirectionDegreesFromNorth);
       renderer.render(scene, camera);
     };
 
