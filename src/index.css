@@ -7,6 +7,18 @@
   left: 20px;
 }
 
+#game-start button{
+  color: white;
+  position: absolute;
+  top: 40%;
+  left: 45%;
+  padding: 10px 20px;
+  border-radius: 5%;
+  background: #00000077;
+  border: 1px solid #ffffff77;
+  font-size: 300%;
+}
+
 #vario-info {
   color: white;
   position: absolute;

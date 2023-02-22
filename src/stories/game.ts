@@ -4,7 +4,6 @@ import Paraglider, { ParagliderConstructor } from "../elements/pg";
 import Controls from "../utils/controls";
 import Helpers from "../utils/helpers";
 import WindIndicator from "../elements/wind-indicator";
-import MathUtils from "../utils/math";
 import Vario from "../audio/vario";
 import Weather from "../elements/weather";
 
@@ -44,7 +43,7 @@ const getObjectPosition = (obj) => {
 };
 
 const Game = {
-  load: async (camera, scene, renderer, terrain, water, gui) => {
+  load: async (camera: THREE.PerspectiveCamera, scene, renderer, terrain, water, gui) => {
     console.log("============ LOAD GAME ====================== ");
     const nav = gui.addFolder("Navigation");
     nav.add(settings, "mouseControl").listen();
@@ -116,7 +115,18 @@ const Game = {
     });
     vario.start();
 
-    BackgroundSound.load(camera);
+    // Game start
+    const gameStart = document.getElementById("game-start-button");
+    gameStart.addEventListener('click', (event : MouseEvent) => {
+      gameStart.style.display = 'none'
+      const cameraOffset = new THREE.Vector3(-4.2, 10, 11.2);
+      camera.position.copy(getObjectPosition(pg.model)).add(cameraOffset);
+      camera.lookAt(pg.position());
+      console.log('start ')
+      animate();
+      console.log("Number of Triangles :", renderer.info.render.triangles);
+      BackgroundSound.load(camera);
+    })
 
     const animate = () => {
       // setTimeout(animate, 2200);
@@ -130,12 +140,6 @@ const Game = {
       renderer.render(scene, camera);
     };
 
-    const cameraOffset = new THREE.Vector3(-4.2, 10, 11.2);
-    camera.position.copy(getObjectPosition(pg.model)).add(cameraOffset);
-    camera.lookAt(pg.position());
-
-    animate();
-    console.log("Number of Triangles :", renderer.info.render.triangles);
   },
 };
 

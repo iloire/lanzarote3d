@@ -176,6 +176,13 @@ class App extends React.Component<AppProps, AppState> {
           </div>
         )}
 
+        <div id="game">
+          <div id="game-start">
+             <button id="game-start-button">START</button>
+          </div>
+          <div id="" className="altitude"></div>
+        </div>
+
         <div id="vario-info">
           <div id="vario-delta" className="delta"></div>
           <div id="vario-altitude" className="altitude"></div>
