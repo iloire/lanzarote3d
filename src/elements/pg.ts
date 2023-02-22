@@ -104,13 +104,13 @@ class Paraglider extends THREE.EventDispatcher {
     }
   }
 
-  moveForward(multiplier) {
+  moveForward(multiplier: number) {
     const velocity = this.direction().multiplyScalar(multiplier * this.speed());
     this.move(velocity);
     this.move(this.weather.getWindVelocity(multiplier));
   }
 
-  moveVertical(multiplier) {
+  moveVertical(multiplier: number) {
     const gravityDirection = new THREE.Vector3(0, -1, 0);
     const downSpeed =
       (multiplier * (this.speed() - this.weather.getSpeedMetresPerSecond())) /

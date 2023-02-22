@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import MathUtils from "../utils/math";
 
 class Weather {
   degreesFromNorth: number;
@@ -10,20 +9,27 @@ class Weather {
     this.speedMetresPerSecond = speedMetresPerSecond;
   }
 
-  getWindDirection() : THREE.Vector3 {
-    return MathUtils.getWindDirectionVector(
-      this.degreesFromNorth
-    );
-  }
-
   getWindVelocity(multiplier: number): THREE.Vector3 {
-    return this.getWindDirection().multiplyScalar(
+    return this.getWindDirectionFromNorth(this.degreesFromNorth).multiplyScalar(
       multiplier * this.speedMetresPerSecond
     );
   }
 
   getSpeedMetresPerSecond(): number {
     return this.speedMetresPerSecond;
+  }
+
+  getWindDirection(): THREE.Vector3 {
+    return this.getWindDirectionFromNorth(this.degreesFromNorth);
+  }
+
+  getWindDirectionFromNorth(degreesFromNorth: number): THREE.Vector3 {
+    const angleRadiansWind = THREE.MathUtils.degToRad(-degreesFromNorth);
+    return new THREE.Vector3().setFromSphericalCoords(
+      1,
+      Math.PI / 2,
+      angleRadiansWind
+    );
   }
 }
 
