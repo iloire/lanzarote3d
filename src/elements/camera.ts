@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-const getObjectPosition = (obj) => {
+const getObjectPosition = (obj: THREE.Object3D) => {
   const pos = new THREE.Vector3();
   obj.getWorldPosition(pos);
   return pos;
@@ -27,8 +27,8 @@ class Camera extends THREE.PerspectiveCamera {
       .listen();
   }
 
-  followTarget(target: THREE.Mesh) {
-    const cameraOffset = new THREE.Vector3(-4.2, 10, 11.2);
+  followTarget(target: THREE.Mesh, offset?: THREE.Vector3) {
+    const cameraOffset = offset || new THREE.Vector3(-4.2, 10, 11.2);
     this.position.copy(getObjectPosition(target)).add(cameraOffset);
   }
 }

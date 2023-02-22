@@ -54,7 +54,10 @@ const Game = {
     controls.enabled = settings.orbitControl;
     gui.add(controls, "enabled").name("orbit controls");
 
-    const weather = new Weather(WEATHER_SETTINGS.windDirectionDegreesFromNorth, WEATHER_SETTINGS.windSpeed)
+    const weather = new Weather(
+      WEATHER_SETTINGS.windDirectionDegreesFromNorth,
+      WEATHER_SETTINGS.windSpeed
+    );
 
     const speedBarUI = document.getElementById("paraglider-speedBar");
     const pg = new Paraglider(pgOptions, weather, terrain);
@@ -76,10 +79,19 @@ const Game = {
     document.addEventListener("keydown", onDocumentKeyDown, false);
 
     function onDocumentKeyDown(event) {
-      var keyCode = event.which;
+      const keyCode = event.which;
+      console.log(keyCode);
       if (keyCode == 32) {
         //space
         pg.jump(terrain);
+      } else if (keyCode == 67) {
+        //c
+        if (gui._hidden) {
+          gui.show();
+        } else {
+          gui.hide();
+        }
+        console.log(gui);
       } else if (keyCode == 83) {
         //s
         pg.toggleSpeedBar();
@@ -110,15 +122,16 @@ const Game = {
     vario.start();
 
     // Game start
+    gui.hide();
     const gameStart = document.getElementById("game-start-button");
-    gameStart.addEventListener('click', (event : MouseEvent) => {
-      gameStart.style.display = 'none'
+    gameStart.addEventListener("click", (event: MouseEvent) => {
+      gameStart.style.display = "none";
       camera.followTarget(pg.model);
 
       animate();
       console.log("Number of Triangles :", renderer.info.render.triangles);
       BackgroundSound.load(camera);
-    })
+    });
 
     const animate = () => {
       // setTimeout(animate, 2200);
@@ -131,7 +144,6 @@ const Game = {
       // windIndicator.update(weather.windDirectionDegreesFromNorth);
       renderer.render(scene, camera);
     };
-
   },
 };
 
