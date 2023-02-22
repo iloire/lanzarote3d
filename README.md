@@ -2,12 +2,10 @@
 
 ## TODO
 
-- island correct scale
 - wing selection
-- decide if pg can jump
 - fix application of wind arrow
-- speed bar
 - unit testing
+- add birds
 
 ## Screenshots
 
