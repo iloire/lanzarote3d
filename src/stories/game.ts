@@ -121,7 +121,6 @@ const Game = {
       const cameraOffset = new THREE.Vector3(-4.2, 10, 11.2);
       camera.position.copy(getObjectPosition(pg.model)).add(cameraOffset);
       camera.lookAt(pg.position());
-      console.log('start ')
       animate();
       console.log("Number of Triangles :", renderer.info.render.triangles);
       BackgroundSound.load(camera);

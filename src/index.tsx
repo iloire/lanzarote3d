@@ -15,6 +15,7 @@ import Island from "./elements/island";
 import Clouds from "./elements/clouds";
 
 import Stories from "./stories/index";
+import Camera from './elements/camera';
 
 import "./index.css";
 
@@ -75,31 +76,15 @@ class App extends React.Component<AppProps, AppState> {
     this.renderer = renderer;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(
+
+    const camera = new Camera(
       45,
       sizes.width / sizes.height,
       1,
       200000
     );
+    camera.addGui(gui)
     scene.add(camera);
-
-    const cameraGui = gui.addFolder("Camera");
-    cameraGui.add(camera.position, "x", -1000, 1000).name("x").listen();
-    cameraGui.add(camera.position, "y", 0, 1000).name("y").listen();
-    cameraGui.add(camera.position, "z", -1000, 1000).name("z").listen();
-
-    cameraGui
-      .add(camera.rotation, "x", -Math.PI, Math.PI)
-      .name("rotation.x")
-      .listen();
-    cameraGui
-      .add(camera.rotation, "y", -Math.PI, Math.PI)
-      .name("rotation.y")
-      .listen();
-    cameraGui
-      .add(camera.rotation, "z", -Math.PI, Math.PI)
-      .name("rotation.z")
-      .listen();
 
     Lights.addLightsToScene(scene, false);
 
