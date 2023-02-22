@@ -42,41 +42,6 @@ const getObjectPosition = (obj) => {
   return pos;
 };
 
-const moveForward = (pg: Paraglider, weather) => {
-  const pgMesh = pg.model;
-  const multipleSpeed = settings.wrapSpeed;
-  //
-  const velocity = pg
-    .direction()
-    .multiplyScalar(multipleSpeed * pg.trimSpeed());
-  const windDirection = MathUtils.getWindDirectionVector(
-    weather.windDirectionDegreesFromNorth
-  );
-  const velocityWind = windDirection.multiplyScalar(
-    multipleSpeed * weather.windSpeed
-  );
-  pg.move(velocity);
-  pg.move(velocityWind);
-};
-
-const moveVertical = (pg: Paraglider, weather, terrain) => {
-  const multipleSpeed = settings.wrapSpeed;
-
-  const gravityDirection = new THREE.Vector3(0, -1, 0);
-  const downSpeed =
-    (multipleSpeed * (pg.trimSpeed() - weather.windSpeed)) / pg.glidingRatio();
-  console.log("downSpeed ", downSpeed);
-
-  const downVector = gravityDirection.multiplyScalar(downSpeed);
-  pg.move(downVector);
-
-  const lift = pg.getLiftValue(terrain, weather);
-  console.log("lift", lift);
-  const liftDirection = new THREE.Vector3(0, 1, 0);
-  const liftVector = liftDirection.multiplyScalar(multipleSpeed * lift);
-  pg.move(liftVector);
-};
-
 const Game = {
   load: async (camera, scene, renderer, terrain, water, gui) => {
     console.log("============ LOAD GAME ====================== ");
@@ -94,7 +59,7 @@ const Game = {
     controls.enabled = settings.orbitControl;
     gui.add(controls, "enabled").name("orbit controls");
 
-    const pg = new Paraglider(pgOptions);
+    const pg = new Paraglider(pgOptions, weather, terrain);
     await pg.loadModel(p.scale, p.position);
     pg.addGui(gui);
     scene.add(pg.model);
@@ -114,11 +79,9 @@ const Game = {
       if (keyCode == 32) {
         //space
         pg.jump(terrain);
-      }
-      //w
-      else if (keyCode == 87) {
-        //w
-        // moveForward(xSpeed);
+      } else if (keyCode == 83) {
+        //s
+        pg.toggleSpeedBar();
       } else if (keyCode == 65) {
         //a
         pg.rotateLeft(settings.rotationSensitivity);
@@ -153,10 +116,6 @@ const Game = {
       controls.target = pg.position();
       controls.update();
       vario.updateReading(pg.altitude());
-      if (!pg.hasTouchedGround(terrain)) {
-        moveForward(pg, weather);
-        moveVertical(pg, weather, terrain);
-      }
       windIndicator.update(weather.windDirectionDegreesFromNorth);
       renderer.render(scene, camera);
     };

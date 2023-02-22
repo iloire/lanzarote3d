@@ -62,15 +62,25 @@ export interface ParagliderConstructor {
 
 class Paraglider extends THREE.EventDispatcher {
   options: ParagliderConstructor;
+  weather: any;
+  terrain: any;
+  speedBar: boolean;
+  currentSpeed: number;
+  interval: any;
   model: THREE.Mesh;
   gravityDirection = new THREE.Vector3(0, -1, 0);
 
-  constructor(options: ParagliderConstructor) {
+  constructor(options: ParagliderConstructor, weather: any, terrain: any) {
     super();
     if (!options.glidingRatio) {
       throw new Error("missing glading ratio");
     }
+    this.speedBar = false;
+    this.currentSpeed = options.trimSpeed;
     this.options = options;
+    this.weather = weather;
+    this.terrain = terrain;
+    this.interval = setInterval(() => this.tick(0.05), 50);
   }
 
   async loadModel(scale: number, initialPosition: THREE.Vector3) {
@@ -84,6 +94,42 @@ class Paraglider extends THREE.EventDispatcher {
       pg.add(this.getGravityHelper(arrowLen));
     }
     this.model = pg;
+  }
+
+  tick(multiplier: number) {
+    if (!this.hasTouchedGround(this.terrain)) {
+      console.log("----");
+      this.moveForward(multiplier);
+      this.moveVertical(multiplier);
+    }
+  }
+
+  moveForward(multiplier) {
+    const pgMesh = this.model;
+    const velocity = this.direction().multiplyScalar(multiplier * this.speed());
+    const windDirection = MathUtils.getWindDirectionVector(
+      this.weather.windDirectionDegreesFromNorth
+    );
+    const velocityWind = windDirection.multiplyScalar(
+      multiplier * this.weather.windSpeed
+    );
+    this.move(velocity);
+    this.move(velocityWind);
+  }
+
+  moveVertical(multiplier) {
+    const gravityDirection = new THREE.Vector3(0, -1, 0);
+    const downSpeed =
+      (multiplier * (this.speed() - this.weather.windSpeed)) /
+      this.glidingRatio();
+    console.log("downSpeed ", downSpeed);
+    const downVector = gravityDirection.multiplyScalar(downSpeed);
+    this.move(downVector);
+
+    const lift = this.getLiftValue(this.terrain, this.weather);
+    const liftDirection = new THREE.Vector3(0, 1, 0);
+    const liftVector = liftDirection.multiplyScalar(multiplier * lift);
+    this.move(liftVector);
   }
 
   addGui(gui) {
@@ -110,19 +156,19 @@ class Paraglider extends THREE.EventDispatcher {
 
     const pgWindGui = gui.addFolder("Paraglider wing");
     pgWindGui
-      .add(this.options, "trimSpeed", 20, 70)
+      .add(this.options, "trimSpeed", 20 / 3.6, 70 / 3.6)
       .name("trim speed")
       .listen();
     pgWindGui
-      .add(this.options, "halfSpeedBarSpeed", 0, 70)
+      .add(this.options, "halfSpeedBarSpeed", 0, 70 / 3.6)
       .name("half speed bar speed")
       .listen();
     pgWindGui
-      .add(this.options, "fullSpeedBarSpeed", 0, 70)
+      .add(this.options, "fullSpeedBarSpeed", 0, 70 / 3.6)
       .name("full speedbar speed")
       .listen();
     pgWindGui
-      .add(this.options, "glidingRatio", 1, 30)
+      .add(this.options, "glidingRatio", 1, 30 / 3.6)
       .name("gliding ratio")
       .listen();
   }
@@ -161,16 +207,18 @@ class Paraglider extends THREE.EventDispatcher {
   ): number {
     // TODO use barlovento
     const delta = 50;
-    const pos = this.position().clone();
-    const posSotavento = pos.clone().addScaledVector(windDirection, delta);
+    const pos = this.position();
+    const posBarlovento = pos.clone().addScaledVector(windDirection, -delta);
 
     const heightPos = getTerrainHeightBelowPosition(pos, terrain);
     const heightPosBarlovento = getTerrainHeightBelowPosition(
-      posSotavento,
+      posBarlovento,
       terrain
     );
-    const gradient = (heightPosBarlovento - heightPos) / delta;
-    return gradient;
+    // console.log("height", heightPos);
+    // console.log("height barlo", heightPosBarlovento);
+    const gradient = (heightPos - heightPosBarlovento) / delta;
+    return gradient > 0 ? gradient : 0; // TODO
   }
 
   getLiftValue(terrain: THREE.Mesh, weather): number {
@@ -179,7 +227,6 @@ class Paraglider extends THREE.EventDispatcher {
       weather.windDirectionDegreesFromNorth
     );
     const height = getTerrainHeightBelowPosition(pos, terrain);
-    // console.log("----------------------------");
     const gradient = this.getTerrainGradientAgainstWindDirection(
       terrain,
       windDirection
@@ -187,13 +234,11 @@ class Paraglider extends THREE.EventDispatcher {
     const windSpeed = weather.windSpeed;
     const heightLiftComponent = height * 0.001;
     const l = heightLiftComponent * gradient;
-    console.log("----------------------------");
-    console.log("windspeed", windSpeed);
-    console.log("heightLiftComponent", heightLiftComponent);
-    console.log("gradient", gradient);
-    console.log("height above ground for pos", height);
-    console.log("l", l);
-    console.log("----------------------------");
+    // console.log("windspeed", windSpeed);
+    // console.log("heightLiftComponent", heightLiftComponent);
+    // console.log("gradient", gradient);
+    // console.log("height above ground for pos", height);
+    // console.log("liftvalue", l);
     return l;
   }
 
@@ -221,6 +266,22 @@ class Paraglider extends THREE.EventDispatcher {
 
   altitude(): number {
     return this.model.position.y;
+  }
+
+  toggleSpeedBar() {
+    if (this.speedBar) {
+      this.speedBar = false;
+      this.currentSpeed = this.options.trimSpeed;
+      console.log("speed bar off");
+    } else {
+      this.speedBar = true;
+      this.currentSpeed = this.options.halfSpeedBarSpeed;
+      console.log("speed bar on");
+    }
+  }
+
+  speed(): number {
+    return this.currentSpeed;
   }
 
   trimSpeed(): number {
