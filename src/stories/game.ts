@@ -6,6 +6,7 @@ import Helpers from "../utils/helpers";
 import WindIndicator from "../elements/wind-indicator";
 import Vario from "../audio/vario";
 import Weather from "../elements/weather";
+import Camera from "../elements/camera";
 
 const KMH_TO_MS = 3.6;
 
@@ -36,14 +37,8 @@ const p = {
   position: new THREE.Vector3(6827, 880, -555),
 };
 
-const getObjectPosition = (obj) => {
-  const pos = new THREE.Vector3();
-  obj.getWorldPosition(pos);
-  return pos;
-};
-
 const Game = {
-  load: async (camera: THREE.PerspectiveCamera, scene, renderer, terrain, water, gui) => {
+  load: async (camera: Camera, scene, renderer, terrain, water, gui) => {
     console.log("============ LOAD GAME ====================== ");
     const nav = gui.addFolder("Navigation");
     nav.add(settings, "mouseControl").listen();
@@ -118,9 +113,8 @@ const Game = {
     const gameStart = document.getElementById("game-start-button");
     gameStart.addEventListener('click', (event : MouseEvent) => {
       gameStart.style.display = 'none'
-      const cameraOffset = new THREE.Vector3(-4.2, 10, 11.2);
-      camera.position.copy(getObjectPosition(pg.model)).add(cameraOffset);
-      camera.lookAt(pg.position());
+      camera.followTarget(pg.model);
+
       animate();
       console.log("Number of Triangles :", renderer.info.render.triangles);
       BackgroundSound.load(camera);
