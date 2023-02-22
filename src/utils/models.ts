@@ -12,15 +12,16 @@ function modelLoader(url) {
 
 const Models = {
   manager,
-  load: async (model, scale, pos, rotation) => {
-    const gltf = await modelLoader(model);
+  load: async (
+    model: THREE.Mesh,
+    scale: number,
+    pos: THREE.Vector3,
+  ) => {
+    const gltf: any = await modelLoader(model);
     const mesh = gltf.scene.children[0];
     mesh.scale.set(scale, scale, scale);
     mesh.position.set(pos.x, pos.y, pos.z);
     mesh.castShadow = true;
-    if (rotation && rotation.x) mesh.rotation.x = rotation.x;
-    if (rotation && rotation.y) mesh.rotation.y = rotation.y;
-    if (rotation && rotation.z) mesh.rotation.z = rotation.z;
     return mesh;
   },
 };

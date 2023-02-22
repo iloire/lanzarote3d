@@ -7,7 +7,7 @@ import textureImg from "../textures/rock_boulder_dry_diff_4k.jpg";
 import * as THREE from "three";
 
 const Island = {
-  load: async (scale, pos) => {
+  load: async (scale: number, pos: THREE.Vector3) => {
     const textureLoader = new THREE.TextureLoader(Models.manager);
     const mesh = await Models.load(model, scale, pos);
 
