@@ -42,7 +42,9 @@ class Vario extends THREE.EventDispatcher {
     this.dispatchEvent({ type: "delta", delta });
     this.lastRecord = this.high;
     if (this.status === "on") {
-      this.play(delta);
+      if (Math.abs(delta) > 0.5) {
+        this.play(delta);
+      }
     }
   };
 
