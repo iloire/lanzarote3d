@@ -10,7 +10,7 @@ import Weather from "../elements/weather";
 const KMH_TO_MS = 3.6;
 
 const settings = {
-  sensitivity: 0.01,
+  // sensitivity: 0.01,
   rotationSensitivity: 0.01,
   mouseControl: false,
   orbitControl: true,
@@ -48,7 +48,7 @@ const Game = {
     const nav = gui.addFolder("Navigation");
     nav.add(settings, "mouseControl").listen();
     nav.add(settings, "rotationSensitivity", 0, 1).listen();
-    nav.add(settings, "sensitivity", 0, 1).listen();
+    // nav.add(settings, "sensitivity", 0, 1).listen();
     nav.add(settings, "wrapSpeed", 1, 10).listen();
 
     // const weatherGui = gui.addFolder("Weather");
@@ -69,7 +69,6 @@ const Game = {
     });
     pg.addGui(gui);
     scene.add(pg.model);
-
 
     // const windIndicator = new WindIndicator();
     // windIndicator.load(weather.windDirectionDegreesFromNorth, 14, {
@@ -97,12 +96,12 @@ const Game = {
         pg.rotateRight(settings.rotationSensitivity);
       }
     }
-    renderer.domElement.addEventListener("mousemove", (event) => {
-      if (settings.mouseControl) {
-        camera.quaternion.y -= (event.movementX * settings.sensitivity) / 20;
-        camera.quaternion.x -= (event.movementY * settings.sensitivity) / 20;
-      }
-    });
+    // renderer.domElement.addEventListener("mousemove", (event) => {
+    //   if (settings.mouseControl) {
+    //     camera.quaternion.y -= (event.movementX * settings.sensitivity) / 20;
+    //     camera.quaternion.x -= (event.movementY * settings.sensitivity) / 20;
+    //   }
+    // });
 
     const altitudeUI = document.getElementById("vario-altitude");
     const deltaUI = document.getElementById("vario-delta");
