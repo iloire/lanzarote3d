@@ -7,17 +7,17 @@ const Clouds = {
     const clouds = [
       {
         type: 0,
-        scale: 0.3,
+        scale: scale * 0.5,
         location: { x: pos.x + 0, y: pos.y + 2, z: pos.z + 3 },
       },
       {
         type: 1,
-        scale: 0.03,
+        scale: scale * 0.05,
         location: { x: pos.x + 0, y: pos.y + 3, z: pos.z + 3 },
       },
       {
         type: 0,
-        scale: 0.3,
+        scale,
         location: { x: pos.x + 0, y: pos.y + 3, z: pos.z + 4 },
       },
     ];

@@ -150,9 +150,9 @@ class App extends React.Component<AppProps, AppState> {
     const island = await Island.load(20000, { x: 0, y: 0, z: 0 });
     scene.add(island);
 
-    const c = await Clouds.load(1, { x: 0, y: 10, z: 0 });
+    const c = await Clouds.load(300, { x: 0, y: 800, z: 0 });
     scene.add(c);
-    const c1 = await Clouds.load(1, { x: 60, y: 12, z: -40 });
+    const c1 = await Clouds.load(301, { x: 60, y: 800, z: -40 });
     scene.add(c1);
 
     const queryString = window.location.search;
