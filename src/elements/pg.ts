@@ -80,7 +80,6 @@ class Paraglider extends THREE.EventDispatcher {
     this.options = options;
     this.weather = weather;
     this.terrain = terrain;
-    this.interval = setInterval(() => this.tick(0.05), 50);
   }
 
   async loadModel(scale: number, initialPosition: THREE.Vector3) {
@@ -94,6 +93,7 @@ class Paraglider extends THREE.EventDispatcher {
       pg.add(this.getGravityHelper(arrowLen));
     }
     this.model = pg;
+    this.interval = setInterval(() => this.tick(0.05), 50);
   }
 
   tick(multiplier: number) {
