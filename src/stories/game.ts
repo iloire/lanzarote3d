@@ -59,8 +59,12 @@ const Game = {
     controls.enabled = settings.orbitControl;
     gui.add(controls, "enabled").name("orbit controls");
 
+    const speedBarUI = document.getElementById("paraglider-speedBar");
     const pg = new Paraglider(pgOptions, weather, terrain);
     await pg.loadModel(p.scale, p.position);
+    pg.addEventListener("position", function (event) {
+      speedBarUI.innerText = pg.isOnSpeedBar().toString();
+    });
     pg.addGui(gui);
     scene.add(pg.model);
 

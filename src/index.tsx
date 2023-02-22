@@ -176,9 +176,14 @@ class App extends React.Component<AppProps, AppState> {
           </div>
         )}
 
-        <div id="vario">
+        <div id="vario-info">
           <div id="vario-delta" className="delta"></div>
           <div id="vario-altitude" className="altitude"></div>
+        </div>
+
+        <div id="paraglider-info">
+          <div id="paraglider-speedBar" className="speedBar"></div>
+          <div id="paraglider-ears" className="ears"></div>
         </div>
 
         <div className="points" style={{ display: "none" }}>

@@ -280,6 +280,10 @@ class Paraglider extends THREE.EventDispatcher {
     }
   }
 
+  isOnSpeedBar(): boolean {
+    return this.speedBar;
+  }
+
   speed(): number {
     return this.currentSpeed;
   }
