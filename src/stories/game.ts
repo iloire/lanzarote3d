@@ -63,7 +63,7 @@ const Game = {
     const pg = new Paraglider(pgOptions, weather, terrain);
     await pg.loadModel(p.scale, p.position);
     pg.addEventListener("position", function (event) {
-      speedBarUI.innerText = pg.isOnSpeedBar().toString();
+      speedBarUI.innerText = "speedbar: " + pg.isOnSpeedBar().toString();
     });
     pg.addGui(gui);
     scene.add(pg.model);
@@ -111,6 +111,8 @@ const Game = {
       altitudeUI.innerText = Math.round(event.altitude) + " m.";
     });
     vario.start();
+
+    BackgroundSound.load(camera);
 
     const animate = () => {
       // setTimeout(animate, 2200);
