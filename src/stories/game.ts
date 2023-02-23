@@ -93,7 +93,6 @@ const Game = {
         } else {
           gui.hide();
         }
-        console.log(gui);
       } else if (keyCode == 77) {
         //m
         bgMusic.toggle();
@@ -117,6 +116,7 @@ const Game = {
 
     const altitudeUI = document.getElementById("vario-altitude");
     const deltaUI = document.getElementById("vario-delta");
+    const groundSpeedUI = document.getElementById("vario-ground-speed");
     const vario = new Vario(pg);
     vario.addEventListener("delta", function (event) {
       deltaUI.innerText = Math.round(event.delta * 100) / 100 + " vertical";
@@ -124,7 +124,21 @@ const Game = {
     vario.addEventListener("altitude", function (event) {
       altitudeUI.innerText = Math.round(event.altitude) + " m.";
     });
+    vario.addEventListener("altitude", function (event) {
+      groundSpeedUI.innerText =
+        Math.round(KMH_TO_MS * pg.getGroundSpeed() * 100) / 100 + " km/h";
+    });
     vario.start();
+
+    const leftControl = document.getElementById("game-controls-left");
+    leftControl.addEventListener("click", (event: MouseEvent) => {
+      pg.rotateLeft(settings.rotationSensitivity);
+    });
+
+    const rightControl = document.getElementById("game-controls-right");
+    rightControl.addEventListener("click", (event: MouseEvent) => {
+      pg.rotateRight(settings.rotationSensitivity);
+    });
 
     // Game start
     gui.hide();

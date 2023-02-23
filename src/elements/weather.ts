@@ -2,14 +2,14 @@ import * as THREE from "three";
 
 class Weather {
   degreesFromNorth: number;
-  speedMetresPerSecond: number
+  speedMetresPerSecond: number;
 
   constructor(degreesFromNorth: number, speedMetresPerSecond: number) {
     this.degreesFromNorth = degreesFromNorth;
     this.speedMetresPerSecond = speedMetresPerSecond;
   }
 
-  getWindVelocity(multiplier: number): THREE.Vector3 {
+  getWindVelocity(multiplier: number = 1): THREE.Vector3 {
     return this.getWindDirectionFromNorth(this.degreesFromNorth).multiplyScalar(
       multiplier * this.speedMetresPerSecond
     );

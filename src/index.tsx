@@ -15,7 +15,7 @@ import Island from "./elements/island";
 import Clouds from "./elements/clouds";
 
 import Stories from "./stories/index";
-import Camera from './elements/camera';
+import Camera from "./elements/camera";
 
 import "./index.css";
 
@@ -77,13 +77,8 @@ class App extends React.Component<AppProps, AppState> {
 
     const scene = new THREE.Scene();
 
-    const camera = new Camera(
-      45,
-      sizes.width / sizes.height,
-      1,
-      200000
-    );
-    camera.addGui(gui)
+    const camera = new Camera(45, sizes.width / sizes.height, 1, 200000);
+    camera.addGui(gui);
     scene.add(camera);
 
     Lights.addLightsToScene(scene, false);
@@ -162,15 +157,19 @@ class App extends React.Component<AppProps, AppState> {
         )}
 
         <div id="game">
-          <div id="game-start">
-             <button id="game-start-button">START</button>
+          <div id="game-controls">
+            <button id="game-controls-left">LEFT</button>
+            <button id="game-controls-right">RIGHT</button>
           </div>
-          <div id="" className="altitude"></div>
+          <div id="game-start">
+            <button id="game-start-button">START</button>
+          </div>
         </div>
 
         <div id="vario-info">
           <div id="vario-delta" className="delta"></div>
           <div id="vario-altitude" className="altitude"></div>
+          <div id="vario-ground-speed" className="ground-speed"></div>
         </div>
 
         <div id="paraglider-info">
