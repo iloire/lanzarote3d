@@ -1,3 +1,5 @@
+import React from "react";
+import { createRoot } from "react-dom/client";
 import * as THREE from "three";
 import BackgroundSound from "../audio/background";
 import Paraglider, { ParagliderConstructor } from "../elements/pg";
@@ -7,6 +9,7 @@ import WindIndicator from "../elements/wind-indicator";
 import Vario from "../audio/vario";
 import Weather from "../elements/weather";
 import Camera from "../elements/camera";
+import UIControls from "../elements/ui-controls";
 
 const KMH_TO_MS = 3.6;
 
@@ -38,8 +41,7 @@ const p = {
 
 const Game = {
   load: async (camera: Camera, scene, renderer, terrain, water, gui) => {
-    console.log("============ LOAD GAME ====================== ");
-
+    gui.hide();
     const nav = gui.addFolder("Navigation");
     nav.add(settings, "mouseControl").listen();
     nav.add(settings, "rotationSensitivity", 0, 1).listen();
@@ -81,7 +83,7 @@ const Game = {
       const keyCode = event.which;
       console.log(keyCode);
       if (keyCode == 32) {
-        //space
+        // space
         pg.jump(terrain);
       } else if (keyCode == 67) {
         //c
@@ -101,6 +103,9 @@ const Game = {
         pg.rotateLeft(settings.rotationSensitivity);
       } else if (keyCode == 68) {
         //d
+        pg.rotateRight(settings.rotationSensitivity);
+      } else if (keyCode == 81) {
+        //q
         pg.rotateRight(settings.rotationSensitivity);
       }
     }
@@ -140,38 +145,43 @@ const Game = {
     weatherSpeedUi.innerText =
       "wind speed: " + WEATHER_SETTINGS.windSpeed * KMH_TO_MS + " km/h";
 
-    const controlsContainer = document.getElementById("game-controls");
     let isLeftTurning;
-    const leftControl = document.getElementById("game-controls-left");
-    leftControl.addEventListener("mousedown", (event: MouseEvent) => {
-      isLeftTurning = true;
-    });
-    leftControl.addEventListener("mouseup", (event: MouseEvent) => {
-      isLeftTurning = false;
-    });
-
     let isRightTurning;
-    const rightControl = document.getElementById("game-controls-right");
-    rightControl.addEventListener("mousedown", (event: MouseEvent) => {
-      isRightTurning = true;
-    });
-    rightControl.addEventListener("mouseup", (event: MouseEvent) => {
-      isRightTurning = false;
-    });
 
     // Game start
-    camera.followTarget(pg.model);
+    camera.firstPersonView(pg.model);
     renderer.render(scene, camera);
-    gui.hide();
-    const gameStart = document.getElementById("game-start-button");
-    gameStart.addEventListener("click", (event: MouseEvent) => {
-      gameStart.style.display = "none";
-      controlsContainer.style.display = "block";
 
-      animate();
-      console.log("Number of Triangles :", renderer.info.render.triangles);
-      bgMusic.start();
-    });
+    const rootElement = document.getElementById("ui-controls");
+    const root = createRoot(rootElement);
+    const uiControls = (
+      <UIControls
+        onLeftBreak={() => {
+          console.log("left");
+          isLeftTurning = true;
+        }}
+        onLeftBreakRelease={() => {
+          console.log("left release");
+          isLeftTurning = false;
+        }}
+        onRightBreak={() => {
+          console.log("right");
+          isRightTurning = true;
+        }}
+        onRightBreakRelease={() => {
+          console.log("right release");
+          isRightTurning = false;
+        }}
+        onGameStart={(fnHideStartButton) => {
+          console.log(this);
+          animate();
+          console.log("Number of Triangles :", renderer.info.render.triangles);
+          bgMusic.start();
+          fnHideStartButton();
+        }}
+      />
+    );
+    root.render(uiControls);
 
     const animate = () => {
       // setTimeout(animate, 2200);
@@ -183,7 +193,7 @@ const Game = {
       }
       requestAnimationFrame(animate);
       const timer = Date.now() * 0.0005;
-      // camera.position.y += Math.sin(timer) * 0.0003;
+      camera.position.y += Math.sin(timer) * 0.0003;
       controls.target = pg.position();
       controls.update();
       vario.updateReading(pg.altitude());

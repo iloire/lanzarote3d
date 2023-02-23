@@ -10,7 +10,7 @@ class Camera extends THREE.PerspectiveCamera {
   addGui(gui) {
     const cameraGui = gui.addFolder("Camera");
     cameraGui.add(this.position, "x", -1000, 1000).name("x").listen();
-    cameraGui.add(this.position, "y", 0, 1000).name("y").listen();
+    cameraGui.add(this.position, "y", 200, 2000).name("y").listen();
     cameraGui.add(this.position, "z", -1000, 1000).name("z").listen();
 
     cameraGui
@@ -30,6 +30,10 @@ class Camera extends THREE.PerspectiveCamera {
   followTarget(target: THREE.Mesh, offset?: THREE.Vector3) {
     const cameraOffset = offset || new THREE.Vector3(-4.2, 10, 11.2);
     this.position.copy(getObjectPosition(target)).add(cameraOffset);
+  }
+
+  firstPersonView(target: THREE.Mesh) {
+    this.position.copy(getObjectPosition(target));
   }
 }
 
