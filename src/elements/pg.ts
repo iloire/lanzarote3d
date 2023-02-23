@@ -2,6 +2,7 @@ import * as THREE from "three";
 import model from "../models/pubg_green_parachute2.glb";
 import Models from "../utils/models";
 import Weather from "../elements/weather";
+import Thermal from "../elements/thermal";
 
 const settings = { SHOW_ARROWS: true };
 const ORIGIN = new THREE.Vector3(0, 0, 0);
@@ -63,14 +64,20 @@ export interface ParagliderConstructor {
 class Paraglider extends THREE.EventDispatcher {
   options: ParagliderConstructor;
   weather: Weather;
-  terrain: any;
+  terrain: THREE.Mesh;
+  thermals: Thermal[];
   speedBar: boolean;
   currentSpeed: number;
   interval: any;
   model: THREE.Mesh;
   gravityDirection = new THREE.Vector3(0, -1, 0);
 
-  constructor(options: ParagliderConstructor, weather: Weather, terrain: any) {
+  constructor(
+    options: ParagliderConstructor,
+    weather: Weather,
+    terrain: THREE.Mesh,
+    thermals: Thermal[]
+  ) {
     super();
     if (!options.glidingRatio) {
       throw new Error("missing glading ratio");
@@ -80,6 +87,19 @@ class Paraglider extends THREE.EventDispatcher {
     this.options = options;
     this.weather = weather;
     this.terrain = terrain;
+    this.thermals = thermals;
+  }
+
+  isInsideThermal(thermal: Thermal): boolean {
+    const pgBB = new THREE.Box3().setFromObject(this.model);
+    const thermalBB = new THREE.Box3().setFromObject(thermal.getMesh());
+    const inTheTermal = thermalBB.containsBox(pgBB);
+    if (inTheTermal) {
+      console.log("inside thernak");
+    } else {
+      console.log("not inside thermal");
+    }
+    return inTheTermal;
   }
 
   async loadModel(scale: number, initialPosition: THREE.Vector3) {
@@ -100,6 +120,11 @@ class Paraglider extends THREE.EventDispatcher {
     if (!this.hasTouchedGround(this.terrain)) {
       this.moveForward(multiplier);
       this.moveVertical(multiplier);
+    }
+    if (this.isInsideThermal(this.thermals[0])) {
+      const liftDirection = new THREE.Vector3(0, 1, 0);
+      const liftVector = liftDirection.multiplyScalar(multiplier * 2);
+      this.move(liftVector);
     }
   }
 

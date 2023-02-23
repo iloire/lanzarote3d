@@ -10,6 +10,7 @@ import Vario from "../audio/vario";
 import Weather from "../elements/weather";
 import Camera from "../elements/camera";
 import UIControls from "../elements/ui-controls";
+import Thermal from "../elements/thermal";
 
 const KMH_TO_MS = 3.6;
 
@@ -60,7 +61,13 @@ const Game = {
     const bgMusic = new BackgroundSound();
 
     const speedBarUI = document.getElementById("paraglider-speedBar");
-    const pg = new Paraglider(pgOptions, weather, terrain);
+
+    const thermal = new Thermal();
+    const thermalPos = new THREE.Vector3(5827, 880, -855);
+    const mesh = await thermal.loadModel(p.position);
+    scene.add(mesh);
+
+    const pg = new Paraglider(pgOptions, weather, terrain, [thermal]);
     await pg.loadModel(p.scale, p.position);
     pg.addEventListener("position", function (event) {
       speedBarUI.innerText =
@@ -182,6 +189,8 @@ const Game = {
       />
     );
     root.render(uiControls);
+
+    // thermal
 
     const animate = () => {
       // setTimeout(animate, 2200);
