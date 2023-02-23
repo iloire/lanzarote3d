@@ -39,10 +39,10 @@ const p = {
 const Game = {
   load: async (camera: Camera, scene, renderer, terrain, water, gui) => {
     console.log("============ LOAD GAME ====================== ");
+
     const nav = gui.addFolder("Navigation");
     nav.add(settings, "mouseControl").listen();
     nav.add(settings, "rotationSensitivity", 0, 1).listen();
-    // nav.add(settings, "sensitivity", 0, 1).listen();
     nav.add(settings, "wrapSpeed", 1, 10).listen();
 
     const controls = Controls.createControls(camera, renderer);
@@ -61,7 +61,8 @@ const Game = {
     const pg = new Paraglider(pgOptions, weather, terrain);
     await pg.loadModel(p.scale, p.position);
     pg.addEventListener("position", function (event) {
-      speedBarUI.innerText = "speedbar: " + pg.isOnSpeedBar().toString();
+      speedBarUI.innerText =
+        "Speedbar (S key): " + pg.isOnSpeedBar().toString();
     });
     pg.addGui(gui);
     scene.add(pg.model);
@@ -115,33 +116,57 @@ const Game = {
     const groundSpeedUI = document.getElementById("vario-ground-speed");
     const vario = new Vario(pg);
     vario.addEventListener("delta", function (event) {
-      deltaUI.innerText = Math.round(event.delta * 100) / 100 + " vertical";
+      deltaUI.innerText =
+        "Altitude Δ: " + Math.round(event.delta * 100) / 100 + " m/s";
     });
     vario.addEventListener("altitude", function (event) {
-      altitudeUI.innerText = Math.round(event.altitude) + " m.";
+      altitudeUI.innerText = "Altitude: " + Math.round(event.altitude) + " m.";
     });
     vario.addEventListener("altitude", function (event) {
       groundSpeedUI.innerText =
-        Math.round(KMH_TO_MS * pg.getGroundSpeed() * 100) / 100 + " km/h";
+        "Speed: " +
+        Math.round(KMH_TO_MS * pg.getGroundSpeed() * 100) / 100 +
+        " km/h";
     });
     vario.start();
 
+    const weatherDirectionUi = document.getElementById("weather-direction");
+    weatherDirectionUi.innerText =
+      "wind direction: " +
+      WEATHER_SETTINGS.windDirectionDegreesFromNorth +
+      " degrees";
+
+    const weatherSpeedUi = document.getElementById("weather-speed");
+    weatherSpeedUi.innerText =
+      "wind speed: " + WEATHER_SETTINGS.windSpeed * KMH_TO_MS + " km/h";
+
+    const controlsContainer = document.getElementById("game-controls");
+    let isLeftTurning;
     const leftControl = document.getElementById("game-controls-left");
-    leftControl.addEventListener("click", (event: MouseEvent) => {
-      pg.rotateLeft(settings.rotationSensitivity);
+    leftControl.addEventListener("mousedown", (event: MouseEvent) => {
+      isLeftTurning = true;
+    });
+    leftControl.addEventListener("mouseup", (event: MouseEvent) => {
+      isLeftTurning = false;
     });
 
+    let isRightTurning;
     const rightControl = document.getElementById("game-controls-right");
-    rightControl.addEventListener("click", (event: MouseEvent) => {
-      pg.rotateRight(settings.rotationSensitivity);
+    rightControl.addEventListener("mousedown", (event: MouseEvent) => {
+      isRightTurning = true;
+    });
+    rightControl.addEventListener("mouseup", (event: MouseEvent) => {
+      isRightTurning = false;
     });
 
     // Game start
+    camera.followTarget(pg.model);
+    renderer.render(scene, camera);
     gui.hide();
     const gameStart = document.getElementById("game-start-button");
     gameStart.addEventListener("click", (event: MouseEvent) => {
       gameStart.style.display = "none";
-      camera.followTarget(pg.model);
+      controlsContainer.style.display = "block";
 
       animate();
       console.log("Number of Triangles :", renderer.info.render.triangles);
@@ -150,6 +175,12 @@ const Game = {
 
     const animate = () => {
       // setTimeout(animate, 2200);
+      if (isLeftTurning) {
+        pg.rotateLeft(settings.rotationSensitivity);
+      }
+      if (isRightTurning) {
+        pg.rotateRight(settings.rotationSensitivity);
+      }
       requestAnimationFrame(animate);
       const timer = Date.now() * 0.0005;
       // camera.position.y += Math.sin(timer) * 0.0003;

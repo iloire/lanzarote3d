@@ -172,6 +172,11 @@ class App extends React.Component<AppProps, AppState> {
           <div id="vario-ground-speed" className="ground-speed"></div>
         </div>
 
+        <div id="weather-info">
+          <div id="weather-direction" className=""></div>
+          <div id="weather-speed" className=""></div>
+        </div>
+
         <div id="paraglider-info">
           <div id="paraglider-speedBar" className="speedBar"></div>
           <div id="paraglider-ears" className="ears"></div>

@@ -8,6 +8,7 @@
 }
 
 #game-controls {
+  display:none;
   color: white;
   position: absolute;
   bottom: 10%;
@@ -16,6 +17,10 @@
   border-radius: 5%;
   background: #00000077;
   border: 1px solid #ffffff77;
+}
+
+#game-controls button {
+  font-size: 250%;
 }
 
 #game-start button{
@@ -27,7 +32,7 @@
   border-radius: 5%;
   background: #00000077;
   border: 1px solid #ffffff77;
-  font-size: 300%;
+  font-size: 400%;
 }
 
 #vario-info {
@@ -41,12 +46,22 @@
   border: 1px solid #ffffff77;
 }
 
+#weather-info {
+  color: white;
+  position: absolute;
+  top: 20px;
+  right: 5%;
+  padding: 0px 10px;
+  border-radius: 5%;
+  background: #00000077;
+  border: 1px solid #ffffff77;
+}
 
 #paraglider-info {
   color: white;
   position: absolute;
   top: 20px;
-  left: 140px;
+  left: 180px;
   padding: 0px 10px;
   border-radius: 5%;
   background: #00000077;
