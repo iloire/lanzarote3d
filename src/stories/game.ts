@@ -59,6 +59,8 @@ const Game = {
       WEATHER_SETTINGS.windSpeed
     );
 
+    const bgMusic = new BackgroundSound();
+
     const speedBarUI = document.getElementById("paraglider-speedBar");
     const pg = new Paraglider(pgOptions, weather, terrain);
     await pg.loadModel(p.scale, p.position);
@@ -92,6 +94,9 @@ const Game = {
           gui.hide();
         }
         console.log(gui);
+      } else if (keyCode == 77) {
+        //m
+        bgMusic.toggle();
       } else if (keyCode == 83) {
         //s
         pg.toggleSpeedBar();
@@ -130,7 +135,7 @@ const Game = {
 
       animate();
       console.log("Number of Triangles :", renderer.info.render.triangles);
-      BackgroundSound.load(camera);
+      bgMusic.start();
     });
 
     const animate = () => {

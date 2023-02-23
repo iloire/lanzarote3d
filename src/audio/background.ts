@@ -3,29 +3,55 @@ import wind1 from "./wind/wind-howl-01.mp3";
 import wind2 from "./wind/hurricane-01.mp3";
 import music from "./music/the-beat-of-nature-122841.mp3";
 
-const play = (camera, file, volume) => {
-  const listener = new THREE.AudioListener();
-  camera.add(listener);
+class BackgroundSound {
+  wind1: THREE.Audio;
+  wind2: THREE.Audio;
+  music: THREE.Audio;
+  playing: boolean;
 
-  // create a global audio source
-  const sound = new THREE.Audio(listener);
+  constructor() {
+    this.load();
+  }
 
-  // load a sound and set it as the Audio object's buffer
-  const audioLoader = new THREE.AudioLoader();
-  audioLoader.load(file, function (buffer) {
-    sound.setBuffer(buffer);
-    sound.setLoop(true);
-    sound.setVolume(volume || 0.3);
-    sound.play();
-  });
-};
+  loadSound(file, volume) {
+    const listener = new THREE.AudioListener();
+    const sound = new THREE.Audio(listener);
+    const audioLoader = new THREE.AudioLoader();
+    audioLoader.load(file, function (buffer) {
+      sound.setBuffer(buffer);
+      sound.setLoop(true);
+      sound.setVolume(volume || 0.3);
+    });
+    return sound;
+  }
 
-const BackgroundSound = {
-  load: (camera) => {
-    play(camera, wind1, 0.3);
-    play(camera, wind2, 0.3);
-    play(camera, music, 0.2);
-  },
-};
+  load() {
+    this.wind1 = this.loadSound(wind1, 0.3);
+    this.wind2 = this.loadSound(wind2, 0.3);
+    this.music = this.loadSound(music, 0.2);
+  }
+
+  toggle() {
+    if (this.playing) {
+      this.stop();
+    } else {
+      this.start();
+    }
+  }
+
+  start() {
+    this.wind1.play();
+    this.wind2.play();
+    this.music.play();
+    this.playing = true;
+  }
+
+  stop() {
+    this.wind1.stop();
+    this.wind2.stop();
+    this.music.stop();
+    this.playing = false;
+  }
+}
 
 export default BackgroundSound;
