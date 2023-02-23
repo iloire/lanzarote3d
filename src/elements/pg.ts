@@ -1,7 +1,6 @@
 import * as THREE from "three";
 import model from "../models/pubg_green_parachute2.glb";
 import Models from "../utils/models";
-import MathUtils from "../utils/math";
 import Weather from "../elements/weather";
 
 const settings = { SHOW_ARROWS: true };

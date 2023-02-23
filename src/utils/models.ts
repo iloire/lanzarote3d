@@ -12,11 +12,7 @@ function modelLoader(url) {
 
 const Models = {
   manager,
-  load: async (
-    model: THREE.Mesh,
-    scale: number,
-    pos: THREE.Vector3,
-  ) => {
+  load: async (model: THREE.Mesh, scale: number, pos: THREE.Vector3) => {
     const gltf: any = await modelLoader(model);
     const mesh = gltf.scene.children[0];
     mesh.scale.set(scale, scale, scale);
