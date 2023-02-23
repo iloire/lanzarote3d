@@ -15,6 +15,12 @@ class Weather {
     );
   }
 
+  addGui(gui) {
+    const weatherGui = gui.addFolder("Weather");
+    weatherGui.add(this, "degreesFromNorth", 0, 360).listen();
+    weatherGui.add(this, "speedMetresPerSecond", 0, 60).listen();
+  }
+
   getSpeedMetresPerSecond(): number {
     return this.speedMetresPerSecond;
   }

@@ -11,7 +11,6 @@ import Camera from "../elements/camera";
 const KMH_TO_MS = 3.6;
 
 const settings = {
-  // sensitivity: 0.01,
   rotationSensitivity: 0.01,
   mouseControl: false,
   orbitControl: true,
@@ -46,10 +45,6 @@ const Game = {
     // nav.add(settings, "sensitivity", 0, 1).listen();
     nav.add(settings, "wrapSpeed", 1, 10).listen();
 
-    // const weatherGui = gui.addFolder("Weather");
-    // weatherGui.add(weather, "windDirectionDegreesFromNorth", 0, 360).listen();
-    // weatherGui.add(weather, "windSpeed", 0, 60).listen();
-
     const controls = Controls.createControls(camera, renderer);
     controls.enabled = settings.orbitControl;
     gui.add(controls, "enabled").name("orbit controls");
@@ -58,6 +53,7 @@ const Game = {
       WEATHER_SETTINGS.windDirectionDegreesFromNorth,
       WEATHER_SETTINGS.windSpeed
     );
+    weather.addGui(gui);
 
     const bgMusic = new BackgroundSound();
 
