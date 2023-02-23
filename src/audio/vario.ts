@@ -68,7 +68,7 @@ class Vario extends THREE.EventDispatcher {
     const audioLoader = new THREE.AudioLoader();
     audioLoader.load(this.getBeepForIncrement(delta), (buffer) => {
       this.sound.setBuffer(buffer);
-      this.sound.setVolume(0.5);
+      this.sound.setVolume(0.3);
       this.sound.play();
     });
   }

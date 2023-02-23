@@ -26,9 +26,9 @@ class BackgroundSound {
   }
 
   load() {
-    this.wind1 = this.loadSound(wind1, 0.3);
-    this.wind2 = this.loadSound(wind2, 0.3);
-    this.music = this.loadSound(music, 0.2);
+    this.wind1 = this.loadSound(wind1, 0.2);
+    this.wind2 = this.loadSound(wind2, 0.2);
+    this.music = this.loadSound(music, 0.3);
   }
 
   toggle() {
