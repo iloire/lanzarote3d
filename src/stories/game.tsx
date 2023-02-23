@@ -8,7 +8,7 @@ import Helpers from "../utils/helpers";
 import WindIndicator from "../elements/wind-indicator";
 import Vario from "../audio/vario";
 import Weather from "../elements/weather";
-import Camera from "../elements/camera";
+import Camera, { CameraMode } from "../elements/camera";
 import UIControls from "../elements/ui-controls";
 import Thermal from "../elements/thermal";
 
@@ -45,7 +45,7 @@ const Game = {
     gui.hide();
     const nav = gui.addFolder("Navigation");
     nav.add(settings, "mouseControl").listen();
-    nav.add(settings, "rotationSensitivity", 0, 1).listen();
+    nav.add(settings, "rotationSensitivity", 0.01, 0.05).listen();
     nav.add(settings, "wrapSpeed", 1, 10).listen();
 
     const controls = Controls.createControls(camera, renderer);
@@ -186,6 +186,15 @@ const Game = {
           bgMusic.start();
           fnHideStartButton();
         }}
+        onSelectCamera={(cam: number) => {
+          if (cam === 1) {
+            camera.setCameraMode(CameraMode.FollowTarget, pg.getMesh());
+          } else if (cam === 2) {
+            camera.setCameraMode(CameraMode.FirstPersonView, pg.getMesh());
+          } else if (cam === 3) {
+            camera.setCameraMode(CameraMode.FarAway, pg.getMesh());
+          }
+        }}
       />
     );
     root.render(uiControls);
@@ -202,7 +211,8 @@ const Game = {
       }
       requestAnimationFrame(animate);
       const timer = Date.now() * 0.0005;
-      camera.position.y += Math.sin(timer) * 0.0003;
+      // camera.position.y += Math.sin(timer) * 0.0003;
+      camera.update();
       controls.target = pg.position();
       controls.update();
       vario.updateReading(pg.altitude());

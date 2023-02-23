@@ -94,11 +94,11 @@ class Paraglider extends THREE.EventDispatcher {
     const pgBB = new THREE.Box3().setFromObject(this.model);
     const thermalBB = new THREE.Box3().setFromObject(thermal.getMesh());
     const inTheTermal = thermalBB.containsBox(pgBB);
-    if (inTheTermal) {
-      console.log("inside thernak");
-    } else {
-      console.log("not inside thermal");
-    }
+    // if (inTheTermal) {
+    //   console.log("inside thernak");
+    // } else {
+    //   console.log("not inside thermal");
+    // }
     return inTheTermal;
   }
 
@@ -113,7 +113,11 @@ class Paraglider extends THREE.EventDispatcher {
       pg.add(this.getGravityHelper(arrowLen));
     }
     this.model = pg;
-    this.interval = setInterval(() => this.tick(0.05), 50);
+    this.interval = setInterval(() => this.tick(0.1), 100);
+  }
+
+  getMesh(): THREE.Mesh {
+    return this.model;
   }
 
   tick(multiplier: number) {

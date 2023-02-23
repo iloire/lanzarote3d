@@ -6,6 +6,7 @@ type UIControlsProps = {
   onRightBreak: () => void;
   onRightBreakRelease: () => void;
   onGameStart: (fnHideStartButton: () => void) => void;
+  onSelectCamera: (num: number) => void;
 };
 
 type UIControlsState = {
@@ -19,6 +20,10 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       showStartButton: true,
     };
   }
+
+  handleCamSelection = (cam: number) => {
+    this.props.onSelectCamera(cam);
+  };
 
   handleLeft = () => {
     this.props.onLeftBreak();
@@ -74,10 +79,19 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       </div>
     );
 
+    const cameraSelection = (
+      <div id="camera-selection">
+        <button onClick={() => this.handleCamSelection(1)}>1</button>
+        <button onClick={() => this.handleCamSelection(2)}>2</button>
+        <button onClick={() => this.handleCamSelection(3)}>3</button>
+      </div>
+    );
+
     return (
       <div id="game">
         {breakControls}
         {startButton}
+        {cameraSelection}
 
         <div id="vario-info">
           <div id="vario-delta" className="delta"></div>

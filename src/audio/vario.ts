@@ -19,7 +19,7 @@ class Vario extends THREE.EventDispatcher {
     const listener = new THREE.AudioListener();
     this.sound = new THREE.Audio(listener);
     this.pg = pg;
-    setInterval(this.tick, 2000);
+    this.tick();
   }
 
   start() {
@@ -33,12 +33,8 @@ class Vario extends THREE.EventDispatcher {
   }
 
   tick = () => {
-    if (!this.lastRecord) {
-      this.lastRecord = this.high;
-      return;
-    }
-    const delta = this.high - this.lastRecord;
-
+    console.log("tick");
+    const delta = this.high - this.lastRecord || this.high;
     this.dispatchEvent({ type: "delta", delta });
     this.lastRecord = this.high;
     if (this.status === "on") {
@@ -46,6 +42,22 @@ class Vario extends THREE.EventDispatcher {
         this.play(delta);
       }
     }
+
+    let delay = 2000;
+    if (delta > 4) {
+      delay = 600;
+    } else if (delta > 3) {
+      delay = 700;
+    } else if (delta > 2) {
+      delay = 800;
+    } else if (delta > 1.5) {
+      delay = 1000;
+    } else if (delta > 1) {
+      delay = 1500;
+    } else {
+      delay = 2000;
+    }
+    setTimeout(this.tick, delay);
   };
 
   getBeepForIncrement(delta) {
@@ -65,6 +77,7 @@ class Vario extends THREE.EventDispatcher {
   }
 
   play(delta) {
+    console.log(delta);
     const audioLoader = new THREE.AudioLoader();
     audioLoader.load(this.getBeepForIncrement(delta), (buffer) => {
       this.sound.setBuffer(buffer);

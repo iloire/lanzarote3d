@@ -7,6 +7,17 @@
   left: 20px;
 }
 
+#camera-selection {
+  color: white;
+  position: absolute;
+  bottom: 5%;
+  left: 30px;
+  padding: 10px;
+  border-radius: 5%;
+  background: #00000077;
+  border: 1px solid #ffffff77;
+}
+
 #game-controls {
   /* display:none; */
   color: white;
