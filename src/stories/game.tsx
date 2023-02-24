@@ -199,7 +199,6 @@ const Game = {
         }}
         onGameStart={(fnHideStartButton) => {
           animate();
-          console.log("Number of Triangles :", renderer.info.render.triangles);
           bgMusic.start();
           fnHideStartButton();
           pg.init();
@@ -227,6 +226,13 @@ const Game = {
     camera.setCameraMode(CameraMode.FollowTarget, pg, controls);
     renderer.render(scene, camera);
 
+    pg.addEventListener("touchedGround", () => {
+      console.log("game over");
+      vario.stop();
+      bgMusic.stop();
+      pg.stop();
+    });
+
     const animate = () => {
       camera.update();
       controls.target = pg.position();
@@ -239,14 +245,8 @@ const Game = {
       if (isRightTurning) {
         pg.rotateRight(settings.rotationSensitivity);
       }
-      if (pg.hasTouchedGround(terrain, water)) {
-        console.log("game over");
-        vario.stop();
-        bgMusic.stop();
-      } else {
-        requestAnimationFrame(animate);
-        // setTimeout(animate, 2200);
-      }
+      requestAnimationFrame(animate);
+      // setTimeout(animate, 2200);
     };
   },
 };

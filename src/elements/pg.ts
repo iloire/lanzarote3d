@@ -132,6 +132,10 @@ class Paraglider extends THREE.EventDispatcher {
     this.interval = setInterval(() => this.tick(0.1 * this.wrapSpeed), 100);
   }
 
+  stop() {
+    clearInterval(this.interval);
+  }
+
   getMesh(): THREE.Mesh {
     return this.model;
   }
@@ -140,6 +144,10 @@ class Paraglider extends THREE.EventDispatcher {
     if (!this.hasTouchedGround(this.terrain, this.water)) {
       this.moveForward(multiplier);
       this.moveVertical(multiplier);
+    } else {
+      this.dispatchEvent({
+        type: "touchedGround",
+      });
     }
     if (this.isInsideThermal(this.thermals[0])) {
       const liftDirection = new THREE.Vector3(0, 1, 0);
