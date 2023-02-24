@@ -63,17 +63,17 @@ const Game = {
     const bgMusic = new BackgroundSound();
 
     const thermalPos = new THREE.Vector3(
-      6827,
+      5727,
       WEATHER_SETTINGS.lclLevel / 2,
-      55
+      -535
     );
     const thermalPos2 = new THREE.Vector3(
-      6827,
+      7127,
       WEATHER_SETTINGS.lclLevel / 2,
-      -355
+      -1405
     );
-    const thermal = new Thermal(thermalPos, WEATHER_SETTINGS.lclLevel);
-    const thermal2 = new Thermal(thermalPos2, WEATHER_SETTINGS.lclLevel);
+    const thermal = new Thermal(thermalPos, WEATHER_SETTINGS.lclLevel, 1.5);
+    const thermal2 = new Thermal(thermalPos2, WEATHER_SETTINGS.lclLevel, 2);
     scene.add(thermal.mesh);
     scene.add(thermal2.mesh);
 

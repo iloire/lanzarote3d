@@ -3,8 +3,17 @@ import * as THREE from "three";
 class Thermal {
   mesh: THREE.Mesh;
 
-  constructor(initialPosition: THREE.Vector3, height: number) {
-    const geometry = new THREE.CylinderGeometry(150, 100, height, 32);
+  constructor(
+    initialPosition: THREE.Vector3,
+    height: number,
+    relativeScale: number = 1
+  ) {
+    const geometry = new THREE.CylinderGeometry(
+      250 * relativeScale,
+      100 * relativeScale,
+      height,
+      32
+    );
     console.log(height);
 
     // Create a new material with a solid color
