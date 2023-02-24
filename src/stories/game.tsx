@@ -19,7 +19,7 @@ function round(number: number): number {
 }
 
 const settings = {
-  rotationSensitivity: 0.02,
+  rotationSensitivity: 0.007,
   mouseControl: false,
   orbitControl: true,
   wrapSpeed: 1,
@@ -62,16 +62,25 @@ const Game = {
 
     const bgMusic = new BackgroundSound();
 
-    const thermal = new Thermal();
     const thermalPos = new THREE.Vector3(
       5827,
       WEATHER_SETTINGS.lclLevel + 100,
       -855
     );
-    const mesh = await thermal.loadModel(p.position);
-    scene.add(mesh);
+    const thermalPos2 = new THREE.Vector3(
+      3827,
+      WEATHER_SETTINGS.lclLevel + 100,
+      -855
+    );
+    const thermal = new Thermal(thermalPos, WEATHER_SETTINGS.lclLevel + 100);
+    const thermal2 = new Thermal(thermalPos2, WEATHER_SETTINGS.lclLevel + 100);
+    scene.add(thermal.mesh);
+    scene.add(thermal2.mesh);
 
-    const pg = new Paraglider(pgOptions, weather, terrain, water, [thermal]);
+    const pg = new Paraglider(pgOptions, weather, terrain, water, [
+      thermal,
+      thermal2,
+    ]);
     await pg.loadModel(p.scale, p.position);
 
     const speedBarUI = document.getElementById("paraglider-speedBar");
@@ -84,7 +93,8 @@ const Game = {
       }
     });
     pg.addEventListener("heightAboveGround", function (event) {
-      heightAboveGroundUI.innerText = round(event.height) + " m. above ground";
+      heightAboveGroundUI.innerText =
+        Math.round(event.height) + " m. above terrain";
     });
     pg.addGui(gui);
     scene.add(pg.model);
@@ -124,13 +134,15 @@ const Game = {
         pg.toggleSpeedBar();
       }
     }
+
+    const varioUI = document.getElementById("vario-info");
     const altitudeUI = document.getElementById("vario-altitude");
     const deltaUI = document.getElementById("vario-delta");
     const groundSpeedUI = document.getElementById("vario-ground-speed");
 
     const vario = new Vario(pg);
     vario.addEventListener("delta", function (event) {
-      deltaUI.innerText = "Altitude Δ: " + round(event.delta) + " m/s";
+      deltaUI.innerText = "Δ: " + round(event.delta) + " m/s";
     });
     vario.addEventListener("altitude", function (event) {
       altitudeUI.innerText = "Altitude: " + Math.round(event.altitude) + " m.";
@@ -190,6 +202,8 @@ const Game = {
           console.log("Number of Triangles :", renderer.info.render.triangles);
           bgMusic.start();
           fnHideStartButton();
+          pg.init();
+          varioUI.style.display = "block";
         }}
         onSelectCamera={(cam: number) => {
           if (cam === 1) {
@@ -207,8 +221,11 @@ const Game = {
           }
         }}
         onViewChange={(view: View) => {
-          console.log("change");
-          console.log(view);
+          if (view === View.Left) {
+            camera.turnLeft();
+          } else if (view === View.Right) {
+            camera.turnRight();
+          }
         }}
         onWrapSpeedChange={(value) => {
           pg.updateWrapSpeed(value);
@@ -219,8 +236,8 @@ const Game = {
     root.render(uiControls);
 
     // Game start
-    renderer.render(scene, camera);
     camera.setCameraMode(CameraMode.FollowTarget, pg, controls);
+    renderer.render(scene, camera);
 
     const animate = () => {
       camera.update();

@@ -126,6 +126,9 @@ class Paraglider extends THREE.EventDispatcher {
       mesh.add(this.getGravityHelper(arrowLen));
     }
     this.model = mesh;
+  }
+
+  init() {
     this.interval = setInterval(() => this.tick(0.1 * this.wrapSpeed), 100);
   }
 
@@ -213,11 +216,11 @@ class Paraglider extends THREE.EventDispatcher {
   }
 
   rotateLeft(rotationSensitivity: number) {
-    this.model.rotation.y += Math.PI * rotationSensitivity;
+    this.model.rotation.y += Math.PI * rotationSensitivity * this.wrapSpeed;
   }
 
   rotateRight(rotationSensitivity: number) {
-    this.model.rotation.y -= Math.PI * rotationSensitivity;
+    this.model.rotation.y -= Math.PI * rotationSensitivity * this.wrapSpeed;
   }
 
   hasTouchedGround(terrain: THREE.Mesh, water: THREE.Mesh): boolean {

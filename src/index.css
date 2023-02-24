@@ -31,7 +31,6 @@
 }
 
 #view-controls {
-  display: none;  
   color: white;
   position: absolute;
   bottom: 10%;
@@ -71,11 +70,13 @@
 }
 
 #vario-info {
+  display: none;
   color: white;
   position: absolute;
   top: 20px;
   left: 20px;
-  padding: 0px 10px;
+  width: 140px;
+  padding: 10px 10px;
   border-radius: 5%;
   background: #00000077;
   border: 1px solid #ffffff77;
@@ -104,6 +105,7 @@
 }
 
 #paraglider-speedBar {
+  display:none;
   font-size: 200%;
 }
 

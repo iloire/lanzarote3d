@@ -3,8 +3,8 @@ import * as THREE from "three";
 class Thermal {
   mesh: THREE.Mesh;
 
-  async loadModel(initialPosition: THREE.Vector3) {
-    const geometry = new THREE.CylinderGeometry(150, 100, 800, 32);
+  constructor(initialPosition: THREE.Vector3, height: number) {
+    const geometry = new THREE.CylinderGeometry(150, 100, height, 32);
 
     // Create a new material with a solid color
     const material = new THREE.MeshBasicMaterial({
@@ -18,10 +18,9 @@ class Thermal {
     cylinder.position.copy(initialPosition);
 
     this.mesh = cylinder;
-    return cylinder;
   }
 
-  getMesh() {
+  getMesh(): THREE.Mesh {
     return this.mesh;
   }
 }

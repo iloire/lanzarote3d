@@ -133,10 +133,8 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
 
     const viewControl = (
       <div id="view-controls">
-        <button onClick={() => this.handleView(View.Left)}>l</button>
-        <button onClick={() => this.handleView(View.Right)}>r</button>
-        <button onClick={() => this.handleView(View.Up)}>up</button>
-        <button onClick={() => this.handleView(View.Down)}>down</button>
+        <button onClick={() => this.handleView(View.Left)}>&lt;</button>
+        <button onClick={() => this.handleView(View.Right)}>&gt;</button>
       </div>
     );
 
@@ -144,16 +142,16 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       false
     ) : (
       <div id="wrapSpeed-controls">
-        wrap speed:
+        skill:
         <select
           defaultValue="1"
           id="wrapSpeed"
           onChange={this.handleWrapChange}
         >
-          <option value="0.5">half speed</option>
+          <option value="0.5">rookie</option>
           <option value="1">normal</option>
-          <option value="5">fast</option>
-          <option value="10">very fast</option>
+          <option value="5">advanced</option>
+          <option value="10">"pro"</option>
           <option value="15">I'm from Lanzarote</option>
           <option value="20">I'm a swiss pilot</option>
         </select>
