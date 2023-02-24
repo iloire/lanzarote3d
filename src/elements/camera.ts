@@ -24,7 +24,7 @@ class Camera extends THREE.PerspectiveCamera {
   controls: OrbitControls;
   follow1Offset: THREE.Vector3 = new THREE.Vector3(-31.2, 10, 21.2);
   follow2Offset: THREE.Vector3 = new THREE.Vector3(31.2, 10, -21.2);
-  topViewOffset: THREE.Vector3 = new THREE.Vector3(30, 300, 10);
+  topViewOffset: THREE.Vector3 = new THREE.Vector3(430, 300, -210);
   airplaneViewOffset: THREE.Vector3 = new THREE.Vector3(30, 3000, 10);
 
   addGui(gui) {

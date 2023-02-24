@@ -25,6 +25,9 @@ type UIControlsState = {
   groundSpeed: number;
   heightAboveGround: number;
   speedBarEngaged: boolean;
+  posX: number;
+  posY: number;
+  posZ: number;
 };
 
 export enum View {
@@ -44,6 +47,9 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       groundSpeed: 0,
       heightAboveGround: 0,
       speedBarEngaged: false,
+      posX: 0,
+      posY: 0,
+      posZ: 0,
     };
     document.addEventListener("keydown", this.onDocumentKeyDown, false);
     document.addEventListener("keyup", this.onDocumentKeyUp, false);
@@ -58,9 +64,13 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
 
     const pg = props.pg;
     pg.addEventListener("position", (event) => {
+      const pos = pg.position();
       this.setState({
         groundSpeed: Math.round(pg.getGroundSpeed() * KMH_TO_MS * 100) / 100,
         speedBarEngaged: pg.isOnSpeedBar(),
+        posX: Math.round(pos.x),
+        posY: Math.round(pos.y),
+        posZ: Math.round(pos.z),
       });
     });
     pg.addEventListener("heightAboveGround", (event) => {
@@ -207,6 +217,14 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       </div>
     );
 
+    const { posX, posY, posZ } = this.state;
+    const paragliderPosition = (
+      <div id="paraglider-position">
+        <div id="paraglider-x">x: {posX}</div>
+        <div id="paraglider-y">y: {posY}</div>
+        <div id="paraglider-z">z: {posZ}</div>
+      </div>
+    );
     const wrapSpeedControl = this.state.showStartButton ? (
       false
     ) : (
@@ -218,9 +236,9 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
           onChange={this.handleWrapChange}
         >
           <option value="1">rookie</option>
-          <option value="5">"pro"</option>
-          <option value="10">I'm from Lanzarote</option>
-          <option value="15">I'm a swiss pilot</option>
+          <option value="3">"pro"</option>
+          <option value="7">I'm from Lanzarote</option>
+          <option value="12">I'm a swiss pilot</option>
         </select>
       </div>
     );
@@ -230,6 +248,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         {breakControls}
         {cameraSelection}
         {paragliderInfo}
+        {paragliderPosition}
         {startButton}
         {varioInfo}
         {viewControl}
