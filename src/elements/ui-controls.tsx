@@ -186,6 +186,9 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         <button onClick={() => this.handleCamMode(CameraMode.AirplaneView)}>
           airplane
         </button>
+        <button onClick={() => this.handleCamMode(CameraMode.OrbitControl)}>
+          orbit
+        </button>
       </div>
     );
 
