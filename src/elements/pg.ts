@@ -4,7 +4,7 @@ import Models from "../utils/models";
 import Weather from "../elements/weather";
 import Thermal from "../elements/thermal";
 
-const settings = { SHOW_ARROWS: true };
+const settings = { SHOW_ARROWS: false };
 const ORIGIN = new THREE.Vector3(0, 0, 0);
 
 function getAttackAngleRadians(glidingRatio: number) {
@@ -71,7 +71,7 @@ class Paraglider extends THREE.EventDispatcher {
   interval: any;
   model: THREE.Mesh;
   gravityDirection = new THREE.Vector3(0, -1, 0);
-  wrapSpeed: number=1;
+  wrapSpeed: number = 1;
 
   constructor(
     options: ParagliderConstructor,
@@ -104,7 +104,7 @@ class Paraglider extends THREE.EventDispatcher {
   }
 
   updateWrapSpeed(value: number) {
-    this.wrapSpeed= value;
+    this.wrapSpeed = value;
   }
 
   async loadModel(scale: number, initialPosition: THREE.Vector3) {
