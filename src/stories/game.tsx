@@ -47,11 +47,6 @@ const Game = {
   load: async (camera: Camera, scene, renderer, terrain, water, gui) => {
     gui.hide();
 
-    const nav = gui.addFolder("Navigation");
-    nav.add(settings, "mouseControl").listen();
-    nav.add(settings, "rotationSensitivity", 0.01, 0.05).listen();
-    nav.add(settings, "wrapSpeed", 1, 10).listen();
-
     const controls = Controls.createControls(camera, renderer);
     controls.enabled = settings.orbitControl;
     gui.add(controls, "enabled").name("orbit controls");
@@ -80,6 +75,15 @@ const Game = {
     pg.addGui(gui);
     scene.add(pg.model);
 
+    const nav = gui.addFolder("Navigation");
+    nav.add(settings, "mouseControl").listen();
+    nav.add(settings, "rotationSensitivity", 0.01, 0.05).listen();
+    nav
+      .add(settings, "wrapSpeed", 1, 10)
+      .listen()
+      .onChange((value) => {
+        pg.updateWrapSpeed(value);
+      });
     document.addEventListener("keydown", onDocumentKeyDown, false);
 
     function onDocumentKeyDown(event) {

@@ -71,6 +71,7 @@ class Paraglider extends THREE.EventDispatcher {
   interval: any;
   model: THREE.Mesh;
   gravityDirection = new THREE.Vector3(0, -1, 0);
+  wrapSpeed: number=1;
 
   constructor(
     options: ParagliderConstructor,
@@ -102,6 +103,10 @@ class Paraglider extends THREE.EventDispatcher {
     return inTheTermal;
   }
 
+  updateWrapSpeed(value: number) {
+    this.wrapSpeed= value;
+  }
+
   async loadModel(scale: number, initialPosition: THREE.Vector3) {
     const pg = await Models.load(model, scale, initialPosition);
     if (settings.SHOW_ARROWS) {
@@ -113,7 +118,7 @@ class Paraglider extends THREE.EventDispatcher {
       pg.add(this.getGravityHelper(arrowLen));
     }
     this.model = pg;
-    this.interval = setInterval(() => this.tick(0.1), 100);
+    this.interval = setInterval(() => this.tick(0.1 * this.wrapSpeed), 100);
   }
 
   getMesh(): THREE.Mesh {
