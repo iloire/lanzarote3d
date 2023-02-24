@@ -7,39 +7,34 @@
   left: 20px;
 }
 
+.UIBox {
+  color: white;
+  padding: 10px;
+  border-radius: 5%;
+  background: #00000077;
+  border: 1px solid #ffffff77;
+}
+
 #camera-selection {
   color: white;
   position: absolute;
   bottom: 1%;
   left: 20px;
-  padding: 10px;
-  border-radius: 5%;
-  background: #00000077;
-  border: 1px solid #ffffff77;
 }
+
 #camera-selection button {font-size: 200%;margin-right: 5px}
 
 #wrapSpeed-controls {
-  color: white;
   position: absolute;
   top: 90px;
   right: 20px;
-  padding: 10px;
-  border-radius: 5%;
-  background: #00000077;
-  border: 1px solid #ffffff77;
   width: 180px;
 }
 
 #view-controls {
-  color: white;
   position: absolute;
   bottom: 10%;
   right: 20px;
-  padding: 10px;
-  border-radius: 5%;
-  background: #00000077;
-  border: 1px solid #ffffff77;
 }
 
 #view-controls button{
@@ -47,14 +42,9 @@
 }
 
 #game-controls {
-  color: white;
   position: absolute;
   bottom: 10%;
   left: 20px;
-  padding: 10px;
-  border-radius: 5%;
-  background: #00000077;
-  border: 1px solid #ffffff77;
 }
 
 
@@ -63,62 +53,41 @@
 }
 
 #game-start button{
-  color: white;
   position: absolute;
   top: 40%;
   left: 45%;
   padding: 10px 20px;
-  border-radius: 5%;
-  background: #00000077;
-  border: 1px solid #ffffff77;
   font-size: 400%;
 }
 
 #vario-info {
-  color: white;
   position: absolute;
   top: 20px;
   left: 20px;
   width: 180px;
   padding: 10px 10px;
-  border-radius: 5%;
-  background: #00000077;
-  border: 1px solid #ffffff77;
 }
 
 #paraglider-position {
-  color: white;
   position: absolute;
   top: 130px;
   left: 20px;
   width: 180px;
-  padding: 10px 10px;
-  border-radius: 5%;
-  background: #00000077;
-  border: 1px solid #ffffff77;
 }
 
 #weather-info {
-  color: white;
   position: absolute;
   top: 20px;
   right: 20px;
   padding: 5px 10px;
-  border-radius: 5%;
-  background: #00000077;
-  border: 1px solid #ffffff77;
   with: 190px;
 }
 
 #paraglider-info {
-  color: white;
   position: absolute;
   top: 20px;
-  left: 200px;
+  left: 230px;
   padding: 0px 10px;
-  border-radius: 5%;
-  background: #00000077;
-  border: 1px solid #ffffff77;
 }
 
 #paraglider-speedBar {
@@ -128,8 +97,6 @@
 .point .label {
   padding: 0px 10px;
   border-radius: 5%;
-  background: #00000077;
-  border: 1px solid #ffffff77;
   color: #ffffff;
   font-family: Helvetica, Arial, sans-serif;
   text-align: center;
