@@ -1,4 +1,5 @@
 import React from "react";
+import { CameraMode } from "./camera";
 
 type UIControlsProps = {
   onLeftBreak: () => void;
@@ -6,7 +7,7 @@ type UIControlsProps = {
   onRightBreak: () => void;
   onRightBreakRelease: () => void;
   onGameStart: (fnHideStartButton: () => void) => void;
-  onSelectCamera: (num: number) => void;
+  onSelectCamera: (mode: CameraMode) => void;
   onViewChange: (view: View) => void;
   onWrapSpeedChange: (value: number) => void;
 };
@@ -53,8 +54,8 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       this.handleRightRelease();
     }
   };
-  handleCamSelection = (cam: number) => {
-    this.props.onSelectCamera(cam);
+  handleCamMode = (mode: CameraMode) => {
+    this.props.onSelectCamera(mode);
   };
 
   handleLeft = () => {
@@ -122,12 +123,24 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       false
     ) : (
       <div id="camera-selection">
-        <button onClick={() => this.handleCamSelection(1)}>f1</button>
-        <button onClick={() => this.handleCamSelection(2)}>f2</button>
-        <button onClick={() => this.handleCamSelection(3)}>fpv</button>
-        <button onClick={() => this.handleCamSelection(4)}>far</button>
-        <button onClick={() => this.handleCamSelection(5)}>top</button>
-        <button onClick={() => this.handleCamSelection(6)}>orbit</button>
+        <button onClick={() => this.handleCamMode(CameraMode.FollowTarget)}>
+          f1
+        </button>
+        <button onClick={() => this.handleCamMode(CameraMode.FollowTarget2)}>
+          f2
+        </button>
+        <button onClick={() => this.handleCamMode(CameraMode.FirstPersonView)}>
+          fpv
+        </button>
+        <button onClick={() => this.handleCamMode(CameraMode.TopView)}>
+          top
+        </button>
+        <button onClick={() => this.handleCamMode(CameraMode.FarAway)}>
+          far away
+        </button>
+        <button onClick={() => this.handleCamMode(CameraMode.AirplaneView)}>
+          airplane
+        </button>
       </div>
     );
 

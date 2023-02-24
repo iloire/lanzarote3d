@@ -62,16 +62,8 @@ const Game = {
 
     const bgMusic = new BackgroundSound();
 
-    const thermalPos = new THREE.Vector3(
-      5827,
-      WEATHER_SETTINGS.lclLevel + 100,
-      -855
-    );
-    const thermalPos2 = new THREE.Vector3(
-      3827,
-      WEATHER_SETTINGS.lclLevel + 100,
-      -855
-    );
+    const thermalPos = new THREE.Vector3(6827, 100, 55);
+    const thermalPos2 = new THREE.Vector3(6827, 100, -355);
     const thermal = new Thermal(thermalPos, WEATHER_SETTINGS.lclLevel + 100);
     const thermal2 = new Thermal(thermalPos2, WEATHER_SETTINGS.lclLevel + 100);
     scene.add(thermal.mesh);
@@ -205,20 +197,8 @@ const Game = {
           pg.init();
           varioUI.style.display = "block";
         }}
-        onSelectCamera={(cam: number) => {
-          if (cam === 1) {
-            camera.setCameraMode(CameraMode.FollowTarget, pg, controls);
-          } else if (cam === 2) {
-            camera.setCameraMode(CameraMode.FollowTarget2, pg, controls);
-          } else if (cam === 3) {
-            camera.setCameraMode(CameraMode.FirstPersonView, pg, controls);
-          } else if (cam === 4) {
-            camera.setCameraMode(CameraMode.FarAway, pg, controls);
-          } else if (cam === 5) {
-            camera.setCameraMode(CameraMode.TopView, pg, controls);
-          } else if (cam === 6) {
-            camera.setCameraMode(CameraMode.OrbitControl, pg, controls);
-          }
+        onSelectCamera={(mode: CameraMode) => {
+          camera.setCameraMode(mode, pg, controls);
         }}
         onViewChange={(view: View) => {
           if (view === View.Left) {
