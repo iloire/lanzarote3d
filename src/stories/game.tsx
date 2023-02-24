@@ -14,6 +14,10 @@ import Thermal from "../elements/thermal";
 
 const KMH_TO_MS = 3.6;
 
+function round(number: number): number {
+  return Math.round(number * 100) / 100;
+}
+
 const settings = {
   rotationSensitivity: 0.01,
   mouseControl: false,
@@ -128,35 +132,33 @@ const Game = {
     const groundSpeedUI = document.getElementById("vario-ground-speed");
     const vario = new Vario(pg);
     vario.addEventListener("delta", function (event) {
-      deltaUI.innerText =
-        "Altitude Δ: " + Math.round(event.delta * 100) / 100 + " m/s";
+      deltaUI.innerText = "Altitude Δ: " + round(event.delta) + " m/s";
     });
     vario.addEventListener("altitude", function (event) {
       altitudeUI.innerText = "Altitude: " + Math.round(event.altitude) + " m.";
     });
     vario.addEventListener("altitude", function (event) {
       groundSpeedUI.innerText =
-        "Speed: " +
-        Math.round(KMH_TO_MS * pg.getGroundSpeed() * 100) / 100 +
-        " km/h";
+        "Speed: " + round(KMH_TO_MS * pg.getGroundSpeed()) + " km/h";
     });
     vario.start();
 
     const weatherDirectionUi = document.getElementById("weather-direction");
-    weatherDirectionUi.innerText =
-      "wind direction: " +
-      WEATHER_SETTINGS.windDirectionDegreesFromNorth +
-      " degrees";
-
     const weatherSpeedUi = document.getElementById("weather-speed");
-    weatherSpeedUi.innerText =
-      "wind speed: " + WEATHER_SETTINGS.windSpeed * KMH_TO_MS + " km/h";
-
+    weather.addEventListener("wind-speedChange", function (event) {
+      console.log(event);
+      weatherSpeedUi.innerText =
+        "wind speed: " + round(event.value * KMH_TO_MS) + " km/h";
+    });
+    weather.addEventListener("wind-directionChange", function (event) {
+      weatherDirectionUi.innerText =
+        "wind direction: " + Math.round(event.value) + " degrees";
+    });
     let isLeftTurning;
     let isRightTurning;
 
     // Game start
-    camera.firstPersonView(pg.model);
+    camera.firstPersonView(pg);
     renderer.render(scene, camera);
 
     const rootElement = document.getElementById("ui-controls");
@@ -164,23 +166,18 @@ const Game = {
     const uiControls = (
       <UIControls
         onLeftBreak={() => {
-          console.log("left");
           isLeftTurning = true;
         }}
         onLeftBreakRelease={() => {
-          console.log("left release");
           isLeftTurning = false;
         }}
         onRightBreak={() => {
-          console.log("right");
           isRightTurning = true;
         }}
         onRightBreakRelease={() => {
-          console.log("right release");
           isRightTurning = false;
         }}
         onGameStart={(fnHideStartButton) => {
-          console.log(this);
           animate();
           console.log("Number of Triangles :", renderer.info.render.triangles);
           bgMusic.start();
@@ -188,18 +185,17 @@ const Game = {
         }}
         onSelectCamera={(cam: number) => {
           if (cam === 1) {
-            camera.setCameraMode(CameraMode.FollowTarget, pg.getMesh());
+            camera.setCameraMode(CameraMode.FollowTarget, pg);
           } else if (cam === 2) {
-            camera.setCameraMode(CameraMode.FirstPersonView, pg.getMesh());
+            camera.setCameraMode(CameraMode.FirstPersonView, pg);
           } else if (cam === 3) {
-            camera.setCameraMode(CameraMode.FarAway, pg.getMesh());
+            camera.setCameraMode(CameraMode.FarAway, pg);
           }
+          renderer.render(scene, camera);
         }}
       />
     );
     root.render(uiControls);
-
-    // thermal
 
     const animate = () => {
       // setTimeout(animate, 2200);
@@ -210,11 +206,7 @@ const Game = {
         pg.rotateRight(settings.rotationSensitivity);
       }
       requestAnimationFrame(animate);
-      const timer = Date.now() * 0.0005;
-      // camera.position.y += Math.sin(timer) * 0.0003;
       camera.update();
-      controls.target = pg.position();
-      controls.update();
       vario.updateReading(pg.altitude());
       // windIndicator.update(weather.windDirectionDegreesFromNorth);
       renderer.render(scene, camera);
