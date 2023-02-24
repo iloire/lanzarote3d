@@ -10,6 +10,7 @@ import Weather from "../elements/weather";
 import Camera, { CameraMode } from "../elements/camera";
 import UIControls from "../elements/ui-controls";
 import Thermal from "../elements/thermal";
+import Clouds from "../elements/clouds";
 
 const KMH_TO_MS = 3.6;
 
@@ -27,6 +28,7 @@ const settings = {
 const WEATHER_SETTINGS = {
   windDirectionDegreesFromNorth: 310,
   windSpeed: 18 / KMH_TO_MS,
+  lclLevel: 1500,
 };
 
 const pgOptions: ParagliderConstructor = {
@@ -62,7 +64,11 @@ const Game = {
     const speedBarUI = document.getElementById("paraglider-speedBar");
 
     const thermal = new Thermal();
-    const thermalPos = new THREE.Vector3(5827, 880, -855);
+    const thermalPos = new THREE.Vector3(
+      5827,
+      WEATHER_SETTINGS.lclLevel + 100,
+      -855
+    );
     const mesh = await thermal.loadModel(p.position);
     scene.add(mesh);
 
@@ -74,6 +80,19 @@ const Game = {
     });
     pg.addGui(gui);
     scene.add(pg.model);
+
+    const c = await Clouds.load(300, {
+      x: 0,
+      y: WEATHER_SETTINGS.lclLevel,
+      z: 0,
+    });
+    scene.add(c);
+    const c1 = await Clouds.load(301, {
+      x: 60,
+      y: WEATHER_SETTINGS.lclLevel + 50,
+      z: -40,
+    });
+    scene.add(c1);
 
     document.addEventListener("keydown", onDocumentKeyDown, false);
 
@@ -182,7 +201,7 @@ const Game = {
     root.render(uiControls);
 
     camera.setCameraMode(CameraMode.FollowTarget, pg);
-    
+
     const animate = () => {
       // setTimeout(animate, 2200);
       if (isLeftTurning) {

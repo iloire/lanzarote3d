@@ -130,10 +130,6 @@ class App extends React.Component<AppProps, AppState> {
     const island = await Island.load(20000, new THREE.Vector3(0, 0, 0));
     scene.add(island);
 
-    const c = await Clouds.load(300, { x: 0, y: 800, z: 0 });
-    scene.add(c);
-    const c1 = await Clouds.load(301, { x: 60, y: 800, z: -40 });
-    scene.add(c1);
 
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
