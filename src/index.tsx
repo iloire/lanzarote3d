@@ -154,6 +154,7 @@ class App extends React.Component<AppProps, AppState> {
           <div id="vario-delta" className="delta"></div>
           <div id="vario-altitude" className="altitude"></div>
           <div id="vario-ground-speed" className="ground-speed"></div>
+          <div id="height-above-ground"></div>
         </div>
 
         <div id="weather-info">

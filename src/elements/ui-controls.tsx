@@ -81,7 +81,6 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
 
   handleView = (view: View) => {
     this.props.onViewChange(view);
-    console.log(view);
   };
 
   handleWrapChange = (event) => {
@@ -119,7 +118,9 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       </div>
     );
 
-    const cameraSelection = (
+    const cameraSelection = this.state.showStartButton ? (
+      false
+    ) : (
       <div id="camera-selection">
         <button onClick={() => this.handleCamSelection(1)}>f1</button>
         <button onClick={() => this.handleCamSelection(2)}>f2</button>
@@ -139,11 +140,16 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       </div>
     );
 
-    const wrapSpeedControl = (
+    const wrapSpeedControl = this.state.showStartButton ? (
+      false
+    ) : (
       <div id="wrapSpeed-controls">
         wrap speed:
         <select id="wrapSpeed" onChange={this.handleWrapChange}>
-          <option value="1">normal</option>
+          <option value="0.5">half speed</option>
+          <option defaultValue value="1">
+            normal
+          </option>
           <option value="5">fast</option>
           <option value="10">very fast</option>
           <option value="15">I'm from Lanzarote</option>
@@ -157,7 +163,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         {breakControls}
         {startButton}
         {cameraSelection}
-        {viewControl}
+        {startButton} {viewControl}
         {cameraSelection}
         {viewControl}
         {wrapSpeedControl}

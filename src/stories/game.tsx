@@ -19,7 +19,7 @@ function round(number: number): number {
 }
 
 const settings = {
-  rotationSensitivity: 0.01,
+  rotationSensitivity: 0.02,
   mouseControl: false,
   orbitControl: true,
   wrapSpeed: 1,
@@ -75,12 +75,16 @@ const Game = {
     await pg.loadModel(p.scale, p.position);
 
     const speedBarUI = document.getElementById("paraglider-speedBar");
+    const heightAboveGroundUI = document.getElementById("height-above-ground");
     pg.addEventListener("position", function (event) {
       if (pg.isOnSpeedBar()) {
         speedBarUI.style.display = "block";
       } else {
         speedBarUI.style.display = "none";
       }
+    });
+    pg.addEventListener("heightAboveGround", function (event) {
+      heightAboveGroundUI.innerText = round(event.height) + " m. above ground";
     });
     pg.addGui(gui);
     scene.add(pg.model);

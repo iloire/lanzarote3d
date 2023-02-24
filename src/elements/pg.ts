@@ -47,7 +47,12 @@ const getTerrainHeightBelowPosition = (
   );
   const intersectsFloor = rayVertical.intersectObjects([terrain, water]);
   if (intersectsFloor.length) {
-    const terrainBelowHeight = intersectsFloor[0].point.y;
+    if (intersectsFloor.length === 1) {
+      // it means we are below the terrain
+      return pos.y;
+    }
+    const yValues = intersectsFloor.map((obj) => obj.point.y);
+    const terrainBelowHeight = Math.max(...yValues);
     return terrainBelowHeight;
   } else {
     return 0;
@@ -217,18 +222,12 @@ class Paraglider extends THREE.EventDispatcher {
 
   hasTouchedGround(terrain: THREE.Mesh, water: THREE.Mesh): boolean {
     const pos = this.model.position;
-    const rayVertical = new THREE.Raycaster(
+    const terrainBelowHeight = getTerrainHeightBelowPosition(
       pos,
-      new THREE.Vector3(0, -1, 0) // vertical
+      terrain,
+      water
     );
-    const intersectsFloor = rayVertical.intersectObjects([terrain, water]);
-    if (intersectsFloor.length) {
-      const terrainBelowHeight = intersectsFloor[0].point.y;
-      return terrainBelowHeight <= 0;
-    } else {
-      console.log("didn;t find intersection");
-    }
-    return true;
+    return pos.y <= terrainBelowHeight;
   }
 
   getTerrainGradientAgainstWindDirection(
@@ -242,6 +241,11 @@ class Paraglider extends THREE.EventDispatcher {
     const posBarlovento = pos.clone().addScaledVector(windDirection, -delta);
 
     const heightPos = getTerrainHeightBelowPosition(pos, terrain, water);
+    const heightAboveGround = pos.y - heightPos;
+    this.dispatchEvent({
+      type: "heightAboveGround",
+      height: heightAboveGround,
+    });
     const heightPosBarlovento = getTerrainHeightBelowPosition(
       posBarlovento,
       terrain,
@@ -265,6 +269,7 @@ class Paraglider extends THREE.EventDispatcher {
     const windSpeed = this.weather.getSpeedMetresPerSecond();
     const heightLiftComponent = height * 0.001;
     const l = heightLiftComponent * gradient;
+    this.dispatchEvent({ type: "lift", lift: l });
     return l;
   }
 
