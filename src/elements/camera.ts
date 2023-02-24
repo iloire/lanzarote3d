@@ -11,6 +11,7 @@ export enum CameraMode {
   FollowTarget = "FOLLOW",
   FirstPersonView = "FPV",
   FarAway = "FAR",
+  TopView = "TOP",
 }
 
 class Camera extends THREE.PerspectiveCamera {
@@ -47,6 +48,8 @@ class Camera extends THREE.PerspectiveCamera {
       this.firstPersonView(this.target);
     } else if (this.mode === CameraMode.FarAway) {
       this.farAwayView(this.target);
+    } else if (this.mode === CameraMode.TopView) {
+      this.topView(this.target);
     } else {
       throw new Error("invalid camera mode");
     }
@@ -72,6 +75,12 @@ class Camera extends THREE.PerspectiveCamera {
 
   farAwayView(target: Paraglider) {
     const cameraoffset = new THREE.Vector3(-1102, 500, 1001.2);
+    this.position.copy(getObjectPosition(target.getMesh())).add(cameraoffset);
+    this.lookAt(target.position());
+  }
+
+  topView(target: Paraglider) {
+    const cameraoffset = new THREE.Vector3(0, 500, 0);
     this.position.copy(getObjectPosition(target.getMesh())).add(cameraoffset);
     this.lookAt(target.position());
   }

@@ -107,6 +107,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         <button onClick={() => this.handleCamSelection(1)}>1</button>
         <button onClick={() => this.handleCamSelection(2)}>2</button>
         <button onClick={() => this.handleCamSelection(3)}>3</button>
+        <button onClick={() => this.handleCamSelection(4)}>top</button>
       </div>
     );
 

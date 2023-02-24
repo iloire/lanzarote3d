@@ -165,6 +165,8 @@ const Game = {
             camera.setCameraMode(CameraMode.FirstPersonView, pg);
           } else if (cam === 3) {
             camera.setCameraMode(CameraMode.FarAway, pg);
+          } else if (cam === 4) {
+            camera.setCameraMode(CameraMode.TopView, pg);
           }
           renderer.render(scene, camera);
         }}
