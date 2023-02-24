@@ -161,12 +161,10 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
           id="wrapSpeed"
           onChange={this.handleWrapChange}
         >
-          <option value="0.5">rookie</option>
-          <option value="1">normal</option>
-          <option value="5">advanced</option>
-          <option value="10">"pro"</option>
-          <option value="15">I'm from Lanzarote</option>
-          <option value="20">I'm a swiss pilot</option>
+          <option value="1">rookie</option>
+          <option value="5">"pro"</option>
+          <option value="10">I'm from Lanzarote</option>
+          <option value="15">I'm a swiss pilot</option>
         </select>
       </div>
     );
