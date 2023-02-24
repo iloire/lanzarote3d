@@ -1,7 +1,13 @@
 import React from "react";
 import { CameraMode } from "./camera";
+import Paraglider from "./pg";
+import Vario from "../audio/vario";
+
+const KMH_TO_MS = 3.6;
 
 type UIControlsProps = {
+  pg: Paraglider;
+  vario: Vario;
   onLeftBreak: () => void;
   onLeftBreakRelease: () => void;
   onRightBreak: () => void;
@@ -14,6 +20,11 @@ type UIControlsProps = {
 
 type UIControlsState = {
   showStartButton: boolean;
+  delta: number;
+  altitude: number;
+  groundSpeed: number;
+  heightAboveGround: number;
+  speedBarEngaged: boolean;
 };
 
 export enum View {
@@ -28,9 +39,33 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     super(props);
     this.state = {
       showStartButton: true,
+      delta: 0,
+      altitude: 0,
+      groundSpeed: 0,
+      heightAboveGround: 0,
+      speedBarEngaged: false,
     };
     document.addEventListener("keydown", this.onDocumentKeyDown, false);
     document.addEventListener("keyup", this.onDocumentKeyUp, false);
+
+    const vario = props.vario;
+    vario.addEventListener("delta", (event) => {
+      this.setState({ delta: Math.round(event.delta * 100) / 100 });
+    });
+    vario.addEventListener("altitude", (event) => {
+      this.setState({ altitude: Math.round(event.altitude) });
+    });
+
+    const pg = props.pg;
+    pg.addEventListener("position", (event) => {
+      this.setState({
+        groundSpeed: Math.round(pg.getGroundSpeed() * KMH_TO_MS * 100) / 100,
+        speedBarEngaged: pg.isOnSpeedBar(),
+      });
+    });
+    pg.addEventListener("heightAboveGround", (event) => {
+      this.setState({ heightAboveGround: Math.round(event.height) });
+    });
   }
 
   onDocumentKeyDown = (event) => {
@@ -151,6 +186,27 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       </div>
     );
 
+    const { delta, altitude, groundSpeed, heightAboveGround, speedBarEngaged } =
+      this.state;
+
+    const varioInfo = (
+      <div id="vario-info">
+        <div id="vario-delta">Δ: {delta} m/s</div>
+        <div id="vario-altitude">Alt.: {altitude} m.</div>
+        <div id="height-above-ground">
+          Alt. above terrain: {heightAboveGround} m.
+        </div>
+        <div id="vario-ground-speed">Ground speed: {groundSpeed} km/h</div>
+      </div>
+    );
+    const speedBarText = speedBarEngaged ? "SPEED-BAR" : "";
+    const paragliderInfo = (
+      <div id="paraglider-info">
+        <div id="paraglider-speedBar">{speedBarText}</div>
+        <div id="paraglider-ears" className="ears"></div>
+      </div>
+    );
+
     const wrapSpeedControl = this.state.showStartButton ? (
       false
     ) : (
@@ -172,10 +228,10 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     return (
       <div id="game">
         {breakControls}
+        {cameraSelection}
+        {paragliderInfo}
         {startButton}
-        {cameraSelection}
-        {startButton} {viewControl}
-        {cameraSelection}
+        {varioInfo}
         {viewControl}
         {wrapSpeedControl}
       </div>

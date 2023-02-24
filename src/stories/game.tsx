@@ -81,21 +81,9 @@ const Game = {
       thermal,
       thermal2,
     ]);
+    const vario = new Vario(pg);
     await pg.loadModel(p.scale, p.position);
 
-    const speedBarUI = document.getElementById("paraglider-speedBar");
-    const heightAboveGroundUI = document.getElementById("height-above-ground");
-    pg.addEventListener("position", function (event) {
-      if (pg.isOnSpeedBar()) {
-        speedBarUI.style.display = "block";
-      } else {
-        speedBarUI.style.display = "none";
-      }
-    });
-    pg.addEventListener("heightAboveGround", function (event) {
-      heightAboveGroundUI.innerText =
-        Math.round(event.height) + " m. above terrain";
-    });
     pg.addGui(gui);
     scene.add(pg.model);
 
@@ -135,23 +123,6 @@ const Game = {
       }
     }
 
-    const varioUI = document.getElementById("vario-info");
-    const altitudeUI = document.getElementById("vario-altitude");
-    const deltaUI = document.getElementById("vario-delta");
-    const groundSpeedUI = document.getElementById("vario-ground-speed");
-
-    const vario = new Vario(pg);
-    vario.addEventListener("delta", function (event) {
-      deltaUI.innerText = "Δ: " + round(event.delta) + " m/s";
-    });
-    vario.addEventListener("altitude", function (event) {
-      altitudeUI.innerText = "Altitude: " + Math.round(event.altitude) + " m.";
-    });
-    vario.addEventListener("altitude", function (event) {
-      groundSpeedUI.innerText =
-        "Speed: " + round(KMH_TO_MS * pg.getGroundSpeed()) + " km/h";
-    });
-
     const nav = gui.addFolder("Navigation");
     nav.add(settings, "mouseControl").listen();
     nav.add(settings, "rotationSensitivity", 0.01, 0.05).listen();
@@ -185,6 +156,8 @@ const Game = {
     const root = createRoot(rootElement);
     const uiControls = (
       <UIControls
+        pg={pg}
+        vario={vario}
         onLeftBreak={() => {
           isLeftTurning = true;
         }}
@@ -202,7 +175,7 @@ const Game = {
           fnHideStartButton();
           vario.start();
           pg.init();
-          varioUI.style.display = "block";
+          // varioUI.style.display = "block";
         }}
         onSelectCamera={(mode: CameraMode) => {
           camera.setCameraMode(mode, pg, controls);
