@@ -107,14 +107,14 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
           onMouseUp={this.handleLeftRelease}
           onMouseDown={this.handleLeft}
         >
-          LEFT
+          &nbsp; &lt;&nbsp;
         </button>
         <button
           id="game-controls-right"
           onMouseUp={this.handleRightRelease}
           onMouseDown={this.handleRight}
         >
-          RIGHT
+          &nbsp; &gt;&nbsp;
         </button>
       </div>
     );

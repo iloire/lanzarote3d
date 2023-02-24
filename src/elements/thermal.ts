@@ -5,6 +5,7 @@ class Thermal {
 
   constructor(initialPosition: THREE.Vector3, height: number) {
     const geometry = new THREE.CylinderGeometry(150, 100, height, 32);
+    console.log(height);
 
     // Create a new material with a solid color
     const material = new THREE.MeshBasicMaterial({
