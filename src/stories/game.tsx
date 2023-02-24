@@ -151,7 +151,6 @@ const Game = {
       groundSpeedUI.innerText =
         "Speed: " + round(KMH_TO_MS * pg.getGroundSpeed()) + " km/h";
     });
-    vario.start();
 
     const nav = gui.addFolder("Navigation");
     nav.add(settings, "mouseControl").listen();
@@ -178,6 +177,7 @@ const Game = {
     weather.addEventListener("lclChange", function (event) {
       weatherLCLUi.innerText = "lcl: " + Math.round(event.value) + "m";
     });
+
     let isLeftTurning;
     let isRightTurning;
 
@@ -198,9 +198,9 @@ const Game = {
           isRightTurning = false;
         }}
         onGameStart={(fnHideStartButton) => {
-          animate();
           bgMusic.start();
           fnHideStartButton();
+          vario.start();
           pg.init();
           varioUI.style.display = "block";
         }}
@@ -224,7 +224,6 @@ const Game = {
 
     // Game start
     camera.setCameraMode(CameraMode.FollowTarget, pg, controls);
-    renderer.render(scene, camera);
 
     pg.addEventListener("touchedGround", () => {
       console.log("game over");
@@ -248,6 +247,7 @@ const Game = {
       requestAnimationFrame(animate);
       // setTimeout(animate, 2200);
     };
+    animate();
   },
 };
 

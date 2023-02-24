@@ -42,6 +42,10 @@
   border: 1px solid #ffffff77;
 }
 
+#view-controls button{
+  font-size: 200%
+}
+
 #game-controls {
   color: white;
   position: absolute;
