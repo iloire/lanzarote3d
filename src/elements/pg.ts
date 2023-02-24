@@ -123,10 +123,8 @@ class Paraglider extends THREE.EventDispatcher {
     mesh.material = new THREE.MeshStandardMaterial({ map: texture });
     if (settings.SHOW_ARROWS) {
       const arrowLen = 700;
-      mesh.add(
-        createTrajectoryArrow(this.options.glidingRatio, arrowLen, 0xff00ff)
-      );
-      mesh.add(createLiftArrow(this.options.glidingRatio, arrowLen, 0xffffff));
+      mesh.add(createTrajectoryArrow(this.glidingRatio(), arrowLen, 0xff00ff));
+      mesh.add(createLiftArrow(this.glidingRatio(), arrowLen, 0xffffff));
       mesh.add(this.getGravityHelper(arrowLen));
     }
     this.model = mesh;
@@ -340,7 +338,11 @@ class Paraglider extends THREE.EventDispatcher {
   }
 
   glidingRatio(): number {
-    return this.options.glidingRatio;
+    if (this.isOnSpeedBar()) {
+      return this.options.glidingRatio * 0.85;
+    } else {
+      return this.options.glidingRatio;
+    }
   }
 
   move(velocity: THREE.Vector3) {
