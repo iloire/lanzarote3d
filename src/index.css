@@ -10,13 +10,14 @@
 #camera-selection {
   color: white;
   position: absolute;
-  bottom: 5%;
-  left: 30px;
+  bottom: 1%;
+  left: 20px;
   padding: 10px;
   border-radius: 5%;
   background: #00000077;
   border: 1px solid #ffffff77;
 }
+#camera-selection button {font-size: 200%;margin-right: 5px}
 
 #game-controls {
   /* display:none; */
