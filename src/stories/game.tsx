@@ -169,9 +169,6 @@ const Game = {
     let isLeftTurning;
     let isRightTurning;
 
-    // Game start
-    renderer.render(scene, camera);
-
     const rootElement = document.getElementById("ui-controls");
     const root = createRoot(rootElement);
     const uiControls = (
@@ -208,7 +205,6 @@ const Game = {
           } else if (cam === 6) {
             camera.setCameraMode(CameraMode.OrbitControl, pg, controls);
           }
-          renderer.render(scene, camera);
         }}
         onViewChange={(view: View) => {
           console.log("change");
@@ -222,26 +218,29 @@ const Game = {
     );
     root.render(uiControls);
 
+    // Game start
+    renderer.render(scene, camera);
     camera.setCameraMode(CameraMode.FollowTarget, pg, controls);
 
     const animate = () => {
+      camera.update();
+      controls.target = pg.position();
+      vario.updateReading(pg.altitude());
+      renderer.render(scene, camera);
+
+      if (isLeftTurning) {
+        pg.rotateLeft(settings.rotationSensitivity);
+      }
+      if (isRightTurning) {
+        pg.rotateRight(settings.rotationSensitivity);
+      }
       if (pg.hasTouchedGround(terrain, water)) {
         console.log("game over");
         vario.stop();
         bgMusic.stop();
       } else {
-        // setTimeout(animate, 2200);
-        if (isLeftTurning) {
-          pg.rotateLeft(settings.rotationSensitivity);
-        }
-        if (isRightTurning) {
-          pg.rotateRight(settings.rotationSensitivity);
-        }
         requestAnimationFrame(animate);
-        camera.update();
-        controls.target = pg.position();
-        vario.updateReading(pg.altitude());
-        renderer.render(scene, camera);
+        // setTimeout(animate, 2200);
       }
     };
   },
