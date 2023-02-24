@@ -13,6 +13,7 @@ class Vario extends THREE.EventDispatcher {
   status: string;
   lastRecord: number;
   high: number;
+  wrapSpeed: number = 1;
 
   constructor(pg: Paraglider) {
     super();
@@ -20,6 +21,10 @@ class Vario extends THREE.EventDispatcher {
     this.sound = new THREE.Audio(listener);
     this.pg = pg;
     this.tick();
+  }
+
+  updateWrapSpeed(value: number) {
+    this.wrapSpeed = value;
   }
 
   start() {
@@ -33,8 +38,11 @@ class Vario extends THREE.EventDispatcher {
   }
 
   tick = () => {
-    console.log("tick");
-    const delta = this.high - this.lastRecord || this.high;
+    if (!this.high) {
+      setTimeout(this.tick, 1000);
+      return;
+    }
+    const delta = (this.high - this.lastRecord || this.high) / this.wrapSpeed;
     this.dispatchEvent({ type: "delta", delta });
     this.lastRecord = this.high;
     if (this.status === "on") {
@@ -77,7 +85,6 @@ class Vario extends THREE.EventDispatcher {
   }
 
   play(delta) {
-    console.log(delta);
     const audioLoader = new THREE.AudioLoader();
     audioLoader.load(this.getBeepForIncrement(delta), (buffer) => {
       this.sound.setBuffer(buffer);
