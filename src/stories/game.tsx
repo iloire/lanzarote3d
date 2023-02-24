@@ -8,7 +8,7 @@ import Helpers from "../utils/helpers";
 import Vario from "../audio/vario";
 import Weather from "../elements/weather";
 import Camera, { CameraMode } from "../elements/camera";
-import UIControls from "../elements/ui-controls";
+import UIControls, { View } from "../elements/ui-controls";
 import Thermal from "../elements/thermal";
 import Clouds from "../elements/clouds";
 
@@ -55,13 +55,12 @@ const Game = {
 
     const weather = new Weather(
       WEATHER_SETTINGS.windDirectionDegreesFromNorth,
-      WEATHER_SETTINGS.windSpeed
+      WEATHER_SETTINGS.windSpeed,
+      WEATHER_SETTINGS.lclLevel
     );
     weather.addGui(gui);
 
     const bgMusic = new BackgroundSound();
-
-    const speedBarUI = document.getElementById("paraglider-speedBar");
 
     const thermal = new Thermal();
     const thermalPos = new THREE.Vector3(
@@ -72,8 +71,10 @@ const Game = {
     const mesh = await thermal.loadModel(p.position);
     scene.add(mesh);
 
-    const pg = new Paraglider(pgOptions, weather, terrain, [thermal]);
+    const pg = new Paraglider(pgOptions, weather, terrain, water, [thermal]);
     await pg.loadModel(p.scale, p.position);
+
+    const speedBarUI = document.getElementById("paraglider-speedBar");
     pg.addEventListener("position", function (event) {
       if (pg.isOnSpeedBar()) {
         speedBarUI.style.display = "block";
@@ -103,7 +104,7 @@ const Game = {
       const keyCode = event.which;
       if (keyCode == 32) {
         // space
-        pg.jump(terrain);
+        // pg.jump(terrain);
       } else if (keyCode == 67) {
         //c
         if (gui._hidden) {
@@ -140,7 +141,7 @@ const Game = {
     nav.add(settings, "mouseControl").listen();
     nav.add(settings, "rotationSensitivity", 0.01, 0.05).listen();
     nav
-      .add(settings, "wrapSpeed", 1, 10)
+      .add(settings, "wrapSpeed", 1, 20)
       .listen()
       .onChange((value) => {
         pg.updateWrapSpeed(value);
@@ -149,8 +150,8 @@ const Game = {
 
     const weatherDirectionUi = document.getElementById("weather-direction");
     const weatherSpeedUi = document.getElementById("weather-speed");
+    const weatherLCLUi = document.getElementById("weather-lclLevel");
     weather.addEventListener("wind-speedChange", function (event) {
-      console.log(event);
       weatherSpeedUi.innerText =
         "wind speed: " + round(event.value * KMH_TO_MS) + " km/h";
     });
@@ -158,11 +159,13 @@ const Game = {
       weatherDirectionUi.innerText =
         "wind direction: " + Math.round(event.value) + " degrees";
     });
+    weather.addEventListener("lclChange", function (event) {
+      weatherLCLUi.innerText = "lcl: " + Math.round(event.value) + "m";
+    });
     let isLeftTurning;
     let isRightTurning;
 
     // Game start
-    camera.firstPersonView(pg);
     renderer.render(scene, camera);
 
     const rootElement = document.getElementById("ui-controls");
@@ -189,34 +192,53 @@ const Game = {
         }}
         onSelectCamera={(cam: number) => {
           if (cam === 1) {
-            camera.setCameraMode(CameraMode.FollowTarget, pg);
+            camera.setCameraMode(CameraMode.FollowTarget, pg, controls);
           } else if (cam === 2) {
-            camera.setCameraMode(CameraMode.FirstPersonView, pg);
+            camera.setCameraMode(CameraMode.FollowTarget2, pg, controls);
           } else if (cam === 3) {
-            camera.setCameraMode(CameraMode.FarAway, pg);
+            camera.setCameraMode(CameraMode.FirstPersonView, pg, controls);
           } else if (cam === 4) {
-            camera.setCameraMode(CameraMode.TopView, pg);
+            camera.setCameraMode(CameraMode.FarAway, pg, controls);
+          } else if (cam === 5) {
+            camera.setCameraMode(CameraMode.TopView, pg, controls);
+          } else if (cam === 6) {
+            camera.setCameraMode(CameraMode.OrbitControl, pg, controls);
           }
           renderer.render(scene, camera);
+        }}
+        onViewChange={(view: View) => {
+          console.log("change");
+          console.log(view);
+        }}
+        onWrapSpeedChange={(value) => {
+          pg.updateWrapSpeed(value);
+          vario.updateWrapSpeed(value);
         }}
       />
     );
     root.render(uiControls);
 
-    camera.setCameraMode(CameraMode.FollowTarget, pg);
+    camera.setCameraMode(CameraMode.FollowTarget, pg, controls);
 
     const animate = () => {
-      // setTimeout(animate, 2200);
-      if (isLeftTurning) {
-        pg.rotateLeft(settings.rotationSensitivity);
+      if (pg.hasTouchedGround(terrain, water)) {
+        console.log("game over");
+        vario.stop();
+        bgMusic.stop();
+      } else {
+        // setTimeout(animate, 2200);
+        if (isLeftTurning) {
+          pg.rotateLeft(settings.rotationSensitivity);
+        }
+        if (isRightTurning) {
+          pg.rotateRight(settings.rotationSensitivity);
+        }
+        requestAnimationFrame(animate);
+        camera.update();
+        controls.target = pg.position();
+        vario.updateReading(pg.altitude());
+        renderer.render(scene, camera);
       }
-      if (isRightTurning) {
-        pg.rotateRight(settings.rotationSensitivity);
-      }
-      requestAnimationFrame(animate);
-      camera.update();
-      vario.updateReading(pg.altitude());
-      renderer.render(scene, camera);
     };
   },
 };

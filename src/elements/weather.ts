@@ -9,11 +9,18 @@ const WEATHER_UPDATE_FRECUENCY = 5000;
 class Weather extends THREE.EventDispatcher {
   degreesFromNorth: number;
   speedMetresPerSecond: number;
+  lclLevel: number;
 
-  constructor(degreesFromNorth: number, speedMetresPerSecond: number) {
+  constructor(
+    degreesFromNorth: number,
+    speedMetresPerSecond: number,
+    lclLevel: number
+  ) {
     super();
     this.degreesFromNorth = degreesFromNorth;
     this.speedMetresPerSecond = speedMetresPerSecond;
+    this.lclLevel = lclLevel;
+
     setInterval(() => {
       const newWindValue = getRandomArbitrary(
         speedMetresPerSecond * 0.9,
@@ -23,8 +30,11 @@ class Weather extends THREE.EventDispatcher {
         degreesFromNorth * 0.95,
         degreesFromNorth * 1.05
       );
+      const newLclValue = getRandomArbitrary(lclLevel * 0.95, lclLevel * 1.05);
       this.speedMetresPerSecond = Math.round(newWindValue * 100) / 100;
       this.degreesFromNorth = Math.round(newDirectionValue * 100) / 100;
+      this.lclLevel = Math.round(newLclValue);
+
       this.dispatchEvent({
         type: "wind-speedChange",
         value: this.speedMetresPerSecond,
@@ -32,6 +42,10 @@ class Weather extends THREE.EventDispatcher {
       this.dispatchEvent({
         type: "wind-directionChange",
         value: this.degreesFromNorth,
+      });
+      this.dispatchEvent({
+        type: "lclChange",
+        value: this.lclLevel,
       });
     }, WEATHER_UPDATE_FRECUENCY);
   }
@@ -49,14 +63,13 @@ class Weather extends THREE.EventDispatcher {
   }
 
   getSpeedMetresPerSecond(): number {
-    // console.log(this.speedMetresPerSecond);
     return this.speedMetresPerSecond;
   }
 
   getWindDirection(): THREE.Vector3 {
     return this.getWindDirectionFromNorth(this.degreesFromNorth);
   }
-  t;
+
   getWindDirectionFromNorth(degreesFromNorth: number): THREE.Vector3 {
     const angleRadiansWind = THREE.MathUtils.degToRad(-degreesFromNorth);
     return new THREE.Vector3().setFromSphericalCoords(

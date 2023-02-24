@@ -4,7 +4,7 @@ class Thermal {
   mesh: THREE.Mesh;
 
   async loadModel(initialPosition: THREE.Vector3) {
-    const geometry = new THREE.CylinderGeometry(250, 120, 800, 32);
+    const geometry = new THREE.CylinderGeometry(150, 100, 800, 32);
 
     // Create a new material with a solid color
     const material = new THREE.MeshBasicMaterial({

@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import Paraglider from "./pg";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 const getObjectPosition = (obj: THREE.Object3D) => {
   const pos = new THREE.Vector3();
@@ -9,14 +10,17 @@ const getObjectPosition = (obj: THREE.Object3D) => {
 
 export enum CameraMode {
   FollowTarget = "FOLLOW",
+  FollowTarget2 = "FOLLOW2",
   FirstPersonView = "FPV",
   FarAway = "FAR",
   TopView = "TOP",
+  OrbitControl = "ORBIT",
 }
 
 class Camera extends THREE.PerspectiveCamera {
   mode: CameraMode;
   target: Paraglider;
+  controls: OrbitControls;
 
   addGui(gui) {
     const cameraGui = gui.addFolder("Camera");
@@ -43,46 +47,69 @@ class Camera extends THREE.PerspectiveCamera {
       return;
     }
     if (this.mode === CameraMode.FollowTarget) {
-      this.followTarget(this.target);
+      this.followTarget();
+    } else if (this.mode === CameraMode.FollowTarget2) {
+      this.followTarget2();
     } else if (this.mode === CameraMode.FirstPersonView) {
-      this.firstPersonView(this.target);
+      this.firstPersonView();
     } else if (this.mode === CameraMode.FarAway) {
-      this.farAwayView(this.target);
+      this.farAwayView();
     } else if (this.mode === CameraMode.TopView) {
-      this.topView(this.target);
+      this.topView();
+    } else if (this.mode === CameraMode.OrbitControl) {
+      this.orbitView();
     } else {
       throw new Error("invalid camera mode");
     }
   }
 
-  setCameraMode(mode: CameraMode, target: Paraglider) {
+  setCameraMode(mode: CameraMode, target: Paraglider, controls: OrbitControls) {
     this.target = target;
     this.mode = mode;
+    this.controls = controls;
     this.update();
   }
 
-  followTarget(target: Paraglider) {
-    const cameraoffset = new THREE.Vector3(-41.2, 10, 41.2);
-    this.position.copy(getObjectPosition(target.getMesh())).add(cameraoffset);
-    this.lookAt(target.position());
+  followTarget() {
+    const cameraoffset = new THREE.Vector3(-31.2, 10, 21.2);
+    this.position
+      .copy(getObjectPosition(this.target.getMesh()))
+      .add(cameraoffset);
+    this.lookAt(this.target.position());
   }
 
-  firstPersonView(target: Paraglider) {
-    this.position.copy(getObjectPosition(target.getMesh()));
-    const directionToLook = target.direction().multiplyScalar(10000);
+  followTarget2() {
+    const cameraoffset = new THREE.Vector3(31.2, 10, -21.2);
+    this.position
+      .copy(getObjectPosition(this.target.getMesh()))
+      .add(cameraoffset);
+    this.lookAt(this.target.position());
+  }
+  firstPersonView() {
+    this.position.copy(getObjectPosition(this.target.getMesh()));
+    const directionToLook = this.target.direction().multiplyScalar(10000);
     this.lookAt(directionToLook);
   }
 
-  farAwayView(target: Paraglider) {
+  farAwayView() {
     const cameraoffset = new THREE.Vector3(-1102, 500, 1001.2);
-    this.position.copy(getObjectPosition(target.getMesh())).add(cameraoffset);
-    this.lookAt(target.position());
+    this.position
+      .copy(getObjectPosition(this.target.getMesh()))
+      .add(cameraoffset);
+    this.lookAt(this.target.position());
   }
 
-  topView(target: Paraglider) {
+  topView() {
     const cameraoffset = new THREE.Vector3(0, 500, 0);
-    this.position.copy(getObjectPosition(target.getMesh())).add(cameraoffset);
-    this.lookAt(target.position());
+    this.position
+      .copy(getObjectPosition(this.target.getMesh()))
+      .add(cameraoffset);
+    this.lookAt(this.target.position());
+  }
+
+  orbitView() {
+    this.controls.target = this.target.position();
+    // this.controls.update();
   }
 }
 

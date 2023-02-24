@@ -7,11 +7,20 @@ type UIControlsProps = {
   onRightBreakRelease: () => void;
   onGameStart: (fnHideStartButton: () => void) => void;
   onSelectCamera: (num: number) => void;
+  onViewChange: (view: View) => void;
+  onWrapSpeedChange: (value: number) => void;
 };
 
 type UIControlsState = {
   showStartButton: boolean;
 };
+
+export enum View {
+  Up = "up",
+  Down = "down",
+  Left = "left",
+  Right = "right",
+}
 
 class UIControls extends React.Component<UIControlsProps, UIControlsState> {
   constructor(props) {
@@ -70,6 +79,14 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     });
   };
 
+  handleView = (view: View) => {
+    this.props.onViewChange(view);
+    console.log(view);
+  };
+
+  handleWrapChange = (event) => {
+    this.props.onWrapSpeedChange(event.target.value);
+  };
   render() {
     const startButton = this.state.showStartButton ? (
       <div id="game-start">
@@ -104,10 +121,34 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
 
     const cameraSelection = (
       <div id="camera-selection">
-        <button onClick={() => this.handleCamSelection(1)}>1</button>
-        <button onClick={() => this.handleCamSelection(2)}>2</button>
-        <button onClick={() => this.handleCamSelection(3)}>3</button>
-        <button onClick={() => this.handleCamSelection(4)}>top</button>
+        <button onClick={() => this.handleCamSelection(1)}>f1</button>
+        <button onClick={() => this.handleCamSelection(2)}>f2</button>
+        <button onClick={() => this.handleCamSelection(3)}>fpv</button>
+        <button onClick={() => this.handleCamSelection(4)}>far</button>
+        <button onClick={() => this.handleCamSelection(5)}>top</button>
+        <button onClick={() => this.handleCamSelection(6)}>orbit</button>
+      </div>
+    );
+
+    const viewControl = (
+      <div id="view-controls">
+        <button onClick={() => this.handleView(View.Left)}>l</button>
+        <button onClick={() => this.handleView(View.Right)}>r</button>
+        <button onClick={() => this.handleView(View.Up)}>up</button>
+        <button onClick={() => this.handleView(View.Down)}>down</button>
+      </div>
+    );
+
+    const wrapSpeedControl = (
+      <div id="wrapSpeed-controls">
+        wrap speed:
+        <select id="wrapSpeed" onChange={this.handleWrapChange}>
+          <option value="1">normal</option>
+          <option value="5">fast</option>
+          <option value="10">very fast</option>
+          <option value="15">I'm from Lanzarote</option>
+          <option value="20">I'm a swiss pilot</option>
+        </select>
       </div>
     );
 
@@ -116,41 +157,10 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         {breakControls}
         {startButton}
         {cameraSelection}
-
-        <div id="vario-info">
-          <div id="vario-delta" className="delta"></div>
-          <div id="vario-altitude" className="altitude"></div>
-          <div id="vario-ground-speed" className="ground-speed"></div>
-        </div>
-
-        <div id="weather-info">
-          <div id="weather-direction" className=""></div>
-          <div id="weather-speed" className=""></div>
-        </div>
-
-        <div id="paraglider-info">
-          <div id="paraglider-speedBar" className="speedBar"></div>
-          <div id="paraglider-ears" className="ears"></div>
-        </div>
-
-        <div className="points" style={{ display: "none" }}>
-          <div className="point point-0">
-            <div className="label label-0">Famara/Teguise</div>
-            <div className="text">Famara</div>
-          </div>
-          <div className="point point-1">
-            <div className="label label-1">Mirador/Orzola</div>
-            <div className="text"></div>
-          </div>
-          <div className="point point-2">
-            <div className="label label-2">Macher/Asomada</div>
-            <div className="text"></div>
-          </div>
-          <div className="point point-3">
-            <div className="label label-3">Tenesar</div>
-            <div className="text">4</div>
-          </div>
-        </div>
+        {viewControl}
+        {cameraSelection}
+        {viewControl}
+        {wrapSpeedControl}
       </div>
     );
   }

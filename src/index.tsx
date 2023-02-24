@@ -157,8 +157,9 @@ class App extends React.Component<AppProps, AppState> {
         </div>
 
         <div id="weather-info">
-          <div id="weather-direction" className=""></div>
-          <div id="weather-speed" className=""></div>
+          <div id="weather-direction"></div>
+          <div id="weather-speed"></div>
+          <div id="weather-lclLevel"></div>
         </div>
 
         <div id="paraglider-info">

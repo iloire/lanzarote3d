@@ -3,6 +3,7 @@ import model from "../models/pubg_green_parachute2.glb";
 import Models from "../utils/models";
 import Weather from "../elements/weather";
 import Thermal from "../elements/thermal";
+import textureImg from "../textures/Parachute_01_D.png";
 
 const settings = { SHOW_ARROWS: false };
 const ORIGIN = new THREE.Vector3(0, 0, 0);
@@ -37,13 +38,14 @@ const createTrajectoryArrow = (
 
 const getTerrainHeightBelowPosition = (
   pos: THREE.Vector3,
-  terrain: THREE.Mesh
+  terrain: THREE.Mesh,
+  water: THREE.Mesh
 ) => {
   const rayVertical = new THREE.Raycaster(
     pos,
     new THREE.Vector3(0, -1, 0) // vertical
   );
-  const intersectsFloor = rayVertical.intersectObject(terrain);
+  const intersectsFloor = rayVertical.intersectObjects([terrain, water]);
   if (intersectsFloor.length) {
     const terrainBelowHeight = intersectsFloor[0].point.y;
     return terrainBelowHeight;
@@ -65,6 +67,7 @@ class Paraglider extends THREE.EventDispatcher {
   options: ParagliderConstructor;
   weather: Weather;
   terrain: THREE.Mesh;
+  water: THREE.Mesh;
   thermals: Thermal[];
   speedBar: boolean;
   currentSpeed: number;
@@ -77,6 +80,7 @@ class Paraglider extends THREE.EventDispatcher {
     options: ParagliderConstructor,
     weather: Weather,
     terrain: THREE.Mesh,
+    water: THREE.Mesh,
     thermals: Thermal[]
   ) {
     super();
@@ -88,6 +92,7 @@ class Paraglider extends THREE.EventDispatcher {
     this.options = options;
     this.weather = weather;
     this.terrain = terrain;
+    this.water = water;
     this.thermals = thermals;
   }
 
@@ -95,11 +100,6 @@ class Paraglider extends THREE.EventDispatcher {
     const pgBB = new THREE.Box3().setFromObject(this.model);
     const thermalBB = new THREE.Box3().setFromObject(thermal.getMesh());
     const inTheTermal = thermalBB.containsBox(pgBB);
-    // if (inTheTermal) {
-    //   console.log("inside thernak");
-    // } else {
-    //   console.log("not inside thermal");
-    // }
     return inTheTermal;
   }
 
@@ -108,16 +108,19 @@ class Paraglider extends THREE.EventDispatcher {
   }
 
   async loadModel(scale: number, initialPosition: THREE.Vector3) {
-    const pg = await Models.load(model, scale, initialPosition);
+    const mesh = await Models.load(model, scale, initialPosition);
+    const textureLoader = new THREE.TextureLoader(Models.manager);
+    const texture = await textureLoader.load(textureImg);
+    mesh.material = new THREE.MeshStandardMaterial({ map: texture });
     if (settings.SHOW_ARROWS) {
       const arrowLen = 700;
-      pg.add(
+      mesh.add(
         createTrajectoryArrow(this.options.glidingRatio, arrowLen, 0xff00ff)
       );
-      pg.add(createLiftArrow(this.options.glidingRatio, arrowLen, 0xffffff));
-      pg.add(this.getGravityHelper(arrowLen));
+      mesh.add(createLiftArrow(this.options.glidingRatio, arrowLen, 0xffffff));
+      mesh.add(this.getGravityHelper(arrowLen));
     }
-    this.model = pg;
+    this.model = mesh;
     this.interval = setInterval(() => this.tick(0.1 * this.wrapSpeed), 100);
   }
 
@@ -126,7 +129,7 @@ class Paraglider extends THREE.EventDispatcher {
   }
 
   tick(multiplier: number) {
-    if (!this.hasTouchedGround(this.terrain)) {
+    if (!this.hasTouchedGround(this.terrain, this.water)) {
       this.moveForward(multiplier);
       this.moveVertical(multiplier);
     }
@@ -157,7 +160,7 @@ class Paraglider extends THREE.EventDispatcher {
     const downVector = gravityDirection.multiplyScalar(downSpeed);
     this.move(downVector);
 
-    const lift = this.getLiftValue(this.terrain);
+    const lift = this.getLiftValue(this.terrain, this.water);
     const liftDirection = new THREE.Vector3(0, 1, 0);
     const liftVector = liftDirection.multiplyScalar(multiplier * lift);
     this.move(liftVector);
@@ -212,28 +215,25 @@ class Paraglider extends THREE.EventDispatcher {
     this.model.rotation.y -= Math.PI * rotationSensitivity;
   }
 
-  jump(terrain: THREE.Mesh) {
-    if (this.hasTouchedGround(terrain)) {
-      this.model.position.y += 0.5;
-    }
-  }
-
-  hasTouchedGround(terrain: THREE.Mesh): boolean {
+  hasTouchedGround(terrain: THREE.Mesh, water: THREE.Mesh): boolean {
     const pos = this.model.position;
     const rayVertical = new THREE.Raycaster(
       pos,
       new THREE.Vector3(0, -1, 0) // vertical
     );
-    const intersectsFloor = rayVertical.intersectObject(terrain);
+    const intersectsFloor = rayVertical.intersectObjects([terrain, water]);
     if (intersectsFloor.length) {
       const terrainBelowHeight = intersectsFloor[0].point.y;
       return terrainBelowHeight <= 0;
+    } else {
+      console.log("didn;t find intersection");
     }
     return true;
   }
 
   getTerrainGradientAgainstWindDirection(
     terrain: THREE.Mesh,
+    water: THREE.Mesh,
     windDirection: THREE.Vector3
   ): number {
     // TODO use barlovento
@@ -241,10 +241,11 @@ class Paraglider extends THREE.EventDispatcher {
     const pos = this.position();
     const posBarlovento = pos.clone().addScaledVector(windDirection, -delta);
 
-    const heightPos = getTerrainHeightBelowPosition(pos, terrain);
+    const heightPos = getTerrainHeightBelowPosition(pos, terrain, water);
     const heightPosBarlovento = getTerrainHeightBelowPosition(
       posBarlovento,
-      terrain
+      terrain,
+      water
     );
     // console.log("height", heightPos);
     // console.log("height barlo", heightPosBarlovento);
@@ -252,22 +253,18 @@ class Paraglider extends THREE.EventDispatcher {
     return gradient > 0 ? gradient : 0; // TODO
   }
 
-  getLiftValue(terrain: THREE.Mesh): number {
+  getLiftValue(terrain: THREE.Mesh, water: THREE.Mesh): number {
     const pos = this.position().clone();
     const windDirection = this.weather.getWindDirection();
-    const height = getTerrainHeightBelowPosition(pos, terrain);
+    const height = getTerrainHeightBelowPosition(pos, terrain, water);
     const gradient = this.getTerrainGradientAgainstWindDirection(
       terrain,
+      water,
       windDirection
     );
     const windSpeed = this.weather.getSpeedMetresPerSecond();
     const heightLiftComponent = height * 0.001;
     const l = heightLiftComponent * gradient;
-    // console.log("windspeed", windSpeed);
-    // console.log("heightLiftComponent", heightLiftComponent);
-    // console.log("gradient", gradient);
-    // console.log("height above ground for pos", height);
-    // console.log("liftvalue", l);
     return l;
   }
 
