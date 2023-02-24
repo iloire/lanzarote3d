@@ -5,7 +5,6 @@ import BackgroundSound from "../audio/background";
 import Paraglider, { ParagliderConstructor } from "../elements/pg";
 import Controls from "../utils/controls";
 import Helpers from "../utils/helpers";
-import WindIndicator from "../elements/wind-indicator";
 import Vario from "../audio/vario";
 import Weather from "../elements/weather";
 import Camera, { CameraMode } from "../elements/camera";
@@ -47,6 +46,7 @@ const p = {
 const Game = {
   load: async (camera: Camera, scene, renderer, terrain, water, gui) => {
     gui.hide();
+
     const nav = gui.addFolder("Navigation");
     nav.add(settings, "mouseControl").listen();
     nav.add(settings, "rotationSensitivity", 0.01, 0.05).listen();
@@ -80,19 +80,10 @@ const Game = {
     pg.addGui(gui);
     scene.add(pg.model);
 
-    // const windIndicator = new WindIndicator();
-    // windIndicator.load(weather.windDirectionDegreesFromNorth, 14, {
-    //   x: 0,
-    //   y: 0,
-    //   z: 0,
-    // });
-    // scene.add(windIndicator.arrow);
-
     document.addEventListener("keydown", onDocumentKeyDown, false);
 
     function onDocumentKeyDown(event) {
       const keyCode = event.which;
-      console.log(keyCode);
       if (keyCode == 32) {
         // space
         pg.jump(terrain);
@@ -109,24 +100,8 @@ const Game = {
       } else if (keyCode == 83) {
         //s
         pg.toggleSpeedBar();
-      } else if (keyCode == 65) {
-        //a
-        pg.rotateLeft(settings.rotationSensitivity);
-      } else if (keyCode == 68) {
-        //d
-        pg.rotateRight(settings.rotationSensitivity);
-      } else if (keyCode == 81) {
-        //q
-        pg.rotateRight(settings.rotationSensitivity);
       }
     }
-    // renderer.domElement.addEventListener("mousemove", (event) => {
-    //   if (settings.mouseControl) {
-    //     camera.quaternion.y -= (event.movementX * settings.sensitivity) / 20;
-    //     camera.quaternion.x -= (event.movementY * settings.sensitivity) / 20;
-    //   }
-    // });
-
     const altitudeUI = document.getElementById("vario-altitude");
     const deltaUI = document.getElementById("vario-delta");
     const groundSpeedUI = document.getElementById("vario-ground-speed");
@@ -208,7 +183,6 @@ const Game = {
       requestAnimationFrame(animate);
       camera.update();
       vario.updateReading(pg.altitude());
-      // windIndicator.update(weather.windDirectionDegreesFromNorth);
       renderer.render(scene, camera);
     };
   },

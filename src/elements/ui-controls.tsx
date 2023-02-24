@@ -19,8 +19,31 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     this.state = {
       showStartButton: true,
     };
+    document.addEventListener("keydown", this.onDocumentKeyDown, false);
+    document.addEventListener("keyup", this.onDocumentKeyUp, false);
   }
 
+  onDocumentKeyDown = (event) => {
+    const keyCode = event.which;
+    if (keyCode == 65) {
+      //a
+      this.handleLeft();
+    } else if (keyCode == 68) {
+      //d
+      this.handleRight();
+    }
+  };
+
+  onDocumentKeyUp = (event) => {
+    const keyCode = event.which;
+    if (keyCode == 65) {
+      //a
+      this.handleLeftRelease();
+    } else if (keyCode == 68) {
+      //d
+      this.handleRightRelease();
+    }
+  };
   handleCamSelection = (cam: number) => {
     this.props.onSelectCamera(cam);
   };
