@@ -101,11 +101,15 @@ class Paraglider extends THREE.EventDispatcher {
     this.thermals = thermals;
   }
 
-  isInsideThermal(thermal: Thermal): boolean {
+  isInsideThermal = (thermal: Thermal): boolean => {
     const pgBB = new THREE.Box3().setFromObject(this.model);
     const thermalBB = new THREE.Box3().setFromObject(thermal.getMesh());
     const inTheTermal = thermalBB.containsBox(pgBB);
     return inTheTermal;
+  };
+
+  isInsideAnyThermal(): boolean {
+    return this.thermals.some(this.isInsideThermal);
   }
 
   updateWrapSpeed(value: number) {
@@ -149,7 +153,8 @@ class Paraglider extends THREE.EventDispatcher {
         type: "touchedGround",
       });
     }
-    if (this.isInsideThermal(this.thermals[0])) {
+
+    if (this.isInsideAnyThermal()) {
       const liftDirection = new THREE.Vector3(0, 1, 0);
       const liftVector = liftDirection.multiplyScalar(multiplier * 2);
       this.move(liftVector);
