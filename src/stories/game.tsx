@@ -100,6 +100,7 @@ const Game = {
     const altitudeUI = document.getElementById("vario-altitude");
     const deltaUI = document.getElementById("vario-delta");
     const groundSpeedUI = document.getElementById("vario-ground-speed");
+
     const vario = new Vario(pg);
     vario.addEventListener("delta", function (event) {
       deltaUI.innerText = "Altitude Δ: " + round(event.delta) + " m/s";
@@ -180,6 +181,8 @@ const Game = {
     );
     root.render(uiControls);
 
+    camera.setCameraMode(CameraMode.FollowTarget, pg);
+    
     const animate = () => {
       // setTimeout(animate, 2200);
       if (isLeftTurning) {
