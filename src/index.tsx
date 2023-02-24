@@ -12,7 +12,6 @@ import Helpers from "./utils/helpers";
 import Water from "./utils/water";
 
 import Island from "./elements/island";
-import Clouds from "./elements/clouds";
 
 import Stories from "./stories/index";
 import Camera from "./elements/camera";
@@ -130,7 +129,6 @@ class App extends React.Component<AppProps, AppState> {
     const island = await Island.load(20000, new THREE.Vector3(0, 0, 0));
     scene.add(island);
 
-
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
     if (urlParams.get("story") === "mechanics") {
@@ -164,7 +162,7 @@ class App extends React.Component<AppProps, AppState> {
         </div>
 
         <div id="paraglider-info">
-          <div id="paraglider-speedBar" className="speedBar"></div>
+          <div id="paraglider-speedBar">SPEED-BAR</div>
           <div id="paraglider-ears" className="ears"></div>
         </div>
 

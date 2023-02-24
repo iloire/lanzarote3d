@@ -75,8 +75,11 @@ const Game = {
     const pg = new Paraglider(pgOptions, weather, terrain, [thermal]);
     await pg.loadModel(p.scale, p.position);
     pg.addEventListener("position", function (event) {
-      speedBarUI.innerText =
-        "Speedbar (S key): " + pg.isOnSpeedBar().toString();
+      if (pg.isOnSpeedBar()) {
+        speedBarUI.style.display = "block";
+      } else {
+        speedBarUI.style.display = "none";
+      }
     });
     pg.addGui(gui);
     scene.add(pg.model);

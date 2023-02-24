@@ -31,6 +31,7 @@
   border: 1px solid #ffffff77;
 }
 
+
 #game-controls button {
   font-size: 250%;
 }
@@ -73,11 +74,15 @@
   color: white;
   position: absolute;
   top: 20px;
-  left: 180px;
+  left: 200px;
   padding: 0px 10px;
   border-radius: 5%;
   background: #00000077;
   border: 1px solid #ffffff77;
+}
+
+#paraglider-speedBar {
+  font-size: 200%;
 }
 
 .point .label {
