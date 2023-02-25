@@ -9,10 +9,7 @@ const HG = {
       requestAnimationFrame(() => animate(mesh));
     };
 
-    const mesh = await Models.load(model, scale, pos, {
-      x: -Math.PI / 2,
-    });
-
+    const mesh = await Models.load(model, scale, pos);
     animate(mesh);
     return mesh;
   },

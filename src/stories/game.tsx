@@ -43,7 +43,7 @@ const pgOptions: ParagliderConstructor = {
 const p = {
   scale: 0.004,
   // position: new THREE.Vector3(6827, 880, -555),
-  position: new THREE.Vector3(8727, 780, -4355),
+  position: new THREE.Vector3(8727, 1280, -4355),
 };
 
 const Game = {
@@ -80,7 +80,7 @@ const Game = {
     );
     const thermal = new Thermal(
       thermalPos,
-      WEATHER_SETTINGS.lclLevel,
+      WEATHER_SETTINGS.lclLevel * 1.2,
       weather,
       1.5
     );
@@ -92,7 +92,7 @@ const Game = {
     );
     const thermal3 = new Thermal(
       thermalPos3,
-      WEATHER_SETTINGS.lclLevel * 0.9,
+      WEATHER_SETTINGS.lclLevel * 1.3,
       weather,
       2
     );
@@ -111,18 +111,33 @@ const Game = {
     pg.addGui(gui);
     scene.add(pg.model);
 
-    const c = await Clouds.load(300, {
-      x: 0,
-      y: WEATHER_SETTINGS.lclLevel,
-      z: 0,
-    });
+    const c = await Clouds.load(
+      1,
+      new THREE.Vector3(
+        thermalPos.x,
+        WEATHER_SETTINGS.lclLevel * 1.2,
+        thermalPos.z
+      )
+    );
     scene.add(c);
-    const c1 = await Clouds.load(301, {
-      x: 60,
-      y: WEATHER_SETTINGS.lclLevel + 50,
-      z: -40,
-    });
-    scene.add(c1);
+    const c2 = await Clouds.load(
+      1,
+      new THREE.Vector3(
+        thermalPos2.x,
+        WEATHER_SETTINGS.lclLevel * 1.1,
+        thermalPos2.z
+      )
+    );
+    scene.add(c2);
+    const c3 = await Clouds.load(
+      1,
+      new THREE.Vector3(
+        thermalPos3.x,
+        WEATHER_SETTINGS.lclLevel * 1.3,
+        thermalPos3.z
+      )
+    );
+    scene.add(c3);
 
     document.addEventListener("keydown", onDocumentKeyDown, false);
 
