@@ -61,12 +61,20 @@
   padding: 15px 15px 10px 15px;
 }
 
-#game-start button{
+#game-start-normal{
   position: absolute;
   top: 40%;
-  left: 45%;
+  left: 30%;
   padding: 10px 20px;
-  font-size: 400%;
+  font-size: 200%;
+}
+
+#game-start-strong{
+  position: absolute;
+  top: 40%;
+  left: 55%;
+  padding: 10px 20px;
+  font-size: 200%;
 }
 
 #instructions {

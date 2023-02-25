@@ -43,7 +43,7 @@ const pgOptions: ParagliderConstructor = {
 const p = {
   scale: 0.004,
   // position: new THREE.Vector3(6827, 880, -555),
-  position: new THREE.Vector3(8727, 1280, -4355),
+  position: new THREE.Vector3(8727, 780, -4355),
 };
 
 const Game = {
@@ -196,7 +196,8 @@ const Game = {
         onRightBreakRelease={() => {
           isRightTurning = false;
         }}
-        onGameStart={(fnHideStartButton) => {
+        onGameStart={(options, fnHideStartButton) => {
+          weather.changeWindSpeed(options.windSpeedMetresPerSecond);
           bgMusic.start();
           fnHideStartButton();
           vario.start();

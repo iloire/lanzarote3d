@@ -23,12 +23,12 @@ class Weather extends THREE.EventDispatcher {
 
     setInterval(() => {
       const newWindValue = getRandomArbitrary(
-        speedMetresPerSecond * 0.9,
-        speedMetresPerSecond * 1.1
+        this.speedMetresPerSecond * 0.9,
+        this.speedMetresPerSecond * 1.1
       );
       const newDirectionValue = getRandomArbitrary(
-        degreesFromNorth * 0.95,
-        degreesFromNorth * 1.05
+        this.degreesFromNorth * 0.95,
+        this.degreesFromNorth * 1.05
       );
       const newLclValue = getRandomArbitrary(lclLevel * 0.95, lclLevel * 1.05);
       this.speedMetresPerSecond = Math.round(newWindValue * 100) / 100;
@@ -48,6 +48,11 @@ class Weather extends THREE.EventDispatcher {
         value: this.lclLevel,
       });
     }, WEATHER_UPDATE_FRECUENCY);
+  }
+
+  changeWindSpeed(windSpeedMetresPerSecond: number) {
+    this.speedMetresPerSecond = windSpeedMetresPerSecond;
+    console.log(this.speedMetresPerSecond);
   }
 
   getWindVelocity(multiplier: number = 1): THREE.Vector3 {

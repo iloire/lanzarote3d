@@ -13,6 +13,10 @@ import arrowRightImg from "../img/right-chevron.png";
 
 const KMH_TO_MS = 3.6;
 
+interface GameStartOptions {
+  windSpeedMetresPerSecond: number;
+}
+
 type UIControlsProps = {
   pg: Paraglider;
   vario: Vario;
@@ -20,7 +24,10 @@ type UIControlsProps = {
   onLeftBreakRelease: () => void;
   onRightBreak: () => void;
   onRightBreakRelease: () => void;
-  onGameStart: (fnHideStartButton: () => void) => void;
+  onGameStart: (
+    options: GameStartOptions,
+    fnHideStartButton: () => void
+  ) => void;
   onSelectCamera: (mode: CameraMode) => void;
   onViewChange: (view: View) => void;
   onWrapSpeedChange: (value: number) => void;
@@ -135,8 +142,11 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     this.props.onRightBreakRelease();
   };
 
-  handleStart = () => {
-    this.props.onGameStart(() => {
+  handleStart = (windSpeedMetresPerSecond: number) => {
+    const options = {
+      windSpeedMetresPerSecond,
+    };
+    this.props.onGameStart(options, () => {
       this.setState({ showStartButton: false });
     });
   };
@@ -151,8 +161,11 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
   render() {
     const startButton = this.state.showStartButton ? (
       <div id="game-start">
-        <button id="game-start-button" onClick={this.handleStart}>
-          START
+        <button id="game-start-normal" onClick={() => this.handleStart(6)}>
+          normal wind
+        </button>
+        <button id="game-start-strong" onClick={() => this.handleStart(9)}>
+          strongcito
         </button>
       </div>
     ) : (
@@ -265,7 +278,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       <div id="wrapSpeed-controls" className="UIBox">
         skill:
         <select
-          defaultValue="1"
+          defaultValue="3"
           id="wrapSpeed"
           onChange={this.handleWrapChange}
         >
