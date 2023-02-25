@@ -50,6 +50,7 @@ type UIControlsState = {
   windSpeed: number;
   windDirection: number;
   lclLevel: number;
+  flyingTime: number;
 };
 
 export enum View {
@@ -77,6 +78,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       windSpeed: 0,
       windDirection: 0,
       lclLevel: 0,
+      flyingTime: 0,
     };
     document.addEventListener("keydown", this.onDocumentKeyDown, false);
     document.addEventListener("keyup", this.onDocumentKeyUp, false);
@@ -99,6 +101,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         posY: Math.round(pos.y),
         posZ: Math.round(pos.z),
         glidingRatio: Math.round(pg.glidingRatio() * 100) / 100,
+        flyingTime: Math.round((pg.getFlyingTime() * 100) / 60) / 100,
       });
     });
     pg.addEventListener("heightAboveGround", (event) => {
@@ -289,6 +292,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       heightAboveGround,
       speedBarEngaged,
       glidingRatio,
+      flyingTime,
     } = this.state;
 
     const varioInfo = (
@@ -300,6 +304,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         </div>
         <div id="vario-ground-speed">Ground speed: {groundSpeed} km/h</div>
         <div id="pg-gliding-ratio">Gliding ratio: {glidingRatio}</div>
+        <div id="pg-flying-time">Flying time: {flyingTime} min.</div>
       </div>
     );
     const speedBarText = speedBarEngaged ? "SPEED-BAR" : "";
@@ -324,7 +329,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       <div id="wrapSpeed-controls" className="UIBox">
         skill:
         <select
-          defaultValue="3"
+          defaultValue="7"
           id="wrapSpeed"
           onChange={this.handleWrapChange}
         >
@@ -332,6 +337,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
           <option value="3">"pro"</option>
           <option value="7">I'm from Lanzarote</option>
           <option value="12">I'm a swiss pilot</option>
+          <option value="52">turbo</option>
         </select>
       </div>
     );

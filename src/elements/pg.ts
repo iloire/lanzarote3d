@@ -75,6 +75,7 @@ class Paraglider extends THREE.EventDispatcher {
   model: THREE.Mesh;
   gravityDirection = new THREE.Vector3(0, -1, 0);
   wrapSpeed: number = 1;
+  flyingTime: number = 0;
 
   constructor(
     options: ParagliderConstructor,
@@ -149,6 +150,7 @@ class Paraglider extends THREE.EventDispatcher {
       const liftVector = liftDirection.multiplyScalar(multiplier * 2);
       this.move(liftVector);
     }
+    this.flyingTime += Math.round(multiplier * 100) / 100;
   }
 
   getGroundSpeed(): number {
@@ -337,6 +339,10 @@ class Paraglider extends THREE.EventDispatcher {
     } else {
       return this.options.glidingRatio;
     }
+  }
+
+  getFlyingTime(): number {
+    return this.flyingTime;
   }
 
   move(velocity: THREE.Vector3) {

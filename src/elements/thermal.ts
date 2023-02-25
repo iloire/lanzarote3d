@@ -17,19 +17,18 @@ class Thermal {
       32
     );
 
-    // Create a new material with a solid color
     const material = new THREE.MeshBasicMaterial({
       color: 0xff0000,
-      opacity: 0.1, // set the opacity level (0-1)
+      opacity: 0.05, // set the opacity level (0-1)
       transparent: true, // enable transparencyopacity: 0.5, // set the opacity level (0-1)
     });
 
-    // Create a new mesh by combining the geometry and material
     const cylinder = new THREE.Mesh(geometry, material);
+    initialPosition.y = initialPosition.y + height / 2;
     cylinder.position.copy(initialPosition);
 
-    const vectorWind = weather.getWindDirection().clone();
-    cylinder.lookAt(new THREE.Vector3(0, 0, -1));
+    // const vectorWind = weather.getWindDirection().clone();
+    // cylinder.lookAt(new THREE.Vector3(0, 0, -1));
 
     this.mesh = cylinder;
   }

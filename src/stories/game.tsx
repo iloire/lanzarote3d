@@ -43,7 +43,8 @@ const pgOptions: ParagliderConstructor = {
 const p = {
   scale: 0.004,
   // position: new THREE.Vector3(6827, 880, -555),
-  position: new THREE.Vector3(8727, 1280, -4355),
+  position: new THREE.Vector3(-5427, 580, -355), // tenesar
+  // position: new THREE.Vector3(8727, 1280, -4355),
 };
 
 const Game = {
@@ -63,24 +64,12 @@ const Game = {
 
     const bgMusic = new BackgroundSound();
 
-    const thermalPos = new THREE.Vector3(
-      5727,
-      WEATHER_SETTINGS.lclLevel / 2,
-      -535
-    );
-    const thermalPos2 = new THREE.Vector3(
-      7127,
-      WEATHER_SETTINGS.lclLevel / 2,
-      -1405
-    );
-    const thermalPos3 = new THREE.Vector3(
-      3027,
-      WEATHER_SETTINGS.lclLevel / 2,
-      1005
-    );
+    const thermalPos = new THREE.Vector3(5727, 0, -535);
+    const thermalPos2 = new THREE.Vector3(7127, 0, -1405);
+    const thermalPos3 = new THREE.Vector3(3027, 0, 1005);
     const thermal = new Thermal(
       thermalPos,
-      WEATHER_SETTINGS.lclLevel * 1.2,
+      WEATHER_SETTINGS.lclLevel * 0.95,
       weather,
       1.5
     );
@@ -92,7 +81,7 @@ const Game = {
     );
     const thermal3 = new Thermal(
       thermalPos3,
-      WEATHER_SETTINGS.lclLevel * 1.3,
+      WEATHER_SETTINGS.lclLevel * 1.05,
       weather,
       2
     );

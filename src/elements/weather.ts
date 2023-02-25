@@ -23,16 +23,20 @@ class Weather extends THREE.EventDispatcher {
 
     setInterval(() => {
       const newWindValue = getRandomArbitrary(
-        this.speedMetresPerSecond * 0.9,
-        this.speedMetresPerSecond * 1.1
+        this.speedMetresPerSecond * 0.95,
+        this.speedMetresPerSecond * 1.05
       );
       const newDirectionValue = getRandomArbitrary(
         this.degreesFromNorth * 0.95,
         this.degreesFromNorth * 1.05
       );
-      const newLclValue = getRandomArbitrary(lclLevel * 0.95, lclLevel * 1.05);
       this.speedMetresPerSecond = Math.round(newWindValue * 100) / 100;
-      this.degreesFromNorth = Math.round(newDirectionValue * 100) / 100;
+      if (newDirectionValue > 360) {
+        this.degreesFromNorth = 360;
+      } else {
+        this.degreesFromNorth = Math.round(newDirectionValue * 100) / 100;
+      }
+      const newLclValue = getRandomArbitrary(lclLevel * 0.95, lclLevel * 1.05);
       this.lclLevel = Math.round(newLclValue);
 
       this.dispatchEvent({
