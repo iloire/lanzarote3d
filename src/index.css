@@ -24,6 +24,10 @@
 
 #camera-selection button {font-size: 200%;margin-right: 5px}
 
+#camera-selection img {
+  width: 30px
+}
+
 #wrapSpeed-controls {
   position: absolute;
   top: 90px;
@@ -38,7 +42,8 @@
 }
 
 #view-controls button{
-  font-size: 200%
+  font-size: 300%;
+  padding: 5px 10px;
 }
 
 #game-controls {
@@ -47,9 +52,13 @@
   left: 20px;
 }
 
+#game-controls img {
+  width: 60px
+}
 
 #game-controls button {
-  font-size: 250%;
+  border-radius: 10px;
+  padding: 15px 15px 10px 15px;
 }
 
 #game-start button{

@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import Weather from "./weather";
 
 class Thermal {
   mesh: THREE.Mesh;
@@ -6,6 +7,7 @@ class Thermal {
   constructor(
     initialPosition: THREE.Vector3,
     height: number,
+    weather: Weather,
     relativeScale: number = 1
   ) {
     const geometry = new THREE.CylinderGeometry(
@@ -14,7 +16,6 @@ class Thermal {
       height,
       32
     );
-    console.log(height);
 
     // Create a new material with a solid color
     const material = new THREE.MeshBasicMaterial({
@@ -26,6 +27,9 @@ class Thermal {
     // Create a new mesh by combining the geometry and material
     const cylinder = new THREE.Mesh(geometry, material);
     cylinder.position.copy(initialPosition);
+
+    const vectorWind = weather.getWindDirection().clone();
+    cylinder.lookAt(new THREE.Vector3(0, 0, -1));
 
     this.mesh = cylinder;
   }

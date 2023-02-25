@@ -2,6 +2,14 @@ import React from "react";
 import { CameraMode } from "./camera";
 import Paraglider from "./pg";
 import Vario from "../audio/vario";
+import airplaneImg from "../img/airplane.png";
+import mountainImg from "../img/mountain.png";
+import mapImg from "../img/map.png";
+import glidingImg from "../img/gliding.png";
+import viewLeftImg from "../img/eye-left.png";
+import viewRightImg from "../img/eye-right.png";
+import arrowLeftImg from "../img/left-chevron.png";
+import arrowRightImg from "../img/right-chevron.png";
 
 const KMH_TO_MS = 3.6;
 
@@ -154,20 +162,20 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     const breakControls = this.state.showStartButton ? (
       false
     ) : (
-      <div id="game-controls" className="UIBox">
+      <div id="game-controls">
         <button
           id="game-controls-left"
           onMouseUp={this.handleLeftRelease}
           onMouseDown={this.handleLeft}
         >
-          &nbsp; &lt;&nbsp;
+          <img src={arrowLeftImg} />
         </button>
         <button
           id="game-controls-right"
           onMouseUp={this.handleRightRelease}
           onMouseDown={this.handleRight}
         >
-          &nbsp; &gt;&nbsp;
+          <img src={arrowRightImg} />
         </button>
       </div>
     );
@@ -175,24 +183,24 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     const cameraSelection = this.state.showStartButton ? (
       false
     ) : (
-      <div id="camera-selection" className="UIBox">
+      <div id="camera-selection">
         <button onClick={() => this.handleCamMode(CameraMode.FollowTarget)}>
-          f1
+          <img src={viewLeftImg} />
         </button>
         <button onClick={() => this.handleCamMode(CameraMode.FollowTarget2)}>
-          f2
+          <img src={viewRightImg} />
         </button>
         <button onClick={() => this.handleCamMode(CameraMode.FirstPersonView)}>
-          fpv
+          <img src={glidingImg} />
         </button>
         <button onClick={() => this.handleCamMode(CameraMode.TopView)}>
-          top
+          <img src={mapImg} />
         </button>
         <button onClick={() => this.handleCamMode(CameraMode.FarAway)}>
-          far away
+          <img src={mountainImg} />
         </button>
         <button onClick={() => this.handleCamMode(CameraMode.AirplaneView)}>
-          airplane
+          <img src={airplaneImg} />
         </button>
         <button
           style={{ display: "none" }}
@@ -204,7 +212,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     );
 
     const viewControl = this.state.viewControlsVisible ? (
-      <div id="view-controls" className="UIBox">
+      <div id="view-controls">
         <button
           onMouseDown={() => this.handleView(View.Left)}
           onMouseUp={() => this.handleView(View.LeftRelease)}
