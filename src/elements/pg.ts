@@ -40,18 +40,17 @@ const getTerrainHeightBelowPosition = (
   pos: THREE.Vector3,
   terrain: THREE.Mesh,
   water: THREE.Mesh
-) => {
+): number => {
   const rayVertical = new THREE.Raycaster(
     pos,
     new THREE.Vector3(0, -1, 0) // vertical
   );
   const intersectsFloor = rayVertical.intersectObjects([terrain, water]);
-  if (intersectsFloor.length) {
+  if (intersectsFloor.length === 2) {
     const yValues = intersectsFloor.map((obj) => obj.point.y);
-    const terrainBelowHeight = Math.max(...yValues);
-    return terrainBelowHeight;
+    return Math.max(...yValues);
   } else {
-    return 0;
+    return NaN;
   }
 };
 
@@ -237,7 +236,7 @@ class Paraglider extends THREE.EventDispatcher {
       terrain,
       water
     );
-    return pos.y <= terrainBelowHeight;
+    return isNaN(terrainBelowHeight);
   }
 
   getTerrainGradientAgainstWindDirection(
@@ -248,14 +247,16 @@ class Paraglider extends THREE.EventDispatcher {
     // TODO use barlovento
     const delta = 50;
     const pos = this.position();
-    const posBarlovento = pos.clone().addScaledVector(windDirection, -delta);
-
     const heightPos = getTerrainHeightBelowPosition(pos, terrain, water);
+    if (isNaN(heightPos)) {
+      return 0;
+    }
     const heightAboveGround = pos.y - heightPos;
     this.dispatchEvent({
       type: "heightAboveGround",
       height: heightAboveGround,
     });
+    const posBarlovento = pos.clone().addScaledVector(windDirection, -delta);
     const heightPosBarlovento = getTerrainHeightBelowPosition(
       posBarlovento,
       terrain,
@@ -269,6 +270,9 @@ class Paraglider extends THREE.EventDispatcher {
     const pos = this.position().clone();
     const windDirection = this.weather.getWindDirection();
     const height = getTerrainHeightBelowPosition(pos, terrain, water);
+    if (isNaN(height)) {
+      return 0;
+    }
     const gradient = this.getTerrainGradientAgainstWindDirection(
       terrain,
       water,
