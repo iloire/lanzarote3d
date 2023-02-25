@@ -16,7 +16,7 @@ const Models = {
     const gltf: any = await modelLoader(model);
     const mesh = gltf.scene.children[0];
     mesh.scale.set(scale, scale, scale);
-    mesh.position.set(pos.x, pos.y, pos.z);
+    mesh.position.copy(pos);
     mesh.castShadow = true;
     return mesh;
   },
