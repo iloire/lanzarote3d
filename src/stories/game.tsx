@@ -42,7 +42,8 @@ const pgOptions: ParagliderConstructor = {
 
 const p = {
   scale: 0.004,
-  position: new THREE.Vector3(6827, 880, -555),
+  // position: new THREE.Vector3(6827, 880, -555),
+  position: new THREE.Vector3(8727, 1280, -4355),
 };
 
 const Game = {
@@ -72,8 +73,18 @@ const Game = {
       WEATHER_SETTINGS.lclLevel / 2,
       -1405
     );
-    const thermal = new Thermal(thermalPos, WEATHER_SETTINGS.lclLevel, 1.5);
-    const thermal2 = new Thermal(thermalPos2, WEATHER_SETTINGS.lclLevel, 2);
+    const thermal = new Thermal(
+      thermalPos,
+      WEATHER_SETTINGS.lclLevel,
+      weather,
+      1.5
+    );
+    const thermal2 = new Thermal(
+      thermalPos2,
+      WEATHER_SETTINGS.lclLevel,
+      weather,
+      2
+    );
     scene.add(thermal.mesh);
     scene.add(thermal2.mesh);
 
@@ -149,8 +160,10 @@ const Game = {
       weatherLCLUi.innerText = "lcl: " + Math.round(event.value) + "m";
     });
 
-    let isLeftTurning;
-    let isRightTurning;
+    let isLeftTurning = false;
+    let isRightTurning = false;
+    let isLeftViewing = false;
+    let isRightViewing = false;
 
     const rootElement = document.getElementById("ui-controls");
     const root = createRoot(rootElement);
@@ -182,9 +195,13 @@ const Game = {
         }}
         onViewChange={(view: View) => {
           if (view === View.Left) {
-            camera.turnLeft();
+            isLeftViewing = true;
+          } else if (view === View.LeftRelease) {
+            isLeftViewing = false;
           } else if (view === View.Right) {
-            camera.turnRight();
+            isRightViewing = true;
+          } else if (view === View.RightRelease) {
+            isRightViewing = false;
           }
         }}
         onWrapSpeedChange={(value) => {
@@ -216,6 +233,12 @@ const Game = {
       }
       if (isRightTurning) {
         pg.rotateRight(settings.rotationSensitivity);
+      }
+      if (isLeftViewing) {
+        camera.turnLeft();
+      }
+      if (isRightViewing) {
+        camera.turnRight();
       }
       requestAnimationFrame(animate);
       // setTimeout(animate, 2200);

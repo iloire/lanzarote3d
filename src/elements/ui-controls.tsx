@@ -31,10 +31,10 @@ type UIControlsState = {
 };
 
 export enum View {
-  Up = "up",
-  Down = "down",
   Left = "left",
+  LeftRelease = "leftRelease",
   Right = "right",
+  RightRelease = "rightRelease",
 }
 
 class UIControls extends React.Component<UIControlsProps, UIControlsState> {
@@ -194,8 +194,18 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
 
     const viewControl = (
       <div id="view-controls" className="UIBox">
-        <button onClick={() => this.handleView(View.Left)}>&lt;</button>
-        <button onClick={() => this.handleView(View.Right)}>&gt;</button>
+        <button
+          onMouseDown={() => this.handleView(View.Left)}
+          onMouseUp={() => this.handleView(View.LeftRelease)}
+        >
+          &lt;
+        </button>
+        <button
+          onMouseDown={() => this.handleView(View.Right)}
+          onMouseUp={() => this.handleView(View.RightRelease)}
+        >
+          &gt;
+        </button>
       </div>
     );
 

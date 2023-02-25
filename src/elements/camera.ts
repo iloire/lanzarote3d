@@ -78,14 +78,14 @@ class Camera extends THREE.PerspectiveCamera {
   }
 
   turnLeft() {
-    const left = new THREE.Vector3(0, 0, 1).multiplyScalar(5);
+    const left = new THREE.Vector3(0, 0, 1).multiplyScalar(1);
     this.follow1Offset.add(left);
     this.follow2Offset.add(left);
     this.topViewOffset.add(left);
   }
 
   turnRight() {
-    const right = new THREE.Vector3(0, 0, -1).multiplyScalar(5);
+    const right = new THREE.Vector3(0, 0, -1).multiplyScalar(1);
     this.follow1Offset.add(right);
     this.follow2Offset.add(right);
     this.topViewOffset.add(right);
