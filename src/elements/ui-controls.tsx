@@ -44,6 +44,7 @@ type UIControlsState = {
   posY: number;
   posZ: number;
   viewControlsVisible: boolean;
+  glidingRatio: number;
 };
 
 export enum View {
@@ -67,6 +68,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       posY: 0,
       posZ: 0,
       viewControlsVisible: true,
+      glidingRatio: 0,
     };
     document.addEventListener("keydown", this.onDocumentKeyDown, false);
     document.addEventListener("keyup", this.onDocumentKeyUp, false);
@@ -88,6 +90,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         posX: Math.round(pos.x),
         posY: Math.round(pos.y),
         posZ: Math.round(pos.z),
+        glidingRatio: Math.round(pg.glidingRatio() * 100) / 100,
       });
     });
     pg.addEventListener("heightAboveGround", (event) => {
@@ -243,8 +246,14 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       false
     );
 
-    const { delta, altitude, groundSpeed, heightAboveGround, speedBarEngaged } =
-      this.state;
+    const {
+      delta,
+      altitude,
+      groundSpeed,
+      heightAboveGround,
+      speedBarEngaged,
+      glidingRatio,
+    } = this.state;
 
     const varioInfo = (
       <div id="vario-info" className="UIBox">
@@ -254,6 +263,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
           Alt. above terrain: {heightAboveGround} m.
         </div>
         <div id="vario-ground-speed">Ground speed: {groundSpeed} km/h</div>
+        <div id="pg-gliding-ratio">Gliding ratio: {glidingRatio}</div>
       </div>
     );
     const speedBarText = speedBarEngaged ? "SPEED-BAR" : "";

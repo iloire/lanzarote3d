@@ -32,7 +32,7 @@ const WEATHER_SETTINGS = {
 };
 
 const pgOptions: ParagliderConstructor = {
-  glidingRatio: 2,
+  glidingRatio: 9,
   trimSpeed: 25 / KMH_TO_MS,
   halfSpeedBarSpeed: 30 / KMH_TO_MS,
   fullSpeedBarSpeed: 35 / KMH_TO_MS,
