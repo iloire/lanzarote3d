@@ -47,10 +47,6 @@ const getTerrainHeightBelowPosition = (
   );
   const intersectsFloor = rayVertical.intersectObjects([terrain, water]);
   if (intersectsFloor.length) {
-    if (intersectsFloor.length === 1) {
-      // it means we are below the terrain
-      return pos.y;
-    }
     const yValues = intersectsFloor.map((obj) => obj.point.y);
     const terrainBelowHeight = Math.max(...yValues);
     return terrainBelowHeight;
@@ -265,8 +261,6 @@ class Paraglider extends THREE.EventDispatcher {
       terrain,
       water
     );
-    // console.log("height", heightPos);
-    // console.log("height barlo", heightPosBarlovento);
     const gradient = (heightPos - heightPosBarlovento) / delta;
     return gradient > 0 ? gradient : 0; // TODO
   }
