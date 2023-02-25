@@ -28,6 +28,7 @@ type UIControlsState = {
   posX: number;
   posY: number;
   posZ: number;
+  viewControlsVisible: boolean;
 };
 
 export enum View {
@@ -50,6 +51,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       posX: 0,
       posY: 0,
       posZ: 0,
+      viewControlsVisible: true,
     };
     document.addEventListener("keydown", this.onDocumentKeyDown, false);
     document.addEventListener("keyup", this.onDocumentKeyUp, false);
@@ -99,7 +101,13 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       this.handleRightRelease();
     }
   };
+
   handleCamMode = (mode: CameraMode) => {
+    if (mode === CameraMode.FirstPersonView) {
+      this.setState({ viewControlsVisible: false });
+    } else {
+      this.setState({ viewControlsVisible: true });
+    }
     this.props.onSelectCamera(mode);
   };
 
@@ -186,13 +194,16 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         <button onClick={() => this.handleCamMode(CameraMode.AirplaneView)}>
           airplane
         </button>
-        <button onClick={() => this.handleCamMode(CameraMode.OrbitControl)}>
+        <button
+          style={{ display: "none" }}
+          onClick={() => this.handleCamMode(CameraMode.OrbitControl)}
+        >
           orbit
         </button>
       </div>
     );
 
-    const viewControl = (
+    const viewControl = this.state.viewControlsVisible ? (
       <div id="view-controls" className="UIBox">
         <button
           onMouseDown={() => this.handleView(View.Left)}
@@ -207,6 +218,8 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
           &gt;
         </button>
       </div>
+    ) : (
+      false
     );
 
     const { delta, altitude, groundSpeed, heightAboveGround, speedBarEngaged } =

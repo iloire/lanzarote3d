@@ -26,6 +26,7 @@ class Camera extends THREE.PerspectiveCamera {
   follow2Offset: THREE.Vector3 = new THREE.Vector3(31.2, 10, -21.2);
   topViewOffset: THREE.Vector3 = new THREE.Vector3(10, 300, -10);
   airplaneViewOffset: THREE.Vector3 = new THREE.Vector3(30, 3000, 10);
+  directionToLook: THREE.Vector3;
 
   addGui(gui) {
     const cameraGui = gui.addFolder("Camera");
@@ -74,21 +75,26 @@ class Camera extends THREE.PerspectiveCamera {
     this.target = target;
     this.mode = mode;
     this.controls = controls;
+    this.directionToLook = target.direction().multiplyScalar(10);
     this.update();
   }
 
   turnLeft() {
-    const left = new THREE.Vector3(0, 0, 1).multiplyScalar(1);
+    const left = new THREE.Vector3(0, 0, 1);
+    this.rotateY((Math.PI / 180) * 5);
     this.follow1Offset.add(left);
     this.follow2Offset.add(left);
     this.topViewOffset.add(left);
+    this.directionToLook.add(left.multiplyScalar(10));
   }
 
   turnRight() {
-    const right = new THREE.Vector3(0, 0, -1).multiplyScalar(1);
+    const right = new THREE.Vector3(0, 0, -1);
+    this.rotateY((-Math.PI / 180) * 5);
     this.follow1Offset.add(right);
     this.follow2Offset.add(right);
     this.topViewOffset.add(right);
+    this.directionToLook.add(right.multiplyScalar(10));
   }
 
   followTarget() {
@@ -108,9 +114,16 @@ class Camera extends THREE.PerspectiveCamera {
   }
 
   firstPersonView() {
-    this.position.copy(getObjectPosition(this.target.getMesh()));
-    const directionToLook = this.target.direction().multiplyScalar(10000);
-    this.lookAt(directionToLook);
+    const posPg = getObjectPosition(this.target.getMesh()).clone();
+    const cameraoffset = new THREE.Vector3(0, -1.1, 0);
+    this.position.copy(
+      posPg.add(this.target.direction().add(cameraoffset).multiplyScalar(-0.8))
+    );
+    this.lookAt(
+      posPg.add(this.target.direction().multiplyScalar(20))
+      // .add(this.directionToLook)
+    );
+    console.log(this.target.direction());
   }
 
   farAwayView() {

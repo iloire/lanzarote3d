@@ -296,11 +296,11 @@ class Paraglider extends THREE.EventDispatcher {
     const rotation = this.model.quaternion.clone();
     const direction = new THREE.Vector3(0, 0, -1);
     direction.applyQuaternion(rotation);
-    return direction;
+    return direction.clone();
   }
 
   position(): THREE.Vector3 {
-    return this.model.position;
+    return this.model.position.clone();
   }
 
   altitude(): number {
