@@ -28,7 +28,7 @@ const settings = {
 const WEATHER_SETTINGS = {
   windDirectionDegreesFromNorth: 310,
   windSpeed: 18 / KMH_TO_MS,
-  lclLevel: 1500,
+  lclLevel: 1800,
 };
 
 const pgOptions: ParagliderConstructor = {
@@ -173,21 +173,6 @@ const Game = {
         vario.updateWrapSpeed(value);
       });
 
-    const weatherDirectionUi = document.getElementById("weather-direction");
-    const weatherSpeedUi = document.getElementById("weather-speed");
-    const weatherLCLUi = document.getElementById("weather-lclLevel");
-    weather.addEventListener("wind-speedChange", function (event) {
-      weatherSpeedUi.innerText =
-        "wind speed: " + round(event.value * KMH_TO_MS) + " km/h";
-    });
-    weather.addEventListener("wind-directionChange", function (event) {
-      weatherDirectionUi.innerText =
-        "wind direction: " + Math.round(event.value) + " degrees";
-    });
-    weather.addEventListener("lclChange", function (event) {
-      weatherLCLUi.innerText = "lcl: " + Math.round(event.value) + "m";
-    });
-
     let isLeftTurning = false;
     let isRightTurning = false;
     let isLeftViewing = false;
@@ -199,6 +184,7 @@ const Game = {
       <UIControls
         pg={pg}
         vario={vario}
+        weather={weather}
         onLeftBreak={() => {
           isLeftTurning = true;
         }}
@@ -253,6 +239,8 @@ const Game = {
 
     const animate = () => {
       camera.update();
+      const timer = Date.now() * 0.0005;
+      camera && (camera.position.y += Math.sin(timer) * 0.0003);
       controls.target = pg.position();
       vario.updateReading(pg.altitude());
       renderer.render(scene, camera);
@@ -270,7 +258,6 @@ const Game = {
         camera.turnRight();
       }
       requestAnimationFrame(animate);
-      // setTimeout(animate, 2200);
     };
     animate();
   },

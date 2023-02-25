@@ -84,9 +84,6 @@ class Paraglider extends THREE.EventDispatcher {
     thermals: Thermal[]
   ) {
     super();
-    if (!options.glidingRatio) {
-      throw new Error("missing glading ratio");
-    }
     this.speedBar = false;
     this.currentSpeed = options.trimSpeed;
     this.options = options;

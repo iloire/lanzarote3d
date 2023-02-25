@@ -2,6 +2,7 @@ import React from "react";
 import { CameraMode } from "./camera";
 import Paraglider from "./pg";
 import Vario from "../audio/vario";
+import Weather from "../elements/weather";
 import airplaneImg from "../img/airplane.png";
 import mountainImg from "../img/mountain.png";
 import mapImg from "../img/map.png";
@@ -20,6 +21,7 @@ interface GameStartOptions {
 type UIControlsProps = {
   pg: Paraglider;
   vario: Vario;
+  weather: Weather;
   onLeftBreak: () => void;
   onLeftBreakRelease: () => void;
   onRightBreak: () => void;
@@ -45,6 +47,9 @@ type UIControlsState = {
   posZ: number;
   viewControlsVisible: boolean;
   glidingRatio: number;
+  windSpeed: number;
+  windDirection: number;
+  lclLevel: number;
 };
 
 export enum View {
@@ -69,6 +74,9 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       posZ: 0,
       viewControlsVisible: true,
       glidingRatio: 0,
+      windSpeed: 0,
+      windDirection: 0,
+      lclLevel: 0,
     };
     document.addEventListener("keydown", this.onDocumentKeyDown, false);
     document.addEventListener("keyup", this.onDocumentKeyUp, false);
@@ -95,6 +103,24 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     });
     pg.addEventListener("heightAboveGround", (event) => {
       this.setState({ heightAboveGround: Math.round(event.height) });
+    });
+
+    const weather = props.weather;
+    weather.addEventListener("wind-speedChange", (event) => {
+      this.setState({
+        windSpeed: Math.round(event.value * KMH_TO_MS * 100) / 100,
+      });
+      // weatherSpeedUi.innerText =
+      //   "wind speed: " + round(event.value * KMH_TO_MS) + " km/h";
+    });
+    weather.addEventListener("wind-directionChange", (event) => {
+      this.setState({ windDirection: Math.round(event.value * 100) / 100 });
+      // weatherDirectionUi.innerText =
+      //   "wind direction: " + Math.round(event.value) + " degrees";
+    });
+    weather.addEventListener("lclChange", (event) => {
+      this.setState({ lclLevel: Math.round(event.value * 100) / 100 });
+      // weatherLCLUi.innerText = "lcl: " + Math.round(event.value) + "m";
     });
   }
 
@@ -246,6 +272,16 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       false
     );
 
+    const { lclLevel, windSpeed, windDirection } = this.state;
+
+    const weatherInfo = (
+      <div id="weather-info" className="UIBox">
+        <div id="weather-direction">Wind direction: {windDirection}</div>
+        <div id="weather-speed">Wind speed: {windSpeed} km/h</div>
+        <div id="weather-lclLevel">LCL: {lclLevel} m.</div>
+      </div>
+    );
+
     const {
       delta,
       altitude,
@@ -315,13 +351,14 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       <div id="game">
         {breakControls}
         {cameraSelection}
+        {instructions}
         {paragliderInfo}
         {paragliderPosition}
         {startButton}
         {varioInfo}
         {viewControl}
+        {weatherInfo}
         {wrapSpeedControl}
-        {instructions}
       </div>
     );
   }

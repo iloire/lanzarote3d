@@ -121,9 +121,7 @@ class Camera extends THREE.PerspectiveCamera {
     );
     this.lookAt(
       posPg.add(this.target.direction().multiplyScalar(20))
-      // .add(this.directionToLook)
     );
-    console.log(this.target.direction());
   }
 
   farAwayView() {
