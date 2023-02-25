@@ -19,7 +19,7 @@ function round(number: number): number {
 }
 
 const settings = {
-  rotationSensitivity: 0.007,
+  rotationSensitivity: 0.002,
   mouseControl: false,
   orbitControl: true,
   wrapSpeed: 1,
@@ -73,6 +73,11 @@ const Game = {
       WEATHER_SETTINGS.lclLevel / 2,
       -1405
     );
+    const thermalPos3 = new THREE.Vector3(
+      3027,
+      WEATHER_SETTINGS.lclLevel / 2,
+      1005
+    );
     const thermal = new Thermal(
       thermalPos,
       WEATHER_SETTINGS.lclLevel,
@@ -81,16 +86,24 @@ const Game = {
     );
     const thermal2 = new Thermal(
       thermalPos2,
-      WEATHER_SETTINGS.lclLevel,
+      WEATHER_SETTINGS.lclLevel * 1.1,
+      weather,
+      2
+    );
+    const thermal3 = new Thermal(
+      thermalPos3,
+      WEATHER_SETTINGS.lclLevel * 0.9,
       weather,
       2
     );
     scene.add(thermal.mesh);
     scene.add(thermal2.mesh);
+    scene.add(thermal3.mesh);
 
     const pg = new Paraglider(pgOptions, weather, terrain, water, [
       thermal,
       thermal2,
+      thermal3,
     ]);
     const vario = new Vario(pg);
     await pg.loadModel(p.scale, p.position);

@@ -277,6 +277,17 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       </div>
     );
 
+    const instructions = this.state.showStartButton ? (
+      <div id="instructions">
+        <p>A: turn left</p>
+        <p>D: turn right</p>
+        <p>S: speedbar</p>
+        <p>E: ears (WIP)</p>
+      </div>
+    ) : (
+      false
+    );
+
     return (
       <div id="game">
         {breakControls}
@@ -287,6 +298,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         {varioInfo}
         {viewControl}
         {wrapSpeedControl}
+        {instructions}
       </div>
     );
   }
