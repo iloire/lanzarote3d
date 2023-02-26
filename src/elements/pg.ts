@@ -144,11 +144,20 @@ class Paraglider extends THREE.EventDispatcher {
         type: "touchedGround",
       });
     }
-
     if (this.isInsideAnyThermal()) {
       const liftDirection = new THREE.Vector3(0, 1, 0);
-      const liftVector = liftDirection.multiplyScalar(multiplier * 2);
+      const lift = 2;
+      const liftVector = liftDirection.multiplyScalar(multiplier * lift);
+      this.dispatchEvent({
+        type: "thermalLift",
+        lift,
+      });
       this.move(liftVector);
+    } else {
+      this.dispatchEvent({
+        type: "thermalLift",
+        lift: 0,
+      });
     }
     this.flyingTime += multiplier;
   }
@@ -167,15 +176,20 @@ class Paraglider extends THREE.EventDispatcher {
 
   moveVertical(multiplier: number) {
     const gravityDirection = new THREE.Vector3(0, -1, 0);
-    const downSpeed =
-      (multiplier * (this.speed() - this.weather.getSpeedMetresPerSecond())) /
-      this.glidingRatio();
-    const downVector = gravityDirection.multiplyScalar(downSpeed);
+    const drop = this.speed() / this.glidingRatio();
+    const downVector = gravityDirection.multiplyScalar(multiplier * drop);
     this.move(downVector);
-
+    this.dispatchEvent({
+      type: "drop",
+      drop,
+    });
     const lift = this.getLiftValue(this.terrain, this.water);
     const liftDirection = new THREE.Vector3(0, 1, 0);
     const liftVector = liftDirection.multiplyScalar(multiplier * lift);
+    this.dispatchEvent({
+      type: "dynamicLift",
+      lift,
+    });
     this.move(liftVector);
   }
 

@@ -42,8 +42,8 @@ const pgOptions: ParagliderConstructor = {
 
 const p = {
   scale: 0.004,
-  // position: new THREE.Vector3(6827, 880, -555),
-  position: new THREE.Vector3(-5427, 580, -355), // tenesar
+  position: new THREE.Vector3(6827, 880, -555),
+  // position: new THREE.Vector3(-5427, 580, -355), // tenesar
   // position: new THREE.Vector3(8727, 1280, -4355),
 };
 

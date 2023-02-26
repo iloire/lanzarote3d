@@ -51,6 +51,9 @@ type UIControlsState = {
   windDirection: number;
   lclLevel: number;
   flyingTime: number;
+  thermalLift: number;
+  dynamicLift: number;
+  drop: number;
 };
 
 export enum View {
@@ -79,6 +82,9 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       windDirection: 0,
       lclLevel: 0,
       flyingTime: 0,
+      thermalLift: 0,
+      dynamicLift: 0,
+      drop: 0,
     };
     document.addEventListener("keydown", this.onDocumentKeyDown, false);
     document.addEventListener("keyup", this.onDocumentKeyUp, false);
@@ -105,25 +111,28 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       });
     });
     pg.addEventListener("heightAboveGround", (event) => {
-      this.setState({ heightAboveGround: Math.round(event.height) });
+      this.setState({ heightAboveGround: event.height });
     });
-
+    pg.addEventListener("thermalLift", (event) => {
+      this.setState({ thermalLift: Math.round(event.lift * 100) / 100 });
+    });
+    pg.addEventListener("dynamicLift", (event) => {
+      this.setState({ dynamicLift: Math.round(event.lift * 100) / 100 });
+    });
+    pg.addEventListener("drop", (event) => {
+      this.setState({ drop: Math.round(event.drop * 100) / 100 });
+    });
     const weather = props.weather;
     weather.addEventListener("wind-speedChange", (event) => {
       this.setState({
         windSpeed: Math.round(event.value * KMH_TO_MS * 100) / 100,
       });
-      // weatherSpeedUi.innerText =
-      //   "wind speed: " + round(event.value * KMH_TO_MS) + " km/h";
     });
     weather.addEventListener("wind-directionChange", (event) => {
       this.setState({ windDirection: Math.round(event.value * 100) / 100 });
-      // weatherDirectionUi.innerText =
-      //   "wind direction: " + Math.round(event.value) + " degrees";
     });
     weather.addEventListener("lclChange", (event) => {
       this.setState({ lclLevel: Math.round(event.value * 100) / 100 });
-      // weatherLCLUi.innerText = "lcl: " + Math.round(event.value) + "m";
     });
   }
 
@@ -293,6 +302,9 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       speedBarEngaged,
       glidingRatio,
       flyingTime,
+      thermalLift,
+      dynamicLift,
+      drop,
     } = this.state;
 
     const varioInfo = (
@@ -305,6 +317,9 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         <div id="vario-ground-speed">Ground speed: {groundSpeed} km/h</div>
         <div id="pg-gliding-ratio">Gliding ratio: {glidingRatio}</div>
         <div id="pg-flying-time">Flying time: {flyingTime} min.</div>
+        <div id="pg-thermal-lift">Thermal lift : {thermalLift} m/s</div>
+        <div id="pg-dynamic-lift">Dynamic lift : {dynamicLift} m/s</div>
+        <div id="pg-drop">Drop : {drop} m/s</div>
       </div>
     );
     const speedBarText = speedBarEngaged ? "SPEED-BAR" : "";
