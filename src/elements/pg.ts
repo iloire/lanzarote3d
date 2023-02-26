@@ -330,6 +330,7 @@ class Paraglider extends THREE.EventDispatcher {
       this.weather.getWindDirection()
     );
     this.dispatchEvent({ type: "gradient", gradient });
+
     const paragliderHeight = pos.y;
     const pgHeightToTerrainHeightRatio =
       (paragliderHeight - height) / paragliderHeight;
@@ -339,9 +340,9 @@ class Paraglider extends THREE.EventDispatcher {
     const heightLiftComponent =
       (1 - pgHeightToTerrainHeightRatio) * height * 0.001;
     console.log("h:", heightLiftComponent);
-    const l = heightLiftComponent * gradient;
-    this.dispatchEvent({ type: "lift", lift: l });
-    return l;
+    const lift = heightLiftComponent * gradient;
+    this.dispatchEvent({ type: "lift", lift });
+    return lift;
   }
 
   getGravityHelper(len: number) {
