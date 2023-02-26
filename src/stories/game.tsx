@@ -190,11 +190,14 @@ const Game = {
           // varioUI.style.display = "block";
         }}
         onPause={(paused) => {
-          console.log(paused);
           if (paused) {
             pg.stop();
+            vario.stop();
+            bgMusic.stop();
           } else {
             pg.init();
+            vario.start();
+            bgMusic.start();
           }
         }}
         onSelectCamera={(mode: CameraMode) => {
