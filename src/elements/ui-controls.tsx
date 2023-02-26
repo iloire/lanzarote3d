@@ -33,6 +33,7 @@ type UIControlsProps = {
   onSelectCamera: (mode: CameraMode) => void;
   onViewChange: (view: View) => void;
   onWrapSpeedChange: (value: number) => void;
+  onPause: (paused: boolean) => void;
 };
 
 type UIControlsState = {
@@ -55,6 +56,7 @@ type UIControlsState = {
   dynamicLift: number;
   drop: number;
   gradient: number;
+  pausedGame: boolean;
 };
 
 export enum View {
@@ -87,6 +89,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       dynamicLift: 0,
       drop: 0,
       gradient: 0,
+      pausedGame: false,
     };
     document.addEventListener("keydown", this.onDocumentKeyDown, false);
     document.addEventListener("keyup", this.onDocumentKeyUp, false);
@@ -149,6 +152,11 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     } else if (keyCode == 68) {
       //d
       this.handleRight();
+    } else if (keyCode == 32) {
+      //space
+      this.setState({ pausedGame: !this.state.pausedGame }, () => {
+        this.onPause(this.state.pausedGame);
+      });
     }
   };
 
@@ -186,6 +194,10 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
 
   handleRightRelease = () => {
     this.props.onRightBreakRelease();
+  };
+
+  onPause = (paused: boolean) => {
+    this.props.onPause(paused);
   };
 
   handleStart = (windSpeedMetresPerSecond: number) => {

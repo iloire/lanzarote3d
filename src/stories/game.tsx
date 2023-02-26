@@ -133,14 +133,7 @@ const Game = {
     function onDocumentKeyDown(event) {
       const keyCode = event.which;
       console.log(keyCode);
-      if (keyCode == 32) {
-        // space
-        if (pg.isRunning()) {
-          pg.stop();
-        } else {
-          pg.init();
-        }
-      } else if (keyCode == 67) {
+      if (keyCode == 67) {
         //c
         if (gui._hidden) {
           gui.show();
@@ -196,6 +189,13 @@ const Game = {
           vario.start();
           pg.init();
           // varioUI.style.display = "block";
+        }}
+        onPause={(paused) => {
+          if (paused) {
+            pg.stop();
+          } else {
+            pg.init();
+          }
         }}
         onSelectCamera={(mode: CameraMode) => {
           camera.setCameraMode(mode, pg, controls);
