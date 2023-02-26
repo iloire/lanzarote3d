@@ -190,7 +190,7 @@ class Paraglider extends THREE.EventDispatcher {
       type: "drop",
       drop,
     });
-    const lift = this.getLiftValue(this.terrain, this.water);
+    const lift = this.getLiftValue();
     const liftDirection = new THREE.Vector3(0, 1, 0);
     const liftVector = liftDirection.multiplyScalar(multiplier * lift);
     this.dispatchEvent({
@@ -318,20 +318,27 @@ class Paraglider extends THREE.EventDispatcher {
     return gradient > 0 ? gradient : 0; // TODO
   }
 
-  getLiftValue(terrain: THREE.Mesh, water: THREE.Mesh): number {
+  getLiftValue(): number {
     const pos = this.position().clone();
-    const windDirection = this.weather.getWindDirection();
-    const height = getTerrainHeightBelowPosition(pos, terrain, water);
+    const height = getTerrainHeightBelowPosition(pos, this.terrain, this.water);
     if (isNaN(height)) {
       return 0;
     }
     const gradient = this.getTerrainGradientAgainstWindDirection(
-      terrain,
-      water,
-      windDirection
+      this.terrain,
+      this.water,
+      this.weather.getWindDirection()
     );
     this.dispatchEvent({ type: "gradient", gradient });
-    const heightLiftComponent = height * 0.001;
+    const paragliderHeight = pos.y;
+    const pgHeightToTerrainHeightRatio =
+      (paragliderHeight - height) / paragliderHeight;
+    console.log("ratio:", pgHeightToTerrainHeightRatio);
+    console.log("height", height);
+    console.log("paragliderHeight", paragliderHeight);
+    const heightLiftComponent =
+      (1 - pgHeightToTerrainHeightRatio) * height * 0.001;
+    console.log("h:", heightLiftComponent);
     const l = heightLiftComponent * gradient;
     this.dispatchEvent({ type: "lift", lift: l });
     return l;
