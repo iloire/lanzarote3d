@@ -90,9 +90,6 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     document.addEventListener("keyup", this.onDocumentKeyUp, false);
 
     const vario = props.vario;
-    vario.addEventListener("delta", (event) => {
-      this.setState({ delta: Math.round(event.delta * 100) / 100 });
-    });
     vario.addEventListener("altitude", (event) => {
       this.setState({ altitude: Math.round(event.altitude) });
     });
@@ -121,6 +118,9 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     });
     pg.addEventListener("drop", (event) => {
       this.setState({ drop: Math.round(event.drop * 100) / 100 });
+    });
+    pg.addEventListener("delta", (event) => {
+      this.setState({ delta: Math.round(event.delta * 100) / 100 });
     });
     const weather = props.weather;
     weather.addEventListener("wind-speedChange", (event) => {
