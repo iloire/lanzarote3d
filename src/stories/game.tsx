@@ -132,9 +132,14 @@ const Game = {
 
     function onDocumentKeyDown(event) {
       const keyCode = event.which;
+      console.log(keyCode);
       if (keyCode == 32) {
         // space
-        // pg.jump(terrain);
+        if (pg.isRunning()) {
+          pg.stop();
+        } else {
+          pg.init();
+        }
       } else if (keyCode == 67) {
         //c
         if (gui._hidden) {

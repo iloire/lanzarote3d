@@ -129,6 +129,12 @@ class Paraglider extends THREE.EventDispatcher {
 
   stop() {
     clearInterval(this.interval);
+    this.interval = null;
+  }
+
+  isRunning() {
+    console.log(this.interval);
+    return !!this.interval;
   }
 
   getMesh(): THREE.Mesh {
