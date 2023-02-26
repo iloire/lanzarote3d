@@ -150,12 +150,6 @@ class App extends React.Component<AppProps, AppState> {
           </div>
         )}
 
-        <div id="weather-info" className="UIBox">
-          <div id="weather-direction"></div>
-          <div id="weather-speed"></div>
-          <div id="weather-lclLevel"></div>
-        </div>
-
         <div className="points" style={{ display: "none" }}>
           <div className="point point-0">
             <div className="label label-0">Famara/Teguise</div>

@@ -76,6 +76,7 @@ class Paraglider extends THREE.EventDispatcher {
   gravityDirection = new THREE.Vector3(0, -1, 0);
   wrapSpeed: number = 1;
   flyingTime: number = 0;
+  metersFlown: number = 0;
   isLeftBreaking: boolean;
   isRightBreaking: boolean;
 
@@ -154,6 +155,7 @@ class Paraglider extends THREE.EventDispatcher {
       });
     }
     this.flyingTime += multiplier;
+    this.metersFlown += multiplier * this.getGroundSpeed();
 
     if (this.isRightBreaking) {
       this.rotateRight();
@@ -161,6 +163,10 @@ class Paraglider extends THREE.EventDispatcher {
     if (this.isLeftBreaking) {
       this.rotateLeft();
     }
+  }
+
+  getMetersFlown(): number {
+    return this.metersFlown;
   }
 
   getGroundSpeed(): number {
@@ -373,6 +379,11 @@ class Paraglider extends THREE.EventDispatcher {
     return this.speedBar;
   }
 
+  airSpeed(): number {
+    return this.currentSpeed;
+  }
+
+  // deprecated, use airSpeed
   speed(): number {
     return this.currentSpeed;
   }

@@ -52,6 +52,7 @@ type UIControlsState = {
   windDirection: number;
   lclLevel: number;
   flyingTime: number;
+  metersFlown: number;
   thermalLift: number;
   dynamicLift: number;
   drop: number;
@@ -85,6 +86,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       windDirection: 0,
       lclLevel: 0,
       flyingTime: 0,
+      metersFlown: 0,
       thermalLift: 0,
       dynamicLift: 0,
       drop: 0,
@@ -110,6 +112,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         posZ: Math.round(pos.z),
         glidingRatio: Math.round(pg.glidingRatio() * 100) / 100,
         flyingTime: Math.round((pg.getFlyingTime() * 100) / 60) / 100,
+        metersFlown: Math.round(pg.getMetersFlown() * 100) / 100,
       });
     });
     pg.addEventListener("heightAboveGround", (event) => {
@@ -319,6 +322,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       speedBarEngaged,
       glidingRatio,
       flyingTime,
+      metersFlown,
       thermalLift,
       dynamicLift,
       drop,
@@ -334,7 +338,8 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         </div>
         <div id="vario-ground-speed">Ground speed: {groundSpeed} km/h</div>
         <div id="pg-gliding-ratio">Gliding ratio: {glidingRatio}</div>
-        <div id="pg-flying-time">Flying time: {flyingTime} min.</div>
+        <div id="pg-flying-time">Flight time: {flyingTime} min.</div>
+        <div id="pg-meters-flown">Flight distance: {metersFlown} m.</div>
         <div id="pg-thermal-lift">Thermal lift : {thermalLift} m/s</div>
         <div id="pg-dynamic-lift">Dynamic lift : {dynamicLift} m/s</div>
         <div id="pg-drop">Drop : {drop} m/s</div>
@@ -371,7 +376,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
           <option value="3">"pro"</option>
           <option value="7">I'm from Lanzarote</option>
           <option value="12">I'm a swiss pilot</option>
-          <option value="52">turbo</option>
+          <option value="52">I'm AGI</option>
         </select>
       </div>
     );
