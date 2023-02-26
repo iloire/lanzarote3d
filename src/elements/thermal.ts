@@ -8,8 +8,8 @@ const createThermalMesh = (
   initialPosition: THREE.Vector3
 ) => {
   const geometry = new THREE.CylinderGeometry(
-    topRadius,
     bottomRadius,
+    topRadius,
     height,
     32
   );
