@@ -110,7 +110,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       });
     });
     pg.addEventListener("heightAboveGround", (event) => {
-      this.setState({ heightAboveGround: event.height });
+      this.setState({ heightAboveGround: Math.round(event.height) });
     });
     pg.addEventListener("thermalLift", (event) => {
       this.setState({ thermalLift: Math.round(event.lift * 100) / 100 });
