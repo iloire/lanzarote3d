@@ -154,9 +154,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       this.handleRight();
     } else if (keyCode == 32) {
       //space
-      this.setState({ pausedGame: !this.state.pausedGame }, () => {
-        this.onPause(this.state.pausedGame);
-      });
+      this.handlePause();
     }
   };
 
@@ -196,8 +194,10 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     this.props.onRightBreakRelease();
   };
 
-  onPause = (paused: boolean) => {
-    this.props.onPause(paused);
+  handlePause = () => {
+    this.setState({ pausedGame: !this.state.pausedGame }, () => {
+      this.props.onPause(this.state.pausedGame);
+    });
   };
 
   handleStart = (windSpeedMetresPerSecond: number) => {
@@ -387,6 +387,16 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       false
     );
 
+    const pauseControls = this.state.pausedGame ? (
+      <div id="game-pause">
+        <button id="game-pause-button" onClick={() => this.handlePause()}>
+          PAUSE
+        </button>
+      </div>
+    ) : (
+      false
+    );
+
     return (
       <div id="game">
         {breakControls}
@@ -399,6 +409,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         {viewControl}
         {weatherInfo}
         {wrapSpeedControl}
+        {pauseControls}
       </div>
     );
   }

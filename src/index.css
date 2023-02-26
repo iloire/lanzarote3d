@@ -52,6 +52,17 @@
   left: 20px;
 }
 
+#game-pause {
+  position: absolute;
+  top: 40%;
+  left: 40%;
+  padding: 10px 20px;
+}
+
+#game-pause button{
+  font-size: 400%;
+}
+
 #game-controls img {
   width: 40px
 }

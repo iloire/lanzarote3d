@@ -132,7 +132,6 @@ const Game = {
 
     function onDocumentKeyDown(event) {
       const keyCode = event.which;
-      console.log(keyCode);
       if (keyCode == 67) {
         //c
         if (gui._hidden) {
@@ -191,6 +190,7 @@ const Game = {
           // varioUI.style.display = "block";
         }}
         onPause={(paused) => {
+          console.log(paused);
           if (paused) {
             pg.stop();
           } else {

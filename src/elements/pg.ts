@@ -71,7 +71,7 @@ class Paraglider extends THREE.EventDispatcher {
   thermals: Thermal[];
   speedBar: boolean;
   currentSpeed: number;
-  interval: any;
+  interval: number = null;
   model: THREE.Mesh;
   gravityDirection = new THREE.Vector3(0, -1, 0);
   wrapSpeed: number = 1;
@@ -126,7 +126,9 @@ class Paraglider extends THREE.EventDispatcher {
   }
 
   init() {
-    this.interval = setInterval(() => this.tick(0.1 * this.wrapSpeed), 100);
+    if (this.interval === null) {
+      this.interval = setInterval(() => this.tick(0.1 * this.wrapSpeed), 100);
+    }
   }
 
   stop() {
