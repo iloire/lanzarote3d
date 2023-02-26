@@ -382,6 +382,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         <p>D: turn right</p>
         <p>S: speedbar</p>
         <p>E: ears (WIP)</p>
+        <p>SPACE: pause</p>
       </div>
     ) : (
       false
