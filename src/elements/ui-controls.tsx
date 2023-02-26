@@ -329,7 +329,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       <div id="wrapSpeed-controls" className="UIBox">
         skill:
         <select
-          defaultValue="7"
+          defaultValue="1"
           id="wrapSpeed"
           onChange={this.handleWrapChange}
         >

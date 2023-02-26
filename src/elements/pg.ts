@@ -150,7 +150,7 @@ class Paraglider extends THREE.EventDispatcher {
       const liftVector = liftDirection.multiplyScalar(multiplier * 2);
       this.move(liftVector);
     }
-    this.flyingTime += Math.round(multiplier * 100) / 100;
+    this.flyingTime += multiplier;
   }
 
   getGroundSpeed(): number {
