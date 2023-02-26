@@ -167,8 +167,6 @@ const Game = {
         vario.updateWrapSpeed(value);
       });
 
-    let isLeftTurning = false;
-    let isRightTurning = false;
     let isLeftViewing = false;
     let isRightViewing = false;
 
@@ -180,16 +178,16 @@ const Game = {
         vario={vario}
         weather={weather}
         onLeftBreak={() => {
-          isLeftTurning = true;
+          pg.leftBreakInput();
         }}
         onLeftBreakRelease={() => {
-          isLeftTurning = false;
+          pg.leftBreakRelease();
         }}
         onRightBreak={() => {
-          isRightTurning = true;
+          pg.rightBreakInput();
         }}
         onRightBreakRelease={() => {
-          isRightTurning = false;
+          pg.rightBreakRelease();
         }}
         onGameStart={(options, fnHideStartButton) => {
           weather.changeWindSpeed(options.windSpeedMetresPerSecond);
@@ -238,19 +236,6 @@ const Game = {
       controls.target = pg.position();
       vario.updateReading(pg.altitude());
       renderer.render(scene, camera);
-
-      if (isLeftTurning) {
-        pg.rotateLeft(settings.rotationSensitivity);
-      }
-      if (isRightTurning) {
-        pg.rotateRight(settings.rotationSensitivity);
-      }
-      if (isLeftViewing) {
-        camera.turnLeft();
-      }
-      if (isRightViewing) {
-        camera.turnRight();
-      }
       requestAnimationFrame(animate);
     };
     animate();

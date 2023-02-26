@@ -76,6 +76,8 @@ class Paraglider extends THREE.EventDispatcher {
   gravityDirection = new THREE.Vector3(0, -1, 0);
   wrapSpeed: number = 1;
   flyingTime: number = 0;
+  isLeftBreaking: boolean;
+  isRightBreaking: boolean;
 
   constructor(
     options: ParagliderConstructor,
@@ -133,7 +135,6 @@ class Paraglider extends THREE.EventDispatcher {
   }
 
   isRunning() {
-    console.log(this.interval);
     return !!this.interval;
   }
 
@@ -151,6 +152,13 @@ class Paraglider extends THREE.EventDispatcher {
       });
     }
     this.flyingTime += multiplier;
+
+    if (this.isRightBreaking) {
+      this.rotateRight();
+    }
+    if (this.isLeftBreaking) {
+      this.rotateLeft();
+    }
   }
 
   getGroundSpeed(): number {
@@ -241,12 +249,28 @@ class Paraglider extends THREE.EventDispatcher {
       .listen();
   }
 
-  rotateLeft(rotationSensitivity: number) {
-    this.model.rotation.y += Math.PI * rotationSensitivity * this.wrapSpeed;
+  leftBreakInput() {
+    this.isLeftBreaking = true;
   }
 
-  rotateRight(rotationSensitivity: number) {
-    this.model.rotation.y -= Math.PI * rotationSensitivity * this.wrapSpeed;
+  leftBreakRelease() {
+    this.isLeftBreaking = false;
+  }
+
+  rotateLeft() {
+    this.model.rotation.y += (Math.PI * this.wrapSpeed) / 200;
+  }
+
+  rightBreakInput() {
+    this.isRightBreaking = true;
+  }
+
+  rightBreakRelease() {
+    this.isRightBreaking = false;
+  }
+
+  rotateRight() {
+    this.model.rotation.y -= (Math.PI * this.wrapSpeed) / 200;
   }
 
   hasTouchedGround(terrain: THREE.Mesh, water: THREE.Mesh): boolean {
