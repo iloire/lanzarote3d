@@ -292,6 +292,7 @@ class Paraglider extends THREE.EventDispatcher {
       water,
       windDirection
     );
+    this.dispatchEvent({ type: "gradient", gradient });
     const heightLiftComponent = height * 0.001;
     const l = heightLiftComponent * gradient;
     this.dispatchEvent({ type: "lift", lift: l });

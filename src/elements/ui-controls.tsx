@@ -54,6 +54,7 @@ type UIControlsState = {
   thermalLift: number;
   dynamicLift: number;
   drop: number;
+  gradient: number;
 };
 
 export enum View {
@@ -85,6 +86,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       thermalLift: 0,
       dynamicLift: 0,
       drop: 0,
+      gradient: 0,
     };
     document.addEventListener("keydown", this.onDocumentKeyDown, false);
     document.addEventListener("keyup", this.onDocumentKeyUp, false);
@@ -121,6 +123,9 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     });
     pg.addEventListener("delta", (event) => {
       this.setState({ delta: Math.round(event.delta * 100) / 100 });
+    });
+    pg.addEventListener("gradient", (event) => {
+      this.setState({ gradient: Math.round(event.gradient * 100) / 100 });
     });
     const weather = props.weather;
     weather.addEventListener("wind-speedChange", (event) => {
@@ -305,6 +310,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       thermalLift,
       dynamicLift,
       drop,
+      gradient,
     } = this.state;
 
     const varioInfo = (
@@ -320,6 +326,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         <div id="pg-thermal-lift">Thermal lift : {thermalLift} m/s</div>
         <div id="pg-dynamic-lift">Dynamic lift : {dynamicLift} m/s</div>
         <div id="pg-drop">Drop : {drop} m/s</div>
+        <div id="pg-gradient">Gradient : {gradient}</div>
       </div>
     );
     const speedBarText = speedBarEngaged ? "SPEED-BAR" : "";
