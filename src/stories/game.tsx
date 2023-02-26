@@ -238,6 +238,12 @@ const Game = {
       camera && (camera.position.y += Math.sin(timer) * 0.0003);
       controls.target = pg.position();
       vario.updateReading(pg.altitude());
+      if (isLeftViewing) {
+        camera.turnLeft();
+      }
+      if (isRightViewing) {
+        camera.turnRight();
+      }
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
     };
