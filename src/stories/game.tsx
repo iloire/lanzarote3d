@@ -234,6 +234,7 @@ const Game = {
       console.log(pg.getTrajectory());
       const trajectory = new Trajectory(pg.getTrajectory(), 10);
       scene.add(trajectory.getMesh());
+      camera.setCameraMode(CameraMode.OrbitControl, pg, controls);
     });
 
     const animate = () => {
