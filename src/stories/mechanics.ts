@@ -3,6 +3,21 @@ import Controls from "../utils/controls";
 
 import Clouds from "../elements/clouds";
 import Trajectory from "../elements/trajectory";
+import Paraglider, { ParagliderConstructor } from "../elements/pg";
+import Weather from "../elements/weather";
+
+const KMH_TO_MS = 3.6;
+
+const WEATHER_SETTINGS = {
+  windDirectionDegreesFromNorth: 310,
+  windSpeed: 18 / KMH_TO_MS,
+  lclLevel: 1800,
+};
+
+const p = {
+  scale: 0.4,
+  position: new THREE.Vector3(6827, 1880, -555),
+};
 
 const Mechanics = {
   load: async (camera, scene, renderer, terrain, water, gui) => {
@@ -16,10 +31,26 @@ const Mechanics = {
     const c2 = await Clouds.load(1, cloudPos2);
     scene.add(c2);
 
-    const animate = () => {
-      requestAnimationFrame(animate);
-      renderer.render(scene, camera);
+    const weather = new Weather(
+      WEATHER_SETTINGS.windDirectionDegreesFromNorth,
+      WEATHER_SETTINGS.windSpeed,
+      WEATHER_SETTINGS.lclLevel
+    );
+    weather.addGui(gui);
+
+    const pgOptions: ParagliderConstructor = {
+      glidingRatio: 9,
+      trimSpeed: 25 / KMH_TO_MS,
+      halfSpeedBarSpeed: 30 / KMH_TO_MS,
+      fullSpeedBarSpeed: 35 / KMH_TO_MS,
+      smallEarsSpeed: 20 / KMH_TO_MS,
+      bigEarsSpeed: 18 / KMH_TO_MS,
     };
+    const pg = new Paraglider(pgOptions, weather, terrain, water, []);
+    await pg.loadModel(p.scale, p.position);
+    pg.addGui(gui);
+    scene.add(pg.getMesh());
+    pg.init();
 
     const points = [
       new THREE.Vector3(29000, 1000, 3100),
@@ -31,10 +62,16 @@ const Mechanics = {
     const trajectory = new Trajectory(points);
     scene.add(trajectory.getMesh());
 
-    animate();
     console.log("Number of Triangles :", renderer.info.render.triangles);
     camera.position.set(4200, 2500, -3200);
-    camera.lookAt(cloudPos);
+
+    const animate = () => {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+      camera.lookAt(pg.position());
+      controls.target = pg.position();
+    };
+    animate();
   },
 };
 

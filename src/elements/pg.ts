@@ -81,6 +81,8 @@ class Paraglider extends THREE.EventDispatcher {
   isRightBreaking: boolean;
   trajectory: THREE.Vector3[] = [];
   tickCounter: number = 0;
+  __lift: number = 0;
+  __gradient: number = 0;
 
   constructor(
     options: ParagliderConstructor,
@@ -116,6 +118,7 @@ class Paraglider extends THREE.EventDispatcher {
 
   async loadModel(scale: number, initialPosition: THREE.Vector3) {
     const mesh = await Models.load(model, scale, initialPosition);
+    // mesh.position.copy(initialPosition);
     const textureLoader = new THREE.TextureLoader(Models.manager);
     const texture = await textureLoader.load(textureImg);
     mesh.material = new THREE.MeshStandardMaterial({ map: texture });
@@ -153,6 +156,7 @@ class Paraglider extends THREE.EventDispatcher {
       this.moveForward(multiplier);
       this.moveVertical(multiplier);
     } else {
+      this.trajectory.push(this.position()); // last point saved
       this.dispatchEvent({
         type: "touchedGround",
       });
@@ -263,6 +267,10 @@ class Paraglider extends THREE.EventDispatcher {
       .add(this.options, "glidingRatio", 1, 30 / 3.6)
       .name("gliding ratio")
       .listen();
+
+    const pgEnv = gui.addFolder("Paraglider env");
+    pgEnv.add(this, "__lift").name("lift").listen();
+    pgEnv.add(this, "__gradient").name("gradient").listen();
   }
 
   leftBreakInput() {
@@ -274,7 +282,8 @@ class Paraglider extends THREE.EventDispatcher {
   }
 
   rotateLeft() {
-    this.model.rotation.y += (Math.PI * this.wrapSpeed) / 200;
+    const multiplier = THREE.MathUtils.smoothstep(this.wrapSpeed, 1, 10);
+    this.model.rotation.y += Math.PI / (60 - 40 * multiplier);
   }
 
   rightBreakInput() {
@@ -286,7 +295,8 @@ class Paraglider extends THREE.EventDispatcher {
   }
 
   rotateRight() {
-    this.model.rotation.y -= (Math.PI * this.wrapSpeed) / 200;
+    const multiplier = THREE.MathUtils.smoothstep(this.wrapSpeed, 1, 10);
+    this.model.rotation.y -= Math.PI / (60 - 40 * multiplier);
   }
 
   hasTouchedGround(terrain: THREE.Mesh, water: THREE.Mesh): boolean {
@@ -338,6 +348,7 @@ class Paraglider extends THREE.EventDispatcher {
       this.weather.getWindDirection()
     );
     this.dispatchEvent({ type: "gradient", gradient });
+    this.__gradient = gradient;
 
     const paragliderHeight = pos.y;
     const pgHeightToTerrainHeightRatio =
@@ -350,6 +361,7 @@ class Paraglider extends THREE.EventDispatcher {
     // console.log("h:", heightLiftComponent);
     const lift = heightLiftComponent * gradient;
     this.dispatchEvent({ type: "lift", lift });
+    this.__lift = lift;
     return lift;
   }
 
