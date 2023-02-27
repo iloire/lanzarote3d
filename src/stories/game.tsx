@@ -230,6 +230,7 @@ const Game = {
       vario.stop();
       bgMusic.stop();
       pg.stop();
+      console.log(pg.getTrajectory())
     });
 
     const animate = () => {

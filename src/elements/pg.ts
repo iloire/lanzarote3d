@@ -79,6 +79,8 @@ class Paraglider extends THREE.EventDispatcher {
   metersFlown: number = 0;
   isLeftBreaking: boolean;
   isRightBreaking: boolean;
+  trajectory: THREE.Vector3[] = [];
+  tickCounter: number = 0;
 
   constructor(
     options: ParagliderConstructor,
@@ -146,6 +148,7 @@ class Paraglider extends THREE.EventDispatcher {
   }
 
   tick(multiplier: number) {
+    this.tickCounter++;
     if (!this.hasTouchedGround(this.terrain, this.water)) {
       this.moveForward(multiplier);
       this.moveVertical(multiplier);
@@ -162,6 +165,11 @@ class Paraglider extends THREE.EventDispatcher {
     }
     if (this.isLeftBreaking) {
       this.rotateLeft();
+    }
+
+    if (this.tickCounter % 10 === 0) {
+      //save point
+      this.trajectory.push(this.position());
     }
   }
 
@@ -334,12 +342,12 @@ class Paraglider extends THREE.EventDispatcher {
     const paragliderHeight = pos.y;
     const pgHeightToTerrainHeightRatio =
       (paragliderHeight - height) / paragliderHeight;
-    console.log("ratio:", pgHeightToTerrainHeightRatio);
-    console.log("height", height);
-    console.log("paragliderHeight", paragliderHeight);
+    // console.log("ratio:", pgHeightToTerrainHeightRatio);
+    // console.log("height", height);
+    // console.log("paragliderHeight", paragliderHeight);
     const heightLiftComponent =
       (1 - pgHeightToTerrainHeightRatio) * height * 0.001;
-    console.log("h:", heightLiftComponent);
+    // console.log("h:", heightLiftComponent);
     const lift = heightLiftComponent * gradient;
     this.dispatchEvent({ type: "lift", lift });
     return lift;
@@ -415,6 +423,10 @@ class Paraglider extends THREE.EventDispatcher {
   move(velocity: THREE.Vector3) {
     this.model.position.add(velocity);
     this.dispatchEvent({ type: "position", position: this.model.position });
+  }
+
+  getTrajectory(): THREE.Vector3[] {
+    return this.trajectory;
   }
 }
 
