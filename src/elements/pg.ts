@@ -12,6 +12,11 @@ function getAttackAngleRadians(glidingRatio: number) {
   return Math.atan(1 / glidingRatio);
 }
 
+const getRotationValue = (wrapSpeed: number): number => {
+  const multiplier = THREE.MathUtils.smoothstep(wrapSpeed, 1, 10);
+  return Math.PI / (60 - 50 * multiplier);
+};
+
 const createLiftArrow = (
   glidingRatio: number,
   len: number,
@@ -282,8 +287,7 @@ class Paraglider extends THREE.EventDispatcher {
   }
 
   rotateLeft() {
-    const multiplier = THREE.MathUtils.smoothstep(this.wrapSpeed, 1, 10);
-    this.model.rotation.y += Math.PI / (60 - 40 * multiplier);
+    this.model.rotation.y += getRotationValue(this.wrapSpeed);
   }
 
   rightBreakInput() {
@@ -295,8 +299,7 @@ class Paraglider extends THREE.EventDispatcher {
   }
 
   rotateRight() {
-    const multiplier = THREE.MathUtils.smoothstep(this.wrapSpeed, 1, 10);
-    this.model.rotation.y -= Math.PI / (60 - 40 * multiplier);
+    this.model.rotation.y -= getRotationValue(this.wrapSpeed);
   }
 
   hasTouchedGround(terrain: THREE.Mesh, water: THREE.Mesh): boolean {
