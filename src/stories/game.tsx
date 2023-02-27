@@ -99,7 +99,7 @@ const Game = {
     await pg.loadModel(p.scale, p.position);
 
     pg.addGui(gui);
-    scene.add(pg.model);
+    scene.add(pg.getMesh());
 
     const c = await Clouds.load(
       1,
