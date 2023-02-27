@@ -11,6 +11,7 @@ import Camera, { CameraMode } from "../elements/camera";
 import UIControls, { View } from "../elements/ui-controls";
 import Thermal from "../elements/thermal";
 import Clouds from "../elements/clouds";
+import Trajectory from "../elements/trajectory";
 
 const KMH_TO_MS = 3.6;
 
@@ -230,7 +231,9 @@ const Game = {
       vario.stop();
       bgMusic.stop();
       pg.stop();
-      console.log(pg.getTrajectory())
+      console.log(pg.getTrajectory());
+      const trajectory = new Trajectory(pg.getTrajectory(), 10);
+      scene.add(trajectory.getMesh());
     });
 
     const animate = () => {
