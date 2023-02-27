@@ -1,4 +1,3 @@
-import HG from "../elements/hg";
 import PG from "../elements/pg";
 import Navigation from "../utils/navigation";
 import Controls from "../utils/controls.js";
@@ -7,10 +6,6 @@ const Default = {
   load: async (camera, scene, renderer) => {
     const controls = Controls.createControls(camera, renderer);
     const navigator = Navigation(camera, controls);
-
-    // hang glider
-    const hg = await HG.load(0.008, { x: 0, y: 10, z: 10 });
-    scene.add(hg);
 
     // paraglider
     const pgScale = 0.8;
