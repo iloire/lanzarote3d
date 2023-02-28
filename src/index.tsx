@@ -127,7 +127,8 @@ class App extends React.Component<AppProps, AppState> {
       }
     };
 
-    const island = await Island.load(20000, new THREE.Vector3(0, 0, 0));
+    const island = await Island.load(20000);
+    island.position.copy(new THREE.Vector3(0, 0, 0));
     scene.add(island);
 
     const queryString = window.location.search;
