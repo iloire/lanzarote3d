@@ -32,7 +32,7 @@
   position: absolute;
   top: 90px;
   right: 20px;
-  width: 180px;
+  width: 160px;
 }
 
 #view-controls {
@@ -91,14 +91,22 @@
 #instructions {
   position: absolute;
   top: 55%;
-  left: 45%;
+  left: 40%;
   font-size: 100%;
   width: 220px;
   color: white;
-  padding: 5px 15px;
-  border-radius: 5%;
+  padding: 10px 15px;
+  border-radius: 5px;
   background: #00000077;
   border: 1px solid #ffffff77;
+}
+
+#instructions div {
+  margin-bottom: 5px;
+}
+
+#instructions span {
+  font-weight: bold;
 }
 
 #vario-info {
@@ -121,7 +129,7 @@
   top: 20px;
   right: 20px;
   padding: 5px 10px;
-  with: 190px;
+  width: 160px;
 }
 
 #paraglider-info {
