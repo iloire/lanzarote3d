@@ -433,7 +433,7 @@ class Paraglider extends THREE.EventDispatcher {
 
   glidingRatio(): number {
     if (this.isOnSpeedBar()) {
-      return this.options.glidingRatio * 0.85;
+      return this.options.glidingRatio * 0.8;
     } else {
       return this.options.glidingRatio;
     }
