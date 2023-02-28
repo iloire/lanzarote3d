@@ -249,10 +249,6 @@ const Game = {
     });
 
     const animate = () => {
-      camera.update();
-      const timer = Date.now() * 0.0005;
-      camera && (camera.position.y += Math.sin(timer) * 0.0003);
-      controls.target = pg.position();
       vario.updateReading(pg.altitude());
       if (isLeftViewing) {
         camera.turnLeft();
@@ -260,6 +256,7 @@ const Game = {
       if (isRightViewing) {
         camera.turnRight();
       }
+      camera.update();
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
     };
