@@ -20,6 +20,7 @@ import "./index.css";
 
 const SHOW_HELPERS = true;
 
+THREE.Cache.enabled = true;
 const gui = new GUI();
 
 const createRenderer = (sizes) => {
