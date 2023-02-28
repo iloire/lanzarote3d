@@ -47,13 +47,21 @@ const getTerrainHeightBelowPosition = (
   water: THREE.Mesh
 ): number => {
   const rayVertical = new THREE.Raycaster(
-    pos,
+    new THREE.Vector3(pos.x, 12000, pos.z),
     new THREE.Vector3(0, -1, 0) // vertical
   );
   const intersectsFloor = rayVertical.intersectObjects([terrain, water]);
   if (intersectsFloor.length === 2) {
     const yValues = intersectsFloor.map((obj) => obj.point.y);
-    return Math.max(...yValues);
+    const max = Math.max(...yValues);
+    if (max >= pos.y) {
+      // terrain above pg, crash
+      return NaN;
+    } else {
+      return max;
+    }
+  } else if (intersectsFloor.length === 1) {
+    return intersectsFloor[0].point.y; // return water high
   } else {
     return NaN;
   }
