@@ -47,7 +47,7 @@ const getTerrainHeightBelowPosition = (
   water: THREE.Mesh
 ): number => {
   const rayVertical = new THREE.Raycaster(
-    new THREE.Vector3(pos.x, 12000, pos.z),
+    new THREE.Vector3(pos.x, 100000, pos.z),
     new THREE.Vector3(0, -1, 0) // vertical
   );
   const intersectsFloor = rayVertical.intersectObjects([terrain, water]);
