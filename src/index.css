@@ -74,7 +74,7 @@
 
 #game-start  {
   position: absolute;
-  top: 60%;
+  top: 65%;
   left: 30%;
 }
 
@@ -91,9 +91,23 @@
 #game-start-strong{
 }
 
+#title {
+  position: absolute;
+  top: 15%;
+  left: 20%;
+}
+
+#title h2{
+  font-size: 200%;
+  color: white;
+  background-color: gray;
+  padding: 5px 15px;
+  border-radius: 5px;
+}
+
 #instructions {
   position: absolute;
-  top: 20%;
+  top: 25%;
   left: 20%;
   font-size: 100%;
   width: 60%;

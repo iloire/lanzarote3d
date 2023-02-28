@@ -361,10 +361,12 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
           <div id="pg-thermal-lift">Thermal lift : {thermalLift} m/s</div>
         )}
         {showDebugInfo && (
-          <div id="pg-dynamic-lift">Dynamic lift : {dynamicLift} m/s</div>
+          <div id="pg-dynamic-lift">Soaring lift : {dynamicLift} m/s</div>
         )}
-        {showDebugInfo && <div id="pg-drop">Drop : {drop} m/s</div>}
-        {showDebugInfo && <div id="pg-gradient">Gradient : {gradient}</div>}
+        {showDebugInfo && <div id="pg-drop">PG sink rate : {drop} m/s</div>}
+        {showDebugInfo && (
+          <div id="pg-gradient">Terrain gradient : {gradient}</div>
+        )}
       </div>
     );
     const speedBarText = speedBarEngaged ? "SPEED-BAR" : "";
@@ -405,6 +407,14 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
           <option value="52">I'm AGI</option>
         </select>
       </div>
+    );
+
+    const title = this.state.showStartButton ? (
+      <div id="title">
+        <h2>Paragliding simulator</h2>
+      </div>
+    ) : (
+      false
     );
 
     const instructions = this.state.showStartButton ? (
@@ -452,6 +462,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
 
     return (
       <div id="game">
+        {title}
         {breakControls}
         {cameraSelection}
         {instructions}
