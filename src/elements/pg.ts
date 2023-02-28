@@ -145,8 +145,12 @@ class Paraglider extends THREE.EventDispatcher {
   }
 
   init() {
+    const interval = 25;
     if (this.interval === null) {
-      this.interval = setInterval(() => this.tick(0.1 * this.wrapSpeed), 100);
+      this.interval = setInterval(
+        () => this.tick((interval / 1000) * this.wrapSpeed),
+        interval
+      );
     }
   }
 
