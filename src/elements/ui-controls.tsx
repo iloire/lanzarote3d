@@ -338,6 +338,10 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     } = this.state;
 
     const { showDebugInfo } = this.props;
+    const distanceFlown =
+      metersFlown < 1000
+        ? Math.round(metersFlown) + " m."
+        : Math.round((metersFlown * 100) / 1000) / 100 + " km.";
 
     const varioInfo = (
       <div id="vario-info" className="UIBox">
@@ -348,7 +352,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         </div>
         <div id="vario-ground-speed">Ground speed: {groundSpeed} km/h</div>
         <div id="pg-flying-time">Flight time: {flyingTime} min.</div>
-        <div id="pg-meters-flown">Flight distance: {metersFlown} m.</div>
+        <div id="pg-meters-flown">Flight distance: {distanceFlown}</div>
         <div id="pg-gliding-ratio">Gliding ratio: {glidingRatio}</div>
         {showDebugInfo && (
           <div id="pg-thermal-lift">Thermal lift : {thermalLift} m/s</div>
