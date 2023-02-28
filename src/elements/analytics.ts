@@ -2,14 +2,19 @@ import ReactGA from "react-ga4";
 ReactGA.initialize("G-EMLJN9ZJ6H");
 
 const category = "game";
+const version = "v0.02";
+
+ReactGA.gtag("set", "user_properties", {
+  app_version: version,
+});
+
 class Analytics {
-  constructor() {}
-  trackEvent(action: string) {
-    console.log("track", action);
+  trackEvent(action: string, label?: string) {
+    console.log("track: ", action);
     ReactGA.event({
       category,
       action,
-      // label: "", // optional
+      label: label || "", // optional
       // value: 99, // optional, must be a number
       // nonInteraction: true, // optional, true/false
       // transport: "xhr", // optional, beacon/xhr/image

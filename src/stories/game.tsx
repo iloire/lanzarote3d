@@ -210,11 +210,11 @@ const Game = {
           }
         }}
         onSelectCamera={(mode: CameraMode) => {
-          analytics.trackEvent("game-camera-change");
+          analytics.trackEvent("game-camera-change", mode);
           camera.setCameraMode(mode, pg, controls);
         }}
         onViewChange={(view: View) => {
-          analytics.trackEvent("game-view-change");
+          analytics.trackEvent("game-view-change", view);
           if (view === View.Left) {
             isLeftViewing = true;
           } else if (view === View.LeftRelease) {
@@ -226,7 +226,7 @@ const Game = {
           }
         }}
         onWrapSpeedChange={(value) => {
-          analytics.trackEvent("game-speed-change");
+          analytics.trackEvent("game-speed-change", value.toString());
           pg.updateWrapSpeed(value);
           vario.updateWrapSpeed(value);
         }}
@@ -246,6 +246,7 @@ const Game = {
       const trajectory = new Trajectory(pg.getTrajectory(), 5);
       scene.add(trajectory.getMesh());
       camera.setCameraMode(CameraMode.OrbitControl, pg, controls);
+      analytics.trackEvent("game-crash", pg.getTrajectory().length.toString());
     });
 
     const animate = () => {
