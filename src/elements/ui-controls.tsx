@@ -427,7 +427,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
 
     const pauseControls = this.state.pausedGame ? (
       <div id="game-pause">
-        <button id="game-pause-button" onClick={() => this.handlePause()}>
+        <button id="game-pause-button" onClick={this.handlePause}>
           PAUSE
         </button>
       </div>
