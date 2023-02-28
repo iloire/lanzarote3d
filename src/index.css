@@ -72,34 +72,42 @@
   padding: 15px 15px 10px 15px;
 }
 
-#game-start button {
+#game-start  {
   position: absolute;
+  top: 60%;
+  left: 30%;
+}
+
+#game-start button {
+  margin-left:40px;
   padding: 5px 10px;
   border-radius: 5px;
   font-size: 200%;
 }
 
 #game-start-normal{
-  top: 40%;
-  left: 30%;
 }
 
 #game-start-strong{
-  top: 40%;
-  left: 55%;
 }
 
 #instructions {
   position: absolute;
-  top: 55%;
-  left: 40%;
+  top: 20%;
+  left: 20%;
   font-size: 100%;
-  width: 220px;
+  width: 60%;
   color: white;
   padding: 10px 15px;
   border-radius: 5px;
   background: #00000077;
   border: 1px solid #ffffff77;
+}
+
+#instructions h3 {
+  margin:0px 0px 20px 0px;
+  text-decoration: underline;
+  font-size:150%;
 }
 
 #instructions div {

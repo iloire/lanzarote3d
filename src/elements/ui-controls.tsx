@@ -409,6 +409,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
 
     const instructions = this.state.showStartButton ? (
       <div id="instructions">
+        <h3>Help</h3>
         <div>
           <span>A</span>: turn left
         </div>
@@ -426,6 +427,13 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         </div>
         <div>
           <span>m</span>: toggle sound
+        </div>
+
+        <div>
+          <br />
+          Tips: pick some thermals to get to cloud base and/or go soaring over
+          the cliff. Stay close to the hill but don't crash!! Also keep an eye
+          on wind direction and strenght, it may change without any warning!
         </div>
       </div>
     ) : (
