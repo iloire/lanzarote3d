@@ -293,24 +293,25 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       </div>
     );
 
-    const viewControl = this.state.viewControlsVisible ? (
-      <div id="view-controls">
-        <button
-          onMouseDown={() => this.handleView(View.Left)}
-          onMouseUp={() => this.handleView(View.LeftRelease)}
-        >
-          &lt;
-        </button>
-        <button
-          onMouseDown={() => this.handleView(View.Right)}
-          onMouseUp={() => this.handleView(View.RightRelease)}
-        >
-          &gt;
-        </button>
-      </div>
-    ) : (
-      false
-    );
+    const viewControl =
+      !this.state.showStartButton && this.state.viewControlsVisible ? (
+        <div id="view-controls">
+          <button
+            onMouseDown={() => this.handleView(View.Left)}
+            onMouseUp={() => this.handleView(View.LeftRelease)}
+          >
+            &lt;
+          </button>
+          <button
+            onMouseDown={() => this.handleView(View.Right)}
+            onMouseUp={() => this.handleView(View.RightRelease)}
+          >
+            &gt;
+          </button>
+        </div>
+      ) : (
+        false
+      );
 
     const { lclLevel, windSpeed, windDirection } = this.state;
 
@@ -343,7 +344,9 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         ? Math.round(metersFlown) + " m."
         : Math.round((metersFlown * 100) / 1000) / 100 + " km.";
 
-    const varioInfo = (
+    const varioInfo = this.state.showStartButton ? (
+      false
+    ) : (
       <div id="vario-info" className="UIBox">
         <div id="vario-delta">Δ: {delta} m/s</div>
         <div id="vario-altitude">Alt.: {altitude} m.</div>
@@ -365,7 +368,9 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       </div>
     );
     const speedBarText = speedBarEngaged ? "SPEED-BAR" : "";
-    const paragliderInfo = (
+    const paragliderInfo = this.state.showStartButton ? (
+      false
+    ) : (
       <div id="paraglider-info" className="UIBox">
         <div id="paraglider-speedBar">{speedBarText}</div>
         <div id="paraglider-ears" className="ears"></div>
@@ -373,7 +378,9 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     );
 
     const { posX, posY, posZ } = this.state;
-    const paragliderPosition = (
+    const paragliderPosition = this.state.showStartButton ? (
+      false
+    ) : (
       <div id="paraglider-position" className="UIBox">
         <div id="paraglider-x">x: {posX}</div>
         <div id="paraglider-y">y: {posY}</div>
