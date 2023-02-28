@@ -430,9 +430,6 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
           <span>S</span>: speedbar
         </div>
         <div>
-          <span>E</span>: ears (WIP)
-        </div>
-        <div>
           <span>SPACE</span>: pause
         </div>
         <div>
