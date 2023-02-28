@@ -143,6 +143,7 @@ const Game = {
       } else if (keyCode == 77) {
         //m
         bgMusic.toggle();
+        vario.toggle();
       } else if (keyCode == 83) {
         //s
         pg.toggleSpeedBar();

@@ -37,6 +37,14 @@ class Vario extends THREE.EventDispatcher {
     this.dispatchEvent({ type: "status", status: "off" });
   }
 
+  toggle() {
+    if (this.status === "off") {
+      this.start();
+    } else {
+      this.stop();
+    }
+  }
+
   tick = () => {
     if (!this.high) {
       setTimeout(this.tick, 1000);
