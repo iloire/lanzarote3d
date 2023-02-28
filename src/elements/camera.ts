@@ -25,7 +25,7 @@ class Camera extends THREE.PerspectiveCamera {
   follow1Offset: THREE.Vector3 = new THREE.Vector3(-31.2, 10, 21.2);
   follow2Offset: THREE.Vector3 = new THREE.Vector3(31.2, 10, -21.2);
   topViewOffset: THREE.Vector3 = new THREE.Vector3(10, 300, -10);
-  airplaneViewOffset: THREE.Vector3 = new THREE.Vector3(-33030, 4000, -18330);
+  airplaneViewOffset: THREE.Vector3 = new THREE.Vector3(-6030, 2000, -11330);
   directionToLook: THREE.Vector3;
 
   addGui(gui) {
@@ -119,9 +119,7 @@ class Camera extends THREE.PerspectiveCamera {
     this.position.copy(
       posPg.add(this.target.direction().add(cameraoffset).multiplyScalar(-0.8))
     );
-    this.lookAt(
-      posPg.add(this.target.direction().multiplyScalar(20))
-    );
+    this.lookAt(posPg.add(this.target.direction().multiplyScalar(20)));
   }
 
   farAwayView() {
