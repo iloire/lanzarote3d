@@ -34,18 +34,19 @@ const WEATHER_SETTINGS = {
 
 const pgOptions: ParagliderConstructor = {
   glidingRatio: 9,
-  trimSpeed: 25 / KMH_TO_MS,
-  halfSpeedBarSpeed: 30 / KMH_TO_MS,
-  fullSpeedBarSpeed: 35 / KMH_TO_MS,
-  smallEarsSpeed: 20 / KMH_TO_MS,
-  bigEarsSpeed: 18 / KMH_TO_MS,
+  trimSpeed: 35 / KMH_TO_MS,
+  halfSpeedBarSpeed: 40 / KMH_TO_MS,
+  fullSpeedBarSpeed: 45 / KMH_TO_MS,
+  smallEarsSpeed: 30 / KMH_TO_MS,
+  bigEarsSpeed: 27 / KMH_TO_MS,
 };
 
 const p = {
   scale: 0.004,
-  position: new THREE.Vector3(6827, 880, -555),
+  position: new THREE.Vector3(6827, 880, -555), // pechos altos
   // position: new THREE.Vector3(-5427, 580, -355), // tenesar
   // position: new THREE.Vector3(8727, 1280, -4355),
+  // position: new THREE.Vector3(7500, 1280, -3700),
 };
 
 const Game = {
@@ -171,6 +172,7 @@ const Game = {
         pg={pg}
         vario={vario}
         weather={weather}
+        showDebugInfo={true}
         defaultGameSpeed={3}
         onLeftBreak={() => {
           pg.leftBreakInput();
@@ -190,7 +192,6 @@ const Game = {
           fnHideStartButton();
           vario.start();
           pg.init();
-          // varioUI.style.display = "block";
         }}
         onPause={(paused) => {
           if (paused) {

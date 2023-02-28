@@ -23,6 +23,7 @@ type UIControlsProps = {
   vario: Vario;
   weather: Weather;
   defaultGameSpeed: number;
+  showDebugInfo: boolean;
   onLeftBreak: () => void;
   onLeftBreakRelease: () => void;
   onRightBreak: () => void;
@@ -156,13 +157,13 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     const keyCode = event.which;
     if (keyCode == 65) {
       //a
-      this.handleLeft();
+      return this.handleLeft();
     } else if (keyCode == 68) {
       //d
-      this.handleRight();
+      return this.handleRight();
     } else if (keyCode == 32) {
       //space
-      this.handlePause();
+      return this.handlePause();
     }
   };
 
@@ -206,6 +207,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     this.setState({ pausedGame: !this.state.pausedGame }, () => {
       this.props.onPause(this.state.pausedGame);
     });
+    return false;
   };
 
   handleStart = (windSpeedMetresPerSecond: number) => {
@@ -335,6 +337,8 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       gradient,
     } = this.state;
 
+    const { showDebugInfo } = this.props;
+
     const varioInfo = (
       <div id="vario-info" className="UIBox">
         <div id="vario-delta">Δ: {delta} m/s</div>
@@ -343,13 +347,17 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
           Alt. above terrain: {heightAboveGround} m.
         </div>
         <div id="vario-ground-speed">Ground speed: {groundSpeed} km/h</div>
-        <div id="pg-gliding-ratio">Gliding ratio: {glidingRatio}</div>
         <div id="pg-flying-time">Flight time: {flyingTime} min.</div>
         <div id="pg-meters-flown">Flight distance: {metersFlown} m.</div>
-        <div id="pg-thermal-lift">Thermal lift : {thermalLift} m/s</div>
-        <div id="pg-dynamic-lift">Dynamic lift : {dynamicLift} m/s</div>
-        <div id="pg-drop">Drop : {drop} m/s</div>
-        <div id="pg-gradient">Gradient : {gradient}</div>
+        <div id="pg-gliding-ratio">Gliding ratio: {glidingRatio}</div>
+        {showDebugInfo && (
+          <div id="pg-thermal-lift">Thermal lift : {thermalLift} m/s</div>
+        )}
+        {showDebugInfo && (
+          <div id="pg-dynamic-lift">Dynamic lift : {dynamicLift} m/s</div>
+        )}
+        {showDebugInfo && <div id="pg-drop">Drop : {drop} m/s</div>}
+        {showDebugInfo && <div id="pg-gradient">Gradient : {gradient}</div>}
       </div>
     );
     const speedBarText = speedBarEngaged ? "SPEED-BAR" : "";
