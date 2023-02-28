@@ -12,6 +12,7 @@ import UIControls, { View } from "../elements/ui-controls";
 import Thermal from "../elements/thermal";
 import Clouds from "../elements/clouds";
 import Trajectory from "../elements/trajectory";
+import Analytics from "../elements/analytics";
 
 const KMH_TO_MS = 3.6;
 
@@ -48,6 +49,8 @@ const p = {
   // position: new THREE.Vector3(8727, 1280, -4355),
   // position: new THREE.Vector3(7500, 1280, -3700),
 };
+
+const analytics = new Analytics();
 
 const Game = {
   load: async (camera: Camera, scene, renderer, terrain, water, gui) => {
@@ -187,6 +190,7 @@ const Game = {
           pg.rightBreakRelease();
         }}
         onGameStart={(options, fnHideStartButton) => {
+          analytics.trackEvent("game-start");
           weather.changeWindSpeed(options.windSpeedMetresPerSecond);
           bgMusic.start();
           fnHideStartButton();
@@ -194,6 +198,7 @@ const Game = {
           pg.init();
         }}
         onPause={(paused) => {
+          analytics.trackEvent("game-pause");
           if (paused) {
             pg.stop();
             vario.stop();
@@ -205,9 +210,11 @@ const Game = {
           }
         }}
         onSelectCamera={(mode: CameraMode) => {
+          analytics.trackEvent("game-camera-change");
           camera.setCameraMode(mode, pg, controls);
         }}
         onViewChange={(view: View) => {
+          analytics.trackEvent("game-view-change");
           if (view === View.Left) {
             isLeftViewing = true;
           } else if (view === View.LeftRelease) {
@@ -219,6 +226,7 @@ const Game = {
           }
         }}
         onWrapSpeedChange={(value) => {
+          analytics.trackEvent("game-speed-change");
           pg.updateWrapSpeed(value);
           vario.updateWrapSpeed(value);
         }}
