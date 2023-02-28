@@ -22,6 +22,7 @@ type UIControlsProps = {
   pg: Paraglider;
   vario: Vario;
   weather: Weather;
+  defaultGameSpeed: number;
   onLeftBreak: () => void;
   onLeftBreakRelease: () => void;
   onRightBreak: () => void;
@@ -147,6 +148,10 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     });
   }
 
+  componentDidMount() {
+    this.props.onWrapSpeedChange(this.props.defaultGameSpeed);
+  }
+
   onDocumentKeyDown = (event) => {
     const keyCode = event.which;
     if (keyCode == 65) {
@@ -219,6 +224,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
   handleWrapChange = (event) => {
     this.props.onWrapSpeedChange(event.target.value);
   };
+
   render() {
     const startButton = this.state.showStartButton ? (
       <div id="game-start">
@@ -226,7 +232,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
           normal wind
         </button>
         <button id="game-start-strong" onClick={() => this.handleStart(9)}>
-          strongcito
+          "fuertito"
         </button>
       </div>
     ) : (
@@ -362,19 +368,20 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         <div id="paraglider-z">z: {posZ}</div>
       </div>
     );
+    const defaultGameSpeed = this.props.defaultGameSpeed;
     const wrapSpeedControl = this.state.showStartButton ? (
       false
     ) : (
       <div id="wrapSpeed-controls" className="UIBox">
-        skill:
+        game speed:
         <select
-          defaultValue="1"
+          defaultValue={defaultGameSpeed}
           id="wrapSpeed"
           onChange={this.handleWrapChange}
         >
           <option value="1">rookie</option>
           <option value="3">"pro"</option>
-          <option value="7">I'm from Lanzarote</option>
+          <option value="7">Soy conejero</option>
           <option value="12">I'm a swiss pilot</option>
           <option value="52">I'm AGI</option>
         </select>
@@ -383,12 +390,24 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
 
     const instructions = this.state.showStartButton ? (
       <div id="instructions">
-        <p>A: turn left</p>
-        <p>D: turn right</p>
-        <p>S: speedbar</p>
-        <p>E: ears (WIP)</p>
-        <p>SPACE: pause</p>
-        <p>m: toggle sound</p>
+        <div>
+          <span>A</span>: turn left
+        </div>
+        <div>
+          <span>D</span>: turn right
+        </div>
+        <div>
+          <span>S</span>: speedbar
+        </div>
+        <div>
+          <span>E</span>: ears (WIP)
+        </div>
+        <div>
+          <span>SPACE</span>: pause
+        </div>
+        <div>
+          <span>m</span>: toggle sound
+        </div>
       </div>
     ) : (
       false

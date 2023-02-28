@@ -171,6 +171,7 @@ const Game = {
         pg={pg}
         vario={vario}
         weather={weather}
+        defaultGameSpeed={3}
         onLeftBreak={() => {
           pg.leftBreakInput();
         }}
