@@ -119,39 +119,41 @@ class App extends React.Component<AppProps, AppState> {
     sky.material.uniforms["sunPosition"].value.copy(sun);
     scene.environment = pmremGenerator.fromScene(sky).texture;
 
-    Models.manager.onProgress = async (url, loaded, total) => {
-      if (Math.floor((loaded / total) * 100) === 100) {
-        this.setState({ sceneReady: true });
-      } else {
-        this.setState({ loadingProcess: Math.floor((loaded / total) * 100) });
-      }
-    };
-
-    const island = await Island.load(20000);
+    const loadingManager = new THREE.LoadingManager();
+    const island = await Island.load(loadingManager);
+    const scale = 20000;
+    island.scale.set(scale, scale, scale);
     island.position.copy(new THREE.Vector3(0, 0, 0));
     scene.add(island);
 
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
-    if (urlParams.get("story") === "mechanics") {
-      await Stories.mechanics(camera, scene, renderer, island, water, gui);
-    } else {
-      await Stories.game(camera, scene, renderer, island, water, gui);
-    }
+    loadingManager.onLoad = async () => {
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      if (urlParams.get("story") === "mechanics") {
+        await Stories.mechanics(camera, scene, renderer, island, water, gui);
+      } else {
+        await Stories.game(camera, scene, renderer, island, water, gui);
+      }
+    };
+    loadingManager.onProgress = async (url, loaded, total) => {
+      console.log(loaded, url);
+      this.setState({ loadingProcess: Math.floor((loaded / total) * 100) });
+    };
   };
 
   render() {
     return (
       <div className="lanzarote">
-        <canvas className="webgl"></canvas>
         {this.state.loadingProcess === 100 ? (
           ""
         ) : (
           <div className="loading">
-            <span className="progress">{this.state.loadingProcess} %</span>
+            <span className="progress">
+              LOADING {this.state.loadingProcess} %
+            </span>
           </div>
         )}
-
+        <canvas className="webgl"></canvas>
         <div className="points" style={{ display: "none" }}>
           <div className="point point-0">
             <div className="label label-0">Famara/Teguise</div>

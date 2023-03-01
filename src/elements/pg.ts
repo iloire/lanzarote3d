@@ -129,9 +129,8 @@ class Paraglider extends THREE.EventDispatcher {
     this.wrapSpeed = value;
   }
 
-  async loadModel(scale: number, initialPosition: THREE.Vector3) {
+  async loadModel(scale: number): Promise<THREE.Mesh> {
     const mesh = await Models.load(model, scale);
-    mesh.position.copy(initialPosition);
     const textureLoader = new THREE.TextureLoader(Models.manager);
     const texture = await textureLoader.load(textureImg);
     mesh.material = new THREE.MeshStandardMaterial({ map: texture });
@@ -142,6 +141,7 @@ class Paraglider extends THREE.EventDispatcher {
       mesh.add(this.getGravityHelper(arrowLen));
     }
     this.model = mesh;
+    return mesh;
   }
 
   init() {

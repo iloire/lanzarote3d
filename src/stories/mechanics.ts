@@ -47,9 +47,10 @@ const Mechanics = {
       bigEarsSpeed: 18 / KMH_TO_MS,
     };
     const pg = new Paraglider(pgOptions, weather, terrain, water, []);
-    await pg.loadModel(p.scale, p.position);
+    const mesh = await pg.loadModel(p.scale);
+    mesh.position.copy(p.position);
     pg.addGui(gui);
-    scene.add(pg.getMesh());
+    scene.add(mesh);
     pg.init();
 
     const points = [

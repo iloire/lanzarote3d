@@ -1,5 +1,12 @@
 .loading {
-   position: fixed;
+   position: absolute;
+   top:40%;
+   left: 30%;
+}
+
+.progress {
+  font-size: 200%;
+  color:white;
 }
 .points {
   position: absolute;

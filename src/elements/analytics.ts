@@ -2,7 +2,7 @@ import ReactGA from "react-ga4";
 ReactGA.initialize("G-EMLJN9ZJ6H");
 
 const category = "game";
-const version = "v0.02";
+const version = "v0.03";
 
 ReactGA.gtag("set", "user_properties", {
   app_version: version,

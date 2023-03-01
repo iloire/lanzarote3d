@@ -100,10 +100,10 @@ const Game = {
       thermal3,
     ]);
     const vario = new Vario(pg);
-    await pg.loadModel(p.scale, p.position);
-
+    const mesh = await pg.loadModel(p.scale);
+    mesh.position.copy(p.position);
     pg.addGui(gui);
-    scene.add(pg.getMesh());
+    scene.add(mesh);
 
     const c = await Clouds.load(
       1,
