@@ -1,7 +1,12 @@
 import * as THREE from "three";
 
 const Helpers = {
-  drawSphericalPosition: (phiDegrees, thetaDegrees, len, scene) => {
+  drawSphericalPosition: (
+    phiDegrees: number,
+    thetaDegrees: number,
+    len: number,
+    scene: THREE.Scene
+  ) => {
     const cubeSize = 190;
     const geometry = new THREE.BoxGeometry(10, 10, 10);
     const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
@@ -17,19 +22,21 @@ const Helpers = {
     scene.add(cube);
   },
 
-  createHelpers: function (scene, options) {
+  createHelpers: function (scene: THREE.Scene) {
     const grid = this.getGrid({ x: 0, y: 0 });
     // scene.add(grid);
 
     scene.add(this.getAxisHelper(100));
   },
-  getAxisHelper: function (len) {
+
+  getAxisHelper: function (len: number) {
     const axesHelperLength = len;
     const axesHelper = new THREE.AxesHelper(axesHelperLength);
     // The X axis is red. The Y axis is green. The Z axis is blue.
     return axesHelper;
   },
-  getGrid: (pos) => {
+
+  getGrid: (pos: THREE.Vector3) => {
     const grid = new THREE.Object3D();
     const gridH = new THREE.GridHelper(100, 10, 0x0000ff, 0x808080);
     pos.y = 0;

@@ -8,7 +8,7 @@ const Animations = {
     newP: THREE.Vector3,
     newT: THREE.Vector3,
     time = 2000,
-    callBack
+    callBack: () => void
   ) => {
     var tween = new TWEEN.Tween({
       x1: camera.position.x,
