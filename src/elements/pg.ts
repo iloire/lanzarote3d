@@ -249,7 +249,7 @@ class Paraglider extends THREE.EventDispatcher {
     const pg = this.model;
     const pgGui = gui.addFolder("Paraglider position");
     pgGui.add(pg.position, "x", -12000, 12000).name("position.x").listen();
-    pgGui.add(pg.position, "y", 0, 1200).name("position.y").listen();
+    pgGui.add(pg.position, "y", 0, 2800).name("position.y").listen();
     pgGui.add(pg.position, "z", -12000, 12000).name("position.z").listen();
     pgGui.add(settings, "SHOW_ARROWS", true).name("forces").listen();
 
