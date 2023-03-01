@@ -129,9 +129,13 @@ class App extends React.Component<AppProps, AppState> {
     loadingManager.onLoad = async () => {
       const queryString = window.location.search;
       const urlParams = new URLSearchParams(queryString);
-      if (urlParams.get("story") === "mechanics") {
+      const story = urlParams.get("story");
+      if (story === "mechanics") {
         await Stories.mechanics(camera, scene, renderer, island, water, gui);
+      } else if (story === "default") {
+        await Stories.game(camera, scene, renderer, island, water, gui);
       } else {
+        // default is game
         await Stories.game(camera, scene, renderer, island, water, gui);
       }
     };

@@ -1,71 +1,73 @@
 import Animations from "./animations";
 import * as THREE from "three";
 
-const Navigation = (camera, controls) => {
+type Callback = () => {};
+
+const Navigation = (camera: THREE.PerspectiveCamera, controls) => {
   const nav = {
-    default: (t, cb) => {
+    default: (t: number = 1600, cb?: Callback) => {
       Animations.animateCamera(
         camera,
         controls,
-        { x: 30, y: 10, z: -115 },
-        { x: 50, y: 0, z: 0 },
+        new THREE.Vector3(30, 10, 115),
+        new THREE.Vector3(50, 0, 0),
         t || 1600,
         cb || (() => {})
       );
     },
 
-    famara: (t, cb) => {
+    famara: (t: number = 1600, cb?: Callback) => {
       Animations.animateCamera(
         camera,
         controls,
-        { x: -40, y: 10, z: -10 },
-        { x: 50, y: 0, z: 0 },
+        new THREE.Vector3(-40, 10, -10),
+        new THREE.Vector3(50, 0, 0),
         t || 1600,
         cb || (() => {})
       );
     },
 
-    orzola: (t, cb) => {
+    orzola: (t: number = 1600, cb?: Callback) => {
       Animations.animateCamera(
         camera,
         controls,
-        { x: 120, y: 10, z: -70 },
-        { x: 20, y: 0, z: -30 },
+        new THREE.Vector3(120, 10, -70),
+        new THREE.Vector3(20, 0, -30),
         t || 1600,
         cb || (() => {})
       );
     },
 
-    macher: (t, cb) => {
+    macher: (t: number = 1600, cb?: Callback) => {
       Animations.animateCamera(
         camera,
         controls,
-        { x: 30, y: 10, z: 100 },
-        { x: -20, y: 0, z: 0 },
+        new THREE.Vector3(-30, 10, 100),
+        new THREE.Vector3(-20, 0, 0),
         t || 1600,
         cb || (() => {})
       );
     },
 
-    tenesar: (t, cb) => {
+    tenesar: (t: number = 1600, cb?: Callback) => {
       Animations.animateCamera(
         camera,
         controls,
-        { x: -30, y: 5, z: -20 },
-        { x: -20, y: 0, z: 0 },
+        new THREE.Vector3(-30, 5, -20),
+        new THREE.Vector3(-20, 0, 0),
         t || 1600,
         cb || (() => {})
       );
     },
   };
 
-  function moveForward(speed) {
+  function moveForward(speed: number) {
     const dir = new THREE.Vector3();
     camera.getWorldDirection(dir);
     camera.position.addScaledVector(dir, speed);
   }
 
-  function moveBackwards(speed) {
+  function moveBackwards(speed: number) {
     const dir = new THREE.Vector3();
     camera.getWorldDirection(dir);
     camera.position.addScaledVector(dir, -1 * speed);
@@ -108,7 +110,7 @@ const Navigation = (camera, controls) => {
   document.querySelectorAll(".point").forEach((item) => {
     item.addEventListener(
       "click",
-      (event) => {
+      (event: any) => {
         let className =
           event.target.classList[event.target.classList.length - 1];
         switch (className) {

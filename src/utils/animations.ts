@@ -1,7 +1,15 @@
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
+import * as THREE from "three";
 
 const Animations = {
-  animateCamera: (camera, controls, newP, newT, time = 2000, callBack) => {
+  animateCamera: (
+    camera: THREE.PerspectiveCamera,
+    controls,
+    newP: THREE.Vector3,
+    newT: THREE.Vector3,
+    time = 2000,
+    callBack
+  ) => {
     var tween = new TWEEN.Tween({
       x1: camera.position.x,
       y1: camera.position.y,

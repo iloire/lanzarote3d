@@ -26,6 +26,7 @@ const createThermalMesh = (
 
   return cylinder;
 };
+
 class Thermal {
   mesh: THREE.Mesh;
 
