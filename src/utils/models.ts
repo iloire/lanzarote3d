@@ -4,7 +4,7 @@ import * as THREE from "three";
 const manager = new THREE.LoadingManager();
 
 function modelLoader(url) {
-  console.log("loading", url);
+  console.log("loading model loader", url);
   const loader = new GLTFLoader(manager);
   return new Promise((resolve, reject) => {
     loader.load(url, (data) => resolve(data), null, reject);
