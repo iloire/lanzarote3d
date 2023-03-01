@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import PG from "../elements/pg";
 import Navigation from "../utils/navigation";
-import Controls from "../utils/controls.js";
+import Controls from "../utils/controls";
 
 const Default = {
   load: async (
@@ -13,7 +13,9 @@ const Default = {
     const navigator = Navigation(camera, controls);
 
     camera.position.set(0, 600, 1200);
-    navigator.famara();
+    navigator.famara(2000, () => {
+      navigator.orzola();
+    });
 
     const animate = () => {
       requestAnimationFrame(animate);

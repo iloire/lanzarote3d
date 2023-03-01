@@ -1,7 +1,7 @@
 import Animations from "./animations";
 import * as THREE from "three";
 
-type Callback = () => {};
+type Callback = () => void | {};
 
 const Navigation = (camera: THREE.PerspectiveCamera, controls) => {
   const nav = {

@@ -1,10 +1,11 @@
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 const Animations = {
   animateCamera: (
     camera: THREE.PerspectiveCamera,
-    controls,
+    controls: OrbitControls,
     newP: THREE.Vector3,
     newT: THREE.Vector3,
     time = 2000,

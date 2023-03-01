@@ -105,12 +105,6 @@ class App extends React.Component<AppProps, AppState> {
     sky.scale.setScalar(1000000);
     scene.add(sky);
 
-    const skyUniforms = sky.material.uniforms;
-    skyUniforms["turbidity"].value = 20;
-    skyUniforms["rayleigh"].value = 2;
-    skyUniforms["mieCoefficient"].value = 0.005;
-    skyUniforms["mieDirectionalG"].value = 0.8;
-
     const sun = new THREE.Vector3();
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     const phi = THREE.MathUtils.degToRad(88);
@@ -130,10 +124,11 @@ class App extends React.Component<AppProps, AppState> {
       const queryString = window.location.search;
       const urlParams = new URLSearchParams(queryString);
       const story = urlParams.get("story");
+      console.log(story);
       if (story === "mechanics") {
         await Stories.mechanics(camera, scene, renderer, island, water, gui);
       } else if (story === "default") {
-        await Stories.game(camera, scene, renderer, island, water, gui);
+        await Stories.default(camera, scene, renderer);
       } else {
         // default is game
         await Stories.game(camera, scene, renderer, island, water, gui);
