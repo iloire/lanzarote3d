@@ -25,8 +25,8 @@
 #camera-selection {
   color: white;
   position: absolute;
-  bottom: 1%;
-  left: 20px;
+  top: 20px;
+  left: 520px;
 }
 
 #camera-selection button {font-size: 200%;margin-right: 5px}
@@ -44,8 +44,8 @@
 
 #view-controls {
   position: absolute;
-  bottom: 10%;
-  right: 20px;
+  top: 70px;
+  left: 520px;
 }
 
 #view-controls button{
@@ -70,23 +70,46 @@
   font-size: 400%;
 }
 
+/* break buttons */
 #game-controls img {
   width: 40px
 }
 
 #game-controls button {
+  display:none;
   border-radius: 10px;
   padding: 15px 15px 10px 15px;
 }
 
+/* Analog control */
+#break-ui {
+  width: 100%;
+  height: 250px;
+  background-color: red;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  opacity: 0.1;
+  z-index:10;
+}
+
+#break-ui div {
+  position: absolute;
+  z-index: 0;
+  right: 50%;
+  width: 5px;
+  height: 250px;
+  background-color: white;
+}
+
+/* START GAME buttons */
 #game-start  {
   position: absolute;
   top: 65%;
-  left: 30%;
+  left: 35%;
 }
 
 #game-start button {
-  margin-left:40px;
   padding: 5px 10px;
   border-radius: 5px;
   font-size: 200%;
@@ -96,6 +119,7 @@
 }
 
 #game-start-strong{
+  margin-left: 40px;
 }
 
 #title {
@@ -126,9 +150,9 @@
 }
 
 #instructions h3 {
-  margin:0px 0px 20px 0px;
+  margin: 0px 0px 20px 0px;
   text-decoration: underline;
-  font-size:150%;
+  font-size: 150%;
 }
 
 #instructions div {

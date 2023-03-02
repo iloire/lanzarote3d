@@ -95,6 +95,7 @@ class Paraglider extends THREE.EventDispatcher {
   tickCounter: number = 0;
   __lift: number = 0;
   __gradient: number = 0;
+  __directionInput: number = 0;
 
   constructor(
     options: ParagliderConstructor,
@@ -188,6 +189,14 @@ class Paraglider extends THREE.EventDispatcher {
     }
     if (this.isLeftBreaking) {
       this.rotateLeft();
+    }
+    const smoother = 0.02;
+    if (this.__directionInput !== 0) {
+      if (this.__directionInput > 0) {
+        this.rotateRight(this.__directionInput * smoother);
+      } else {
+        this.rotateLeft(-1 * this.__directionInput * smoother);
+      }
     }
 
     if (this.tickCounter % 10 === 0) {
@@ -292,6 +301,11 @@ class Paraglider extends THREE.EventDispatcher {
     pgEnv.add(this, "__gradient").name("gradient").listen();
   }
 
+  directionInput(direction: number) {
+    this.__directionInput = direction;
+    console.log("pg: ", direction);
+  }
+
   leftBreakInput() {
     this.isLeftBreaking = true;
   }
@@ -300,8 +314,8 @@ class Paraglider extends THREE.EventDispatcher {
     this.isLeftBreaking = false;
   }
 
-  rotateLeft() {
-    this.model.rotation.y += getRotationValue(this.wrapSpeed);
+  rotateLeft(strength: number = 1) {
+    this.model.rotation.y += strength * getRotationValue(this.wrapSpeed);
   }
 
   rightBreakInput() {
@@ -312,8 +326,8 @@ class Paraglider extends THREE.EventDispatcher {
     this.isRightBreaking = false;
   }
 
-  rotateRight() {
-    this.model.rotation.y -= getRotationValue(this.wrapSpeed);
+  rotateRight(strength: number = 1) {
+    this.model.rotation.y -= strength * getRotationValue(this.wrapSpeed);
   }
 
   hasTouchedGround(terrain: THREE.Mesh, water: THREE.Mesh): boolean {

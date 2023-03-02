@@ -189,6 +189,10 @@ const Game = {
         onRightBreakRelease={() => {
           pg.rightBreakRelease();
         }}
+        onBreakUIChange={(direction: number) => {
+          pg.directionInput(direction);
+          console.log("berak change", direction);
+        }}
         onGameStart={(options, fnHideStartButton) => {
           analytics.trackEvent("game-start");
           weather.changeWindSpeed(options.windSpeedMetresPerSecond);

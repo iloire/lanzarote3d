@@ -24,6 +24,7 @@ type UIControlsProps = {
   weather: Weather;
   defaultGameSpeed: number;
   showDebugInfo: boolean;
+  onBreakUIChange: (direction: number) => void;
   onLeftBreak: () => void;
   onLeftBreakRelease: () => void;
   onRightBreak: () => void;
@@ -151,6 +152,27 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
 
   componentDidMount() {
     this.props.onWrapSpeedChange(this.props.defaultGameSpeed);
+    const breakUIelement = document.getElementById("break-ui");
+    breakUIelement.onmousemove = (e: any) => {
+      if (e.target !== breakUIelement) {
+        return;
+      }
+      const rect = e.target.getBoundingClientRect();
+      console.log(rect);
+      console.log(e.target);
+      const x = e.clientX - rect.left; //x position within the element.
+      const percentage = x / rect.width;
+      const direction = (percentage - 0.5) * 100;
+
+      this.handleBreakUIChange(direction);
+    };
+    breakUIelement.onmouseleave = (e: any) => {
+      if (e.target !== breakUIelement) {
+        return;
+      }
+      const rect = e.target.getBoundingClientRect();
+      this.handleBreakUIChange(0);
+    };
   }
 
   onDocumentKeyDown = (event) => {
@@ -227,8 +249,13 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     this.props.onWrapSpeedChange(event.target.value);
   };
 
+  handleBreakUIChange = (direction: number) => {
+    this.props.onBreakUIChange(direction);
+  };
+
   render() {
-    const startButton = this.state.showStartButton ? (
+    const isGameStarted = !this.state.showStartButton;
+    const startButton = !isGameStarted ? (
       <div id="game-start">
         <button id="game-start-normal" onClick={() => this.handleStart(6)}>
           normal wind
@@ -241,9 +268,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       false
     );
 
-    const breakControls = this.state.showStartButton ? (
-      false
-    ) : (
+    const breakControls = isGameStarted ? (
       <div id="game-controls">
         <button
           id="game-controls-left"
@@ -260,11 +285,11 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
           <img src={arrowRightImg} />
         </button>
       </div>
+    ) : (
+      false
     );
 
-    const cameraSelection = this.state.showStartButton ? (
-      false
-    ) : (
+    const cameraSelection = isGameStarted ? (
       <div id="camera-selection">
         <button onClick={() => this.handleCamMode(CameraMode.FollowTarget)}>
           <img src={viewLeftImg} />
@@ -291,10 +316,12 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
           orbit
         </button>
       </div>
+    ) : (
+      false
     );
 
     const viewControl =
-      !this.state.showStartButton && this.state.viewControlsVisible ? (
+      isGameStarted && this.state.viewControlsVisible ? (
         <div id="view-controls">
           <button
             onMouseDown={() => this.handleView(View.Left)}
@@ -344,9 +371,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         ? Math.round(metersFlown) + " m."
         : Math.round((metersFlown * 100) / 1000) / 100 + " km.";
 
-    const varioInfo = this.state.showStartButton ? (
-      false
-    ) : (
+    const varioInfo = isGameStarted ? (
       <div id="vario-info" className="UIBox">
         <div id="vario-delta">Δ: {delta} m/s</div>
         <div id="vario-altitude">Alt.: {altitude} m.</div>
@@ -368,31 +393,31 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
           <div id="pg-gradient">Terrain gradient : {gradient}</div>
         )}
       </div>
+    ) : (
+      false
     );
     const speedBarText = speedBarEngaged ? "SPEED-BAR" : "";
-    const paragliderInfo = this.state.showStartButton ? (
-      false
-    ) : (
+    const paragliderInfo = isGameStarted ? (
       <div id="paraglider-info" className="UIBox">
         <div id="paraglider-speedBar">{speedBarText}</div>
         <div id="paraglider-ears" className="ears"></div>
       </div>
+    ) : (
+      false
     );
 
     const { posX, posY, posZ } = this.state;
-    const paragliderPosition = this.state.showStartButton ? (
-      false
-    ) : (
+    const paragliderPosition = isGameStarted ? (
       <div id="paraglider-position" className="UIBox">
         <div id="paraglider-x">x: {posX}</div>
         <div id="paraglider-y">y: {posY}</div>
         <div id="paraglider-z">z: {posZ}</div>
       </div>
+    ) : (
+      false
     );
     const defaultGameSpeed = this.props.defaultGameSpeed;
-    const wrapSpeedControl = this.state.showStartButton ? (
-      false
-    ) : (
+    const wrapSpeedControl = isGameStarted ? (
       <div id="wrapSpeed-controls" className="UIBox">
         game speed:
         <select
@@ -407,9 +432,11 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
           <option value="52">I'm AGI</option>
         </select>
       </div>
+    ) : (
+      false
     );
 
-    const title = this.state.showStartButton ? (
+    const title = !isGameStarted ? (
       <div id="title">
         <h2>Paragliding simulator</h2>
       </div>
@@ -417,7 +444,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       false
     );
 
-    const instructions = this.state.showStartButton ? (
+    const instructions = !isGameStarted ? (
       <div id="instructions">
         <h3>Help</h3>
         <div>
@@ -457,6 +484,12 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       false
     );
 
+    const breakControlUI = (
+      <div id="break-ui">
+        <div>&nbsp;</div>
+      </div>
+    );
+
     return (
       <div id="game">
         {title}
@@ -471,6 +504,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         {weatherInfo}
         {wrapSpeedControl}
         {pauseControls}
+        {breakControlUI}
       </div>
     );
   }
