@@ -1,9 +1,10 @@
 import Animations from "./animations";
 import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 type Callback = () => void | {};
 
-const Navigation = (camera: THREE.PerspectiveCamera, controls) => {
+const Navigation = (camera: THREE.PerspectiveCamera, controls: OrbitControls) => {
   const nav = {
     default: (t: number = 1600, cb?: Callback) => {
       Animations.animateCamera(

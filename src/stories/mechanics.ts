@@ -5,6 +5,7 @@ import Clouds from "../elements/clouds";
 import Trajectory from "../elements/trajectory";
 import Paraglider, { ParagliderConstructor } from "../elements/pg";
 import Weather from "../elements/weather";
+import Bird from "../elements/bird";
 
 const KMH_TO_MS = 3.6;
 
@@ -20,7 +21,14 @@ const p = {
 };
 
 const Mechanics = {
-  load: async (camera, scene, renderer, terrain, water, gui) => {
+  load: async (
+    camera: THREE.PerspectiveCamera,
+    scene: THREE.Scene,
+    renderer,
+    terrain: THREE.Mesh,
+    water: THREE.Mesh,
+    gui
+  ) => {
     const controls = Controls.createControls(camera, renderer);
 
     const cloudPos = new THREE.Vector3(87, 1300, 3355);
@@ -52,6 +60,12 @@ const Mechanics = {
     pg.addGui(gui);
     scene.add(mesh);
     pg.init();
+
+    const bird = new Bird();
+    const birdMesh = await bird.loadModel(2);
+    const birdPosition = new THREE.Vector3(6847, 1980, -555);
+    mesh.position.copy(birdPosition);
+    scene.add(birdMesh);
 
     const points = [
       new THREE.Vector3(29000, 1000, 3100),

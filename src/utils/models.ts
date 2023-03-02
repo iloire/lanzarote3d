@@ -20,6 +20,7 @@ const Models = {
     return mesh;
   },
   load: async (model: THREE.Mesh, scale: number, pos?: THREE.Vector3) => {
+    console.warn("deprecated, use loadsimple instead");
     const gltf: any = await modelLoader(model);
     const mesh = gltf.scene.children[0];
     mesh.scale.set(scale, scale, scale);
