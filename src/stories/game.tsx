@@ -238,6 +238,10 @@ const Game = {
     );
     root.render(uiControls);
 
+    const fogColor = 0x000000;
+    const fog = new THREE.Fog(fogColor, 1, 10000);
+    scene.fog = fog;
+
     // Game start
     camera.setCameraMode(CameraMode.FollowTarget, pg, controls);
 
