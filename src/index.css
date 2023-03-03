@@ -35,11 +35,13 @@
   width: 30px
 }
 
-#wrapSpeed-controls {
+#wrapSpeed-ui {
+  font-size: 300%;
+  font-weight: bold;
   position: absolute;
-  top: 90px;
-  right: 20px;
-  width: 160px;
+  right: 4%;
+  top: 100px;
+  color: white;
 }
 
 #view-controls {

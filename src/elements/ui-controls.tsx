@@ -61,6 +61,7 @@ type UIControlsState = {
   drop: number;
   gradient: number;
   pausedGame: boolean;
+  wrapSpeed: number;
 };
 
 export enum View {
@@ -95,6 +96,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       drop: 0,
       gradient: 0,
       pausedGame: false,
+      wrapSpeed: props.defaultGameSpeed,
     };
     document.addEventListener("keydown", this.onDocumentKeyDown, false);
     document.addEventListener("keyup", this.onDocumentKeyUp, false);
@@ -177,7 +179,31 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
 
   onDocumentKeyDown = (event) => {
     const keyCode = event.which;
-    if (keyCode == 65) {
+    if (keyCode === 49) {
+      //1
+      this.handleWrapChange(1);
+    } else if (keyCode === 50) {
+      //2
+      this.handleWrapChange(2);
+    } else if (keyCode === 51) {
+      //3
+      this.handleWrapChange(3);
+    } else if (keyCode === 52) {
+      //4
+      this.handleWrapChange(5);
+    } else if (keyCode === 53) {
+      //5
+      this.handleWrapChange(7);
+    } else if (keyCode === 54) {
+      //6
+      this.handleWrapChange(9);
+    } else if (keyCode === 55) {
+      //7
+      this.handleWrapChange(15);
+    } else if (keyCode === 56) {
+      //8
+      this.handleWrapChange(20);
+    } else if (keyCode == 65) {
       //a
       return this.handleLeft();
     } else if (keyCode == 68) {
@@ -245,8 +271,10 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     this.props.onViewChange(view);
   };
 
-  handleWrapChange = (event) => {
-    this.props.onWrapSpeedChange(event.target.value);
+  handleWrapChange = (newWrap: number) => {
+    this.setState({ wrapSpeed: newWrap }, () => {
+      this.props.onWrapSpeedChange(newWrap);
+    });
   };
 
   handleBreakUIChange = (direction: number) => {
@@ -363,9 +391,14 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       dynamicLift,
       drop,
       gradient,
+      wrapSpeed,
+      pausedGame,
+      posX,
+      posY,
+      posZ,
     } = this.state;
 
-    const { showDebugInfo } = this.props;
+    const { showDebugInfo, defaultGameSpeed } = this.props;
     const distanceFlown =
       metersFlown < 1000
         ? Math.round(metersFlown) + " m."
@@ -406,31 +439,11 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       false
     );
 
-    const { posX, posY, posZ } = this.state;
     const paragliderPosition = isGameStarted ? (
       <div id="paraglider-position" className="UIBox">
         <div id="paraglider-x">x: {posX}</div>
         <div id="paraglider-y">y: {posY}</div>
         <div id="paraglider-z">z: {posZ}</div>
-      </div>
-    ) : (
-      false
-    );
-    const defaultGameSpeed = this.props.defaultGameSpeed;
-    const wrapSpeedControl = isGameStarted ? (
-      <div id="wrapSpeed-controls" className="UIBox">
-        game speed:
-        <select
-          defaultValue={defaultGameSpeed}
-          id="wrapSpeed"
-          onChange={this.handleWrapChange}
-        >
-          <option value="1">rookie</option>
-          <option value="3">"pro"</option>
-          <option value="7">Soy conejero</option>
-          <option value="12">I'm a swiss pilot</option>
-          <option value="52">I'm AGI</option>
-        </select>
       </div>
     ) : (
       false
@@ -474,7 +487,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       false
     );
 
-    const pauseControls = this.state.pausedGame ? (
+    const pauseControls = pausedGame ? (
       <div id="game-pause">
         <button id="game-pause-button" onClick={this.handlePause}>
           PAUSE
@@ -490,6 +503,8 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       </div>
     );
 
+    const wrapSpeedValueUI = <div id="wrapSpeed-ui">X{wrapSpeed}</div>;
+
     return (
       <div id="game">
         {title}
@@ -502,7 +517,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         {varioInfo}
         {viewControl}
         {weatherInfo}
-        {wrapSpeedControl}
+        {wrapSpeedValueUI}
         {pauseControls}
         {breakControlUI}
       </div>
