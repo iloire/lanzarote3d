@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import Models from "../utils/models";
-import model from "../models/pubg_green_parachute2.glb";
+import model from "../models/birds.glb";
 
 class Bird {
   mesh: THREE.Mesh;
@@ -9,7 +9,7 @@ class Bird {
     const animate = (mesh) => {
       const timer = (Date.now() + Math.random() * 1000) * 0.001;
       mesh.position.y = mesh.position.y + Math.sin(timer) * 1;
-      mesh.position.x += 10;
+      mesh.position.x += 2;
       requestAnimationFrame(() => animate(mesh));
     };
     animate(mesh);
