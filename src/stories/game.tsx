@@ -13,6 +13,7 @@ import Thermal from "../elements/thermal";
 import Clouds from "../elements/clouds";
 import Trajectory from "../elements/trajectory";
 import Analytics from "../elements/analytics";
+import Stats from "three/examples/jsm/libs/stats.module";
 
 const KMH_TO_MS = 3.6;
 
@@ -269,9 +270,13 @@ const Game = {
       camera.update();
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
+      stats.update();
     };
     animate();
   },
 };
 
 export default Game;
+
+const stats = Stats();
+document.body.appendChild(stats.dom);
