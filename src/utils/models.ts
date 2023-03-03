@@ -13,6 +13,9 @@ function modelLoader(url, manager?: THREE.LoadingManager) {
 
 const Models = {
   manager: defaultManager,
+  loadGltf: async (model: string, manager?: THREE.LoadingManager) => {
+    return modelLoader(model, manager);
+  },
   loadSimple: async (model: string, manager: THREE.LoadingManager) => {
     const gltf: any = await modelLoader(model, manager);
     const mesh = gltf.scene.children[0];
