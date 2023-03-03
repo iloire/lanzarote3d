@@ -5,7 +5,7 @@ import Clouds from "../elements/clouds";
 import Trajectory from "../elements/trajectory";
 import Paraglider, { ParagliderConstructor } from "../elements/pg";
 import Weather from "../elements/weather";
-import Bird from "../elements/bird";
+import Birds from "../elements/birds";
 
 const KMH_TO_MS = 3.6;
 
@@ -61,11 +61,11 @@ const Mechanics = {
     scene.add(mesh);
     pg.init();
 
-    const bird = new Bird();
-    const birdMesh = await bird.loadModel(33);
-    const birdPosition = new THREE.Vector3(p.position.x, 1280, p.position.z);
-    birdMesh.position.copy(birdPosition);
-    scene.add(birdMesh);
+    const birds = new Birds();
+    const birdsMesh = await birds.loadModel(33);
+    const birdsPosition = new THREE.Vector3(p.position.x, 1280, p.position.z);
+    birdsMesh.position.copy(birdsPosition);
+    scene.add(birdsMesh);
 
     const points = [
       new THREE.Vector3(29000, 1000, 3100),

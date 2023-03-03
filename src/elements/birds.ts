@@ -4,16 +4,17 @@ import model from "../models/birds.glb";
 
 const clock = new THREE.Clock();
 
-const animate = (mesh, mixer) => {
+const animate = (mesh, scale, mixer) => {
   const timer = (Date.now() + Math.random() * 1000) * 0.001;
   mesh.position.y = mesh.position.y + Math.sin(timer) * 1;
-  mesh.position.x += 2;
+  mesh.position.x += 0.2 * scale;
+  mesh.position.z -= 0.1 * scale;
   const delta = clock.getDelta();
   mixer.update(delta);
-  requestAnimationFrame(() => animate(mesh, mixer));
+  requestAnimationFrame(() => animate(mesh, scale, mixer));
 };
 
-class Bird {
+class Birds {
   mesh: THREE.Mesh;
   async loadModel(scale: number): Promise<THREE.Mesh> {
     const gltf: any = await Models.loadGltf(model);
@@ -23,10 +24,10 @@ class Bird {
     const mixer = new THREE.AnimationMixer(gltf.scene);
     const animationAction = mixer.clipAction(animations[0]);
     animationAction.play();
-    animate(mesh, mixer);
+    animate(mesh, scale, mixer);
     this.mesh = mesh;
     return mesh;
   }
 }
 
-export default Bird;
+export default Birds;
