@@ -62,6 +62,7 @@ type UIControlsState = {
   gradient: number;
   pausedGame: boolean;
   wrapSpeed: number;
+  showHelp: boolean;
 };
 
 export enum View {
@@ -97,6 +98,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       gradient: 0,
       pausedGame: false,
       wrapSpeed: props.defaultGameSpeed,
+      showHelp: false,
     };
     document.addEventListener("keydown", this.onDocumentKeyDown, false);
     document.addEventListener("keyup", this.onDocumentKeyUp, false);
@@ -179,6 +181,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
 
   onDocumentKeyDown = (event) => {
     const keyCode = event.which;
+    console.log(keyCode);
     if (keyCode === 49) {
       //1
       this.handleWrapChange(1);
@@ -212,6 +215,9 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     } else if (keyCode == 32) {
       //space
       return this.handlePause();
+    } else if (keyCode == 72) {
+      //space
+      return this.toggleHelp();
     }
   };
 
@@ -275,6 +281,10 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     this.setState({ wrapSpeed: newWrap }, () => {
       this.props.onWrapSpeedChange(newWrap);
     });
+  };
+
+  toggleHelp = () => {
+    this.setState({ showHelp: !this.state.showHelp });
   };
 
   handleBreakUIChange = (direction: number) => {
@@ -396,6 +406,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       posX,
       posY,
       posZ,
+      showHelp,
     } = this.state;
 
     const { showDebugInfo, defaultGameSpeed } = this.props;
@@ -457,35 +468,41 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       false
     );
 
-    const instructions = !isGameStarted ? (
-      <div id="instructions">
-        <h3>Help</h3>
-        <div>
-          <span>A</span>: turn left
+    const helpUI =
+      !isGameStarted || showHelp ? (
+        <div id="instructions">
+          <h3>Help</h3>
+          <div>
+            <span>A</span>: turn left
+          </div>
+          <div>
+            <span>D</span>: turn right
+          </div>
+          <div>
+            <span>S</span>: speedbar
+          </div>
+          <div>
+            <span>SPACE</span>: pause
+          </div>
+          <div>
+            <span>m</span>: toggle sound
+          </div>
+          <div>
+            <span>h</span>: toggle Help menu
+          </div>
+          <div>
+            <span>1-8</span>: game wrap speed
+          </div>
+          <div>
+            <br />
+            Tips: pick some thermals to get to cloud base and/or go soaring over
+            the cliff. Stay close to the hill but don't crash!! Also keep an eye
+            on wind direction and strenght, it may change without any warning!
+          </div>
         </div>
-        <div>
-          <span>D</span>: turn right
-        </div>
-        <div>
-          <span>S</span>: speedbar
-        </div>
-        <div>
-          <span>SPACE</span>: pause
-        </div>
-        <div>
-          <span>m</span>: toggle sound
-        </div>
-
-        <div>
-          <br />
-          Tips: pick some thermals to get to cloud base and/or go soaring over
-          the cliff. Stay close to the hill but don't crash!! Also keep an eye
-          on wind direction and strenght, it may change without any warning!
-        </div>
-      </div>
-    ) : (
-      false
-    );
+      ) : (
+        false
+      );
 
     const pauseControls = pausedGame ? (
       <div id="game-pause">
@@ -503,14 +520,14 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       </div>
     );
 
-    const wrapSpeedValueUI = <div id="wrapSpeed-ui">X{wrapSpeed}</div>;
+    const wrapSpeedValueUI = <div id="wrapSpeed-ui">x{wrapSpeed}</div>;
 
     return (
       <div id="game">
         {title}
         {breakControls}
         {cameraSelection}
-        {instructions}
+        {helpUI}
         {paragliderInfo}
         {paragliderPosition}
         {startButton}
