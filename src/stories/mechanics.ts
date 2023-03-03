@@ -62,9 +62,9 @@ const Mechanics = {
     pg.init();
 
     const bird = new Bird();
-    const birdMesh = await bird.loadModel(2);
-    const birdPosition = new THREE.Vector3(6847, 1980, -555);
-    mesh.position.copy(birdPosition);
+    const birdMesh = await bird.loadModel(33);
+    const birdPosition = new THREE.Vector3(p.position.x, 1280, p.position.z);
+    birdMesh.position.copy(birdPosition);
     scene.add(birdMesh);
 
     const points = [
