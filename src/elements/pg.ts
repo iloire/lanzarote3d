@@ -418,6 +418,10 @@ class Paraglider extends THREE.EventDispatcher {
     return this.model.position.clone();
   }
 
+  setPosition(pos: THREE.Vector3) {
+    this.model.position.copy(pos);
+  }
+
   altitude(): number {
     return this.model.position.y;
   }

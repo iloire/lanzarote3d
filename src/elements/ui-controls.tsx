@@ -1,4 +1,5 @@
 import React from "react";
+import * as THREE from "three";
 import { CameraMode } from "./camera";
 import Paraglider from "./pg";
 import Vario from "../audio/vario";
@@ -11,12 +12,9 @@ import viewLeftImg from "../img/eye-left.png";
 import viewRightImg from "../img/eye-right.png";
 import arrowLeftImg from "../img/left-chevron.png";
 import arrowRightImg from "../img/right-chevron.png";
+import { GameStartOptions } from "../stories/game/types";
 
 const KMH_TO_MS = 3.6;
-
-interface GameStartOptions {
-  windSpeedMetresPerSecond: number;
-}
 
 type UIControlsProps = {
   pg: Paraglider;
@@ -264,9 +262,10 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     return false;
   };
 
-  handleStart = (windSpeedMetresPerSecond: number) => {
-    const options = {
+  handleStart = (windSpeedMetresPerSecond: number, startingPosition) => {
+    const options: GameStartOptions = {
       windSpeedMetresPerSecond,
+      startingPosition,
     };
     this.props.onGameStart(options, () => {
       this.setState({ showStartButton: false });
@@ -295,11 +294,21 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     const isGameStarted = !this.state.showStartButton;
     const startButton = !isGameStarted ? (
       <div id="game-start">
-        <button id="game-start-normal" onClick={() => this.handleStart(6)}>
-          normal wind
+        <button
+          id="game-start-normal"
+          onClick={
+            () => this.handleStart(6, new THREE.Vector3(6827, 880, -555)) // pechos altos
+          }
+        >
+          Famara
         </button>
-        <button id="game-start-strong" onClick={() => this.handleStart(9)}>
-          "fuertito"
+        <button
+          id="game-start-strong"
+          onClick={() =>
+            this.handleStart(6, new THREE.Vector3(-5427, 580, -355))
+          } // tenesar
+        >
+          Tenesar
         </button>
       </div>
     ) : (

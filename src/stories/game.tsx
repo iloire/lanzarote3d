@@ -14,6 +14,7 @@ import Clouds from "../elements/clouds";
 import Trajectory from "../elements/trajectory";
 import Analytics from "../elements/analytics";
 import Stats from "three/examples/jsm/libs/stats.module";
+import { GameStartOptions } from "../stories/game/types";
 
 const KMH_TO_MS = 3.6;
 
@@ -194,12 +195,13 @@ const Game = {
           pg.directionInput(direction);
           console.log("berak change", direction);
         }}
-        onGameStart={(options, fnHideStartButton) => {
+        onGameStart={(options: GameStartOptions, fnHideStartButton) => {
           analytics.trackEvent("game-start");
           weather.changeWindSpeed(options.windSpeedMetresPerSecond);
           bgMusic.start();
           fnHideStartButton();
           vario.start();
+          pg.setPosition(options.startingPosition);
           pg.init();
         }}
         onPause={(paused) => {
