@@ -210,11 +210,11 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     } else if (keyCode == 68) {
       //d
       return this.handleRight();
-    } else if (keyCode == 32) {
-      //space
+    } else if (keyCode == 80) {
+      //p
       return this.handlePause();
     } else if (keyCode == 72) {
-      //space
+      //h
       return this.toggleHelp();
     }
   };
@@ -491,7 +491,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
             <span>S</span>: speedbar
           </div>
           <div>
-            <span>SPACE</span>: pause
+            <span>p</span>: pause
           </div>
           <div>
             <span>m</span>: toggle sound
