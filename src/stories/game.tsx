@@ -1,9 +1,11 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import * as THREE from "three";
+import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 import BackgroundSound from "../audio/background";
 import Paraglider, { ParagliderConstructor } from "../elements/pg";
 import Controls from "../utils/controls";
+import Animations from "../utils/animations";
 import Helpers from "../utils/helpers";
 import Vario from "../audio/vario";
 import Weather from "../elements/weather";
@@ -54,7 +56,14 @@ const p = {
 const analytics = new Analytics();
 
 const Game = {
-  load: async (camera: Camera, scene, renderer, terrain, water, gui) => {
+  load: async (
+    camera: Camera,
+    scene: THREE.Scene,
+    renderer,
+    terrain: THREE.Mesh,
+    water: THREE.Mesh,
+    gui
+  ) => {
     gui.hide();
 
     const controls = Controls.createControls(camera, renderer);
@@ -267,6 +276,13 @@ const Game = {
       scene.add(trajectory.getMesh());
       camera.setCameraMode(CameraMode.OrbitControl, pg, controls);
       analytics.trackEvent("game-crash", pg.getTrajectory().length.toString());
+      Animations.animateCamera(
+        camera,
+        controls,
+        p.position,
+        pg.position(),
+        2000
+      );
     });
 
     const animate = () => {
@@ -283,6 +299,7 @@ const Game = {
       if (isZoomOutViewing) {
         camera.zoomOut();
       }
+      TWEEN.update();
       camera.update();
       renderer.render(scene, camera);
       requestAnimationFrame(animate);

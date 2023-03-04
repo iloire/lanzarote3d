@@ -6,12 +6,13 @@ const Animations = {
   animateCamera: (
     camera: THREE.PerspectiveCamera,
     controls: OrbitControls,
-    newP: THREE.Vector3,
-    newT: THREE.Vector3,
-    time = 2000,
-    callBack: () => void
+    newPosition: THREE.Vector3,
+    newTarget: THREE.Vector3,
+    time: number = 2000,
+    callBack?: () => void
   ) => {
-    var tween = new TWEEN.Tween({
+    console.log("animation started");
+    const tween = new TWEEN.Tween({
       x1: camera.position.x,
       y1: camera.position.y,
       z1: camera.position.z,
@@ -21,12 +22,12 @@ const Animations = {
     });
     tween.to(
       {
-        x1: newP.x,
-        y1: newP.y,
-        z1: newP.z,
-        x2: newT.x,
-        y2: newT.y,
-        z2: newT.z,
+        x1: newPosition.x,
+        y1: newPosition.y,
+        z1: newPosition.z,
+        x2: newTarget.x,
+        y2: newTarget.y,
+        z2: newTarget.z,
       },
       time
     );
@@ -40,8 +41,9 @@ const Animations = {
       controls.update();
     });
     tween.onComplete(function () {
+      console.log("animation done ");
       controls.enabled = true;
-      callBack();
+      callBack && callBack();
     });
     tween.easing(TWEEN.Easing.Cubic.InOut);
     tween.start();

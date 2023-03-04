@@ -124,9 +124,11 @@ class App extends React.Component<AppProps, AppState> {
       const queryString = window.location.search;
       const urlParams = new URLSearchParams(queryString);
       const story = urlParams.get("story");
-      console.log(story);
+      console.log("loading story:", story);
       if (story === "mechanics") {
         await Stories.mechanics(camera, scene, renderer, island, water, gui);
+      } else if (story === "flyzones") {
+        await Stories.flyzones(camera, scene, renderer);
       } else if (story === "default") {
         await Stories.default(camera, scene, renderer);
       } else {
@@ -153,24 +155,6 @@ class App extends React.Component<AppProps, AppState> {
           </div>
         )}
         <canvas className="webgl"></canvas>
-        <div className="points" style={{ display: "none" }}>
-          <div className="point point-0">
-            <div className="label label-0">Famara/Teguise</div>
-            <div className="text">Famara</div>
-          </div>
-          <div className="point point-1">
-            <div className="label label-1">Mirador/Orzola</div>
-            <div className="text"></div>
-          </div>
-          <div className="point point-2">
-            <div className="label label-2">Macher/Asomada</div>
-            <div className="text"></div>
-          </div>
-          <div className="point point-3">
-            <div className="label label-3">Tenesar</div>
-            <div className="text">4</div>
-          </div>
-        </div>
       </div>
     );
   }
