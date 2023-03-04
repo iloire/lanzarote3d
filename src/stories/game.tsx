@@ -24,8 +24,7 @@ function round(number: number): number {
 
 const settings = {
   rotationSensitivity: 0.002,
-  mouseControl: false,
-  orbitControl: true,
+  orbitControl: false,
   wrapSpeed: 1,
 };
 
@@ -157,7 +156,6 @@ const Game = {
     }
 
     const nav = gui.addFolder("Navigation");
-    nav.add(settings, "mouseControl").listen();
     nav.add(settings, "rotationSensitivity", 0.01, 0.05).listen();
     nav
       .add(settings, "wrapSpeed", 1, 20)

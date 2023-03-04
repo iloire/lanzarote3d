@@ -160,8 +160,6 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         return;
       }
       const rect = e.target.getBoundingClientRect();
-      console.log(rect);
-      console.log(e.target);
       const x = e.clientX - rect.left; //x position within the element.
       const percentage = x / rect.width;
       const direction = (percentage - 0.5) * 100;
