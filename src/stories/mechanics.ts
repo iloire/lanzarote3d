@@ -70,6 +70,9 @@ const Mechanics = {
     console.log("Number of Triangles :", renderer.info.render.triangles);
     camera.position.set(4200, 2500, -3200);
 
+    const fogColor = 0x000000;
+    scene.fog = new THREE.FogExp2(fogColor, 0.00001);
+
     const animate = () => {
       requestAnimationFrame(animate);
       renderer.render(scene, camera);
