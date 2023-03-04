@@ -167,6 +167,8 @@ const Game = {
 
     let isLeftViewing = false;
     let isRightViewing = false;
+    let isZoomInViewing = false;
+    let isZoomOutViewing = false;
 
     const rootElement = document.getElementById("ui-controls");
     const root = createRoot(rootElement);
@@ -228,6 +230,14 @@ const Game = {
             isRightViewing = true;
           } else if (view === View.RightRelease) {
             isRightViewing = false;
+          } else if (view === View.ZoomIn) {
+            isZoomInViewing = true;
+          } else if (view === View.ZoomInRelease) {
+            isZoomInViewing = false;
+          } else if (view === View.ZoomOut) {
+            isZoomOutViewing = true;
+          } else if (view === View.ZoomOutRelease) {
+            isZoomOutViewing = false;
           }
         }}
         onWrapSpeedChange={(value) => {
@@ -266,6 +276,12 @@ const Game = {
       }
       if (isRightViewing) {
         camera.turnRight();
+      }
+      if (isZoomInViewing) {
+        camera.zoomIn();
+      }
+      if (isZoomOutViewing) {
+        camera.zoomOut();
       }
       camera.update();
       renderer.render(scene, camera);

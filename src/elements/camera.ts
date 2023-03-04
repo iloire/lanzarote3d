@@ -24,6 +24,7 @@ class Camera extends THREE.PerspectiveCamera {
   angle: number = 0;
   angleIncrement: number = 0.015;
   distance: number = 20;
+  distanceIncrement: number = 2;
   topViewOffset: THREE.Vector3 = new THREE.Vector3(10, 300, -10);
   airplaneViewOffset: THREE.Vector3 = new THREE.Vector3(-6030, 2000, -11330);
   directionToLook: THREE.Vector3;
@@ -84,6 +85,14 @@ class Camera extends THREE.PerspectiveCamera {
 
   turnRight() {
     this.angle += this.angleIncrement;
+  }
+
+  zoomIn() {
+    this.distance -= this.distanceIncrement;
+  }
+
+  zoomOut() {
+    this.distance += this.distanceIncrement;
   }
 
   followTarget() {

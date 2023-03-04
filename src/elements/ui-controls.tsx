@@ -64,6 +64,10 @@ type UIControlsState = {
 };
 
 export enum View {
+  ZoomIn = "zoomIn",
+  ZoomInRelease = "zoomInRelease",
+  ZoomOut = "zoomOut",
+  ZoomOutRelease = "zoomOutRelease",
   Left = "left",
   LeftRelease = "leftRelease",
   Right = "right",
@@ -365,6 +369,18 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     const viewControl =
       isGameStarted && this.state.viewControlsVisible ? (
         <div id="view-controls">
+          <button
+            onMouseDown={() => this.handleView(View.ZoomIn)}
+            onMouseUp={() => this.handleView(View.ZoomInRelease)}
+          >
+            in
+          </button>
+          <button
+            onMouseDown={() => this.handleView(View.ZoomOut)}
+            onMouseUp={() => this.handleView(View.ZoomOutRelease)}
+          >
+            out
+          </button>
           <button
             onMouseDown={() => this.handleView(View.Left)}
             onMouseUp={() => this.handleView(View.LeftRelease)}
