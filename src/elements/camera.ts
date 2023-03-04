@@ -10,7 +10,6 @@ const getObjectPosition = (obj: THREE.Object3D) => {
 
 export enum CameraMode {
   FollowTarget = "FOLLOW",
-  FollowTarget2 = "FOLLOW2",
   FirstPersonView = "FPV",
   FarAway = "FAR",
   TopView = "TOP",
@@ -22,8 +21,9 @@ class Camera extends THREE.PerspectiveCamera {
   mode: CameraMode;
   target: Paraglider;
   controls: OrbitControls;
-  follow1Offset: THREE.Vector3 = new THREE.Vector3(-31.2, 10, 21.2);
-  follow2Offset: THREE.Vector3 = new THREE.Vector3(31.2, 10, -21.2);
+  angle: number = 0;
+  angleIncrement: number = 0.015;
+  distance: number = 20;
   topViewOffset: THREE.Vector3 = new THREE.Vector3(10, 300, -10);
   airplaneViewOffset: THREE.Vector3 = new THREE.Vector3(-6030, 2000, -11330);
   directionToLook: THREE.Vector3;
@@ -54,8 +54,6 @@ class Camera extends THREE.PerspectiveCamera {
     }
     if (this.mode === CameraMode.FollowTarget) {
       this.followTarget();
-    } else if (this.mode === CameraMode.FollowTarget2) {
-      this.followTarget2();
     } else if (this.mode === CameraMode.FirstPersonView) {
       this.firstPersonView();
     } else if (this.mode === CameraMode.FarAway) {
@@ -77,39 +75,21 @@ class Camera extends THREE.PerspectiveCamera {
     this.controls = controls;
     this.directionToLook = target.direction().multiplyScalar(10);
     this.update();
+    this.position.copy(getObjectPosition(this.target.getMesh()));
   }
 
   turnLeft() {
-    const left = new THREE.Vector3(0, 0, 1);
-    this.rotateY((Math.PI / 180) * 5);
-    this.follow1Offset.add(left);
-    this.follow2Offset.add(left);
-    this.topViewOffset.add(left);
-    this.directionToLook.add(left.multiplyScalar(10));
+    this.angle -= this.angleIncrement;
   }
 
   turnRight() {
-    const right = new THREE.Vector3(0, 0, -1);
-    this.rotateY((-Math.PI / 180) * 5);
-    this.follow1Offset.add(right);
-    this.follow2Offset.add(right);
-    this.topViewOffset.add(right);
-    this.directionToLook.add(right.multiplyScalar(10));
+    this.angle += this.angleIncrement;
   }
 
   followTarget() {
-    const cameraoffset = this.follow1Offset;
-    this.position
-      .copy(getObjectPosition(this.target.getMesh()))
-      .add(cameraoffset);
-    this.lookAt(this.target.position());
-  }
-
-  followTarget2() {
-    const cameraoffset = this.follow2Offset;
-    this.position
-      .copy(getObjectPosition(this.target.getMesh()))
-      .add(cameraoffset);
+    const x = this.target.position().x + Math.sin(this.angle) * this.distance;
+    const z = this.target.position().z + Math.cos(this.angle) * this.distance;
+    this.position.set(x, this.target.position().y, z);
     this.lookAt(this.target.position());
   }
 

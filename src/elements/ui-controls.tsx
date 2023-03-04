@@ -339,9 +339,6 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         <button onClick={() => this.handleCamMode(CameraMode.FollowTarget)}>
           <img src={viewLeftImg} />
         </button>
-        <button onClick={() => this.handleCamMode(CameraMode.FollowTarget2)}>
-          <img src={viewRightImg} />
-        </button>
         <button onClick={() => this.handleCamMode(CameraMode.FirstPersonView)}>
           <img src={glidingImg} />
         </button>
