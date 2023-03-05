@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import Paraglider from "./pg";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import Animations from "../utils/animations";
 
 const getObjectPosition = (obj: THREE.Object3D) => {
   const pos = new THREE.Vector3();
@@ -22,9 +23,10 @@ class Camera extends THREE.PerspectiveCamera {
   target: Paraglider;
   controls: OrbitControls;
   angle: number = 0;
-  angleIncrement: number = 0.015;
+  angleIncrement: number = 0.05;
   distance: number = 20;
   distanceIncrement: number = 2;
+  farAwayOffset: THREE.Vector3 = new THREE.Vector3(-1302, 700, 1301.2);
   topViewOffset: THREE.Vector3 = new THREE.Vector3(10, 300, -10);
   airplaneViewOffset: THREE.Vector3 = new THREE.Vector3(-6030, 2000, -11330);
   directionToLook: THREE.Vector3;
@@ -74,9 +76,6 @@ class Camera extends THREE.PerspectiveCamera {
     this.target = target;
     this.mode = mode;
     this.controls = controls;
-    this.directionToLook = target.direction().multiplyScalar(10);
-    this.update();
-    this.position.copy(getObjectPosition(this.target.getMesh()));
   }
 
   turnLeft() {
@@ -95,6 +94,22 @@ class Camera extends THREE.PerspectiveCamera {
     this.distance += this.distanceIncrement;
   }
 
+  animateTo(
+    newPosition: THREE.Vector3,
+    newTarget: THREE.Vector3,
+    duration: number = 2000,
+    cb: any = () => {}
+  ) {
+    Animations.animateCamera(
+      this,
+      this.controls,
+      newPosition,
+      newTarget,
+      duration,
+      cb
+    );
+  }
+
   followTarget() {
     const x = this.target.position().x + Math.sin(this.angle) * this.distance;
     const z = this.target.position().z + Math.cos(this.angle) * this.distance;
@@ -103,41 +118,37 @@ class Camera extends THREE.PerspectiveCamera {
   }
 
   firstPersonView() {
-    const posPg = getObjectPosition(this.target.getMesh()).clone();
     const cameraoffset = new THREE.Vector3(0, -1.1, 0);
     this.position.copy(
-      posPg.add(this.target.direction().add(cameraoffset).multiplyScalar(-0.8))
+      this.target
+        .position()
+        .add(this.target.direction().add(cameraoffset).multiplyScalar(-0.8))
     );
-    this.lookAt(posPg.add(this.target.direction().multiplyScalar(20)));
+    this.lookAt(
+      this.target.position().add(this.target.direction().multiplyScalar(20))
+    );
   }
 
   farAwayView() {
-    const cameraoffset = new THREE.Vector3(-1302, 700, 1301.2);
-    this.position
-      .copy(getObjectPosition(this.target.getMesh()))
-      .add(cameraoffset);
-    this.lookAt(this.target.position());
+    this.viewWithOffset(this.farAwayOffset);
   }
 
   topView() {
-    const cameraoffset = this.topViewOffset;
-    this.position
-      .copy(getObjectPosition(this.target.getMesh()))
-      .add(cameraoffset);
-    this.lookAt(this.target.position());
+    this.viewWithOffset(this.topViewOffset);
   }
 
   airplaneView() {
-    const cameraoffset = this.airplaneViewOffset;
-    this.position
-      .copy(getObjectPosition(this.target.getMesh()))
-      .add(cameraoffset);
-    this.lookAt(this.target.position());
+    this.viewWithOffset(this.airplaneViewOffset);
   }
 
   orbitView() {
     this.controls.target = this.target.position();
     this.controls.update();
+  }
+
+  private viewWithOffset(offset: THREE.Vector3) {
+    this.position.copy(this.target.position()).add(offset);
+    this.lookAt(this.target.position());
   }
 }
 

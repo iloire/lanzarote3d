@@ -150,7 +150,6 @@ const Game = {
         }}
         onBreakUIChange={(direction: number) => {
           pg.directionInput(direction);
-          console.log("berak change", direction);
         }}
         onGameStart={(options: GameStartOptions, fnHideStartButton) => {
           analytics.trackEvent("game-start");
@@ -160,6 +159,11 @@ const Game = {
           vario.start();
           pg.setPosition(options.startingPosition);
           pg.init();
+          camera.setCameraMode(CameraMode.FirstPersonView, pg, controls);
+          const fogColor = 0x000000;
+          // const fog = new THREE.FogExp2(fogColor, 0.0002);
+          const fog = new THREE.Fog(fogColor, 1, 15000);
+          scene.fog = fog;
         }}
         onPause={(paused) => {
           analytics.trackEvent("game-pause");
@@ -206,32 +210,26 @@ const Game = {
     );
     root.render(uiControls);
 
-    const fogColor = 0x000000;
-    scene.fog = new THREE.FogExp2(fogColor, 0.0002);
-    // const fog = new THREE.Fog(fogColor, 1, 15000);
-    // scene.fog = fog;
-
     // Game start
-    camera.setCameraMode(CameraMode.FollowTarget, pg, controls);
+    camera.setCameraMode(CameraMode.AirplaneView, pg, controls);
 
-    pg.addEventListener("touchedGround", () => {
-      console.log("game over");
+    function touchedGround() {
+      analytics.trackEvent("game-crash", pg.getTrajectory().length.toString());
       vario.stop();
       bgMusic.stop();
       pg.stop();
-      console.log(pg.getTrajectory());
       const trajectory = new Trajectory(pg.getTrajectory(), 5);
       scene.add(trajectory.getMesh());
       camera.setCameraMode(CameraMode.OrbitControl, pg, controls);
-      analytics.trackEvent("game-crash", pg.getTrajectory().length.toString());
-      Animations.animateCamera(
-        camera,
-        controls,
-        p.position,
-        pg.position(),
-        2000
+      camera.animateTo(
+        p.position.add(
+          new THREE.Vector3(0, 30, 0).add(weather.getWindVelocity(-250))
+        ),
+        pg.position()
       );
-    });
+    }
+
+    pg.addEventListener("touchedGround", touchedGround);
 
     const animate = () => {
       vario.updateReading(pg.altitude());
@@ -253,6 +251,7 @@ const Game = {
       requestAnimationFrame(animate);
       stats.update();
     };
+
     animate();
   },
 };
