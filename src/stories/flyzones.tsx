@@ -5,37 +5,10 @@ import { createRoot } from "react-dom/client";
 import Camera, { CameraMode } from "../elements/camera";
 import Animations from "../utils/animations";
 import Controls from "../utils/controls";
+import locations from "./locations/lanzarote";
 
 const initial = new THREE.Vector3(7, 880, 5);
 
-const pechos = new THREE.Vector3(-2207, 880, -2055);
-const pechosLookAt = new THREE.Vector3(6827, 880, -6555);
-
-const tenesar = new THREE.Vector3(-6527, 580, -4555);
-const tenesarLookAt = new THREE.Vector3(-5127, 580, -255);
-
-const locations = [
-  {
-    title: "Famara",
-    pos: new THREE.Vector3(-2207, 880, -2055),
-    lookAt: new THREE.Vector3(6827, 880, -6555),
-  },
-  {
-    title: "Tenesar",
-    pos: new THREE.Vector3(-6527, 580, -4555),
-    lookAt: new THREE.Vector3(-5127, 580, -255),
-  },
-  {
-    title: "Mirador",
-    pos: new THREE.Vector3(20527, 580, -14555),
-    lookAt: new THREE.Vector3(-5127, 580, -255),
-  },
-  {
-    title: "Playa Quemdada",
-    pos: new THREE.Vector3(-3527, 580, 17055),
-    lookAt: new THREE.Vector3(-7127, 580, 12055),
-  },
-];
 const FlyZones = {
   load: (camera: Camera, scene: THREE.Scene, renderer) => {
     const navigateTo = (point: THREE.Vector3, lookAt: THREE.Vector3) => {

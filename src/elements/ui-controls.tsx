@@ -13,11 +13,13 @@ import viewRightImg from "../img/eye-right.png";
 import arrowLeftImg from "../img/left-chevron.png";
 import arrowRightImg from "../img/right-chevron.png";
 import { GameStartOptions } from "../stories/game/types";
+import { Location } from "../stories/locations/index";
 
 const KMH_TO_MS = 3.6;
 
 type UIControlsProps = {
   pg: Paraglider;
+  locations: Location[];
   vario: Vario;
   weather: Weather;
   defaultGameSpeed: number;
@@ -264,10 +266,13 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     return false;
   };
 
-  handleStart = (windSpeedMetresPerSecond: number, startingPosition) => {
+  handleStart = (
+    windSpeedMetresPerSecond: number,
+    startingLocation: Location
+  ) => {
     const options: GameStartOptions = {
+      startingLocation,
       windSpeedMetresPerSecond,
-      startingPosition,
     };
     this.props.onGameStart(options, () => {
       this.setState({ showStartButton: false });
@@ -294,25 +299,13 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
 
   render() {
     const isGameStarted = !this.state.showStartButton;
+    const buttons = this.props.locations.map((location) => (
+      <button onClick={() => this.handleStart(6, location)}>
+        {location.title}
+      </button>
+    ));
     const startButton = !isGameStarted ? (
-      <div id="game-start">
-        <button
-          id="game-start-normal"
-          onClick={
-            () => this.handleStart(6, new THREE.Vector3(6827, 880, -555)) // pechos altos
-          }
-        >
-          Famara
-        </button>
-        <button
-          id="game-start-strong"
-          onClick={() =>
-            this.handleStart(6, new THREE.Vector3(-5427, 580, -355))
-          } // tenesar
-        >
-          Tenesar
-        </button>
-      </div>
+      <div id="game-start">{buttons}</div>
     ) : (
       false
     );

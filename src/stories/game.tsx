@@ -17,6 +17,7 @@ import Analytics from "../elements/analytics";
 import Stats from "three/examples/jsm/libs/stats.module";
 import { GameStartOptions } from "../stories/game/types";
 import Environment from "./game/env";
+import locations from "./locations/lanzarote";
 
 const KMH_TO_MS = 3.6;
 
@@ -127,6 +128,7 @@ const Game = {
     const uiControls = (
       <UIControls
         pg={pg}
+        locations={locations}
         vario={vario}
         weather={weather}
         showDebugInfo={true}
@@ -152,7 +154,7 @@ const Game = {
           bgMusic.start();
           fnHideStartButton();
           vario.start();
-          pg.setPosition(options.startingPosition);
+          pg.setPosition(options.startingLocation.pos);
           pg.init();
           camera.setCameraMode(CameraMode.FirstPersonView, pg);
           const fogColor = 0x000000;

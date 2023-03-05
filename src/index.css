@@ -117,8 +117,9 @@
 #game-start  {
   position: absolute;
   top: 65%;
-  left: 35%;
+  left: 30%;
   z-index: 100;
+  width: 60%;
 }
 
 #game-start button {
