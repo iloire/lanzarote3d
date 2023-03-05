@@ -45,6 +45,10 @@ class Thermal {
     this.mesh = thermal;
   }
 
+  getPosition(): THREE.Vector3 {
+    return this.mesh.position;
+  }
+
   getMesh(): THREE.Mesh {
     return this.mesh;
   }

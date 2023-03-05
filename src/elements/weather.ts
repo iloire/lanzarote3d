@@ -88,6 +88,10 @@ class Weather extends THREE.EventDispatcher {
       angleRadiansWind
     );
   }
+
+  getLclLevel(): number {
+    return this.lclLevel;
+  }
 }
 
 export default Weather;

@@ -17,6 +17,7 @@ import Trajectory from "../elements/trajectory";
 import Analytics from "../elements/analytics";
 import Stats from "three/examples/jsm/libs/stats.module";
 import { GameStartOptions } from "../stories/game/types";
+import Environment from "./game/env";
 
 const KMH_TO_MS = 3.6;
 
@@ -79,69 +80,16 @@ const Game = {
 
     const bgMusic = new BackgroundSound();
 
-    const thermalPos = new THREE.Vector3(5727, 0, -535);
-    const thermalPos2 = new THREE.Vector3(7127, 0, -1405);
-    const thermalPos3 = new THREE.Vector3(3027, 0, 1005);
-    const thermal = new Thermal(
-      thermalPos,
-      WEATHER_SETTINGS.lclLevel * 0.95,
-      weather,
-      1.5
-    );
-    const thermal2 = new Thermal(
-      thermalPos2,
-      WEATHER_SETTINGS.lclLevel * 1.1,
-      weather,
-      2
-    );
-    const thermal3 = new Thermal(
-      thermalPos3,
-      WEATHER_SETTINGS.lclLevel * 1.05,
-      weather,
-      2
-    );
-    scene.add(thermal.mesh);
-    scene.add(thermal2.mesh);
-    scene.add(thermal3.mesh);
+    const thermals = Environment.addThermals(scene, weather);
 
-    const pg = new Paraglider(pgOptions, weather, terrain, water, [
-      thermal,
-      thermal2,
-      thermal3,
-    ]);
+    const pg = new Paraglider(pgOptions, weather, terrain, water, thermals);
     const vario = new Vario(pg);
     const mesh = await pg.loadModel(p.scale);
     mesh.position.copy(p.position);
     pg.addGui(gui);
     scene.add(mesh);
 
-    const c = await Clouds.load(
-      1,
-      new THREE.Vector3(
-        thermalPos.x,
-        WEATHER_SETTINGS.lclLevel * 1.2,
-        thermalPos.z
-      )
-    );
-    scene.add(c);
-    const c2 = await Clouds.load(
-      1,
-      new THREE.Vector3(
-        thermalPos2.x,
-        WEATHER_SETTINGS.lclLevel * 1.1,
-        thermalPos2.z
-      )
-    );
-    scene.add(c2);
-    const c3 = await Clouds.load(
-      1,
-      new THREE.Vector3(
-        thermalPos3.x,
-        WEATHER_SETTINGS.lclLevel * 1.3,
-        thermalPos3.z
-      )
-    );
-    scene.add(c3);
+    Environment.addClouds(scene, weather, thermals);
 
     document.addEventListener("keydown", onDocumentKeyDown, false);
 
