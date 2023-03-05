@@ -4,14 +4,14 @@ import Controls from "../utils/controls";
 import Clouds from "../elements/clouds";
 import Trajectory from "../elements/trajectory";
 import Paraglider, { ParagliderConstructor } from "../elements/pg";
-import Weather from "../elements/weather";
+import Weather, { WeatherOptions } from "../elements/weather";
 import Birds from "../elements/birds";
 
 const KMH_TO_MS = 3.6;
 
-const WEATHER_SETTINGS = {
+const WEATHER_SETTINGS: WeatherOptions = {
   windDirectionDegreesFromNorth: 310,
-  windSpeed: 18 / KMH_TO_MS,
+  speedMetresPerSecond: 18 / KMH_TO_MS,
   lclLevel: 1800,
 };
 
@@ -39,11 +39,7 @@ const Mechanics = {
     const c2 = await Clouds.load(1, cloudPos2);
     scene.add(c2);
 
-    const weather = new Weather(
-      WEATHER_SETTINGS.windDirectionDegreesFromNorth,
-      WEATHER_SETTINGS.windSpeed,
-      WEATHER_SETTINGS.lclLevel
-    );
+    const weather = new Weather(WEATHER_SETTINGS);
     weather.addGui(gui);
 
     const pgOptions: ParagliderConstructor = {

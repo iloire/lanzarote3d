@@ -6,78 +6,88 @@ function getRandomArbitrary(min, max) {
 
 const WEATHER_UPDATE_FRECUENCY = 5000;
 
-class Weather extends THREE.EventDispatcher {
-  degreesFromNorth: number;
+export type WeatherOptions = {
+  windDirectionDegreesFromNorth: number;
   speedMetresPerSecond: number;
   lclLevel: number;
+};
 
-  constructor(
-    degreesFromNorth: number,
-    speedMetresPerSecond: number,
-    lclLevel: number
-  ) {
+class Weather extends THREE.EventDispatcher {
+  options: WeatherOptions;
+
+  constructor(options: WeatherOptions) {
     super();
-    this.degreesFromNorth = degreesFromNorth;
-    this.speedMetresPerSecond = speedMetresPerSecond;
-    this.lclLevel = lclLevel;
+    this.options = options;
 
     setInterval(() => {
       const newWindValue = getRandomArbitrary(
-        this.speedMetresPerSecond * 0.95,
-        this.speedMetresPerSecond * 1.05
+        this.options.speedMetresPerSecond * 0.95,
+        this.options.speedMetresPerSecond * 1.05
       );
       const newDirectionValue = THREE.MathUtils.clamp(
         getRandomArbitrary(
-          this.degreesFromNorth * 0.95,
-          this.degreesFromNorth * 1.05
+          this.options.windDirectionDegreesFromNorth * 0.95,
+          this.options.windDirectionDegreesFromNorth * 1.05
         ),
         0,
         360
       );
-      this.speedMetresPerSecond = Math.round(newWindValue * 100) / 100;
-      this.degreesFromNorth = Math.round(newDirectionValue * 100) / 100;
+      this.options.speedMetresPerSecond = Math.round(newWindValue * 100) / 100;
+      this.options.windDirectionDegreesFromNorth =
+        Math.round(newDirectionValue * 100) / 100;
 
-      const newLclValue = getRandomArbitrary(lclLevel * 0.95, lclLevel * 1.05);
-      this.lclLevel = Math.round(newLclValue);
+      const newLclValue = getRandomArbitrary(
+        this.options.lclLevel * 0.95,
+        this.options.lclLevel * 1.05
+      );
+      this.options.lclLevel = Math.round(newLclValue);
 
       this.dispatchEvent({
         type: "wind-speedChange",
-        value: this.speedMetresPerSecond,
+        value: this.options.speedMetresPerSecond,
       });
       this.dispatchEvent({
         type: "wind-directionChange",
-        value: this.degreesFromNorth,
+        value: this.options.windDirectionDegreesFromNorth,
       });
       this.dispatchEvent({
         type: "lclChange",
-        value: this.lclLevel,
+        value: this.options.lclLevel,
       });
     }, WEATHER_UPDATE_FRECUENCY);
   }
 
   changeWindSpeed(windSpeedMetresPerSecond: number) {
-    this.speedMetresPerSecond = windSpeedMetresPerSecond;
-    console.log(this.speedMetresPerSecond);
+    this.options.speedMetresPerSecond = windSpeedMetresPerSecond;
+    console.log(this.options.speedMetresPerSecond);
+  }
+
+  changeWindDirection(degreesFromNorth: number) {
+    this.options.windDirectionDegreesFromNorth = degreesFromNorth;
   }
 
   getWindVelocity(multiplier: number = 1): THREE.Vector3 {
-    return this.getWindDirectionFromNorth(this.degreesFromNorth).multiplyScalar(
-      multiplier * this.speedMetresPerSecond
-    );
+    return this.getWindDirectionFromNorth(
+      this.options.windDirectionDegreesFromNorth
+    ).multiplyScalar(multiplier * this.options.speedMetresPerSecond);
   }
 
   addGui(gui) {
     const weatherGui = gui.addFolder("Weather");
-    weatherGui.add(this, "degreesFromNorth", 0, 360).listen();
-    weatherGui.add(this, "speedMetresPerSecond", 0, 60).listen();
+    weatherGui
+      .add(this.options, "windDirectionDegreesFromNorth", 0, 360)
+      .listen();
+    weatherGui.add(this.options, "speedMetresPerSecond", 0, 60).listen();
   }
 
   getSpeedMetresPerSecond(): number {
-    return this.speedMetresPerSecond;
+    return this.options.speedMetresPerSecond;
   }
 
   getWindDirection(): THREE.Vector3 {
-    return this.getWindDirectionFromNorth(this.degreesFromNorth);
+    return this.getWindDirectionFromNorth(
+      this.options.windDirectionDegreesFromNorth
+    );
   }
 
   getWindDirectionFromNorth(degreesFromNorth: number): THREE.Vector3 {
@@ -90,7 +100,7 @@ class Weather extends THREE.EventDispatcher {
   }
 
   getLclLevel(): number {
-    return this.lclLevel;
+    return this.options.lclLevel;
   }
 }
 

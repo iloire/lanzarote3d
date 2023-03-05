@@ -7,7 +7,7 @@ import Paraglider, { ParagliderConstructor } from "../elements/pg";
 import Animations from "../utils/animations";
 import Helpers from "../utils/helpers";
 import Vario from "../audio/vario";
-import Weather from "../elements/weather";
+import Weather, { WeatherOptions } from "../elements/weather";
 import Camera, { CameraMode } from "../elements/camera";
 import UIControls, { View } from "../elements/ui-controls";
 import Thermal from "../elements/thermal";
@@ -31,9 +31,9 @@ const settings = {
   wrapSpeed: 1,
 };
 
-const WEATHER_SETTINGS = {
+const WEATHER_SETTINGS: WeatherOptions = {
   windDirectionDegreesFromNorth: 310,
-  windSpeed: 18 / KMH_TO_MS,
+  speedMetresPerSecond: 18 / KMH_TO_MS,
   lclLevel: 1800,
 };
 
@@ -67,11 +67,7 @@ const Game = {
   ) => {
     gui.hide();
 
-    const weather = new Weather(
-      WEATHER_SETTINGS.windDirectionDegreesFromNorth,
-      WEATHER_SETTINGS.windSpeed,
-      WEATHER_SETTINGS.lclLevel
-    );
+    const weather = new Weather(WEATHER_SETTINGS);
     weather.addGui(gui);
 
     const bgMusic = new BackgroundSound();
@@ -151,6 +147,7 @@ const Game = {
         onGameStart={(options: GameStartOptions, fnHideStartButton) => {
           analytics.trackEvent("game-start");
           weather.changeWindSpeed(options.windSpeedMetresPerSecond);
+          weather.changeWindDirection(options.windDirectionDegreesFromNorth);
           bgMusic.start();
           fnHideStartButton();
           vario.start();

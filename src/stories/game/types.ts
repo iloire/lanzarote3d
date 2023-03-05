@@ -4,4 +4,5 @@ import { Location } from "../locations/index";
 export type GameStartOptions = {
   startingLocation: Location;
   windSpeedMetresPerSecond: number;
+  windDirectionDegreesFromNorth: number;
 };

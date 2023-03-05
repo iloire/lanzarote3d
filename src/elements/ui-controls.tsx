@@ -268,11 +268,13 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
 
   handleStart = (
     windSpeedMetresPerSecond: number,
+    windDirectionDegreesFromNorth: number,
     startingLocation: Location
   ) => {
     const options: GameStartOptions = {
       startingLocation,
       windSpeedMetresPerSecond,
+      windDirectionDegreesFromNorth,
     };
     this.props.onGameStart(options, () => {
       this.setState({ showStartButton: false });
@@ -300,7 +302,15 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
   render() {
     const isGameStarted = !this.state.showStartButton;
     const buttons = this.props.locations.map((location) => (
-      <button onClick={() => this.handleStart(6, location)}>
+      <button
+        onClick={() =>
+          this.handleStart(
+            6,
+            location.idealWindDirectionDegreesFromNorth,
+            location
+          )
+        }
+      >
         {location.title}
       </button>
     ));
