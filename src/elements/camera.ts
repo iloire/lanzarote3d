@@ -2,6 +2,7 @@ import * as THREE from "three";
 import Paraglider from "./pg";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import Animations from "../utils/animations";
+import Controls from "../utils/controls";
 
 const getObjectPosition = (obj: THREE.Object3D) => {
   const pos = new THREE.Vector3();
@@ -31,11 +32,22 @@ class Camera extends THREE.PerspectiveCamera {
   airplaneViewOffset: THREE.Vector3 = new THREE.Vector3(-6030, 2000, -11330);
   directionToLook: THREE.Vector3;
 
+  constructor(
+    fov: number,
+    aspect: number,
+    near: number,
+    far: number,
+    renderer: any
+  ) {
+    super(fov, aspect, near, far);
+    this.controls = Controls.createControls(this, renderer);
+  }
+
   addGui(gui) {
     const cameraGui = gui.addFolder("Camera");
-    cameraGui.add(this.position, "x", -1000, 1000).name("x").listen();
+    cameraGui.add(this.position, "x", -10000, 10000).name("x").listen();
     cameraGui.add(this.position, "y", 200, 2000).name("y").listen();
-    cameraGui.add(this.position, "z", -1000, 1000).name("z").listen();
+    cameraGui.add(this.position, "z", -10000, 10000).name("z").listen();
 
     cameraGui
       .add(this.rotation, "x", -Math.PI, Math.PI)
@@ -72,10 +84,9 @@ class Camera extends THREE.PerspectiveCamera {
     }
   }
 
-  setCameraMode(mode: CameraMode, target: Paraglider, controls: OrbitControls) {
+  setCameraMode(mode: CameraMode, target: Paraglider) {
     this.target = target;
     this.mode = mode;
-    this.controls = controls;
   }
 
   turnLeft() {

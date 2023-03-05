@@ -77,7 +77,13 @@ class App extends React.Component<AppProps, AppState> {
 
     const scene = new THREE.Scene();
 
-    const camera = new Camera(45, sizes.width / sizes.height, 1, 200000);
+    const camera = new Camera(
+      45,
+      sizes.width / sizes.height,
+      1,
+      200000,
+      renderer
+    );
     camera.addGui(gui);
     scene.add(camera);
 

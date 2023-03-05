@@ -4,7 +4,6 @@ import * as THREE from "three";
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 import BackgroundSound from "../audio/background";
 import Paraglider, { ParagliderConstructor } from "../elements/pg";
-import Controls from "../utils/controls";
 import Animations from "../utils/animations";
 import Helpers from "../utils/helpers";
 import Vario from "../audio/vario";
@@ -66,10 +65,6 @@ const Game = {
     gui
   ) => {
     gui.hide();
-
-    const controls = Controls.createControls(camera, renderer);
-    controls.enabled = settings.orbitControl;
-    gui.add(controls, "enabled").name("orbit controls");
 
     const weather = new Weather(
       WEATHER_SETTINGS.windDirectionDegreesFromNorth,
@@ -159,7 +154,7 @@ const Game = {
           vario.start();
           pg.setPosition(options.startingPosition);
           pg.init();
-          camera.setCameraMode(CameraMode.FirstPersonView, pg, controls);
+          camera.setCameraMode(CameraMode.FirstPersonView, pg);
           const fogColor = 0x000000;
           // const fog = new THREE.FogExp2(fogColor, 0.0002);
           const fog = new THREE.Fog(fogColor, 1, 15000);
@@ -179,7 +174,7 @@ const Game = {
         }}
         onSelectCamera={(mode: CameraMode) => {
           analytics.trackEvent("game-camera-change", mode);
-          camera.setCameraMode(mode, pg, controls);
+          camera.setCameraMode(mode, pg);
         }}
         onViewChange={(view: View) => {
           analytics.trackEvent("game-view-change", view);
@@ -211,7 +206,7 @@ const Game = {
     root.render(uiControls);
 
     // Game start
-    camera.setCameraMode(CameraMode.AirplaneView, pg, controls);
+    camera.setCameraMode(CameraMode.AirplaneView, pg);
 
     function touchedGround() {
       analytics.trackEvent("game-crash", pg.getTrajectory().length.toString());
@@ -220,7 +215,7 @@ const Game = {
       pg.stop();
       const trajectory = new Trajectory(pg.getTrajectory(), 5);
       scene.add(trajectory.getMesh());
-      camera.setCameraMode(CameraMode.OrbitControl, pg, controls);
+      camera.setCameraMode(CameraMode.OrbitControl, pg);
       camera.animateTo(
         p.position.add(
           new THREE.Vector3(0, 30, 0).add(weather.getWindVelocity(-250))
