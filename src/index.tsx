@@ -16,6 +16,7 @@ import Island from "./elements/island";
 import Stories from "./stories/index";
 import Camera from "./elements/camera";
 
+import WebGL from "./WebGL";
 import "./index.css";
 
 const SHOW_HELPERS = true;
@@ -159,6 +160,10 @@ class App extends React.Component<AppProps, AppState> {
 }
 
 const rootElement = document.getElementById("root");
-const root = createRoot(rootElement);
-
-root.render(<App />);
+if (WebGL.isWebGLAvailable()) {
+  const root = createRoot(rootElement);
+  root.render(<App />);
+} else {
+  const warning = WebGL.getWebGLErrorMessage();
+  rootElement.appendChild(warning);
+}
