@@ -12,7 +12,6 @@ const initial = new THREE.Vector3(7, 880, 5);
 const FlyZones = {
   load: (camera: Camera, scene: THREE.Scene, renderer) => {
     const navigateTo = (point: THREE.Vector3, lookAt: THREE.Vector3) => {
-      console.log("navigate to:", point);
       camera.animateTo(point, lookAt, 1000, () => {
         console.log("doe");
       });
@@ -27,7 +26,8 @@ const FlyZones = {
     ));
     root.render(<div className="points">{buttons}</div>);
 
-    camera.position.copy(initial);
+    const initial = locations[0];
+    navigateTo(initial.lookFrom, initial.lookAt);
 
     const animate = () => {
       TWEEN.update();
