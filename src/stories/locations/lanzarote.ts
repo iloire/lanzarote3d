@@ -11,10 +11,10 @@ const locations: Location[] = [
   },
   {
     title: "Tenesar",
-    position: new THREE.Vector3(-6527, 580, -4555),
+    position: new THREE.Vector3(-4827, 380, -855),
     lookFrom: new THREE.Vector3(-6527, 580, -4555),
     lookAt: new THREE.Vector3(-5127, 580, -255),
-    idealWindDirectionDegreesFromNorth: 300,
+    idealWindDirectionDegreesFromNorth: 350,
   },
   {
     title: "Mirador",
