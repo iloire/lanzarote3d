@@ -19,14 +19,14 @@ const locations: Location[] = [
   {
     title: "Mirador",
     position: new THREE.Vector3(15027, 580, -12555),
-    lookFrom: new THREE.Vector3(20527, 580, -14555),
+    lookFrom: new THREE.Vector3(18527, 580, -13555),
     lookAt: new THREE.Vector3(-5127, 580, -255),
     idealWindDirectionDegreesFromNorth: 30,
   },
   {
     title: "Playa Quemada",
     position: new THREE.Vector3(-6227, 580, 14055),
-    lookFrom: new THREE.Vector3(-6227, 580, 14055),
+    lookFrom: new THREE.Vector3(-4727, 580, 17055),
     lookAt: new THREE.Vector3(-7127, 580, 12055),
     idealWindDirectionDegreesFromNorth: 130,
   },
