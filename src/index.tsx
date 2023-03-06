@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import GUI from "lil-gui";
 
 import * as THREE from "three";
-import { Sky } from "three/examples/jsm/objects/Sky";
+import Sky from "./components/sky";
 
 import Animations from "./utils/animations";
 import Lights from "./utils/lights";
@@ -107,17 +107,9 @@ class App extends React.Component<AppProps, AppState> {
     scene.add(water);
     // Helpers.drawSphericalPosition(30, 90, 100, scene);
 
-    const sky: any = new Sky();
-    sky.scale.setScalar(1000000);
-    scene.add(sky);
-
-    const sun = new THREE.Vector3();
-    const pmremGenerator = new THREE.PMREMGenerator(renderer);
-    const phi = THREE.MathUtils.degToRad(88);
-    const theta = THREE.MathUtils.degToRad(280);
-    sun.setFromSphericalCoords(1, phi, theta);
-    sky.material.uniforms["sunPosition"].value.copy(sun);
-    scene.environment = pmremGenerator.fromScene(sky).texture;
+    const sky: Sky = new Sky();
+    const skyMesh = sky.load(90.2);
+    scene.add(skyMesh);
 
     const loadingManager = new THREE.LoadingManager();
     const island = await Island.load(loadingManager);
