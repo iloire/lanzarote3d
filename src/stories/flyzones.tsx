@@ -21,7 +21,7 @@ const FlyZones = {
     const rootElement = document.getElementById("legend-points");
     const root = createRoot(rootElement);
     const buttons = locations.map((location) => (
-      <button onClick={() => navigateTo(location.pos, location.lookAt)}>
+      <button onClick={() => navigateTo(location.lookFrom, location.lookAt)}>
         {location.title}
       </button>
     ));

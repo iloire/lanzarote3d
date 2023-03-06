@@ -13,6 +13,7 @@ const Default = {
     const navigator = Navigation(camera, controls);
 
     camera.position.set(0, 600, 1200);
+
     navigator.famara(2000, () => {
       navigator.orzola();
     });

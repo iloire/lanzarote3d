@@ -25,6 +25,10 @@ class Trajectory {
     this.mesh = group;
   }
 
+  getPoints(): THREE.Vector3[] {
+    return this.points;
+  }
+
   getMesh(): THREE.Object3D {
     return this.mesh;
   }

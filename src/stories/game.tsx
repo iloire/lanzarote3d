@@ -48,10 +48,6 @@ const pgOptions: ParagliderConstructor = {
 
 const p = {
   scale: 0.004,
-  position: new THREE.Vector3(6827, 880, -555), // pechos altos
-  // position: new THREE.Vector3(-5427, 580, -355), // tenesar
-  // position: new THREE.Vector3(8727, 1280, -4355),
-  // position: new THREE.Vector3(7500, 1280, -3700),
 };
 
 const analytics = new Analytics();
@@ -77,7 +73,6 @@ const Game = {
     const pg = new Paraglider(pgOptions, weather, terrain, water, thermals);
     const vario = new Vario(pg);
     const mesh = await pg.loadModel(p.scale);
-    mesh.position.copy(p.position);
     pg.addGui(gui);
     scene.add(mesh);
 
@@ -151,7 +146,7 @@ const Game = {
           bgMusic.start();
           fnHideStartButton();
           vario.start();
-          pg.setPosition(options.startingLocation.pos);
+          pg.setPosition(options.startingLocation.position);
           pg.init();
           camera.setCameraMode(CameraMode.FirstPersonView, pg);
           const fogColor = 0x000000;
@@ -215,8 +210,9 @@ const Game = {
       const trajectory = new Trajectory(pg.getTrajectory(), 5);
       scene.add(trajectory.getMesh());
       camera.setCameraMode(CameraMode.OrbitControl, pg);
+      const initialPosition = trajectory.getPoints()[0];
       camera.animateTo(
-        p.position.add(
+        initialPosition.add(
           new THREE.Vector3(0, 30, 0).add(weather.getWindVelocity(-250))
         ),
         pg.position()
