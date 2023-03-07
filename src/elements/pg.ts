@@ -216,9 +216,8 @@ class Paraglider extends THREE.EventDispatcher {
   }
 
   setRoll(angle: number) {
-    const validAngle = THREE.MathUtils.clamp(angle, 0, 90);
+    const validAngle = THREE.MathUtils.clamp(angle, -90, 90);
     const angleRadians = THREE.MathUtils.degToRad(validAngle);
-    console.log("roll: ", angle);
     this.__rollAngle = angleRadians;
     this.model.rotation.z = -1 * angleRadians;
   }
