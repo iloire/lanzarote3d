@@ -59,6 +59,7 @@ type UIControlsState = {
   thermalLift: number;
   dynamicLift: number;
   drop: number;
+  rollDrop: number;
   gradient: number;
   pausedGame: boolean;
   wrapSpeed: number;
@@ -99,6 +100,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       thermalLift: 0,
       dynamicLift: 0,
       drop: 0,
+      rollDrop: 0,
       gradient: 0,
       pausedGame: false,
       wrapSpeed: props.defaultGameSpeed,
@@ -137,6 +139,9 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     });
     pg.addEventListener("drop", (event) => {
       this.setState({ drop: Math.round(event.drop * 100) / 100 });
+    });
+    pg.addEventListener("rollDrop", (event) => {
+      this.setState({ rollDrop: Math.round(event.drop * 100) / 100 });
     });
     pg.addEventListener("delta", (event) => {
       this.setState({ delta: Math.round(event.delta * 100) / 100 });
@@ -443,6 +448,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       thermalLift,
       dynamicLift,
       drop,
+      rollDrop,
       gradient,
       wrapSpeed,
       pausedGame,
@@ -476,6 +482,9 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
           <div id="pg-dynamic-lift">Soaring lift : {dynamicLift} m/s</div>
         )}
         {showDebugInfo && <div id="pg-drop">PG sink rate : {drop} m/s</div>}
+        {showDebugInfo && (
+          <div id="pg-drop">Roll sink rate : {rollDrop} m/s</div>
+        )}
         {showDebugInfo && (
           <div id="pg-gradient">Terrain gradient : {gradient}</div>
         )}

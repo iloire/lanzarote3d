@@ -194,8 +194,9 @@ class Paraglider extends THREE.EventDispatcher {
       } else if (this.isRightBreaking) {
         this.rotationInertia += keyBreakMultiplier * smoother;
       } else if (Math.abs(this.rotationInertia) > 0) {
+        // passive recovery of momentum
         this.rotationInertia =
-          this.rotationInertia - this.rotationInertia * smoother;
+          this.rotationInertia - (this.rotationInertia * smoother) / 3;
       }
     } else {
       this.rotationInertia += this.__directionInput * smoother;
@@ -255,6 +256,21 @@ class Paraglider extends THREE.EventDispatcher {
       lift,
     });
     this.move(liftVector);
+    console.log("lift:", lift);
+
+    // roll sink
+    if (this.__rollAngle !== 0) {
+      const rollDrop = this.__rollAngle * 10;
+      const sinkDirection = new THREE.Vector3(0, -1, 0);
+      const sinkVector = sinkDirection.multiplyScalar(
+        multiplier * Math.abs(rollDrop)
+      );
+      this.dispatchEvent({
+        type: "rollDrop",
+        drop: rollDrop,
+      });
+      this.move(sinkVector);
+    }
 
     const liftThermal = this.isInsideAnyThermal() ? 2 : 0;
     const liftThermalDirection = new THREE.Vector3(0, 1, 0);
