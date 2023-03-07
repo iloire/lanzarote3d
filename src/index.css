@@ -59,7 +59,6 @@
 }
 
 #view-controls button{
-  font-size: 300%;
   padding: 5px 10px;
 }
 
@@ -93,12 +92,12 @@
 
 /* Analog control */
 #break-ui {
-  width: 100%;
-  height: 250px;
-  background-color: gray;
   position: absolute;
-  bottom: 0;
-  left: 0;
+  width: 40%;
+  height: 80px;
+  background-color: gray;
+  top: 200px;
+  left: 30%;
   opacity: 0.3;
   z-index:10;
 }
@@ -108,7 +107,7 @@
   z-index: 0;
   right: 50%;
   width: 5px;
-  height: 250px;
+  height: 80px;
   background-color: white;
 }
 
