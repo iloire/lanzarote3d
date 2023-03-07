@@ -238,6 +238,7 @@ const Game = {
       TWEEN.update();
       camera.update();
       renderer.render(scene, camera);
+      // setTimeout(animate, 1000);
       requestAnimationFrame(animate);
       stats.update();
     };

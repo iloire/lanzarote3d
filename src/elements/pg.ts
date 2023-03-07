@@ -96,6 +96,7 @@ class Paraglider extends THREE.EventDispatcher {
   __lift: number = 0;
   __gradient: number = 0;
   __directionInput: number = 0;
+  rotationInertia = 0;
 
   constructor(
     options: ParagliderConstructor,
@@ -184,19 +185,22 @@ class Paraglider extends THREE.EventDispatcher {
     this.flyingTime += multiplier;
     this.metersFlown += multiplier * this.getGroundSpeed();
 
-    if (this.isRightBreaking) {
-      this.rotateRight();
-    }
-    if (this.isLeftBreaking) {
-      this.rotateLeft();
-    }
-    const smoother = 0.02;
-    if (this.__directionInput !== 0) {
-      if (this.__directionInput > 0) {
-        this.rotateRight(this.__directionInput * smoother);
-      } else {
-        this.rotateLeft(-1 * this.__directionInput * smoother);
+    const smoother = 0.08;
+    if (this.__directionInput === 0) {
+      if (this.isLeftBreaking) {
+        this.rotationInertia -= 3 * smoother;
+      } else if (this.isRightBreaking) {
+        this.rotationInertia += 3 * smoother;
+      } else if (Math.abs(this.rotationInertia) > 0) {
+        this.rotationInertia =
+          this.rotationInertia - this.rotationInertia * smoother;
       }
+    } else {
+      this.rotationInertia += this.__directionInput * smoother;
+    }
+
+    if (Math.abs(this.rotationInertia) > 0) {
+      this.rotate(this.rotationInertia * smoother);
     }
 
     if (this.tickCounter % 10 === 0) {
@@ -303,7 +307,6 @@ class Paraglider extends THREE.EventDispatcher {
 
   directionInput(direction: number) {
     this.__directionInput = direction;
-    console.log("pg: ", direction);
   }
 
   leftBreakInput() {
@@ -314,9 +317,13 @@ class Paraglider extends THREE.EventDispatcher {
     this.isLeftBreaking = false;
   }
 
-  rotateLeft(strength: number = 1) {
-    this.model.rotation.y += strength * getRotationValue(this.wrapSpeed);
+  rotate(value: number = 0) {
+    this.model.rotation.y += -1 * value * getRotationValue(this.wrapSpeed);
   }
+
+  // rotateLeft(strength: number = 1) {
+  //   this.model.rotation.y += strength * getRotationValue(this.wrapSpeed);
+  // }
 
   rightBreakInput() {
     this.isRightBreaking = true;
@@ -326,9 +333,9 @@ class Paraglider extends THREE.EventDispatcher {
     this.isRightBreaking = false;
   }
 
-  rotateRight(strength: number = 1) {
-    this.model.rotation.y -= strength * getRotationValue(this.wrapSpeed);
-  }
+  // rotateRight(strength: number = 1) {
+  //   this.model.rotation.y -= strength * getRotationValue(this.wrapSpeed);
+  // }
 
   hasTouchedGround(terrain: THREE.Mesh, water: THREE.Mesh): boolean {
     const pos = this.model.position;

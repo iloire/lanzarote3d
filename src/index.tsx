@@ -26,6 +26,7 @@ const gui = new GUI();
 
 const createRenderer = (sizes) => {
   const renderer = new THREE.WebGLRenderer({
+    powerPreference: "low-power" /* This can also be 'high-performance' */,
     canvas: document.querySelector("canvas.webgl"),
     antialias: true,
   });
