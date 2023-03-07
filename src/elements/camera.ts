@@ -70,21 +70,21 @@ class Camera extends THREE.PerspectiveCamera {
     if (!this.mode) {
       return;
     }
-    const raycaster = new THREE.Raycaster(
-      this.position,
-      this.target.position().clone().sub(this.position).normalize()
-    );
-    const intersects = raycaster.intersectObject(this.terrain);
-    if (intersects.length > 0) {
-      // console.log("camera intersects", intersects);
-      const distance = intersects[0].distance;
-      // console.log(distance);
-      const newPosition = new THREE.Vector3().addVectors(
-        this.position,
-        raycaster.ray.direction.multiplyScalar(distance)
-      );
-      this.position.copy(newPosition);
-    }
+    // const raycaster = new THREE.Raycaster(
+    //   this.position,
+    //   this.target.position().clone().sub(this.position).normalize()
+    // );
+    // const intersects = raycaster.intersectObject(this.terrain);
+    // if (intersects.length > 0) {
+    //   // console.log("camera intersects", intersects);
+    //   const distance = intersects[0].distance;
+    //   // console.log(distance);
+    //   const newPosition = new THREE.Vector3().addVectors(
+    //     this.position,
+    //     raycaster.ray.direction.multiplyScalar(distance)
+    //   );
+    //   this.position.copy(newPosition);
+    // }
     if (this.mode === CameraMode.FollowTarget) {
       this.followTarget();
     } else if (this.mode === CameraMode.FirstPersonView) {
