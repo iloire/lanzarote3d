@@ -23,6 +23,7 @@ type UIControlsProps = {
   vario: Vario;
   weather: Weather;
   defaultGameSpeed: number;
+  defaultCameraMode: CameraMode;
   showDebugInfo: boolean;
   onBreakUIChange: (direction: number) => void;
   onLeftBreak: () => void;
@@ -292,6 +293,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     windDirectionDegreesFromNorth: number,
     startingLocation: Location
   ) => {
+    this.handleCamMode(this.props.defaultCameraMode);
     const options: GameStartOptions = {
       startingLocation,
       windSpeedMetresPerSecond,

@@ -124,6 +124,7 @@ const Game = {
         weather={weather}
         showDebugInfo={true}
         defaultGameSpeed={3}
+        defaultCameraMode={CameraMode.FirstPersonView}
         onLeftBreak={() => {
           pg.leftBreakInput();
         }}
