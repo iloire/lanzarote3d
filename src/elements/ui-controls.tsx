@@ -375,24 +375,28 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
           <button
             onMouseDown={() => this.handleView(View.ZoomIn)}
             onMouseUp={() => this.handleView(View.ZoomInRelease)}
+            onMouseLeave={() => this.handleView(View.ZoomInRelease)}
           >
             in
           </button>
           <button
             onMouseDown={() => this.handleView(View.ZoomOut)}
             onMouseUp={() => this.handleView(View.ZoomOutRelease)}
+            onMouseLeave={() => this.handleView(View.ZoomOutRelease)}
           >
             out
           </button>
           <button
             onMouseDown={() => this.handleView(View.Left)}
             onMouseUp={() => this.handleView(View.LeftRelease)}
+            onMouseLeave={() => this.handleView(View.LeftRelease)}
           >
             &lt;
           </button>
           <button
             onMouseDown={() => this.handleView(View.Right)}
             onMouseUp={() => this.handleView(View.RightRelease)}
+            onMouseLeave={() => this.handleView(View.RightRelease)}
           >
             &gt;
           </button>
