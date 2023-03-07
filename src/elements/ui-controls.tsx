@@ -171,13 +171,11 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       if (e.target !== breakUIelement) {
         return;
       }
-      if (isClicked) {
-        const rect = e.target.getBoundingClientRect();
-        const x = e.clientX - rect.left; //x position within the element.
-        const percentage = x / rect.width;
-        const direction = (percentage - 0.5) * 100;
-        this.handleBreakUIChange(direction);
-      }
+      const rect = e.target.getBoundingClientRect();
+      const x = e.clientX - rect.left; //x position within the element.
+      const percentage = x / rect.width;
+      const direction = (percentage - 0.5) * 100;
+      this.handleBreakUIChange(direction);
     };
     const releaseBreak = (e: any) => {
       if (e.target !== breakUIelement) {
@@ -185,16 +183,8 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       }
       const rect = e.target.getBoundingClientRect();
       this.handleBreakUIChange(0);
-      isClicked = false;
     };
     let isClicked = false;
-    breakUIelement.onmousedown = (e: any) => {
-      isClicked = true;
-      applyBreak(e);
-    };
-    breakUIelement.onmouseup = (e: any) => {
-      releaseBreak(e);
-    };
     breakUIelement.onmousemove = (e: any) => {
       applyBreak(e);
     };
