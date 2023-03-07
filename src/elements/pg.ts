@@ -93,6 +93,7 @@ class Paraglider extends THREE.EventDispatcher {
   isRightBreaking: boolean;
   trajectory: THREE.Vector3[] = [];
   tickCounter: number = 0;
+  __rollAngle: number = 0;
   __lift: number = 0;
   __gradient: number = 0;
   __directionInput: number = 0;
@@ -186,11 +187,12 @@ class Paraglider extends THREE.EventDispatcher {
     this.metersFlown += multiplier * this.getGroundSpeed();
 
     const smoother = 0.08;
+    const keyBreakMultiplier = 5;
     if (this.__directionInput === 0) {
       if (this.isLeftBreaking) {
-        this.rotationInertia -= 3 * smoother;
+        this.rotationInertia -= keyBreakMultiplier * smoother;
       } else if (this.isRightBreaking) {
-        this.rotationInertia += 3 * smoother;
+        this.rotationInertia += keyBreakMultiplier * smoother;
       } else if (Math.abs(this.rotationInertia) > 0) {
         this.rotationInertia =
           this.rotationInertia - this.rotationInertia * smoother;
@@ -200,13 +202,25 @@ class Paraglider extends THREE.EventDispatcher {
     }
 
     if (Math.abs(this.rotationInertia) > 0) {
+      this.setRoll(this.rotationInertia * 1.3);
       this.rotate(this.rotationInertia * smoother);
+    } else {
+      this.setRoll(0);
     }
+    console.log("inertia:", this.rotationInertia);
 
     if (this.tickCounter % 10 === 0) {
       //save point
       this.trajectory.push(this.position());
     }
+  }
+
+  setRoll(angle: number) {
+    const validAngle = THREE.MathUtils.clamp(angle, 0, 90);
+    const angleRadians = THREE.MathUtils.degToRad(validAngle);
+    console.log("roll: ", angle);
+    this.__rollAngle = angleRadians;
+    this.model.rotation.z = -1 * angleRadians;
   }
 
   getMetersFlown(): number {
