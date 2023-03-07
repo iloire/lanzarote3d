@@ -78,16 +78,6 @@ class App extends React.Component<AppProps, AppState> {
 
     const scene = new THREE.Scene();
 
-    const camera = new Camera(
-      45,
-      sizes.width / sizes.height,
-      1,
-      200000,
-      renderer
-    );
-    camera.addGui(gui);
-    scene.add(camera);
-
     Lights.addLightsToScene(scene, false);
 
     window.addEventListener(
@@ -118,6 +108,17 @@ class App extends React.Component<AppProps, AppState> {
     island.scale.set(scale, scale, scale);
     island.position.copy(new THREE.Vector3(0, 0, 0));
     scene.add(island);
+
+    const camera = new Camera(
+      45,
+      sizes.width / sizes.height,
+      1,
+      200000,
+      renderer,
+      island
+    );
+    camera.addGui(gui);
+    scene.add(camera);
 
     loadingManager.onLoad = async () => {
       const queryString = window.location.search;

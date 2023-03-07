@@ -161,23 +161,39 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
   componentDidMount() {
     this.props.onWrapSpeedChange(this.props.defaultGameSpeed);
     const breakUIelement = document.getElementById("break-ui");
-    breakUIelement.onmousemove = (e: any) => {
+    const applyBreak = (e: any) => {
       if (e.target !== breakUIelement) {
         return;
       }
-      const rect = e.target.getBoundingClientRect();
-      const x = e.clientX - rect.left; //x position within the element.
-      const percentage = x / rect.width;
-      const direction = (percentage - 0.5) * 100;
-
-      this.handleBreakUIChange(direction);
+      if (isClicked) {
+        const rect = e.target.getBoundingClientRect();
+        const x = e.clientX - rect.left; //x position within the element.
+        const percentage = x / rect.width;
+        const direction = (percentage - 0.5) * 100;
+        this.handleBreakUIChange(direction);
+      }
     };
-    breakUIelement.onmouseleave = (e: any) => {
+    const releaseBreak = (e: any) => {
       if (e.target !== breakUIelement) {
         return;
       }
       const rect = e.target.getBoundingClientRect();
       this.handleBreakUIChange(0);
+      isClicked = false;
+    };
+    let isClicked = false;
+    breakUIelement.onmousedown = (e: any) => {
+      isClicked = true;
+      applyBreak(e);
+    };
+    breakUIelement.onmouseup = (e: any) => {
+      releaseBreak(e);
+    };
+    breakUIelement.onmousemove = (e: any) => {
+      applyBreak(e);
+    };
+    breakUIelement.onmouseleave = (e: any) => {
+      releaseBreak(e);
     };
   }
 

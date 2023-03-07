@@ -22,6 +22,7 @@ export enum CameraMode {
 class Camera extends THREE.PerspectiveCamera {
   mode: CameraMode;
   target: Paraglider;
+  terrain: THREE.Mesh;
   controls: OrbitControls;
   angle: number = 0;
   angleIncrement: number = 0.05;
@@ -37,9 +38,11 @@ class Camera extends THREE.PerspectiveCamera {
     aspect: number,
     near: number,
     far: number,
-    renderer: any
+    renderer: THREE.WebGLRenderer,
+    terrain: THREE.Mesh
   ) {
     super(fov, aspect, near, far);
+    this.terrain = terrain;
     this.controls = Controls.createControls(this, renderer);
   }
 
@@ -66,6 +69,21 @@ class Camera extends THREE.PerspectiveCamera {
   update() {
     if (!this.mode) {
       return;
+    }
+    const raycaster = new THREE.Raycaster(
+      this.position,
+      this.target.position().clone().sub(this.position).normalize()
+    );
+    const intersects = raycaster.intersectObject(this.terrain);
+    if (intersects.length > 0) {
+      console.log("camera intersects", intersects);
+      const distance = intersects[0].distance;
+      console.log(distance);
+      const newPosition = new THREE.Vector3().addVectors(
+        this.position,
+        raycaster.ray.direction.multiplyScalar(distance)
+      );
+      this.position.copy(newPosition);
     }
     if (this.mode === CameraMode.FollowTarget) {
       this.followTarget();
