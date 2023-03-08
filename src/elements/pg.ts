@@ -278,7 +278,7 @@ class Paraglider extends THREE.EventDispatcher {
 
     // roll sink
     if (this.__rollAngle !== 0) {
-      const rollDrop = this.__rollAngle * 10;
+      const rollDrop = this.__rollAngle * 7;
       const sinkDirection = new THREE.Vector3(0, -1, 0);
       const sinkVector = sinkDirection.multiplyScalar(
         multiplier * Math.abs(rollDrop)
