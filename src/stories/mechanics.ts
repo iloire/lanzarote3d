@@ -69,7 +69,26 @@ const Mechanics = {
     const fogColor = 0x000000;
     scene.fog = new THREE.FogExp2(fogColor, 0.00001);
 
+    const findCameraIntercept = () => {
+      const raycaster = new THREE.Raycaster(
+        pg.position(),
+        camera.position.clone().sub(pg.position()).normalize()
+      );
+      const intersects = raycaster.intersectObject(terrain);
+      if (intersects.length > 0) {
+        console.log("camera intersects", intersects);
+        const distance = intersects[0].distance;
+        console.log(distance);
+        const newPosition = new THREE.Vector3().addVectors(
+          camera.position,
+          raycaster.ray.direction.multiplyScalar(-1 * distance)
+        );
+        camera.position.copy(newPosition);
+      }
+    };
+
     const animate = () => {
+      findCameraIntercept();
       requestAnimationFrame(animate);
       renderer.render(scene, camera);
       camera.lookAt(pg.position());
