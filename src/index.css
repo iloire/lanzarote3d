@@ -106,10 +106,11 @@
   position: absolute;
   z-index: 0;
   right: 50%;
-  width: 5px;
+  width: 2px;
   height: 80px;
   background-color: white;
 }
+
 
 #view-ui {
   position: absolute;
@@ -126,9 +127,18 @@
   position: absolute;
   z-index: 0;
   right: 50%;
-  width: 5px;
+  width: 2px;
   height: 80px;
   background-color: white;
+}
+
+.ui-help {
+  position: absolute;
+  font-size: 200%;
+  text-align: center;
+  color: white;
+  left: 20%;
+  top: 20px;
 }
 
 /* START GAME buttons */
