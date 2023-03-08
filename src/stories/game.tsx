@@ -82,7 +82,7 @@ const Game = {
 
     function onDocumentKeyDown(event) {
       const keyCode = event.which;
-      if (keyCode == 67) {
+      if (keyCode == 90) {
         //c
         if (gui._hidden) {
           gui.show();
@@ -141,6 +141,7 @@ const Game = {
           pg.directionInput(direction);
         }}
         onViewUIChange={(direction: number) => {
+          camera.lookDirection(-1 * direction);
           camera.lookDirection(-1 * direction);
         }}
         onGameStart={(options: GameStartOptions, fnHideStartButton) => {

@@ -252,18 +252,20 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     } else if (keyCode === 56) {
       //8
       this.handleWrapChange(20);
-    } else if (keyCode == 65) {
+    } else if (keyCode === 65) {
       //a
       return this.handleLeft();
-    } else if (keyCode == 68) {
+    } else if (keyCode === 68) {
       //d
       return this.handleRight();
-    } else if (keyCode == 80) {
+    } else if (keyCode === 80) {
       //p
       return this.handlePause();
-    } else if (keyCode == 72) {
+    } else if (keyCode === 72) {
       //h
       return this.toggleHelp();
+    } else if (keyCode === 67) {
+      this.toggleCamMode();
     }
   };
 
@@ -277,6 +279,20 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       this.handleRightRelease();
     }
   };
+
+  toggleCamMode() {
+    const isGameStarted = !this.state.showStartButton;
+    const { viewControlsVisible } = this.state;
+    if (!isGameStarted) {
+      return;
+    }
+
+    if (viewControlsVisible) {
+      this.handleCamMode(CameraMode.FirstPersonView);
+    } else {
+      this.handleCamMode(CameraMode.FollowTarget);
+    }
+  }
 
   handleCamMode = (mode: CameraMode) => {
     if (mode === CameraMode.FirstPersonView) {
@@ -569,6 +585,9 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
           </div>
           <div>
             <span>h</span>: toggle Help menu
+          </div>
+          <div>
+            <span>c</span>: toggle camera view
           </div>
           <div>
             <span>1-8</span>: game wrap speed
