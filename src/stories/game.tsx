@@ -140,12 +140,15 @@ const Game = {
         onBreakUIChange={(direction: number) => {
           pg.directionInput(direction);
         }}
+        onViewUIChange={(direction: number) => {
+          camera.lookDirection(-1 * direction);
+        }}
         onGameStart={(options: GameStartOptions, fnHideStartButton) => {
           analytics.trackEvent("game-start");
           weather.changeWindSpeed(options.windSpeedMetresPerSecond);
           weather.changeWindDirection(options.windDirectionDegreesFromNorth);
-          bgMusic.start();
           fnHideStartButton();
+          bgMusic.start();
           vario.start();
           pg.setPosition(options.startingLocation.position);
           pg.init();

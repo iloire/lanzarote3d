@@ -26,6 +26,7 @@ type UIControlsProps = {
   defaultCameraMode: CameraMode;
   showDebugInfo: boolean;
   onBreakUIChange: (direction: number) => void;
+  onViewUIChange: (direction: number) => void;
   onLeftBreak: () => void;
   onLeftBreakRelease: () => void;
   onRightBreak: () => void;
@@ -166,6 +167,38 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
 
   componentDidMount() {
     this.props.onWrapSpeedChange(this.props.defaultGameSpeed);
+    this.setUpBreakUI();
+    this.setUpViewUI();
+  }
+
+  setUpViewUI() {
+    const viewUIelement = document.getElementById("view-ui");
+    const applyView = (e: any) => {
+      if (e.target !== viewUIelement) {
+        return;
+      }
+      const rect = e.target.getBoundingClientRect();
+      const x = e.clientX - rect.left; //x position within the element.
+      const percentage = x / rect.width;
+      const direction = (percentage - 0.5) * 100;
+      this.handleViewUIChange(direction);
+    };
+    const releaseView = (e: any) => {
+      if (e.target !== viewUIelement) {
+        return;
+      }
+      const rect = e.target.getBoundingClientRect();
+      this.handleViewUIChange(0);
+    };
+    viewUIelement.onmousemove = (e: any) => {
+      applyView(e);
+    };
+    viewUIelement.onmouseleave = (e: any) => {
+      releaseView(e);
+    };
+  }
+
+  setUpBreakUI() {
     const breakUIelement = document.getElementById("break-ui");
     const applyBreak = (e: any) => {
       if (e.target !== breakUIelement) {
@@ -184,7 +217,6 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       const rect = e.target.getBoundingClientRect();
       this.handleBreakUIChange(0);
     };
-    let isClicked = false;
     breakUIelement.onmousemove = (e: any) => {
       applyBreak(e);
     };
@@ -310,6 +342,10 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
 
   handleBreakUIChange = (direction: number) => {
     this.props.onBreakUIChange(direction);
+  };
+
+  handleViewUIChange = (direction: number) => {
+    this.props.onViewUIChange(direction);
   };
 
   render() {
@@ -564,6 +600,11 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       </div>
     );
 
+    const viewControlUI = (
+      <div id="view-ui">
+        <div>&nbsp;</div>
+      </div>
+    );
     const wrapSpeedValueUI = <div id="wrapSpeed-ui">x{wrapSpeed}</div>;
 
     return (
@@ -581,6 +622,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         {wrapSpeedValueUI}
         {pauseControls}
         {breakControlUI}
+        {viewControlUI}
       </div>
     );
   }

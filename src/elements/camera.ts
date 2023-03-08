@@ -32,6 +32,7 @@ class Camera extends THREE.PerspectiveCamera {
   topViewOffset: THREE.Vector3 = new THREE.Vector3(10, 300, -10);
   airplaneViewOffset: THREE.Vector3 = new THREE.Vector3(-6030, 2000, -11330);
   directionToLook: THREE.Vector3;
+  viewRotation: number = 0;
 
   constructor(
     fov: number,
@@ -70,21 +71,21 @@ class Camera extends THREE.PerspectiveCamera {
     if (!this.mode) {
       return;
     }
-    // const raycaster = new THREE.Raycaster(
-    //   this.position,
-    //   this.target.position().clone().sub(this.position).normalize()
-    // );
-    // const intersects = raycaster.intersectObject(this.terrain);
-    // if (intersects.length > 0) {
-    //   // console.log("camera intersects", intersects);
-    //   const distance = intersects[0].distance;
-    //   // console.log(distance);
-    //   const newPosition = new THREE.Vector3().addVectors(
-    //     this.position,
-    //     raycaster.ray.direction.multiplyScalar(distance)
-    //   );
-    //   this.position.copy(newPosition);
-    // }
+    const raycaster = new THREE.Raycaster(
+      this.target.position(),
+      this.position.clone().sub(this.target.position()).normalize()
+    );
+    const intersects = raycaster.intersectObject(this.terrain);
+    if (intersects.length > 0) {
+      console.log("camera intersects", intersects);
+      const distance = intersects[0].distance;
+      console.log(distance);
+      const newPosition = new THREE.Vector3().addVectors(
+        this.position,
+        raycaster.ray.direction.multiplyScalar(distance)
+      );
+      // this.position.copy(newPosition);
+    }
     if (this.mode === CameraMode.FollowTarget) {
       this.followTarget();
     } else if (this.mode === CameraMode.FirstPersonView) {
@@ -123,6 +124,11 @@ class Camera extends THREE.PerspectiveCamera {
     this.distance += this.distanceIncrement;
   }
 
+  lookDirection(degrees: number) {
+    const angleRadians = THREE.MathUtils.degToRad(degrees);
+    this.viewRotation = angleRadians;
+  }
+
   animateTo(
     newPosition: THREE.Vector3,
     newTarget: THREE.Vector3,
@@ -157,7 +163,10 @@ class Camera extends THREE.PerspectiveCamera {
       this.target.position().add(this.target.direction().multiplyScalar(20))
     );
     // adjust for roll
-    this.rotateZ(this.target.model.rotation.z);
+    this.rotateZ(this.viewRotation / 4 + this.target.model.rotation.z);
+
+    // view rotation
+    this.rotateY(this.viewRotation * 1.5);
   }
 
   farAwayView() {
