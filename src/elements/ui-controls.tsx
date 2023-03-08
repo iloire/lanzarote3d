@@ -595,13 +595,13 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     );
 
     const breakControlUI = (
-      <div id="break-ui">
+      <div id="break-ui" style={{ display: isGameStarted ? "" : "none" }}>
         <div>&nbsp;</div>
       </div>
     );
 
     const viewControlUI = (
-      <div id="view-ui">
+      <div id="view-ui" style={{ display: isGameStarted ? "" : "none" }}>
         <div>&nbsp;</div>
       </div>
     );
