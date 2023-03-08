@@ -220,9 +220,11 @@
 
 #paraglider-info {
   position: absolute;
-  top: 20px;
-  left: 460px;
+  top: 290px;
+  left: 20px;
   padding: 0px 10px;
+  color: red;
+  background-color: white;
 }
 
 #paraglider-speedBar {
