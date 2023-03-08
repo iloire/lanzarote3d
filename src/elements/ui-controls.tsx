@@ -601,7 +601,13 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     );
 
     const viewControlUI = (
-      <div id="view-ui" style={{ display: isGameStarted ? "" : "none" }}>
+      <div
+        id="view-ui"
+        style={{
+          display:
+            isGameStarted && !this.state.viewControlsVisible ? "" : "none",
+        }}
+      >
         <div>&nbsp;</div>
       </div>
     );
