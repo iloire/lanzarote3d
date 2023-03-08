@@ -188,6 +188,7 @@ class Paraglider extends THREE.EventDispatcher {
 
     const smoother = 0.1;
     const keyBreakMultiplier = 10;
+    const passiveRecoveryMultiplier = 4;
     if (this.__directionInput === 0) {
       if (this.isLeftBreaking) {
         this.rotationInertia -= multiplier * keyBreakMultiplier * smoother;
@@ -195,11 +196,22 @@ class Paraglider extends THREE.EventDispatcher {
         this.rotationInertia += multiplier * keyBreakMultiplier * smoother;
       } else if (Math.abs(this.rotationInertia) > 0) {
         // passive recovery of momentum
-        this.rotationInertia -= multiplier * (this.rotationInertia * smoother);
+        this.rotationInertia -=
+          passiveRecoveryMultiplier *
+          multiplier *
+          (this.rotationInertia * smoother);
       }
     } else {
       // apply analogic input
-      this.rotationInertia += multiplier * this.__directionInput * smoother;
+      if (
+        Math.sign(this.__directionInput) !== Math.sign(this.rotationInertia)
+      ) {
+        // break input against inertia. We may it a bit stronger input
+        this.rotationInertia +=
+          2 * multiplier * this.__directionInput * smoother;
+      } else {
+        this.rotationInertia += multiplier * this.__directionInput * smoother;
+      }
     }
 
     if (Math.abs(this.rotationInertia) > 0) {
