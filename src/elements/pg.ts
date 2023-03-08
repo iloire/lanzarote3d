@@ -126,6 +126,7 @@ class Paraglider extends THREE.EventDispatcher {
   countInsideHowManyThermals(): number {
     return this.thermals.filter(this.isInsideThermal).length;
   }
+
   isInsideAnyThermal(): boolean {
     return this.thermals.some(this.isInsideThermal);
   }
@@ -192,7 +193,8 @@ class Paraglider extends THREE.EventDispatcher {
     const smoother = 0.1;
     const keyBreakMultiplier = 10;
     const passiveRecoveryMultiplier = 4;
-    const turnMultiplier = THREE.MathUtils.clamp(multiplier, 0, 0.15);
+
+    const turnMultiplier = THREE.MathUtils.clamp(multiplier, 0, 0.07);
     if (this.__directionInput === 0) {
       if (this.isLeftBreaking) {
         this.rotationInertia -= turnMultiplier * keyBreakMultiplier * smoother;
@@ -290,6 +292,7 @@ class Paraglider extends THREE.EventDispatcher {
 
     const inHowManyThermals = this.countInsideHowManyThermals();
     const liftThermal = 2 * inHowManyThermals; // this.isInsideAnyThermal() ? 2 : 0;
+
     const liftThermalDirection = new THREE.Vector3(0, 1, 0);
     const liftThermalVector = liftThermalDirection.multiplyScalar(
       multiplier * liftThermal
