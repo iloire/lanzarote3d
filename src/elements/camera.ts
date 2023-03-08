@@ -77,9 +77,9 @@ class Camera extends THREE.PerspectiveCamera {
     );
     const intersects = raycaster.intersectObject(this.terrain);
     if (intersects.length > 0) {
-      console.log("camera intersects", intersects);
+      // console.log("camera intersects", intersects);
       const distance = intersects[0].distance;
-      console.log(distance);
+      // console.log(distance);
       const newPosition = new THREE.Vector3().addVectors(
         this.position,
         raycaster.ray.direction.multiplyScalar(distance)
