@@ -254,4 +254,4 @@ const Game = {
 export default Game;
 
 const stats = Stats();
-document.body.appendChild(stats.dom);
+document.getElementById("stats").appendChild(stats.dom);

@@ -132,15 +132,6 @@
   background-color: white;
 }
 
-.ui-help {
-  position: absolute;
-  font-size: 200%;
-  text-align: center;
-  color: white;
-  left: 20%;
-  top: 20px;
-}
-
 /* START GAME buttons */
 #game-start  {
   position: absolute;
@@ -238,3 +229,13 @@
   font-size: 200%;
 }
 
+#stats  {
+  position: absolute !important;
+}
+
+#stats div {
+  position: absolute !important;
+  bottom: 10px !important;
+  top: inherit !important;
+  left: 10px !important;
+}
