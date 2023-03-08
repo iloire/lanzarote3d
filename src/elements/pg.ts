@@ -186,20 +186,20 @@ class Paraglider extends THREE.EventDispatcher {
     this.flyingTime += multiplier;
     this.metersFlown += multiplier * this.getGroundSpeed();
 
-    const smoother = 0.03;
-    const keyBreakMultiplier = 5;
+    const smoother = 0.1;
+    const keyBreakMultiplier = 10;
     if (this.__directionInput === 0) {
       if (this.isLeftBreaking) {
-        this.rotationInertia -= keyBreakMultiplier * smoother;
+        this.rotationInertia -= multiplier * keyBreakMultiplier * smoother;
       } else if (this.isRightBreaking) {
-        this.rotationInertia += keyBreakMultiplier * smoother;
+        this.rotationInertia += multiplier * keyBreakMultiplier * smoother;
       } else if (Math.abs(this.rotationInertia) > 0) {
         // passive recovery of momentum
-        this.rotationInertia -= (this.rotationInertia * smoother) / 3;
+        this.rotationInertia -= multiplier * (this.rotationInertia * smoother);
       }
     } else {
       // apply analogic input
-      this.rotationInertia += this.__directionInput * smoother;
+      this.rotationInertia += multiplier * this.__directionInput * smoother;
     }
 
     if (Math.abs(this.rotationInertia) > 0) {
@@ -208,7 +208,6 @@ class Paraglider extends THREE.EventDispatcher {
     } else {
       this.setRoll(0);
     }
-    console.log("inertia:", this.rotationInertia);
 
     if (this.tickCounter % 10 === 0) {
       //save point
@@ -257,7 +256,6 @@ class Paraglider extends THREE.EventDispatcher {
       lift,
     });
     this.move(liftVector);
-    console.log("lift:", lift);
 
     // roll sink
     if (this.__rollAngle !== 0) {
