@@ -5,18 +5,19 @@ const createThermalMesh = (
   bottomRadius: number,
   topRadius: number,
   height: number,
+  opacity: number,
   initialPosition: THREE.Vector3
 ) => {
   const geometry = new THREE.CylinderGeometry(
-    bottomRadius,
     topRadius,
+    bottomRadius,
     height,
     32
   );
 
   const material = new THREE.MeshBasicMaterial({
     color: 0xff0000,
-    opacity: 0.05, // set the opacity level (0-1)
+    opacity, // set the opacity level (0-1)
     transparent: true, // enable transparencyopacity: 0.5, // set the opacity level (0-1)
   });
 
@@ -27,20 +28,30 @@ const createThermalMesh = (
   return cylinder;
 };
 
+export type ThermalDimensions = {
+  bottomRadius: number;
+  topRadius: number;
+  height: number;
+};
+
 class Thermal {
   mesh: THREE.Mesh;
+  __isMainThermal: boolean;
 
   constructor(
+    dimensions: ThermalDimensions,
     initialPosition: THREE.Vector3,
-    height: number,
+    opacity,
     weather: Weather,
-    relativeScale: number = 1
+    isMainThermal: boolean
   ) {
+    this.__isMainThermal = isMainThermal;
     const thermal = createThermalMesh(
-      250 * relativeScale,
-      150 * relativeScale,
-      height,
-      initialPosition
+      dimensions.topRadius,
+      dimensions.bottomRadius,
+      dimensions.height,
+      opacity,
+      initialPosition.clone()
     );
     this.mesh = thermal;
   }
@@ -51,6 +62,10 @@ class Thermal {
 
   getMesh(): THREE.Mesh {
     return this.mesh;
+  }
+
+  isMainThermal(): boolean {
+    return this.__isMainThermal;
   }
 }
 

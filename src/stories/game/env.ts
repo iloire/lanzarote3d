@@ -1,21 +1,51 @@
 import * as THREE from "three";
 import Clouds from "../../elements/clouds";
 import Weather from "../../elements/weather";
-import Thermal from "../../elements/thermal";
+import Thermal, { ThermalDimensions } from "../../elements/thermal";
+
+const generateThermalPair = (
+  dimensions: ThermalDimensions,
+  position: THREE.Vector3,
+  weather: Weather
+): Thermal[] => {
+  const thermal = new Thermal(dimensions, position, 0.05, weather, true);
+  const thermalInside = new Thermal(
+    {
+      bottomRadius: dimensions.bottomRadius / 2,
+      topRadius: dimensions.topRadius / 2,
+      height: dimensions.height,
+    },
+    position,
+    0.09,
+    weather,
+    false
+  );
+  return [thermal, thermalInside];
+};
 
 const Environment = {
   addThermals: (scene: THREE.Scene, weather: Weather): Thermal[] => {
     const lclLevel = weather.getLclLevel();
-    const thermalPos = new THREE.Vector3(5727, 0, -535);
-    const thermalPos2 = new THREE.Vector3(7127, 0, -1405);
-    const thermalPos3 = new THREE.Vector3(3027, 0, 1005);
-    const thermal = new Thermal(thermalPos, lclLevel * 0.95, weather, 1.5);
-    const thermal2 = new Thermal(thermalPos2, lclLevel * 1.1, weather, 2);
-    const thermal3 = new Thermal(thermalPos3, lclLevel * 1.05, weather, 2);
-    scene.add(thermal.mesh);
-    scene.add(thermal2.mesh);
-    scene.add(thermal3.mesh);
-    return [thermal, thermal2, thermal3];
+    const thermalPair1 = generateThermalPair(
+      { bottomRadius: 360, topRadius: 160, height: lclLevel },
+      new THREE.Vector3(5727, 0, -535),
+      weather
+    );
+    const thermalPair2 = generateThermalPair(
+      { bottomRadius: 360, topRadius: 160, height: lclLevel },
+      new THREE.Vector3(7127, 0, -1405),
+      weather
+    );
+    const thermalPair3 = generateThermalPair(
+      { bottomRadius: 360, topRadius: 160, height: lclLevel },
+      new THREE.Vector3(3027, 0, 1005),
+      weather
+    );
+    const allThermals = thermalPair1.concat(thermalPair2).concat(thermalPair3);
+    allThermals.forEach((t) => {
+      scene.add(t.getMesh());
+    });
+    return allThermals;
   },
 
   async addClouds(
@@ -24,34 +54,23 @@ const Environment = {
     thermals: Thermal[]
   ): Promise<THREE.Object3D[]> {
     const lclLevel = weather.getLclLevel();
-    const c = await Clouds.load(
-      1,
-      new THREE.Vector3(
-        thermals[0].getPosition().x,
-        lclLevel * 1.2,
-        thermals[0].getPosition().z
-      )
+    const mainThermals = thermals.filter((t) => t.isMainThermal());
+    const clouds = await Promise.all(
+      mainThermals.map((t) => {
+        return Clouds.load(
+          1,
+          new THREE.Vector3(
+            thermals[0].getPosition().x,
+            lclLevel * 1.2,
+            thermals[0].getPosition().z
+          )
+        );
+      })
     );
-    scene.add(c);
-    const c2 = await Clouds.load(
-      1,
-      new THREE.Vector3(
-        thermals[1].getPosition().x,
-        lclLevel * 1.1,
-        thermals[1].getPosition().z
-      )
-    );
-    scene.add(c2);
-    const c3 = await Clouds.load(
-      1,
-      new THREE.Vector3(
-        thermals[2].getPosition().x,
-        lclLevel * 1.3,
-        thermals[2].getPosition().z
-      )
-    );
-    scene.add(c3);
-    return [c, c2, c3];
+    clouds.forEach((c) => {
+      scene.add(c);
+    });
+    return clouds;
   },
 };
 
