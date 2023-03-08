@@ -144,7 +144,8 @@
 #game-start button {
   padding: 5px 10px;
   border-radius: 5px;
-  font-size: 200%;
+  margin:5px;
+  font-size: 100%;
 }
 
 #game-start-normal{
@@ -233,6 +234,7 @@
 
 #stats  {
   position: absolute !important;
+  bottom: 0px;
 }
 
 #stats div {
