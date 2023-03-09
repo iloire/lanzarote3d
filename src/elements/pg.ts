@@ -222,6 +222,8 @@ class Paraglider extends THREE.EventDispatcher {
       }
     }
 
+    this.rotationInertia = THREE.MathUtils.clamp(this.rotationInertia, -50, 50);
+
     if (Math.abs(this.rotationInertia) > 0) {
       this.setRoll(this.rotationInertia * 1.3);
       this.rotate(this.rotationInertia * smoother);
