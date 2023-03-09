@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import model from "../models/paraglider.glb";
+import model from "../models/paraglider2.glb";
 import Models from "../utils/models";
 import Weather from "../elements/weather";
 import Thermal from "../elements/thermal";
