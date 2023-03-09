@@ -51,10 +51,12 @@ class BackgroundSound {
   }
 
   stop() {
-    this.wind1.stop();
-    this.wind2.stop();
-    this.music.stop();
-    this.playing = false;
+    if (this.playing) {
+      this.wind1.stop();
+      this.wind2.stop();
+      this.music.stop();
+      this.playing = false;
+    }
   }
 }
 
