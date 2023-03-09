@@ -14,12 +14,14 @@ class Vario extends THREE.EventDispatcher {
   lastRecord: number;
   high: number;
   wrapSpeed: number = 1;
+  sound_enabled: boolean;
 
-  constructor(pg: Paraglider) {
+  constructor(pg: Paraglider, sound_enabled: boolean) {
     super();
     const listener = new THREE.AudioListener();
     this.sound = new THREE.Audio(listener);
     this.pg = pg;
+    this.sound_enabled = sound_enabled;
     this.tick();
   }
 
@@ -54,7 +56,9 @@ class Vario extends THREE.EventDispatcher {
     this.lastRecord = this.high;
     if (this.status === "on") {
       if (Math.abs(delta) > 0.5) {
-        this.play(delta);
+        if (this.sound_enabled) {
+          this.play(delta);
+        }
       }
     }
 

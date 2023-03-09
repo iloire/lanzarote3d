@@ -21,6 +21,8 @@ import locations from "./locations/lanzarote";
 
 const KMH_TO_MS = 3.6;
 
+const SOUND_ENABLED = false;
+
 function round(number: number): number {
   return Math.round(number * 100) / 100;
 }
@@ -66,12 +68,12 @@ const Game = {
     const weather = new Weather(WEATHER_SETTINGS);
     weather.addGui(gui);
 
-    const bgMusic = new BackgroundSound();
+    const bgMusic = new BackgroundSound(SOUND_ENABLED);
 
     const thermals = Environment.addThermals(scene, weather);
 
     const pg = new Paraglider(pgOptions, weather, terrain, water, thermals);
-    const vario = new Vario(pg);
+    const vario = new Vario(pg, SOUND_ENABLED);
     const mesh = await pg.loadModel(p.scale);
     pg.addGui(gui);
     scene.add(mesh);

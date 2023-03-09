@@ -8,8 +8,10 @@ class BackgroundSound {
   wind2: THREE.Audio;
   music: THREE.Audio;
   playing: boolean;
+  sound_enabled: boolean;
 
-  constructor() {
+  constructor(sound_enabled: boolean) {
+    this.sound_enabled = sound_enabled;
     this.load();
   }
 
@@ -40,10 +42,12 @@ class BackgroundSound {
   }
 
   start() {
-    this.wind1.play();
-    this.wind2.play();
-    this.music.play();
-    this.playing = true;
+    if (this.sound_enabled) {
+      this.wind1.play();
+      this.wind2.play();
+      this.music.play();
+      this.playing = true;
+    }
   }
 
   stop() {
