@@ -3,33 +3,6 @@ import * as THREE from "three";
 const MAX_HEIGHT = 40;
 const X_AXIS_ROTATION_DEGREES = -90;
 
-const getOriginApplication = (degreesFromNorth: number) => {
-  switch (true) {
-    case degreesFromNorth < 30:
-      return 175;
-    case degreesFromNorth < 45:
-      return 145;
-    case degreesFromNorth < 65:
-      return 145;
-    case degreesFromNorth < 90:
-      return 105;
-    case degreesFromNorth < 135:
-      return 45;
-    case degreesFromNorth < 180:
-      return 30;
-    case degreesFromNorth < 225:
-      return -30;
-    case degreesFromNorth < 270:
-      return -65;
-    case degreesFromNorth < 315:
-      return -90;
-    case degreesFromNorth < 330:
-      return -145;
-    default:
-      return -175;
-  }
-};
-
 const getDirectionFromNorth = (
   directionDegreesFromNorth: number
 ): THREE.Vector3 => {
@@ -43,15 +16,10 @@ const getDirectionFromNorth = (
 const createWindArrow = (
   directionDegreesFromNorth: number,
   length: number,
+  origin: THREE.Vector3,
   color
 ): THREE.ArrowHelper => {
-  const origin = new THREE.Vector3();
-  const originDegreesFromNorth = getOriginApplication(
-    directionDegreesFromNorth
-  );
-  const originPhi = THREE.MathUtils.degToRad(originDegreesFromNorth);
-  origin.setFromSphericalCoords(length, Math.PI / 2.1, originPhi);
-
+  console.log(origin);
   const arrowHelper = new THREE.ArrowHelper(
     getDirectionFromNorth(directionDegreesFromNorth),
     origin,
@@ -62,9 +30,18 @@ const createWindArrow = (
 };
 
 class WindIndicator {
+  length: number;
+  constructor(length: number) {
+    this.length = length;
+  }
   arrow: THREE.ArrowHelper;
-  load(directionDegrees: number): THREE.ArrowHelper {
-    this.arrow = createWindArrow(directionDegrees, 100, 0xffff00);
+  load(directionDegrees: number, origin: THREE.Vector3): THREE.ArrowHelper {
+    this.arrow = createWindArrow(
+      directionDegrees,
+      this.length,
+      origin,
+      0xffff00
+    );
     return this.arrow;
   }
 

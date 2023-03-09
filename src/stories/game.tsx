@@ -49,7 +49,7 @@ const pgOptions: ParagliderConstructor = {
 };
 
 const p = {
-  scale: 0.004,
+  scale: 1,
 };
 
 const analytics = new Analytics();
