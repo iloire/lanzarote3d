@@ -156,10 +156,10 @@ const Game = {
           pg.setPosition(options.startingLocation.position);
           pg.init();
           camera.setCameraMode(CameraMode.FirstPersonView, pg);
-          const fogColor = 0x000000;
+          // const fogColor = 0x000000;
           // const fog = new THREE.FogExp2(fogColor, 0.0002);
-          const fog = new THREE.Fog(fogColor, 1, 15000);
-          scene.fog = fog;
+          // const fog = new THREE.Fog(fogColor, 1, 15000);
+          // scene.fog = fog;
         }}
         onPause={(paused) => {
           analytics.trackEvent("game-pause");
