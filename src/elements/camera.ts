@@ -153,7 +153,7 @@ class Camera extends THREE.PerspectiveCamera {
   }
 
   firstPersonView() {
-    const cameraoffset = new THREE.Vector3(0, -1.1, 0);
+    const cameraoffset = new THREE.Vector3(0, -2.1, 0);
     this.position.copy(
       this.target
         .position()
