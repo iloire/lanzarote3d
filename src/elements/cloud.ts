@@ -12,10 +12,12 @@ const Cloud = {
       mesh.position.y = mesh.position.y + Math.sin(timer) * 1;
       requestAnimationFrame(() => animate(mesh));
     };
-    const mesh = await Models.load(
-      type === "BLACK" ? blackCloud : whiteCloud,
-      type === "BLACK" ? 2 : 30
+    const mesh = await Models.loadSimple(
+      type === "BLACK" ? blackCloud : whiteCloud
     );
+
+    const scale = type === "BLACK" ? 2 : 30;
+    mesh.scale.set(scale, scale, scale);
     animate(mesh);
     return mesh;
   },
