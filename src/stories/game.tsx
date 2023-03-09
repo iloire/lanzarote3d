@@ -229,10 +229,10 @@ const Game = {
 
     pg.addEventListener("touchedGround", touchedGround);
 
-    const windIndicator = new WindIndicator(4000);
+    const windIndicator = new WindIndicator(40);
     const arrow = windIndicator.load(
       WEATHER_SETTINGS.windDirectionDegreesFromNorth,
-      pg.position().add(pg.direction().multiplyScalar(300))
+      pg.position().add(pg.direction())
     );
     scene.add(arrow);
     pg.addEventListener("position", (event) => {
