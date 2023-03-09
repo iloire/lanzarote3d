@@ -18,6 +18,7 @@ import Stats from "three/examples/jsm/libs/stats.module";
 import { GameStartOptions } from "../stories/game/types";
 import Environment from "./game/env";
 import locations from "./locations/lanzarote";
+import WindIndicator from "../components/wind-indicator";
 
 const KMH_TO_MS = 3.6;
 
@@ -227,6 +228,22 @@ const Game = {
     }
 
     pg.addEventListener("touchedGround", touchedGround);
+
+    const windIndicator = new WindIndicator(4000);
+    const arrow = windIndicator.load(
+      WEATHER_SETTINGS.windDirectionDegreesFromNorth,
+      pg.position().add(pg.direction().multiplyScalar(300))
+    );
+    scene.add(arrow);
+    pg.addEventListener("position", (event) => {
+      arrow.position
+        .copy(event.position)
+        .add(pg.direction().multiplyScalar(300));
+    });
+
+    weather.addEventListener("wind-directionChange", (event) => {
+      windIndicator.update(event.value);
+    });
 
     const animate = () => {
       vario.updateReading(pg.altitude());

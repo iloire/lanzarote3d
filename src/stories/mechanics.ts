@@ -6,6 +6,7 @@ import Trajectory from "../elements/trajectory";
 import Paraglider, { ParagliderConstructor } from "../elements/pg";
 import Weather, { WeatherOptions } from "../elements/weather";
 import Birds from "../elements/birds";
+import WindIndicator from "../components/wind-indicator";
 
 const KMH_TO_MS = 3.6;
 
@@ -68,6 +69,10 @@ const Mechanics = {
 
     // const fogColor = 0x000000;
     // scene.fog = new THREE.FogExp2(fogColor, 0.00001);
+
+    const windIndicator = new WindIndicator(4000);
+    const arrow = windIndicator.load(330, pg.position());
+    scene.add(arrow);
 
     const findCameraIntercept = () => {
       const raycaster = new THREE.Raycaster(
