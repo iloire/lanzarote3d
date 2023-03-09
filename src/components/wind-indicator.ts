@@ -3,7 +3,7 @@ import * as THREE from "three";
 const MAX_HEIGHT = 40;
 const X_AXIS_ROTATION_DEGREES = -90;
 
-const getOriginApplication = (degreesFromNorth) => {
+const getOriginApplication = (degreesFromNorth: number) => {
   switch (true) {
     case degreesFromNorth < 30:
       return 175;
@@ -30,7 +30,9 @@ const getOriginApplication = (degreesFromNorth) => {
   }
 };
 
-const getDirectionFromNorth = (directionDegreesFromNorth) => {
+const getDirectionFromNorth = (
+  directionDegreesFromNorth: number
+): THREE.Vector3 => {
   const dir = new THREE.Vector3();
   const dirPhi = THREE.MathUtils.degToRad(-directionDegreesFromNorth);
   dir.setFromSphericalCoords(1, Math.PI / 2, dirPhi);
@@ -38,7 +40,11 @@ const getDirectionFromNorth = (directionDegreesFromNorth) => {
   return dir;
 };
 
-const createWindArrow = (directionDegreesFromNorth, length, color) => {
+const createWindArrow = (
+  directionDegreesFromNorth: number,
+  length: number,
+  color
+): THREE.ArrowHelper => {
   const origin = new THREE.Vector3();
   const originDegreesFromNorth = getOriginApplication(
     directionDegreesFromNorth
@@ -56,12 +62,13 @@ const createWindArrow = (directionDegreesFromNorth, length, color) => {
 };
 
 class WindIndicator {
-  load(directionDegrees, scale, pos) {
+  arrow: THREE.ArrowHelper;
+  load(directionDegrees: number): THREE.ArrowHelper {
     this.arrow = createWindArrow(directionDegrees, 100, 0xffff00);
     return this.arrow;
   }
 
-  update(degrees) {
+  update(degrees: number) {
     this.arrow.setDirection(getDirectionFromNorth(degrees));
   }
 }
