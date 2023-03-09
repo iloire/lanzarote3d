@@ -16,9 +16,10 @@ const Models = {
   loadGltf: async (model: string, manager?: THREE.LoadingManager) => {
     return modelLoader(model, manager);
   },
-  loadSimple: async (model: string, manager: THREE.LoadingManager) => {
+  loadSimple: async (model: string, manager?: THREE.LoadingManager) => {
     const gltf: any = await modelLoader(model, manager);
-    const mesh = gltf.scene.children[0];
+    const mesh =
+      gltf.scene.children.length === 1 ? gltf.scene.children[0] : gltf.scene;
     mesh.castShadow = true;
     return mesh;
   },
