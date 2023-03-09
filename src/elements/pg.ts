@@ -192,7 +192,7 @@ class Paraglider extends THREE.EventDispatcher {
     this.metersFlown += multiplier * this.getGroundSpeed();
 
     const smoother = 0.1;
-    const keyBreakMultiplier = 10;
+    const keyBreakMultiplier = 15;
     const passiveRecoveryMultiplier = 4;
 
     const turnMultiplier = THREE.MathUtils.clamp(multiplier, 0, 0.07);
