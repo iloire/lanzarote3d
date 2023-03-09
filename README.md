@@ -21,3 +21,4 @@
 - [https://www.soundjay.com/wind-sound-effect.html](https://www.soundjay.com/wind-sound-effect.html)
 - [https://www.audiocheck.net/audiofrequencysignalgenerator_sinetone.php](https://www.audiocheck.net/audiofrequencysignalgenerator_sinetone.php)
 - "Birds" (https://skfb.ly/6ZEHR) by Zacxophone is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
+- Potato character: https://skfb.ly/6yUwQ
