@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import model from "../models/pubg_green_parachute2.glb";
+import model from "../models/paraglider.glb";
 import Models from "../utils/models";
 import Weather from "../elements/weather";
 import Thermal from "../elements/thermal";
@@ -136,7 +136,8 @@ class Paraglider extends THREE.EventDispatcher {
   }
 
   async loadModel(scale: number): Promise<THREE.Mesh> {
-    const mesh = await Models.load(model, scale);
+    const mesh = await Models.loadSimple(model);
+    mesh.scale.set(scale, scale, scale);
     const mat001 = new THREE.MeshPhysicalMaterial();
     mat001.color = new THREE.Color("red");
     mat001.reflectivity = 1.0;
