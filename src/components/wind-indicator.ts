@@ -1,8 +1,5 @@
 import * as THREE from "three";
 
-const MAX_HEIGHT = 40;
-const X_AXIS_ROTATION_DEGREES = -90;
-
 const getDirectionFromNorth = (
   directionDegreesFromNorth: number
 ): THREE.Vector3 => {
