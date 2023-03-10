@@ -21,5 +21,5 @@
 - [https://www.soundjay.com/wind-sound-effect.html](https://www.soundjay.com/wind-sound-effect.html)
 - [https://www.audiocheck.net/audiofrequencysignalgenerator_sinetone.php](https://www.audiocheck.net/audiofrequencysignalgenerator_sinetone.php)
 - ["Birds" by Zacxophone](https://skfb.ly/6ZEHR)
-- ["Potato character" by Indie Omega (Alan Antich)](Phttps://skfb.ly/6yUwQ)
-- ["Low Poly Cloud" by Hyungjung Kim)](https://skfb.ly/69Qnw)
+- ["Potato character" by Indie Omega (Alan Antich)](https://skfb.ly/6yUwQ)
+- ["Low Poly Cloud" by Hyungjung Kim](https://skfb.ly/69Qnw)
