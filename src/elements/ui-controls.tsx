@@ -140,7 +140,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       this.setState({ dynamicLift: Math.round(event.lift * 100) / 100 });
     });
     pg.addEventListener("drop", (event) => {
-      this.setState({ drop: Math.round(event.drop * 100) / 100 });
+      this.setState({ drop: (-1 * Math.round(event.drop * 100)) / 100 });
     });
     pg.addEventListener("rollDrop", (event) => {
       this.setState({ rollDrop: Math.round(event.drop * 100) / 100 });
