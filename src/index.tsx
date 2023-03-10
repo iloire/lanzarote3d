@@ -9,7 +9,7 @@ import Animations from "./utils/animations";
 import Lights from "./utils/lights";
 import Models from "./utils/models";
 import Helpers from "./utils/helpers";
-import Water from "./utils/water";
+import Water from "./components/water";
 
 import Island from "./elements/island";
 
@@ -95,7 +95,7 @@ class App extends React.Component<AppProps, AppState> {
       Helpers.createHelpers(scene);
     }
 
-    const water = Water.load();
+    const water = new Water().load();
     scene.add(water);
     // Helpers.drawSphericalPosition(30, 90, 100, scene);
 
