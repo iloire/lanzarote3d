@@ -26,22 +26,30 @@ const generateThermalPair = (
 const Environment = {
   addThermals: (scene: THREE.Scene, weather: Weather): Thermal[] => {
     const lclLevel = weather.getLclLevel();
-    const thermalPair1 = generateThermalPair(
+    // famara
+    const t1 = generateThermalPair(
       { bottomRadius: 360, topRadius: 160, height: lclLevel },
       new THREE.Vector3(5727, 0, -535),
       weather
     );
-    const thermalPair2 = generateThermalPair(
+    const t2 = generateThermalPair(
       { bottomRadius: 360, topRadius: 160, height: lclLevel },
       new THREE.Vector3(7127, 0, -1405),
       weather
     );
-    const thermalPair3 = generateThermalPair(
+    const t3 = generateThermalPair(
       { bottomRadius: 360, topRadius: 160, height: lclLevel },
       new THREE.Vector3(3027, 0, 1005),
       weather
     );
-    const allThermals = thermalPair1.concat(thermalPair2).concat(thermalPair3);
+
+    // tenesar
+    const t4 = generateThermalPair(
+      { bottomRadius: 360, topRadius: 160, height: lclLevel },
+      new THREE.Vector3(-4827, 0, -855),
+      weather
+    );
+    const allThermals = t1.concat(t2).concat(t3).concat(t4);
     allThermals.forEach((t) => {
       scene.add(t.getMesh());
     });
