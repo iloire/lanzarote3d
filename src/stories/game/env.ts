@@ -49,7 +49,24 @@ const Environment = {
       new THREE.Vector3(-4827, 0, -855),
       weather
     );
-    const allThermals = t1.concat(t2).concat(t3).concat(t4);
+    // mirador
+    const t5 = generateThermalPair(
+      { bottomRadius: 360, topRadius: 160, height: lclLevel },
+      new THREE.Vector3(15027, 0, -12555),
+      weather
+    );
+    // pq
+    const t6 = generateThermalPair(
+      { bottomRadius: 360, topRadius: 160, height: lclLevel },
+      new THREE.Vector3(-6227, 580, 14055),
+      weather
+    );
+    const allThermals = t1
+      .concat(t2)
+      .concat(t3)
+      .concat(t4)
+      .concat(t5)
+      .concat(t6);
     allThermals.forEach((t) => {
       scene.add(t.getMesh());
     });
@@ -68,9 +85,9 @@ const Environment = {
         return Clouds.load(
           1,
           new THREE.Vector3(
-            thermals[0].getPosition().x,
+            t.getPosition().x,
             lclLevel * 1.2,
-            thermals[0].getPosition().z
+            t.getPosition().z
           )
         );
       })

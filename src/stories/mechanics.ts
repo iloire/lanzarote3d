@@ -7,6 +7,7 @@ import Paraglider, { ParagliderConstructor } from "../elements/pg";
 import Weather, { WeatherOptions } from "../elements/weather";
 import Birds from "../elements/birds";
 import WindIndicator from "../components/wind-indicator";
+import Environment from "./game/env";
 
 const KMH_TO_MS = 3.6;
 
@@ -42,6 +43,9 @@ const Mechanics = {
 
     const weather = new Weather(WEATHER_SETTINGS);
     weather.addGui(gui);
+
+    const thermals = Environment.addThermals(scene, weather);
+    Environment.addClouds(scene, weather, thermals);
 
     const pgOptions: ParagliderConstructor = {
       glidingRatio: 9,

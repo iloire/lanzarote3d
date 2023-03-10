@@ -72,14 +72,13 @@ const Game = {
     const bgMusic = new BackgroundSound(SOUND_ENABLED);
 
     const thermals = Environment.addThermals(scene, weather);
+    Environment.addClouds(scene, weather, thermals);
 
     const pg = new Paraglider(pgOptions, weather, terrain, water, thermals);
     const vario = new Vario(pg, SOUND_ENABLED);
     const mesh = await pg.loadModel(p.scale);
     pg.addGui(gui);
     scene.add(mesh);
-
-    Environment.addClouds(scene, weather, thermals);
 
     document.addEventListener("keydown", onDocumentKeyDown, false);
 
