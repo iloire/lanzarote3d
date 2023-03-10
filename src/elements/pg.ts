@@ -371,10 +371,6 @@ class Paraglider extends THREE.EventDispatcher {
     this.model.rotation.y += -1 * value * getRotationValue(this.wrapSpeed);
   }
 
-  // rotateLeft(strength: number = 1) {
-  //   this.model.rotation.y += strength * getRotationValue(this.wrapSpeed);
-  // }
-
   rightBreakInput() {
     this.isRightBreaking = true;
   }
@@ -382,10 +378,6 @@ class Paraglider extends THREE.EventDispatcher {
   rightBreakRelease() {
     this.isRightBreaking = false;
   }
-
-  // rotateRight(strength: number = 1) {
-  //   this.model.rotation.y -= strength * getRotationValue(this.wrapSpeed);
-  // }
 
   hasTouchedGround(terrain: THREE.Mesh, water: THREE.Mesh): boolean {
     const pos = this.model.position;
