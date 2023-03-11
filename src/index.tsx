@@ -6,7 +6,6 @@ import * as THREE from "three";
 import Sky from "./components/sky";
 
 import Animations from "./utils/animations";
-import Lights from "./utils/lights";
 import Models from "./utils/models";
 import Helpers from "./utils/helpers";
 import Water from "./components/water";
@@ -79,8 +78,6 @@ class App extends React.Component<AppProps, AppState> {
 
     const scene = new THREE.Scene();
 
-    Lights.addLightsToScene(scene, false);
-
     window.addEventListener(
       "resize",
       () => {
@@ -95,19 +92,17 @@ class App extends React.Component<AppProps, AppState> {
       Helpers.createHelpers(scene);
     }
 
-    const water = new Water().load();
+    const sky: Sky = new Sky(20, 3);
+    const skyMesh = sky.addToScene(scene);
+
+    const water = new Water().load(sky.getSunPosition());
     scene.add(water);
     // Helpers.drawSphericalPosition(30, 90, 100, scene);
-
-    const sky: Sky = new Sky();
-    const skyMesh = sky.load(90.2);
-    scene.add(skyMesh);
 
     const loadingManager = new THREE.LoadingManager();
     const island = await Island.load(loadingManager);
     const scale = 20000;
     island.scale.set(scale, scale, scale);
-    island.position.copy(new THREE.Vector3(0, 0, 0));
     scene.add(island);
 
     const camera = new Camera(
@@ -127,20 +122,35 @@ class App extends React.Component<AppProps, AppState> {
       const story = urlParams.get("story");
       console.log("loading story:", story);
       if (story === "mechanics") {
-        await Stories.mechanics(camera, scene, renderer, island, water, gui);
+        await Stories.mechanics(
+          camera,
+          scene,
+          renderer,
+          island,
+          water,
+          sky,
+          gui
+        );
       } else if (story === "flyzones") {
         await Stories.flyzones(camera, scene, renderer);
       } else if (story === "default") {
         await Stories.default(camera, scene, renderer);
+      } else if (story === "daytime") {
+        await Stories.daytime(camera, scene, renderer, island, water, sky, gui);
       } else {
         // default is game
-        await Stories.game(camera, scene, renderer, island, water, gui);
+        await Stories.game(camera, scene, renderer, island, water, sky, gui);
       }
     };
     loadingManager.onProgress = async (url, loaded, total) => {
-      console.log(loaded, url);
       this.setState({ loadingProcess: Math.floor((loaded / total) * 100) });
     };
+
+    function animate() {
+      water.material.uniforms["time"].value += 1.0 / 60.0;
+      requestAnimationFrame(animate);
+    }
+    animate();
   };
 
   render() {

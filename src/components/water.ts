@@ -4,7 +4,7 @@ import waterTexture from "../textures/waternormals.jpg";
 import Models from "../utils/models";
 
 export default class Water {
-  load() {
+  load(sunPosition: THREE.Vector3) {
     const waterGeometry = new THREE.PlaneGeometry(1000000, 1000000);
     const water = new WaterEffect(waterGeometry, {
       textureWidth: 512,
@@ -21,6 +21,7 @@ export default class Water {
       distortionScale: 4,
     });
     water.rotation.x = -Math.PI / 2;
+    water.material.uniforms["sunDirection"].value.copy(sunPosition).normalize();
     return water;
   }
 }

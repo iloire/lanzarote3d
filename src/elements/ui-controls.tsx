@@ -290,7 +290,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     if (viewControlsVisible) {
       this.handleCamMode(CameraMode.FirstPersonView);
     } else {
-      this.handleCamMode(CameraMode.FollowTarget);
+      this.handleCamMode(CameraMode.FollowTargetBehind);
     }
   }
 

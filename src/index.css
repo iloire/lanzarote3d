@@ -58,6 +58,12 @@
   left: 520px;
 }
 
+#daytime {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+}
+
 #view-controls button{
   padding: 5px 10px;
 }

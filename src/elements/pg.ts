@@ -265,7 +265,6 @@ class Paraglider extends THREE.EventDispatcher {
     const gravityDirection = new THREE.Vector3(0, -1, 0);
     const drop = this.speed() / this.glidingRatio();
     const downVector = gravityDirection.multiplyScalar(multiplier * drop);
-    this.move(downVector);
     this.dispatchEvent({
       type: "drop",
       drop,
@@ -277,19 +276,15 @@ class Paraglider extends THREE.EventDispatcher {
       type: "dynamicLift",
       lift,
     });
-    this.move(liftVector);
 
     // roll sink
-    if (this.__rollAngle !== 0) {
-      const rollDrop = Math.abs(this.__rollAngle * 7);
-      const sinkDirection = new THREE.Vector3(0, -1, 0);
-      const sinkVector = sinkDirection.multiplyScalar(multiplier * rollDrop);
-      this.dispatchEvent({
-        type: "rollDrop",
-        drop: rollDrop,
-      });
-      this.move(sinkVector);
-    }
+    const rollDrop = Math.abs(this.__rollAngle * 7);
+    const sinkDirection = new THREE.Vector3(0, -1, 0);
+    const sinkVector = sinkDirection.multiplyScalar(multiplier * rollDrop);
+    this.dispatchEvent({
+      type: "rollDrop",
+      drop: rollDrop,
+    });
 
     const inHowManyThermals = this.countInsideHowManyThermals();
     const liftThermal = 2 * inHowManyThermals; // this.isInsideAnyThermal() ? 2 : 0;
@@ -302,11 +297,16 @@ class Paraglider extends THREE.EventDispatcher {
       type: "thermalLift",
       lift: liftThermal,
     });
-    this.move(liftThermalVector);
+
+    const combinedMoveVector = downVector
+      .add(liftVector)
+      .add(sinkVector)
+      .add(liftThermalVector);
+    this.move(combinedMoveVector);
 
     this.dispatchEvent({
       type: "delta",
-      delta: lift + liftThermal - drop,
+      delta: lift + liftThermal - drop - rollDrop,
     });
   }
 

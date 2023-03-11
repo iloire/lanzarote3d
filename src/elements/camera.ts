@@ -11,8 +11,9 @@ const getObjectPosition = (obj: THREE.Object3D) => {
 };
 
 export enum CameraMode {
-  FollowTarget = "FOLLOW",
   FirstPersonView = "FPV",
+  FollowTarget = "FOLLOW",
+  FollowTargetBehind = "FOLLOWBEHIND",
   FarAway = "FAR",
   TopView = "TOP",
   AirplaneView = "AIRPLANE",
@@ -88,6 +89,8 @@ class Camera extends THREE.PerspectiveCamera {
     }
     if (this.mode === CameraMode.FollowTarget) {
       this.followTarget();
+    } else if (this.mode === CameraMode.FollowTargetBehind) {
+      this.followTargetBehind();
     } else if (this.mode === CameraMode.FirstPersonView) {
       this.firstPersonView();
     } else if (this.mode === CameraMode.FarAway) {
@@ -150,6 +153,23 @@ class Camera extends THREE.PerspectiveCamera {
     const z = this.target.position().z + Math.cos(this.angle) * this.distance;
     this.position.set(x, this.target.position().y, z);
     this.lookAt(this.target.position());
+  }
+
+  followTargetBehind() {
+    const cameraoffset = new THREE.Vector3(3, 1, 3);
+    this.position.copy(
+      this.target
+        .position()
+        .add(this.target.direction().add(cameraoffset).multiplyScalar(10))
+    );
+    this.lookAt(
+      this.target.position().add(this.target.direction().multiplyScalar(20))
+    );
+    // adjust for roll
+    // this.rotateZ(this.viewRotation / 4 + this.target.model.rotation.z);
+
+    // view rotation
+    // this.rotateY(this.viewRotation * 1.5);
   }
 
   firstPersonView() {

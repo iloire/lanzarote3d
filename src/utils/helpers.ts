@@ -7,24 +7,29 @@ const Helpers = {
     len: number,
     scene: THREE.Scene
   ) => {
-    const cubeSize = 190;
-    const geometry = new THREE.BoxGeometry(10, 10, 10);
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
     const phi = THREE.MathUtils.degToRad(phiDegrees);
     const theta = THREE.MathUtils.degToRad(thetaDegrees);
 
     const pos = new THREE.Vector3();
-    pos.setFromSphericalCoords(len, theta, phi);
-    console.log(pos);
+    pos.setFromSphericalCoords(len, phi, theta);
+
+    Helpers.drawPoint(scene, pos);
+  },
+
+  drawPoint(scene: THREE.Scene, position: THREE.Vector3) {
+    const cubeSize = 1900;
+    const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
+    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
 
     const cube = new THREE.Mesh(geometry, material);
-    cube.position.copy(pos);
+    cube.position.copy(position);
+    console.log(cube);
     scene.add(cube);
   },
 
   createHelpers: function (scene: THREE.Scene) {
     const grid = this.getGrid({ x: 0, y: 0 });
-    // scene.add(grid);
+    scene.add(grid);
 
     scene.add(this.getAxisHelper(100));
   },

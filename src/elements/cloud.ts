@@ -7,7 +7,7 @@ export type CloudType = "BLACK" | "WHITE";
 
 const Cloud = {
   load: async (type: CloudType) => {
-    const animate = (mesh) => {
+    const animate = (mesh: THREE.Mesh) => {
       const timer = (Date.now() + Math.random() * 1000) * 0.001;
       mesh.position.y = mesh.position.y + Math.sin(timer) * 1;
       requestAnimationFrame(() => animate(mesh));

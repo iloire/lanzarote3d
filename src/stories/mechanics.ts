@@ -1,13 +1,14 @@
 import * as THREE from "three";
 import Controls from "../utils/controls";
 
-import Clouds from "../elements/clouds";
+import Sky from "../components/sky";
 import Trajectory from "../elements/trajectory";
 import Paraglider, { ParagliderConstructor } from "../elements/pg";
 import Weather, { WeatherOptions } from "../elements/weather";
 import Birds from "../elements/birds";
 import WindIndicator from "../components/wind-indicator";
 import Environment from "./game/env";
+import Helpers from "../utils/helpers";
 
 const KMH_TO_MS = 3.6;
 
@@ -29,17 +30,10 @@ const Mechanics = {
     renderer,
     terrain: THREE.Mesh,
     water: THREE.Mesh,
+    sky: Sky,
     gui
   ) => {
     const controls = Controls.createControls(camera, renderer);
-
-    // const cloudPos = new THREE.Vector3(87, 1300, 3355);
-    // const c = await Clouds.load(1, cloudPos);
-    // scene.add(c);
-    //
-    // const cloudPos2 = new THREE.Vector3(837, 1300, -3355);
-    // const c2 = await Clouds.load(1, cloudPos2);
-    // scene.add(c2);
 
     const weather = new Weather(WEATHER_SETTINGS);
     weather.addGui(gui);
@@ -78,30 +72,33 @@ const Mechanics = {
     const arrow = windIndicator.load(330, pg.position());
     scene.add(arrow);
 
-    const findCameraIntercept = () => {
-      const raycaster = new THREE.Raycaster(
-        pg.position(),
-        camera.position.clone().sub(pg.position()).normalize()
-      );
-      const intersects = raycaster.intersectObject(terrain);
-      if (intersects.length > 0) {
-        console.log("camera intersects", intersects);
-        const distance = intersects[0].distance;
-        console.log(distance);
-        const newPosition = new THREE.Vector3().addVectors(
-          camera.position,
-          raycaster.ray.direction.multiplyScalar(-1 * distance)
-        );
-        camera.position.copy(newPosition);
-      }
-    };
+    Helpers.drawPoint(scene, sky.getSunPosition());
+
+    // const findCameraIntercept = () => {
+    //   const raycaster = new THREE.Raycaster(
+    //     pg.position(),
+    //     camera.position.clone().sub(pg.position()).normalize()
+    //   );
+    //   const intersects = raycaster.intersectObject(terrain);
+    //   if (intersects.length > 0) {
+    //     console.log("camera intersects", intersects);
+    //     const distance = intersects[0].distance;
+    //     console.log(distance);
+    //     const newPosition = new THREE.Vector3().addVectors(
+    //       camera.position,
+    //       raycaster.ray.direction.multiplyScalar(-1 * distance)
+    //     );
+    //     camera.position.copy(newPosition);
+    //   }
+    // };
 
     const animate = () => {
-      findCameraIntercept();
+      // findCameraIntercept();
       requestAnimationFrame(animate);
       renderer.render(scene, camera);
-      camera.lookAt(pg.position());
-      controls.target = pg.position();
+      // camera.lookAt(sky.getSunPosition());
+      // camera.lookAt(pg.position());
+      // controls.target = pg.position();
     };
     animate();
   },

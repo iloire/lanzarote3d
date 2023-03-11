@@ -6,4 +6,5 @@ export type Location = {
   lookFrom: THREE.Vector3;
   lookAt: THREE.Vector3;
   idealWindDirectionDegreesFromNorth: number;
+  idealSunPositionDegrees: number;
 };

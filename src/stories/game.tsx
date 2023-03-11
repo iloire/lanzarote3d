@@ -19,6 +19,7 @@ import { GameStartOptions } from "../stories/game/types";
 import Environment from "./game/env";
 import locations from "./locations/lanzarote";
 import WindIndicator from "../components/wind-indicator";
+import Sky from "../components/sky";
 
 const KMH_TO_MS = 3.6;
 
@@ -62,6 +63,7 @@ const Game = {
     renderer,
     terrain: THREE.Mesh,
     water: THREE.Mesh,
+    sky: Sky,
     gui
   ) => {
     gui.hide();
