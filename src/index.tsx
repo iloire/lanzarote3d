@@ -137,6 +137,8 @@ class App extends React.Component<AppProps, AppState> {
         await Stories.default(camera, scene, renderer);
       } else if (story === "daytime") {
         await Stories.daytime(camera, scene, renderer, island, water, sky, gui);
+      } else if (story === "night") {
+        await Stories.night(camera, scene, renderer, island, water, sky, gui);
       } else {
         // default is game
         await Stories.game(camera, scene, renderer, island, water, sky, gui);

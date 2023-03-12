@@ -3,6 +3,7 @@ import FlyZones from "./flyzones";
 import Game from "./game";
 import Mechanics from "./mechanics";
 import DayTime from "./daytime";
+import Night from "./night";
 
 const Stories = {
   default: Default.load,
@@ -10,6 +11,7 @@ const Stories = {
   game: Game.load,
   mechanics: Mechanics.load,
   daytime: DayTime.load,
+  night: Night.load,
 };
 
 export default Stories;
