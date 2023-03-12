@@ -17,6 +17,11 @@ import { Location } from "../stories/locations/index";
 
 const KMH_TO_MS = 3.6;
 
+export type FirstPersonViewLook = {
+  x: number;
+  y: number;
+};
+
 type UIControlsProps = {
   pg: Paraglider;
   locations: Location[];
@@ -26,7 +31,7 @@ type UIControlsProps = {
   defaultCameraMode: CameraMode;
   showDebugInfo: boolean;
   onBreakUIChange: (direction: number) => void;
-  onViewUIChange: (direction: number) => void;
+  onViewUIChange: (direction: FirstPersonViewLook) => void;
   onLeftBreak: () => void;
   onLeftBreakRelease: () => void;
   onRightBreak: () => void;
@@ -171,14 +176,22 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     this.setUpViewUI();
   }
 
+  applyViewMouseMove(e, target) {
+    const rect = target.getBoundingClientRect();
+    const x = e.clientX - rect.left; //x position within the element.
+    const y = e.clientY - rect.top; //y position within the element.
+    const percentageX = x / rect.width;
+    const percentageY = y / rect.height;
+    const directionX = (percentageX - 0.5) * 100;
+    const directionY = (percentageY - 0.5) * 100;
+    this.handleViewUIChange({ x: directionX, y: directionY });
+  }
+
   setUpViewUI() {
     const viewUIelement = document.getElementById("root");
     const applyView = (e: any) => {
       const rect = e.target.getBoundingClientRect();
-      const x = e.clientX - rect.left; //x position within the element.
-      const percentage = x / rect.width;
-      const direction = (percentage - 0.5) * 100;
-      this.handleViewUIChange(direction);
+      this.applyViewMouseMove(e, e.target);
     };
     viewUIelement.onmousemove = (e: any) => {
       applyView(e);
@@ -196,6 +209,10 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       const percentage = x / rect.width;
       const direction = (percentage - 0.5) * 100;
       this.handleBreakUIChange(direction);
+
+      // also move main view
+      const viewUIelement = document.getElementById("root");
+      this.applyViewMouseMove(e, viewUIelement);
     };
     const releaseBreak = (e: any) => {
       if (e.target !== breakUIelement) {
@@ -347,7 +364,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     this.props.onBreakUIChange(direction);
   };
 
-  handleViewUIChange = (direction: number) => {
+  handleViewUIChange = (direction: FirstPersonViewLook) => {
     this.props.onViewUIChange(direction);
   };
 

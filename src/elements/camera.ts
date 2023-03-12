@@ -33,7 +33,8 @@ class Camera extends THREE.PerspectiveCamera {
   topViewOffset: THREE.Vector3 = new THREE.Vector3(10, 300, -10);
   airplaneViewOffset: THREE.Vector3 = new THREE.Vector3(-6030, 2000, -11330);
   directionToLook: THREE.Vector3;
-  viewRotation: number = 0;
+  viewRotationX: number = 0;
+  viewRotationY: number = 0;
 
   constructor(
     fov: number,
@@ -127,9 +128,11 @@ class Camera extends THREE.PerspectiveCamera {
     this.distance += this.distanceIncrement;
   }
 
-  lookDirection(degrees: number) {
-    const angleRadians = THREE.MathUtils.degToRad(degrees);
-    this.viewRotation = angleRadians;
+  lookDirection(xDegrees: number, yDegrees: number) {
+    const angleRadiansX = THREE.MathUtils.degToRad(xDegrees);
+    const angleRadiansY = THREE.MathUtils.degToRad(yDegrees);
+    this.viewRotationX = angleRadiansX;
+    this.viewRotationY = angleRadiansY;
   }
 
   animateTo(
@@ -166,10 +169,10 @@ class Camera extends THREE.PerspectiveCamera {
       this.target.position().add(this.target.direction().multiplyScalar(20))
     );
     // adjust for roll
-    // this.rotateZ(this.viewRotation / 4 + this.target.model.rotation.z);
+    // this.rotateZ(this.viewRotationX / 4 + this.target.model.rotation.z);
 
     // view rotation
-    // this.rotateY(this.viewRotation * 1.5);
+    // this.rotateY(this.viewRotationX * 1.5);
   }
 
   firstPersonView() {
@@ -183,10 +186,11 @@ class Camera extends THREE.PerspectiveCamera {
       this.target.position().add(this.target.direction().multiplyScalar(20))
     );
     // adjust for roll
-    this.rotateZ(this.viewRotation / 4 + this.target.model.rotation.z);
+    this.rotateZ(-1 * (this.viewRotationX / 4 + this.target.model.rotation.z));
 
     // view rotation
-    this.rotateY(this.viewRotation * 1.5);
+    this.rotateY(-1 * this.viewRotationX * 1.5);
+    this.rotateX(-1 * this.viewRotationY * 1.5);
   }
 
   farAwayView() {

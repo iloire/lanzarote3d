@@ -99,11 +99,11 @@
 /* Analog control */
 #break-ui {
   position: absolute;
-  width: 40%;
-  height: 80px;
+  width: 30%;
+  height: 60px;
   background-color: gray;
-  top: 200px;
-  left: 30%;
+  top: 48%;
+  left: 35%;
   opacity: 0.3;
   z-index:10;
 }
@@ -113,7 +113,7 @@
   z-index: 0;
   right: 50%;
   width: 2px;
-  height: 80px;
+  height: 60px;
   background-color: white;
 }
 

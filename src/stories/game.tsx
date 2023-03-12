@@ -9,7 +9,7 @@ import Helpers from "../utils/helpers";
 import Vario from "../audio/vario";
 import Weather, { WeatherOptions } from "../elements/weather";
 import Camera, { CameraMode } from "../elements/camera";
-import UIControls, { View } from "../elements/ui-controls";
+import UIControls, { View, FirstPersonViewLook } from "../elements/ui-controls";
 import Thermal from "../elements/thermal";
 import Clouds from "../elements/clouds";
 import Trajectory from "../elements/trajectory";
@@ -22,7 +22,7 @@ import Sky from "../components/sky";
 
 const KMH_TO_MS = 3.6;
 
-const SOUND_ENABLED = true;
+const SOUND_ENABLED = false;
 
 function round(number: number): number {
   return Math.round(number * 100) / 100;
@@ -143,9 +143,8 @@ const Game = {
         onBreakUIChange={(direction: number) => {
           pg.directionInput(direction);
         }}
-        onViewUIChange={(direction: number) => {
-          camera.lookDirection(-1 * direction);
-          camera.lookDirection(-1 * direction);
+        onViewUIChange={(direction: FirstPersonViewLook) => {
+          camera.lookDirection(direction.x, direction.y);
         }}
         onGameStart={(options: GameStartOptions, fnHideStartButton) => {
           analytics.trackEvent("game-start");
