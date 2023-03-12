@@ -172,29 +172,16 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
   }
 
   setUpViewUI() {
-    const viewUIelement = document.getElementById("view-ui");
+    const viewUIelement = document.getElementById("root");
     const applyView = (e: any) => {
-      if (e.target !== viewUIelement) {
-        return;
-      }
       const rect = e.target.getBoundingClientRect();
       const x = e.clientX - rect.left; //x position within the element.
       const percentage = x / rect.width;
       const direction = (percentage - 0.5) * 100;
       this.handleViewUIChange(direction);
     };
-    const releaseView = (e: any) => {
-      if (e.target !== viewUIelement) {
-        return;
-      }
-      const rect = e.target.getBoundingClientRect();
-      this.handleViewUIChange(0);
-    };
     viewUIelement.onmousemove = (e: any) => {
       applyView(e);
-    };
-    viewUIelement.onmouseleave = (e: any) => {
-      releaseView(e);
     };
   }
 
@@ -620,17 +607,6 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       </div>
     );
 
-    const viewControlUI = (
-      <div
-        id="view-ui"
-        style={{
-          display:
-            isGameStarted && !this.state.viewControlsVisible ? "" : "none",
-        }}
-      >
-        <div>&nbsp;</div>
-      </div>
-    );
     const wrapSpeedValueUI = <div id="wrapSpeed-ui">x{wrapSpeed}</div>;
 
     return (
@@ -648,7 +624,6 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         {wrapSpeedValueUI}
         {pauseControls}
         {breakControlUI}
-        {viewControlUI}
       </div>
     );
   }
