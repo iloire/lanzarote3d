@@ -55,10 +55,17 @@ const Environment = {
       new THREE.Vector3(15027, 0, -12555),
       weather
     );
+
     // pq
     const t6 = generateThermalPair(
       { bottomRadius: 360, topRadius: 160, height: lclLevel },
-      new THREE.Vector3(-6227, 580, 14055),
+      new THREE.Vector3(-6227, 0, 14055),
+      weather
+    );
+    // mala
+    const t7 = generateThermalPair(
+      { bottomRadius: 360, topRadius: 160, height: lclLevel },
+      new THREE.Vector3(14227, 0, -3755),
       weather
     );
     const allThermals = t1
@@ -66,7 +73,8 @@ const Environment = {
       .concat(t3)
       .concat(t4)
       .concat(t5)
-      .concat(t6);
+      .concat(t6)
+      .concat(t7);
     allThermals.forEach((t) => {
       scene.add(t.getMesh());
     });

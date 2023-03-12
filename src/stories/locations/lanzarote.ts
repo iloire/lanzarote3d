@@ -27,6 +27,14 @@ const locations: Location[] = [
     idealSunPositionDegrees: 30,
   },
   {
+    title: "Mala",
+    position: new THREE.Vector3(14727, 380, -3555),
+    lookFrom: new THREE.Vector3(14527, 480, -3855),
+    lookAt: new THREE.Vector3(13427, 380, -3555),
+    idealWindDirectionDegreesFromNorth: 30,
+    idealSunPositionDegrees: 30,
+  },
+  {
     title: "Playa Quemada",
     position: new THREE.Vector3(-6227, 580, 14055),
     lookFrom: new THREE.Vector3(-4727, 580, 17055),
