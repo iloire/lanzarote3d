@@ -368,6 +368,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     const isGameStarted = !this.state.showStartButton;
     const buttons = this.props.locations.map((location) => (
       <button
+        key={location.title}
         onClick={() =>
           this.handleStart(
             6,
