@@ -15,7 +15,7 @@ const Night = {
     gui
   ) => {
     const controls = Controls.createControls(camera, renderer);
-    sky.updateSunPosition(3);
+    sky.updateSunPosition(2);
 
     const animate = () => {
       requestAnimationFrame(animate);

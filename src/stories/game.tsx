@@ -14,7 +14,6 @@ import Thermal from "../elements/thermal";
 import Clouds from "../elements/clouds";
 import Trajectory from "../elements/trajectory";
 import Analytics from "../elements/analytics";
-import Stats from "three/examples/jsm/libs/stats.module";
 import { GameStartOptions } from "../stories/game/types";
 import Environment from "./game/env";
 import locations from "./locations/lanzarote";
@@ -23,7 +22,7 @@ import Sky from "../components/sky";
 
 const KMH_TO_MS = 3.6;
 
-const SOUND_ENABLED = false;
+const SOUND_ENABLED = true;
 
 function round(number: number): number {
   return Math.round(number * 100) / 100;
@@ -265,7 +264,6 @@ const Game = {
       renderer.render(scene, camera);
       // setTimeout(animate, 1000);
       requestAnimationFrame(animate);
-      stats.update();
     };
 
     animate();
@@ -273,6 +271,3 @@ const Game = {
 };
 
 export default Game;
-
-const stats = Stats();
-document.getElementById("stats").appendChild(stats.dom);

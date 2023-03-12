@@ -30,7 +30,6 @@ const Helpers = {
   createHelpers: function (scene: THREE.Scene) {
     const grid = this.getGrid({ x: 0, y: 0 });
     scene.add(grid);
-
     scene.add(this.getAxisHelper(100));
   },
 

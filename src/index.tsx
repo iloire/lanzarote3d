@@ -1,6 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import GUI from "lil-gui";
+import Stats from "three/examples/jsm/libs/stats.module";
 
 import * as THREE from "three";
 import Sky from "./components/sky";
@@ -25,9 +26,11 @@ const gui = new GUI();
 
 const createRenderer = (sizes) => {
   const renderer = new THREE.WebGLRenderer({
-    // powerPreference: "low-power" /* This can also be 'high-performance' */,
+    // powerPreference: "low-power" ,
+    powerPreference: "high-performance",
     canvas: document.querySelector("canvas.webgl"),
     antialias: true,
+    alpha: true,
   });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(sizes.width, sizes.height);
@@ -92,8 +95,9 @@ class App extends React.Component<AppProps, AppState> {
       Helpers.createHelpers(scene);
     }
 
-    const sky: Sky = new Sky(20, 3);
+    const sky: Sky = new Sky(11, 3);
     const skyMesh = sky.addToScene(scene);
+    sky.addGui(gui);
 
     const water = new Water().load(sky.getSunPosition());
     scene.add(water);
@@ -103,6 +107,7 @@ class App extends React.Component<AppProps, AppState> {
     const island = await Island.load(loadingManager);
     const scale = 20000;
     island.scale.set(scale, scale, scale);
+    island.position.set(0, 20, 0);
     scene.add(island);
 
     const camera = new Camera(
@@ -151,6 +156,7 @@ class App extends React.Component<AppProps, AppState> {
     function animate() {
       water.material.uniforms["time"].value += 1.0 / 60.0;
       requestAnimationFrame(animate);
+      stats.update();
     }
     animate();
   };
@@ -181,3 +187,6 @@ if (WebGL.isWebGLAvailable()) {
   const warning = WebGL.getWebGLErrorMessage();
   rootElement.appendChild(warning);
 }
+
+const stats = Stats();
+document.getElementById("stats").appendChild(stats.dom);

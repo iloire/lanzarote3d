@@ -7,6 +7,35 @@ import {
 import lensflareTexture0 from "../textures/lensflare0.png";
 import lensflareTexture1 from "../textures/lensflare1.png";
 import Time from "../utils/time";
+import Moon from "./moon";
+
+const calculateLightIntensity = (
+  timeOfDayInHours: number,
+  monthOfTheYear: number
+) => {
+  if (timeOfDayInHours < 6) {
+    return 0.2;
+  }
+  if (timeOfDayInHours < 10) {
+    return 0.3;
+  }
+  if (timeOfDayInHours < 12) {
+    return 0.4;
+  }
+  if (timeOfDayInHours < 14) {
+    return 0.5;
+  }
+  if (timeOfDayInHours < 16) {
+    return 0.4;
+  }
+  if (timeOfDayInHours < 18) {
+    return 0.3;
+  }
+  if (timeOfDayInHours < 20) {
+    return 0.2;
+  }
+  return 0.1;
+};
 
 const calculateSunPosition = (
   timeOfDayInHours: number,
@@ -25,10 +54,14 @@ const calculateSunPosition = (
   return sunPosition;
 };
 
+const USE_DIRECTIONAL_LIGHT = false;
+
 export default class Sky extends THREE.Object3D {
   sunPosition: THREE.Vector3;
   monthOfTheYear: number;
   sky: SkyExample;
+  ambientLight: THREE.AmbientLight;
+  moon: THREE.Object3D;
   pointLight: THREE.PointLight;
   directionalLight: THREE.DirectionalLight;
   directionalLightHelper: THREE.DirectionalLightHelper;
@@ -49,22 +82,56 @@ export default class Sky extends THREE.Object3D {
     skyUniforms["mieDirectionalG"].value = 0.8;
 
     const distance = 0; // max range of the light
-    const intensity = 0.1;
+    const intensity = 0.9;
     this.pointLight = new THREE.PointLight(0xffffff, intensity, distance);
     this.pointLight.color.setHSL(0.995, 0.5, 0.9);
     this.pointLight.position.copy(
-      this.sunPosition.clone().multiplyScalar(10000)
+      this.sunPosition.clone().multiplyScalar(1000000)
     );
 
-    this.directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    this.directionalLight.position.copy(
-      this.sunPosition.clone().multiplyScalar(10000)
+    const lightIntensity = calculateLightIntensity(
+      timeOfDayInHours,
+      monthOfTheYear
     );
 
-    this.directionalLightHelper = new THREE.DirectionalLightHelper(
-      this.directionalLight,
-      1000
-    );
+    if (USE_DIRECTIONAL_LIGHT) {
+      this.directionalLight = new THREE.DirectionalLight(
+        0xffffff,
+        lightIntensity
+      );
+      this.directionalLight.position.copy(
+        this.sunPosition.clone().multiplyScalar(1000)
+      );
+
+      this.directionalLightHelper = new THREE.DirectionalLightHelper(
+        this.directionalLight,
+        1000
+      );
+    }
+
+    this.ambientLight = new THREE.AmbientLight(0xffffff, lightIntensity);
+
+    const moon = new Moon();
+    this.moon = moon.load(1000);
+    this.moon.position.set(0, 10000, 0);
+  }
+
+  addGui(gui) {
+    const skyGui = gui.addFolder("Sky");
+    skyGui
+      .add(this.ambientLight, "intensity", 0, 1)
+      .name("ambient.intensity")
+      .listen();
+    if (this.directionalLight) {
+      skyGui
+        .add(this.directionalLight, "intensity", 0, 1)
+        .name("directional.intensity")
+        .listen();
+    }
+    skyGui
+      .add(this.pointLight, "intensity", 0, 1)
+      .name("pointLight.intensity")
+      .listen();
   }
 
   updateSunPosition(timeOfDayInHours: number) {
@@ -76,41 +143,53 @@ export default class Sky extends THREE.Object3D {
     this.pointLight.position.copy(
       this.sunPosition.clone().multiplyScalar(10000)
     );
-    this.directionalLight.position.copy(
-      this.sunPosition.clone().multiplyScalar(10000)
+    this.pointLight.intensity = calculateLightIntensity(
+      timeOfDayInHours,
+      this.monthOfTheYear
     );
-    this.directionalLightHelper.update();
+
+    if (this.directionalLight) {
+      this.directionalLight.position.copy(
+        this.sunPosition.clone().multiplyScalar(10000)
+      );
+      this.directionalLight.intensity =
+        calculateLightIntensity(timeOfDayInHours, this.monthOfTheYear) * 0.3;
+      this.directionalLightHelper.update();
+    }
+    this.ambientLight.intensity = calculateLightIntensity(
+      timeOfDayInHours,
+      this.monthOfTheYear
+    );
   }
 
   addToScene(scene: THREE.Scene) {
     scene.add(this.sky);
-    scene.add(this.directionalLight);
-    scene.add(this.directionalLightHelper);
+    if (this.directionalLight) {
+      scene.add(this.directionalLight);
+      scene.add(this.directionalLightHelper);
+    }
     scene.add(this.pointLight);
-    this.addAmbientLight(scene, 0.1);
-    // this.addFlare(scene, pointLight);
+    scene.add(this.moon);
+    scene.add(this.ambientLight);
+    // this.addFlare(this.pointLight);
   }
 
-  addAmbientLight(scene: THREE.Scene, intensity) {
-    const ambientLight = new THREE.AmbientLight(0xffffff, intensity);
-    scene.add(ambientLight);
+  addFlare(light: THREE.Light) {
+    const textureLoader = new THREE.TextureLoader();
+    const textureFlare0 = textureLoader.load(lensflareTexture0);
+    const textureFlare1 = textureLoader.load(lensflareTexture1);
+    const lensflare = new Lensflare();
+    const size = 600;
+    const distance = 0; //(optional) (0-1) from light source (0 = at light source)
+    lensflare.addElement(
+      new LensflareElement(textureFlare0, size, 0, light.color)
+    );
+    lensflare.addElement(new LensflareElement(textureFlare1, 60, 0.6));
+    lensflare.addElement(new LensflareElement(textureFlare1, 70, 0.7));
+    lensflare.addElement(new LensflareElement(textureFlare1, 120, 0.9));
+    lensflare.addElement(new LensflareElement(textureFlare1, 70, 1));
+    light.add(lensflare);
   }
-
-  // addFlare(scene: THREE.Scene, pointLight: THREE.PointLight) {
-  //   const textureLoader = new THREE.TextureLoader();
-  //   const textureFlare0 = textureLoader.load(lensflareTexture0);
-  //   const textureFlare1 = textureLoader.load(lensflareTexture1);
-  //   const lensflare = new Lensflare();
-  //   lensflare.addElement(
-  //     new LensflareElement(textureFlare0, 600, 0, pointLight.color)
-  //   );
-  //   lensflare.addElement(new LensflareElement(textureFlare1, 60, 0.6));
-  //   lensflare.addElement(new LensflareElement(textureFlare1, 70, 0.7));
-  //   lensflare.addElement(new LensflareElement(textureFlare1, 120, 0.9));
-  //   lensflare.addElement(new LensflareElement(textureFlare1, 70, 1));
-  //   pointLight.add(lensflare);
-  //   scene.add(pointLight);
-  // }
 
   getSunPosition(): THREE.Vector3 {
     return this.sunPosition;
