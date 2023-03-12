@@ -98,6 +98,7 @@
 
 /* Analog control */
 #break-ui {
+  display: none;
   position: absolute;
   width: 30%;
   height: 60px;

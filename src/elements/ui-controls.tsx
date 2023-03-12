@@ -172,11 +172,10 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
 
   componentDidMount() {
     this.props.onWrapSpeedChange(this.props.defaultGameSpeed);
-    this.setUpBreakUI();
     this.setUpViewUI();
   }
 
-  applyViewMouseMove(e, target) {
+  applyViewMouseMove(e, target, isMouseDown) {
     const rect = target.getBoundingClientRect();
     const x = e.clientX - rect.left; //x position within the element.
     const y = e.clientY - rect.top; //y position within the element.
@@ -185,47 +184,24 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     const directionX = (percentageX - 0.5) * 100;
     const directionY = (percentageY - 0.5) * 100;
     this.handleViewUIChange({ x: directionX, y: directionY });
+    if (isMouseDown) {
+      this.handleBreakUIChange(directionX);
+    }
   }
 
   setUpViewUI() {
+    let mouseDown = false;
     const viewUIelement = document.getElementById("root");
-    const applyView = (e: any) => {
-      const rect = e.target.getBoundingClientRect();
-      this.applyViewMouseMove(e, e.target);
-    };
     viewUIelement.onmousemove = (e: any) => {
-      applyView(e);
+      this.applyViewMouseMove(e, e.target, mouseDown);
     };
-  }
-
-  setUpBreakUI() {
-    const breakUIelement = document.getElementById("break-ui");
-    const applyBreak = (e: any) => {
-      if (e.target !== breakUIelement) {
-        return;
-      }
-      const rect = e.target.getBoundingClientRect();
-      const x = e.clientX - rect.left; //x position within the element.
-      const percentage = x / rect.width;
-      const direction = (percentage - 0.5) * 100;
-      this.handleBreakUIChange(direction);
-
-      // also move main view
-      const viewUIelement = document.getElementById("root");
-      this.applyViewMouseMove(e, viewUIelement);
+    viewUIelement.onmousedown = (e: any) => {
+      mouseDown = true;
+      this.applyViewMouseMove(e, e.target, mouseDown);
     };
-    const releaseBreak = (e: any) => {
-      if (e.target !== breakUIelement) {
-        return;
-      }
-      const rect = e.target.getBoundingClientRect();
+    viewUIelement.onmouseup = (e: any) => {
+      mouseDown = false;
       this.handleBreakUIChange(0);
-    };
-    breakUIelement.onmousemove = (e: any) => {
-      applyBreak(e);
-    };
-    breakUIelement.onmouseleave = (e: any) => {
-      releaseBreak(e);
     };
   }
 
