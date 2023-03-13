@@ -23,6 +23,7 @@ import Sky from "../components/sky";
 const KMH_TO_MS = 3.6;
 
 const SOUND_ENABLED = false;
+const FOG_ENABLED = true;
 
 function round(number: number): number {
   return Math.round(number * 100) / 100;
@@ -66,6 +67,7 @@ const Game = {
     gui
   ) => {
     gui.hide();
+    sky.updateSunPosition(12);
 
     const weather = new Weather(WEATHER_SETTINGS);
     weather.addGui(gui);
@@ -156,10 +158,12 @@ const Game = {
           pg.setPosition(options.startingLocation.position);
           pg.init();
           camera.setCameraMode(CameraMode.FirstPersonView, pg);
-          // const fogColor = 0x000000;
-          // const fog = new THREE.FogExp2(fogColor, 0.0002);
-          // const fog = new THREE.Fog(fogColor, 1, 15000);
-          // scene.fog = fog;
+          if (FOG_ENABLED) {
+            const fogColor = 0x000000;
+            const fog = new THREE.FogExp2(fogColor, 0.0002);
+            // const fog = new THREE.Fog(fogColor, 1, 15000);
+            scene.fog = fog;
+          }
         }}
         onPause={(paused) => {
           analytics.trackEvent("game-pause");
