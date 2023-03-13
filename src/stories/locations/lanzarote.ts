@@ -42,6 +42,14 @@ const locations: Location[] = [
     idealWindDirectionDegreesFromNorth: 130,
     idealSunPositionDegrees: 30,
   },
+  {
+    title: "High in the island",
+    position: new THREE.Vector3(-6227, 3580, 14055),
+    lookFrom: new THREE.Vector3(-4727, 3580, 17055),
+    lookAt: new THREE.Vector3(-7127, 3580, 12055),
+    idealWindDirectionDegreesFromNorth: 130,
+    idealSunPositionDegrees: 30,
+  },
 ];
 
 export default locations;
