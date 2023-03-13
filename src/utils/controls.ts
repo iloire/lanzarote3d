@@ -4,14 +4,14 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 const Controls = {
   createControls: (camera: THREE.PerspectiveCamera, renderer) => {
     const controls = new OrbitControls(camera, renderer.domElement);
-    controls.panSpeed = 0.4;
-    controls.rotateSpeed = 0.2;
-    controls.zoomSpeed = 0.4;
+    controls.panSpeed = 1.0;
+    controls.rotateSpeed = 1.2;
+    controls.zoomSpeed = 1.9;
 
     controls.enableDamping = true;
     controls.enablePan = true;
     // controls.maxPolarAngle = 1.5;
-    // controls.minDistance = 0.2;
+    controls.minDistance = 200;
     // controls.maxDistance = 220;
 
     controls.keys = {
