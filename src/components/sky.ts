@@ -7,7 +7,6 @@ import {
 import lensflareTexture0 from "../textures/lensflare0.png";
 import lensflareTexture1 from "../textures/lensflare1.png";
 import Time from "../utils/time";
-import Moon from "./moon";
 
 const calculateLightIntensity = (
   timeOfDayInHours: number,
@@ -61,7 +60,6 @@ export default class Sky extends THREE.Object3D {
   monthOfTheYear: number;
   sky: SkyExample;
   ambientLight: THREE.AmbientLight;
-  moon: THREE.Object3D;
   pointLight: THREE.PointLight;
   directionalLight: THREE.DirectionalLight;
   directionalLightHelper: THREE.DirectionalLightHelper;
@@ -110,10 +108,6 @@ export default class Sky extends THREE.Object3D {
     }
 
     this.ambientLight = new THREE.AmbientLight(0xffffff, lightIntensity);
-
-    const moon = new Moon();
-    this.moon = moon.load(1000);
-    this.moon.position.set(0, 10000, 0);
   }
 
   addGui(gui) {
@@ -169,7 +163,6 @@ export default class Sky extends THREE.Object3D {
       scene.add(this.directionalLightHelper);
     }
     scene.add(this.pointLight);
-    scene.add(this.moon);
     scene.add(this.ambientLight);
     // this.addFlare(this.pointLight);
   }
