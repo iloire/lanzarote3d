@@ -22,16 +22,16 @@ const calculateLightIntensity = (
     return 0.4;
   }
   if (timeOfDayInHours < 14) {
-    return 0.5;
+    return 0.6;
   }
   if (timeOfDayInHours < 16) {
-    return 0.4;
+    return 0.5;
   }
   if (timeOfDayInHours < 18) {
-    return 0.3;
+    return 0.4;
   }
   if (timeOfDayInHours < 20) {
-    return 0.2;
+    return 0.3;
   }
   return 0.1;
 };
