@@ -104,6 +104,7 @@ class App extends React.Component<AppProps, AppState> {
     // Helpers.drawSphericalPosition(30, 90, 100, scene);
 
     const loadingManager = new THREE.LoadingManager();
+
     const island = await Island.load(loadingManager);
     const scale = 20000;
     island.scale.set(scale, scale, scale);
@@ -126,32 +127,15 @@ class App extends React.Component<AppProps, AppState> {
       const urlParams = new URLSearchParams(queryString);
       const story = urlParams.get("story");
       console.log("loading story:", story);
-      if (story === "mechanics") {
-        await Stories.mechanics(
-          camera,
-          scene,
-          renderer,
-          island,
-          water,
-          sky,
-          gui
-        );
-      } else if (story === "flyzones") {
-        await Stories.flyzones(camera, scene, renderer);
-      } else if (story === "default") {
-        await Stories.default(camera, scene, renderer);
-      } else if (story === "daytime") {
-        await Stories.daytime(camera, scene, renderer, island, water, sky, gui);
-      } else if (story === "night") {
-        await Stories.night(camera, scene, renderer, island, water, sky, gui);
-      } else {
-        // default is game
-        await Stories.game(camera, scene, renderer, island, water, sky, gui);
-      }
-    };
-    loadingManager.onProgress = async (url, loaded, total) => {
-      this.setState({ loadingProcess: Math.floor((loaded / total) * 100) });
-    };
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const story = urlParams.get("story");
+    console.log("loading story:", story);
+    if (story) {
+      await Stories[story](camera, scene, renderer, island, water, sky, gui);
+    } else {
+      await Stories.game(camera, scene, renderer, island, water, sky, gui);
+    }
 
     function animate() {
       water.material.uniforms["time"].value += 1.0 / 60.0;
