@@ -3,6 +3,7 @@ import Paraglider from "./pg";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import Animations from "../utils/animations";
 import Controls from "../utils/controls";
+import GuiHelper from "../utils/gui";
 
 const getObjectPosition = (obj: THREE.Object3D) => {
   const pos = new THREE.Vector3();
@@ -50,23 +51,7 @@ class Camera extends THREE.PerspectiveCamera {
   }
 
   addGui(gui) {
-    const cameraGui = gui.addFolder("Camera");
-    cameraGui.add(this.position, "x", -10000, 10000).name("x").listen();
-    cameraGui.add(this.position, "y", 200, 2000).name("y").listen();
-    cameraGui.add(this.position, "z", -10000, 10000).name("z").listen();
-
-    cameraGui
-      .add(this.rotation, "x", -Math.PI, Math.PI)
-      .name("rotation.x")
-      .listen();
-    cameraGui
-      .add(this.rotation, "y", -Math.PI, Math.PI)
-      .name("rotation.y")
-      .listen();
-    cameraGui
-      .add(this.rotation, "z", -Math.PI, Math.PI)
-      .name("rotation.z")
-      .listen();
+    GuiHelper.addLocationGui(gui, "camera", this);
   }
 
   update() {
