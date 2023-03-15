@@ -1,7 +1,9 @@
 import * as THREE from "three";
 import Pilot from "./pilot";
+import GuiHelper from "../utils/gui";
 
 const mat_wing = new THREE.MeshLambertMaterial({ color: 0x00ffff });
+const numeroCajones = 16;
 
 const createCajon = (w: number, h: number, deep: number): THREE.Mesh => {
   const geo = new THREE.BoxGeometry(w, h, deep);
@@ -14,33 +16,18 @@ const createCajon = (w: number, h: number, deep: number): THREE.Mesh => {
 const createHalfWing = (): THREE.Mesh => {
   const group = new THREE.Mesh();
   let distanceCajon = 0;
-  for (let i = 0; i < 15; i++) {
+  for (let i = 0; i < numeroCajones; i++) {
     const w = 2 + i * 0.5;
     const h = 0.5 + i * 0.2;
     const deep = 10 + i * 2.8;
-    distanceCajon += w * 0.9;
+    distanceCajon += w * 0.8;
     const cajon = createCajon(w, h, deep);
-    cajon.position.set(i * 3, distanceCajon, 0);
+    cajon.position.set(i * 1.9 - 2 * h, distanceCajon, 0);
     group.add(cajon);
   }
   group.rotateZ(Math.PI / 2);
   group.rotateX(Math.PI / 2);
   return group;
-};
-
-const createWing = (): THREE.Mesh => {
-  const wing = new THREE.Mesh();
-  const halfWing = createHalfWing();
-  const otherHalf = halfWing.clone();
-  otherHalf.rotateX(Math.PI);
-  otherHalf.translateY(-155);
-
-  wing.add(halfWing);
-  wing.add(otherHalf);
-
-  wing.translateZ(-85);
-  wing.translateY(80);
-  return wing;
 };
 
 const createPilot = (): THREE.Object3D => {
@@ -49,16 +36,63 @@ const createPilot = (): THREE.Object3D => {
 };
 
 class ParagliderModel {
-  load(): THREE.Mesh {
+  leftWing: THREE.Object3D;
+  rightWing: THREE.Object3D;
+  wing: THREE.Mesh;
+  pilot: THREE.Mesh;
+  initialLeftWingRotation: number;
+  initialRightWingRotation: number;
+
+  breakLeft() {
+    this.leftWing.rotation.y = this.initialLeftWingRotation + 0.2;
+  }
+
+  breakRight() {
+    this.rightWing.rotation.y = this.initialRightWingRotation - 0.2;
+  }
+
+  handsUp() {
+    this.rightWing.rotation.y = this.initialRightWingRotation;
+    this.leftWing.rotation.y = this.initialLeftWingRotation;
+  }
+
+  createWing(): THREE.Mesh {
+    this.wing = new THREE.Mesh();
+
+    this.leftWing = createHalfWing();
+    this.initialLeftWingRotation = this.leftWing.rotation.y;
+
+    this.rightWing = this.leftWing.clone();
+    this.rightWing.rotateX(Math.PI);
+    this.rightWing.translateY(-155);
+    this.initialRightWingRotation = this.rightWing.rotation.y;
+
+    this.wing.add(this.leftWing);
+    this.wing.add(this.rightWing);
+
+    this.wing.translateZ(-78);
+    this.wing.translateY(80);
+    return this.wing;
+  }
+
+  load(gui?: any): THREE.Mesh {
     const model = new THREE.Mesh();
-    const wing = createWing();
+    const wing = this.createWing();
+    wing.position.y = -30;
     model.add(wing);
+
     const pilot = createPilot();
     const scale = 0.03;
     pilot.scale.set(scale, scale, scale);
+    pilot.position.y = -110;
     pilot.rotateY(Math.PI / 2);
     model.add(pilot);
 
+    if (gui) {
+      GuiHelper.addLocationGui(gui, "leftWing", this.leftWing);
+      GuiHelper.addLocationGui(gui, "rightWing", this.rightWing);
+      GuiHelper.addLocationGui(gui, "pilot", pilot);
+    }
     return model;
   }
 }
