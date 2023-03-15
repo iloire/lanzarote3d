@@ -35,6 +35,21 @@ const createPilot = (): THREE.Object3D => {
   return pilot.load();
 };
 
+const createLines = (): THREE.Object3D => {
+  const material = new THREE.LineBasicMaterial({ color: 0x0000ff }); // blue color
+  const points = []; // array to hold the points of the line segments
+
+  points.push(new THREE.Vector3(1, -1, -40)); // start point of first segment
+  points.push(new THREE.Vector3(5, -120, 0)); // end point of first segment
+
+  points.push(new THREE.Vector3(1, -1, 40)); // start point of second segment
+  points.push(new THREE.Vector3(5, -120, 0)); // end point of second segment
+
+  const geometry = new THREE.BufferGeometry().setFromPoints(points); // create the geometry from the points
+  const lineSegments = new THREE.LineSegments(geometry, material); // create the line segments
+  return lineSegments;
+};
+
 class ParagliderModel {
   leftWing: THREE.Object3D;
   rightWing: THREE.Object3D;
@@ -87,6 +102,9 @@ class ParagliderModel {
     pilot.position.y = -110;
     pilot.rotateY(Math.PI / 2);
     model.add(pilot);
+
+    const lines = createLines();
+    model.add(lines);
 
     if (gui) {
       GuiHelper.addLocationGui(gui, "leftWing", this.leftWing);
