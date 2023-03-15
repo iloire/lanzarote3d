@@ -8,7 +8,6 @@ import Sky from "./components/sky";
 
 import Animations from "./utils/animations";
 import Models from "./utils/models";
-import Helpers from "./utils/helpers";
 import Water from "./components/water";
 
 import Island from "./elements/island";
@@ -18,8 +17,6 @@ import Camera from "./elements/camera";
 
 import WebGL from "./WebGL";
 import "./index.css";
-
-const SHOW_HELPERS = true;
 
 THREE.Cache.enabled = true;
 const gui = new GUI();
@@ -91,11 +88,7 @@ class App extends React.Component<AppProps, AppState> {
       false
     );
 
-    if (SHOW_HELPERS) {
-      Helpers.createHelpers(scene);
-    }
-
-    const sky: Sky = new Sky(11, 3);
+    const sky: Sky = new Sky(20, 3);
     const skyMesh = sky.addToScene(scene);
     sky.addGui(gui);
 
@@ -104,11 +97,14 @@ class App extends React.Component<AppProps, AppState> {
     // Helpers.drawSphericalPosition(30, 90, 100, scene);
 
     const loadingManager = new THREE.LoadingManager();
+    loadingManager.onProgress = async (url, loaded, total) => {
+      this.setState({ loadingProcess: Math.floor((loaded / total) * 100) });
+    };
 
     const island = await Island.load(loadingManager);
     const scale = 20000;
     island.scale.set(scale, scale, scale);
-    island.position.set(0, 20, 0);
+    island.position.set(0, 0, 0);
     scene.add(island);
 
     const camera = new Camera(
@@ -122,16 +118,11 @@ class App extends React.Component<AppProps, AppState> {
     camera.addGui(gui);
     scene.add(camera);
 
-    loadingManager.onLoad = async () => {
-      const queryString = window.location.search;
-      const urlParams = new URLSearchParams(queryString);
-      const story = urlParams.get("story");
-      console.log("loading story:", story);
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
     const story = urlParams.get("story");
     console.log("loading story:", story);
-    if (story) {
+    if (story && Stories[story]) {
       await Stories[story](camera, scene, renderer, island, water, sky, gui);
     } else {
       await Stories.game(camera, scene, renderer, island, water, sky, gui);

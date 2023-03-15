@@ -3,9 +3,12 @@ import model from "../models/paraglider2.glb";
 import Models from "../utils/models";
 import Weather from "../elements/weather";
 import Thermal from "../elements/thermal";
+import ParagliderModel from "../components/paraglider";
+import GuiHelper from "../utils/gui";
 
-const settings = { SHOW_ARROWS: false };
 const ORIGIN = new THREE.Vector3(0, 0, 0);
+const DOWN_DIRECTION = new THREE.Vector3(0, -1, 0);
+const UP_DIRECTION = new THREE.Vector3(0, 1, 0);
 
 function getAttackAngleRadians(glidingRatio: number) {
   return Math.atan(1 / glidingRatio);
@@ -21,9 +24,8 @@ const createLiftArrow = (
   len: number,
   color
 ): THREE.ArrowHelper => {
-  const dir = new THREE.Vector3(0, 1, 0);
-  const arrow = new THREE.ArrowHelper(dir, ORIGIN, len, color);
-  const axis = new THREE.Vector3(1, 0, 0);
+  const arrow = new THREE.ArrowHelper(UP_DIRECTION.clone(), ORIGIN, len, color);
+  const axis = new THREE.Vector3(0, 0, 1);
   arrow.rotateOnAxis(axis, -getAttackAngleRadians(glidingRatio));
   return arrow;
 };
@@ -33,10 +35,19 @@ const createTrajectoryArrow = (
   len: number,
   color
 ): THREE.ArrowHelper => {
-  const dir = new THREE.Vector3(0, 0, -1);
+  const dir = new THREE.Vector3(1, 0, 0);
   const arrow = new THREE.ArrowHelper(dir, ORIGIN, len, color);
-  const axis = new THREE.Vector3(1, 0, 0);
+  const axis = new THREE.Vector3(0, 0, 1);
   arrow.rotateOnAxis(axis, -getAttackAngleRadians(glidingRatio));
+  return arrow;
+};
+
+const createDirectionArrow = (
+  dir: THREE.Vector3,
+  len: number,
+  color
+): THREE.ArrowHelper => {
+  const arrow = new THREE.ArrowHelper(dir, ORIGIN, len, color);
   return arrow;
 };
 
@@ -76,6 +87,7 @@ export interface ParagliderConstructor {
 }
 
 class Paraglider extends THREE.EventDispatcher {
+  paragliderModel: ParagliderModel;
   options: ParagliderConstructor;
   weather: Weather;
   terrain: THREE.Mesh;
@@ -85,7 +97,6 @@ class Paraglider extends THREE.EventDispatcher {
   currentSpeed: number;
   interval: number = null;
   model: THREE.Mesh;
-  gravityDirection = new THREE.Vector3(0, -1, 0);
   wrapSpeed: number = 1;
   flyingTime: number = 0;
   metersFlown: number = 0;
@@ -98,15 +109,18 @@ class Paraglider extends THREE.EventDispatcher {
   __gradient: number = 0;
   __directionInput: number = 0;
   rotationInertia = 0;
+  debug: boolean;
 
   constructor(
     options: ParagliderConstructor,
     weather: Weather,
     terrain: THREE.Mesh,
     water: THREE.Mesh,
-    thermals: Thermal[]
+    thermals: Thermal[],
+    debug?: boolean
   ) {
     super();
+    this.debug = debug;
     this.speedBar = false;
     this.currentSpeed = options.trimSpeed;
     this.options = options;
@@ -135,22 +149,19 @@ class Paraglider extends THREE.EventDispatcher {
     this.wrapSpeed = value;
   }
 
-  async loadModel(scale: number): Promise<THREE.Mesh> {
-    const mesh = await Models.loadSimple(model);
+  async loadModel(scale: number): Promise<THREE.Object3D> {
+    this.paragliderModel = new ParagliderModel();
+    const mesh = this.paragliderModel.load();
     mesh.scale.set(scale, scale, scale);
-    const mat001 = new THREE.MeshPhysicalMaterial();
-    mat001.color = new THREE.Color("red");
-    mat001.reflectivity = 1.0;
-    mat001.roughness = 0.0;
-    mat001.envMapIntensity = 1.0;
-    mesh.material = mat001;
-    if (settings.SHOW_ARROWS) {
+    mesh.position.y += 300;
+    this.model = mesh;
+    if (this.debug) {
       const arrowLen = 700;
+      mesh.add(createDirectionArrow(this.direction(), arrowLen, 0x0000ff));
       mesh.add(createTrajectoryArrow(this.glidingRatio(), arrowLen, 0xff00ff));
       mesh.add(createLiftArrow(this.glidingRatio(), arrowLen, 0xffffff));
       mesh.add(this.getGravityHelper(arrowLen));
     }
-    this.model = mesh;
     return mesh;
   }
 
@@ -222,10 +233,18 @@ class Paraglider extends THREE.EventDispatcher {
       }
     }
 
+    if (this.__directionInput > 0 || this.isRightBreaking) {
+      this.paragliderModel.breakRight();
+    } else if (this.__directionInput < 0 || this.isLeftBreaking) {
+      this.paragliderModel.breakLeft();
+    } else {
+      this.paragliderModel.handsUp();
+    }
+
     this.rotationInertia = THREE.MathUtils.clamp(this.rotationInertia, -50, 50);
 
     if (Math.abs(this.rotationInertia) > 0) {
-      this.setRoll(this.rotationInertia * 1.3);
+      this.setRoll(Math.abs(this.rotationInertia) * 1.3);
       this.rotate(this.rotationInertia * smoother);
     } else {
       this.setRoll(0);
@@ -262,25 +281,24 @@ class Paraglider extends THREE.EventDispatcher {
   }
 
   moveVertical(multiplier: number) {
-    const gravityDirection = new THREE.Vector3(0, -1, 0);
     const drop = this.speed() / this.glidingRatio();
-    const downVector = gravityDirection.multiplyScalar(multiplier * drop);
+    const downVector = DOWN_DIRECTION.clone().multiplyScalar(multiplier * drop);
     this.dispatchEvent({
       type: "drop",
       drop,
     });
     const lift = this.getLiftValue();
-    const liftDirection = new THREE.Vector3(0, 1, 0);
-    const liftVector = liftDirection.multiplyScalar(multiplier * lift);
+    const liftVector = UP_DIRECTION.clone().multiplyScalar(multiplier * lift);
     this.dispatchEvent({
       type: "dynamicLift",
       lift,
     });
 
     // roll sink
-    const rollDrop = Math.abs(this.__rollAngle * 7);
-    const sinkDirection = new THREE.Vector3(0, -1, 0);
-    const sinkVector = sinkDirection.multiplyScalar(multiplier * rollDrop);
+    const rollDrop = Math.abs(this.__rollAngle * 7); // TODO: do something better
+    const sinkVector = DOWN_DIRECTION.clone().multiplyScalar(
+      multiplier * rollDrop
+    );
     this.dispatchEvent({
       type: "rollDrop",
       drop: rollDrop,
@@ -288,9 +306,7 @@ class Paraglider extends THREE.EventDispatcher {
 
     const inHowManyThermals = this.countInsideHowManyThermals();
     const liftThermal = 2 * inHowManyThermals; // this.isInsideAnyThermal() ? 2 : 0;
-
-    const liftThermalDirection = new THREE.Vector3(0, 1, 0);
-    const liftThermalVector = liftThermalDirection.multiplyScalar(
+    const liftThermalVector = UP_DIRECTION.clone().multiplyScalar(
       multiplier * liftThermal
     );
     this.dispatchEvent({
@@ -303,7 +319,6 @@ class Paraglider extends THREE.EventDispatcher {
       .add(sinkVector)
       .add(liftThermalVector);
     this.move(combinedMoveVector);
-
     this.dispatchEvent({
       type: "delta",
       delta: lift + liftThermal - drop - rollDrop,
@@ -312,26 +327,11 @@ class Paraglider extends THREE.EventDispatcher {
 
   addGui(gui) {
     const pg = this.model;
+    GuiHelper.addLocationGui(gui, "Paraglider", pg, {
+      min: -20000,
+      max: 20000,
+    });
     const pgGui = gui.addFolder("Paraglider position");
-    pgGui.add(pg.position, "x", -22000, 22000).name("position.x").listen();
-    pgGui.add(pg.position, "y", 0, 2800).name("position.y").listen();
-    pgGui.add(pg.position, "z", -22000, 22000).name("position.z").listen();
-    pgGui.add(settings, "SHOW_ARROWS", true).name("forces").listen();
-
-    const pgRotationGui = gui.addFolder("Paraglider rotation");
-    pgRotationGui
-      .add(pg.rotation, "x", -Math.PI, Math.PI)
-      .name("rotation.x")
-      .listen();
-    pgRotationGui
-      .add(pg.rotation, "y", -Math.PI, Math.PI)
-      .name("rotation.y")
-      .listen();
-    pgRotationGui
-      .add(pg.rotation, "z", -Math.PI, Math.PI)
-      .name("rotation.z")
-      .listen();
-
     const pgWindGui = gui.addFolder("Paraglider wing");
     pgWindGui
       .add(this.options, "trimSpeed", 20 / 3.6, 70 / 3.6)
@@ -447,19 +447,18 @@ class Paraglider extends THREE.EventDispatcher {
 
   getGravityHelper(len: number) {
     const arrow = new THREE.ArrowHelper(
-      this.gravityDirection,
+      DOWN_DIRECTION.clone(),
       ORIGIN,
       len,
       0xff0000
     );
-    // arrow.up.set(0, 0, -1);
     return arrow;
   }
 
   direction(): THREE.Vector3 {
-    const rotation = this.model.quaternion.clone();
-    const direction = new THREE.Vector3(0, 0, -1);
-    direction.applyQuaternion(rotation);
+    const forward = new THREE.Vector3(1, 0, 0);
+    const quaternion = this.model.getWorldQuaternion(new THREE.Quaternion());
+    const direction = forward.clone().applyQuaternion(quaternion);
     return direction.clone();
   }
 

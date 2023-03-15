@@ -4,6 +4,7 @@ import Sky from "../components/sky";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import Paraglider from "../components/paraglider";
+import Helpers from "../utils/helpers";
 
 const Workshop = {
   load: async (
@@ -18,6 +19,8 @@ const Workshop = {
     terrain.visible = false;
     water.visible = false;
 
+    Helpers.createHelpers(scene);
+
     const controls = Controls.createControls(camera, renderer);
     sky.updateSunPosition(12);
     //
@@ -30,9 +33,11 @@ const Workshop = {
     // scene.add(plane);
 
     const paraglider = new Paraglider();
-    const mesh = paraglider.load();
+    const mesh = paraglider.load(gui);
     mesh.position.set(0, 0, 0);
     scene.add(mesh);
+    paraglider.breakLeft();
+    paraglider.breakRight();
 
     const animate = () => {
       requestAnimationFrame(animate);
@@ -41,7 +46,7 @@ const Workshop = {
 
     camera.position.set(66, 32, 41);
     camera.lookAt(mesh.position);
-    controls.target = mesh.position;
+    // controls.target = mesh.position.clone().add(new THREE.Vector3(0, 12, 0));
     animate();
   },
 };

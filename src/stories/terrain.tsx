@@ -15,7 +15,7 @@ const Terrain = {
     sky: Sky,
     gui
   ) => {
-    // water.visible = false;
+    water.visible = false;
     terrain.visible = false;
 
     const controls = Controls.createControls(camera, renderer);
@@ -31,8 +31,8 @@ const Terrain = {
     const displacement = loader.load(textureImg);
     const groundGeometry = new THREE.PlaneGeometry(10000, 10000, 300, 300);
     const groundMaterial = new THREE.MeshPhongMaterial({
-      // wireframe: true,
-      color: "red",
+      wireframe: true,
+      color: "green",
       displacementMap: displacement,
       displacementScale: 900,
       // displacementBias: 2,

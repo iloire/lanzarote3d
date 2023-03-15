@@ -23,7 +23,9 @@ import Sky from "../components/sky";
 const KMH_TO_MS = 3.6;
 
 const SOUND_ENABLED = false;
-const FOG_ENABLED = true;
+const FOG_ENABLED = false;
+const TIME_OF_DAY = 19;
+const DEBUG = false;
 
 function round(number: number): number {
   return Math.round(number * 100) / 100;
@@ -50,8 +52,24 @@ const pgOptions: ParagliderConstructor = {
   bigEarsSpeed: 27 / KMH_TO_MS,
 };
 
-const p = {
-  scale: 1,
+const addWindIndicatorToScene = (
+  scene: THREE.Scene,
+  pg: Paraglider,
+  weather: Weather
+) => {
+  const windIndicator = new WindIndicator(140);
+  const arrow = windIndicator.load(
+    WEATHER_SETTINGS.windDirectionDegreesFromNorth,
+    pg.position().add(pg.direction())
+  );
+  scene.add(arrow);
+  pg.addEventListener("position", (event) => {
+    arrow.position.copy(event.position).add(pg.direction().multiplyScalar(300));
+  });
+
+  weather.addEventListener("wind-directionChange", (event) => {
+    windIndicator.update(event.value);
+  });
 };
 
 const analytics = new Analytics();
@@ -67,7 +85,7 @@ const Game = {
     gui
   ) => {
     gui.hide();
-    sky.updateSunPosition(12);
+    sky.updateSunPosition(TIME_OF_DAY);
 
     const weather = new Weather(WEATHER_SETTINGS);
     weather.addGui(gui);
@@ -77,9 +95,21 @@ const Game = {
     const thermals = Environment.addThermals(scene, weather);
     Environment.addClouds(scene, weather, thermals);
 
-    const pg = new Paraglider(pgOptions, weather, terrain, water, thermals);
+    const pg = new Paraglider(
+      pgOptions,
+      weather,
+      terrain,
+      water,
+      thermals,
+      DEBUG
+    );
     const vario = new Vario(pg, SOUND_ENABLED);
-    const mesh = await pg.loadModel(p.scale);
+    const mesh = await pg.loadModel(1);
+    const box = new THREE.BoxHelper(mesh, 0xffff00);
+    if (DEBUG) {
+      scene.add(box);
+    }
+    mesh.rotateY(Math.PI / 2);
     pg.addGui(gui);
     scene.add(mesh);
 
@@ -232,23 +262,10 @@ const Game = {
 
     pg.addEventListener("touchedGround", touchedGround);
 
-    const windIndicator = new WindIndicator(40);
-    const arrow = windIndicator.load(
-      WEATHER_SETTINGS.windDirectionDegreesFromNorth,
-      pg.position().add(pg.direction())
-    );
-    scene.add(arrow);
-    pg.addEventListener("position", (event) => {
-      arrow.position
-        .copy(event.position)
-        .add(pg.direction().multiplyScalar(300));
-    });
-
-    weather.addEventListener("wind-directionChange", (event) => {
-      windIndicator.update(event.value);
-    });
+    addWindIndicatorToScene(scene, pg, weather);
 
     const animate = () => {
+      box.update();
       vario.updateReading(pg.altitude());
       if (isLeftViewing) {
         camera.turnLeft();

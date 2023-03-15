@@ -275,6 +275,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
   }
 
   handleCamMode = (mode: CameraMode) => {
+    console.log(mode);
     if (mode === CameraMode.FirstPersonView) {
       this.setState({ viewControlsVisible: false });
     } else {

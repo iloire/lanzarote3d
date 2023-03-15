@@ -9,6 +9,8 @@ import Birds from "../elements/birds";
 import WindIndicator from "../components/wind-indicator";
 import Environment from "./game/env";
 import Helpers from "../utils/helpers";
+import Stone from "../components/stone";
+import Tree from "../components/tree";
 
 const KMH_TO_MS = 3.6;
 
@@ -19,8 +21,8 @@ const WEATHER_SETTINGS: WeatherOptions = {
 };
 
 const p = {
-  scale: 20.4,
-  position: new THREE.Vector3(6827, 1880, -555),
+  scale: 10,
+  position: new THREE.Vector3(6827, 3080, -555),
 };
 
 const Mechanics = {
@@ -41,6 +43,8 @@ const Mechanics = {
     const thermals = Environment.addThermals(scene, weather);
     Environment.addClouds(scene, weather, thermals);
 
+    sky.updateSunPosition(12);
+
     const pgOptions: ParagliderConstructor = {
       glidingRatio: 9,
       trimSpeed: 25 / KMH_TO_MS,
@@ -54,7 +58,6 @@ const Mechanics = {
     mesh.position.copy(p.position);
     pg.addGui(gui);
     scene.add(mesh);
-    pg.init();
 
     // const birds = new Birds();
     // const birdsMesh = await birds.loadModel(33);
@@ -69,7 +72,7 @@ const Mechanics = {
     const arrow = windIndicator.load(330, pg.position());
     scene.add(arrow);
 
-    Helpers.drawPoint(scene, sky.getSunPosition());
+    // Helpers.drawPoint(scene, sky.getSunPosition());
 
     // const findCameraIntercept = () => {
     //   const raycaster = new THREE.Raycaster(
@@ -89,6 +92,16 @@ const Mechanics = {
     //   }
     // };
 
+    const stone = new Stone().load();
+    stone.position.set(0, 1000, 0);
+    stone.scale.set(100, 100, 100);
+    scene.add(stone);
+
+    const tree = new Tree().load();
+    tree.position.set(0, 400, 0);
+    tree.scale.set(10, 10, 10);
+    scene.add(tree);
+
     const animate = () => {
       // findCameraIntercept();
       requestAnimationFrame(animate);
@@ -99,7 +112,7 @@ const Mechanics = {
     };
 
     camera.position.set(4200, 12500, -23200);
-    camera.lookAt(0, 0, 0);
+    camera.lookAt(mesh.position);
     animate();
   },
 };

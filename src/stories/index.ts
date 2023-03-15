@@ -5,6 +5,7 @@ import Mechanics from "./mechanics";
 import DayTime from "./daytime";
 import Night from "./night";
 import Terrain from "./terrain";
+import Workshop from "./workshop";
 
 const Stories = {
   default: Default.load,
@@ -14,6 +15,7 @@ const Stories = {
   daytime: DayTime.load,
   night: Night.load,
   terrain: Terrain.load,
+  workshop: Workshop.load,
 };
 
 export default Stories;

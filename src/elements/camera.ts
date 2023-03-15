@@ -28,8 +28,8 @@ class Camera extends THREE.PerspectiveCamera {
   controls: OrbitControls;
   angle: number = 0;
   angleIncrement: number = 0.05;
-  distance: number = 20;
-  distanceIncrement: number = 2;
+  distance: number = 30;
+  distanceIncrement: number = 10;
   farAwayOffset: THREE.Vector3 = new THREE.Vector3(-1302, 700, 1301.2);
   topViewOffset: THREE.Vector3 = new THREE.Vector3(10, 300, -10);
   airplaneViewOffset: THREE.Vector3 = new THREE.Vector3(-6030, 2000, -11330);
@@ -144,7 +144,7 @@ class Camera extends THREE.PerspectiveCamera {
   }
 
   followTargetBehind() {
-    const cameraoffset = new THREE.Vector3(3, 1, 3);
+    const cameraoffset = new THREE.Vector3(-20, 1, 0);
     this.position.copy(
       this.target
         .position()
@@ -153,23 +153,19 @@ class Camera extends THREE.PerspectiveCamera {
     this.lookAt(
       this.target.position().add(this.target.direction().multiplyScalar(20))
     );
-    // adjust for roll
-    // this.rotateZ(this.viewRotationX / 4 + this.target.model.rotation.z);
-
-    // view rotation
-    // this.rotateY(this.viewRotationX * 1.5);
   }
 
   firstPersonView() {
-    const cameraoffset = new THREE.Vector3(0, 3, 0);
+    const cameraoffset = new THREE.Vector3(0, -45, 0);
     this.position.copy(
       this.target
         .position()
-        .add(this.target.direction().add(cameraoffset).multiplyScalar(-0.8))
+        .add(this.target.direction().add(cameraoffset).multiplyScalar(2))
     );
     this.lookAt(
-      this.target.position().add(this.target.direction().multiplyScalar(20))
+      this.target.position().add(this.target.direction().multiplyScalar(200))
     );
+    console.log(this.target.direction());
     // adjust for roll
     this.rotateZ(-1 * (this.viewRotationX / 4 + this.target.model.rotation.z));
 

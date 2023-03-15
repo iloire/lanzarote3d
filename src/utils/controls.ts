@@ -11,7 +11,7 @@ const Controls = {
     controls.enableDamping = true;
     controls.enablePan = true;
     // controls.maxPolarAngle = 1.5;
-    controls.minDistance = 200;
+    // controls.minDistance = 200;
     // controls.maxDistance = 220;
 
     controls.keys = {
