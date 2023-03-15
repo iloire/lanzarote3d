@@ -16,7 +16,6 @@ const createWindArrow = (
   origin: THREE.Vector3,
   color
 ): THREE.ArrowHelper => {
-  console.log(origin);
   const arrowHelper = new THREE.ArrowHelper(
     getDirectionFromNorth(directionDegreesFromNorth),
     origin,
