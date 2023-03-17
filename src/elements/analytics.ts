@@ -10,7 +10,6 @@ ReactGA.gtag("set", "user_properties", {
 
 class Analytics {
   trackEvent(action: string, label?: string) {
-    console.log("track: ", action);
     ReactGA.event({
       category,
       action,
