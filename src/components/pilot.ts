@@ -112,7 +112,7 @@ const getHead = (): THREE.Group => {
 const getBody = (): THREE.Group => {
   const group = new THREE.Group();
 
-  const bodyGeo = new THREE.BoxGeometry(250, 420, 1200);
+  const bodyGeo = new THREE.BoxGeometry(250, 420, 1400);
   const body = new THREE.Mesh(bodyGeo, suitMat);
   body.position.x = 0;
   body.position.y = -350;
