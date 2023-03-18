@@ -29,7 +29,7 @@ const GuiHelper = {
     gui,
     name: string,
     pos: THREE.Vector3,
-    options: GuiHelperOptions = { min: -20, max: 20 }
+    options: GuiHelperOptions = { min: -100, max: 100 }
   ) => {
     const { min, max } = options;
     const g = gui.addFolder(name);
@@ -44,12 +44,7 @@ const GuiHelper = {
       .listen();
   },
 
-  addLocationGui: (
-    gui,
-    name: string,
-    obj: any,
-    options: GuiHelperOptions = { min: -20, max: 20 }
-  ) => {
+  addLocationGui: (gui, name: string, obj: any, options?: GuiHelperOptions) => {
     GuiHelper.addPositionGui(gui, name, obj.position, options);
     GuiHelper.addRotationGui(gui, name, obj.rotation);
   },
