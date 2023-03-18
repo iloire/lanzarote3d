@@ -23,7 +23,7 @@ import Sky from "../components/sky";
 const KMH_TO_MS = 3.6;
 
 const FOG_ENABLED = false;
-const TIME_OF_DAY = 20;
+const TIME_OF_DAY = 19;
 const SOUND_ENABLED = false;
 const DEBUG = false;
 
@@ -131,6 +131,9 @@ const Game = {
       } else if (keyCode == 83) {
         //s
         pg.toggleSpeedBar();
+      } else if (keyCode == 69) {
+        //s
+        pg.toggleEars();
       }
     }
 
