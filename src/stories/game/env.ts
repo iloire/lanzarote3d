@@ -68,37 +68,21 @@ const addTreesAroundArea = (
   terrain: THREE.Mesh,
   scene: THREE.Scene
 ) => {
-  for (let index = 0; index < numberTrees; index++) {
-    const newX = pos.x + 10 * index * rndIntBetween(0, 20);
-    const newZ = pos.z + 10 * index * rndIntBetween(0, 10);
-
-    const terrainHeight = getTerrainHeight(
-      new THREE.Vector3(newX, 0, newZ),
-      terrain
-    );
-    if (isNaN(terrainHeight)) {
-      break;
-    }
-    const treePos = new THREE.Vector3(newX, terrainHeight, newZ);
-    console.log(treePos);
-
-    const tree = new Tree().load();
-    tree.position.copy(treePos);
-    const scale = 5;
-    tree.scale.set(scale, scale, scale);
-    scene.add(tree);
-  }
+  const tree = new Tree().load();
+  const scale = 3;
+  tree.scale.set(scale, scale, scale);
+  addMeshAroundArea(tree, pos, numberTrees, terrain, scene);
 };
 
 const addMeshAroundArea = (
-  mesh: THREE.Mesh,
+  obj: THREE.Object3D,
   pos: THREE.Vector3,
-  numberTrees: number,
+  number: number,
   terrain: THREE.Mesh,
   scene: THREE.Scene
 ) => {
-  for (let index = 0; index < numberTrees; index++) {
-    const newX = pos.x + 10 * index * rndIntBetween(0, 20);
+  for (let index = 0; index < number; index++) {
+    const newX = pos.x + 10 * index * rndIntBetween(0, 5);
     const newZ = pos.z + 10 * index * rndIntBetween(0, 10);
 
     const terrainHeight = getTerrainHeight(
@@ -108,12 +92,10 @@ const addMeshAroundArea = (
     if (isNaN(terrainHeight)) {
       break;
     }
-    const treePos = new THREE.Vector3(newX, terrainHeight, newZ);
+    const meshPos = new THREE.Vector3(newX, terrainHeight, newZ);
 
-    const meshClone = mesh.clone();
-    meshClone.position.copy(treePos);
-    const scale = 5;
-    meshClone.scale.set(scale, scale, scale);
+    const meshClone = obj.clone();
+    meshClone.position.copy(meshPos);
     scene.add(meshClone);
   }
 };
@@ -121,12 +103,17 @@ const addMeshAroundArea = (
 const Environment = {
   addStones: (scene: THREE.Scene, terrain: THREE.Mesh) => {
     const stone = new Stone().load();
-    stone.scale.set(100, 100, 100);
-    addMeshAroundArea(stone, new THREE.Vector3(0, 600, 0), 100, terrain, scene);
+    const scale = 4;
+    stone.scale.set(scale, scale, scale);
+    const pos = new THREE.Vector3(6879, 600, -545);
+    addMeshAroundArea(stone, pos, 100, terrain, scene);
   },
   addTrees: (scene: THREE.Scene, terrain: THREE.Mesh) => {
-    addTreesAroundArea(new THREE.Vector3(0, 600, 0), 100, terrain, scene);
-    addTreesAroundArea(new THREE.Vector3(6879, 600, -545), 100, terrain, scene);
+    const pos = new THREE.Vector3(6879, 600, -545);
+    const tree = new Tree().load();
+    const scale = 5;
+    tree.scale.set(scale, scale, scale);
+    addMeshAroundArea(tree, pos, 100, terrain, scene);
   },
   addThermals: (scene: THREE.Scene, weather: Weather): Thermal[] => {
     const lclLevel = weather.getLclLevel();
