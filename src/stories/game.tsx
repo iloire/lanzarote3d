@@ -22,7 +22,7 @@ import Sky from "../components/sky";
 
 const KMH_TO_MS = 3.6;
 
-const FOG_ENABLED = true;
+const FOG_ENABLED = false;
 const TIME_OF_DAY = 20;
 const SOUND_ENABLED = false;
 const DEBUG = false;
@@ -105,7 +105,7 @@ const Game = {
       DEBUG
     );
     const vario = new Vario(pg, SOUND_ENABLED);
-    const pgMesh = await pg.loadModel(1);
+    const pgMesh = await pg.loadModel(0.5);
     const box = new THREE.BoxHelper(pgMesh, 0xffff00);
     if (DEBUG) {
       scene.add(box);
@@ -186,18 +186,18 @@ const Game = {
           bgMusic.start();
           vario.start();
           pg.setPosition(options.startingLocation.position);
-          pg.setPosition(options.startingLocation.position);
-          pg.setPosition(options.startingLocation.position);
-          pg.setPosition(options.startingLocation.position);
           pg.model.rotation.y = 1.2;
           pg.init();
           camera.setCameraMode(CameraMode.FirstPersonView, pg);
           if (FOG_ENABLED) {
             const fogColor = 0x000000;
-            const fog = new THREE.FogExp2(fogColor, 0.00002);
+            const fog = new THREE.FogExp2(fogColor, 0.0002);
             // const fog = new THREE.Fog(fogColor, 1, 15000);
             scene.fog = fog;
           }
+        }}
+        onFinishGame={() => {
+          finishGame();
         }}
         onPause={(paused) => {
           analytics.trackEvent("game-pause");
@@ -249,7 +249,7 @@ const Game = {
 
     function touchedGround() {}
 
-    function crashed() {
+    function finishGame() {
       analytics.trackEvent("game-crash", pg.getTrajectory().length.toString());
       vario.stop();
       bgMusic.stop();
@@ -272,13 +272,14 @@ const Game = {
     }
 
     pg.addEventListener("touchedGround", touchedGround);
-    pg.addEventListener("crashed", crashed);
+    pg.addEventListener("crashed", finishGame);
 
     addWindIndicatorToScene(scene, pg, weather);
 
     renderer.render(scene, camera); // must render before adding trees
     Environment.addTrees(scene, terrain);
     Environment.addStones(scene, terrain);
+    // await Environment.addOtherGliders(scene, weather, terrain, water);
 
     const animate = () => {
       box.update();

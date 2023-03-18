@@ -38,6 +38,7 @@ type UIControlsProps = {
   onViewChange: (view: View) => void;
   onWrapSpeedChange: (value: number) => void;
   onPause: (paused: boolean) => void;
+  onFinishGame: () => void;
 };
 
 type UIControlsState = {
@@ -65,6 +66,7 @@ type UIControlsState = {
   wrapSpeed: number;
   showHelp: boolean;
   cameraMode: CameraMode;
+  groundTouches: number;
 };
 
 export enum View {
@@ -106,6 +108,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       wrapSpeed: props.defaultGameSpeed,
       showHelp: false,
       cameraMode: props.defaultCameraMode,
+      groundTouches: 0,
     };
     document.addEventListener("keydown", this.onDocumentKeyDown, false);
     document.addEventListener("keyup", this.onDocumentKeyUp, false);
@@ -147,6 +150,10 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     pg.addEventListener("gradient", (event) => {
       this.setState({ gradient: Math.round(event.gradient * 100) / 100 });
     });
+    pg.addEventListener("touchedGround", (event) => {
+      this.setState({ groundTouches: event.groundTouches });
+    });
+
     const weather = props.weather;
     weather.addEventListener("wind-speedChange", (event) => {
       this.setState({
@@ -238,6 +245,9 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     } else if (keyCode === 80) {
       //p
       return this.handlePause();
+    } else if (keyCode === 27) {
+      //ESC
+      return this.handlePause();
     } else if (keyCode === 72) {
       //h
       return this.toggleHelp();
@@ -301,6 +311,13 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       this.props.onPause(this.state.pausedGame);
     });
     return false;
+  };
+
+  handleFinishGame = () => {
+    // this.setState({ pausedGame: !this.state.pausedGame }, () => {
+    this.props.onFinishGame();
+    // });
+    // return false;
   };
 
   handleStart = (
@@ -420,7 +437,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         false
       );
 
-    const { lclLevel, windSpeed, windDirection } = this.state;
+    const { lclLevel, windSpeed, windDirection, groundTouches } = this.state;
 
     const weatherInfo = (
       <div id="weather-info" className="UIBox">
@@ -428,6 +445,14 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         <div id="weather-speed">Wind speed: {windSpeed} km/h</div>
         <div id="weather-lclLevel">LCL: {lclLevel} m.</div>
       </div>
+    );
+
+    const groundTouchesUI = groundTouches ? (
+      <div id="ground-touches" className="UIBox">
+        <span>{groundTouches}</span>
+      </div>
+    ) : (
+      false
     );
 
     const {
@@ -554,6 +579,9 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         <button id="game-pause-button" onClick={this.handlePause}>
           PAUSE
         </button>
+        <button id="game-end-button" onClick={this.handleFinishGame}>
+          END
+        </button>
       </div>
     ) : (
       false
@@ -581,6 +609,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         {wrapSpeedValueUI}
         {pauseControls}
         {breakControlUI}
+        {groundTouchesUI}
       </div>
     );
   }

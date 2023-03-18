@@ -45,6 +45,17 @@
   left: 460px;
 }
 
+#ground-touches {
+  position: absolute;
+  top: 20px;
+  left: 460px;
+  background-color: red;
+}
+
+#ground-touches span {
+  font-size: 300%;
+}
+
 #daytime {
   position: absolute;
   top: 20px;

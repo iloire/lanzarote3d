@@ -169,7 +169,7 @@ class Paraglider extends THREE.EventDispatcher {
 
   async loadModel(scale: number): Promise<THREE.Object3D> {
     this.paragliderModel = new ParagliderModel();
-    const mesh = this.paragliderModel.load();
+    const mesh = await this.paragliderModel.load();
     mesh.scale.set(scale, scale, scale);
     this.model = mesh;
     if (this.debug) {
@@ -184,7 +184,7 @@ class Paraglider extends THREE.EventDispatcher {
   }
 
   init() {
-    const interval = 25;
+    const interval = 50;
     if (this.interval === null) {
       this.interval = setInterval(
         () => this.tick((interval / 1000) * this.wrapSpeed),
@@ -214,6 +214,7 @@ class Paraglider extends THREE.EventDispatcher {
       this.numberGroundTouches++;
       this.dispatchEvent({
         type: "touchedGround",
+        groundTouches: this.numberGroundTouches,
       });
       this.trajectory.push(this.position()); // last point saved
       if (ANTI_CRASH_ENABLED) {
