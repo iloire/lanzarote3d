@@ -22,21 +22,21 @@ const calculateLightIntensity = (
     return 0.4;
   }
   if (timeOfDayInHours < 14) {
-    return 0.6;
+    return 0.7;
   }
   if (timeOfDayInHours < 16) {
-    return 0.5;
+    return 0.6;
   }
   if (timeOfDayInHours < 18) {
-    return 0.4;
+    return 0.5;
   }
   if (timeOfDayInHours <= 20) {
-    return 0.3;
+    return 0.4;
   }
   if (timeOfDayInHours < 21) {
-    return 0.25;
+    return 0.35;
   }
-  return 0.1;
+  return 0.2;
 };
 
 const calculateSunPosition = (
