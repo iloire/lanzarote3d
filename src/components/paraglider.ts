@@ -1,7 +1,8 @@
 import * as THREE from "three";
 import Pilot from "./pilot";
 import GuiHelper from "../utils/gui";
-
+// import modelHarness from "../models/hawklowv4.glb";
+import Models from "../utils/models";
 const mat_wing = new THREE.MeshLambertMaterial({ color: 0x00ffff });
 const numeroCajones = 16;
 
@@ -16,7 +17,10 @@ const createCajon = (w: number, h: number, deep: number): THREE.Mesh => {
 const createHalfWing = (): THREE.Mesh => {
   const group = new THREE.Mesh();
   let distanceCajon = 0;
-  const lineMat = new THREE.LineBasicMaterial({ color: 0xc2c2c2 }); // blue color
+  const lineMat = new THREE.LineBasicMaterial({
+    color: 0xc2c2c2,
+    opacity: 0.1,
+  }); // blue color
   const points = []; // array to hold the points of the line segments
   for (let i = 0; i < numeroCajones; i++) {
     const w = 2 + i * 0.5;
@@ -89,7 +93,7 @@ class ParagliderModel {
     return this.wing;
   }
 
-  load(gui?: any): THREE.Mesh {
+  async load(gui?: any): Promise<THREE.Mesh> {
     const model = new THREE.Mesh();
     const wing = this.createWing();
     wing.position.y = 80;
@@ -103,11 +107,20 @@ class ParagliderModel {
     this.pilotMesh.rotateY(Math.PI / 2);
     model.add(this.pilotMesh);
 
+    // const harness = await Models.loadSimple(modelHarness);
+    // harness.rotateY(Math.PI);
+    // harness.position.set(70, -20, 0);
+    // const scaleHarness = 0.4;
+    // harness.scale.set(scaleHarness, scaleHarness, scaleHarness);
+    //
+    // model.add(harness);
+
     if (gui) {
       GuiHelper.addLocationGui(gui, "leftWing", this.leftWing);
       GuiHelper.addLocationGui(gui, "rightWing", this.rightWing);
       GuiHelper.addLocationGui(gui, "pilot", this.pilotMesh);
       GuiHelper.addLocationGui(gui, "paraglider", model);
+      // GuiHelper.addLocationGui(gui, "harness", harness);
     }
     return model;
   }
