@@ -30,7 +30,7 @@ class Camera extends THREE.PerspectiveCamera {
   distance: number = 200;
   distanceIncrement: number = 20;
   farAwayOffset: THREE.Vector3 = new THREE.Vector3(-1302, 700, 1301.2);
-  topViewOffset: THREE.Vector3 = new THREE.Vector3(10, 300, -10);
+  topViewOffset: THREE.Vector3 = new THREE.Vector3(30, 3700, -40);
   airplaneViewOffset: THREE.Vector3 = new THREE.Vector3(-6030, 2000, -11330);
   directionToLook: THREE.Vector3;
   viewRotationHorizontal: number = 0;
