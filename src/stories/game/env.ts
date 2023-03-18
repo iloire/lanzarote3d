@@ -87,8 +87,6 @@ const addMeshAroundArea = (
     const currentScale = obj.scale.x;
     const newScale = currentScale * (1 + 0.1 * rndIntBetween(-3, 3));
 
-    console.log("scale", newScale);
-
     const meshClone = obj.clone();
     meshClone.scale.set(newScale, newScale, newScale);
     meshClone.position.copy(meshPos);
