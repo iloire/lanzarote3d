@@ -137,6 +137,7 @@ const Environment = {
 
     // close to pq
     const t8 = generateThermalPair(new THREE.Vector3(-3927, 0, 9830), weather);
+    const t9 = generateThermalPair(new THREE.Vector3(592, 0, 5530), weather);
 
     const allThermals = t1
       .concat(t2)
@@ -145,7 +146,8 @@ const Environment = {
       .concat(t5)
       .concat(t6)
       .concat(t7)
-      .concat(t8);
+      .concat(t8)
+      .concat(t9);
     allThermals.forEach((t) => {
       scene.add(t.getMesh());
     });
