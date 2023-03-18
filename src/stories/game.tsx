@@ -255,15 +255,15 @@ const Game = {
       bgMusic.stop();
       pg.stop();
 
-      const trajectory = new Trajectory(pg.getTrajectory(), 5);
+      const trajectory = new Trajectory(pg.getTrajectory(), 15);
       scene.add(trajectory.getMesh());
       camera.setCameraMode(CameraMode.OrbitControl, pg);
 
       const trajectoryPoints = trajectory.getPoints();
-      const initialPosition = trajectoryPoints[0];
       if (trajectoryPoints.length) {
+        const first = trajectoryPoints[0];
         camera.animateTo(
-          initialPosition.add(
+          first.vector.add(
             new THREE.Vector3(0, 30, 0).add(weather.getWindVelocity(-250))
           ),
           pg.position()

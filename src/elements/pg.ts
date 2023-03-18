@@ -4,6 +4,7 @@ import Weather from "../elements/weather";
 import Thermal from "../elements/thermal";
 import ParagliderModel from "../components/paraglider";
 import GuiHelper from "../utils/gui";
+import { TrajectoryPoint, TrajectoryPointType } from "../elements/trajectory";
 
 const ORIGIN = new THREE.Vector3(0, 0, 0);
 const DOWN_DIRECTION = new THREE.Vector3(0, -1, 0);
@@ -119,7 +120,7 @@ class Paraglider extends THREE.EventDispatcher {
   metersFlown: number = 0;
   isLeftBreaking: boolean;
   isRightBreaking: boolean;
-  trajectory: THREE.Vector3[] = [];
+  trajectory: TrajectoryPoint[] = [];
   tickCounter: number = 0;
   __rollAngle: number = 0;
   __lift: number = 0;
@@ -216,7 +217,10 @@ class Paraglider extends THREE.EventDispatcher {
         type: "touchedGround",
         groundTouches: this.numberGroundTouches,
       });
-      this.trajectory.push(this.position()); // last point saved
+      this.trajectory.push({
+        type: TrajectoryPointType.TouchGround,
+        vector: this.position(),
+      }); // last point saved
       if (ANTI_CRASH_ENABLED) {
         this.model.position.y += 10;
       } else {
@@ -281,7 +285,12 @@ class Paraglider extends THREE.EventDispatcher {
 
     if (this.tickCounter % 10 === 0) {
       //save point
-      this.trajectory.push(this.position());
+      this.trajectory.push({
+        type: this.speedBar
+          ? TrajectoryPointType.SpeedBar
+          : TrajectoryPointType.Normal,
+        vector: this.position(),
+      });
     }
   }
 
@@ -546,7 +555,7 @@ class Paraglider extends THREE.EventDispatcher {
     return this.flyingTime;
   }
 
-  getTrajectory(): THREE.Vector3[] {
+  getTrajectory(): TrajectoryPoint[] {
     return this.trajectory;
   }
 }

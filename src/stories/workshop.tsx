@@ -33,7 +33,7 @@ const Workshop = {
     // scene.add(plane);
 
     const paraglider = new Paraglider();
-    const mesh = paraglider.load(gui);
+    const mesh = await paraglider.load(gui);
     mesh.position.set(0, 0, 0);
     scene.add(mesh);
     // paraglider.breakLeft();
@@ -44,8 +44,8 @@ const Workshop = {
       renderer.render(scene, camera);
     };
 
-    const lookAt = mesh.position.clone().add(new THREE.Vector3(0, -90, 0));
-    camera.position.set(66, 32, 41);
+    const lookAt = mesh.position.clone().add(new THREE.Vector3(0, 0, 0));
+    camera.position.set(96, 32, 81);
     camera.lookAt(lookAt);
     controls.target = lookAt;
     animate();
