@@ -5,8 +5,8 @@ const locations: Location[] = [
   {
     title: "Famara",
     position: new THREE.Vector3(6827, 880, -555), // pechos altos
-    lookFrom: new THREE.Vector3(-2207, 880, -2055),
-    lookAt: new THREE.Vector3(6827, 880, -6555),
+    lookFrom: new THREE.Vector3(6827, 880, -555),
+    lookAt: new THREE.Vector3(7827, 880, -1555),
     idealWindDirectionDegreesFromNorth: 300,
     idealSunPositionDegrees: 30,
   },
