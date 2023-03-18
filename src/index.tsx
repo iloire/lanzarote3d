@@ -119,6 +119,9 @@ class App extends React.Component<AppProps, AppState> {
     camera.addGui(gui);
     scene.add(camera);
 
+    // const helper = new THREE.CameraHelper(camera);
+    // scene.add(helper);
+
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
     const story = urlParams.get("story");
