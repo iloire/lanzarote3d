@@ -48,6 +48,7 @@ type UIControlsState = {
   groundSpeed: number;
   heightAboveGround: number;
   speedBarEngaged: boolean;
+  earsEngaged: boolean;
   posX: number;
   posY: number;
   posZ: number;
@@ -90,6 +91,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       groundSpeed: 0,
       heightAboveGround: 0,
       speedBarEngaged: false,
+      earsEngaged: false,
       posX: 0,
       posY: 0,
       posZ: 0,
@@ -124,6 +126,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       this.setState({
         groundSpeed: Math.round(pg.getGroundSpeed() * KMH_TO_MS * 100) / 100,
         speedBarEngaged: pg.isOnSpeedBar(),
+        earsEngaged: pg.isOnEars(),
         posX: Math.round(pos.x),
         posY: Math.round(pos.y),
         posZ: Math.round(pos.z),
@@ -461,6 +464,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       groundSpeed,
       heightAboveGround,
       speedBarEngaged,
+      earsEngaged,
       glidingRatio,
       flyingTime,
       metersFlown,
@@ -508,10 +512,13 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       false
     );
     const speedBarText = speedBarEngaged ? "SPEED-BAR" : "";
+    const earsText = earsEngaged ? "EARS" : "";
     const paragliderInfo = isGameStarted ? (
       <div id="paraglider-info" className="UIBox">
         <div id="paraglider-speedBar">{speedBarText}</div>
-        <div id="paraglider-ears" className="ears"></div>
+        <div id="paraglider-ears" className="ears">
+          {earsText}
+        </div>
       </div>
     ) : (
       false

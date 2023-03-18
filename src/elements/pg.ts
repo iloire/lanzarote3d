@@ -112,7 +112,7 @@ class Paraglider extends THREE.EventDispatcher {
   water: THREE.Mesh;
   thermals: Thermal[];
   speedBar: boolean;
-  currentSpeed: number;
+  ears: boolean;
   interval: number = null;
   model: THREE.Mesh;
   wrapSpeed: number = 1;
@@ -141,7 +141,6 @@ class Paraglider extends THREE.EventDispatcher {
     super();
     this.debug = debug;
     this.speedBar = false;
-    this.currentSpeed = options.trimSpeed;
     this.options = options;
     this.weather = weather;
     this.terrain = terrain;
@@ -311,13 +310,13 @@ class Paraglider extends THREE.EventDispatcher {
   }
 
   getGroundSpeed(): number {
-    const pgVelocity = this.direction().multiplyScalar(this.speed());
+    const pgVelocity = this.direction().multiplyScalar(this.airSpeed());
     const windVelocity = this.weather.getWindVelocity();
     return pgVelocity.add(windVelocity).length();
   }
 
   move(multiplier: number) {
-    const drop = this.speed() / this.glidingRatio();
+    const drop = this.airSpeed() / this.glidingRatio();
     const downVector = DOWN_DIRECTION.clone().multiplyScalar(multiplier * drop);
     this.dispatchEvent({
       type: "drop",
@@ -344,7 +343,7 @@ class Paraglider extends THREE.EventDispatcher {
     });
 
     const velocityVector = this.direction().multiplyScalar(
-      multiplier * this.speed()
+      multiplier * this.airSpeed()
     );
     const windVector = this.weather.getWindVelocity(multiplier);
 
@@ -514,14 +513,22 @@ class Paraglider extends THREE.EventDispatcher {
     return this.model.position.y;
   }
 
+  toggleEars() {
+    if (this.ears) {
+      this.ears = false;
+      console.log("ears off");
+    } else {
+      this.ears = true;
+      console.log("ears on");
+    }
+  }
+
   toggleSpeedBar() {
     if (this.speedBar) {
       this.speedBar = false;
-      this.currentSpeed = this.options.trimSpeed;
       console.log("speed bar off");
     } else {
       this.speedBar = true;
-      this.currentSpeed = this.options.halfSpeedBarSpeed;
       console.log("speed bar on");
     }
   }
@@ -530,13 +537,19 @@ class Paraglider extends THREE.EventDispatcher {
     return this.speedBar;
   }
 
-  airSpeed(): number {
-    return this.currentSpeed;
+  isOnEars(): boolean {
+    return this.ears;
   }
 
-  // deprecated, use airSpeed
-  speed(): number {
-    return this.currentSpeed;
+  airSpeed(): number {
+    let speed = this.options.trimSpeed;
+    if (this.ears) {
+      speed = speed * 0.8;
+    }
+    if (this.speedBar) {
+      speed = speed * 1.2;
+    }
+    return speed;
   }
 
   trimSpeed(): number {
@@ -544,11 +557,14 @@ class Paraglider extends THREE.EventDispatcher {
   }
 
   glidingRatio(): number {
+    let ratio = this.options.glidingRatio;
     if (this.isOnSpeedBar()) {
-      return this.options.glidingRatio * 0.8;
-    } else {
-      return this.options.glidingRatio;
+      ratio = ratio * 0.8;
     }
+    if (this.isOnEars()) {
+      ratio = ratio * 0.8;
+    }
+    return ratio;
   }
 
   getFlyingTime(): number {
