@@ -30,19 +30,6 @@
   border: 1px solid #ffffff77;
 }
 
-#camera-selection {
-  color: white;
-  position: absolute;
-  top: 20px;
-  left: 520px;
-}
-
-#camera-selection button {font-size: 200%;margin-right: 5px}
-
-#camera-selection img {
-  width: 30px
-}
-
 #wrapSpeed-ui {
   font-size: 200%;
   font-weight: bold;
@@ -54,8 +41,8 @@
 
 #view-controls {
   position: absolute;
-  top: 70px;
-  left: 520px;
+  top: 20px;
+  left: 460px;
 }
 
 #daytime {

@@ -12,13 +12,12 @@ const getObjectPosition = (obj: THREE.Object3D) => {
 };
 
 export enum CameraMode {
-  FirstPersonView = "FPV",
-  FollowTarget = "FOLLOW",
-  FollowTargetBehind = "FOLLOWBEHIND",
-  FarAway = "FAR",
-  TopView = "TOP",
-  AirplaneView = "AIRPLANE",
-  OrbitControl = "ORBIT",
+  FirstPersonView = 1,
+  FollowTarget = 2,
+  FarAway = 3,
+  TopView = 4,
+  AirplaneView = 5,
+  OrbitControl = 6,
 }
 
 class Camera extends THREE.PerspectiveCamera {
@@ -28,14 +27,14 @@ class Camera extends THREE.PerspectiveCamera {
   controls: OrbitControls;
   angle: number = 0;
   angleIncrement: number = 0.05;
-  distance: number = 30;
-  distanceIncrement: number = 10;
+  distance: number = 200;
+  distanceIncrement: number = 20;
   farAwayOffset: THREE.Vector3 = new THREE.Vector3(-1302, 700, 1301.2);
   topViewOffset: THREE.Vector3 = new THREE.Vector3(10, 300, -10);
   airplaneViewOffset: THREE.Vector3 = new THREE.Vector3(-6030, 2000, -11330);
   directionToLook: THREE.Vector3;
-  viewRotationX: number = 0;
-  viewRotationY: number = 0;
+  viewRotationHorizontal: number = 0;
+  viewRotationVertical: number = 0;
 
   constructor(
     fov: number,
@@ -51,7 +50,7 @@ class Camera extends THREE.PerspectiveCamera {
   }
 
   addGui(gui) {
-    GuiHelper.addLocationGui(gui, "camera", this);
+    GuiHelper.addLocationGui(gui, "camera", this, { min: 0, max: 10000 });
   }
 
   update() {
@@ -75,8 +74,6 @@ class Camera extends THREE.PerspectiveCamera {
     }
     if (this.mode === CameraMode.FollowTarget) {
       this.followTarget();
-    } else if (this.mode === CameraMode.FollowTargetBehind) {
-      this.followTargetBehind();
     } else if (this.mode === CameraMode.FirstPersonView) {
       this.firstPersonView();
     } else if (this.mode === CameraMode.FarAway) {
@@ -116,8 +113,8 @@ class Camera extends THREE.PerspectiveCamera {
   lookDirection(xDegrees: number, yDegrees: number) {
     const angleRadiansX = THREE.MathUtils.degToRad(xDegrees);
     const angleRadiansY = THREE.MathUtils.degToRad(yDegrees);
-    this.viewRotationX = angleRadiansX;
-    this.viewRotationY = angleRadiansY;
+    this.viewRotationHorizontal = angleRadiansX;
+    this.viewRotationVertical = angleRadiansY;
   }
 
   animateTo(
@@ -137,41 +134,36 @@ class Camera extends THREE.PerspectiveCamera {
   }
 
   followTarget() {
-    const x = this.target.position().x + Math.sin(this.angle) * this.distance;
-    const z = this.target.position().z + Math.cos(this.angle) * this.distance;
-    this.position.set(x, this.target.position().y, z);
-    this.lookAt(this.target.position());
-  }
+    const x = Math.sin(this.angle) * this.distance;
+    const z = Math.cos(this.angle) * this.distance;
+    const pg = this.target;
+    const cameraOffset = new THREE.Vector3(x, 40, 60 + z);
+    this.position.copy(pg.position().add(pg.direction().add(cameraOffset)));
 
-  followTargetBehind() {
-    const cameraoffset = new THREE.Vector3(-20, 1, 0);
-    this.position.copy(
-      this.target
-        .position()
-        .add(this.target.direction().add(cameraoffset).multiplyScalar(10))
-    );
-    this.lookAt(
-      this.target.position().add(this.target.direction().multiplyScalar(20))
-    );
+    const lookOffset = new THREE.Vector3(0, 0, 0);
+    const lookAt = pg.position().add(pg.direction().add(lookOffset));
+    this.lookAt(lookAt);
   }
 
   firstPersonView() {
-    const cameraoffset = new THREE.Vector3(0, -45, 0);
-    this.position.copy(
-      this.target
-        .position()
-        .add(this.target.direction().add(cameraoffset).multiplyScalar(2))
-    );
-    this.lookAt(
-      this.target.position().add(this.target.direction().multiplyScalar(200))
-    );
-    console.log(this.target.direction());
+    // const cameraOffset = new THREE.Vector3(-40, 0, 0);
+    const cam = this;
+    const pg = this.target;
+
+    cam.position.copy(pg.position());
+
+    // const lookOffset = new THREE.Vector3(0, -70, 2);
+    const lookAt = pg.position().add(pg.direction().multiplyScalar(20000));
+    this.lookAt(lookAt);
+
     // adjust for roll
-    this.rotateZ(-1 * (this.viewRotationX / 4 + this.target.model.rotation.z));
+    this.rotateZ(
+      -1 * (this.viewRotationHorizontal / 4 + this.target.model.rotation.z)
+    );
 
     // view rotation
-    this.rotateY(-1 * this.viewRotationX * 1.5);
-    this.rotateX(-1 * this.viewRotationY * 1.5);
+    this.rotateY(-1 * this.viewRotationHorizontal * 1.5);
+    this.rotateX(-1 * this.viewRotationVertical * 1.5);
   }
 
   farAwayView() {

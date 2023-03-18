@@ -4,12 +4,6 @@ import { CameraMode } from "./camera";
 import Paraglider from "./pg";
 import Vario from "../audio/vario";
 import Weather from "../elements/weather";
-import airplaneImg from "../img/airplane.png";
-import mountainImg from "../img/mountain.png";
-import mapImg from "../img/map.png";
-import glidingImg from "../img/gliding.png";
-import viewLeftImg from "../img/eye-left.png";
-import viewRightImg from "../img/eye-right.png";
 import arrowLeftImg from "../img/left-chevron.png";
 import arrowRightImg from "../img/right-chevron.png";
 import { GameStartOptions } from "../stories/game/types";
@@ -66,11 +60,11 @@ type UIControlsState = {
   thermalLift: number;
   dynamicLift: number;
   drop: number;
-  rollDrop: number;
   gradient: number;
   pausedGame: boolean;
   wrapSpeed: number;
   showHelp: boolean;
+  cameraMode: CameraMode;
 };
 
 export enum View {
@@ -107,11 +101,11 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       thermalLift: 0,
       dynamicLift: 0,
       drop: 0,
-      rollDrop: 0,
       gradient: 0,
       pausedGame: false,
       wrapSpeed: props.defaultGameSpeed,
       showHelp: false,
+      cameraMode: props.defaultCameraMode,
     };
     document.addEventListener("keydown", this.onDocumentKeyDown, false);
     document.addEventListener("keyup", this.onDocumentKeyUp, false);
@@ -146,9 +140,6 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     });
     pg.addEventListener("drop", (event) => {
       this.setState({ drop: (-1 * Math.round(event.drop * 100)) / 100 });
-    });
-    pg.addEventListener("rollDrop", (event) => {
-      this.setState({ rollDrop: (-1 * Math.round(event.drop * 100)) / 100 });
     });
     pg.addEventListener("delta", (event) => {
       this.setState({ delta: Math.round(event.delta * 100) / 100 });
@@ -232,6 +223,9 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     } else if (keyCode === 56) {
       //8
       this.handleWrapChange(20);
+    } else if (keyCode === 57) {
+      //8
+      this.handleWrapChange(50);
     } else if (keyCode === 65) {
       //a
       return this.handleLeft();
@@ -262,20 +256,19 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
 
   toggleCamMode() {
     const isGameStarted = !this.state.showStartButton;
-    const { viewControlsVisible } = this.state;
+    const { viewControlsVisible, cameraMode } = this.state;
     if (!isGameStarted) {
       return;
     }
-
-    if (viewControlsVisible) {
-      this.handleCamMode(CameraMode.FirstPersonView);
-    } else {
-      this.handleCamMode(CameraMode.FollowTargetBehind);
-    }
+    const numberCameraModes = Object.keys(CameraMode).length / 2;
+    const nextMode = cameraMode < numberCameraModes - 1 ? cameraMode + 1 : 1;
+    this.setState({ cameraMode: nextMode }, () => {
+      this.handleCamMode(CameraMode[CameraMode[nextMode]]);
+    });
   }
 
   handleCamMode = (mode: CameraMode) => {
-    console.log(mode);
+    console.log("CAMERA:", mode);
     if (mode === CameraMode.FirstPersonView) {
       this.setState({ viewControlsVisible: false });
     } else {
@@ -388,34 +381,6 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       false
     );
 
-    const cameraSelection = isGameStarted ? (
-      <div id="camera-selection">
-        <button onClick={() => this.handleCamMode(CameraMode.FollowTarget)}>
-          <img src={viewLeftImg} />
-        </button>
-        <button onClick={() => this.handleCamMode(CameraMode.FirstPersonView)}>
-          <img src={glidingImg} />
-        </button>
-        <button onClick={() => this.handleCamMode(CameraMode.TopView)}>
-          <img src={mapImg} />
-        </button>
-        <button onClick={() => this.handleCamMode(CameraMode.FarAway)}>
-          <img src={mountainImg} />
-        </button>
-        <button onClick={() => this.handleCamMode(CameraMode.AirplaneView)}>
-          <img src={airplaneImg} />
-        </button>
-        <button
-          style={{ display: "none" }}
-          onClick={() => this.handleCamMode(CameraMode.OrbitControl)}
-        >
-          orbit
-        </button>
-      </div>
-    ) : (
-      false
-    );
-
     const viewControl =
       isGameStarted && this.state.viewControlsVisible ? (
         <div id="view-controls">
@@ -474,7 +439,6 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       thermalLift,
       dynamicLift,
       drop,
-      rollDrop,
       gradient,
       wrapSpeed,
       pausedGame,
@@ -508,9 +472,6 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
           <div id="pg-dynamic-lift">Soaring lift : {dynamicLift} m/s</div>
         )}
         {showDebugInfo && <div id="pg-drop">PG sink rate : {drop} m/s</div>}
-        {showDebugInfo && (
-          <div id="pg-drop">Roll sink rate : {rollDrop} m/s</div>
-        )}
         {showDebugInfo && (
           <div id="pg-gradient">Terrain gradient : {gradient}</div>
         )}
@@ -607,7 +568,6 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       <div id="game">
         {title}
         {breakControls}
-        {cameraSelection}
         {helpUI}
         {paragliderInfo}
         {paragliderPosition}
