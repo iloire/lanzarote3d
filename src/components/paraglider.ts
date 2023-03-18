@@ -16,54 +16,52 @@ const createCajon = (w: number, h: number, deep: number): THREE.Mesh => {
 const createHalfWing = (): THREE.Mesh => {
   const group = new THREE.Mesh();
   let distanceCajon = 0;
+  const lineMat = new THREE.LineBasicMaterial({ color: 0xc2c2c2 }); // blue color
+  const points = []; // array to hold the points of the line segments
   for (let i = 0; i < numeroCajones; i++) {
     const w = 2 + i * 0.5;
     const h = 0.5 + i * 0.2;
     const deep = 10 + i * 2.8;
     distanceCajon += w * 0.8;
     const cajon = createCajon(w, h, deep);
-    cajon.position.set(i * 1.9 - 2 * h, distanceCajon, 0);
+    const x = i * 1.9 - 2 * h;
+    cajon.position.set(x, distanceCajon, 0);
     group.add(cajon);
+
+    if (i % 2 === 0) {
+      //lines
+      const handLocation = new THREE.Vector3(-75, 70, -3);
+      points.push(new THREE.Vector3(i * 1.5, distanceCajon, deep * 0.5)); // start point of first segment
+      points.push(handLocation);
+
+      points.push(new THREE.Vector3(i * 1.5, distanceCajon, -deep * 0.5)); // start point of first segment
+      points.push(handLocation);
+    }
   }
   group.rotateZ(Math.PI / 2);
   group.rotateX(Math.PI / 2);
+  const geometry = new THREE.BufferGeometry().setFromPoints(points); // create the geometry from the points
+  const lineSegments = new THREE.LineSegments(geometry, lineMat); // create the line segments
+  group.add(lineSegments);
   return group;
 };
 
-const createPilot = (): THREE.Object3D => {
-  const pilot = new Pilot();
-  return pilot.load();
-};
-
-const createLines = (): THREE.Object3D => {
-  const material = new THREE.LineBasicMaterial({ color: 0x0000ff }); // blue color
-  const points = []; // array to hold the points of the line segments
-
-  points.push(new THREE.Vector3(1, -1, -40)); // start point of first segment
-  points.push(new THREE.Vector3(5, -120, 0)); // end point of first segment
-
-  points.push(new THREE.Vector3(1, -1, 40)); // start point of second segment
-  points.push(new THREE.Vector3(5, -120, 0)); // end point of second segment
-
-  const geometry = new THREE.BufferGeometry().setFromPoints(points); // create the geometry from the points
-  const lineSegments = new THREE.LineSegments(geometry, material); // create the line segments
-  return lineSegments;
-};
+const BREAK_ROTATION = 0.05;
 
 class ParagliderModel {
   leftWing: THREE.Object3D;
   rightWing: THREE.Object3D;
   wing: THREE.Mesh;
-  pilot: THREE.Mesh;
+  pilotMesh: THREE.Object3D;
   initialLeftWingRotation: number;
   initialRightWingRotation: number;
 
   breakLeft() {
-    this.leftWing.rotation.y = this.initialLeftWingRotation + 0.2;
+    this.leftWing.rotation.y = this.initialLeftWingRotation + BREAK_ROTATION;
   }
 
   breakRight() {
-    this.rightWing.rotation.y = this.initialRightWingRotation - 0.2;
+    this.rightWing.rotation.y = this.initialRightWingRotation + BREAK_ROTATION;
   }
 
   handsUp() {
@@ -75,11 +73,12 @@ class ParagliderModel {
     this.wing = new THREE.Mesh();
 
     this.leftWing = createHalfWing();
+    this.leftWing.scale.z = -1;
     this.initialLeftWingRotation = this.leftWing.rotation.y;
 
     this.rightWing = this.leftWing.clone();
-    this.rightWing.rotateX(Math.PI);
-    this.rightWing.translateY(-155);
+    this.rightWing.scale.y = -1;
+    this.rightWing.translateY(155);
     this.initialRightWingRotation = this.rightWing.rotation.y;
 
     this.wing.add(this.leftWing);
@@ -93,25 +92,28 @@ class ParagliderModel {
   load(gui?: any): THREE.Mesh {
     const model = new THREE.Mesh();
     const wing = this.createWing();
-    wing.position.y = -30;
+    wing.position.y = 80;
     model.add(wing);
 
-    const pilot = createPilot();
+    const pilot = new Pilot();
+    this.pilotMesh = pilot.load();
     const scale = 0.03;
-    pilot.scale.set(scale, scale, scale);
-    pilot.position.y = -110;
-    pilot.rotateY(Math.PI / 2);
-    model.add(pilot);
-
-    const lines = createLines();
-    model.add(lines);
+    this.pilotMesh.scale.set(scale, scale, scale);
+    this.pilotMesh.position.x = -5;
+    this.pilotMesh.rotateY(Math.PI / 2);
+    model.add(this.pilotMesh);
 
     if (gui) {
       GuiHelper.addLocationGui(gui, "leftWing", this.leftWing);
       GuiHelper.addLocationGui(gui, "rightWing", this.rightWing);
-      GuiHelper.addLocationGui(gui, "pilot", pilot);
+      GuiHelper.addLocationGui(gui, "pilot", this.pilotMesh);
+      GuiHelper.addLocationGui(gui, "paraglider", model);
     }
     return model;
+  }
+
+  getPilotPosition(): THREE.Vector3 {
+    return this.pilotMesh.position.clone();
   }
 }
 

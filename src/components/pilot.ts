@@ -124,12 +124,12 @@ const getBody = (): THREE.Group => {
   const armLeft = new THREE.Mesh(armGeo, suitMat);
   armLeft.position.x = -190;
   armLeft.position.y = -50;
-  armLeft.position.z = 200;
+  armLeft.position.z = 150;
 
   const armRight = new THREE.Mesh(armGeo, suitMat);
   armRight.position.x = 190;
   armRight.position.y = -50;
-  armRight.position.z = 200;
+  armRight.position.z = 150;
 
   //hands
   const handGeo = new THREE.BoxGeometry(70, 70, 70);
@@ -137,13 +137,15 @@ const getBody = (): THREE.Group => {
   handLeft.position.y = 190;
 
   const handRight = new THREE.Mesh(handGeo, skinMat);
-  handRight.position.y = 160;
+  handRight.position.y = 190;
   armRight.add(handRight);
   armLeft.add(handLeft);
 
   const armRotation = 0.3;
   armLeft.rotateZ(armRotation);
+  armLeft.rotateX(armRotation);
   armRight.rotateZ(-1 * armRotation);
+  armRight.rotateX(armRotation);
 
   group.add(armLeft);
   group.add(armRight);
