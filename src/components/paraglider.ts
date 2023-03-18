@@ -32,7 +32,7 @@ const createHalfWing = (): THREE.Mesh => {
     cajon.position.set(x, distanceCajon, 0);
     group.add(cajon);
 
-    if (i % 2 === 0) {
+    if (i % 4 === 0) {
       //lines
       const handLocation = new THREE.Vector3(-75, 70, -3);
       points.push(new THREE.Vector3(i * 1.5, distanceCajon, deep * 0.5)); // start point of first segment
