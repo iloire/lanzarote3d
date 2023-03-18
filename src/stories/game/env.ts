@@ -5,6 +5,9 @@ import Thermal, { ThermalDimensions } from "../../elements/thermal";
 import { rndIntBetween } from "../../utils/math";
 import Tree from "../../components/tree";
 import Stone from "../../components/stone";
+import Paraglider, { ParagliderConstructor } from "../../elements/pg";
+
+const KMH_TO_MS = 3.6;
 
 const generateRandomLcl = (lclLevel: number): number => {
   return lclLevel + rndIntBetween(-200, 3000);
@@ -14,8 +17,8 @@ const generateRandomThermalDimensions = (
   lclLevel: number
 ): ThermalDimensions => {
   return {
-    bottomRadius: rndIntBetween(220, 350),
-    topRadius: rndIntBetween(400, 600),
+    bottomRadius: rndIntBetween(320, 450),
+    topRadius: rndIntBetween(500, 700),
     height: generateRandomLcl(lclLevel),
   };
 };
@@ -62,18 +65,6 @@ const getTerrainHeight = (pos: THREE.Vector3, terrain: THREE.Mesh) => {
   }
 };
 
-const addTreesAroundArea = (
-  pos: THREE.Vector3,
-  numberTrees: number,
-  terrain: THREE.Mesh,
-  scene: THREE.Scene
-) => {
-  const tree = new Tree().load();
-  const scale = 3;
-  tree.scale.set(scale, scale, scale);
-  addMeshAroundArea(tree, pos, numberTrees, terrain, scene);
-};
-
 const addMeshAroundArea = (
   obj: THREE.Object3D,
   pos: THREE.Vector3,
@@ -93,14 +84,59 @@ const addMeshAroundArea = (
       break;
     }
     const meshPos = new THREE.Vector3(newX, terrainHeight, newZ);
+    const currentScale = obj.scale.x;
+    const newScale = currentScale * (1 + 0.1 * rndIntBetween(-3, 3));
+
+    console.log("scale", newScale);
 
     const meshClone = obj.clone();
+    meshClone.scale.set(newScale, newScale, newScale);
     meshClone.position.copy(meshPos);
     scene.add(meshClone);
   }
 };
 
+const createPg = async (
+  options: ParagliderConstructor,
+  weather: Weather,
+  terrain: THREE.Mesh,
+  water: THREE.Mesh,
+  pos: THREE.Vector3
+): Promise<Paraglider> => {
+  const pg = new Paraglider(options, weather, terrain, water, [], false);
+  const pgMesh = await pg.loadModel(1);
+  pg.setPosition(pos);
+  pg.init();
+  return pg;
+};
+
 const Environment = {
+  addOtherGliders: async (
+    scene: THREE.Scene,
+    weather: Weather,
+    terrain: THREE.Mesh,
+    water: THREE.Mesh
+  ) => {
+    const pgOptions: ParagliderConstructor = {
+      glidingRatio: 9,
+      trimSpeed: 35 / KMH_TO_MS,
+      halfSpeedBarSpeed: 40 / KMH_TO_MS,
+      fullSpeedBarSpeed: 45 / KMH_TO_MS,
+      smallEarsSpeed: 30 / KMH_TO_MS,
+      bigEarsSpeed: 27 / KMH_TO_MS,
+    };
+    const pos = new THREE.Vector3(1379, 600, -545);
+    const pg = await createPg(pgOptions, weather, terrain, water, pos);
+    scene.add(pg.getMesh());
+
+    const pos2 = new THREE.Vector3(3379, 900, -1545);
+    const pg2 = await createPg(pgOptions, weather, terrain, water, pos);
+    scene.add(pg2.getMesh());
+
+    const pos3 = new THREE.Vector3(3979, 1200, -1945);
+    const pg3 = await createPg(pgOptions, weather, terrain, water, pos);
+    scene.add(pg3.getMesh());
+  },
   addStones: (scene: THREE.Scene, terrain: THREE.Mesh) => {
     const stone = new Stone().load();
     const scale = 4;
@@ -109,11 +145,23 @@ const Environment = {
     addMeshAroundArea(stone, pos, 100, terrain, scene);
   },
   addTrees: (scene: THREE.Scene, terrain: THREE.Mesh) => {
-    const pos = new THREE.Vector3(6879, 600, -545);
     const tree = new Tree().load();
     const scale = 5;
     tree.scale.set(scale, scale, scale);
-    addMeshAroundArea(tree, pos, 100, terrain, scene);
+    addMeshAroundArea(
+      tree,
+      new THREE.Vector3(6879, 600, -545),
+      100,
+      terrain,
+      scene
+    );
+    addMeshAroundArea(
+      tree,
+      new THREE.Vector3(8879, 600, -2245),
+      100,
+      terrain,
+      scene
+    );
   },
   addThermals: (scene: THREE.Scene, weather: Weather): Thermal[] => {
     const lclLevel = weather.getLclLevel();
