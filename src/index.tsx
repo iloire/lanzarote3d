@@ -28,6 +28,7 @@ const createRenderer = (sizes) => {
     canvas: document.querySelector("canvas.webgl"),
     antialias: true,
     alpha: true,
+    logarithmicDepthBuffer: true,
   });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(sizes.width, sizes.height);
