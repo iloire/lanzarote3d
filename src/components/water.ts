@@ -7,8 +7,8 @@ export default class Water {
   load(sunPosition: THREE.Vector3) {
     const waterGeometry = new THREE.PlaneGeometry(1000000, 1000000);
     const water = new WaterEffect(waterGeometry, {
-      textureWidth: 512,
-      textureHeight: 512,
+      // textureWidth: 512,
+      // textureHeight: 512,
       waterNormals: new THREE.TextureLoader(Models.manager).load(
         waterTexture,
         (texture) => {

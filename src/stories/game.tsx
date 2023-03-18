@@ -22,9 +22,9 @@ import Sky from "../components/sky";
 
 const KMH_TO_MS = 3.6;
 
+const FOG_ENABLED = true;
+const TIME_OF_DAY = 20;
 const SOUND_ENABLED = false;
-const FOG_ENABLED = false;
-const TIME_OF_DAY = 19;
 const DEBUG = false;
 
 function round(number: number): number {
@@ -93,6 +93,7 @@ const Game = {
     const bgMusic = new BackgroundSound(SOUND_ENABLED);
 
     const thermals = Environment.addThermals(scene, weather);
+
     Environment.addClouds(scene, weather, thermals);
 
     const pg = new Paraglider(
@@ -104,14 +105,13 @@ const Game = {
       DEBUG
     );
     const vario = new Vario(pg, SOUND_ENABLED);
-    const mesh = await pg.loadModel(1);
-    const box = new THREE.BoxHelper(mesh, 0xffff00);
+    const pgMesh = await pg.loadModel(1);
+    const box = new THREE.BoxHelper(pgMesh, 0xffff00);
     if (DEBUG) {
       scene.add(box);
     }
-    mesh.rotateY(Math.PI / 2);
     pg.addGui(gui);
-    scene.add(mesh);
+    scene.add(pgMesh);
 
     document.addEventListener("keydown", onDocumentKeyDown, false);
 
@@ -186,11 +186,15 @@ const Game = {
           bgMusic.start();
           vario.start();
           pg.setPosition(options.startingLocation.position);
+          pg.setPosition(options.startingLocation.position);
+          pg.setPosition(options.startingLocation.position);
+          pg.setPosition(options.startingLocation.position);
+          pg.model.rotation.y = 1.2;
           pg.init();
           camera.setCameraMode(CameraMode.FirstPersonView, pg);
           if (FOG_ENABLED) {
             const fogColor = 0x000000;
-            const fog = new THREE.FogExp2(fogColor, 0.0002);
+            const fog = new THREE.FogExp2(fogColor, 0.00002);
             // const fog = new THREE.Fog(fogColor, 1, 15000);
             scene.fog = fog;
           }
@@ -208,7 +212,7 @@ const Game = {
           }
         }}
         onSelectCamera={(mode: CameraMode) => {
-          analytics.trackEvent("game-camera-change", mode);
+          analytics.trackEvent("game-camera-change", mode.toString());
           camera.setCameraMode(mode, pg);
         }}
         onViewChange={(view: View) => {
@@ -243,26 +247,38 @@ const Game = {
     // Game start
     camera.setCameraMode(CameraMode.AirplaneView, pg);
 
-    function touchedGround() {
+    function touchedGround() {}
+
+    function crashed() {
       analytics.trackEvent("game-crash", pg.getTrajectory().length.toString());
       vario.stop();
       bgMusic.stop();
       pg.stop();
+
       const trajectory = new Trajectory(pg.getTrajectory(), 5);
       scene.add(trajectory.getMesh());
       camera.setCameraMode(CameraMode.OrbitControl, pg);
-      const initialPosition = trajectory.getPoints()[0];
-      camera.animateTo(
-        initialPosition.add(
-          new THREE.Vector3(0, 30, 0).add(weather.getWindVelocity(-250))
-        ),
-        pg.position()
-      );
+
+      const trajectoryPoints = trajectory.getPoints();
+      const initialPosition = trajectoryPoints[0];
+      if (trajectoryPoints.length) {
+        camera.animateTo(
+          initialPosition.add(
+            new THREE.Vector3(0, 30, 0).add(weather.getWindVelocity(-250))
+          ),
+          pg.position()
+        );
+      }
     }
 
     pg.addEventListener("touchedGround", touchedGround);
+    pg.addEventListener("crashed", crashed);
 
     addWindIndicatorToScene(scene, pg, weather);
+
+    renderer.render(scene, camera); // must render before adding trees
+    Environment.addTrees(scene, terrain);
+    Environment.addStones(scene, terrain);
 
     const animate = () => {
       box.update();

@@ -2,8 +2,8 @@ import * as THREE from "three";
 import Weather from "./weather";
 
 const createThermalMesh = (
-  bottomRadius: number,
   topRadius: number,
+  bottomRadius: number,
   height: number,
   opacity: number,
   initialPosition: THREE.Vector3
@@ -36,6 +36,7 @@ export type ThermalDimensions = {
 
 class Thermal {
   mesh: THREE.Mesh;
+  dimensions: ThermalDimensions;
   __isMainThermal: boolean;
 
   constructor(
@@ -53,11 +54,16 @@ class Thermal {
       opacity,
       initialPosition.clone()
     );
+    this.dimensions = dimensions;
     this.mesh = thermal;
   }
 
   getPosition(): THREE.Vector3 {
     return this.mesh.position;
+  }
+
+  getDimensions(): ThermalDimensions {
+    return this.dimensions;
   }
 
   getMesh(): THREE.Mesh {

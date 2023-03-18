@@ -224,8 +224,11 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       //8
       this.handleWrapChange(20);
     } else if (keyCode === 57) {
-      //8
+      //9
       this.handleWrapChange(50);
+    } else if (keyCode === 48) {
+      //0
+      this.handleWrapChange(100);
     } else if (keyCode === 65) {
       //a
       return this.handleLeft();

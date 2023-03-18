@@ -1,29 +1,28 @@
+import * as THREE from "three";
 import model from "../models/lanzarote.glb";
 import Models from "../utils/models";
 import textureImg from "../textures/mars1.jpg";
 import textureImgHeightMap from "../textures/h-map-lanzarote.png";
-import * as THREE from "three";
+
+const USE_BLENDER_MODEL = true;
 
 const loadFromDisplacement = async () => {
   const loader = new THREE.TextureLoader();
   const displacement = await loader.load(textureImgHeightMap);
-  const groundGeometry = new THREE.PlaneGeometry(3, 3, 300, 300);
+  const groundGeometry = new THREE.PlaneGeometry(100000, 100000, 300, 300);
   const groundMaterial = new THREE.MeshPhongMaterial({
     // wireframe: true,
     color: "red",
     displacementMap: displacement,
-    displacementScale: 2,
+    displacementScale: 200,
     // displacementBias: 2,
     map: displacement,
   });
 
   const mesh = new THREE.Mesh(groundGeometry, groundMaterial);
   mesh.rotation.x = -Math.PI / 2;
-  console.log(mesh);
   return mesh;
 };
-
-const USE_BLENDER_MODEL = true;
 
 const Island = {
   load: async (manager: THREE.LoadingManager): Promise<THREE.Mesh> => {

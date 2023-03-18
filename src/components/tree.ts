@@ -2,6 +2,7 @@
 import * as THREE from "three";
 var mat_grey = new THREE.MeshLambertMaterial({ color: 0xf3f2f7 });
 var mat_yellow = new THREE.MeshLambertMaterial({ color: 0xfeb42b });
+var mat_green = new THREE.MeshLambertMaterial({ color: 0xb2d2a4 });
 var mat_dark = new THREE.MeshLambertMaterial({ color: 0x5a6e6c });
 var mat_brown = new THREE.MeshLambertMaterial({ color: 0xa3785f });
 
@@ -23,7 +24,7 @@ class Tree {
 
     //crown
     const geo_crown = new THREE.IcosahedronGeometry(2.5, 0);
-    const crown = new THREE.Mesh(geo_crown, mat_yellow);
+    const crown = new THREE.Mesh(geo_crown, mat_green);
     crown.scale.y = 0.4;
     crown.rotation.z = -0.5;
     crown.rotation.x = -0.2;

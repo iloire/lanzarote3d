@@ -57,6 +57,7 @@ const Mechanics = {
     const mesh = await pg.loadModel(p.scale);
     mesh.position.copy(p.position);
     pg.addGui(gui);
+    pg.init();
     scene.add(mesh);
 
     // const birds = new Birds();
@@ -92,15 +93,18 @@ const Mechanics = {
     //   }
     // };
 
-    const stone = new Stone().load();
-    stone.position.set(0, 1000, 0);
-    stone.scale.set(100, 100, 100);
-    scene.add(stone);
+    // const stone = new Stone().load();
+    // stone.position.set(0, 1000, 0);
+    // stone.scale.set(100, 100, 100);
+    // scene.add(stone);
+    //
+    // const tree = new Tree().load();
+    // tree.position.set(0, 400, 0);
+    // tree.scale.set(10, 10, 10);
+    // scene.add(tree);
 
-    const tree = new Tree().load();
-    tree.position.set(0, 400, 0);
-    tree.scale.set(10, 10, 10);
-    scene.add(tree);
+    renderer.render(scene, camera); // render before adding trees
+    Environment.addTrees(scene, terrain);
 
     const animate = () => {
       // findCameraIntercept();

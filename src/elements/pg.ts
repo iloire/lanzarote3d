@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import model from "../models/paraglider2.glb";
 import Models from "../utils/models";
 import Weather from "../elements/weather";
 import Thermal from "../elements/thermal";
@@ -9,6 +8,8 @@ import GuiHelper from "../utils/gui";
 const ORIGIN = new THREE.Vector3(0, 0, 0);
 const DOWN_DIRECTION = new THREE.Vector3(0, -1, 0);
 const UP_DIRECTION = new THREE.Vector3(0, 1, 0);
+const FORWARD_DIRECTION = new THREE.Vector3(1, 0, 0);
+const ANTI_CRASH_ENABLED = true;
 
 function getAttackAngleRadians(glidingRatio: number) {
   return Math.atan(1 / glidingRatio);
@@ -42,11 +43,27 @@ const createTrajectoryArrow = (
   return arrow;
 };
 
+const createGravityArrow = (mesh: THREE.Mesh, len: number) => {
+  const dir = DOWN_DIRECTION.clone();
+  const arrow = new THREE.ArrowHelper(dir, ORIGIN, len, 0xff0000);
+  return arrow;
+};
+
 const createDirectionArrow = (
   dir: THREE.Vector3,
   len: number,
   color
 ): THREE.ArrowHelper => {
+  const arrow = new THREE.ArrowHelper(dir, ORIGIN, len, color);
+  return arrow;
+};
+
+const createCentripetalArrow = (
+  mesh: THREE.Mesh,
+  len: number,
+  color
+): THREE.ArrowHelper => {
+  const dir = new THREE.Vector3(0, -1, 0);
   const arrow = new THREE.ArrowHelper(dir, ORIGIN, len, color);
   return arrow;
 };
@@ -110,6 +127,7 @@ class Paraglider extends THREE.EventDispatcher {
   __directionInput: number = 0;
   rotationInertia = 0;
   debug: boolean;
+  numberGroundTouches: number = 0;
 
   constructor(
     options: ParagliderConstructor,
@@ -153,14 +171,14 @@ class Paraglider extends THREE.EventDispatcher {
     this.paragliderModel = new ParagliderModel();
     const mesh = this.paragliderModel.load();
     mesh.scale.set(scale, scale, scale);
-    mesh.position.y += 300;
     this.model = mesh;
     if (this.debug) {
-      const arrowLen = 700;
+      const arrowLen = 50;
+      mesh.add(createCentripetalArrow(mesh, arrowLen, 0x0000ff));
       mesh.add(createDirectionArrow(this.direction(), arrowLen, 0x0000ff));
       mesh.add(createTrajectoryArrow(this.glidingRatio(), arrowLen, 0xff00ff));
       mesh.add(createLiftArrow(this.glidingRatio(), arrowLen, 0xffffff));
-      mesh.add(this.getGravityHelper(arrowLen));
+      mesh.add(createGravityArrow(mesh, arrowLen));
     }
     return mesh;
   }
@@ -191,33 +209,43 @@ class Paraglider extends THREE.EventDispatcher {
   tick(multiplier: number) {
     this.tickCounter++;
     if (!this.hasTouchedGround(this.terrain, this.water)) {
-      this.moveForward(multiplier);
-      this.moveVertical(multiplier);
+      this.move(multiplier);
     } else {
-      this.trajectory.push(this.position()); // last point saved
+      this.numberGroundTouches++;
       this.dispatchEvent({
         type: "touchedGround",
       });
+      this.trajectory.push(this.position()); // last point saved
+      if (ANTI_CRASH_ENABLED) {
+        this.model.position.y += 10;
+      } else {
+        this.dispatchEvent({
+          type: "crashed",
+        });
+      }
     }
     this.flyingTime += multiplier;
     this.metersFlown += multiplier * this.getGroundSpeed();
 
-    const smoother = 0.1;
+    const rotationSmoother = 0.08;
+
     const keyBreakMultiplier = 15; // for A/D keys
     const passiveRecoveryMultiplier = 5;
 
     const turnMultiplier = THREE.MathUtils.clamp(multiplier, 0, 0.07);
     if (this.__directionInput === 0) {
       if (this.isLeftBreaking) {
-        this.rotationInertia -= turnMultiplier * keyBreakMultiplier * smoother;
+        this.rotationInertia -=
+          turnMultiplier * keyBreakMultiplier * rotationSmoother;
       } else if (this.isRightBreaking) {
-        this.rotationInertia += turnMultiplier * keyBreakMultiplier * smoother;
+        this.rotationInertia +=
+          turnMultiplier * keyBreakMultiplier * rotationSmoother;
       } else if (Math.abs(this.rotationInertia) > 0) {
         // passive recovery of momentum
         this.rotationInertia -=
           passiveRecoveryMultiplier *
           turnMultiplier *
-          (this.rotationInertia * smoother);
+          (this.rotationInertia * rotationSmoother);
       }
     } else {
       // apply analogic input
@@ -226,10 +254,10 @@ class Paraglider extends THREE.EventDispatcher {
       ) {
         // break input against inertia. We may it a bit stronger input
         this.rotationInertia +=
-          2 * turnMultiplier * this.__directionInput * smoother;
+          2 * turnMultiplier * this.__directionInput * rotationSmoother;
       } else {
         this.rotationInertia +=
-          turnMultiplier * this.__directionInput * smoother;
+          turnMultiplier * this.__directionInput * rotationSmoother;
       }
     }
 
@@ -245,7 +273,7 @@ class Paraglider extends THREE.EventDispatcher {
 
     if (Math.abs(this.rotationInertia) > 0) {
       this.setRoll(Math.abs(this.rotationInertia) * 1.3);
-      this.rotate(this.rotationInertia * smoother);
+      this.rotate(this.rotationInertia * rotationSmoother);
     } else {
       this.setRoll(0);
     }
@@ -254,6 +282,10 @@ class Paraglider extends THREE.EventDispatcher {
       //save point
       this.trajectory.push(this.position());
     }
+  }
+
+  rotate(value: number = 0) {
+    this.model.rotation.y += -1 * value * getRotationValue(this.wrapSpeed);
   }
 
   setRoll(angle: number) {
@@ -274,34 +306,21 @@ class Paraglider extends THREE.EventDispatcher {
     return pgVelocity.add(windVelocity).length();
   }
 
-  moveForward(multiplier: number) {
-    const velocity = this.direction().multiplyScalar(multiplier * this.speed());
-    this.move(velocity);
-    this.move(this.weather.getWindVelocity(multiplier));
-  }
-
-  moveVertical(multiplier: number) {
+  move(multiplier: number) {
     const drop = this.speed() / this.glidingRatio();
     const downVector = DOWN_DIRECTION.clone().multiplyScalar(multiplier * drop);
     this.dispatchEvent({
       type: "drop",
       drop,
     });
+
     const lift = this.getLiftValue();
-    const liftVector = UP_DIRECTION.clone().multiplyScalar(multiplier * lift);
+    const liftVector = this.direction(UP_DIRECTION).multiplyScalar(
+      multiplier * lift
+    );
     this.dispatchEvent({
       type: "dynamicLift",
       lift,
-    });
-
-    // roll sink
-    const rollDrop = Math.abs(this.__rollAngle * 7); // TODO: do something better
-    const sinkVector = DOWN_DIRECTION.clone().multiplyScalar(
-      multiplier * rollDrop
-    );
-    this.dispatchEvent({
-      type: "rollDrop",
-      drop: rollDrop,
     });
 
     const inHowManyThermals = this.countInsideHowManyThermals();
@@ -314,14 +333,25 @@ class Paraglider extends THREE.EventDispatcher {
       lift: liftThermal,
     });
 
-    const combinedMoveVector = downVector
+    const velocityVector = this.direction().multiplyScalar(
+      multiplier * this.speed()
+    );
+    const windVector = this.weather.getWindVelocity(multiplier);
+
+    const combinedMoveVector = new THREE.Vector3(0, 0, 0)
+      .add(downVector)
       .add(liftVector)
-      .add(sinkVector)
-      .add(liftThermalVector);
-    this.move(combinedMoveVector);
+      .add(liftThermalVector)
+      .add(velocityVector)
+      .add(windVector);
+
+    this.model.position.add(combinedMoveVector);
+    this.dispatchEvent({ type: "position", position: this.model.position });
+
+    const delta = combinedMoveVector.y / multiplier;
     this.dispatchEvent({
       type: "delta",
-      delta: lift + liftThermal - drop - rollDrop,
+      delta,
     });
   }
 
@@ -331,7 +361,7 @@ class Paraglider extends THREE.EventDispatcher {
       min: -20000,
       max: 20000,
     });
-    const pgGui = gui.addFolder("Paraglider position");
+
     const pgWindGui = gui.addFolder("Paraglider wing");
     pgWindGui
       .add(this.options, "trimSpeed", 20 / 3.6, 70 / 3.6)
@@ -353,6 +383,13 @@ class Paraglider extends THREE.EventDispatcher {
     const pgEnv = gui.addFolder("Paraglider env");
     pgEnv.add(this, "__lift").name("lift").listen();
     pgEnv.add(this, "__gradient").name("gradient").listen();
+
+    const pgPhysics = gui.addFolder("Paraglider physics");
+    pgPhysics.add(this, "rotationInertia", -10, 10).name("inertia").listen();
+    pgPhysics
+      .add(this, "__directionInput", -50, 50)
+      .name("directionInput")
+      .listen();
   }
 
   directionInput(direction: number) {
@@ -365,10 +402,6 @@ class Paraglider extends THREE.EventDispatcher {
 
   leftBreakRelease() {
     this.isLeftBreaking = false;
-  }
-
-  rotate(value: number = 0) {
-    this.model.rotation.y += -1 * value * getRotationValue(this.wrapSpeed);
   }
 
   rightBreakInput() {
@@ -386,7 +419,8 @@ class Paraglider extends THREE.EventDispatcher {
       terrain,
       water
     );
-    return isNaN(terrainBelowHeight);
+    const paragliderIsCloseEnoughToTerrain = pos.y - terrainBelowHeight < 20;
+    return isNaN(terrainBelowHeight) || paragliderIsCloseEnoughToTerrain;
   }
 
   getTerrainGradientAgainstWindDirection(
@@ -437,7 +471,7 @@ class Paraglider extends THREE.EventDispatcher {
     // console.log("height", height);
     // console.log("paragliderHeight", paragliderHeight);
     const heightLiftComponent =
-      (1 - pgHeightToTerrainHeightRatio) * height * 0.001;
+      (1 - pgHeightToTerrainHeightRatio) * height * 0.002;
     // console.log("h:", heightLiftComponent);
     const lift = heightLiftComponent * gradient;
     this.dispatchEvent({ type: "lift", lift });
@@ -445,25 +479,21 @@ class Paraglider extends THREE.EventDispatcher {
     return lift;
   }
 
-  getGravityHelper(len: number) {
-    const arrow = new THREE.ArrowHelper(
-      DOWN_DIRECTION.clone(),
-      ORIGIN,
-      len,
-      0xff0000
-    );
-    return arrow;
+  direction(localVector: THREE.Vector3 = FORWARD_DIRECTION): THREE.Vector3 {
+    const quaternion = this.model.getWorldQuaternion(new THREE.Quaternion());
+    return localVector.clone().applyQuaternion(quaternion);
   }
 
-  direction(): THREE.Vector3 {
-    const forward = new THREE.Vector3(1, 0, 0);
-    const quaternion = this.model.getWorldQuaternion(new THREE.Quaternion());
-    const direction = forward.clone().applyQuaternion(quaternion);
-    return direction.clone();
+  rotation(): THREE.Quaternion {
+    return this.model.getWorldQuaternion(new THREE.Quaternion()).clone();
   }
 
   position(): THREE.Vector3 {
     return this.model.position.clone();
+  }
+
+  getPilotPosition(): THREE.Vector3 {
+    return this.position().add(this.paragliderModel.getPilotPosition());
   }
 
   setPosition(pos: THREE.Vector3) {
@@ -513,11 +543,6 @@ class Paraglider extends THREE.EventDispatcher {
 
   getFlyingTime(): number {
     return this.flyingTime;
-  }
-
-  move(velocity: THREE.Vector3) {
-    this.model.position.add(velocity);
-    this.dispatchEvent({ type: "position", position: this.model.position });
   }
 
   getTrajectory(): THREE.Vector3[] {

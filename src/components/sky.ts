@@ -30,8 +30,11 @@ const calculateLightIntensity = (
   if (timeOfDayInHours < 18) {
     return 0.4;
   }
-  if (timeOfDayInHours < 20) {
+  if (timeOfDayInHours <= 20) {
     return 0.3;
+  }
+  if (timeOfDayInHours < 21) {
+    return 0.25;
   }
   return 0.1;
 };
@@ -53,7 +56,7 @@ const calculateSunPosition = (
   return sunPosition;
 };
 
-const USE_DIRECTIONAL_LIGHT = false;
+const USE_DIRECTIONAL_LIGHT = true;
 
 export default class Sky extends THREE.Object3D {
   sunPosition: THREE.Vector3;
@@ -82,6 +85,7 @@ export default class Sky extends THREE.Object3D {
     const distance = 0; // max range of the light
     const intensity = 0.9;
     this.pointLight = new THREE.PointLight(0xffffff, intensity, distance);
+    this.pointLight.castShadow = true;
     this.pointLight.color.setHSL(0.995, 0.5, 0.9);
     this.pointLight.position.copy(
       this.sunPosition.clone().multiplyScalar(1000000)
@@ -97,6 +101,7 @@ export default class Sky extends THREE.Object3D {
         0xffffff,
         lightIntensity
       );
+      this.directionalLight.castShadow = true;
       this.directionalLight.position.copy(
         this.sunPosition.clone().multiplyScalar(1000)
       );
