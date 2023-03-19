@@ -22,6 +22,7 @@ export default class Water {
     });
     water.rotation.x = -Math.PI / 2;
     water.material.uniforms["sunDirection"].value.copy(sunPosition).normalize();
+    water.receiveShadow = true;
     return water;
   }
 }

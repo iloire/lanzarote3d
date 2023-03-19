@@ -36,7 +36,7 @@ class WindIndicator {
       directionDegrees,
       this.length,
       origin,
-      0xffff00
+      0xffffff
     );
     return this.arrow;
   }

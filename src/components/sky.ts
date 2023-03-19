@@ -103,13 +103,13 @@ export default class Sky extends THREE.Object3D {
       );
       this.directionalLight.castShadow = true;
       this.directionalLight.position.copy(
-        this.sunPosition.clone().multiplyScalar(1000)
+        this.sunPosition.clone().multiplyScalar(100000)
       );
 
-      this.directionalLightHelper = new THREE.DirectionalLightHelper(
-        this.directionalLight,
-        1000
-      );
+      // this.directionalLightHelper = new THREE.DirectionalLightHelper(
+      //   this.directionalLight,
+      //   1000
+      // );
     }
 
     this.ambientLight = new THREE.AmbientLight(0xffffff, lightIntensity);
@@ -153,7 +153,7 @@ export default class Sky extends THREE.Object3D {
       );
       this.directionalLight.intensity =
         calculateLightIntensity(timeOfDayInHours, this.monthOfTheYear) * 0.3;
-      this.directionalLightHelper.update();
+      // this.directionalLightHelper.update();
     }
     this.ambientLight.intensity = calculateLightIntensity(
       timeOfDayInHours,
@@ -169,7 +169,7 @@ export default class Sky extends THREE.Object3D {
     }
     scene.add(this.pointLight);
     scene.add(this.ambientLight);
-    // this.addFlare(this.pointLight);
+    this.addFlare(this.pointLight);
   }
 
   addFlare(light: THREE.Light) {
@@ -182,10 +182,10 @@ export default class Sky extends THREE.Object3D {
     lensflare.addElement(
       new LensflareElement(textureFlare0, size, 0, light.color)
     );
-    lensflare.addElement(new LensflareElement(textureFlare1, 60, 0.6));
-    lensflare.addElement(new LensflareElement(textureFlare1, 70, 0.7));
-    lensflare.addElement(new LensflareElement(textureFlare1, 120, 0.9));
-    lensflare.addElement(new LensflareElement(textureFlare1, 70, 1));
+    lensflare.addElement(new LensflareElement(textureFlare1, size, 0.6));
+    // lensflare.addElement(new LensflareElement(textureFlare1, size, 0.7));
+    // lensflare.addElement(new LensflareElement(textureFlare1, size, 0.9));
+    // lensflare.addElement(new LensflareElement(textureFlare1, size, 1));
     light.add(lensflare);
   }
 
