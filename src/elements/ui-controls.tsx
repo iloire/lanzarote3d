@@ -245,11 +245,8 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     } else if (keyCode === 68) {
       //d
       return this.handleRight();
-    } else if (keyCode === 80) {
-      //p
-      return this.handlePause();
-    } else if (keyCode === 27) {
-      //ESC
+    } else if (keyCode === 80 || keyCode === 32 || keyCode === 27) {
+      //p, space, ESC
       return this.handlePause();
     } else if (keyCode === 72) {
       //h
