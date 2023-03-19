@@ -5,6 +5,8 @@ import Thermal, { ThermalDimensions } from "../../elements/thermal";
 import { rndIntBetween } from "../../utils/math";
 import Tree from "../../components/tree";
 import Stone from "../../components/stone";
+import House from "../../components/house";
+import Boat from "../../components/boat";
 import Paraglider, { ParagliderConstructor } from "../../elements/pg";
 
 const KMH_TO_MS = 3.6;
@@ -73,8 +75,8 @@ const addMeshAroundArea = (
   scene: THREE.Scene
 ) => {
   for (let index = 0; index < number; index++) {
-    const newX = pos.x + 10 * index * rndIntBetween(0, 5);
-    const newZ = pos.z + 10 * index * rndIntBetween(0, 10);
+    const newX = pos.x + 2 * index * rndIntBetween(0, 5);
+    const newZ = pos.z + 2 * index * rndIntBetween(0, 10);
 
     const terrainHeight = getTerrainHeight(
       new THREE.Vector3(newX, 0, newZ),
@@ -135,6 +137,44 @@ const Environment = {
     const pg3 = await createPg(pgOptions, weather, terrain, water, pos);
     scene.add(pg3.getMesh());
   },
+  addBoats: (scene: THREE.Scene, terrain: THREE.Mesh) => {
+    const boat = new Boat().load();
+    const scale = 3;
+    boat.scale.set(scale, scale, scale);
+    addMeshAroundArea(
+      boat,
+      new THREE.Vector3(7879, 0, -4445),
+      5,
+      terrain,
+      scene
+    );
+    addMeshAroundArea(
+      boat,
+      new THREE.Vector3(8279, 0, -6155),
+      4,
+      terrain,
+      scene
+    );
+  },
+  addHouses: (scene: THREE.Scene, terrain: THREE.Mesh) => {
+    const house = new House().load();
+    const scale = 5;
+    house.scale.set(scale, scale, scale);
+    addMeshAroundArea(
+      house,
+      new THREE.Vector3(6879, 0, -545),
+      20,
+      terrain,
+      scene
+    );
+    addMeshAroundArea(
+      house,
+      new THREE.Vector3(6279, 0, -3155),
+      20,
+      terrain,
+      scene
+    );
+  },
   addStones: (scene: THREE.Scene, terrain: THREE.Mesh) => {
     const stone = new Stone().load();
     const scale = 4;
@@ -144,7 +184,7 @@ const Environment = {
   },
   addTrees: (scene: THREE.Scene, terrain: THREE.Mesh) => {
     const tree = new Tree().load();
-    const scale = 5;
+    const scale = 3;
     tree.scale.set(scale, scale, scale);
     addMeshAroundArea(
       tree,

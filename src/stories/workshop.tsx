@@ -4,6 +4,7 @@ import Sky from "../components/sky";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import Paraglider from "../components/paraglider";
+import Boat from "../components/boat";
 import Helpers from "../utils/helpers";
 
 const Workshop = {
@@ -36,7 +37,13 @@ const Workshop = {
     const mesh = await paraglider.load(gui);
     mesh.position.set(0, 0, 0);
     scene.add(mesh);
-    // paraglider.breakLeft();
+
+    const boat = new Boat();
+    const boatMesh = boat.load(gui);
+    boatMesh.position.set(20, 0, 30);
+    scene.add(boatMesh);
+
+    paraglider.breakLeft();
     // paraglider.breakRight();
 
     const animate = () => {
@@ -45,7 +52,7 @@ const Workshop = {
     };
 
     const lookAt = mesh.position.clone().add(new THREE.Vector3(0, 0, 0));
-    camera.position.set(96, 32, 81);
+    camera.position.set(20, 192, 121);
     camera.lookAt(lookAt);
     controls.target = lookAt;
     animate();

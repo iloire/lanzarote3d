@@ -57,7 +57,7 @@ const addWindIndicatorToScene = (
   pg: Paraglider,
   weather: Weather
 ) => {
-  const windIndicator = new WindIndicator(140);
+  const windIndicator = new WindIndicator(40);
   const arrow = windIndicator.load(
     WEATHER_SETTINGS.windDirectionDegreesFromNorth,
     pg.position().add(pg.direction())
@@ -282,6 +282,8 @@ const Game = {
     renderer.render(scene, camera); // must render before adding trees
     Environment.addTrees(scene, terrain);
     Environment.addStones(scene, terrain);
+    Environment.addHouses(scene, terrain);
+    Environment.addBoats(scene, water);
     // await Environment.addOtherGliders(scene, weather, terrain, water);
 
     const animate = () => {
