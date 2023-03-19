@@ -7,6 +7,7 @@ import Tree from "../../components/tree";
 import Stone from "../../components/stone";
 import House from "../../components/house";
 import Boat from "../../components/boat";
+import Birds from "../../components/birds";
 import Paraglider, { ParagliderConstructor } from "../../elements/pg";
 
 const KMH_TO_MS = 3.6;
@@ -111,6 +112,11 @@ const createPg = async (
 };
 
 const Environment = {
+  addBirds: (scene: THREE.Scene) => {
+    const birds = new Birds();
+    const birdsMesh = birds.load();
+    scene.add(birdsMesh);
+  },
   addOtherGliders: async (
     scene: THREE.Scene,
     weather: Weather,

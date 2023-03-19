@@ -201,7 +201,7 @@ const Game = {
         }}
         onFinishGame={(fnHideButtons) => {
           finishGame();
-          fnHideButtons()
+          fnHideButtons();
         }}
         onPause={(paused) => {
           analytics.trackEvent("game-pause");
@@ -285,6 +285,7 @@ const Game = {
     Environment.addStones(scene, terrain);
     Environment.addHouses(scene, terrain);
     Environment.addBoats(scene, water);
+    Environment.addBirds(scene);
     // await Environment.addOtherGliders(scene, weather, terrain, water);
 
     const animate = () => {
@@ -308,6 +309,8 @@ const Game = {
       // setTimeout(animate, 1000);
       requestAnimationFrame(animate);
     };
+
+    console.log("triangles:", renderer.info.render.triangles);
 
     animate();
   },
