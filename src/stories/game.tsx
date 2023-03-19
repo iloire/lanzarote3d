@@ -24,7 +24,7 @@ const KMH_TO_MS = 3.6;
 
 const FOG_ENABLED = false;
 const TIME_OF_DAY = 19;
-const SOUND_ENABLED = false;
+const SOUND_ENABLED = true;
 const DEBUG = false;
 
 function round(number: number): number {
@@ -199,8 +199,9 @@ const Game = {
             scene.fog = fog;
           }
         }}
-        onFinishGame={() => {
+        onFinishGame={(fnHideButtons) => {
           finishGame();
+          fnHideButtons()
         }}
         onPause={(paused) => {
           analytics.trackEvent("game-pause");

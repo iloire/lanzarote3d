@@ -38,7 +38,7 @@ type UIControlsProps = {
   onViewChange: (view: View) => void;
   onWrapSpeedChange: (value: number) => void;
   onPause: (paused: boolean) => void;
-  onFinishGame: () => void;
+  onFinishGame: (fnHideButtons: () => void) => void;
 };
 
 type UIControlsState = {
@@ -317,10 +317,9 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
   };
 
   handleFinishGame = () => {
-    // this.setState({ pausedGame: !this.state.pausedGame }, () => {
-    this.props.onFinishGame();
-    // });
-    // return false;
+    this.props.onFinishGame(() => {
+      this.setState({ pausedGame: false });
+    });
   };
 
   handleStart = (
