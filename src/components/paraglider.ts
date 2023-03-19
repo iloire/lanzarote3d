@@ -8,30 +8,25 @@ import Models from "../utils/models";
 const BREAK_ROTATION = 0.05;
 
 class ParagliderModel {
-  leftWing: THREE.Object3D;
-  rightWing: THREE.Object3D;
-  wing: THREE.Mesh;
+  glider: Glider;
   pilotMesh: THREE.Object3D;
-  initialLeftWingRotation: number;
-  initialRightWingRotation: number;
 
   breakLeft() {
-    this.leftWing.rotation.y = this.initialLeftWingRotation + BREAK_ROTATION;
+    this.glider.breakLeft();
   }
 
   breakRight() {
-    this.rightWing.rotation.y = this.initialRightWingRotation + BREAK_ROTATION;
+    this.glider.breakRight();
   }
 
   handsUp() {
-    this.rightWing.rotation.y = this.initialRightWingRotation;
-    this.leftWing.rotation.y = this.initialLeftWingRotation;
+    this.glider.handsUp();
   }
 
   async load(gui?: any): Promise<THREE.Mesh> {
     const model = new THREE.Mesh();
-    const glider = new Glider();
-    const wing = glider.createWing();
+    this.glider = new Glider();
+    const wing = this.glider.createWing();
     wing.position.y = 80;
     model.add(wing);
 

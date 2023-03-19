@@ -2,17 +2,28 @@ import * as THREE from "three";
 import GuiHelper from "../utils/gui";
 
 const mat_wing = new THREE.MeshLambertMaterial({ color: 0x00ffff });
+const mat_break = new THREE.MeshLambertMaterial({ color: 0xffffff });
 const numeroCajones = 16;
 
-const createCajon = (w: number, h: number, deep: number): THREE.Mesh => {
+type HalfWing = {
+  wingBreakSystem: THREE.Object3D;
+  wing: THREE.Object3D;
+};
+
+const createCajon = (
+  w: number,
+  h: number,
+  deep: number,
+  mat: THREE.MeshLambertMaterial
+): THREE.Mesh => {
   const geo = new THREE.BoxGeometry(w, h, deep);
-  const cajon = new THREE.Mesh(geo, mat_wing);
+  const cajon = new THREE.Mesh(geo, mat);
   cajon.castShadow = true;
   cajon.rotation.set(0, 0, Math.PI / 2);
   return cajon;
 };
 
-const createHalfWing = (): THREE.Mesh => {
+const createHalfWing = (scale?: THREE.Vector3): HalfWing => {
   const group = new THREE.Mesh();
   let distanceCajon = 0;
   const lineMat = new THREE.LineBasicMaterial({
@@ -20,15 +31,23 @@ const createHalfWing = (): THREE.Mesh => {
     opacity: 0.1,
   }); // blue color
   const points = []; // array to hold the points of the line segments
+  const wingBreakSystem = new THREE.Group();
   for (let i = 0; i < numeroCajones; i++) {
     const w = 2 + i * 0.5;
     const h = 0.5 + i * 0.2;
-    const deep = 10 + i * 2.8;
+    const deep = 8 + i * 2.8;
     distanceCajon += w * 0.8;
-    const cajon = createCajon(w, h, deep);
     const x = i * 1.9 - 2 * h;
+
+    const cajon = createCajon(w, h, deep, mat_wing);
     cajon.position.set(x, distanceCajon, 0);
+
+    const breakDeep = deep / 10;
+    const breakBox = createCajon(w, h, breakDeep, mat_break);
+    breakBox.position.set(x, distanceCajon, deep / 2);
+
     group.add(cajon);
+    wingBreakSystem.add(breakBox);
 
     if (i % 4 === 0) {
       //lines
@@ -40,47 +59,57 @@ const createHalfWing = (): THREE.Mesh => {
       points.push(handLocation);
     }
   }
+  group.add(wingBreakSystem);
   group.rotateZ(Math.PI / 2);
   group.rotateX(Math.PI / 2);
   const geometry = new THREE.BufferGeometry().setFromPoints(points); // create the geometry from the points
   const lineSegments = new THREE.LineSegments(geometry, lineMat); // create the line segments
   group.add(lineSegments);
-  return group;
+  if (scale) {
+    group.scale.set(scale.x, scale.y, scale.z);
+  }
+  return { wing: group, wingBreakSystem };
 };
 
 class Glider {
-  leftWing: THREE.Object3D;
-  rightWing: THREE.Object3D;
-  wing: THREE.Mesh;
-  initialLeftWingRotation: number;
-  initialRightWingRotation: number;
+  leftWing: HalfWing;
+  rightWing: HalfWing;
+  fullWing: THREE.Mesh;
+
+  breakLeft() {
+    this.leftWing.wingBreakSystem.position.x = -3;
+  }
+
+  breakRight() {
+    this.rightWing.wingBreakSystem.position.x = -3;
+  }
+
+  handsUp() {
+    this.leftWing.wingBreakSystem.position.x = 0;
+    this.rightWing.wingBreakSystem.position.x = 0;
+  }
 
   createWing(): THREE.Mesh {
-    this.wing = new THREE.Mesh();
+    this.fullWing = new THREE.Mesh();
 
-    this.leftWing = createHalfWing();
-    this.leftWing.scale.z = -1;
-    this.initialLeftWingRotation = this.leftWing.rotation.y;
+    this.leftWing = createHalfWing(new THREE.Vector3(1, 1, -1));
+    this.rightWing = createHalfWing(new THREE.Vector3(1, -1, -1));
+    this.rightWing.wing.translateY(155);
 
-    this.rightWing = this.leftWing.clone();
-    this.rightWing.scale.y = -1;
-    this.rightWing.translateY(155);
-    this.initialRightWingRotation = this.rightWing.rotation.y;
+    this.fullWing.add(this.leftWing.wing);
+    this.fullWing.add(this.rightWing.wing);
 
-    this.wing.add(this.leftWing);
-    this.wing.add(this.rightWing);
-
-    this.wing.translateZ(-78);
-    this.wing.translateY(80);
-    return this.wing;
+    this.fullWing.translateZ(-78);
+    this.fullWing.translateY(80);
+    return this.fullWing;
   }
 
   async load(gui?: any): Promise<THREE.Mesh> {
     const wing = this.createWing();
     if (gui) {
-      GuiHelper.addLocationGui(gui, "leftWing", this.leftWing);
-      GuiHelper.addLocationGui(gui, "rightWing", this.rightWing);
-      GuiHelper.addLocationGui(gui, "wing", this.wing);
+      GuiHelper.addLocationGui(gui, "leftWing", this.leftWing.wing);
+      GuiHelper.addLocationGui(gui, "rightWing", this.rightWing.wing);
+      GuiHelper.addLocationGui(gui, "wing", this.fullWing);
     }
     return wing;
   }
