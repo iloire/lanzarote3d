@@ -39,6 +39,7 @@ class ParagliderModel {
     const scale = 0.03;
     this.pilotMesh.scale.set(scale, scale, scale);
     this.pilotMesh.position.x = -5;
+    this.pilotMesh.position.z = -0.4;
     this.pilotMesh.rotateY(Math.PI / 2);
     model.add(this.pilotMesh);
 

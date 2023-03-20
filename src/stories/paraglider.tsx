@@ -39,7 +39,7 @@ const ParagliderWorkshop = {
     };
 
     const lookAt = mesh.position.clone().add(new THREE.Vector3(0, 0, 0));
-    camera.position.set(25, 12, 25);
+    camera.position.set(125, 9, 0);
     camera.lookAt(lookAt);
     controls.target = lookAt;
     animate();

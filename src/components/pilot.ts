@@ -26,6 +26,9 @@ const lipMat = new THREE.MeshLambertMaterial({
   color: "#333",
   // shading: THREE.FlatShading,
 });
+const carabinerMat = new THREE.MeshLambertMaterial({
+  color: "#ff0000",
+});
 
 const getHead = (): THREE.Group => {
   const group = new THREE.Group();
@@ -144,14 +147,26 @@ class Pilot {
     this.armRight.add(handRight);
     this.armLeft.add(handLeft);
 
-    const armRotation = 0.3;
+    const armRotation = -0.3;
     this.armLeft.rotateZ(armRotation);
-    this.armLeft.rotateX(armRotation);
+    this.armLeft.rotateX(-1 * armRotation);
+    //
     this.armRight.rotateZ(-1 * armRotation);
-    this.armRight.rotateX(armRotation);
+    this.armRight.rotateX(-1 * armRotation);
+
+    // carabiner
+    const carabinerGeo = new THREE.BoxGeometry(40, 30, 50);
+    const carabinerLeft = new THREE.Mesh(carabinerGeo, carabinerMat);
+    carabinerLeft.position.set(110, -140, 275);
+
+    const carabinerRight = carabinerLeft.clone();
+    carabinerRight.position.set(-110, -140, 275);
 
     group.add(this.armLeft);
     group.add(this.armRight);
+
+    group.add(carabinerLeft);
+    group.add(carabinerRight);
 
     return group;
   }

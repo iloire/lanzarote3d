@@ -51,7 +51,7 @@ const createHalfWing = (scale?: THREE.Vector3): HalfWing => {
 
     if (i % 4 === 0) {
       //lines
-      const carabinerLocation = new THREE.Vector3(-85, 75, -3);
+      const carabinerLocation = new THREE.Vector3(-84.5, 75, -3);
       points.push(new THREE.Vector3(i * 1.5, distanceCajon, deep * 0.5));
       points.push(carabinerLocation);
 
