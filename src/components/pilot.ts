@@ -22,6 +22,10 @@ const suitMat = new THREE.MeshLambertMaterial({
   color: "#333",
   // shading: THREE.FlatShading,
 });
+const subBodyMat = new THREE.MeshLambertMaterial({
+  color: "#666",
+  // shading: THREE.FlatShading,
+});
 const lipMat = new THREE.MeshLambertMaterial({
   color: "#333",
   // shading: THREE.FlatShading,
@@ -118,12 +122,19 @@ class Pilot {
   getBody(): THREE.Group {
     const group = new THREE.Group();
 
-    const bodyGeo = new THREE.BoxGeometry(250, 420, 1400);
+    const bodyGeo = new THREE.BoxGeometry(250, 420, 1100);
     const body = new THREE.Mesh(bodyGeo, suitMat);
     body.position.x = 0;
-    body.position.y = -350;
+    body.position.y = -390;
     body.position.z = 200;
     group.add(body);
+
+    const subBodyGeo = new THREE.BoxGeometry(150, 420, 400);
+    const subBody = new THREE.Mesh(subBodyGeo, subBodyMat);
+    subBody.position.x = 0;
+    subBody.position.y = -385;
+    subBody.position.z = 400;
+    group.add(subBody);
 
     //arms
     const armGeo = new THREE.BoxGeometry(50, 390, 60);
@@ -157,10 +168,10 @@ class Pilot {
     // carabiner
     const carabinerGeo = new THREE.BoxGeometry(40, 30, 50);
     const carabinerLeft = new THREE.Mesh(carabinerGeo, carabinerMat);
-    carabinerLeft.position.set(110, -140, 275);
+    carabinerLeft.position.set(90, -180, 275);
 
     const carabinerRight = carabinerLeft.clone();
-    carabinerRight.position.set(-110, -140, 275);
+    carabinerRight.position.set(-90, -180, 275);
 
     group.add(this.armLeft);
     group.add(this.armRight);
