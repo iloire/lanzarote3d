@@ -24,7 +24,7 @@ const KMH_TO_MS = 3.6;
 
 const FOG_ENABLED = false;
 const TIME_OF_DAY = 19;
-const SOUND_ENABLED = true;
+const SOUND_ENABLED = false;
 const DEBUG = false;
 
 function round(number: number): number {
@@ -285,8 +285,17 @@ const Game = {
     Environment.addStones(scene, terrain);
     Environment.addHouses(scene, terrain);
     Environment.addBoats(scene, water);
-    Environment.addBirds(scene);
-    // await Environment.addOtherGliders(scene, weather, terrain, water);
+    const birdsPath = [
+      { x: 7500, y: 1090, z: -1068 },
+      { x: 6500, y: 1190, z: -1368 },
+      { x: 4500, y: 1390, z: -1768 },
+    ];
+    Environment.addBirds(
+      scene,
+      birdsPath.map((p) => new THREE.Vector3(p.x, p.y, p.z)),
+      gui
+    );
+    await Environment.addOtherGliders(scene, weather, terrain, water);
 
     const animate = () => {
       box.update();

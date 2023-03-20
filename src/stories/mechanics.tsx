@@ -5,7 +5,6 @@ import Sky from "../components/sky";
 import Trajectory from "../elements/trajectory";
 import Paraglider, { ParagliderConstructor } from "../elements/pg";
 import Weather, { WeatherOptions } from "../elements/weather";
-import Birds from "../elements/birds";
 import WindIndicator from "../components/wind-indicator";
 import Environment from "./game/env";
 import Helpers from "../utils/helpers";
@@ -59,12 +58,6 @@ const Mechanics = {
     pg.addGui(gui);
     pg.init();
     scene.add(mesh);
-
-    // const birds = new Birds();
-    // const birdsMesh = await birds.loadModel(33);
-    // const birdsPosition = new THREE.Vector3(p.position.x, 1280, p.position.z);
-    // birdsMesh.position.copy(birdsPosition);
-    // scene.add(birdsMesh);
 
     // const fogColor = 0x000000;
     // scene.fog = new THREE.FogExp2(fogColor, 0.00001);

@@ -112,11 +112,12 @@ const createPg = async (
 };
 
 const Environment = {
-  addBirds: (scene: THREE.Scene) => {
+  addBirds: async (scene: THREE.Scene, path: THREE.Vector3[], gui?: any) => {
     const birds = new Birds();
-    const birdsMesh = birds.load();
+    const birdsMesh = await birds.load(path, gui);
     scene.add(birdsMesh);
   },
+
   addOtherGliders: async (
     scene: THREE.Scene,
     weather: Weather,
@@ -136,13 +137,18 @@ const Environment = {
     scene.add(pg.getMesh());
 
     const pos2 = new THREE.Vector3(3379, 900, -1545);
-    const pg2 = await createPg(pgOptions, weather, terrain, water, pos);
+    const pg2 = await createPg(pgOptions, weather, terrain, water, pos2);
     scene.add(pg2.getMesh());
 
-    const pos3 = new THREE.Vector3(3979, 1200, -1945);
-    const pg3 = await createPg(pgOptions, weather, terrain, water, pos);
-    scene.add(pg3.getMesh());
+    // const pos3 = new THREE.Vector3(379, 1200, -145);
+    // const pg3 = await createPg(pgOptions, weather, terrain, water, pos3);
+    // scene.add(pg3.getMesh());
+    //
+    // const pos4 = new THREE.Vector3(8179, 1200, -3945);
+    // const pg4 = await createPg(pgOptions, weather, terrain, water, pos4);
+    // scene.add(pg4.getMesh());
   },
+
   addBoats: (scene: THREE.Scene, terrain: THREE.Mesh) => {
     const boat = new Boat().load();
     const scale = 3;
@@ -162,6 +168,7 @@ const Environment = {
       scene
     );
   },
+
   addHouses: (scene: THREE.Scene, terrain: THREE.Mesh) => {
     const house = new House().load();
     const scale = 5;
@@ -181,6 +188,7 @@ const Environment = {
       scene
     );
   },
+
   addStones: (scene: THREE.Scene, terrain: THREE.Mesh) => {
     const stone = new Stone().load();
     const scale = 4;
@@ -188,6 +196,7 @@ const Environment = {
     const pos = new THREE.Vector3(6879, 600, -545);
     addMeshAroundArea(stone, pos, 100, terrain, scene);
   },
+
   addTrees: (scene: THREE.Scene, terrain: THREE.Mesh) => {
     const tree = new Tree().load();
     const scale = 3;
@@ -207,6 +216,7 @@ const Environment = {
       scene
     );
   },
+
   addThermals: (scene: THREE.Scene, weather: Weather): Thermal[] => {
     const lclLevel = weather.getLclLevel();
     // famara
