@@ -2,7 +2,6 @@ import * as THREE from "three";
 import Pilot from "./pilot";
 import Glider from "./glider";
 import GuiHelper from "../utils/gui";
-// import modelHarness from "../models/hawklowv4.glb";
 import Models from "../utils/models";
 
 const BREAK_ROTATION = 0.05;
@@ -38,18 +37,9 @@ class ParagliderModel {
     this.pilotMesh.rotateY(Math.PI / 2);
     model.add(this.pilotMesh);
 
-    // const harness = await Models.loadSimple(modelHarness);
-    // harness.rotateY(Math.PI);
-    // harness.position.set(70, -20, 0);
-    // const scaleHarness = 0.4;
-    // harness.scale.set(scaleHarness, scaleHarness, scaleHarness);
-    //
-    // model.add(harness);
-
     if (gui) {
       GuiHelper.addLocationGui(gui, "pilot", this.pilotMesh);
       GuiHelper.addLocationGui(gui, "paraglider", model);
-      // GuiHelper.addLocationGui(gui, "harness", harness);
     }
     return model;
   }
