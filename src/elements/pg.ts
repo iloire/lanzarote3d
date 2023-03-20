@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 import Models from "../utils/models";
 import Weather from "../elements/weather";
 import Thermal from "../elements/thermal";
@@ -11,6 +12,8 @@ const DOWN_DIRECTION = new THREE.Vector3(0, -1, 0);
 const UP_DIRECTION = new THREE.Vector3(0, 1, 0);
 const FORWARD_DIRECTION = new THREE.Vector3(1, 0, 0);
 const ANTI_CRASH_ENABLED = true;
+
+const TICK_INTERVAL = 25;
 
 function getAttackAngleRadians(glidingRatio: number) {
   return Math.atan(1 / glidingRatio);
@@ -185,11 +188,10 @@ class Paraglider extends THREE.EventDispatcher {
   }
 
   init() {
-    const interval = 50;
     if (this.interval === null) {
       this.interval = setInterval(
-        () => this.tick((interval / 1000) * this.wrapSpeed),
-        interval
+        () => this.tick((TICK_INTERVAL / 1000) * this.wrapSpeed),
+        TICK_INTERVAL
       );
     }
   }
@@ -282,12 +284,10 @@ class Paraglider extends THREE.EventDispatcher {
 
     this.rotationInertia = THREE.MathUtils.clamp(this.rotationInertia, -50, 50);
 
-    if (Math.abs(this.rotationInertia) > 0) {
-      this.setRoll(Math.abs(this.rotationInertia) * 1.3);
-      this.rotate(this.rotationInertia * rotationSmoother);
-    } else {
-      this.setRoll(0);
-    }
+    this.rotate(
+      this.rotationInertia * rotationSmoother,
+      this.rotationInertia * 1.3
+    );
 
     if (this.tickCounter % 10 === 0) {
       //save point
@@ -300,16 +300,16 @@ class Paraglider extends THREE.EventDispatcher {
     }
   }
 
-  rotate(value: number = 0) {
-    this.model.rotation.y += -1 * value * getRotationValue(this.wrapSpeed);
-  }
-
-  setRoll(angle: number) {
+  rotate(yRotationIncrement: number = 0, zAngle: number) {
     const maxAngle = 75;
-    const validAngle = THREE.MathUtils.clamp(angle, -1 * maxAngle, maxAngle);
-    const angleRadians = THREE.MathUtils.degToRad(validAngle);
-    this.__rollAngle = angleRadians;
-    this.model.rotation.z = -1 * angleRadians;
+    const startRotation = this.model.rotation;
+    const yRotation = (this.model.rotation.y +=
+      -1 * yRotationIncrement * getRotationValue(this.wrapSpeed));
+    const validAngle = THREE.MathUtils.clamp(zAngle, -1 * maxAngle, maxAngle);
+    const zRotation = THREE.MathUtils.degToRad(validAngle);
+    const endRotation = new THREE.Euler(0, yRotation, zRotation);
+    this.__rollAngle = zRotation;
+    this.model.rotation.copy(endRotation);
   }
 
   getMetersFlown(): number {
@@ -361,7 +361,17 @@ class Paraglider extends THREE.EventDispatcher {
       .add(velocityVector)
       .add(windVector);
 
-    this.model.position.add(combinedMoveVector);
+    const startPosition = this.position();
+    const nextPosition = this.position().add(combinedMoveVector);
+    const tween = new TWEEN.Tween(startPosition)
+      .to(nextPosition, TICK_INTERVAL) // Set the duration of the animation to 1000 milliseconds (1 second)
+      // .easing(TWEEN.Easing.Quadratic.InOut) // Set the easing function for the animation
+      .onUpdate(() => {
+        // Update the position of the object on each frame of the animation
+        this.model.position.copy(startPosition);
+      })
+      .start(); // Start the animation
+
     this.dispatchEvent({ type: "position", position: this.model.position });
 
     const delta = combinedMoveVector.y / multiplier;
