@@ -5,7 +5,7 @@ const skinMat = new THREE.MeshLambertMaterial({
   // shading: THREE.FlatShading,
 });
 const helmetMat = new THREE.MeshLambertMaterial({
-  color: "#fff",
+  color: "#ac2626",
   // shading: THREE.FlatShading,
 });
 const eyeMat = new THREE.MeshLambertMaterial({
@@ -42,14 +42,21 @@ const getHead = (): THREE.Group => {
   group.add(head);
 
   //Helmet
-  const helmetGeo = new THREE.BoxGeometry(320, 120, 290);
+  const helmetGeo = new THREE.BoxGeometry(400, 190, 390);
   const helmet = new THREE.Mesh(helmetGeo, helmetMat);
   helmet.position.x = 0;
   helmet.position.z = 0;
   helmet.position.y = 180;
   head.add(helmet);
 
-  const hatBottomGeo = new THREE.BoxGeometry(400, 40, 380);
+  const helmet2Geo = new THREE.BoxGeometry(400, 220, 290);
+  const helmet2 = new THREE.Mesh(helmet2Geo, helmetMat);
+  helmet2.position.x = 0;
+  helmet2.position.z = -20;
+  helmet2.position.y = 0;
+  head.add(helmet2);
+
+  const hatBottomGeo = new THREE.BoxGeometry(420, 40, 400);
   const hatBottom = new THREE.Mesh(hatBottomGeo, suitMat);
   hatBottom.position.x = 0;
   hatBottom.position.z = 0;
