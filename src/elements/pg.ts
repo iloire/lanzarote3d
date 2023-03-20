@@ -78,18 +78,18 @@ const getTerrainHeightBelowPosition = (
     new THREE.Vector3(pos.x, 100000, pos.z), // big enough value for Y
     new THREE.Vector3(0, -1, 0) // vertical
   );
-  const intersectsFloor = rayVertical.intersectObjects([terrain, water]);
-  if (intersectsFloor.length === 2) {
-    const yValues = intersectsFloor.map((obj) => obj.point.y);
-    const max = Math.max(...yValues);
-    if (max >= pos.y) {
+  if (pos.y < 0) {
+    return NaN; // below water
+  }
+  const intersectsFloor = rayVertical.intersectObjects([terrain]);
+  if (intersectsFloor.length === 1) {
+    const height = intersectsFloor[0].point.y;
+    if (height >= pos.y) {
       // terrain above pg, crash
       return NaN;
     } else {
-      return max;
+      return height;
     }
-  } else if (intersectsFloor.length === 1) {
-    return intersectsFloor[0].point.y; // return water high
   } else {
     return NaN;
   }
@@ -126,6 +126,7 @@ class Paraglider extends THREE.EventDispatcher {
   __lift: number = 0;
   __gradient: number = 0;
   __directionInput: number = 0;
+  lift: number = 0;
   rotationInertia = 0;
   debug: boolean;
   numberGroundTouches: number = 0;
@@ -208,24 +209,30 @@ class Paraglider extends THREE.EventDispatcher {
 
   tick(multiplier: number) {
     this.tickCounter++;
-    if (!this.hasTouchedGround(this.terrain, this.water)) {
-      this.move(multiplier);
-    } else {
-      this.numberGroundTouches++;
-      this.dispatchEvent({
-        type: "touchedGround",
-        groundTouches: this.numberGroundTouches,
-      });
-      this.trajectory.push({
-        type: TrajectoryPointType.TouchGround,
-        vector: this.position(),
-      }); // last point saved
-      if (ANTI_CRASH_ENABLED) {
-        this.model.position.y += 10;
-      } else {
+
+    this.move(multiplier);
+
+    if (this.tickCounter % 5 === 0) {
+      // perf
+      if (this.hasTouchedGround(this.terrain, this.water)) {
+        this.numberGroundTouches++;
         this.dispatchEvent({
-          type: "crashed",
+          type: "touchedGround",
+          groundTouches: this.numberGroundTouches,
         });
+        this.trajectory.push({
+          type: TrajectoryPointType.TouchGround,
+          vector: this.position(),
+        }); // last point saved
+        if (ANTI_CRASH_ENABLED) {
+          this.model.position.y += 10;
+        } else {
+          this.dispatchEvent({
+            type: "crashed",
+          });
+        }
+      } else {
+        this.lift = this.getLiftValue();
       }
     }
     this.flyingTime += multiplier;
@@ -323,7 +330,7 @@ class Paraglider extends THREE.EventDispatcher {
       drop,
     });
 
-    const lift = this.getLiftValue();
+    const lift = this.lift;
     const liftVector = this.direction(UP_DIRECTION).multiplyScalar(
       multiplier * lift
     );
@@ -460,7 +467,7 @@ class Paraglider extends THREE.EventDispatcher {
   }
 
   getLiftValue(): number {
-    const pos = this.position().clone();
+    const pos = this.position();
     const height = getTerrainHeightBelowPosition(pos, this.terrain, this.water);
     if (isNaN(height)) {
       return 0;
@@ -473,15 +480,11 @@ class Paraglider extends THREE.EventDispatcher {
     this.dispatchEvent({ type: "gradient", gradient });
     this.__gradient = gradient;
 
-    const paragliderHeight = pos.y;
+    const paragliderHeight = height;
     const pgHeightToTerrainHeightRatio =
       (paragliderHeight - height) / paragliderHeight;
-    // console.log("ratio:", pgHeightToTerrainHeightRatio);
-    // console.log("height", height);
-    // console.log("paragliderHeight", paragliderHeight);
     const heightLiftComponent =
       (1 - pgHeightToTerrainHeightRatio) * height * 0.002;
-    // console.log("h:", heightLiftComponent);
     const lift = heightLiftComponent * gradient;
     this.dispatchEvent({ type: "lift", lift });
     this.__lift = lift;
