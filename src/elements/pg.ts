@@ -354,12 +354,18 @@ class Paraglider extends THREE.EventDispatcher {
     );
     const windVector = this.weather.getWindVelocity(multiplier);
 
+    // bit of randomness
+    const timer = (Date.now() + Math.random() * 1000) * 0.001;
+    const randomY = Math.sin(timer);
+    const randomVector = new THREE.Vector3(0, randomY, 0);
+
     const combinedMoveVector = new THREE.Vector3(0, 0, 0)
       .add(downVector)
       .add(liftVector)
       .add(liftThermalVector)
       .add(velocityVector)
-      .add(windVector);
+      .add(windVector)
+      .add(randomVector);
 
     const startPosition = this.position();
     const nextPosition = this.position().add(combinedMoveVector);
