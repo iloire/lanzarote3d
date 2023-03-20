@@ -356,7 +356,7 @@ class Paraglider extends THREE.EventDispatcher {
 
     // bit of randomness
     const timer = (Date.now() + Math.random() * 1000) * 0.001;
-    const randomY = Math.sin(timer);
+    const randomY = Math.sin(timer) * 0.1;
     const randomVector = new THREE.Vector3(0, randomY, 0);
 
     const combinedMoveVector = new THREE.Vector3(0, 0, 0)
@@ -364,8 +364,8 @@ class Paraglider extends THREE.EventDispatcher {
       .add(liftVector)
       .add(liftThermalVector)
       .add(velocityVector)
-      .add(windVector)
-      .add(randomVector);
+      .add(windVector);
+    // .add(randomVector);
 
     const startPosition = this.position();
     const nextPosition = this.position().add(combinedMoveVector);
