@@ -295,7 +295,7 @@ const Game = {
       birdsPath.map((p) => new THREE.Vector3(p.x, p.y, p.z)),
       gui
     );
-    await Environment.addOtherGliders(scene, weather, terrain, water);
+    // await Environment.addOtherGliders(scene, weather, terrain, water);
 
     const animate = () => {
       box.update();

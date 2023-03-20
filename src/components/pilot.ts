@@ -32,9 +32,6 @@ const getHead = (): THREE.Group => {
 
   const headGeo = new THREE.BoxGeometry(300, 350, 280);
   const head = new THREE.Mesh(headGeo, skinMat);
-  // head.position.x = 0;
-  // head.position.y = 160;
-  // head.position.z = 400;
   group.add(head);
 
   //Helmet

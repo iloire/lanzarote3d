@@ -131,13 +131,11 @@ class Camera extends THREE.PerspectiveCamera {
   }
 
   firstPersonView() {
-    // const cameraOffset = new THREE.Vector3(-40, 0, 0);
     const cam = this;
     const pg = this.target;
 
     cam.position.copy(pg.position());
 
-    // const lookOffset = new THREE.Vector3(0, -70, 2);
     const lookAt = pg.position().add(pg.direction().multiplyScalar(20000));
     this.lookAt(lookAt);
 
