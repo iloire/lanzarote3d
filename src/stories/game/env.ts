@@ -2,7 +2,7 @@ import * as THREE from "three";
 import Clouds from "../../elements/clouds";
 import Weather from "../../elements/weather";
 import Thermal, { ThermalDimensions } from "../../elements/thermal";
-import { rndIntBetween } from "../../utils/math";
+import { rndBetween, rndIntBetween } from "../../utils/math";
 import Tree from "../../components/tree";
 import PineTree from "../../components/pinetree";
 import Stone from "../../components/stone";
@@ -69,16 +69,22 @@ const getTerrainHeight = (pos: THREE.Vector3, terrain: THREE.Mesh) => {
   }
 };
 
+const getRandomRotation = (): THREE.Euler => {
+  return new THREE.Euler(0, rndBetween(0, Math.PI), 0);
+};
+
 const addMeshAroundArea = (
   obj: THREE.Object3D,
   pos: THREE.Vector3,
   number: number,
   terrain: THREE.Mesh,
-  scene: THREE.Scene
+  scene: THREE.Scene,
+  minDistance?: number,
+  y?: number
 ) => {
   for (let index = 0; index < number; index++) {
-    const newX = pos.x + 2 * index * rndIntBetween(0, 5);
-    const newZ = pos.z + 2 * index * rndIntBetween(0, 10);
+    const newX = pos.x + (minDistance || 30 + index) * rndIntBetween(1, 5);
+    const newZ = pos.z + (minDistance || 30 + index) * rndIntBetween(1, 10);
 
     const terrainHeight = getTerrainHeight(
       new THREE.Vector3(newX, 0, newZ),
@@ -94,6 +100,11 @@ const addMeshAroundArea = (
     const meshClone = obj.clone();
     meshClone.scale.set(newScale, newScale, newScale);
     meshClone.position.copy(meshPos);
+    meshClone.rotation.copy(getRandomRotation());
+    if (y) {
+      meshClone.position.y += y;
+    }
+
     scene.add(meshClone);
   }
 };
@@ -172,58 +183,71 @@ const Environment = {
 
   addHouses: (scene: THREE.Scene, terrain: THREE.Mesh) => {
     const house = new House().load();
-    const scale = 5;
+    const scale = 1;
     house.scale.set(scale, scale, scale);
     addMeshAroundArea(
       house,
       new THREE.Vector3(6879, 0, -545),
-      20,
+      10,
       terrain,
-      scene
+      scene,
+      100,
+      7
     );
     addMeshAroundArea(
+      // famara
       house,
       new THREE.Vector3(6279, 0, -3155),
-      20,
+      10,
       terrain,
-      scene
+      scene,
+      40,
+      7
     );
   },
 
   addStones: (scene: THREE.Scene, terrain: THREE.Mesh) => {
     const stone = new Stone().load();
-    const scale = 4;
+    const scale = 1;
     stone.scale.set(scale, scale, scale);
     const pos = new THREE.Vector3(6879, 600, -545);
-    addMeshAroundArea(stone, pos, 100, terrain, scene);
+    addMeshAroundArea(stone, pos, 100, terrain, scene, 200, 2);
   },
 
   addTrees: (scene: THREE.Scene, terrain: THREE.Mesh) => {
     const tree = new Tree().load();
-    const scale = 3;
+    const scale = 1;
     tree.scale.set(scale, scale, scale);
     addMeshAroundArea(
       tree,
       new THREE.Vector3(6879, 0, -545),
       100,
       terrain,
-      scene
+      scene,
+      100,
+      5
     );
     addMeshAroundArea(
       tree,
       new THREE.Vector3(8879, 0, -2245),
       100,
       terrain,
-      scene
+      scene,
+      100,
+      5
     );
+
     const pineTree = new PineTree().load();
-    pineTree.scale.set(scale, scale, scale);
+    const scalePineTree = 2;
+    pineTree.scale.set(scalePineTree, scalePineTree, scalePineTree);
     addMeshAroundArea(
       pineTree,
       new THREE.Vector3(8379, 0, -2145),
       100,
       terrain,
-      scene
+      scene,
+      100,
+      5
     );
   },
 
