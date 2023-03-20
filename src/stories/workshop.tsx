@@ -5,6 +5,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import Paraglider from "../components/paraglider";
 import Boat from "../components/boat";
+import House from "../components/house";
 import PineTree from "../components/pinetree";
 import Helpers from "../utils/helpers";
 
@@ -43,6 +44,11 @@ const Workshop = {
     const boatMesh = boat.load(gui);
     boatMesh.position.set(20, 0, 30);
     scene.add(boatMesh);
+
+    const house = new House();
+    const houseMesh = house.load(gui);
+    houseMesh.position.set(40, 0, 30);
+    scene.add(houseMesh);
 
     const pineTree = new PineTree();
     const pineTreeMesh = pineTree.load();
