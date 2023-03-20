@@ -5,6 +5,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import Paraglider from "../components/paraglider";
 import Boat from "../components/boat";
+import PineTree from "../components/pinetree";
 import Helpers from "../utils/helpers";
 
 const Workshop = {
@@ -42,6 +43,12 @@ const Workshop = {
     const boatMesh = boat.load(gui);
     boatMesh.position.set(20, 0, 30);
     scene.add(boatMesh);
+
+    const pineTree = new PineTree();
+    const pineTreeMesh = pineTree.load();
+    pineTreeMesh.scale.set(3, 3, 3);
+    pineTreeMesh.position.set(20, 0, 30);
+    scene.add(pineTreeMesh);
 
     paraglider.breakLeft();
     // paraglider.breakRight();

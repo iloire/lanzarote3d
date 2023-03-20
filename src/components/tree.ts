@@ -7,7 +7,7 @@ var mat_dark = new THREE.MeshLambertMaterial({ color: 0x5a6e6c });
 var mat_brown = new THREE.MeshLambertMaterial({ color: 0xa3785f });
 
 class Tree {
-  load() {
+  load(): THREE.Object3D {
     const tree = new THREE.Group();
     const pi = Math.PI;
 

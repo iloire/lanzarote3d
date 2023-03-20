@@ -4,6 +4,7 @@ import Weather from "../../elements/weather";
 import Thermal, { ThermalDimensions } from "../../elements/thermal";
 import { rndIntBetween } from "../../utils/math";
 import Tree from "../../components/tree";
+import PineTree from "../../components/pinetree";
 import Stone from "../../components/stone";
 import House from "../../components/house";
 import Boat from "../../components/boat";
@@ -203,14 +204,23 @@ const Environment = {
     tree.scale.set(scale, scale, scale);
     addMeshAroundArea(
       tree,
-      new THREE.Vector3(6879, 600, -545),
+      new THREE.Vector3(6879, 0, -545),
       100,
       terrain,
       scene
     );
     addMeshAroundArea(
       tree,
-      new THREE.Vector3(8879, 600, -2245),
+      new THREE.Vector3(8879, 0, -2245),
+      100,
+      terrain,
+      scene
+    );
+    const pineTree = new PineTree().load();
+    pineTree.scale.set(scale, scale, scale);
+    addMeshAroundArea(
+      pineTree,
+      new THREE.Vector3(8379, 0, -2145),
       100,
       terrain,
       scene
