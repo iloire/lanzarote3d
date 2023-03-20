@@ -106,56 +106,73 @@ const getHead = (): THREE.Group => {
   return group;
 };
 
-const getBody = (): THREE.Group => {
-  const group = new THREE.Group();
-
-  const bodyGeo = new THREE.BoxGeometry(250, 420, 1400);
-  const body = new THREE.Mesh(bodyGeo, suitMat);
-  body.position.x = 0;
-  body.position.y = -350;
-  body.position.z = 200;
-  group.add(body);
-
-  //arms
-  const armGeo = new THREE.BoxGeometry(50, 390, 60);
-  const armLeft = new THREE.Mesh(armGeo, suitMat);
-  armLeft.position.x = -190;
-  armLeft.position.y = -50;
-  armLeft.position.z = 150;
-
-  const armRight = new THREE.Mesh(armGeo, suitMat);
-  armRight.position.x = 190;
-  armRight.position.y = -50;
-  armRight.position.z = 150;
-
-  //hands
-  const handGeo = new THREE.BoxGeometry(70, 70, 70);
-  const handLeft = new THREE.Mesh(handGeo, skinMat);
-  handLeft.position.y = 190;
-
-  const handRight = new THREE.Mesh(handGeo, skinMat);
-  handRight.position.y = 190;
-  armRight.add(handRight);
-  armLeft.add(handLeft);
-
-  const armRotation = 0.3;
-  armLeft.rotateZ(armRotation);
-  armLeft.rotateX(armRotation);
-  armRight.rotateZ(-1 * armRotation);
-  armRight.rotateX(armRotation);
-
-  group.add(armLeft);
-  group.add(armRight);
-
-  return group;
-};
+const BREAK_Y_MOVE = 90;
 
 class Pilot {
+  armRight: THREE.Mesh;
+  armLeft: THREE.Mesh;
+
+  getBody(): THREE.Group {
+    const group = new THREE.Group();
+
+    const bodyGeo = new THREE.BoxGeometry(250, 420, 1400);
+    const body = new THREE.Mesh(bodyGeo, suitMat);
+    body.position.x = 0;
+    body.position.y = -350;
+    body.position.z = 200;
+    group.add(body);
+
+    //arms
+    const armGeo = new THREE.BoxGeometry(50, 390, 60);
+    this.armRight = new THREE.Mesh(armGeo, suitMat);
+    this.armRight.position.x = -190;
+    this.armRight.position.y = -50;
+    this.armRight.position.z = 150;
+
+    this.armLeft = new THREE.Mesh(armGeo, suitMat);
+    this.armLeft.position.x = 190;
+    this.armLeft.position.y = -50;
+    this.armLeft.position.z = 150;
+
+    //hands
+    const handGeo = new THREE.BoxGeometry(70, 70, 70);
+    const handLeft = new THREE.Mesh(handGeo, skinMat);
+    handLeft.position.y = 190;
+
+    const handRight = new THREE.Mesh(handGeo, skinMat);
+    handRight.position.y = 190;
+    this.armRight.add(handRight);
+    this.armLeft.add(handLeft);
+
+    const armRotation = 0.3;
+    this.armLeft.rotateZ(armRotation);
+    this.armLeft.rotateX(armRotation);
+    this.armRight.rotateZ(-1 * armRotation);
+    this.armRight.rotateX(armRotation);
+
+    group.add(this.armLeft);
+    group.add(this.armRight);
+
+    return group;
+  }
   load(): THREE.Object3D {
     const group = new THREE.Group();
     group.add(getHead());
-    group.add(getBody());
+    group.add(this.getBody());
     return group;
+  }
+
+  breakLeft() {
+    this.armLeft.position.y = -1 * BREAK_Y_MOVE;
+  }
+
+  breakRight() {
+    this.armRight.position.y = -1 * BREAK_Y_MOVE;
+  }
+
+  handsUp() {
+    this.armLeft.position.y = 0;
+    this.armRight.position.y = 0;
   }
 }
 

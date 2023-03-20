@@ -8,18 +8,22 @@ const BREAK_ROTATION = 0.05;
 
 class ParagliderModel {
   glider: Glider;
+  pilot: Pilot;
   pilotMesh: THREE.Object3D;
 
   breakLeft() {
     this.glider.breakLeft();
+    this.pilot.breakLeft();
   }
 
   breakRight() {
     this.glider.breakRight();
+    this.pilot.breakRight();
   }
 
   handsUp() {
     this.glider.handsUp();
+    this.pilot.handsUp();
   }
 
   async load(gui?: any): Promise<THREE.Mesh> {
@@ -29,8 +33,9 @@ class ParagliderModel {
     wing.position.y = 80;
     model.add(wing);
 
-    const pilot = new Pilot();
-    this.pilotMesh = pilot.load();
+    this.pilot = new Pilot();
+    this.pilotMesh = this.pilot.load();
+
     const scale = 0.03;
     this.pilotMesh.scale.set(scale, scale, scale);
     this.pilotMesh.position.x = -5;

@@ -51,12 +51,12 @@ const createHalfWing = (scale?: THREE.Vector3): HalfWing => {
 
     if (i % 4 === 0) {
       //lines
-      const handLocation = new THREE.Vector3(-75, 70, -3);
-      points.push(new THREE.Vector3(i * 1.5, distanceCajon, deep * 0.5)); // start point of first segment
-      points.push(handLocation);
+      const carabinerLocation = new THREE.Vector3(-85, 75, -3);
+      points.push(new THREE.Vector3(i * 1.5, distanceCajon, deep * 0.5));
+      points.push(carabinerLocation);
 
-      points.push(new THREE.Vector3(i * 1.5, distanceCajon, -deep * 0.5)); // start point of first segment
-      points.push(handLocation);
+      points.push(new THREE.Vector3(i * 1.5, distanceCajon, -deep * 0.5));
+      points.push(carabinerLocation);
     }
   }
   group.add(wingBreakSystem);
