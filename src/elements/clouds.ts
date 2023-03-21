@@ -1,15 +1,5 @@
-import Cloud, { CloudType } from "../elements/cloud";
+import Cloud from "../elements/cloud";
 import * as THREE from "three";
-
-const getRandomType = (): CloudType => {
-  return "WHITE";
-  const rn = random(1, 3);
-  if (rn === 1) {
-    return "WHITE";
-  } else {
-    return "BLACK";
-  }
-};
 
 const randomNumber = (min: number, max: number) => Math.random() * min + max;
 
@@ -19,7 +9,7 @@ const getRandomSign = (): number => {
 };
 
 const getRandomCloud = async () => {
-  const cloud = await Cloud.load(getRandomType());
+  const cloud = await Cloud.load();
   const boundingBox = new THREE.Box3().setFromObject(cloud);
   const size = new THREE.Vector3();
   boundingBox.getSize(size);

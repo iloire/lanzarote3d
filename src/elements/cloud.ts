@@ -1,8 +1,4 @@
 import * as THREE from "three";
-import blackCloud from "../models/clouds.glb";
-import whiteCloud from "../models/low_poly_cloud.glb";
-import Models from "../utils/models";
-import textureImg from "../textures/mars1.jpg";
 import { rndBetween, rndIntBetween } from "../utils/math";
 
 const mat_cloud = new THREE.MeshLambertMaterial({ color: 0xffffff });
@@ -10,24 +6,6 @@ const mat_cloud2 = new THREE.MeshLambertMaterial({ color: 0x666666 });
 const mat_cloud3 = new THREE.MeshLambertMaterial({ color: 0x999999 });
 
 const materials = [mat_cloud, mat_cloud2, mat_cloud3];
-
-export type CloudType = "BLACK" | "WHITE";
-
-const getGlbCloud = async (type: CloudType) => {
-  const mesh = await Models.loadSimple(
-    type === "BLACK" ? blackCloud : whiteCloud
-  );
-
-  const textureLoader = new THREE.TextureLoader();
-  const texture = await textureLoader.load(textureImg);
-  mesh.material = new THREE.MeshStandardMaterial({
-    map: texture,
-    depthTest: true,
-  });
-  const scale = type === "BLACK" ? 2 : 30;
-  mesh.scale.set(scale, scale, scale);
-  return mesh;
-};
 
 const generateCloudPart = (
   radius: number,
@@ -46,7 +24,7 @@ const generateCloudPart = (
   return cloudPart;
 };
 
-const generateCloud = async () => {
+const generateCloud = async (): Promise<THREE.Object3D> => {
   const radius = 40;
   const r = rndBetween;
   const n = rndIntBetween(3, 8);
@@ -70,16 +48,15 @@ const generateCloud = async () => {
 const experimental = true;
 
 const Cloud = {
-  load: async (type: CloudType): Promise<THREE.Object3D> => {
-    const mesh = !experimental
-      ? await getGlbCloud(type)
-      : await generateCloud();
+  load: async (): Promise<THREE.Object3D> => {
+    const mesh = await generateCloud();
 
-    const animate = (mesh: THREE.Mesh) => {
+    const animate = (mesh: THREE.Object3D) => {
       const timer = (Date.now() + Math.random() * 1000) * 0.0001;
       mesh.position.y = mesh.position.y + Math.sin(timer) * 0.1;
       requestAnimationFrame(() => animate(mesh));
     };
+
     animate(mesh);
     return mesh;
   },

@@ -3,7 +3,7 @@ import Controls from "../utils/controls";
 import Sky from "../components/sky";
 import React from "react";
 import { createRoot } from "react-dom/client";
-import Cloud, { CloudType } from "../elements/cloud";
+import Cloud from "../elements/cloud";
 import Helpers from "../utils/helpers";
 
 const CloudWorkshop = {
@@ -23,19 +23,18 @@ const CloudWorkshop = {
 
     const controls = Controls.createControls(camera, renderer);
     sky.updateSunPosition(12);
-    //
 
-    const mesh = await Cloud.load("WHITE");
+    const mesh = await Cloud.load();
     mesh.scale.set(0.1, 0.1, 0.1);
     mesh.position.set(0, 0, 0);
     scene.add(mesh);
 
-    const mesh2 = await Cloud.load("WHITE");
+    const mesh2 = await Cloud.load();
     mesh2.scale.set(0.1, 0.1, 0.1);
     mesh2.position.set(0, 0, 150);
     scene.add(mesh2);
 
-    const mesh3 = await Cloud.load("WHITE");
+    const mesh3 = await Cloud.load();
     mesh3.scale.set(0.1, 0.1, 0.1);
     mesh3.position.set(0, 0, -50);
     scene.add(mesh3);
