@@ -3,6 +3,11 @@ import GuiHelper from "../utils/gui";
 
 const mat_wing = new THREE.MeshLambertMaterial({ color: 0x00ffff });
 const mat_break = new THREE.MeshLambertMaterial({ color: 0xffffff });
+const lineMat = new THREE.LineBasicMaterial({
+  color: 0xc2c2c2,
+  opacity: 0.01,
+});
+
 const numeroCajones = 16;
 
 type HalfWing = {
@@ -26,10 +31,6 @@ const createCajon = (
 const createHalfWing = (scale?: THREE.Vector3): HalfWing => {
   const group = new THREE.Mesh();
   let distanceCajon = 0;
-  const lineMat = new THREE.LineBasicMaterial({
-    color: 0xc2c2c2,
-    opacity: 0.1,
-  }); // blue color
   const points = []; // array to hold the points of the line segments
   const wingBreakSystem = new THREE.Group();
   for (let i = 0; i < numeroCajones; i++) {
@@ -49,7 +50,7 @@ const createHalfWing = (scale?: THREE.Vector3): HalfWing => {
     group.add(cajon);
     wingBreakSystem.add(breakBox);
 
-    if (i % 4 === 0) {
+    if (i % 6 === 0) {
       //lines
       const carabinerLocation = new THREE.Vector3(-84.5, 75, -3);
       points.push(new THREE.Vector3(i * 1.5, distanceCajon, deep * 0.5));
