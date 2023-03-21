@@ -303,12 +303,16 @@ class Paraglider extends THREE.EventDispatcher {
   rotate(yRotationIncrement: number = 0, zAngle: number) {
     const maxAngle = 75;
     const startRotation = this.model.rotation;
+
     const yRotation = (this.model.rotation.y +=
       -1 * yRotationIncrement * getRotationValue(this.wrapSpeed));
-    const validAngle = THREE.MathUtils.clamp(zAngle, -1 * maxAngle, maxAngle);
-    const zRotation = THREE.MathUtils.degToRad(validAngle);
+
+    const validZAngle = THREE.MathUtils.clamp(zAngle, -1 * maxAngle, maxAngle);
+    const zRotation = -1 * Math.abs(THREE.MathUtils.degToRad(validZAngle));
+
     const endRotation = new THREE.Euler(0, yRotation, zRotation);
     this.__rollAngle = zRotation;
+
     this.model.rotation.copy(endRotation);
   }
 
