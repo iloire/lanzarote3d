@@ -26,7 +26,7 @@ const getRandomCloud = async () => {
   const rndPosOffset = new THREE.Vector3(
     getRandomSign() * random(0.3 * size.x, 1.2 * size.x),
     getRandomSign() * random(0.1 * size.y, 0.2 * size.y),
-    getRandomSign() * random(0.3 * size.z, 2 * size.z)
+    getRandomSign() * random(0.3 * size.z, size.z)
   );
   cloud.position.copy(rndPosOffset);
   cloud.rotation.x = -Math.PI / 2;
@@ -43,12 +43,13 @@ const random = (min: number, max: number): number =>
 const Clouds = {
   load: async (scale: number, pos: THREE.Vector3) => {
     const group = new THREE.Group();
-    const nClouds = random(3, 8);
+    const nClouds = random(2, 5);
     for (let i = 0; i < nClouds; i++) {
       const cloud = await getRandomCloud();
       group.add(cloud);
       group.position.copy(pos);
     }
+    group.scale.set(scale, scale, scale);
     return group;
   },
 };

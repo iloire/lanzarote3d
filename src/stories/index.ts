@@ -7,6 +7,8 @@ import Night from "./night";
 import Terrain from "./terrain";
 import Workshop from "./workshop";
 import Paraglider from "./paraglider";
+import Cloud from "./cloud";
+import Clouds from "./clouds";
 
 const Stories = {
   default: Default.load,
@@ -18,6 +20,8 @@ const Stories = {
   terrain: Terrain.load,
   workshop: Workshop.load,
   paraglider: Paraglider.load,
+  cloud: Cloud.load,
+  clouds: Clouds.load,
 };
 
 export default Stories;

@@ -37,16 +37,17 @@ export type ThermalDimensions = {
 class Thermal {
   mesh: THREE.Mesh;
   dimensions: ThermalDimensions;
-  __isMainThermal: boolean;
+  mainThermal: boolean;
+  superThermal: boolean;
 
   constructor(
     dimensions: ThermalDimensions,
     initialPosition: THREE.Vector3,
     opacity,
     weather: Weather,
-    isMainThermal: boolean
+    isMainThermal: boolean,
+    isSuperThermal: boolean
   ) {
-    this.__isMainThermal = isMainThermal;
     const thermal = createThermalMesh(
       dimensions.topRadius,
       dimensions.bottomRadius,
@@ -54,7 +55,9 @@ class Thermal {
       opacity,
       initialPosition.clone()
     );
+    this.mainThermal = isMainThermal;
     this.dimensions = dimensions;
+    this.superThermal = isSuperThermal;
     this.mesh = thermal;
   }
 
@@ -71,7 +74,11 @@ class Thermal {
   }
 
   isMainThermal(): boolean {
-    return this.__isMainThermal;
+    return this.mainThermal;
+  }
+
+  isSuperThermal(): boolean {
+    return this.superThermal;
   }
 }
 

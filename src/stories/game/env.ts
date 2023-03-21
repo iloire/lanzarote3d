@@ -18,26 +18,31 @@ const generateRandomLcl = (lclLevel: number): number => {
 };
 
 const generateRandomThermalDimensions = (
-  lclLevel: number
+  lclLevel: number,
+  isSuperThermal: boolean
 ): ThermalDimensions => {
+  const multiplier = isSuperThermal ? 1.4 : 1;
   return {
-    bottomRadius: rndIntBetween(420, 490),
-    topRadius: rndIntBetween(500, 700),
-    height: generateRandomLcl(lclLevel),
+    bottomRadius: rndIntBetween(420 * multiplier, 490 * multiplier),
+    topRadius: rndIntBetween(500 * multiplier, 700 * multiplier),
+    height: generateRandomLcl(lclLevel) * multiplier,
   };
 };
 
 const generateThermalPair = (
   position: THREE.Vector3,
   weather: Weather,
+  superThermal: boolean = false,
   dimensions?: ThermalDimensions
 ): Thermal[] => {
   const thermal = new Thermal(
-    dimensions || generateRandomThermalDimensions(weather.getLclLevel()),
+    dimensions ||
+      generateRandomThermalDimensions(weather.getLclLevel(), superThermal),
     position,
     0.05,
     weather,
-    true
+    true,
+    superThermal
   );
 
   const interiorThermalDimensions = {
@@ -51,6 +56,7 @@ const generateThermalPair = (
     position,
     0.09,
     weather,
+    false,
     false
   );
   return [thermal, thermalInside];
@@ -298,10 +304,12 @@ const Environment = {
 
     // tenesar
     const t4 = generateThermalPair(new THREE.Vector3(-4827, 0, -855), weather);
+
     // mirador
     const t5 = generateThermalPair(
       new THREE.Vector3(15027, 0, -12555),
-      weather
+      weather,
+      true
     );
 
     // pq
@@ -313,6 +321,12 @@ const Environment = {
     const t8 = generateThermalPair(new THREE.Vector3(-3927, 0, 9830), weather);
     const t9 = generateThermalPair(new THREE.Vector3(592, 0, 5530), weather);
 
+    const superT1 = generateThermalPair(
+      new THREE.Vector3(15027, 0, -12555),
+      weather,
+      true
+    );
+
     const allThermals = t1
       .concat(t2)
       .concat(t3)
@@ -321,7 +335,9 @@ const Environment = {
       .concat(t6)
       .concat(t7)
       .concat(t8)
-      .concat(t9);
+      .concat(t9)
+      .concat(superT1);
+
     allThermals.forEach((t) => {
       scene.add(t.getMesh());
     });
@@ -338,14 +354,25 @@ const Environment = {
     const mainThermals = thermals.filter((t) => t.isMainThermal());
     const clouds = await Promise.all(
       mainThermals.map((t) => {
-        return Clouds.load(
-          1,
-          new THREE.Vector3(
-            t.getPosition().x,
-            t.getDimensions().height * (1 + 0.05 * rndIntBetween(1, 5)),
-            t.getPosition().z
-          )
-        );
+        if (t.isSuperThermal()) {
+          return Clouds.load(
+            5,
+            new THREE.Vector3(
+              t.getPosition().x,
+              t.getDimensions().height * (2.2 + 0.05 * rndIntBetween(1, 5)),
+              t.getPosition().z
+            )
+          );
+        } else {
+          return Clouds.load(
+            1,
+            new THREE.Vector3(
+              t.getPosition().x,
+              t.getDimensions().height * (1 + 0.05 * rndIntBetween(1, 5)),
+              t.getPosition().z
+            )
+          );
+        }
       })
     );
     clouds.forEach((c) => {
