@@ -21,7 +21,7 @@ const generateRandomThermalDimensions = (
   lclLevel: number
 ): ThermalDimensions => {
   return {
-    bottomRadius: rndIntBetween(320, 450),
+    bottomRadius: rndIntBetween(420, 490),
     topRadius: rndIntBetween(500, 700),
     height: generateRandomLcl(lclLevel),
   };
