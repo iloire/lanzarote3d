@@ -5,7 +5,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import Paraglider from "../components/paraglider";
 import Boat from "../components/boat";
-import House from "../components/house";
+import House, { HouseType } from "../components/house";
 import PineTree from "../components/pinetree";
 import Helpers from "../utils/helpers";
 
@@ -45,7 +45,12 @@ const Workshop = {
     boatMesh.position.set(20, 0, 30);
     scene.add(boatMesh);
 
-    const house = new House();
+    const houseSmall = new House(HouseType.Small);
+    const houseSmallMesh = houseSmall.load(gui);
+    houseSmallMesh.position.set(-40, 0, 60);
+    scene.add(houseSmallMesh);
+
+    const house = new House(HouseType.Medium);
     const houseMesh = house.load(gui);
     houseMesh.position.set(40, 0, 30);
     scene.add(houseMesh);
