@@ -358,21 +358,24 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
   };
 
   render() {
+    const availableForPlaying = (location) => location.availableForPlaying;
     const isGameStarted = !this.state.showStartButton;
-    const buttons = this.props.locations.map((location) => (
-      <button
-        key={location.title}
-        onClick={() =>
-          this.handleStart(
-            6,
-            location.idealWindDirectionDegreesFromNorth,
-            location
-          )
-        }
-      >
-        {location.title}
-      </button>
-    ));
+    const buttons = this.props.locations
+      .filter(availableForPlaying)
+      .map((location) => (
+        <button
+          key={location.title}
+          onClick={() =>
+            this.handleStart(
+              6,
+              location.idealWindDirectionDegreesFromNorth,
+              location
+            )
+          }
+        >
+          FLY "{location.title}"
+        </button>
+      ));
     const startButton = !isGameStarted ? (
       <div id="game-start">{buttons}</div>
     ) : (

@@ -74,6 +74,13 @@ const addWindIndicatorToScene = (
 
 const analytics = new Analytics();
 
+enum GameStatus {
+  NonStarted,
+  Started,
+  Paused,
+  Finished,
+}
+
 const Game = {
   load: async (
     camera: Camera,
@@ -118,7 +125,7 @@ const Game = {
     function onDocumentKeyDown(event) {
       const keyCode = event.which;
       if (keyCode == 90) {
-        //c
+        //z
         if (gui._hidden) {
           gui.show();
         } else {
@@ -152,8 +159,11 @@ const Game = {
     let isZoomInViewing = false;
     let isZoomOutViewing = false;
 
+    let gameStatus = GameStatus.NonStarted;
+
     const rootElement = document.getElementById("ui-controls");
     const root = createRoot(rootElement);
+
     const uiControls = (
       <UIControls
         pg={pg}
@@ -179,25 +189,13 @@ const Game = {
           pg.directionInput(direction);
         }}
         onViewUIChange={(direction: FirstPersonViewLook) => {
-          camera.lookDirection(direction.x, direction.y);
+          if (gameStatus === GameStatus.Started) {
+            camera.lookDirection(direction.x, direction.y);
+          }
         }}
         onGameStart={(options: GameStartOptions, fnHideStartButton) => {
-          analytics.trackEvent("game-start");
-          weather.changeWindSpeed(options.windSpeedMetresPerSecond);
-          weather.changeWindDirection(options.windDirectionDegreesFromNorth);
+          startGame(options);
           fnHideStartButton();
-          bgMusic.start();
-          vario.start();
-          pg.setPosition(options.startingLocation.position);
-          pg.model.rotation.y = 1.2;
-          pg.init();
-          camera.setCameraMode(CameraMode.FirstPersonView, pg);
-          if (FOG_ENABLED) {
-            const fogColor = 0x000000;
-            const fog = new THREE.FogExp2(fogColor, 0.0002);
-            // const fog = new THREE.Fog(fogColor, 1, 15000);
-            scene.fog = fog;
-          }
         }}
         onFinishGame={(fnHideButtons) => {
           finishGame();
@@ -209,10 +207,12 @@ const Game = {
             pg.stop();
             vario.stop();
             bgMusic.stop();
+            gameStatus = GameStatus.Paused;
           } else {
             pg.init();
             vario.start();
             bgMusic.start();
+            gameStatus = GameStatus.Started;
           }
         }}
         onSelectCamera={(mode: CameraMode) => {
@@ -248,10 +248,6 @@ const Game = {
     );
     root.render(uiControls);
 
-    // Game start
-    pg.setPosition(locations[0].position);
-    camera.setCameraMode(CameraMode.FirstPersonView, pg);
-
     function touchedGround() {}
 
     function finishGame() {
@@ -274,6 +270,25 @@ const Game = {
           pg.position()
         );
       }
+      gameStatus = GameStatus.Finished;
+    }
+
+    function startGame(options: GameStartOptions) {
+      analytics.trackEvent("game-start");
+      weather.changeWindSpeed(options.windSpeedMetresPerSecond);
+      weather.changeWindDirection(options.windDirectionDegreesFromNorth);
+      bgMusic.start();
+      vario.start();
+      pg.setPosition(options.startingLocation.position);
+      pg.init();
+      camera.setCameraMode(CameraMode.FirstPersonView, pg);
+      if (FOG_ENABLED) {
+        const fogColor = 0x000000;
+        const fog = new THREE.FogExp2(fogColor, 0.0002);
+        // const fog = new THREE.Fog(fogColor, 1, 15000);
+        scene.fog = fog;
+      }
+      gameStatus = GameStatus.Started;
     }
 
     pg.addEventListener("touchedGround", touchedGround);
@@ -282,6 +297,13 @@ const Game = {
     addWindIndicatorToScene(scene, pg, weather);
 
     renderer.render(scene, camera); // must render before adding trees
+
+    // Game start
+    pg.setPosition(locations[0].position);
+    pg.model.rotation.y = 1.2; // TODO: should implemente a setDirection on pg
+    camera.setCameraMode(CameraMode.FirstPersonView, pg);
+    camera.lookAt(locations[0].lookAt);
+
     Environment.addTrees(scene, terrain);
     Environment.addStones(scene, terrain);
     Environment.addHouses(scene, terrain);
@@ -316,13 +338,11 @@ const Game = {
       TWEEN.update();
       camera.update();
       renderer.render(scene, camera);
-      // setTimeout(animate, 1000);
       requestAnimationFrame(animate);
     };
+    animate();
 
     console.log("triangles:", renderer.info.render.triangles);
-
-    animate();
   },
 };
 

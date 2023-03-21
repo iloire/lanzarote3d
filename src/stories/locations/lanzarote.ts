@@ -9,6 +9,7 @@ const locations: Location[] = [
     lookAt: new THREE.Vector3(7827, 880, -1555),
     idealWindDirectionDegreesFromNorth: 300,
     idealSunPositionDegrees: 30,
+    availableForPlaying: true,
   },
   {
     title: "Tenesar",
@@ -17,6 +18,7 @@ const locations: Location[] = [
     lookAt: new THREE.Vector3(-5127, 580, -255),
     idealWindDirectionDegreesFromNorth: 350,
     idealSunPositionDegrees: 30,
+    availableForPlaying: false,
   },
   {
     title: "Mirador",
@@ -25,6 +27,7 @@ const locations: Location[] = [
     lookAt: new THREE.Vector3(-5127, 580, -255),
     idealWindDirectionDegreesFromNorth: 30,
     idealSunPositionDegrees: 30,
+    availableForPlaying: false,
   },
   {
     title: "Mala",
@@ -33,6 +36,7 @@ const locations: Location[] = [
     lookAt: new THREE.Vector3(13427, 380, -3555),
     idealWindDirectionDegreesFromNorth: 30,
     idealSunPositionDegrees: 30,
+    availableForPlaying: false,
   },
   {
     title: "Playa Quemada",
@@ -41,6 +45,7 @@ const locations: Location[] = [
     lookAt: new THREE.Vector3(-7127, 580, 12055),
     idealWindDirectionDegreesFromNorth: 130,
     idealSunPositionDegrees: 30,
+    availableForPlaying: false,
   },
   {
     title: "High in the island",
@@ -49,6 +54,7 @@ const locations: Location[] = [
     lookAt: new THREE.Vector3(-7127, 3580, 12055),
     idealWindDirectionDegreesFromNorth: 130,
     idealSunPositionDegrees: 30,
+    availableForPlaying: false,
   },
 ];
 
