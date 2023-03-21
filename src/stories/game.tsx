@@ -200,7 +200,10 @@ const Game = {
           }
         }}
         onPause={(paused) => {
-          if (gameStatus === GameStatus.Started) {
+          if (
+            gameStatus === GameStatus.Started ||
+            gameStatus === GameStatus.Paused
+          ) {
             analytics.trackEvent("game-pause");
             if (paused) {
               pg.stop();
