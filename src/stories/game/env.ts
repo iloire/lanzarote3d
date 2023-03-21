@@ -353,7 +353,11 @@ const Environment = {
     });
 
     // custom clouds
-    [{ x: 5120, y: 2000, z: -10100 }].map(async (pos) => {
+    [
+      { x: 5120, y: 2000, z: -10100 },
+      { x: 2600, y: 2300, z: 842 },
+      { x: -3600, y: 2300, z: 8042 },
+    ].map(async (pos) => {
       const cloud = await Clouds.load(
         1,
         new THREE.Vector3(pos.x, pos.y, pos.z)
