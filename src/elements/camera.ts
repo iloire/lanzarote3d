@@ -122,7 +122,7 @@ class Camera extends THREE.PerspectiveCamera {
     const x = Math.sin(this.angle) * this.distance;
     const z = Math.cos(this.angle) * this.distance;
     const pg = this.target;
-    const cameraOffset = new THREE.Vector3(x, 40, 60 + z);
+    const cameraOffset = new THREE.Vector3(x, -10, 60 + z);
     this.position.copy(pg.position().add(pg.direction().add(cameraOffset)));
 
     const lookOffset = new THREE.Vector3(0, 0, 0);
