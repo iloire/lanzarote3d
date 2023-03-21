@@ -6,3 +6,10 @@ export type GameStartOptions = {
   windSpeedMetresPerSecond: number;
   windDirectionDegreesFromNorth: number;
 };
+
+export enum GameStatus {
+  NonStarted,
+  Started,
+  Paused,
+  Finished,
+}

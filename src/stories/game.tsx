@@ -14,7 +14,7 @@ import Thermal from "../elements/thermal";
 import Clouds from "../elements/clouds";
 import Trajectory from "../elements/trajectory";
 import Analytics from "../elements/analytics";
-import { GameStartOptions } from "../stories/game/types";
+import { GameStartOptions, GameStatus } from "../stories/game/types";
 import Environment from "./game/env";
 import locations from "./locations/lanzarote";
 import WindIndicator from "../components/wind-indicator";
@@ -73,13 +73,6 @@ const addWindIndicatorToScene = (
 };
 
 const analytics = new Analytics();
-
-enum GameStatus {
-  NonStarted,
-  Started,
-  Paused,
-  Finished,
-}
 
 const Game = {
   load: async (
@@ -198,21 +191,28 @@ const Game = {
           fnHideStartButton();
         }}
         onFinishGame={(fnHideButtons) => {
-          finishGame();
-          fnHideButtons();
+          if (
+            gameStatus === GameStatus.Started ||
+            gameStatus === GameStatus.Paused
+          ) {
+            finishGame();
+            fnHideButtons();
+          }
         }}
         onPause={(paused) => {
-          analytics.trackEvent("game-pause");
-          if (paused) {
-            pg.stop();
-            vario.stop();
-            bgMusic.stop();
-            gameStatus = GameStatus.Paused;
-          } else {
-            pg.init();
-            vario.start();
-            bgMusic.start();
-            gameStatus = GameStatus.Started;
+          if (gameStatus === GameStatus.Started) {
+            analytics.trackEvent("game-pause");
+            if (paused) {
+              pg.stop();
+              vario.stop();
+              bgMusic.stop();
+              gameStatus = GameStatus.Paused;
+            } else {
+              pg.init();
+              vario.start();
+              bgMusic.start();
+              gameStatus = GameStatus.Started;
+            }
           }
         }}
         onSelectCamera={(mode: CameraMode) => {
