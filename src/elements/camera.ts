@@ -16,7 +16,6 @@ export enum CameraMode {
   FollowTarget = 2,
   FarAway = 3,
   TopView = 4,
-  AirplaneView = 5,
   OrbitControl = 6,
 }
 
@@ -31,7 +30,6 @@ class Camera extends THREE.PerspectiveCamera {
   distanceIncrement: number = 20;
   farAwayOffset: THREE.Vector3 = new THREE.Vector3(-1302, 700, 1301.2);
   topViewOffset: THREE.Vector3 = new THREE.Vector3(30, 3700, -40);
-  airplaneViewOffset: THREE.Vector3 = new THREE.Vector3(-6030, 2000, -11330);
   directionToLook: THREE.Vector3;
   viewRotationHorizontal: number = 0;
   viewRotationVertical: number = 0;
@@ -65,8 +63,6 @@ class Camera extends THREE.PerspectiveCamera {
       this.farAwayView();
     } else if (this.mode === CameraMode.TopView) {
       this.topView();
-    } else if (this.mode === CameraMode.AirplaneView) {
-      this.airplaneView();
     } else if (this.mode === CameraMode.OrbitControl) {
       this.orbitView();
     } else {
@@ -155,10 +151,6 @@ class Camera extends THREE.PerspectiveCamera {
 
   topView() {
     this.viewWithOffset(this.topViewOffset);
-  }
-
-  airplaneView() {
-    this.viewWithOffset(this.airplaneViewOffset);
   }
 
   orbitView() {

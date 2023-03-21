@@ -249,7 +249,8 @@ const Game = {
     root.render(uiControls);
 
     // Game start
-    camera.setCameraMode(CameraMode.AirplaneView, pg);
+    pg.setPosition(locations[0].position);
+    camera.setCameraMode(CameraMode.FirstPersonView, pg);
 
     function touchedGround() {}
 
