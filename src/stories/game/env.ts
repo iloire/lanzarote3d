@@ -198,10 +198,40 @@ const Environment = {
       // famara
       house,
       new THREE.Vector3(6279, 0, -3155),
+      40,
+      terrain,
+      scene,
+      40,
+      7
+    );
+    addMeshAroundArea(
+      // noruegos
+      house,
+      new THREE.Vector3(7827, 0, -3460),
+      10,
+      terrain,
+      scene,
+      20,
+      7
+    );
+    addMeshAroundArea(
+      // tenesar
+      house,
+      new THREE.Vector3(-5200, 0, -480),
       10,
       terrain,
       scene,
       40,
+      7
+    );
+    addMeshAroundArea(
+      // teguise
+      house,
+      new THREE.Vector3(5600, 0, 705),
+      50,
+      terrain,
+      scene,
+      70,
       7
     );
   },
@@ -236,7 +266,15 @@ const Environment = {
       100,
       5
     );
-
+    addMeshAroundArea(
+      tree,
+      new THREE.Vector3(5600, 0, 705),
+      100,
+      terrain,
+      scene,
+      40,
+      5
+    );
     const pineTree = new PineTree().load();
     const scalePineTree = 2;
     pineTree.scale.set(scalePineTree, scalePineTree, scalePineTree);
@@ -296,6 +334,7 @@ const Environment = {
     thermals: Thermal[]
   ): Promise<THREE.Object3D[]> {
     const lclLevel = weather.getLclLevel();
+    // from thermals
     const mainThermals = thermals.filter((t) => t.isMainThermal());
     const clouds = await Promise.all(
       mainThermals.map((t) => {
@@ -311,6 +350,15 @@ const Environment = {
     );
     clouds.forEach((c) => {
       scene.add(c);
+    });
+
+    // custom clouds
+    [{ x: 5120, y: 2000, z: -10100 }].map(async (pos) => {
+      const cloud = await Clouds.load(
+        1,
+        new THREE.Vector3(pos.x, pos.y, pos.z)
+      );
+      scene.add(cloud);
     });
     return clouds;
   },
