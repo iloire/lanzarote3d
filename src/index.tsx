@@ -138,6 +138,7 @@ class App extends React.Component<AppProps, AppState> {
       stats.update();
     }
     animate();
+    console.log("triangles:", renderer.info.render.triangles);
   };
 
   render() {

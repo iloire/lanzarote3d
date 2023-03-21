@@ -48,10 +48,11 @@ class Thermal {
     isMainThermal: boolean,
     isSuperThermal: boolean
   ) {
+    const multiplier = isSuperThermal ? 2 : 1;
     const thermal = createThermalMesh(
       dimensions.topRadius,
       dimensions.bottomRadius,
-      dimensions.height,
+      dimensions.height * multiplier,
       opacity,
       initialPosition.clone()
     );

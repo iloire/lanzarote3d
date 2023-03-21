@@ -22,10 +22,11 @@ const generateRandomThermalDimensions = (
   isSuperThermal: boolean
 ): ThermalDimensions => {
   const multiplier = isSuperThermal ? 1.4 : 1;
+  const heightMultiplier = isSuperThermal ? 1.3 : 1;
   return {
     bottomRadius: rndIntBetween(420 * multiplier, 490 * multiplier),
     topRadius: rndIntBetween(500 * multiplier, 700 * multiplier),
-    height: generateRandomLcl(lclLevel) * multiplier,
+    height: generateRandomLcl(lclLevel) * heightMultiplier,
   };
 };
 
@@ -356,10 +357,10 @@ const Environment = {
       mainThermals.map((t) => {
         if (t.isSuperThermal()) {
           return Clouds.load(
-            5,
+            3,
             new THREE.Vector3(
               t.getPosition().x,
-              t.getDimensions().height * (2.2 + 0.05 * rndIntBetween(1, 5)),
+              t.getDimensions().height * (1.2 + 0.05 * rndIntBetween(1, 5)),
               t.getPosition().z
             )
           );
