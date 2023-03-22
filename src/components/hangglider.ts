@@ -10,7 +10,6 @@ const BREAK_ROTATION = 0.05;
 class HangGliderModel extends AutoFlier {
   wing: Wing;
   pilot: Pilot;
-  pilotMesh: THREE.Object3D;
 
   async load(path: THREE.Vector3[], gui?: any): Promise<THREE.Mesh> {
     this.path = path;
@@ -24,14 +23,14 @@ class HangGliderModel extends AutoFlier {
 
     // pilot
     this.pilot = new Pilot();
-    this.pilotMesh = this.pilot.load();
+    const pilotMesh = this.pilot.load();
     const pilotScale = 0.03;
-    this.pilotMesh.scale.set(pilotScale, pilotScale, pilotScale);
-    this.pilotMesh.position.x = -5;
-    this.pilotMesh.position.z = -0.4;
-    this.pilotMesh.rotateY(Math.PI / 2);
+    pilotMesh.scale.set(pilotScale, pilotScale, pilotScale);
+    pilotMesh.position.x = -5;
+    pilotMesh.position.z = -0.4;
+    pilotMesh.rotateY(Math.PI / 2);
 
-    this.mesh.add(this.pilotMesh);
+    this.mesh.add(pilotMesh);
     this.mesh.add(wingMesh);
 
     if (path.length > 1) {
@@ -39,9 +38,10 @@ class HangGliderModel extends AutoFlier {
     }
 
     if (gui) {
-      GuiHelper.addLocationGui(gui, "pilot", this.pilotMesh);
+      GuiHelper.addLocationGui(gui, "pilot", pilotMesh);
       GuiHelper.addLocationGui(gui, "paraglider", this.mesh);
     }
+
     this.animate();
     return this.mesh;
   }
@@ -51,10 +51,6 @@ class HangGliderModel extends AutoFlier {
       this.move();
     }
     requestAnimationFrame(() => this.animate());
-  }
-
-  getPilotPosition(): THREE.Vector3 {
-    return this.pilotMesh.position.clone();
   }
 }
 
