@@ -321,6 +321,15 @@ const Game = {
       birdsPath.map((p) => new THREE.Vector3(p.x, p.y, p.z)),
       gui
     );
+    const hgPath = [
+      { x: 6500, y: 1190, z: -1368 },
+      { x: 7500, y: 1090, z: -1068 },
+    ];
+    Environment.addHangGlider(
+      scene,
+      hgPath.map((p) => new THREE.Vector3(p.x, p.y, p.z)),
+      gui
+    );
     // await Environment.addOtherGliders(scene, weather, terrain, water);
 
     const animate = () => {

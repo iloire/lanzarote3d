@@ -10,6 +10,7 @@ import House, { HouseType } from "../../components/house";
 import Boat from "../../components/boat";
 import Birds from "../../components/birds";
 import Paraglider, { ParagliderConstructor } from "../../elements/pg";
+import HangGlider from "../../components/hangglider";
 
 const KMH_TO_MS = 3.6;
 
@@ -135,6 +136,16 @@ const Environment = {
     const birds = new Birds();
     const birdsMesh = await birds.load(path, gui);
     scene.add(birdsMesh);
+  },
+
+  addHangGlider: async (
+    scene: THREE.Scene,
+    path: THREE.Vector3[],
+    gui?: any
+  ) => {
+    const hg = new HangGlider();
+    const hgMesh = await hg.load(path, gui);
+    scene.add(hgMesh);
   },
 
   addOtherGliders: async (
