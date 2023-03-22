@@ -7,5 +7,5 @@ export type Location = {
   lookAt: THREE.Vector3;
   idealWindDirectionDegreesFromNorth: number;
   idealSunPositionDegrees: number;
-  availableForPlaying?: boolean;
+  availableForPlaying: boolean;
 };

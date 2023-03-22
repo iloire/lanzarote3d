@@ -549,9 +549,11 @@ class Paraglider extends THREE.EventDispatcher {
   toggleSpeedBar() {
     if (this.speedBar) {
       this.speedBar = false;
+      this.paragliderModel.releaseSpeedBar();
       console.log("speed bar off");
     } else {
       this.speedBar = true;
+      this.paragliderModel.speedBar();
       console.log("speed bar on");
     }
   }

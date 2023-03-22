@@ -26,6 +26,14 @@ class ParagliderModel {
     this.pilot.handsUp();
   }
 
+  speedBar() {
+    this.pilot.speedBar();
+  }
+
+  releaseSpeedBar() {
+    this.pilot.releaseSpeedBar();
+  }
+
   async load(gui?: any): Promise<THREE.Mesh> {
     const model = new THREE.Mesh();
     this.glider = new Glider();

@@ -125,16 +125,17 @@ const BREAK_Y_MOVE = 90;
 class Pilot {
   armRight: THREE.Mesh;
   armLeft: THREE.Mesh;
+  body: THREE.Mesh;
 
   getBody(): THREE.Group {
     const group = new THREE.Group();
 
     const bodyGeo = new THREE.BoxGeometry(250, 420, 1100);
-    const body = new THREE.Mesh(bodyGeo, suitMat);
-    body.position.x = 0;
-    body.position.y = -390;
-    body.position.z = 200;
-    group.add(body);
+    this.body = new THREE.Mesh(bodyGeo, suitMat);
+    this.body.position.x = 0;
+    this.body.position.y = -390;
+    this.body.position.z = 200;
+    group.add(this.body);
 
     const subBodyGeo = new THREE.BoxGeometry(150, 420, 400);
     const subBody = new THREE.Mesh(subBodyGeo, subBodyMat);
@@ -193,6 +194,19 @@ class Pilot {
     group.add(getHead());
     group.add(this.getBody());
     return group;
+  }
+
+  speedBar() {
+    this.body.scale.z = 1.2;
+    this.body.position.z += 40;
+    this.body.scale.x = 0.9;
+  }
+
+  releaseSpeedBar() {
+    this.body.scale.z = 1;
+    this.body.position.z -= 40;
+
+    this.body.scale.x = 1;
   }
 
   breakLeft() {
