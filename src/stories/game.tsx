@@ -22,7 +22,7 @@ import Sky from "../components/sky";
 
 const KMH_TO_MS = 3.6;
 
-const FOG_ENABLED = false;
+const FOG_ENABLED = true;
 const TIME_OF_DAY = 19;
 const SOUND_ENABLED = false;
 const DEBUG = false;
@@ -287,8 +287,8 @@ const Game = {
       camera.setCameraMode(CameraMode.FirstPersonView, pg);
       if (FOG_ENABLED) {
         const fogColor = 0x000000;
-        const fog = new THREE.FogExp2(fogColor, 0.0002);
-        // const fog = new THREE.Fog(fogColor, 1, 15000);
+        // const fog = new THREE.FogExp2(fogColor, 0.0002);
+        const fog = new THREE.Fog(fogColor, 1, 22500);
         scene.fog = fog;
       }
       gameStatus = GameStatus.Started;
