@@ -24,7 +24,7 @@ const CloudsWorkshop = {
 
     const controls = Controls.createControls(camera, renderer);
 
-    const mesh = await Clouds.load(1, new THREE.Vector3(0, 0, 0));
+    const mesh = await new Clouds().load(1, new THREE.Vector3(0, 0, 0));
     mesh.scale.set(0.1, 0.1, 0.1);
     mesh.position.set(0, 0, 0);
     scene.add(mesh);

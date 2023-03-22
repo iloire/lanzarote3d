@@ -371,7 +371,7 @@ class Environment {
     const clouds = await Promise.all(
       mainThermals.map((t) => {
         if (t.isSuperThermal()) {
-          return Clouds.load(
+          return new Clouds().load(
             3,
             new THREE.Vector3(
               t.getPosition().x,
@@ -380,7 +380,7 @@ class Environment {
             )
           );
         } else {
-          return Clouds.load(
+          return new Clouds().load(
             1,
             new THREE.Vector3(
               t.getPosition().x,
@@ -401,7 +401,7 @@ class Environment {
       { x: 2600, y: 2300, z: 842 },
       { x: -3600, y: 2300, z: 8042 },
     ].map(async (pos) => {
-      const cloud = await Clouds.load(
+      const cloud = await new Clouds().load(
         1,
         new THREE.Vector3(pos.x, pos.y, pos.z)
       );

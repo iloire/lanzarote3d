@@ -30,8 +30,8 @@ const getRandomCloud = async () => {
 const random = (min: number, max: number): number =>
   Math.floor(Math.random() * (max - min)) + min;
 
-const Clouds = {
-  load: async (scale: number, pos: THREE.Vector3) => {
+class Clouds {
+  async load(scale: number, pos: THREE.Vector3): Promise<THREE.Object3D> {
     const group = new THREE.Group();
     const nClouds = random(2, 5);
     for (let i = 0; i < nClouds; i++) {
@@ -41,7 +41,7 @@ const Clouds = {
     }
     group.scale.set(scale, scale, scale);
     return group;
-  },
-};
+  }
+}
 
 export default Clouds;
