@@ -101,7 +101,6 @@ class Glider {
     this.fullWing.add(this.rightWing.wing);
 
     this.fullWing.translateZ(-78);
-    this.fullWing.translateY(80);
     return this.fullWing;
   }
 
