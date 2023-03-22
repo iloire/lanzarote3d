@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import Pilot from "./pilot";
-import Wing from "./wing";
+import Wing from "./parts/wing";
 import GuiHelper from "../utils/gui";
 import Models from "../utils/models";
 import AutoFlier from "./base/auto-flier";

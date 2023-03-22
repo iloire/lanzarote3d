@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import Pilot from "./pilot";
-import Glider from "./glider";
+import Glider from "./parts/glider";
 import GuiHelper from "../utils/gui";
 import Models from "../utils/models";
 
