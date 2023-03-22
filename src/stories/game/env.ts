@@ -360,7 +360,7 @@ const Environment = {
             3,
             new THREE.Vector3(
               t.getPosition().x,
-              t.getDimensions().height * (1.2 + 0.05 * rndIntBetween(1, 5)),
+              t.getDimensions().height * (1 + 0.01 * rndIntBetween(10, 30)),
               t.getPosition().z
             )
           );
@@ -369,7 +369,7 @@ const Environment = {
             1,
             new THREE.Vector3(
               t.getPosition().x,
-              t.getDimensions().height * (1 + 0.05 * rndIntBetween(1, 5)),
+              t.getDimensions().height * (1 + 0.01 * rndIntBetween(10, 30)),
               t.getPosition().z
             )
           );
