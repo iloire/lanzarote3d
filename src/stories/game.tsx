@@ -11,7 +11,6 @@ import Weather, { WeatherOptions } from "../elements/weather";
 import Camera, { CameraMode } from "../elements/camera";
 import UIControls, { View, FirstPersonViewLook } from "../elements/ui-controls";
 import Thermal from "../elements/thermal";
-import Clouds from "../elements/clouds";
 import Trajectory from "../elements/trajectory";
 import Analytics from "../elements/analytics";
 import { GameStartOptions, GameStatus } from "../stories/game/types";

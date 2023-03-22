@@ -3,7 +3,7 @@ import Controls from "../utils/controls";
 import Sky from "../components/sky";
 import React from "react";
 import { createRoot } from "react-dom/client";
-import Cloud from "../elements/cloud";
+import Cloud from "../components/cloud";
 import Helpers from "../utils/helpers";
 
 const CloudWorkshop = {

@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import Clouds from "../../elements/clouds";
+import Clouds from "../../components/clouds";
 import Weather from "../../elements/weather";
 import Thermal, { ThermalDimensions } from "../../elements/thermal";
 import { rndBetween, rndIntBetween } from "../../utils/math";
@@ -149,7 +149,6 @@ class Environment {
   async addHangGlider(scene: THREE.Scene, path: THREE.Vector3[], gui?: any) {
     this.hg = new HangGlider();
     const hgMesh = await this.hg.load(path, gui);
-    hgMesh.rotation.x = Math.PI;
     scene.add(hgMesh);
   }
 

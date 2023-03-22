@@ -1,4 +1,4 @@
-import Cloud from "../elements/cloud";
+import Cloud from "./cloud";
 import * as THREE from "three";
 
 const randomNumber = (min: number, max: number) => Math.random() * min + max;
