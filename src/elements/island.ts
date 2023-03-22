@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import model from "../models/lanzarote.glb";
 import Models from "../utils/models";
-import textureImg from "../textures/mars2.jpg";
+import textureImg from "../textures/mars1.jpg";
 import textureImgHeightMap from "../textures/h-map-lanzarote.png";
 
 const USE_BLENDER_MODEL = true;
