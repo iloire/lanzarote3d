@@ -3,15 +3,10 @@ import GuiHelper from "../utils/gui";
 
 const mat_wing = new THREE.MeshLambertMaterial({ color: 0x00ffff });
 const mat_break = new THREE.MeshLambertMaterial({ color: 0xffffff });
-const lineMat = new THREE.LineBasicMaterial({
-  color: 0xc2c2c2,
-  opacity: 0.01,
-});
 
 const numeroCajones = 16;
 
 type HalfWing = {
-  wingBreakSystem: THREE.Object3D;
   wing: THREE.Object3D;
 };
 
@@ -32,64 +27,29 @@ const createHalfWing = (scale?: THREE.Vector3): HalfWing => {
   const group = new THREE.Mesh();
   let distanceCajon = 0;
   const points = []; // array to hold the points of the line segments
-  const wingBreakSystem = new THREE.Group();
   for (let i = 0; i < numeroCajones; i++) {
     const w = 2 + i * 0.5;
     const h = 0.5 + i * 0.2;
-    const deep = 8 + i * 2.8;
+    const deep = 8 + i * 5;
     distanceCajon += w * 0.8;
 
     const cajon = createCajon(w, h, deep, mat_wing);
-
-    const x = i * 1.9 - 2 * h;
-    cajon.position.set(x, distanceCajon, 0);
-
-    const breakDeep = deep / 10;
-    const breakBox = createCajon(w, h, breakDeep, mat_break);
-    breakBox.position.set(x, distanceCajon, deep / 2);
+    cajon.position.set(h, distanceCajon, 0 - deep / 2);
 
     group.add(cajon);
-    wingBreakSystem.add(breakBox);
-
-    if (i % 6 === 0) {
-      //lines
-      const carabinerLocation = new THREE.Vector3(-84.5, 75, -3);
-      points.push(new THREE.Vector3(i * 1.5, distanceCajon, deep * 0.5));
-      points.push(carabinerLocation);
-
-      points.push(new THREE.Vector3(i * 1.5, distanceCajon, -deep * 0.5));
-      points.push(carabinerLocation);
-    }
   }
-  group.add(wingBreakSystem);
   group.rotateZ(Math.PI / 2);
   group.rotateX(Math.PI / 2);
-  const geometry = new THREE.BufferGeometry().setFromPoints(points); // create the geometry from the points
-  const lineSegments = new THREE.LineSegments(geometry, lineMat); // create the line segments
-  group.add(lineSegments);
   if (scale) {
     group.scale.set(scale.x, scale.y, scale.z);
   }
-  return { wing: group, wingBreakSystem };
+  return { wing: group };
 };
 
-class Glider {
+class Wing {
   leftWing: HalfWing;
   rightWing: HalfWing;
   fullWing: THREE.Mesh;
-
-  breakLeft() {
-    this.leftWing.wingBreakSystem.position.x = -3;
-  }
-
-  breakRight() {
-    this.rightWing.wingBreakSystem.position.x = -3;
-  }
-
-  handsUp() {
-    this.leftWing.wingBreakSystem.position.x = 0;
-    this.rightWing.wingBreakSystem.position.x = 0;
-  }
 
   createWing(): THREE.Mesh {
     this.fullWing = new THREE.Mesh();
@@ -116,4 +76,4 @@ class Glider {
   }
 }
 
-export default Glider;
+export default Wing;

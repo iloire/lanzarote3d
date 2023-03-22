@@ -7,6 +7,7 @@ import Night from "./night";
 import Terrain from "./terrain";
 import Workshop from "./workshop";
 import Paraglider from "./paraglider";
+import HangGlider from "./hangglider";
 import Cloud from "./cloud";
 import Clouds from "./clouds";
 
@@ -20,6 +21,7 @@ const Stories = {
   terrain: Terrain.load,
   workshop: Workshop.load,
   paraglider: Paraglider.load,
+  hangglider: HangGlider.load,
   cloud: Cloud.load,
   clouds: Clouds.load,
 };
