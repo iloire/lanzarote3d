@@ -9,7 +9,7 @@ const getRandomSign = (): number => {
 };
 
 const getRandomCloud = async () => {
-  const cloud = await Cloud.load();
+  const cloud = await new Cloud().load();
   const boundingBox = new THREE.Box3().setFromObject(cloud);
   const size = new THREE.Vector3();
   boundingBox.getSize(size);

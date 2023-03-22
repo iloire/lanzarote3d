@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { rndBetween, rndIntBetween } from "../utils/math";
+import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 
 const mat_cloud = new THREE.MeshLambertMaterial({ color: 0xffffff });
 const mat_cloud2 = new THREE.MeshLambertMaterial({ color: 0x666666 });
@@ -47,9 +48,48 @@ const generateCloud = async (): Promise<THREE.Object3D> => {
 
 const experimental = true;
 
-const Cloud = {
-  load: async (): Promise<THREE.Object3D> => {
+const tweakSize = (mesh: THREE.Object3D, interval: number) => {
+  const min = 0.95,
+    max = 1.05;
+  const multiplier = rndBetween(min, max);
+  const scaleX = mesh.scale.x * multiplier;
+  const scaleY = mesh.scale.y * multiplier;
+  const scaleZ = mesh.scale.z * multiplier;
+
+  const targetPosition = new THREE.Vector3(scaleX, scaleY, scaleZ);
+  new TWEEN.Tween(mesh.scale)
+    .to(targetPosition, interval)
+    .easing(TWEEN.Easing.Cubic.InOut)
+    .start();
+};
+
+const tweakPos = (mesh: THREE.Object3D, interval: number) => {
+  const min = 0.95,
+    max = 1.05;
+  const multiplier = rndBetween(min, max);
+  const posX = mesh.position.x * multiplier;
+  const posY = mesh.position.y * multiplier;
+  const posZ = mesh.position.z * multiplier;
+
+  const targetPosition = new THREE.Vector3(posX, posY, posZ);
+  new TWEEN.Tween(mesh.position)
+    .to(targetPosition, interval)
+    .easing(TWEEN.Easing.Cubic.InOut)
+    .start();
+};
+
+class Cloud {
+  interval: number;
+
+  async load(): Promise<THREE.Object3D> {
     const mesh = await generateCloud();
+    const interval = 3000;
+    this.interval = setInterval(() => {
+      mesh.children.forEach((m) => {
+        tweakSize(m, interval);
+        tweakPos(m, interval);
+      });
+    }, interval);
 
     const animate = (mesh: THREE.Object3D) => {
       const timer = (Date.now() + Math.random() * 1000) * 0.0001;
@@ -59,7 +99,7 @@ const Cloud = {
 
     animate(mesh);
     return mesh;
-  },
-};
+  }
+}
 
 export default Cloud;
