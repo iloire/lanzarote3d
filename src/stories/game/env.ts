@@ -131,29 +131,34 @@ const createPg = async (
   return pg;
 };
 
-const Environment = {
-  addBirds: async (scene: THREE.Scene, path: THREE.Vector3[], gui?: any) => {
-    const birds = new Birds();
-    const birdsMesh = await birds.load(path, gui);
+class Environment {
+  birds: Birds;
+  hg: HangGlider;
+
+  updateWrapSpeed(wrapSpeed: number) {
+    this.birds.updateWrapSpeed(wrapSpeed);
+    this.hg.updateWrapSpeed(wrapSpeed);
+  }
+
+  async addBirds(scene: THREE.Scene, path: THREE.Vector3[], gui?: any) {
+    this.birds = new Birds();
+    const birdsMesh = await this.birds.load(path, gui);
     scene.add(birdsMesh);
-  },
+  }
 
-  addHangGlider: async (
-    scene: THREE.Scene,
-    path: THREE.Vector3[],
-    gui?: any
-  ) => {
-    const hg = new HangGlider();
-    const hgMesh = await hg.load(path, gui);
+  async addHangGlider(scene: THREE.Scene, path: THREE.Vector3[], gui?: any) {
+    this.hg = new HangGlider();
+    const hgMesh = await this.hg.load(path, gui);
+    hgMesh.rotation.x = Math.PI;
     scene.add(hgMesh);
-  },
+  }
 
-  addOtherGliders: async (
+  async addOtherGliders(
     scene: THREE.Scene,
     weather: Weather,
     terrain: THREE.Mesh,
     water: THREE.Mesh
-  ) => {
+  ) {
     const pgOptions: ParagliderConstructor = {
       glidingRatio: 9,
       trimSpeed: 35 / KMH_TO_MS,
@@ -177,9 +182,9 @@ const Environment = {
     // const pos4 = new THREE.Vector3(8179, 1200, -3945);
     // const pg4 = await createPg(pgOptions, weather, terrain, water, pos4);
     // scene.add(pg4.getMesh());
-  },
+  }
 
-  addBoats: (scene: THREE.Scene, terrain: THREE.Mesh) => {
+  addBoats(scene: THREE.Scene, terrain: THREE.Mesh) {
     const boat = new Boat().load();
     const scale = 3;
     boat.scale.set(scale, scale, scale);
@@ -197,9 +202,9 @@ const Environment = {
       terrain,
       scene
     );
-  },
+  }
 
-  addHouses: (scene: THREE.Scene, terrain: THREE.Mesh) => {
+  addHouses(scene: THREE.Scene, terrain: THREE.Mesh) {
     const house = new House(HouseType.Medium).load();
     const house2 = new House(HouseType.Small).load();
 
@@ -252,17 +257,17 @@ const Environment = {
       70,
       7
     );
-  },
+  }
 
-  addStones: (scene: THREE.Scene, terrain: THREE.Mesh) => {
+  addStones(scene: THREE.Scene, terrain: THREE.Mesh) {
     const stone = new Stone().load();
     const scale = 1;
     stone.scale.set(scale, scale, scale);
     const pos = new THREE.Vector3(6879, 600, -545);
     addMeshAroundArea([stone], pos, 100, terrain, scene, 200, 2);
-  },
+  }
 
-  addTrees: (scene: THREE.Scene, terrain: THREE.Mesh) => {
+  addTrees(scene: THREE.Scene, terrain: THREE.Mesh) {
     const tree = new Tree().load();
     const scale = 1;
     tree.scale.set(scale, scale, scale);
@@ -305,9 +310,9 @@ const Environment = {
       100,
       5
     );
-  },
+  }
 
-  addThermals: (scene: THREE.Scene, weather: Weather): Thermal[] => {
+  addThermals(scene: THREE.Scene, weather: Weather): Thermal[] {
     const lclLevel = weather.getLclLevel();
     // famara
     const t1 = generateThermalPair(new THREE.Vector3(5727, 0, -535), weather);
@@ -354,7 +359,7 @@ const Environment = {
       scene.add(t.getMesh());
     });
     return allThermals;
-  },
+  }
 
   async addClouds(
     scene: THREE.Scene,
@@ -404,7 +409,7 @@ const Environment = {
       scene.add(cloud);
     });
     return clouds;
-  },
-};
+  }
+}
 
 export default Environment;

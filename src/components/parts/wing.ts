@@ -49,30 +49,24 @@ const createHalfWing = (scale?: THREE.Vector3): HalfWing => {
 class Wing {
   leftWing: HalfWing;
   rightWing: HalfWing;
-  fullWing: THREE.Mesh;
-
-  createWing(): THREE.Mesh {
-    this.fullWing = new THREE.Mesh();
-
-    this.leftWing = createHalfWing(new THREE.Vector3(1, 1, -1));
-    this.rightWing = createHalfWing(new THREE.Vector3(1, -1, -1));
-    this.rightWing.wing.translateY(155);
-
-    this.fullWing.add(this.leftWing.wing);
-    this.fullWing.add(this.rightWing.wing);
-
-    this.fullWing.translateZ(-78);
-    return this.fullWing;
-  }
 
   async load(gui?: any): Promise<THREE.Mesh> {
-    const wing = this.createWing();
+    const fullWing = new THREE.Mesh();
+
+    const leftWing = createHalfWing(new THREE.Vector3(1, 1, -1));
+    const rightWing = createHalfWing(new THREE.Vector3(1, -1, -1));
+    rightWing.wing.translateY(155);
+
+    fullWing.add(leftWing.wing);
+    fullWing.add(rightWing.wing);
+
+    fullWing.translateZ(-78);
     if (gui) {
-      GuiHelper.addLocationGui(gui, "leftWing", this.leftWing.wing);
-      GuiHelper.addLocationGui(gui, "rightWing", this.rightWing.wing);
-      GuiHelper.addLocationGui(gui, "wing", this.fullWing);
+      GuiHelper.addLocationGui(gui, "leftWing", leftWing.wing);
+      GuiHelper.addLocationGui(gui, "rightWing", rightWing.wing);
+      GuiHelper.addLocationGui(gui, "wing", fullWing);
     }
-    return wing;
+    return fullWing;
   }
 }
 

@@ -87,14 +87,14 @@ const Game = {
     gui.hide();
     sky.updateSunPosition(TIME_OF_DAY);
 
+    const env = new Environment();
+
     const weather = new Weather(WEATHER_SETTINGS);
     weather.addGui(gui);
 
     const bgMusic = new BackgroundSound(SOUND_ENABLED);
 
-    const thermals = Environment.addThermals(scene, weather);
-
-    Environment.addClouds(scene, weather, thermals);
+    const thermals = env.addThermals(scene, weather);
 
     const pg = new Paraglider(
       pgOptions,
@@ -137,14 +137,19 @@ const Game = {
       }
     }
 
+    const wrapSpeedChange = (value: number) => {
+      pg.updateWrapSpeed(value);
+      vario.updateWrapSpeed(value);
+      env.updateWrapSpeed(value);
+    };
+
     const nav = gui.addFolder("Navigation");
     nav.add(settings, "rotationSensitivity", 0.01, 0.05).listen();
     nav
       .add(settings, "wrapSpeed", 1, 20)
       .listen()
       .onChange((value) => {
-        pg.updateWrapSpeed(value);
-        vario.updateWrapSpeed(value);
+        wrapSpeedChange(value);
       });
 
     let isLeftViewing = false;
@@ -244,8 +249,7 @@ const Game = {
         }}
         onWrapSpeedChange={(value) => {
           analytics.trackEvent("game-speed-change", value.toString());
-          pg.updateWrapSpeed(value);
-          vario.updateWrapSpeed(value);
+          wrapSpeedChange(value);
         }}
       />
     );
@@ -307,30 +311,35 @@ const Game = {
     camera.setCameraMode(CameraMode.FirstPersonView, pg);
     camera.lookAt(locations[0].lookAt);
 
-    Environment.addTrees(scene, terrain);
-    Environment.addStones(scene, terrain);
-    Environment.addHouses(scene, terrain);
-    Environment.addBoats(scene, water);
+    env.addClouds(scene, weather, thermals);
+    env.addTrees(scene, terrain);
+    env.addStones(scene, terrain);
+    env.addHouses(scene, terrain);
+    env.addBoats(scene, water);
     const birdsPath = [
       { x: 7500, y: 1090, z: -1068 },
       { x: 6500, y: 1190, z: -1368 },
       { x: 4500, y: 1390, z: -1768 },
     ];
-    Environment.addBirds(
+    env.addBirds(
       scene,
       birdsPath.map((p) => new THREE.Vector3(p.x, p.y, p.z)),
       gui
     );
     const hgPath = [
+      { x: 10000, y: 1090, z: -6068 },
       { x: 6500, y: 1190, z: -1368 },
-      { x: 7500, y: 1090, z: -1068 },
+      { x: 8200, y: 1190, z: -1668 },
+      { x: 8900, y: 1390, z: -2768 },
+      { x: 9500, y: 1790, z: -4268 },
+      { x: 11000, y: 2790, z: -7468 },
     ];
-    Environment.addHangGlider(
+    env.addHangGlider(
       scene,
       hgPath.map((p) => new THREE.Vector3(p.x, p.y, p.z)),
       gui
     );
-    // await Environment.addOtherGliders(scene, weather, terrain, water);
+    // await env.addOtherGliders(scene, weather, terrain, water);
 
     const animate = () => {
       box.update();

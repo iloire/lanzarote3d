@@ -39,8 +39,10 @@ const Mechanics = {
     const weather = new Weather(WEATHER_SETTINGS);
     weather.addGui(gui);
 
-    const thermals = Environment.addThermals(scene, weather);
-    Environment.addClouds(scene, weather, thermals);
+    const env = new Environment();
+
+    const thermals = env.addThermals(scene, weather);
+    env.addClouds(scene, weather, thermals);
 
     sky.updateSunPosition(12);
 
@@ -97,7 +99,7 @@ const Mechanics = {
     // scene.add(tree);
 
     renderer.render(scene, camera); // render before adding trees
-    Environment.addTrees(scene, terrain);
+    env.addTrees(scene, terrain);
 
     const animate = () => {
       // findCameraIntercept();

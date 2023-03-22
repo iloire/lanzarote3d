@@ -15,26 +15,28 @@ class HangGliderModel extends AutoFlier {
   async load(path: THREE.Vector3[], gui?: any): Promise<THREE.Mesh> {
     this.path = path;
     this.mesh = new THREE.Mesh();
-    this.wing = new Wing();
 
-    const wing = this.wing.createWing();
-    wing.position.y = 10;
-    wing.position.x = -40;
-    this.mesh.add(wing);
+    // wing
+    const wing = new Wing();
+    const wingMesh = await wing.load();
+    wingMesh.position.y = 10;
+    wingMesh.position.x = -40;
+
+    // pilot
+    this.pilot = new Pilot();
+    this.pilotMesh = this.pilot.load();
+    const pilotScale = 0.03;
+    this.pilotMesh.scale.set(pilotScale, pilotScale, pilotScale);
+    this.pilotMesh.position.x = -5;
+    this.pilotMesh.position.z = -0.4;
+    this.pilotMesh.rotateY(Math.PI / 2);
+
+    this.mesh.add(this.pilotMesh);
+    this.mesh.add(wingMesh);
 
     if (path.length > 1) {
       this.mesh.position.copy(path[0]);
     }
-
-    this.pilot = new Pilot();
-    this.pilotMesh = this.pilot.load();
-
-    const scale = 0.03;
-    this.pilotMesh.scale.set(scale, scale, scale);
-    this.pilotMesh.position.x = -5;
-    this.pilotMesh.position.z = -0.4;
-    this.pilotMesh.rotateY(Math.PI / 2);
-    this.mesh.add(this.pilotMesh);
 
     if (gui) {
       GuiHelper.addLocationGui(gui, "pilot", this.pilotMesh);

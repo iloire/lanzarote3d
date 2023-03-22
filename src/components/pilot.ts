@@ -189,6 +189,7 @@ class Pilot {
 
     return group;
   }
+
   load(): THREE.Object3D {
     const group = new THREE.Group();
     group.add(getHead());
