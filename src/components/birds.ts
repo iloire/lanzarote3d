@@ -2,14 +2,12 @@ import * as THREE from "three";
 import GuiHelper from "../utils/gui";
 import Models from "../utils/models";
 import model from "../models/birds.glb";
+import AutoFlier from "./base/auto-flier";
 
 const mat = new THREE.MeshLambertMaterial({ color: 0xffffff });
 const clock = new THREE.Clock();
 
-class Birds {
-  currentPointIndex: number = 0;
-  path: THREE.Vector3[];
-  mesh: THREE.Mesh;
+class Birds extends AutoFlier {
   mixer: any;
   interval: number;
 
@@ -47,20 +45,6 @@ class Birds {
 
   position(): THREE.Vector3 {
     return this.mesh.position.clone();
-  }
-
-  move() {
-    const nextPointToTravel = this.path[this.currentPointIndex];
-    const velocity = nextPointToTravel.clone().sub(this.position()).normalize();
-    this.mesh.position.add(velocity.multiplyScalar(1));
-
-    if (nextPointToTravel.distanceTo(this.position()) < 10) {
-      if (this.currentPointIndex < this.path.length - 1) {
-        this.currentPointIndex++;
-      } else {
-        this.currentPointIndex = 0;
-      }
-    }
   }
 }
 

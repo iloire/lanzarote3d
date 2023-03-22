@@ -3,13 +3,11 @@ import Pilot from "./pilot";
 import Wing from "./wing";
 import GuiHelper from "../utils/gui";
 import Models from "../utils/models";
+import AutoFlier from "./base/auto-flier";
 
 const BREAK_ROTATION = 0.05;
 
-class HangGliderModel {
-  currentPointIndex: number = 0;
-  path: THREE.Vector3[];
-  mesh: THREE.Mesh;
+class HangGliderModel extends AutoFlier {
   wing: Wing;
   pilot: Pilot;
   pilotMesh: THREE.Object3D;
@@ -55,23 +53,6 @@ class HangGliderModel {
 
   getPilotPosition(): THREE.Vector3 {
     return this.pilotMesh.position.clone();
-  }
-
-  move() {
-    const nextPointToTravel = this.path[this.currentPointIndex];
-    const velocity = nextPointToTravel
-      .clone()
-      .sub(this.mesh.position)
-      .normalize();
-    this.mesh.position.add(velocity.multiplyScalar(1));
-
-    if (nextPointToTravel.distanceTo(this.mesh.position) < 10) {
-      if (this.currentPointIndex < this.path.length - 1) {
-        this.currentPointIndex++;
-      } else {
-        this.currentPointIndex = 0;
-      }
-    }
   }
 }
 
