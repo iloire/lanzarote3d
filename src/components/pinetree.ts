@@ -1,12 +1,23 @@
 import * as THREE from "three";
+import { rndIntBetween } from "../utils/math";
+
+const pineMaterials = [
+  new THREE.MeshBasicMaterial({ color: 0x0d5b28 }),
+  new THREE.MeshBasicMaterial({ color: 0x093923 }),
+  new THREE.MeshBasicMaterial({ color: 0x2e8d36 }),
+  new THREE.MeshBasicMaterial({ color: 0x081f1c }),
+  new THREE.MeshBasicMaterial({ color: 0x00b662 }),
+];
 
 class PineTree {
   load(): THREE.Object3D {
     const group = new THREE.Group();
-    // Create the pine tree geometry
+
     const pineGeometry = new THREE.ConeGeometry(3, 9, 8);
-    const pineMaterial = new THREE.MeshBasicMaterial({ color: 0x0b6623 });
-    const pine = new THREE.Mesh(pineGeometry, pineMaterial);
+    const pine = new THREE.Mesh(
+      pineGeometry,
+      pineMaterials[rndIntBetween(0, pineMaterials.length)]
+    );
     pine.position.y = 12;
     group.add(pine);
 

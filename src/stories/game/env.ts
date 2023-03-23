@@ -81,8 +81,10 @@ const getRandomRotation = (): THREE.Euler => {
   return new THREE.Euler(0, rndBetween(0, Math.PI), 0);
 };
 
+type MeshAroundAreaParam = THREE.Object3D | (() => THREE.Object3D);
+
 const addMeshAroundArea = (
-  objs: THREE.Object3D[],
+  params: MeshAroundAreaParam[],
   pos: THREE.Vector3,
   number: number,
   terrain: THREE.Mesh,
@@ -91,7 +93,13 @@ const addMeshAroundArea = (
   y?: number
 ) => {
   for (let index = 0; index < number; index++) {
-    const obj = objs[rndIntBetween(0, objs.length)];
+    const param = params[rndIntBetween(0, params.length)];
+    let obj;
+    if (typeof param === "function") {
+      obj = param();
+    } else {
+      obj = param;
+    }
     const newX = pos.x + (minDistance || 30 + index) * rndIntBetween(1, 5);
     const newZ = pos.z + (minDistance || 30 + index) * rndIntBetween(1, 10);
 
@@ -297,11 +305,15 @@ class Environment {
       40,
       5
     );
-    const pineTree = new PineTree().load();
-    const scalePineTree = 2;
-    pineTree.scale.set(scalePineTree, scalePineTree, scalePineTree);
     addMeshAroundArea(
-      [pineTree],
+      [
+        () => {
+          const pineTree = new PineTree().load();
+          const scalePineTree = 2;
+          pineTree.scale.set(scalePineTree, scalePineTree, scalePineTree);
+          return pineTree;
+        },
+      ],
       new THREE.Vector3(8379, 0, -2145),
       100,
       terrain,
