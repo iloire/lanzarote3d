@@ -49,9 +49,7 @@ const Mechanics = {
     const pgOptions: ParagliderConstructor = {
       glidingRatio: 9,
       trimSpeed: 25 / KMH_TO_MS,
-      halfSpeedBarSpeed: 30 / KMH_TO_MS,
       fullSpeedBarSpeed: 35 / KMH_TO_MS,
-      smallEarsSpeed: 20 / KMH_TO_MS,
       bigEarsSpeed: 18 / KMH_TO_MS,
     };
     const pg = new Paraglider(pgOptions, weather, terrain, water, []);

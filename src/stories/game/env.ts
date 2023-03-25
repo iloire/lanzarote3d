@@ -169,9 +169,7 @@ class Environment {
     const pgOptions: ParagliderConstructor = {
       glidingRatio: 9,
       trimSpeed: 35 / KMH_TO_MS,
-      halfSpeedBarSpeed: 40 / KMH_TO_MS,
       fullSpeedBarSpeed: 45 / KMH_TO_MS,
-      smallEarsSpeed: 30 / KMH_TO_MS,
       bigEarsSpeed: 27 / KMH_TO_MS,
     };
     const pos = new THREE.Vector3(1379, 600, -545);
@@ -309,7 +307,7 @@ class Environment {
       [
         () => {
           const pineTree = new PineTree().load();
-          const scalePineTree = 2;
+          const scalePineTree = 10;
           pineTree.scale.set(scalePineTree, scalePineTree, scalePineTree);
           return pineTree;
         },
@@ -318,7 +316,7 @@ class Environment {
       100,
       terrain,
       scene,
-      100,
+      400,
       5
     );
   }

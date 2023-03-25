@@ -101,9 +101,7 @@ const getTerrainHeightBelowPosition = (
 export interface ParagliderConstructor {
   glidingRatio: number;
   trimSpeed: number;
-  halfSpeedBarSpeed: number;
   fullSpeedBarSpeed: number;
-  smallEarsSpeed: number;
   bigEarsSpeed: number;
 }
 
@@ -402,10 +400,6 @@ class Paraglider extends THREE.EventDispatcher {
     pgWindGui
       .add(this.options, "trimSpeed", 20 / 3.6, 70 / 3.6)
       .name("trim speed")
-      .listen();
-    pgWindGui
-      .add(this.options, "halfSpeedBarSpeed", 0, 70 / 3.6)
-      .name("half speed bar speed")
       .listen();
     pgWindGui
       .add(this.options, "fullSpeedBarSpeed", 0, 70 / 3.6)

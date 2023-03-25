@@ -23,7 +23,8 @@ const KMH_TO_MS = 3.6;
 
 const FOG_ENABLED = true;
 const TIME_OF_DAY = 19;
-const SOUND_ENABLED = false;
+const SOUND_ENABLED = true;
+const START_WITH_SOUND = false;
 const DEBUG = false;
 
 function round(number: number): number {
@@ -45,9 +46,7 @@ const WEATHER_SETTINGS: WeatherOptions = {
 const pgOptions: ParagliderConstructor = {
   glidingRatio: 9,
   trimSpeed: 35 / KMH_TO_MS,
-  halfSpeedBarSpeed: 40 / KMH_TO_MS,
   fullSpeedBarSpeed: 45 / KMH_TO_MS,
-  smallEarsSpeed: 30 / KMH_TO_MS,
   bigEarsSpeed: 27 / KMH_TO_MS,
 };
 
@@ -104,7 +103,7 @@ const Game = {
       DEBUG
     );
     const vario = new Vario(pg, SOUND_ENABLED);
-    const pgMesh = await pg.loadModel(0.5);
+    const pgMesh = await pg.loadModel(0.05);
     const box = new THREE.BoxHelper(pgMesh, 0xffff00);
     if (DEBUG) {
       scene.add(box);
@@ -283,8 +282,10 @@ const Game = {
       analytics.trackEvent("game-start");
       weather.changeWindSpeed(options.windSpeedMetresPerSecond);
       weather.changeWindDirection(options.windDirectionDegreesFromNorth);
-      bgMusic.start();
-      vario.start();
+      if (START_WITH_SOUND) {
+        bgMusic.start();
+        vario.start();
+      }
       pg.setPosition(options.startingLocation.position);
       pg.init();
       camera.setCameraMode(CameraMode.FirstPersonView, pg);
