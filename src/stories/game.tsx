@@ -213,8 +213,8 @@ const Game = {
               gameStatus = GameStatus.Paused;
             } else {
               pg.init();
-              vario.unPause();
-              bgMusic.unPause();
+              vario.start();
+              bgMusic.play();
               gameStatus = GameStatus.Started;
             }
           }
@@ -281,7 +281,7 @@ const Game = {
       weather.changeWindSpeed(options.windSpeedMetresPerSecond);
       weather.changeWindDirection(options.windDirectionDegreesFromNorth);
       if (START_WITH_SOUND) {
-        bgMusic.start();
+        bgMusic.play();
         vario.start();
       }
       pg.setPosition(options.startingLocation.position);

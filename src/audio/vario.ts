@@ -11,6 +11,7 @@ class Vario extends THREE.EventDispatcher {
   sound: any;
   pg: Paraglider;
   status: string = "off";
+  paused: boolean;
   lastRecord: number;
   high: number;
   volume: number = 0.3;
@@ -30,11 +31,8 @@ class Vario extends THREE.EventDispatcher {
   }
 
   pause() {
+    this.paused = true;
     this.sound.setVolume(0);
-  }
-
-  unPause() {
-    this.sound.setVolume(this.volume);
   }
 
   start() {

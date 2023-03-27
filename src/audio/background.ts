@@ -8,10 +8,15 @@ class BackgroundSound {
   wind2: THREE.Audio;
   music: THREE.Audio;
   enabled: boolean;
+  paused: boolean;
   volume: number = 0.3;
 
   constructor() {
     this.load();
+  }
+
+  isPlaying() {
+    return [this.wind1, this.wind2, this.music].every((i) => i.isPlaying);
   }
 
   loadSound(file, volume?: number) {
@@ -21,7 +26,7 @@ class BackgroundSound {
     if (volume) {
       this.volume = volume;
     }
-    audioLoader.load(file, function (buffer) {
+    audioLoader.load(file, (buffer) => {
       sound.setBuffer(buffer);
       sound.setLoop(true);
       sound.setVolume(this.volume);
@@ -36,26 +41,21 @@ class BackgroundSound {
   }
 
   toggle() {
-    if (this.enabled) {
-      this.stop();
+    if (this.isPlaying()) {
+      this.pause();
     } else {
-      this.start();
+      this.play();
     }
   }
 
   pause() {
-    this.wind1.setVolume(0);
-    this.wind2.setVolume(0);
-    this.music.setVolume(0);
+    this.paused = true;
+    this.wind1.pause();
+    this.wind2.pause();
+    this.music.pause();
   }
 
-  unPause() {
-    this.wind1.setVolume(this.volume);
-    this.wind2.setVolume(this.volume);
-    this.music.setVolume(this.volume);
-  }
-
-  start() {
+  play() {
     this.wind1.play();
     this.wind2.play();
     this.music.play();
