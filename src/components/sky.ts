@@ -58,6 +58,20 @@ const calculateSunPosition = (
 
 const USE_DIRECTIONAL_LIGHT = true;
 
+type SkyOptions = {
+  turbidity: number;
+  rayleigh: number;
+  mieCoefficient: number;
+  mieDirectionalG: number;
+};
+
+const defaultSkyOptions: SkyOptions = {
+  turbidity: 2,
+  rayleigh: 2,
+  mieCoefficient: 0.005,
+  mieDirectionalG: 0.8,
+};
+
 export default class Sky extends THREE.Object3D {
   sunPosition: THREE.Vector3;
   monthOfTheYear: number;
@@ -66,21 +80,30 @@ export default class Sky extends THREE.Object3D {
   pointLight: THREE.PointLight;
   directionalLight: THREE.DirectionalLight;
   directionalLightHelper: THREE.DirectionalLightHelper;
+  skyOptions: SkyOptions;
 
-  constructor(timeOfDayInHours: number, monthOfTheYear: number) {
+  constructor(
+    timeOfDayInHours: number,
+    monthOfTheYear: number,
+    skyOptions?: SkyOptions
+  ) {
     super();
     this.sunPosition = calculateSunPosition(timeOfDayInHours, monthOfTheYear);
     this.monthOfTheYear = monthOfTheYear;
+    this.skyOptions = skyOptions || defaultSkyOptions;
 
     this.sky = new SkyExample();
     this.sky.material.uniforms["sunPosition"].value.copy(this.sunPosition);
     this.sky.scale.setScalar(1000000000);
 
     const skyUniforms = this.sky.material.uniforms;
-    skyUniforms["turbidity"].value = 20;
-    skyUniforms["rayleigh"].value = 2;
-    skyUniforms["mieCoefficient"].value = 0.005;
-    skyUniforms["mieDirectionalG"].value = 0.8;
+    for (const key in this.skyOptions) {
+      if (skyUniforms[key]) {
+        skyUniforms[key].value = this.skyOptions[key];
+      } else {
+        console.error(key, "not found");
+      }
+    }
 
     const distance = 0; // max range of the light
     const intensity = 0.9;
@@ -115,6 +138,16 @@ export default class Sky extends THREE.Object3D {
     this.ambientLight = new THREE.AmbientLight(0xffffff, lightIntensity);
   }
 
+  addSkyGui(gui) {
+    const skyGui = gui.addFolder("Sky options");
+    const skyUniforms = this.sky.material.uniforms;
+    for (const key in this.skyOptions) {
+      if (skyUniforms[key]) {
+        skyGui.add(skyUniforms[key], "value", 0, 10).name(key).listen();
+      }
+    }
+  }
+
   addGui(gui) {
     const skyGui = gui.addFolder("Sky");
     skyGui
@@ -131,6 +164,8 @@ export default class Sky extends THREE.Object3D {
       .add(this.pointLight, "intensity", 0, 1)
       .name("pointLight.intensity")
       .listen();
+
+    this.addSkyGui(gui);
   }
 
   updateSunPosition(timeOfDayInHours: number) {
