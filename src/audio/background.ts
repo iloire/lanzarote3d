@@ -7,7 +7,7 @@ class BackgroundSound {
   wind1: THREE.Audio;
   wind2: THREE.Audio;
   music: THREE.Audio;
-  playing: boolean;
+  enabled: boolean;
   sound_enabled: boolean;
 
   constructor(sound_enabled: boolean) {
@@ -34,7 +34,7 @@ class BackgroundSound {
   }
 
   toggle() {
-    if (this.playing) {
+    if (this.enabled) {
       this.stop();
     } else {
       this.start();
@@ -46,16 +46,16 @@ class BackgroundSound {
       this.wind1.play();
       this.wind2.play();
       this.music.play();
-      this.playing = true;
+      this.enabled = true;
     }
   }
 
   stop() {
-    if (this.playing) {
+    if (this.enabled) {
       this.wind1.stop();
       this.wind2.stop();
       this.music.stop();
-      this.playing = false;
+      this.enabled = false;
     }
   }
 }
