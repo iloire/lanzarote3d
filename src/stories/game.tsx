@@ -23,7 +23,6 @@ const KMH_TO_MS = 3.6;
 
 const FOG_ENABLED = true;
 const TIME_OF_DAY = 19;
-const SOUND_ENABLED = true;
 const START_WITH_SOUND = false;
 const DEBUG = false;
 
@@ -90,7 +89,7 @@ const Game = {
     const weather = new Weather(WEATHER_SETTINGS);
     weather.addGui(gui);
 
-    const bgMusic = new BackgroundSound(SOUND_ENABLED);
+    const bgMusic = new BackgroundSound();
 
     const thermals = env.addThermals(scene, weather);
 
@@ -102,7 +101,7 @@ const Game = {
       thermals,
       DEBUG
     );
-    const vario = new Vario(pg, SOUND_ENABLED);
+    const vario = new Vario(pg);
     const pgMesh = await pg.loadModel(0.05);
     const box = new THREE.BoxHelper(pgMesh, 0xffff00);
     if (DEBUG) {
@@ -210,13 +209,13 @@ const Game = {
             analytics.trackEvent("game-pause");
             if (paused) {
               pg.stop();
-              vario.stop();
-              bgMusic.stop();
+              vario.pause();
+              bgMusic.pause();
               gameStatus = GameStatus.Paused;
             } else {
               pg.init();
-              vario.start();
-              bgMusic.start();
+              vario.unPause();
+              bgMusic.unPause();
               gameStatus = GameStatus.Started;
             }
           }

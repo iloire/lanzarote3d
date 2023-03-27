@@ -8,21 +8,23 @@ class BackgroundSound {
   wind2: THREE.Audio;
   music: THREE.Audio;
   enabled: boolean;
-  sound_enabled: boolean;
+  volume: number = 0.3;
 
-  constructor(sound_enabled: boolean) {
-    this.sound_enabled = sound_enabled;
+  constructor() {
     this.load();
   }
 
-  loadSound(file, volume) {
+  loadSound(file, volume?: number) {
     const listener = new THREE.AudioListener();
     const sound = new THREE.Audio(listener);
     const audioLoader = new THREE.AudioLoader();
+    if (volume) {
+      this.volume = volume;
+    }
     audioLoader.load(file, function (buffer) {
       sound.setBuffer(buffer);
       sound.setLoop(true);
-      sound.setVolume(volume || 0.3);
+      sound.setVolume(this.volume);
     });
     return sound;
   }
@@ -41,13 +43,23 @@ class BackgroundSound {
     }
   }
 
+  pause() {
+    this.wind1.setVolume(0);
+    this.wind2.setVolume(0);
+    this.music.setVolume(0);
+  }
+
+  unPause() {
+    this.wind1.setVolume(this.volume);
+    this.wind2.setVolume(this.volume);
+    this.music.setVolume(this.volume);
+  }
+
   start() {
-    if (this.sound_enabled) {
-      this.wind1.play();
-      this.wind2.play();
-      this.music.play();
-      this.enabled = true;
-    }
+    this.wind1.play();
+    this.wind2.play();
+    this.music.play();
+    this.enabled = true;
   }
 
   stop() {

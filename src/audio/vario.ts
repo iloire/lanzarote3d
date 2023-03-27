@@ -13,20 +13,28 @@ class Vario extends THREE.EventDispatcher {
   status: string = "off";
   lastRecord: number;
   high: number;
+  volume: number = 0.3;
   wrapSpeed: number = 1;
-  sound_enabled: boolean;
 
-  constructor(pg: Paraglider, sound_enabled: boolean) {
+  constructor(pg: Paraglider) {
     super();
     const listener = new THREE.AudioListener();
     this.sound = new THREE.Audio(listener);
+    this.sound.setVolume(this.volume);
     this.pg = pg;
-    this.sound_enabled = sound_enabled;
     this.tick();
   }
 
   updateWrapSpeed(value: number) {
     this.wrapSpeed = value;
+  }
+
+  pause() {
+    this.sound.setVolume(0);
+  }
+
+  unPause() {
+    this.sound.setVolume(this.volume);
   }
 
   start() {
@@ -56,9 +64,7 @@ class Vario extends THREE.EventDispatcher {
     this.lastRecord = this.high;
     if (this.status === "on") {
       if (Math.abs(delta) > 0.5) {
-        if (this.sound_enabled) {
-          this.play(delta);
-        }
+        this.play(delta);
       }
     }
 
@@ -99,7 +105,6 @@ class Vario extends THREE.EventDispatcher {
     const audioLoader = new THREE.AudioLoader();
     audioLoader.load(this.getBeepForIncrement(delta), (buffer) => {
       this.sound.setBuffer(buffer);
-      this.sound.setVolume(0.3);
       this.sound.play();
     });
   }
