@@ -10,7 +10,7 @@ import Paraglider from "../elements/pg";
 class Vario extends THREE.EventDispatcher {
   sound: any;
   pg: Paraglider;
-  status: string;
+  status: string = "off";
   lastRecord: number;
   high: number;
   wrapSpeed: number = 1;
