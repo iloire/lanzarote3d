@@ -13,6 +13,7 @@ import Paraglider, { ParagliderConstructor } from "../../elements/pg";
 import HangGlider from "../../components/hangglider";
 
 const KMH_TO_MS = 3.6;
+const THERMAL_OPACITY = 0.04;
 
 const generateRandomLcl = (lclLevel: number): number => {
   return lclLevel + rndIntBetween(-200, 3000);
@@ -41,7 +42,7 @@ const generateThermalPair = (
     dimensions ||
       generateRandomThermalDimensions(weather.getLclLevel(), superThermal),
     position,
-    0.05,
+    THERMAL_OPACITY,
     weather,
     true,
     superThermal
@@ -56,7 +57,7 @@ const generateThermalPair = (
   const thermalInside = new Thermal(
     interiorThermalDimensions,
     position,
-    0.09,
+    THERMAL_OPACITY,
     weather,
     false,
     false
