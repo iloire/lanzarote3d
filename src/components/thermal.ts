@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import Weather from "./weather";
+import Weather from "../elements/weather";
 
 const createThermalMesh = (
   topRadius: number,

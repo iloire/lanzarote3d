@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import Clouds from "../../components/clouds";
 import Weather from "../../elements/weather";
-import Thermal, { ThermalDimensions } from "../../elements/thermal";
+import Thermal, { ThermalDimensions } from "../../components/thermal";
 import { rndBetween, rndIntBetween } from "../../utils/math";
 import Tree from "../../components/tree";
 import PineTree from "../../components/pinetree";
