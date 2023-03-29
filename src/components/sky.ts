@@ -7,6 +7,7 @@ import {
 import lensflareTexture0 from "../textures/lensflare0.png";
 import lensflareTexture1 from "../textures/lensflare1.png";
 import Time from "../utils/time";
+import GuiHelper from "../utils/gui";
 
 const calculateLightIntensity = (
   timeOfDayInHours: number,
@@ -46,7 +47,7 @@ const calculateSunPosition = (
   const sunPosition = new THREE.Vector3();
   // phi is how far the point is from the North Pole
   const phi = THREE.MathUtils.degToRad(
-    Time.getSunAltitudeDegreesAccordingToTimeOfDay(timeOfDayInHours)
+    -1 * Time.getSunAltitudeDegreesAccordingToTimeOfDay(timeOfDayInHours)
   );
   //theta is the azimuth angle
   const theta = THREE.MathUtils.degToRad(
@@ -67,7 +68,7 @@ type SkyOptions = {
 
 const defaultSkyOptions: SkyOptions = {
   turbidity: 2,
-  rayleigh: 2,
+  rayleigh: 3,
   mieCoefficient: 0.005,
   mieDirectionalG: 0.8,
 };
@@ -94,7 +95,7 @@ export default class Sky extends THREE.Object3D {
 
     this.sky = new SkyExample();
     this.sky.material.uniforms["sunPosition"].value.copy(this.sunPosition);
-    this.sky.scale.setScalar(1000000000);
+    this.sky.scale.setScalar(10000000);
 
     const skyUniforms = this.sky.material.uniforms;
     for (const key in this.skyOptions) {
@@ -146,6 +147,11 @@ export default class Sky extends THREE.Object3D {
         skyGui.add(skyUniforms[key], "value", 0, 10).name(key).listen();
       }
     }
+    GuiHelper.addPositionGui(
+      gui,
+      "sun",
+      this.sky.material.uniforms["sunPosition"].value
+    );
   }
 
   addGui(gui) {

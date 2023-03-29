@@ -21,7 +21,7 @@ import Sky from "../components/sky";
 const KMH_TO_MS = 3.6;
 
 const FOG_ENABLED = true;
-const TIME_OF_DAY = 19;
+const TIME_OF_DAY = 20;
 const START_WITH_SOUND = false;
 const DEBUG = false;
 

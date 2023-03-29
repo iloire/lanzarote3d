@@ -44,7 +44,7 @@ const Mechanics = {
     const thermals = env.addThermals(scene, weather);
     env.addClouds(scene, weather, thermals);
 
-    sky.updateSunPosition(12);
+    sky.updateSunPosition(20);
 
     const pgOptions: ParagliderConstructor = {
       glidingRatio: 9,
