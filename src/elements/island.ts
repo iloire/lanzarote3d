@@ -30,6 +30,9 @@ const Island = {
       const mesh = await Models.loadSimple(model, manager);
       const textureLoader = new THREE.TextureLoader(manager);
       const texture = await textureLoader.load(textureImg);
+      texture.wrapS = THREE.RepeatWrapping;
+      texture.wrapT = THREE.RepeatWrapping;
+      texture.repeat.set(5, 5);
       mesh.material = new THREE.MeshStandardMaterial({
         map: texture,
         // wireframe: true,
