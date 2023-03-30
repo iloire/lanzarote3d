@@ -52,8 +52,8 @@ class ParagliderModel {
     model.add(this.pilotMesh);
 
     if (gui) {
-      GuiHelper.addLocationGui(gui, "pilot", this.pilotMesh);
-      GuiHelper.addLocationGui(gui, "paraglider", model);
+      GuiHelper.addLocationGui(gui, "pilot model", this.pilotMesh);
+      GuiHelper.addLocationGui(gui, "paraglider model", model);
     }
     return model;
   }
