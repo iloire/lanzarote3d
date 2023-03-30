@@ -26,8 +26,8 @@ class Camera extends THREE.PerspectiveCamera {
   controls: OrbitControls;
   angle: number = 0;
   angleIncrement: number = 0.05;
-  distance: number = 200;
-  distanceIncrement: number = 20;
+  distance: number = 10;
+  distanceIncrement: number = 2;
   farAwayOffset: THREE.Vector3 = new THREE.Vector3(-1302, 700, 1301.2);
   topViewOffset: THREE.Vector3 = new THREE.Vector3(30, 3700, -40);
   directionToLook: THREE.Vector3;
@@ -118,7 +118,7 @@ class Camera extends THREE.PerspectiveCamera {
     const x = Math.sin(this.angle) * this.distance;
     const z = Math.cos(this.angle) * this.distance;
     const pg = this.target;
-    const cameraOffset = new THREE.Vector3(x, -10, 60 + z);
+    const cameraOffset = new THREE.Vector3(x, 1, z);
     this.position.copy(pg.position().add(pg.direction().add(cameraOffset)));
 
     const lookOffset = new THREE.Vector3(0, 0, 0);
@@ -130,7 +130,8 @@ class Camera extends THREE.PerspectiveCamera {
     const cam = this;
     const pg = this.target;
 
-    cam.position.copy(pg.position());
+    const cameraOffset = new THREE.Vector3(0, 0.8, 0);
+    cam.position.copy(pg.position()).add(cameraOffset);
 
     const lookAt = pg.position().add(pg.direction().multiplyScalar(20000));
     this.lookAt(lookAt);
