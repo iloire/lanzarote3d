@@ -41,7 +41,7 @@ class ParagliderModel {
     wing.position.y = 80;
     model.add(wing);
 
-    this.pilot = new Pilot({ helmetColor: 0x000000 });
+    this.pilot = new Pilot({ helmetColor: 0xffff00 });
     this.pilotMesh = this.pilot.load();
 
     const scale = 0.03;
