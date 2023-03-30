@@ -23,6 +23,7 @@ const GuiHelper = {
     g.add(rotation, "z", min, max)
       .name(name + ".rotation.z")
       .listen();
+    g.open(false);
   },
 
   addPositionGui: (
@@ -42,9 +43,15 @@ const GuiHelper = {
     g.add(pos, "z", min, max)
       .name(name + ".position.z")
       .listen();
+    g.open(false);
   },
 
-  addLocationGui: (gui, name: string, obj: any, options?: GuiHelperOptions) => {
+  addLocationGui: (
+    gui,
+    name: string,
+    obj: THREE.Object3D,
+    options?: GuiHelperOptions
+  ) => {
     GuiHelper.addPositionGui(gui, name + " position", obj.position, options);
     GuiHelper.addRotationGui(gui, name + " rotation", obj.rotation);
   },

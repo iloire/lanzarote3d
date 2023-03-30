@@ -25,7 +25,7 @@ class Birds extends AutoFlier {
     }
     this.animate();
     if (gui) {
-      GuiHelper.addLocationGui(gui, "birds", this.mesh, {
+      GuiHelper.addLocationGui(gui, "Birds", this.mesh, {
         min: -10000,
         max: 10000,
       });

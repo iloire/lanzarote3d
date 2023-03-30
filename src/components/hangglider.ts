@@ -38,8 +38,8 @@ class HangGliderModel extends AutoFlier {
     }
 
     if (gui) {
-      GuiHelper.addLocationGui(gui, "pilot", pilotMesh);
-      GuiHelper.addLocationGui(gui, "paraglider", this.mesh);
+      GuiHelper.addLocationGui(gui, "Hanglider pilot", pilotMesh);
+      GuiHelper.addLocationGui(gui, "Hanglider", this.mesh);
     }
 
     this.animate();

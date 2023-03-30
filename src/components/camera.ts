@@ -48,7 +48,7 @@ class Camera extends THREE.PerspectiveCamera {
   }
 
   addGui(gui) {
-    GuiHelper.addLocationGui(gui, "camera", this, { min: 0, max: 10000 });
+    GuiHelper.addLocationGui(gui, "Camera", this, { min: 0, max: 10000 });
   }
 
   update() {
