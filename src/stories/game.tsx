@@ -8,7 +8,7 @@ import Animations from "../utils/animations";
 import Helpers from "../utils/helpers";
 import Vario from "../audio/vario";
 import Weather, { WeatherOptions } from "../elements/weather";
-import Camera, { CameraMode } from "../elements/camera";
+import Camera, { CameraMode } from "../components/camera";
 import UIControls, { View, FirstPersonViewLook } from "../elements/ui-controls";
 import Trajectory from "../elements/trajectory";
 import Analytics from "../elements/analytics";

@@ -1,6 +1,6 @@
 import React from "react";
 import * as THREE from "three";
-import { CameraMode } from "./camera";
+import { CameraMode } from "../components/camera";
 import Paraglider from "../components/pg";
 import Vario from "../audio/vario";
 import Weather from "../elements/weather";

@@ -13,7 +13,7 @@ import Water from "./components/water";
 import Island from "./components/island";
 
 import Stories from "./stories/index";
-import Camera from "./elements/camera";
+import Camera from "./components/camera";
 
 import WebGL from "./WebGL";
 import "./index.css";
