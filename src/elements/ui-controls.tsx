@@ -1,7 +1,7 @@
 import React from "react";
 import * as THREE from "three";
 import { CameraMode } from "./camera";
-import Paraglider from "./pg";
+import Paraglider from "../components/pg";
 import Vario from "../audio/vario";
 import Weather from "../elements/weather";
 import arrowLeftImg from "../img/left-chevron.png";

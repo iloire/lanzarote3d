@@ -3,7 +3,7 @@ import Controls from "../utils/controls";
 
 import Sky from "../components/sky";
 import Trajectory from "../elements/trajectory";
-import Paraglider, { ParagliderConstructor } from "../elements/pg";
+import Paraglider, { ParagliderConstructor } from "../components/pg";
 import Weather, { WeatherOptions } from "../elements/weather";
 import WindIndicator from "../components/wind-indicator";
 import Environment from "./game/env";

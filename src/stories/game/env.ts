@@ -9,7 +9,7 @@ import Stone from "../../components/stone";
 import House, { HouseType } from "../../components/house";
 import Boat from "../../components/boat";
 import Birds from "../../components/birds";
-import Paraglider, { ParagliderConstructor } from "../../elements/pg";
+import Paraglider, { ParagliderConstructor } from "../../components/pg";
 import HangGlider from "../../components/hangglider";
 
 const KMH_TO_MS = 3.6;
