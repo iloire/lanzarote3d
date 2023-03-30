@@ -45,8 +45,8 @@ const GuiHelper = {
   },
 
   addLocationGui: (gui, name: string, obj: any, options?: GuiHelperOptions) => {
-    GuiHelper.addPositionGui(gui, name, obj.position, options);
-    GuiHelper.addRotationGui(gui, name, obj.rotation);
+    GuiHelper.addPositionGui(gui, name + " position", obj.position, options);
+    GuiHelper.addRotationGui(gui, name + " rotation", obj.rotation);
   },
 };
 
