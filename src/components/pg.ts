@@ -169,9 +169,9 @@ class Paraglider extends THREE.EventDispatcher {
     this.wrapSpeed = value;
   }
 
-  async loadModel(scale: number): Promise<THREE.Object3D> {
+  async loadModel(scale: number, gui?: any): Promise<THREE.Object3D> {
     this.paragliderModel = new ParagliderModel();
-    const mesh = await this.paragliderModel.load();
+    const mesh = await this.paragliderModel.load(gui);
     mesh.scale.set(scale, scale, scale);
     this.model = mesh;
     if (this.debug) {
