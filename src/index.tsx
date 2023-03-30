@@ -10,7 +10,7 @@ import Animations from "./utils/animations";
 import Models from "./utils/models";
 import Water from "./components/water";
 
-import Island from "./elements/island";
+import Island from "./components/island";
 
 import Stories from "./stories/index";
 import Camera from "./elements/camera";
