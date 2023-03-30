@@ -4,10 +4,6 @@ const skinMat = new THREE.MeshLambertMaterial({
   color: "#e0bea5",
   // shading: THREE.FlatShading,
 });
-const helmetMat = new THREE.MeshLambertMaterial({
-  color: "#ac2626",
-  // shading: THREE.FlatShading,
-});
 const eyeMat = new THREE.MeshLambertMaterial({
   color: "white",
   // shading: THREE.FlatShading
@@ -34,7 +30,13 @@ const carabinerMat = new THREE.MeshLambertMaterial({
   color: "#ff0000",
 });
 
-const getHead = (): THREE.Group => {
+const getColoredMaterial = (color: number) => {
+  return new THREE.MeshLambertMaterial({
+    color,
+  });
+};
+
+const getHead = (options: PilotOptions): THREE.Group => {
   const group = new THREE.Group();
 
   const headGeo = new THREE.BoxGeometry(300, 350, 280);
@@ -42,6 +44,7 @@ const getHead = (): THREE.Group => {
   group.add(head);
 
   //Helmet
+  const helmetMat = getColoredMaterial(options.helmetColor);
   const helmetGeo = new THREE.BoxGeometry(400, 190, 390);
   const helmet = new THREE.Mesh(helmetGeo, helmetMat);
   helmet.position.x = 0;
@@ -122,10 +125,19 @@ const getHead = (): THREE.Group => {
 
 const BREAK_Y_MOVE = 90;
 
+type PilotOptions = {
+  helmetColor?: number;
+};
+
 class Pilot {
   armRight: THREE.Mesh;
   armLeft: THREE.Mesh;
   body: THREE.Mesh;
+  options: PilotOptions;
+
+  constructor(options: PilotOptions) {
+    this.options = options;
+  }
 
   getBody(): THREE.Group {
     const group = new THREE.Group();
@@ -192,7 +204,7 @@ class Pilot {
 
   load(): THREE.Object3D {
     const group = new THREE.Group();
-    group.add(getHead());
+    group.add(getHead(this.options));
     group.add(this.getBody());
     return group;
   }
