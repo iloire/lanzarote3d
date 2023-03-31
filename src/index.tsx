@@ -21,6 +21,7 @@ import "./index.css";
 
 THREE.Cache.enabled = true;
 const gui = new GUI();
+gui.hide();
 
 const createRenderer = (sizes) => {
   const renderer = new THREE.WebGLRenderer({
