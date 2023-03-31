@@ -16,6 +16,7 @@ import Stories from "./stories/index";
 import Camera from "./components/camera";
 
 import WebGL from "./WebGL";
+
 import "./index.css";
 
 THREE.Cache.enabled = true;
@@ -135,7 +136,7 @@ class App extends React.Component<AppProps, AppState> {
     function animate() {
       water.material.uniforms["time"].value += 1.0 / 60.0;
       requestAnimationFrame(animate);
-      stats.update();
+      // stats.update();
     }
     animate();
     console.log("triangles:", renderer.info.render.triangles);
@@ -168,5 +169,5 @@ if (WebGL.isWebGLAvailable()) {
   rootElement.appendChild(warning);
 }
 
-const stats = Stats();
-document.getElementById("stats").appendChild(stats.dom);
+// const stats = Stats();
+// document.getElementById("stats").appendChild(stats.dom);

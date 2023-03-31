@@ -9,6 +9,11 @@ module.exports = {
     path: path.join(__dirname, "/dist"),
     filename: "bundle.js",
   },
+  externals: {
+    rStats: "rStats",
+    glStats: "glStats",
+    threeStats: "threeStats",
+  },
   devServer: {
     port: 8080,
   },
@@ -49,6 +54,10 @@ module.exports = {
       },
       {
         test: /\.(glb|gltf)$/,
+        type: "asset/resource",
+      },
+      {
+        test: /\.(drc)$/,
         type: "asset/resource",
       },
       {

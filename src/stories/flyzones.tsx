@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 import React from "react";
 import { createRoot } from "react-dom/client";
-import Camera, { CameraMode } from "../elements/camera";
+import Camera, { CameraMode } from "../components/camera";
 import Animations from "../utils/animations";
 import Controls from "../utils/controls";
 import locations from "./locations/lanzarote";

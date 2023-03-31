@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import PG from "../elements/pg";
 import Navigation from "../utils/navigation";
 import Controls from "../utils/controls";
 

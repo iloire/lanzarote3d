@@ -17,6 +17,9 @@ import Environment from "./game/env";
 import locations from "./locations/lanzarote";
 import WindIndicator from "../components/wind-indicator";
 import Sky from "../components/sky";
+import rStats from "rStats";
+import glStats from "glStats";
+import threeStats from "threeStats";
 
 const KMH_TO_MS = 3.6;
 
@@ -80,6 +83,29 @@ const Game = {
     sky: Sky,
     gui
   ) => {
+    const tS = new threeStats(renderer);
+    const gl = new glStats();
+    const rS = new rStats({
+      CSSPath: "https://spite.github.io/rstats/",
+      userTimingAPI: true,
+      values: {
+        frame: { caption: "Total frame time (ms)", over: 16 },
+        fps: { caption: "Framerate (FPS)", below: 30 },
+        calls: { caption: "Calls (three.js)", over: 3000 },
+        raf: { caption: "Time since last rAF (ms)" },
+        rstats: { caption: "rStats update (ms)" },
+      },
+      groups: [
+        { caption: "Framerate", values: ["fps", "raf"] },
+        {
+          caption: "Frame Budget",
+          values: ["frame", "texture", "setup", "render"],
+        },
+      ],
+      fractions: [{ base: "frame", steps: ["move", "render"] }],
+      plugins: [tS, gl],
+    });
+
     gui.hide();
     sky.updateSunPosition(TIME_OF_DAY);
 
@@ -92,14 +118,15 @@ const Game = {
 
     const thermals = env.addThermals(scene, weather);
 
-    const pg = new Paraglider(
-      pgOptions,
+    const envOptions = {
       weather,
       terrain,
       water,
       thermals,
-      DEBUG
-    );
+      rs: rS,
+    };
+
+    const pg = new Paraglider(pgOptions, envOptions, DEBUG);
     const vario = new Vario(pg);
     const pgMesh = await pg.loadModel(0.05, gui);
     const box = new THREE.BoxHelper(pgMesh, 0xffff00);
@@ -354,9 +381,26 @@ const Game = {
       if (isZoomOutViewing) {
         camera.zoomOut();
       }
+
+      gl.start();
+
+      rS("frame").start();
+      rS("rAF").tick();
+      rS("FPS").frame();
+
+      rS("tween").start();
       TWEEN.update();
+      rS("tween").end();
+
       camera.update();
+
+      rS("render").start();
       renderer.render(scene, camera);
+      rS("render").end();
+
+      rS("frame").end();
+      rS().update();
+
       requestAnimationFrame(animate);
     };
     animate();

@@ -52,7 +52,13 @@ const Mechanics = {
       fullSpeedBarSpeed: 35 / KMH_TO_MS,
       bigEarsSpeed: 18 / KMH_TO_MS,
     };
-    const pg = new Paraglider(pgOptions, weather, terrain, water, []);
+    const envOptions = {
+      weather,
+      terrain,
+      water,
+      thermals,
+    };
+    const pg = new Paraglider(pgOptions, envOptions);
     const mesh = await pg.loadModel(p.scale);
     mesh.position.copy(p.position);
     pg.addGui(gui);

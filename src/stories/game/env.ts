@@ -9,7 +9,10 @@ import Stone from "../../components/stone";
 import House, { HouseType } from "../../components/house";
 import Boat from "../../components/boat";
 import Birds from "../../components/birds";
-import Paraglider, { ParagliderConstructor } from "../../components/pg";
+import Paraglider, {
+  ParagliderConstructor,
+  EnvOptions,
+} from "../../components/pg";
 import HangGlider from "../../components/hangglider";
 
 const KMH_TO_MS = 3.6;
@@ -128,12 +131,10 @@ const addMeshAroundArea = (
 
 const createPg = async (
   options: ParagliderConstructor,
-  weather: Weather,
-  terrain: THREE.Mesh,
-  water: THREE.Mesh,
+  env: EnvOptions,
   pos: THREE.Vector3
 ): Promise<Paraglider> => {
-  const pg = new Paraglider(options, weather, terrain, water, [], false);
+  const pg = new Paraglider(options, env, false);
   const pgMesh = await pg.loadModel(1);
   pg.setPosition(pos);
   pg.init();
@@ -173,12 +174,18 @@ class Environment {
       fullSpeedBarSpeed: 45 / KMH_TO_MS,
       bigEarsSpeed: 27 / KMH_TO_MS,
     };
+    const envOptions = {
+      weather,
+      terrain,
+      water,
+      thermals: [],
+    };
     const pos = new THREE.Vector3(1379, 600, -545);
-    const pg = await createPg(pgOptions, weather, terrain, water, pos);
+    const pg = await createPg(pgOptions, envOptions, pos);
     scene.add(pg.getMesh());
 
     const pos2 = new THREE.Vector3(3379, 900, -1545);
-    const pg2 = await createPg(pgOptions, weather, terrain, water, pos2);
+    const pg2 = await createPg(pgOptions, envOptions, pos2);
     scene.add(pg2.getMesh());
 
     // const pos3 = new THREE.Vector3(379, 1200, -145);
