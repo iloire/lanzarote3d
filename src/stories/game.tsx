@@ -84,7 +84,7 @@ const Game = {
     gui
   ) => {
     const tS = new threeStats(renderer);
-    const gl = new glStats();
+    const glS = new glStats();
     const rS = new rStats({
       CSSPath: "https://spite.github.io/rstats/",
       userTimingAPI: true,
@@ -103,7 +103,7 @@ const Game = {
         },
       ],
       fractions: [{ base: "frame", steps: ["move", "render"] }],
-      plugins: [tS, gl],
+      plugins: [tS, glS],
     });
 
     gui.hide();
@@ -382,7 +382,7 @@ const Game = {
         camera.zoomOut();
       }
 
-      gl.start();
+      glS.start();
 
       rS("frame").start();
       rS("rAF").tick();
@@ -392,7 +392,9 @@ const Game = {
       TWEEN.update();
       rS("tween").end();
 
+      rS("camera").start();
       camera.update();
+      rS("camera").end();
 
       rS("render").start();
       renderer.render(scene, camera);
