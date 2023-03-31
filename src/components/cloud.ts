@@ -64,8 +64,8 @@ const tweakSize = (mesh: THREE.Object3D, interval: number) => {
 };
 
 const tweakPos = (mesh: THREE.Object3D, interval: number) => {
-  const min = 0.95,
-    max = 1.05;
+  const min = 0.9,
+    max = 1.1;
   const multiplier = rndBetween(min, max);
   const posX = mesh.position.x * multiplier;
   const posY = mesh.position.y * multiplier;
