@@ -206,7 +206,9 @@ export default class Sky extends THREE.Object3D {
     scene.add(this.sky);
     if (this.directionalLight) {
       scene.add(this.directionalLight);
-      scene.add(this.directionalLightHelper);
+      if (this.directionalLightHelper) {
+        scene.add(this.directionalLightHelper);
+      }
     }
     scene.add(this.pointLight);
     scene.add(this.ambientLight);
