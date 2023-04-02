@@ -101,8 +101,9 @@ const Game = {
       fractions: [{ base: "frame", steps: ["move", "render"] }],
       plugins: [tS, glS],
     });
+    const rsBase: any = document.getElementsByClassName("rs-base");
+    rsBase[0].style.display = "none";
 
-    gui.hide();
     sky.updateSunPosition(TIME_OF_DAY);
 
     const env = new Environment();
@@ -138,9 +139,16 @@ const Game = {
       const keyCode = event.which;
       if (keyCode == 90) {
         //z
+        const rsBase: any = document.getElementsByClassName("rs-base");
         if (gui._hidden) {
+          if (rsBase.length) {
+            rsBase[0].style.display = "";
+          }
           gui.show();
         } else {
+          if (rsBase.length) {
+            rsBase[0].style.display = "none";
+          }
           gui.hide();
         }
       } else if (keyCode == 77) {
