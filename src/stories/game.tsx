@@ -28,10 +28,6 @@ const TIME_OF_DAY = 20;
 const START_WITH_SOUND = false;
 const DEBUG = false;
 
-function round(number: number): number {
-  return Math.round(number * 100) / 100;
-}
-
 const settings = {
   rotationSensitivity: 0.002,
   orbitControl: false,
