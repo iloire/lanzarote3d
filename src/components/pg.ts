@@ -132,7 +132,7 @@ class Paraglider extends THREE.EventDispatcher {
   isRightBreaking: boolean;
   trajectory: TrajectoryPoint[] = [];
   tickCounter: number = 0;
-  __rollAngle: number = 0;
+  __rollAngleRadians: number = 0;
   __lift: number = 0;
   __gradient: number = 0;
   __directionInput: number = 0;
@@ -248,6 +248,7 @@ class Paraglider extends THREE.EventDispatcher {
         this.lift = this.getLiftValue();
       }
     }
+
     this.flyingTime += multiplier;
     this.metersFlown += multiplier * this.getGroundSpeed();
 
@@ -323,7 +324,8 @@ class Paraglider extends THREE.EventDispatcher {
     const zRotation = -1 * Math.abs(THREE.MathUtils.degToRad(validZAngle));
 
     const endRotation = new THREE.Euler(0, yRotation, zRotation);
-    this.__rollAngle = zRotation;
+
+    this.__rollAngleRadians = zRotation;
 
     this.model.rotation.copy(endRotation);
   }
