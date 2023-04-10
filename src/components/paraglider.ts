@@ -44,8 +44,8 @@ class ParagliderModel {
     }
   }
 
-  async load(gui?: any): Promise<THREE.Mesh> {
-    const mesh = new THREE.Mesh();
+  async load(gui?: any): Promise<THREE.Object3D> {
+    const mesh = new THREE.Object3D();
     this.glider = new Glider();
 
     const wing = this.glider.createWing();

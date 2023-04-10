@@ -47,7 +47,7 @@ const createTrajectoryArrow = (
   return arrow;
 };
 
-const createGravityArrow = (mesh: THREE.Mesh, len: number) => {
+const createGravityArrow = (mesh: THREE.Object3D, len: number) => {
   const dir = DOWN_DIRECTION.clone();
   const arrow = new THREE.ArrowHelper(dir, ORIGIN, len, 0xff0000);
   return arrow;
@@ -63,7 +63,7 @@ const createDirectionArrow = (
 };
 
 const createCentripetalArrow = (
-  mesh: THREE.Mesh,
+  mesh: THREE.Object3D,
   len: number,
   color
 ): THREE.ArrowHelper => {
@@ -124,7 +124,7 @@ class Paraglider extends THREE.EventDispatcher {
   speedBar: boolean;
   ears: boolean;
   interval: number = null;
-  mesh: THREE.Mesh;
+  mesh: THREE.Object3D;
   wrapSpeed: number = 1;
   flyingTime: number = 0;
   metersFlown: number = 0;
@@ -215,7 +215,7 @@ class Paraglider extends THREE.EventDispatcher {
     return !!this.interval;
   }
 
-  getMesh(): THREE.Mesh {
+  getMesh(): THREE.Object3D {
     return this.mesh;
   }
 
