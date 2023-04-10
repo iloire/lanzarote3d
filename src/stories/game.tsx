@@ -345,7 +345,7 @@ const Game = {
 
     // Game start
     pg.setPosition(locations[0].position);
-    pg.model.rotation.y = 1.2; // TODO: should implemente a setDirection on pg
+    pg.getMesh().rotation.y = 1.2; // TODO: should implemente a setDirection on pg
     setCameraMode(CameraMode.FirstPersonView);
     camera.lookAt(locations[0].lookAt);
 

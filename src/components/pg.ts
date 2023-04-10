@@ -124,7 +124,7 @@ class Paraglider extends THREE.EventDispatcher {
   speedBar: boolean;
   ears: boolean;
   interval: number = null;
-  model: THREE.Mesh;
+  mesh: THREE.Mesh;
   wrapSpeed: number = 1;
   flyingTime: number = 0;
   metersFlown: number = 0;
@@ -159,7 +159,7 @@ class Paraglider extends THREE.EventDispatcher {
   }
 
   isInsideThermal = (thermal: Thermal): boolean => {
-    const pgBB = new THREE.Box3().setFromObject(this.model);
+    const pgBB = new THREE.Box3().setFromObject(this.mesh);
     const thermalBB = new THREE.Box3().setFromObject(thermal.getMesh());
     const inTheTermal = thermalBB.containsBox(pgBB);
     return inTheTermal;
@@ -185,7 +185,7 @@ class Paraglider extends THREE.EventDispatcher {
     this.paragliderModel = new ParagliderModel();
     const mesh = await this.paragliderModel.load(gui);
     mesh.scale.set(scale, scale, scale);
-    this.model = mesh;
+    this.mesh = mesh;
     if (this.debug) {
       const arrowLen = 50;
       mesh.add(createCentripetalArrow(mesh, arrowLen, 0x0000ff));
@@ -216,7 +216,7 @@ class Paraglider extends THREE.EventDispatcher {
   }
 
   getMesh(): THREE.Mesh {
-    return this.model;
+    return this.mesh;
   }
 
   tick(multiplier: number) {
@@ -238,7 +238,7 @@ class Paraglider extends THREE.EventDispatcher {
           vector: this.position(),
         }); // last point saved
         if (ANTI_CRASH_ENABLED) {
-          this.model.position.y += 10;
+          this.mesh.position.y += 10;
         } else {
           this.dispatchEvent({
             type: "crashed",
@@ -315,9 +315,9 @@ class Paraglider extends THREE.EventDispatcher {
 
   rotate(yRotationIncrement: number = 0, zAngle: number) {
     const maxAngle = 75;
-    const startRotation = this.model.rotation;
+    const startRotation = this.mesh.rotation;
 
-    const yRotation = (this.model.rotation.y +=
+    const yRotation = (this.mesh.rotation.y +=
       -1 * yRotationIncrement * getRotationValue(this.wrapSpeed));
 
     const validZAngle = THREE.MathUtils.clamp(zAngle, -1 * maxAngle, maxAngle);
@@ -327,7 +327,7 @@ class Paraglider extends THREE.EventDispatcher {
 
     this.__rollAngleRadians = zRotation;
 
-    this.model.rotation.copy(endRotation);
+    this.mesh.rotation.copy(endRotation);
   }
 
   getMetersFlown(): number {
@@ -392,11 +392,11 @@ class Paraglider extends THREE.EventDispatcher {
       // .easing(TWEEN.Easing.Quadratic.InOut) // Set the easing function for the animation
       .onUpdate(() => {
         // Update the position of the object on each frame of the animation
-        this.model.position.copy(startPosition);
+        this.mesh.position.copy(startPosition);
       })
       .start(); // Start the animation
 
-    this.dispatchEvent({ type: "position", position: this.model.position });
+    this.dispatchEvent({ type: "position", position: this.mesh.position });
 
     const delta = combinedMoveVector.y / multiplier;
     this.dispatchEvent({
@@ -406,7 +406,7 @@ class Paraglider extends THREE.EventDispatcher {
   }
 
   addGui(gui) {
-    const pg = this.model;
+    const pg = this.mesh;
     GuiHelper.addLocationGui(gui, "Paraglider", pg, {
       min: -20000,
       max: 20000,
@@ -459,7 +459,7 @@ class Paraglider extends THREE.EventDispatcher {
   }
 
   hasTouchedGround(terrain: THREE.Mesh, water: THREE.Mesh): boolean {
-    const pos = this.model.position;
+    const pos = this.mesh.position;
     const terrainBelowHeight = getTerrainHeightBelowPosition(
       pos,
       terrain,
@@ -522,16 +522,16 @@ class Paraglider extends THREE.EventDispatcher {
   }
 
   direction(localVector: THREE.Vector3 = FORWARD_DIRECTION): THREE.Vector3 {
-    const quaternion = this.model.getWorldQuaternion(new THREE.Quaternion());
+    const quaternion = this.mesh.getWorldQuaternion(new THREE.Quaternion());
     return localVector.clone().applyQuaternion(quaternion);
   }
 
   rotation(): THREE.Quaternion {
-    return this.model.getWorldQuaternion(new THREE.Quaternion()).clone();
+    return this.mesh.getWorldQuaternion(new THREE.Quaternion()).clone();
   }
 
   position(): THREE.Vector3 {
-    return this.model.position.clone();
+    return this.mesh.position.clone();
   }
 
   getPilotPosition(): THREE.Vector3 {
@@ -539,11 +539,11 @@ class Paraglider extends THREE.EventDispatcher {
   }
 
   setPosition(pos: THREE.Vector3) {
-    this.model.position.copy(pos);
+    this.mesh.position.copy(pos);
   }
 
   altitude(): number {
-    return this.model.position.y;
+    return this.mesh.position.y;
   }
 
   toggleEars() {

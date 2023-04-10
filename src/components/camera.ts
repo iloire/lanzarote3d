@@ -151,7 +151,7 @@ class Camera extends THREE.PerspectiveCamera {
 
     // adjust for roll
     this.rotateZ(
-      -1 * (this.viewRotationHorizontal / 4 + this.target.model.rotation.z)
+      -1 * (this.viewRotationHorizontal / 4 + pg.getMesh().rotation.z)
     );
 
     // view rotation

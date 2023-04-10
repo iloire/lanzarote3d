@@ -45,12 +45,13 @@ class ParagliderModel {
   }
 
   async load(gui?: any): Promise<THREE.Mesh> {
-    const model = new THREE.Mesh();
+    const mesh = new THREE.Mesh();
     this.glider = new Glider();
+
     const wing = this.glider.createWing();
     wing.position.y = 80;
     wing.position.x = 22;
-    model.add(wing);
+    mesh.add(wing);
 
     this.pilot = new Pilot({ helmetColor: 0xffff00 });
     this.pilotMesh = this.pilot.load();
@@ -60,13 +61,13 @@ class ParagliderModel {
     this.pilotMesh.position.x = 17;
     this.pilotMesh.position.z = -0.4;
     this.pilotMesh.rotateY(Math.PI / 2);
-    model.add(this.pilotMesh);
+    mesh.add(this.pilotMesh);
 
     if (gui) {
       GuiHelper.addLocationGui(gui, "Pilot model", this.pilotMesh);
-      GuiHelper.addLocationGui(gui, "Paraglider model", model);
+      GuiHelper.addLocationGui(gui, "Paraglider model", mesh);
     }
-    return model;
+    return mesh;
   }
 
   getPilotPosition(): THREE.Vector3 {
