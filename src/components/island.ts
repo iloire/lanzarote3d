@@ -6,6 +6,21 @@ import textureImgHeightMap from "../textures/h-map-lanzarote.png";
 
 const USE_BLENDER_MODEL = true;
 
+const loadFromBlenderModel = async (manager: THREE.LoadingManager) => {
+  const mesh = await Models.loadSimple(model, manager);
+  const textureLoader = new THREE.TextureLoader(manager);
+  const texture = await textureLoader.load(textureImg);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(5, 5);
+  mesh.material = new THREE.MeshStandardMaterial({
+    map: texture,
+    // wireframe: true,
+    depthTest: true,
+  });
+  return mesh;
+};
+
 const loadFromDisplacement = async () => {
   const loader = new THREE.TextureLoader();
   const displacement = await loader.load(textureImgHeightMap);
@@ -27,18 +42,7 @@ const loadFromDisplacement = async () => {
 const Island = {
   load: async (manager: THREE.LoadingManager): Promise<THREE.Mesh> => {
     if (USE_BLENDER_MODEL) {
-      const mesh = await Models.loadSimple(model, manager);
-      const textureLoader = new THREE.TextureLoader(manager);
-      const texture = await textureLoader.load(textureImg);
-      texture.wrapS = THREE.RepeatWrapping;
-      texture.wrapT = THREE.RepeatWrapping;
-      texture.repeat.set(5, 5);
-      mesh.material = new THREE.MeshStandardMaterial({
-        map: texture,
-        // wireframe: true,
-        depthTest: true,
-      });
-      return mesh;
+      return loadFromBlenderModel(manager);
     } else {
       return loadFromDisplacement();
     }
