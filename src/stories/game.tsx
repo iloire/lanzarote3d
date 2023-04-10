@@ -189,6 +189,15 @@ const Game = {
     const rootElement = document.getElementById("ui-controls");
     const root = createRoot(rootElement);
 
+    function setCameraMode(mode) {
+      camera.setCameraMode(mode, pg);
+      if (mode === CameraMode.FirstPersonView) {
+        pg.setFirstPersonView(true);
+      } else {
+        pg.setFirstPersonView(false);
+      }
+    }
+
     const uiControls = (
       <UIControls
         pg={pg}
@@ -252,7 +261,7 @@ const Game = {
         }}
         onSelectCamera={(mode: CameraMode) => {
           analytics.trackEvent("game-camera-change", mode.toString());
-          camera.setCameraMode(mode, pg);
+          setCameraMode(mode);
         }}
         onViewChange={(view: View) => {
           analytics.trackEvent("game-view-change", view);
@@ -337,7 +346,7 @@ const Game = {
     // Game start
     pg.setPosition(locations[0].position);
     pg.model.rotation.y = 1.2; // TODO: should implemente a setDirection on pg
-    camera.setCameraMode(CameraMode.FirstPersonView, pg);
+    setCameraMode(CameraMode.FirstPersonView);
     camera.lookAt(locations[0].lookAt);
 
     env.addClouds(scene, weather, thermals);

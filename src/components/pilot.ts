@@ -1,40 +1,19 @@
 import * as THREE from "three";
 
-const skinMat = new THREE.MeshLambertMaterial({
-  color: "#e0bea5",
-  // shading: THREE.FlatShading,
-});
-const eyeMat = new THREE.MeshLambertMaterial({
-  color: "white",
-  // shading: THREE.FlatShading
-});
-
-const pupilaMat = new THREE.MeshLambertMaterial({
-  color: "#333",
-  // shading: THREE.FlatShading,
-});
-
-const suitMat = new THREE.MeshLambertMaterial({
-  color: "#333",
-  // shading: THREE.FlatShading,
-});
-const subBodyMat = new THREE.MeshLambertMaterial({
-  color: "#666",
-  // shading: THREE.FlatShading,
-});
-const lipMat = new THREE.MeshLambertMaterial({
-  color: "#333",
-  // shading: THREE.FlatShading,
-});
-const carabinerMat = new THREE.MeshLambertMaterial({
-  color: "#ff0000",
-});
-
 const getColoredMaterial = (color: number) => {
-  return new THREE.MeshLambertMaterial({
+  return new THREE.MeshStandardMaterial({
     color,
+    side: THREE.DoubleSide,
   });
 };
+
+const skinMat = getColoredMaterial(0xe0bea5);
+const eyeMat = getColoredMaterial(0xffffff);
+const pupilaMat = getColoredMaterial(0x333);
+const subBodyMat = getColoredMaterial(0x666);
+const lipMat = getColoredMaterial(0x333);
+const carabinerMat = getColoredMaterial(0xff0000);
+const suitMat = getColoredMaterial(0x333);
 
 const getHead = (options: PilotOptions): THREE.Group => {
   const group = new THREE.Group();
@@ -133,16 +112,25 @@ class Pilot {
   armRight: THREE.Mesh;
   armLeft: THREE.Mesh;
   body: THREE.Mesh;
+  head: THREE.Group;
   options: PilotOptions;
 
   constructor(options: PilotOptions) {
     this.options = options;
   }
 
+  showHead() {
+    this.head.visible = true;
+  }
+
+  hideHead() {
+    this.head.visible = false;
+  }
+
   getBody(): THREE.Group {
     const group = new THREE.Group();
 
-    const bodyGeo = new THREE.BoxGeometry(250, 420, 1100);
+    const bodyGeo = new THREE.BoxGeometry(250, 420, 1400);
     this.body = new THREE.Mesh(bodyGeo, suitMat);
     this.body.position.x = 0;
     this.body.position.y = -390;
@@ -204,7 +192,8 @@ class Pilot {
 
   load(): THREE.Object3D {
     const group = new THREE.Group();
-    group.add(getHead(this.options));
+    this.head = getHead(this.options);
+    group.add(this.head);
     group.add(this.getBody());
     return group;
   }

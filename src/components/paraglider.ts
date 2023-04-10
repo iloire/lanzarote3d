@@ -34,11 +34,22 @@ class ParagliderModel {
     this.pilot.releaseSpeedBar();
   }
 
+  setFirstPersonView(isFirstPersonView: boolean) {
+    if (isFirstPersonView) {
+      console.log("hide");
+      this.pilot.hideHead();
+    } else {
+      console.log("shiow");
+      this.pilot.showHead();
+    }
+  }
+
   async load(gui?: any): Promise<THREE.Mesh> {
     const model = new THREE.Mesh();
     this.glider = new Glider();
     const wing = this.glider.createWing();
     wing.position.y = 80;
+    wing.position.x = 17;
     model.add(wing);
 
     this.pilot = new Pilot({ helmetColor: 0xffff00 });
@@ -46,7 +57,7 @@ class ParagliderModel {
 
     const scale = 0.03;
     this.pilotMesh.scale.set(scale, scale, scale);
-    this.pilotMesh.position.x = -5;
+    this.pilotMesh.position.x = 17;
     this.pilotMesh.position.z = -0.4;
     this.pilotMesh.rotateY(Math.PI / 2);
     model.add(this.pilotMesh);

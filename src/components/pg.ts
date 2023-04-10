@@ -165,6 +165,10 @@ class Paraglider extends THREE.EventDispatcher {
     return inTheTermal;
   };
 
+  setFirstPersonView(isFirstPersonView: boolean) {
+    this.paragliderModel.setFirstPersonView(isFirstPersonView);
+  }
+
   countInsideHowManyThermals(): number {
     return this.thermals.filter(this.isInsideThermal).length;
   }

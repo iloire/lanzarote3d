@@ -28,6 +28,7 @@ class Camera extends THREE.PerspectiveCamera {
   angleIncrement: number = 0.05;
   distance: number = 10;
   distanceIncrement: number = 2;
+  firstPersonViewOffset: THREE.Vector3 = new THREE.Vector3(0, 0.1, 0);
   farAwayOffset: THREE.Vector3 = new THREE.Vector3(-1302, 700, 1301.2);
   topViewOffset: THREE.Vector3 = new THREE.Vector3(30, 3700, -40);
   directionToLook: THREE.Vector3;
@@ -49,6 +50,19 @@ class Camera extends THREE.PerspectiveCamera {
 
   addGui(gui) {
     GuiHelper.addLocationGui(gui, "Camera", this, { min: 0, max: 10000 });
+    GuiHelper.addPositionGui(gui, "Camera.farAwayOffset", this.farAwayOffset, {
+      min: -100,
+      max: 100,
+    });
+    GuiHelper.addPositionGui(
+      gui,
+      "Camera.firstPersonViewOffset",
+      this.firstPersonViewOffset,
+      {
+        min: -20,
+        max: 20,
+      }
+    );
   }
 
   update() {
@@ -130,8 +144,7 @@ class Camera extends THREE.PerspectiveCamera {
     const cam = this;
     const pg = this.target;
 
-    const cameraOffset = new THREE.Vector3(0, 0.8, 0);
-    cam.position.copy(pg.position()).add(cameraOffset);
+    cam.position.copy(pg.position()).add(this.firstPersonViewOffset);
 
     const lookAt = pg.position().add(pg.direction().multiplyScalar(20000));
     this.lookAt(lookAt);
