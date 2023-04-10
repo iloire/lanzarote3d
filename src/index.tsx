@@ -44,7 +44,8 @@ interface AppProps {
 }
 
 interface AppState {
-  // Define your component state here
+  loadingProcess: number;
+  showAppSelection: boolean;
 }
 
 class App extends React.Component<AppProps, AppState> {
@@ -52,8 +53,9 @@ class App extends React.Component<AppProps, AppState> {
 
   state = {
     loadingProcess: 0,
-    sceneReady: false,
+    showAppSelection: false,
   };
+
   constructor(props: AppProps) {
     super(props);
     this.renderer = null;
@@ -130,9 +132,10 @@ class App extends React.Component<AppProps, AppState> {
     const story = urlParams.get("story");
     console.log("loading story:", story);
     if (story && Stories[story]) {
+      this.setState({ showAppSelection: false });
       await Stories[story](camera, scene, renderer, island, water, sky, gui);
     } else {
-      await Stories.game(camera, scene, renderer, island, water, sky, gui);
+      this.setState({ showAppSelection: true });
     }
 
     function animate() {
@@ -143,17 +146,42 @@ class App extends React.Component<AppProps, AppState> {
     console.log("triangles:", renderer.info.render.triangles);
   };
 
+  navigateTo(story: string) {
+    window.location.href = "?story=" + story;
+  }
+
   render() {
+    const { loadingProcess, showAppSelection } = this.state;
+
     return (
       <div className="lanzarote">
-        {this.state.loadingProcess === 100 ? (
+        {loadingProcess === 100 ? (
           ""
         ) : (
           <div className="loading">
-            <span className="progress">
-              LOADING {this.state.loadingProcess} %
-            </span>
+            <span className="progress">LOADING {loadingProcess} %</span>
           </div>
+        )}
+
+        {showAppSelection ? (
+          <div className="appOptions">
+            <button onClick={() => this.navigateTo("game")}>game</button>
+            <button onClick={() => this.navigateTo("workshop")}>
+              workshop
+            </button>
+            <button onClick={() => this.navigateTo("mechanics")}>
+              mechanics
+            </button>
+            <button onClick={() => this.navigateTo("paraglider")}>
+              paraglider
+            </button>
+            <button onClick={() => this.navigateTo("hangglider")}>
+              hangglider
+            </button>
+            <button onClick={() => this.navigateTo("terrain")}>terrain</button>
+          </div>
+        ) : (
+          ""
         )}
         <canvas className="webgl"></canvas>
       </div>

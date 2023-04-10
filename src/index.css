@@ -1,3 +1,9 @@
+.appOptions {
+  position: absolute;
+  top: 5%;
+  left: 40px;
+}
+
 .loading {
    position: absolute;
    top:40%;
