@@ -14,6 +14,10 @@ export default class Water {
       meshWater.rotation.x = -Math.PI / 2;
       return meshWater;
     } else {
+      function animate() {
+        water.material.uniforms["time"].value += 1.0 / 60.0;
+        requestAnimationFrame(animate);
+      }
       const water = new WaterEffect(waterGeometry, {
         // textureWidth: 512,
         // textureHeight: 512,
@@ -33,6 +37,7 @@ export default class Water {
         .copy(sunPosition)
         .normalize();
       water.receiveShadow = true;
+      animate();
       return water;
     }
   }

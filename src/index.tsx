@@ -135,7 +135,6 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     function animate() {
-      water.material.uniforms["time"].value += 1.0 / 60.0;
       requestAnimationFrame(animate);
       // stats.update();
     }
