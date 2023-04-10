@@ -7,7 +7,6 @@ const defaultManager = new THREE.LoadingManager();
 function modelLoader(url, draco: boolean, manager?: THREE.LoadingManager) {
   const man = manager || defaultManager;
   const loader = draco ? new DRACOLoader(man) : new GLTFLoader(man);
-  console.log(loader);
   if (draco) {
     // loader.setDecoderPath("/examples/jsm/libs/draco/");
     // loader.preload();
