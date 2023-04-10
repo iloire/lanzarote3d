@@ -49,7 +49,7 @@ class ParagliderModel {
     this.glider = new Glider();
     const wing = this.glider.createWing();
     wing.position.y = 80;
-    wing.position.x = 17;
+    wing.position.x = 22;
     model.add(wing);
 
     this.pilot = new Pilot({ helmetColor: 0xffff00 });
