@@ -152,6 +152,25 @@ class App extends React.Component<AppProps, AppState> {
 
   render() {
     const { loadingProcess, showAppSelection } = this.state;
+    const stories = [
+      { story: "game" },
+      { story: "workshop" },
+      { story: "mechanics" },
+      { story: "paraglider" },
+      { story: "hangglider" },
+      { story: "terrain" },
+      { story: "night" },
+      { story: "cloud" },
+      { story: "clouds" },
+      { story: "flyzones" },
+      { story: "daytime" },
+    ];
+
+    const buttons = stories.map((story) => (
+      <button onClick={() => this.navigateTo(story.story)}>
+        {story.story}
+      </button>
+    ));
 
     return (
       <div className="lanzarote">
@@ -163,26 +182,7 @@ class App extends React.Component<AppProps, AppState> {
           </div>
         )}
 
-        {showAppSelection ? (
-          <div className="appOptions">
-            <button onClick={() => this.navigateTo("game")}>game</button>
-            <button onClick={() => this.navigateTo("workshop")}>
-              workshop
-            </button>
-            <button onClick={() => this.navigateTo("mechanics")}>
-              mechanics
-            </button>
-            <button onClick={() => this.navigateTo("paraglider")}>
-              paraglider
-            </button>
-            <button onClick={() => this.navigateTo("hangglider")}>
-              hangglider
-            </button>
-            <button onClick={() => this.navigateTo("terrain")}>terrain</button>
-          </div>
-        ) : (
-          ""
-        )}
+        {showAppSelection ? <div className="appOptions">{buttons}</div> : ""}
         <canvas className="webgl"></canvas>
       </div>
     );
