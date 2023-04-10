@@ -317,8 +317,9 @@ class Paraglider extends THREE.EventDispatcher {
     const maxAngle = 75;
     const startRotation = this.mesh.rotation;
 
-    const yRotation = (this.mesh.rotation.y +=
-      -1 * yRotationIncrement * getRotationValue(this.wrapSpeed));
+    const yRotation =
+      this.mesh.rotation.y +
+      -1 * yRotationIncrement * getRotationValue(this.wrapSpeed);
 
     const validZAngle = THREE.MathUtils.clamp(zAngle, -1 * maxAngle, maxAngle);
     const zRotation = -1 * Math.abs(THREE.MathUtils.degToRad(validZAngle));
