@@ -39,7 +39,7 @@ class ParagliderModel {
       console.log("hide");
       this.pilot.hideHead();
     } else {
-      console.log("shiow");
+      console.log("show");
       this.pilot.showHead();
     }
   }
