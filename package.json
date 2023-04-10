@@ -8,7 +8,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-ga4": "^2.0.0",
-    "three": "^0.149.0"
+    "three": "^0.149.0",
+    "three-mesh-bvh": "^0.5.23"
   },
   "devDependencies": {
     "@babel/core": "^7.20.12",

@@ -3,6 +3,9 @@ import model from "../models/lanzarote.glb";
 import Models from "../utils/models";
 import textureImg from "../textures/mars1.jpg";
 import textureImgHeightMap from "../textures/h-map-lanzarote.png";
+import { MeshBVH, acceleratedRaycast } from "three-mesh-bvh";
+
+THREE.Mesh.prototype.raycast = acceleratedRaycast;
 
 const USE_BLENDER_MODEL = true;
 
@@ -18,6 +21,7 @@ const loadFromBlenderModel = async (manager: THREE.LoadingManager) => {
     // wireframe: true,
     depthTest: true,
   });
+  mesh.geometry.boundsTree = new MeshBVH(mesh.geometry);
   return mesh;
 };
 

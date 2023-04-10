@@ -81,6 +81,7 @@ const getTerrainHeightBelowPosition = (
     new THREE.Vector3(pos.x, 100000, pos.z), // big enough value for Y
     new THREE.Vector3(0, -1, 0) // vertical
   );
+  rayVertical.firstHitOnly = true;
   if (pos.y < 0) {
     return NaN; // below water
   }
