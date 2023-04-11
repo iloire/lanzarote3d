@@ -17,9 +17,7 @@ import { addGameEnvironment } from "./game/env";
 import locations from "./locations/lanzarote";
 import WindIndicator from "../components/wind-indicator";
 import Sky from "../components/sky";
-import rStats from "rStats";
-import glStats from "glStats";
-import threeStats from "threeStats";
+import PerfStats from "../utils/stats";
 
 const KMH_TO_MS = 3.6;
 
@@ -79,30 +77,7 @@ const Game = {
     sky: Sky,
     gui
   ) => {
-    const tS = new threeStats(renderer);
-    const glS = new glStats();
-    const rS = new rStats({
-      CSSPath: "https://spite.github.io/rstats/",
-      userTimingAPI: true,
-      values: {
-        frame: { caption: "Total frame time (ms)", over: 16 },
-        fps: { caption: "Framerate (FPS)", below: 30 },
-        calls: { caption: "Calls (three.js)", over: 3000 },
-        raf: { caption: "Time since last rAF (ms)" },
-        rstats: { caption: "rStats update (ms)" },
-      },
-      groups: [
-        { caption: "Framerate", values: ["fps", "raf"] },
-        {
-          caption: "Frame Budget",
-          values: ["frame", "texture", "setup", "render"],
-        },
-      ],
-      fractions: [{ base: "frame", steps: ["move", "render"] }],
-      plugins: [tS, glS],
-    });
-    const rsBase: any = document.getElementsByClassName("rs-base");
-    rsBase[0].style.display = "none";
+    const perfStats = new PerfStats(renderer, "rs-base");
 
     sky.updateSunPosition(TIME_OF_DAY);
 
@@ -119,7 +94,7 @@ const Game = {
       terrain,
       water,
       thermals,
-      rs: rS,
+      perfStats,
     };
 
     const pg = new Paraglider(pgOptions, envOptions, DEBUG);
@@ -138,16 +113,11 @@ const Game = {
       const keyCode = event.which;
       if (keyCode == 90) {
         //z
-        const rsBase: any = document.getElementsByClassName("rs-base");
         if (gui._hidden) {
-          if (rsBase.length) {
-            rsBase[0].style.display = "";
-          }
+          perfStats.show();
           gui.show();
         } else {
-          if (rsBase.length) {
-            rsBase[0].style.display = "none";
-          }
+          perfStats.hide();
           gui.hide();
         }
       } else if (keyCode == 77) {
@@ -364,29 +334,22 @@ const Game = {
         camera.zoomOut();
       }
 
-      glS.start();
-
-      rS("frame").start();
-      rS("rAF").tick();
-      rS("FPS").frame();
-
-      rS("tween").start();
-      TWEEN.update();
-      rS("tween").end();
-
-      rS("camera").start();
-      camera.update();
-      rS("camera").end();
-
-      rS("render").start();
-      renderer.render(scene, camera);
-      rS("render").end();
-
-      rS("frame").end();
-      rS().update();
+      perfStats.frameStart();
+      perfStats.wrapFunction("tween", () => {
+        TWEEN.update();
+      });
+      perfStats.wrapFunction("camera", () => {
+        camera.update();
+      });
+      perfStats.wrapFunction("render", () => {
+        renderer.render(scene, camera);
+      });
+      perfStats.frameEnd();
+      perfStats.update();
 
       requestAnimationFrame(animate);
     };
+
     animate();
 
     console.log("triangles:", renderer.info.render.triangles);

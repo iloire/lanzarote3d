@@ -111,7 +111,7 @@ export interface EnvOptions {
   terrain: THREE.Mesh;
   water: THREE.Mesh;
   thermals: Thermal[];
-  rs?: any; //stats
+  perfStats?: any; //stats
 }
 
 class Paraglider extends THREE.EventDispatcher {
@@ -140,7 +140,7 @@ class Paraglider extends THREE.EventDispatcher {
   rotationInertia = 0;
   debug: boolean;
   numberGroundTouches: number = 0;
-  rs: any; // stats
+  perfStats: any; // stats
 
   constructor(
     options: ParagliderConstructor,
@@ -155,7 +155,7 @@ class Paraglider extends THREE.EventDispatcher {
     this.terrain = envOptions.terrain;
     this.water = envOptions.water;
     this.thermals = envOptions.thermals;
-    this.rs = envOptions.rs;
+    this.perfStats = envOptions.perfStats;
   }
 
   isInsideThermal = (thermal: Thermal): boolean => {
@@ -222,7 +222,7 @@ class Paraglider extends THREE.EventDispatcher {
   tick(multiplier: number) {
     this.tickCounter++;
 
-    this.rs && this.rs("move").start();
+    this.perfStats && this.perfStats.startTick("move");
     this.move(multiplier);
 
     if (this.tickCounter % 5 === 0) {
@@ -310,7 +310,7 @@ class Paraglider extends THREE.EventDispatcher {
         vector: this.position(),
       });
     }
-    this.rs && this.rs("move").end();
+    this.perfStats && this.perfStats.endTick("move");
   }
 
   rotate(yRotationIncrement: number = 0, zAngle: number) {
