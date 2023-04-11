@@ -43,6 +43,10 @@ export default class PerfStats {
     this.container[0].style.display = "";
   }
 
+  isVisible() {
+    return this.container[0].style.display === "";
+  }
+
   startTick(name: string) {
     if (!name) {
       throw new Error("invalid name");

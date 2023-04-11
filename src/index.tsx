@@ -124,6 +124,19 @@ class App extends React.Component<AppProps, AppState> {
     camera.addGui(gui);
     scene.add(camera);
 
+    document.addEventListener("keydown", onDocumentKeyDown, false);
+    function onDocumentKeyDown(event) {
+      const keyCode = event.which;
+      if (keyCode == 90) {
+        //z
+        if (gui._hidden) {
+          gui.show();
+        } else {
+          gui.hide();
+        }
+      }
+    }
+
     // const helper = new THREE.CameraHelper(camera);
     // scene.add(helper);
 

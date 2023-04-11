@@ -113,12 +113,10 @@ const Game = {
       const keyCode = event.which;
       if (keyCode == 90) {
         //z
-        if (gui._hidden) {
-          perfStats.show();
-          gui.show();
-        } else {
+        if (perfStats.isVisible()) {
           perfStats.hide();
-          gui.hide();
+        } else {
+          perfStats.show();
         }
       } else if (keyCode == 77) {
         //m
