@@ -6,7 +6,7 @@ import Trajectory from "../elements/trajectory";
 import Paraglider, { ParagliderConstructor } from "../components/pg";
 import Weather, { WeatherOptions } from "../elements/weather";
 import WindIndicator from "../components/wind-indicator";
-import Environment from "./game/env";
+import { addGameEnvironment } from "./game/env";
 import Helpers from "../utils/helpers";
 import Stone from "../components/stone";
 import Tree from "../components/tree";
@@ -39,7 +39,7 @@ const Mechanics = {
     const weather = new Weather(WEATHER_SETTINGS);
     weather.addGui(gui);
 
-    const env = new Environment();
+    const env = addGameEnvironment(scene, terrain, weather, water, gui);
 
     const thermals = env.addThermals(scene, weather);
     env.addClouds(scene, weather, thermals);

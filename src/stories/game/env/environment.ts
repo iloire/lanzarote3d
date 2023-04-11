@@ -1,20 +1,20 @@
 import * as THREE from "three";
-import Clouds from "../../components/clouds";
-import Weather from "../../elements/weather";
-import Thermal, { ThermalDimensions } from "../../components/thermal";
-import { rndBetween, rndIntBetween } from "../../utils/math";
-import Tree from "../../components/tree";
-import PineTree from "../../components/pinetree";
-import Stone from "../../components/stone";
-import House, { HouseType } from "../../components/house";
-import Boat from "../../components/boat";
-import Birds from "../../components/birds";
+import Clouds from "../../../components/clouds";
+import Weather from "../../../elements/weather";
+import Thermal, { ThermalDimensions } from "../../../components/thermal";
+import { rndBetween, rndIntBetween } from "../../../utils/math";
+import Tree from "../../../components/tree";
+import PineTree from "../../../components/pinetree";
+import Stone from "../../../components/stone";
+import House, { HouseType } from "../../../components/house";
+import Boat from "../../../components/boat";
+import Birds from "../../../components/birds";
 import Paraglider, {
   ParagliderConstructor,
   EnvOptions,
-} from "../../components/pg";
-import HangGlider from "../../components/hangglider";
-import { addMeshAroundArea, generateThermalPair } from "./env/utils";
+} from "../../../components/pg";
+import HangGlider from "../../../components/hangglider";
+import { addMeshAroundArea, generateThermalPair } from "./utils";
 
 const KMH_TO_MS = 3.6;
 const THERMAL_OPACITY = 0.04;
@@ -34,6 +34,7 @@ const createPg = async (
 class Environment {
   birds: Birds;
   hg: HangGlider;
+  thermals: Thermal[] = [];
 
   updateWrapSpeed(wrapSpeed: number) {
     this.birds.updateWrapSpeed(wrapSpeed);
@@ -265,6 +266,9 @@ class Environment {
     allThermals.forEach((t) => {
       scene.add(t.getMesh());
     });
+
+    this.thermals.concat(allThermals);
+
     return allThermals;
   }
 
@@ -316,6 +320,10 @@ class Environment {
       scene.add(cloud);
     });
     return clouds;
+  }
+
+  getThermals(): Thermal[] {
+    return this.thermals;
   }
 }
 
