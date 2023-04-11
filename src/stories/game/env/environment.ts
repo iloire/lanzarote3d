@@ -42,8 +42,8 @@ class Environment {
   }
 
   updateWrapSpeed(wrapSpeed: number) {
-    this.birds.updateWrapSpeed(wrapSpeed);
-    this.hg.updateWrapSpeed(wrapSpeed);
+    this.birds && this.birds.updateWrapSpeed(wrapSpeed);
+    this.hg && this.hg.updateWrapSpeed(wrapSpeed);
   }
 
   async addBirds(path: THREE.Vector3[], gui?: any) {
