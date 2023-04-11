@@ -444,7 +444,17 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     const weatherInfo = (
       <div id="weather-info" className="UIBox">
         <div id="weather-direction">Wind direction: {windDirection}</div>
-        <div id="weather-speed">Wind speed: {windSpeed} km/h</div>
+        <div id="weather-speed">
+          Wind speed:{" "}
+          {windSpeed > 30 ? (
+            <span style={{ color: "red", fontWeight: "bold" }}>
+              {windSpeed}
+            </span>
+          ) : (
+            windSpeed
+          )}{" "}
+          km/h
+        </div>
         <div id="weather-lclLevel">LCL: {lclLevel} m.</div>
       </div>
     );
