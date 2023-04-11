@@ -35,26 +35,30 @@ class Environment {
   birds: Birds;
   hg: HangGlider;
   thermals: Thermal[] = [];
+  scene: THREE.Scene;
+
+  constructor(scene: THREE.Scene) {
+    this.scene = scene;
+  }
 
   updateWrapSpeed(wrapSpeed: number) {
     this.birds.updateWrapSpeed(wrapSpeed);
     this.hg.updateWrapSpeed(wrapSpeed);
   }
 
-  async addBirds(scene: THREE.Scene, path: THREE.Vector3[], gui?: any) {
+  async addBirds(path: THREE.Vector3[], gui?: any) {
     this.birds = new Birds();
     const birdsMesh = await this.birds.load(path, gui);
-    scene.add(birdsMesh);
+    this.scene.add(birdsMesh);
   }
 
-  async addHangGlider(scene: THREE.Scene, path: THREE.Vector3[], gui?: any) {
+  async addHangGlider(path: THREE.Vector3[], gui?: any) {
     this.hg = new HangGlider();
     const hgMesh = await this.hg.load(path, gui);
-    scene.add(hgMesh);
+    this.scene.add(hgMesh);
   }
 
   async addOtherGliders(
-    scene: THREE.Scene,
     weather: Weather,
     terrain: THREE.Mesh,
     water: THREE.Mesh
@@ -73,11 +77,11 @@ class Environment {
     };
     const pos = new THREE.Vector3(1379, 600, -545);
     const pg = await createPg(pgOptions, envOptions, pos);
-    scene.add(pg.getMesh());
+    this.scene.add(pg.getMesh());
 
     const pos2 = new THREE.Vector3(3379, 900, -1545);
     const pg2 = await createPg(pgOptions, envOptions, pos2);
-    scene.add(pg2.getMesh());
+    this.scene.add(pg2.getMesh());
 
     // const pos3 = new THREE.Vector3(379, 1200, -145);
     // const pg3 = await createPg(pgOptions, weather, terrain, water, pos3);
@@ -88,7 +92,7 @@ class Environment {
     // scene.add(pg4.getMesh());
   }
 
-  addBoats(scene: THREE.Scene, terrain: THREE.Mesh) {
+  addBoats(terrain: THREE.Mesh) {
     const boat = new Boat().load();
     const scale = 3;
     boat.scale.set(scale, scale, scale);
@@ -97,18 +101,18 @@ class Environment {
       new THREE.Vector3(7879, 0, -4445),
       5,
       terrain,
-      scene
+      this.scene
     );
     addMeshAroundArea(
       [boat],
       new THREE.Vector3(8279, 0, -6155),
       4,
       terrain,
-      scene
+      this.scene
     );
   }
 
-  addHouses(scene: THREE.Scene, terrain: THREE.Mesh) {
+  addHouses(terrain: THREE.Mesh) {
     const house = new House(HouseType.Medium).load();
     const house2 = new House(HouseType.Small).load();
 
@@ -117,7 +121,7 @@ class Environment {
       new THREE.Vector3(6879, 0, -545),
       20,
       terrain,
-      scene,
+      this.scene,
       70,
       9
     );
@@ -127,7 +131,7 @@ class Environment {
       new THREE.Vector3(6279, 0, -3155),
       40,
       terrain,
-      scene,
+      this.scene,
       40,
       10
     );
@@ -137,7 +141,7 @@ class Environment {
       new THREE.Vector3(7827, 0, -3460),
       10,
       terrain,
-      scene,
+      this.scene,
       20,
       11
     );
@@ -147,7 +151,7 @@ class Environment {
       new THREE.Vector3(-5200, 0, -480),
       10,
       terrain,
-      scene,
+      this.scene,
       40,
       9
     );
@@ -157,21 +161,21 @@ class Environment {
       new THREE.Vector3(5600, 0, 705),
       50,
       terrain,
-      scene,
+      this.scene,
       70,
       7
     );
   }
 
-  addStones(scene: THREE.Scene, terrain: THREE.Mesh) {
+  addStones(terrain: THREE.Mesh) {
     const stone = new Stone().load();
     const scale = 1;
     stone.scale.set(scale, scale, scale);
     const pos = new THREE.Vector3(6879, 600, -545);
-    addMeshAroundArea([stone], pos, 100, terrain, scene, 200, 2);
+    addMeshAroundArea([stone], pos, 100, terrain, this.scene, 200, 2);
   }
 
-  addTrees(scene: THREE.Scene, terrain: THREE.Mesh) {
+  addTrees(terrain: THREE.Mesh) {
     const tree = new Tree().load();
     const scale = 1;
     tree.scale.set(scale, scale, scale);
@@ -180,7 +184,7 @@ class Environment {
       new THREE.Vector3(6879, 0, -545),
       100,
       terrain,
-      scene,
+      this.scene,
       100,
       5
     );
@@ -189,7 +193,7 @@ class Environment {
       new THREE.Vector3(8879, 0, -2245),
       100,
       terrain,
-      scene,
+      this.scene,
       100,
       5
     );
@@ -198,7 +202,7 @@ class Environment {
       new THREE.Vector3(5600, 0, 705),
       100,
       terrain,
-      scene,
+      this.scene,
       40,
       5
     );
@@ -214,13 +218,13 @@ class Environment {
       new THREE.Vector3(8379, 0, -2145),
       100,
       terrain,
-      scene,
+      this.scene,
       400,
       5
     );
   }
 
-  addThermals(scene: THREE.Scene, weather: Weather): Thermal[] {
+  addThermals(weather: Weather): Thermal[] {
     const lclLevel = weather.getLclLevel();
     // famara
     const t1 = generateThermalPair(new THREE.Vector3(5727, 0, -535), weather);
@@ -264,7 +268,7 @@ class Environment {
       .concat(superT1);
 
     allThermals.forEach((t) => {
-      scene.add(t.getMesh());
+      this.scene.add(t.getMesh());
     });
 
     this.thermals.concat(allThermals);
@@ -273,7 +277,6 @@ class Environment {
   }
 
   async addClouds(
-    scene: THREE.Scene,
     weather: Weather,
     thermals: Thermal[]
   ): Promise<THREE.Object3D[]> {
@@ -304,7 +307,7 @@ class Environment {
       })
     );
     clouds.forEach((c) => {
-      scene.add(c);
+      this.scene.add(c);
     });
 
     // custom clouds
@@ -317,7 +320,7 @@ class Environment {
         1,
         new THREE.Vector3(pos.x, pos.y, pos.z)
       );
-      scene.add(cloud);
+      this.scene.add(cloud);
     });
     return clouds;
   }

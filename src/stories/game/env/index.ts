@@ -10,22 +10,21 @@ export const addGameEnvironment = (
   water: THREE.Mesh,
   gui?: any
 ): Environment => {
-  const env = new Environment();
+  const env = new Environment(scene);
 
-  const thermals = env.addThermals(scene, weather);
+  const thermals = env.addThermals(weather);
 
-  env.addClouds(scene, weather, thermals);
-  env.addTrees(scene, terrain);
-  env.addStones(scene, terrain);
-  env.addHouses(scene, terrain);
-  env.addBoats(scene, water);
+  env.addClouds(weather, thermals);
+  env.addTrees(terrain);
+  env.addStones(terrain);
+  env.addHouses(terrain);
+  env.addBoats(water);
   const birdsPath = [
     { x: 7500, y: 1090, z: -1068 },
     { x: 6500, y: 1190, z: -1368 },
     { x: 4500, y: 1390, z: -1768 },
   ];
   env.addBirds(
-    scene,
     birdsPath.map((p) => new THREE.Vector3(p.x, p.y, p.z)),
     gui
   );
@@ -38,7 +37,6 @@ export const addGameEnvironment = (
     { x: 11000, y: 2790, z: -7468 },
   ];
   env.addHangGlider(
-    scene,
     hgPath.map((p) => new THREE.Vector3(p.x, p.y, p.z)),
     gui
   );
