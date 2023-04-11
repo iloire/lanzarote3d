@@ -193,6 +193,7 @@ class Paraglider extends THREE.EventDispatcher {
       mesh.add(createTrajectoryArrow(this.glidingRatio(), arrowLen, 0xff00ff));
       mesh.add(createLiftArrow(this.glidingRatio(), arrowLen, 0xffffff));
       mesh.add(createGravityArrow(mesh, arrowLen));
+      this.paragliderModel.showAxesHelper();
     }
     return mesh;
   }

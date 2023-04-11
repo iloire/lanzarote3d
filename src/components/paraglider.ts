@@ -10,6 +10,15 @@ class ParagliderModel {
   glider: Glider;
   pilot: Pilot;
   pilotMesh: THREE.Object3D;
+  axesHelper: THREE.AxesHelper;
+
+  showAxesHelper() {
+    this.axesHelper.visible = true;
+  }
+
+  toggleAxesHelper() {
+    this.axesHelper.visible = !this.axesHelper.visible;
+  }
 
   breakLeft() {
     this.glider.breakLeft();
@@ -67,6 +76,10 @@ class ParagliderModel {
       GuiHelper.addLocationGui(gui, "Pilot model", this.pilotMesh);
       GuiHelper.addLocationGui(gui, "Paraglider model", mesh);
     }
+
+    this.axesHelper = new THREE.AxesHelper(100);
+    this.axesHelper.visible = false;
+    mesh.add(this.axesHelper);
     return mesh;
   }
 
