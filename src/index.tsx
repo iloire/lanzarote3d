@@ -180,7 +180,7 @@ class App extends React.Component<AppProps, AppState> {
     ];
 
     const buttons = stories.map((story) => (
-      <button onClick={() => this.navigateTo(story.story)}>
+      <button key={story.story} onClick={() => this.navigateTo(story.story)}>
         {story.story}
       </button>
     ));
