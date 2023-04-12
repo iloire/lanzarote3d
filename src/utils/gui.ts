@@ -10,7 +10,7 @@ const GuiHelper = {
     gui,
     name: string,
     rotation: THREE.Euler,
-    options: GuiHelperOptions = { min: -Math.PI, max: Math.PI }
+    options: GuiHelperOptions = { min: -2 * Math.PI, max: 2 * Math.PI }
   ) => {
     const { min, max } = options;
     const g = gui.addFolder(name);
