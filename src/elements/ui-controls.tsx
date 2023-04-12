@@ -208,7 +208,6 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
 
   onDocumentKeyDown = (event) => {
     const keyCode = event.which;
-    console.log(keyCode);
     if (keyCode === 49) {
       //1
       this.handleWrapChange(1);
