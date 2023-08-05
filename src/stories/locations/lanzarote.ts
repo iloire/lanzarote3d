@@ -18,7 +18,7 @@ const locations: Location[] = [
     lookAt: new THREE.Vector3(-5127, 580, -255),
     idealWindDirectionDegreesFromNorth: 350,
     idealSunPositionDegrees: 30,
-    availableForPlaying: false,
+    availableForPlaying: true,
   },
   {
     title: "Mirador",
