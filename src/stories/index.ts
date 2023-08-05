@@ -5,9 +5,9 @@ import Mechanics from "./mechanics";
 import DayTime from "./daytime";
 import Night from "./night";
 import Terrain from "./terrain";
-import Workshop from "./workshop";
+// import Workshop from "./workshop";
 import Paraglider from "./paraglider";
-import HangGlider from "./hangglider";
+// import HangGlider from "./hangglider";
 import Cloud from "./cloud";
 import Clouds from "./clouds";
 
@@ -19,9 +19,9 @@ const Stories = {
   daytime: DayTime.load,
   night: Night.load,
   terrain: Terrain.load,
-  workshop: Workshop.load,
-  paraglider: Paraglider.load,
-  hangglider: HangGlider.load,
+  // workshop: Workshop.load,
+  // paraglider: Paraglider.load,
+  // hangglider: HangGlider.load,
   cloud: Cloud.load,
   clouds: Clouds.load,
 };

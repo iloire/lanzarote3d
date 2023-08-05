@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import * as CANNON from "cannon";
 
 const Helpers = {
   drawSphericalPosition: (
@@ -38,6 +39,12 @@ const Helpers = {
     const axesHelper = new THREE.AxesHelper(axesHelperLength);
     // The X axis is red. The Y axis is green. The Z axis is blue.
     return axesHelper;
+  },
+
+  createArrowHelperForVec3: function (vector: CANNON.Vec3, len) {
+    const vec = new THREE.Vector3(vector.x, vector.y, vector.z);
+    const arrowHelper = new THREE.ArrowHelper(vec, vec, len);
+    return arrowHelper;
   },
 
   getGrid: (pos: THREE.Vector3) => {

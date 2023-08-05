@@ -3,7 +3,7 @@ import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 import Models from "../utils/models";
 import Weather from "../elements/weather";
 import Thermal from "../components/thermal";
-import ParagliderModel from "../components/paraglider";
+import ParagliderModel from "../models/threejs/paraglider";
 import GuiHelper from "../utils/gui";
 import { TrajectoryPoint, TrajectoryPointType } from "../elements/trajectory";
 

@@ -1,23 +1,14 @@
 import * as THREE from "three";
+import * as CANNON from "cannon-es";
 import Controls from "../utils/controls";
 
 import Sky from "../components/sky";
-import Trajectory from "../elements/trajectory";
-import Paraglider, { ParagliderConstructor } from "../components/pg";
-import Weather, { WeatherOptions } from "../elements/weather";
+import World from "../components/world";
 import WindIndicator from "../components/wind-indicator";
-import { addGameEnvironment } from "./game/env";
 import Helpers from "../utils/helpers";
-import Stone from "../components/stone";
-import Tree from "../components/tree";
+import Paraglider from "../components/paraglider";
 
 const KMH_TO_MS = 3.6;
-
-const WEATHER_SETTINGS: WeatherOptions = {
-  windDirectionDegreesFromNorth: 310,
-  speedMetresPerSecond: 18 / KMH_TO_MS,
-  lclLevel: 1800,
-};
 
 const p = {
   scale: 10,
@@ -28,94 +19,29 @@ const Mechanics = {
   load: async (
     camera: THREE.PerspectiveCamera,
     scene: THREE.Scene,
-    renderer,
+    renderer: THREE.WebGLRenderer,
     terrain: THREE.Mesh,
     water: THREE.Mesh,
     sky: Sky,
     gui
   ) => {
+    terrain.visible = false;
+
     const controls = Controls.createControls(camera, renderer);
-
-    const weather = new Weather(WEATHER_SETTINGS);
-    weather.addGui(gui);
-
-    const env = addGameEnvironment(scene, terrain, weather, water, gui);
-
-    const thermals = env.addThermals(weather);
-    env.addClouds(weather, thermals);
 
     sky.updateSunPosition(20);
 
-    const pgOptions: ParagliderConstructor = {
-      glidingRatio: 9,
-      trimSpeed: 25 / KMH_TO_MS,
-      fullSpeedBarSpeed: 35 / KMH_TO_MS,
-      bigEarsSpeed: 18 / KMH_TO_MS,
-    };
-    const envOptions = {
-      weather,
-      terrain,
-      water,
-      thermals,
-    };
-    const pg = new Paraglider(pgOptions, envOptions);
-    const mesh = await pg.loadModel(p.scale);
-    mesh.position.copy(p.position);
-    pg.addGui(gui);
-    pg.init();
-    scene.add(mesh);
-
-    // const fogColor = 0x000000;
-    // scene.fog = new THREE.FogExp2(fogColor, 0.00001);
-
-    const windIndicator = new WindIndicator(4000);
-    const arrow = windIndicator.load(330, pg.position());
-    scene.add(arrow);
-
-    // Helpers.drawPoint(scene, sky.getSunPosition());
-
-    // const findCameraIntercept = () => {
-    //   const raycaster = new THREE.Raycaster(
-    //     pg.position(),
-    //     camera.position.clone().sub(pg.position()).normalize()
-    //   );
-    //   const intersects = raycaster.intersectObject(terrain);
-    //   if (intersects.length > 0) {
-    //     console.log("camera intersects", intersects);
-    //     const distance = intersects[0].distance;
-    //     console.log(distance);
-    //     const newPosition = new THREE.Vector3().addVectors(
-    //       camera.position,
-    //       raycaster.ray.direction.multiplyScalar(-1 * distance)
-    //     );
-    //     camera.position.copy(newPosition);
-    //   }
-    // };
-
-    // const stone = new Stone().load();
-    // stone.position.set(0, 1000, 0);
-    // stone.scale.set(100, 100, 100);
-    // scene.add(stone);
-    //
-    // const tree = new Tree().load();
-    // tree.position.set(0, 400, 0);
-    // tree.scale.set(10, 10, 10);
-    // scene.add(tree);
-
-    renderer.render(scene, camera); // render before adding trees
-    env.addTrees(terrain);
+    const world = new World(scene, renderer, camera);
+    const paraglider = new Paraglider();
+    paraglider.addToWorld(world);
 
     const animate = () => {
-      // findCameraIntercept();
+      world.step();
       requestAnimationFrame(animate);
-      renderer.render(scene, camera);
-      // camera.lookAt(sky.getSunPosition());
-      // camera.lookAt(pg.position());
-      // controls.target = pg.position();
     };
 
-    camera.position.set(4200, 12500, -23200);
-    camera.lookAt(mesh.position);
+    camera.position.set(14200, 9500, 8200);
+    camera.lookAt(0, 0, 0);
     animate();
   },
 };

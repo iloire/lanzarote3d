@@ -3,4 +3,6 @@ const rndIntBetween = (min: number, max: number) =>
 
 const rndBetween = (min, max) => Math.random() * (max - min) + min;
 
-export { rndIntBetween, rndBetween };
+const G = -9.82;
+
+export { rndIntBetween, rndBetween, G };

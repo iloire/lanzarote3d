@@ -1,91 +1,104 @@
 import * as THREE from "three";
-import Pilot from "./pilot";
-import Glider from "./parts/glider";
-import GuiHelper from "../utils/gui";
-import Models from "../utils/models";
+import * as CANNON from "cannon-es";
+import { IWorldEntity } from "../interfaces/IWorldEntity";
+import World from "./world";
+import Glider from "../models/threejs/parts/glider";
+import Helpers from "../utils/helpers";
+import { G } from "../utils/math";
+import { threeQuat } from "../utils/conversions";
 
-const BREAK_ROTATION = 0.05;
+class Paraglider extends THREE.Object3D implements IWorldEntity {
+  wingBody: CANNON.Body;
+  pilotBody: CANNON.Body;
+  modelContainer: THREE.Group;
+  isLeftBreakEngaged: boolean;
+  isRightBreakEngaged: boolean;
 
-class ParagliderModel {
-  glider: Glider;
-  pilot: Pilot;
-  pilotMesh: THREE.Object3D;
-  axesHelper: THREE.AxesHelper;
+  constructor() {
+    super();
 
-  showAxesHelper() {
-    this.axesHelper.visible = true;
+    this.modelContainer = new THREE.Group();
+    this.add(this.modelContainer);
+
+    // wing
+    const glider = new Glider();
+    const wing = glider.createWing();
+    wing.visible = false;
+    this.modelContainer.add(wing);
+
+    // Create a box for the wing
+    const wingShape = new CANNON.Box(new CANNON.Vec3(1000, 100, 100));
+    this.wingBody = new CANNON.Body({ mass: 20, shape: wingShape });
+    this.wingBody.fixedRotation = true;
+    this.wingBody.linearDamping = 0.1;
+    this.wingBody.updateMassProperties();
+    this.wingBody.position.set(0, 2400, 0);
+
+    // Create a box for the pilot
+    const pilotShape = new CANNON.Box(new CANNON.Vec3(20, 20, 20));
+    this.pilotBody = new CANNON.Body({ mass: 80, shape: pilotShape });
+    this.pilotBody.fixedRotation = true;
+    this.pilotBody.linearDamping = 0.1;
+    this.pilotBody.updateMassProperties();
+    this.pilotBody.position.set(0, 2000, 0);
+
+    document.addEventListener("keydown", this.onKeyDown, false);
+    document.addEventListener("keyup", this.onKeyUp, false);
   }
 
-  toggleAxesHelper() {
-    this.axesHelper.visible = !this.axesHelper.visible;
+  onKeyDown = (event: KeyboardEvent) => {
+    if (event.code === "KeyA") {
+      this.isLeftBreakEngaged = true;
+    }
+  };
+
+  onKeyUp = (event: KeyboardEvent) => {
+    if (event.code === "KeyA") {
+      this.isLeftBreakEngaged = false;
+    }
+  };
+
+  addToWorld(world: World) {
+    world.addBody(this.wingBody);
+    world.addBody(this.pilotBody);
+    const constraint = new CANNON.DistanceConstraint(
+      this.pilotBody,
+      this.wingBody,
+      900
+    );
+    world.addConstraint(constraint);
+    world.addUpdatableEntity(this);
+    // world.addGraphicsObject(this.modelContainer);
   }
 
-  breakLeft() {
-    this.glider.breakLeft();
-    this.pilot.breakLeft();
+  applyLift() {
+    const quat = threeQuat(this.wingBody.quaternion);
+    // const up = new THREE.Vector3(0, 0, 1).applyQuaternion(quat);
+
+    const weight = -G * (this.pilotBody.mass + this.wingBody.mass);
+    const lift = weight / 1;
+    const liftForce = new CANNON.Vec3(0, weight, 0);
+    const liftForcePoint = this.wingBody.position;
+    this.wingBody.applyForce(liftForce, liftForcePoint);
   }
 
-  breakRight() {
-    this.glider.breakRight();
-    this.pilot.breakRight();
-  }
+  applyForces() {
+    this.applyLift();
 
-  handsUp() {
-    this.glider.handsUp();
-    this.pilot.handsUp();
-  }
-
-  speedBar() {
-    this.pilot.speedBar();
-  }
-
-  releaseSpeedBar() {
-    this.pilot.releaseSpeedBar();
-  }
-
-  setFirstPersonView(isFirstPersonView: boolean) {
-    if (isFirstPersonView) {
-      console.log("hide");
-      this.pilot.hideHead();
-    } else {
-      console.log("show");
-      this.pilot.showHead();
+    // breaks
+    if (this.isLeftBreakEngaged) {
+      // const force = new CANNON.Vec3(1200, 10, 1000);
+      // this.wingBody.angularVelocity.set(Math.PI / 20, 0, 0); // Rotate around Y axis at 360 degrees per second
+      // const forcePoint = this.wingBody.position.clone();
+      // this.wingBody.applyForce(force, forcePoint);
+      const torque = new CANNON.Vec3(1000, 100, 1000); // Apply torque around the Y-axis
+      this.wingBody.applyTorque(torque);
     }
   }
 
-  async load(gui?: any): Promise<THREE.Object3D> {
-    const mesh = new THREE.Object3D();
-    this.glider = new Glider();
-
-    const wing = this.glider.createWing();
-    wing.position.y = 80;
-    wing.position.x = 22;
-    mesh.add(wing);
-
-    this.pilot = new Pilot({ helmetColor: 0xffff00 });
-    this.pilotMesh = this.pilot.load();
-
-    const scale = 0.03;
-    this.pilotMesh.scale.set(scale, scale, scale);
-    this.pilotMesh.position.x = 17;
-    this.pilotMesh.position.z = -0.4;
-    this.pilotMesh.rotateY(Math.PI / 2);
-    mesh.add(this.pilotMesh);
-
-    if (gui) {
-      GuiHelper.addLocationGui(gui, "Pilot model", this.pilotMesh);
-      GuiHelper.addLocationGui(gui, "Paraglider model", mesh);
-    }
-
-    this.axesHelper = new THREE.AxesHelper(100);
-    this.axesHelper.visible = false;
-    mesh.add(this.axesHelper);
-    return mesh;
-  }
-
-  getPilotPosition(): THREE.Vector3 {
-    return this.pilotMesh.position.clone();
+  update(): void {
+    this.applyForces();
   }
 }
 
-export default ParagliderModel;
+export default Paraglider;

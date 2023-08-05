@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import GuiHelper from "../utils/gui";
 import Models from "../utils/models";
-import model from "../models/birds.glb";
+import model from "../models/glb/birds.glb";
 import AutoFlier from "./base/auto-flier";
 
 const mat = new THREE.MeshLambertMaterial({ color: 0xffffff });

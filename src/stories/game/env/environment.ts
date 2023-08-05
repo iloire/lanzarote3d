@@ -13,7 +13,7 @@ import Paraglider, {
   ParagliderConstructor,
   EnvOptions,
 } from "../../../components/pg";
-import HangGlider from "../../../components/hangglider";
+import HangGlider from "../../../models/threejs/hangglider";
 import { addMeshAroundArea, generateThermalPair } from "./utils";
 
 const KMH_TO_MS = 3.6;
@@ -43,7 +43,7 @@ class Environment {
 
   updateWrapSpeed(wrapSpeed: number) {
     this.birds && this.birds.updateWrapSpeed(wrapSpeed);
-    this.hg && this.hg.updateWrapSpeed(wrapSpeed);
+    // this.hg && this.hg.updateWrapSpeed(wrapSpeed);
   }
 
   async addBirds(path: THREE.Vector3[], gui?: any) {
@@ -52,11 +52,11 @@ class Environment {
     this.scene.add(birdsMesh);
   }
 
-  async addHangGlider(path: THREE.Vector3[], gui?: any) {
-    this.hg = new HangGlider();
-    const hgMesh = await this.hg.load(path, gui);
-    this.scene.add(hgMesh);
-  }
+  // async addHangGlider(path: THREE.Vector3[], gui?: any) {
+  //   this.hg = new HangGlider();
+  //   const hgMesh = await this.hg.load(path, gui);
+  //   this.scene.add(hgMesh);
+  // }
 
   async addOtherGliders(
     weather: Weather,

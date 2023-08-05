@@ -3,7 +3,7 @@ import Controls from "../utils/controls";
 import Sky from "../components/sky";
 import React from "react";
 import { createRoot } from "react-dom/client";
-import Paraglider from "../components/paraglider";
+import Paraglider from "../models/threejs//paraglider";
 import Helpers from "../utils/helpers";
 
 const ParagliderWorkshop = {

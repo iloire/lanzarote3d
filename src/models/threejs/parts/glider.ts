@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import GuiHelper from "../../utils/gui";
+import GuiHelper from "../../../utils/gui";
 
 const mat_wing = new THREE.MeshLambertMaterial({ color: 0x00ffff });
 const mat_break = new THREE.MeshLambertMaterial({ color: 0xffffff });

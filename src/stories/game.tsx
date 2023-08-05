@@ -1,6 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import * as THREE from "three";
+import * as CANNON from "cannon-es";
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 import BackgroundSound from "../audio/background";
 import Paraglider, { ParagliderConstructor } from "../components/pg";
@@ -18,6 +19,7 @@ import locations from "./locations/lanzarote";
 import WindIndicator from "../components/wind-indicator";
 import Sky from "../components/sky";
 import PerfStats from "../utils/stats";
+import { CannonDebugRenderer } from "../lib/cannon/CannonDebugRenderer";
 
 const KMH_TO_MS = 3.6;
 
@@ -203,7 +205,7 @@ const Game = {
             gameStatus === GameStatus.Started ||
             gameStatus === GameStatus.Paused
           ) {
-            finishGame();
+            // finishGame();
             fnHideButtons();
           }
         }}
@@ -258,30 +260,28 @@ const Game = {
     );
     root.render(uiControls);
 
-    function touchedGround() {}
-
-    function finishGame() {
-      analytics.trackEvent("game-crash", pg.getTrajectory().length.toString());
-      vario.stop();
-      bgMusic.stop();
-      pg.stop();
-
-      const trajectory = new Trajectory(pg.getTrajectory(), 15);
-      scene.add(trajectory.getMesh());
-      camera.setCameraMode(CameraMode.OrbitControl, pg);
-
-      const trajectoryPoints = trajectory.getPoints();
-      if (trajectoryPoints.length) {
-        const first = trajectoryPoints[0];
-        camera.animateTo(
-          first.vector.add(
-            new THREE.Vector3(0, 30, 0).add(weather.getWindVelocity(-250))
-          ),
-          pg.position()
-        );
-      }
-      gameStatus = GameStatus.Finished;
-    }
+    // function finishGame() {
+    //   analytics.trackEvent("game-crash", pg.getTrajectory().length.toString());
+    //   vario.stop();
+    //   bgMusic.stop();
+    //   pg.stop();
+    //
+    //   const trajectory = new Trajectory(pg.getTrajectory(), 15);
+    //   scene.add(trajectory.getMesh());
+    //   camera.setCameraMode(CameraMode.OrbitControl, pg);
+    //
+    //   const trajectoryPoints = trajectory.getPoints();
+    //   if (trajectoryPoints.length) {
+    //     const first = trajectoryPoints[0];
+    //     camera.animateTo(
+    //       first.vector.add(
+    //         new THREE.Vector3(0, 30, 0).add(weather.getWindVelocity(-250))
+    //       ),
+    //       pg.position()
+    //     );
+    //   }
+    //   gameStatus = GameStatus.Finished;
+    // }
 
     function startGame(options: GameStartOptions) {
       analytics.trackEvent("game-start");
@@ -303,20 +303,43 @@ const Game = {
       gameStatus = GameStatus.Started;
     }
 
-    pg.addEventListener("touchedGround", touchedGround);
-    pg.addEventListener("crashed", finishGame);
+    // pg.addEventListener("crashed", finishGame);
 
     addWindIndicatorToScene(scene, pg, weather);
 
     renderer.render(scene, camera); // must render before adding trees
 
-    // Game start
     pg.setPosition(locations[0].position);
     pg.getMesh().rotation.y = 1.2; // TODO: should implemente a setDirection on pg
     setCameraMode(CameraMode.FirstPersonView);
     camera.lookAt(locations[0].lookAt);
 
+    // ==== CANNON ===================
+    // const physicsWorld = new CANNON.World({
+    //   gravity: new CANNON.Vec3(0, -9.2, 0),
+    // });
+    // const paragliderBody = new CANNON.Body({
+    //   mass: 1,
+    //   position: new CANNON.Vec3(
+    //     pg.position().x,
+    //     pg.position().y,
+    //     pg.position().z
+    //   ),
+    //   shape: new CANNON.Box(new CANNON.Vec3(30, 30, 30)),
+    // });
+    // physicsWorld.addBody(paragliderBody);
+
     const animate = () => {
+      // cannon
+      // physicsWorld.step(1 / 60); // seconds
+      // pg.setPosition(
+      //   new THREE.Vector3(
+      //     paragliderBody.position.x,
+      //     paragliderBody.position.y,
+      //     paragliderBody.position.z
+      //   )
+      // );
+
       box.update();
       vario.updateReading(pg.altitude());
       if (isLeftViewing) {

@@ -1,20 +1,16 @@
 import * as THREE from "three";
 import Pilot from "./pilot";
 import Wing from "./parts/wing";
-import GuiHelper from "../utils/gui";
-import Models from "../utils/models";
-import AutoFlier from "./base/auto-flier";
+import GuiHelper from "../../utils/gui";
+import Models from "../../utils/models";
 
 const BREAK_ROTATION = 0.05;
 
-class HangGliderModel extends AutoFlier {
+class HangGliderModel {
   wing: Wing;
   pilot: Pilot;
 
-  async load(path: THREE.Vector3[], gui?: any): Promise<THREE.Mesh> {
-    this.path = path;
-    this.mesh = new THREE.Mesh();
-
+  async load(gui?: any): Promise<THREE.Object3D> {
     // wing
     const wing = new Wing();
     const wingMesh = await wing.load();
@@ -30,27 +26,15 @@ class HangGliderModel extends AutoFlier {
     pilotMesh.position.z = -0.4;
     pilotMesh.rotateY(Math.PI / 2);
 
-    this.mesh.add(pilotMesh);
-    this.mesh.add(wingMesh);
-
-    if (path.length > 1) {
-      this.mesh.position.copy(path[0]);
-    }
+    const group = new THREE.Group();
+    group.add(pilotMesh);
+    group.add(wingMesh);
 
     if (gui) {
       GuiHelper.addLocationGui(gui, "Hanglider pilot", pilotMesh);
-      GuiHelper.addLocationGui(gui, "Hanglider", this.mesh);
+      GuiHelper.addLocationGui(gui, "Hanglider", group);
     }
-
-    this.animate();
-    return this.mesh;
-  }
-
-  animate() {
-    if (this.path.length) {
-      this.move();
-    }
-    requestAnimationFrame(() => this.animate());
+    return group;
   }
 }
 
