@@ -2,22 +2,25 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import * as THREE from "three";
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
-import BackgroundSound from "../audio/background";
-import Paraglider, { ParagliderConstructor } from "../components/pg";
-import Animations from "../utils/animations";
-import Helpers from "../utils/helpers";
-import Vario from "../audio/vario";
-import Weather, { WeatherOptions } from "../elements/weather";
-import Camera, { CameraMode } from "../components/camera";
-import UIControls, { View, FirstPersonViewLook } from "../elements/ui-controls";
-import Trajectory from "../elements/trajectory";
-import Analytics from "../elements/analytics";
-import { GameStartOptions, GameStatus } from "../stories/game/types";
-import { addGameEnvironment } from "./game/env";
-import locations from "./locations/lanzarote";
-import WindIndicator from "../components/wind-indicator";
-import Sky from "../components/sky";
-import PerfStats from "../utils/stats";
+import BackgroundSound from "../../audio/background";
+import Paraglider, { ParagliderConstructor } from "../../components/pg";
+import Animations from "../../utils/animations";
+import Helpers from "../../utils/helpers";
+import Vario from "../../audio/vario";
+import Weather, { WeatherOptions } from "../../elements/weather";
+import Camera, { CameraMode } from "../../components/camera";
+import UIControls, {
+  View,
+  FirstPersonViewLook,
+} from "../../elements/ui-controls";
+import Trajectory from "../../elements/trajectory";
+import Analytics from "../../elements/analytics";
+import { GameStartOptions, GameStatus } from "./types";
+import { addGameEnvironment } from "./env";
+import locations from "../locations/lanzarote";
+import WindIndicator from "../../components/wind-indicator";
+import Sky from "../../components/sky";
+import PerfStats from "../../utils/stats";
 
 const KMH_TO_MS = 3.6;
 
