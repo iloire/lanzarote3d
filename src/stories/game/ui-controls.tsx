@@ -1,13 +1,13 @@
 import React from "react";
 import * as THREE from "three";
-import { CameraMode } from "../components/camera";
-import Paraglider from "../components/pg";
-import Vario from "../audio/vario";
-import Weather from "../elements/weather";
-import arrowLeftImg from "../img/left-chevron.png";
-import arrowRightImg from "../img/right-chevron.png";
-import { GameStartOptions } from "../stories/game/types";
-import { Location } from "../stories/locations/index";
+import { CameraMode } from "../../components/camera";
+import Paraglider from "../../components/pg";
+import Vario from "../../audio/vario";
+import Weather from "../../elements/weather";
+import arrowLeftImg from "../../img/left-chevron.png";
+import arrowRightImg from "../../img/right-chevron.png";
+import { GameStartOptions } from "./types";
+import { Location } from "../../stories/locations/index";
 
 const KMH_TO_MS = 3.6;
 
