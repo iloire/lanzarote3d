@@ -24,6 +24,7 @@ const KMH_TO_MS = 3.6;
 const FOG_ENABLED = true;
 const TIME_OF_DAY = 20;
 const START_WITH_SOUND = false;
+const INITIAL_CAMERA_MODE = CameraMode.FollowTarget;
 const DEBUG = false;
 
 const settings = {
@@ -187,7 +188,7 @@ const Game = {
         weather={weather}
         showDebugInfo={true}
         defaultGameSpeed={3}
-        defaultCameraMode={CameraMode.FirstPersonView}
+        defaultCameraMode={INITIAL_CAMERA_MODE}
         onLeftBreak={() => {
           pg.leftBreakInput();
         }}
@@ -282,7 +283,7 @@ const Game = {
 
       const trajectory = new Trajectory(pg.getTrajectory(), 15);
       scene.add(trajectory.getMesh());
-      camera.setCameraMode(CameraMode.OrbitControl, pg);
+      setCameraMode(CameraMode.OrbitControl);
 
       const trajectoryPoints = trajectory.getPoints();
       if (trajectoryPoints.length) {
@@ -307,7 +308,7 @@ const Game = {
       }
       pg.setPosition(options.startingLocation.position);
       pg.init();
-      camera.setCameraMode(CameraMode.FirstPersonView, pg);
+      setCameraMode(INITIAL_CAMERA_MODE);
       if (FOG_ENABLED) {
         const fogColor = 0x000000;
         // const fog = new THREE.FogExp2(fogColor, 0.0002);

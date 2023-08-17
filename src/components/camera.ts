@@ -5,6 +5,9 @@ import Animations from "../utils/animations";
 import Controls from "../utils/controls";
 import GuiHelper from "../utils/gui";
 
+const DEFAULT_FOLLOW_DISTANCE = 30;
+const DEFAULT_ANGLE = Math.PI / 1.4;
+
 const getObjectPosition = (obj: THREE.Object3D) => {
   const pos = new THREE.Vector3();
   obj.getWorldPosition(pos);
@@ -24,9 +27,9 @@ class Camera extends THREE.PerspectiveCamera {
   target: Paraglider;
   terrain: THREE.Mesh;
   controls: OrbitControls;
-  angle: number = 0;
+  angle: number = DEFAULT_ANGLE;
   angleIncrement: number = 0.05;
-  distance: number = 10;
+  distance: number = DEFAULT_FOLLOW_DISTANCE;
   distanceIncrement: number = 2;
   firstPersonViewOffset: THREE.Vector3 = new THREE.Vector3(0, 0.1, 0);
   farAwayOffset: THREE.Vector3 = new THREE.Vector3(-1302, 700, 1301.2);
@@ -63,6 +66,8 @@ class Camera extends THREE.PerspectiveCamera {
         max: 20,
       }
     );
+    const g = gui.addFolder("Camera.followTarget");
+    g.add(this, "angle", -Math.PI, Math.PI).name("angle").listen();
   }
 
   update() {
