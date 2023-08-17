@@ -108,10 +108,15 @@ const Game = {
     scene.add(pgMesh);
 
     document.addEventListener("keydown", onDocumentKeyDown, false);
+    document.addEventListener("keyup", onDocumentKeyUp, false);
 
     function onDocumentKeyDown(event) {
       const keyCode = event.which;
-      if (keyCode == 90) {
+      if (keyCode === 37) {
+        isLeftViewing = true;
+      } else if (keyCode === 39) {
+        isRightViewing = true;
+      } else if (keyCode == 90) {
         //z
         if (perfStats.isVisible()) {
           perfStats.hide();
@@ -128,6 +133,15 @@ const Game = {
       } else if (keyCode == 69) {
         //s
         pg.toggleEars();
+      }
+    }
+
+    function onDocumentKeyUp(event) {
+      const keyCode = event.which;
+      if (keyCode === 37) {
+        isLeftViewing = false;
+      } else if (keyCode === 39) {
+        isRightViewing = false;
       }
     }
 
