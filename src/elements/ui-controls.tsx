@@ -208,7 +208,11 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
 
   onDocumentKeyDown = (event) => {
     const keyCode = event.which;
-    if (keyCode === 49) {
+    if (keyCode === 37) {
+      this.handleView(View.Left);
+    } else if (keyCode === 39) {
+      this.handleView(View.Right);
+    } else if (keyCode === 49) {
       //1
       this.handleWrapChange(1);
     } else if (keyCode === 50) {
@@ -257,7 +261,11 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
 
   onDocumentKeyUp = (event) => {
     const keyCode = event.which;
-    if (keyCode == 65) {
+    if (keyCode === 37) {
+      this.handleView(View.LeftRelease);
+    } else if (keyCode === 39) {
+      this.handleView(View.RightRelease);
+    } else if (keyCode == 65) {
       //a
       this.handleLeftRelease();
     } else if (keyCode == 68) {
