@@ -23,7 +23,7 @@ const KMH_TO_MS = 3.6;
 
 const FOG_ENABLED = true;
 const TIME_OF_DAY = 20;
-const START_WITH_SOUND = false;
+const START_WITH_SOUND = true;
 const INITIAL_CAMERA_MODE = CameraMode.FollowTarget;
 const DEBUG = false;
 
