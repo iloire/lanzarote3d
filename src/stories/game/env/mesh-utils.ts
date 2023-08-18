@@ -10,7 +10,6 @@ const getTerrainHeight = (pos: THREE.Vector3, terrain: THREE.Mesh) => {
     new THREE.Vector3(pos.x, 10000, pos.z), // big enough value for Y
     new THREE.Vector3(0, -1, 0) // vertical
   );
-  console.log(terrain);
   const intersects = rayVertical.intersectObject(terrain);
   if (intersects.length === 1) {
     return intersects[0].point.y;
@@ -22,21 +21,21 @@ const getTerrainHeight = (pos: THREE.Vector3, terrain: THREE.Mesh) => {
 export type MeshAroundAreaParam = THREE.Object3D | (() => THREE.Object3D);
 
 export const addMeshAroundArea = (
-  params: MeshAroundAreaParam[],
+  meshTypes: MeshAroundAreaParam[],
   pos: THREE.Vector3,
-  number: number,
+  numberItemsToAdd: number,
   terrain: THREE.Mesh,
   scene: THREE.Scene,
   minDistance?: number,
   y?: number
 ) => {
-  for (let index = 0; index < number; index++) {
-    const param = params[rndIntBetween(0, params.length)];
+  for (let index = 0; index < numberItemsToAdd; index++) {
+    const meshType = meshTypes[rndIntBetween(0, meshTypes.length)];
     let obj;
-    if (typeof param === "function") {
-      obj = param();
+    if (typeof meshType === "function") {
+      obj = meshType();
     } else {
-      obj = param;
+      obj = meshType;
     }
     const newX = pos.x + (minDistance || 30 + index) * rndIntBetween(1, 5);
     const newZ = pos.z + (minDistance || 30 + index) * rndIntBetween(1, 10);
