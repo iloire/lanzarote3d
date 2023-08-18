@@ -109,21 +109,10 @@ const Game = {
     scene.add(pgMesh);
 
     document.addEventListener("keydown", onDocumentKeyDown, false);
-    document.addEventListener("keyup", onDocumentKeyUp, false);
 
     function onDocumentKeyDown(event) {
       const keyCode = event.which;
-      if (keyCode === 37) {
-        isLeftViewing = true;
-      } else if (keyCode === 39) {
-        isRightViewing = true;
-      } else if (keyCode === 38) {
-        // arrow up
-        isZoomInViewing = true;
-      } else if (keyCode === 40) {
-        // arrow down
-        isZoomOutViewing = true;
-      } else if (keyCode == 90) {
+      if (keyCode == 90) {
         //z
         if (perfStats.isVisible()) {
           perfStats.hide();
@@ -143,21 +132,6 @@ const Game = {
       }
     }
 
-    function onDocumentKeyUp(event) {
-      const keyCode = event.which;
-      if (keyCode === 37) {
-        isLeftViewing = false;
-      } else if (keyCode === 39) {
-        isRightViewing = false;
-      } else if (keyCode === 38) {
-        // arrow up
-        isZoomInViewing = false;
-      } else if (keyCode === 40) {
-        // arrow down
-        isZoomOutViewing = false;
-      }
-    }
-
     const wrapSpeedChange = (value: number) => {
       pg.updateWrapSpeed(value);
       vario.updateWrapSpeed(value);
@@ -172,11 +146,6 @@ const Game = {
       .onChange((value) => {
         wrapSpeedChange(value);
       });
-
-    let isLeftViewing = false;
-    let isRightViewing = false;
-    let isZoomInViewing = false;
-    let isZoomOutViewing = false;
 
     let gameStatus = GameStatus.NonStarted;
 
@@ -326,19 +295,6 @@ const Game = {
     const animate = () => {
       box.update();
       vario.updateReading(pg.altitude());
-      if (isLeftViewing) {
-        camera.turnLeft();
-      }
-      if (isRightViewing) {
-        camera.turnRight();
-      }
-      if (isZoomInViewing) {
-        camera.zoomIn();
-      }
-      if (isZoomOutViewing) {
-        camera.zoomOut();
-      }
-
       perfStats.frameStart();
       perfStats.wrapFunction("tween", () => {
         TWEEN.update();

@@ -20,6 +20,44 @@ export enum CameraMode {
   OrbitControl = 6,
 }
 
+let isLeftViewing = false;
+let isRightViewing = false;
+let isZoomInViewing = false;
+let isZoomOutViewing = false;
+
+document.addEventListener("keydown", onDocumentKeyDown, false);
+document.addEventListener("keyup", onDocumentKeyUp, false);
+
+function onDocumentKeyDown(event) {
+  const keyCode = event.which;
+  if (keyCode === 37) {
+    isLeftViewing = true;
+  } else if (keyCode === 39) {
+    isRightViewing = true;
+  } else if (keyCode === 38) {
+    // arrow up
+    isZoomInViewing = true;
+  } else if (keyCode === 40) {
+    // arrow down
+    isZoomOutViewing = true;
+  }
+}
+
+function onDocumentKeyUp(event) {
+  const keyCode = event.which;
+  if (keyCode === 37) {
+    isLeftViewing = false;
+  } else if (keyCode === 39) {
+    isRightViewing = false;
+  } else if (keyCode === 38) {
+    // arrow up
+    isZoomInViewing = false;
+  } else if (keyCode === 40) {
+    // arrow down
+    isZoomOutViewing = false;
+  }
+}
+
 class Camera extends THREE.PerspectiveCamera {
   mode: CameraMode;
   target: Paraglider;
@@ -74,6 +112,19 @@ class Camera extends THREE.PerspectiveCamera {
       this.orbitView();
     } else {
       throw new Error("invalid camera mode");
+    }
+
+    if (isLeftViewing) {
+      this.turnLeft();
+    }
+    if (isRightViewing) {
+      this.turnRight();
+    }
+    if (isZoomInViewing) {
+      this.zoomIn();
+    }
+    if (isZoomOutViewing) {
+      this.zoomOut();
     }
   }
 
