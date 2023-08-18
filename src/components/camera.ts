@@ -22,6 +22,8 @@ export enum CameraMode {
 
 let isLeftViewing = false;
 let isRightViewing = false;
+let isUpViewing = false;
+let isDownViewing = false;
 let isZoomInViewing = false;
 let isZoomOutViewing = false;
 
@@ -40,6 +42,12 @@ function onDocumentKeyDown(event) {
   } else if (keyCode === 40) {
     // arrow down
     isZoomOutViewing = true;
+  } else if (keyCode === 33) {
+    // page up
+    isUpViewing = true;
+  } else if (keyCode === 34) {
+    // page down
+    isDownViewing = true;
   }
 }
 
@@ -55,6 +63,12 @@ function onDocumentKeyUp(event) {
   } else if (keyCode === 40) {
     // arrow down
     isZoomOutViewing = false;
+  } else if (keyCode === 33) {
+    // page up
+    isUpViewing = false;
+  } else if (keyCode === 34) {
+    // page down
+    isDownViewing = false;
   }
 }
 
@@ -64,6 +78,7 @@ class Camera extends THREE.PerspectiveCamera {
   terrain: THREE.Mesh;
   controls: OrbitControls;
   angle: number = DEFAULT_ANGLE;
+  angleY: number = 1.4;
   distance: number = DEFAULT_FOLLOW_DISTANCE;
   angleIncrement: number = 0.02;
   distanceIncrement: number = 0.9;
@@ -120,6 +135,12 @@ class Camera extends THREE.PerspectiveCamera {
     if (isRightViewing) {
       this.turnRight();
     }
+    if (isUpViewing) {
+      this.lookUp();
+    }
+    if (isDownViewing) {
+      this.lookDown();
+    }
     if (isZoomInViewing) {
       this.zoomIn();
     }
@@ -141,6 +162,13 @@ class Camera extends THREE.PerspectiveCamera {
     this.angle += this.angleIncrement;
   }
 
+  lookUp() {
+    this.angleY -= this.angleIncrement;
+  }
+
+  lookDown() {
+    this.angleY += this.angleIncrement;
+  }
   zoomIn() {
     this.distance -= this.distanceIncrement;
   }
@@ -175,8 +203,10 @@ class Camera extends THREE.PerspectiveCamera {
   followTarget() {
     const x = Math.sin(this.angle) * this.distance;
     const z = Math.cos(this.angle) * this.distance;
+    const y = Math.cos(this.angleY) * this.distance;
+
     const pg = this.target;
-    const cameraOffset = new THREE.Vector3(x, 1, z);
+    const cameraOffset = new THREE.Vector3(x, y, z);
     this.position.copy(pg.position().add(pg.direction().add(cameraOffset)));
 
     const lookOffset = new THREE.Vector3(0, 0, 0);
