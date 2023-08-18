@@ -28,9 +28,9 @@ class Camera extends THREE.PerspectiveCamera {
   terrain: THREE.Mesh;
   controls: OrbitControls;
   angle: number = DEFAULT_ANGLE;
-  angleIncrement: number = 0.05;
   distance: number = DEFAULT_FOLLOW_DISTANCE;
-  distanceIncrement: number = 2;
+  angleIncrement: number = 0.02;
+  distanceIncrement: number = 0.9;
   firstPersonViewOffset: THREE.Vector3 = new THREE.Vector3(0, 0.1, 0);
   farAwayOffset: THREE.Vector3 = new THREE.Vector3(-1302, 700, 1301.2);
   topViewOffset: THREE.Vector3 = new THREE.Vector3(30, 3700, -40);
