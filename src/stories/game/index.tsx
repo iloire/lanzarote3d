@@ -117,6 +117,12 @@ const Game = {
         isLeftViewing = true;
       } else if (keyCode === 39) {
         isRightViewing = true;
+      } else if (keyCode === 38) {
+        // arrow up
+        isZoomInViewing = true;
+      } else if (keyCode === 40) {
+        // arrow down
+        isZoomOutViewing = true;
       } else if (keyCode == 90) {
         //z
         if (perfStats.isVisible()) {
@@ -143,6 +149,12 @@ const Game = {
         isLeftViewing = false;
       } else if (keyCode === 39) {
         isRightViewing = false;
+      } else if (keyCode === 38) {
+        // arrow up
+        isZoomInViewing = false;
+      } else if (keyCode === 40) {
+        // arrow down
+        isZoomOutViewing = false;
       }
     }
 
