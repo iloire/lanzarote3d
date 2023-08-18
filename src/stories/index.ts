@@ -1,6 +1,6 @@
 import Default from "./default";
 import FlyZones from "./flyzones";
-import Game from "./game/index";
+import Game from "./game/game";
 import Mechanics from "./mechanics";
 import DayTime from "./daytime";
 import Night from "./night";
