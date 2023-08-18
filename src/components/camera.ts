@@ -30,44 +30,45 @@ let isZoomOutViewing = false;
 document.addEventListener("keydown", onDocumentKeyDown, false);
 document.addEventListener("keyup", onDocumentKeyUp, false);
 
+enum KeyCodes {
+  left = 37, // left arrow
+  right = 39, //right arrow
+  up = 38, // up arrow
+  down = 40, // down arrow
+  in = 33, // page up
+  out = 34, // page down
+}
+
 function onDocumentKeyDown(event) {
   const keyCode = event.which;
-  if (keyCode === 37) {
+  if (keyCode === KeyCodes.left) {
     isLeftViewing = true;
-  } else if (keyCode === 39) {
+  } else if (keyCode === KeyCodes.right) {
     isRightViewing = true;
-  } else if (keyCode === 38) {
-    // arrow up
-    isZoomInViewing = true;
-  } else if (keyCode === 40) {
-    // arrow down
+  } else if (keyCode === KeyCodes.out) {
     isZoomOutViewing = true;
-  } else if (keyCode === 33) {
-    // page up
+  } else if (keyCode === KeyCodes.in) {
+    isZoomInViewing = true;
+  } else if (keyCode === KeyCodes.up) {
     isUpViewing = true;
-  } else if (keyCode === 34) {
-    // page down
+  } else if (keyCode === KeyCodes.down) {
     isDownViewing = true;
   }
 }
 
 function onDocumentKeyUp(event) {
   const keyCode = event.which;
-  if (keyCode === 37) {
+  if (keyCode === KeyCodes.left) {
     isLeftViewing = false;
-  } else if (keyCode === 39) {
+  } else if (keyCode === KeyCodes.right) {
     isRightViewing = false;
-  } else if (keyCode === 38) {
-    // arrow up
-    isZoomInViewing = false;
-  } else if (keyCode === 40) {
-    // arrow down
+  } else if (keyCode === KeyCodes.out) {
     isZoomOutViewing = false;
-  } else if (keyCode === 33) {
-    // page up
+  } else if (keyCode === KeyCodes.in) {
+    isZoomInViewing = false;
+  } else if (keyCode === KeyCodes.up) {
     isUpViewing = false;
-  } else if (keyCode === 34) {
-    // page down
+  } else if (keyCode === KeyCodes.down) {
     isDownViewing = false;
   }
 }
@@ -129,24 +130,12 @@ class Camera extends THREE.PerspectiveCamera {
       throw new Error("invalid camera mode");
     }
 
-    if (isLeftViewing) {
-      this.turnLeft();
-    }
-    if (isRightViewing) {
-      this.turnRight();
-    }
-    if (isUpViewing) {
-      this.lookUp();
-    }
-    if (isDownViewing) {
-      this.lookDown();
-    }
-    if (isZoomInViewing) {
-      this.zoomIn();
-    }
-    if (isZoomOutViewing) {
-      this.zoomOut();
-    }
+    isLeftViewing && this.turnLeft();
+    isRightViewing && this.turnRight();
+    isUpViewing && this.lookUp();
+    isDownViewing && this.lookDown();
+    isZoomInViewing && this.zoomIn();
+    isZoomOutViewing && this.zoomOut();
   }
 
   setCameraMode(mode: CameraMode, target: Paraglider) {
