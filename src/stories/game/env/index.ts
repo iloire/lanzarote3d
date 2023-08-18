@@ -4,7 +4,7 @@ import Environment from "../env/environment";
 import Weather from "../../../elements/weather";
 
 const BIRDS = false;
-const HGLIDER = false;
+const HGLIDER = true;
 
 export const addGameEnvironment = (
   scene: THREE.Scene,

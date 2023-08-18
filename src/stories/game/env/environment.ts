@@ -14,7 +14,8 @@ import Paraglider, {
   EnvOptions,
 } from "../../../components/pg";
 import HangGlider from "../../../components/hangglider";
-import { addMeshAroundArea, generateThermalPair } from "./utils";
+import { addMeshAroundArea } from "./mesh-utils";
+import { generateThermalPair } from "./thermal-utils";
 
 const KMH_TO_MS = 3.6;
 const THERMAL_OPACITY = 0.04;
