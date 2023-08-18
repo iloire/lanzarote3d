@@ -17,7 +17,6 @@ const getObjectPosition = (obj: THREE.Object3D) => {
 export enum CameraMode {
   FirstPersonView = 1,
   FollowTarget = 2,
-  FarAway = 3,
   OrbitControl = 6,
 }
 
@@ -31,7 +30,6 @@ class Camera extends THREE.PerspectiveCamera {
   angleIncrement: number = 0.02;
   distanceIncrement: number = 0.9;
   firstPersonViewOffset: THREE.Vector3 = new THREE.Vector3(0, 0.1, 0);
-  farAwayOffset: THREE.Vector3 = new THREE.Vector3(-1302, 700, 1301.2);
   directionToLook: THREE.Vector3;
   viewRotationHorizontal: number = 0;
   viewRotationVertical: number = 0;
@@ -51,10 +49,6 @@ class Camera extends THREE.PerspectiveCamera {
 
   addGui(gui) {
     GuiHelper.addLocationGui(gui, "Camera", this, { min: 0, max: 10000 });
-    GuiHelper.addPositionGui(gui, "Camera.farAwayOffset", this.farAwayOffset, {
-      min: -100,
-      max: 100,
-    });
     GuiHelper.addPositionGui(
       gui,
       "Camera.firstPersonViewOffset",
@@ -76,8 +70,6 @@ class Camera extends THREE.PerspectiveCamera {
       this.followTarget();
     } else if (this.mode === CameraMode.FirstPersonView) {
       this.firstPersonView();
-    } else if (this.mode === CameraMode.FarAway) {
-      this.farAwayView();
     } else if (this.mode === CameraMode.OrbitControl) {
       this.orbitView();
     } else {
@@ -158,10 +150,6 @@ class Camera extends THREE.PerspectiveCamera {
     // view rotation
     this.rotateY(-1 * this.viewRotationHorizontal * 1.5);
     this.rotateX(-1 * this.viewRotationVertical * 1.5);
-  }
-
-  farAwayView() {
-    this.viewWithOffset(this.farAwayOffset);
   }
 
   orbitView() {
