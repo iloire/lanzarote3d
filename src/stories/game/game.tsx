@@ -23,7 +23,7 @@ const KMH_TO_MS = 3.6;
 
 const FOG_ENABLED = true;
 const TIME_OF_DAY = 20;
-const START_WITH_SOUND = true;
+const START_WITH_SOUND = false;
 const INITIAL_CAMERA_MODE = CameraMode.FollowTarget;
 const DEBUG = false;
 
@@ -256,26 +256,6 @@ const Game = {
         onSelectCamera={(mode: CameraMode) => {
           analytics.trackEvent("game-camera-change", mode.toString());
           setCameraMode(mode);
-        }}
-        onViewChange={(view: View) => {
-          analytics.trackEvent("game-view-change", view);
-          if (view === View.Left) {
-            isLeftViewing = true;
-          } else if (view === View.LeftRelease) {
-            isLeftViewing = false;
-          } else if (view === View.Right) {
-            isRightViewing = true;
-          } else if (view === View.RightRelease) {
-            isRightViewing = false;
-          } else if (view === View.ZoomIn) {
-            isZoomInViewing = true;
-          } else if (view === View.ZoomInRelease) {
-            isZoomInViewing = false;
-          } else if (view === View.ZoomOut) {
-            isZoomOutViewing = true;
-          } else if (view === View.ZoomOutRelease) {
-            isZoomOutViewing = false;
-          }
         }}
         onWrapSpeedChange={(value) => {
           analytics.trackEvent("game-speed-change", value.toString());

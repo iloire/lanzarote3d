@@ -35,7 +35,6 @@ type UIControlsProps = {
     fnHideStartButton: () => void
   ) => void;
   onSelectCamera: (mode: CameraMode) => void;
-  onViewChange: (view: View) => void;
   onWrapSpeedChange: (value: number) => void;
   onPause: (paused: boolean) => void;
   onFinishGame: (fnHideButtons: () => void) => void;
