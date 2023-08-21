@@ -14,6 +14,9 @@ const getTerrainHeight = (pos: THREE.Vector3, terrain: THREE.Mesh) => {
   if (intersects.length === 1) {
     return intersects[0].point.y;
   } else {
+    console.error("can not calculate terrain height");
+    console.log(terrain);
+    console.log(rayVertical);
     return NaN;
   }
 };
@@ -22,7 +25,7 @@ export type MeshAroundAreaParam = THREE.Object3D | (() => THREE.Object3D);
 
 export const addMeshAroundArea = (
   meshTypes: MeshAroundAreaParam[],
-  pos: THREE.Vector3,
+  centerPosition: THREE.Vector3,
   numberItemsToAdd: number,
   terrain: THREE.Mesh,
   scene: THREE.Scene,
@@ -37,8 +40,10 @@ export const addMeshAroundArea = (
     } else {
       obj = meshType;
     }
-    const newX = pos.x + (minDistance || 30 + index) * rndIntBetween(1, 5);
-    const newZ = pos.z + (minDistance || 30 + index) * rndIntBetween(1, 10);
+    const newX =
+      centerPosition.x + (minDistance || 30 + index) * rndIntBetween(1, 5);
+    const newZ =
+      centerPosition.z + (minDistance || 30 + index) * rndIntBetween(1, 10);
 
     const terrainHeight = getTerrainHeight(
       new THREE.Vector3(newX, 0, newZ),
