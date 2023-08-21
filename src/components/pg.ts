@@ -7,6 +7,7 @@ import ParagliderModel from "../components/paraglider";
 import GuiHelper from "../utils/gui";
 import { TrajectoryPoint, TrajectoryPointType } from "../elements/trajectory";
 import { getTerrainHeightBelowPosition } from "../utils/collision";
+import { addDebugArrowsToParaglider } from "./pg-debug";
 
 const ORIGIN = new THREE.Vector3(0, 0, 0);
 const DOWN_DIRECTION = new THREE.Vector3(0, -1, 0);
@@ -16,61 +17,9 @@ const ANTI_CRASH_ENABLED = true;
 
 const TICK_INTERVAL = 25;
 
-function getAttackAngleRadians(glidingRatio: number) {
-  return Math.atan(1 / glidingRatio);
-}
-
 const getRotationValue = (wrapSpeed: number): number => {
   const multiplier = THREE.MathUtils.smoothstep(wrapSpeed, 1, 10);
   return Math.PI / (60 - 50 * multiplier);
-};
-
-const createLiftArrow = (
-  glidingRatio: number,
-  len: number,
-  color
-): THREE.ArrowHelper => {
-  const arrow = new THREE.ArrowHelper(UP_DIRECTION.clone(), ORIGIN, len, color);
-  const axis = new THREE.Vector3(0, 0, 1);
-  arrow.rotateOnAxis(axis, -getAttackAngleRadians(glidingRatio));
-  return arrow;
-};
-
-const createTrajectoryArrow = (
-  glidingRatio: number,
-  len: number,
-  color
-): THREE.ArrowHelper => {
-  const dir = new THREE.Vector3(1, 0, 0);
-  const arrow = new THREE.ArrowHelper(dir, ORIGIN, len, color);
-  const axis = new THREE.Vector3(0, 0, 1);
-  arrow.rotateOnAxis(axis, -getAttackAngleRadians(glidingRatio));
-  return arrow;
-};
-
-const createGravityArrow = (mesh: THREE.Object3D, len: number) => {
-  const dir = DOWN_DIRECTION.clone();
-  const arrow = new THREE.ArrowHelper(dir, ORIGIN, len, 0xff0000);
-  return arrow;
-};
-
-const createDirectionArrow = (
-  dir: THREE.Vector3,
-  len: number,
-  color
-): THREE.ArrowHelper => {
-  const arrow = new THREE.ArrowHelper(dir, ORIGIN, len, color);
-  return arrow;
-};
-
-const createCentripetalArrow = (
-  mesh: THREE.Object3D,
-  len: number,
-  color
-): THREE.ArrowHelper => {
-  const dir = new THREE.Vector3(0, -1, 0);
-  const arrow = new THREE.ArrowHelper(dir, ORIGIN, len, color);
-  return arrow;
 };
 
 export interface ParagliderConstructor {
@@ -161,12 +110,7 @@ class Paraglider extends THREE.EventDispatcher {
     mesh.scale.set(scale, scale, scale);
     this.mesh = mesh;
     if (this.debug) {
-      const arrowLen = 50;
-      mesh.add(createCentripetalArrow(mesh, arrowLen, 0x0000ff));
-      mesh.add(createDirectionArrow(this.direction(), arrowLen, 0x0000ff));
-      mesh.add(createTrajectoryArrow(this.glidingRatio(), arrowLen, 0xff00ff));
-      mesh.add(createLiftArrow(this.glidingRatio(), arrowLen, 0xffffff));
-      mesh.add(createGravityArrow(mesh, arrowLen));
+      addDebugArrowsToParaglider(this);
       this.paragliderModel.showAxesHelper();
     }
     return mesh;
