@@ -1,9 +1,11 @@
 import * as THREE from "three";
 import Paraglider from "./pg";
-
-const ORIGIN = new THREE.Vector3(0, 0, 0);
-const DOWN_DIRECTION = new THREE.Vector3(0, -1, 0);
-const UP_DIRECTION = new THREE.Vector3(0, 1, 0);
+import {
+  ORIGIN,
+  FORWARD_DIRECTION,
+  UP_DIRECTION,
+  DOWN_DIRECTION,
+} from "./common";
 
 function getAttackAngleRadians(glidingRatio: number) {
   return Math.atan(1 / glidingRatio);

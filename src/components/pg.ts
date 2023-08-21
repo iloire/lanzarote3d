@@ -8,13 +8,14 @@ import GuiHelper from "../utils/gui";
 import { TrajectoryPoint, TrajectoryPointType } from "../elements/trajectory";
 import { getTerrainHeightBelowPosition } from "../utils/collision";
 import { addDebugArrowsToParaglider } from "./pg-debug";
+import {
+  ORIGIN,
+  FORWARD_DIRECTION,
+  UP_DIRECTION,
+  DOWN_DIRECTION,
+} from "./common";
 
-const ORIGIN = new THREE.Vector3(0, 0, 0);
-const DOWN_DIRECTION = new THREE.Vector3(0, -1, 0);
-const UP_DIRECTION = new THREE.Vector3(0, 1, 0);
-const FORWARD_DIRECTION = new THREE.Vector3(1, 0, 0);
 const ANTI_CRASH_ENABLED = true;
-
 const TICK_INTERVAL = 25;
 
 const getRotationValue = (wrapSpeed: number): number => {
@@ -157,7 +158,7 @@ class Paraglider extends THREE.EventDispatcher {
           vector: this.position(),
         }); // last point saved
         if (ANTI_CRASH_ENABLED) {
-          this.mesh.position.y += 20;
+          console.log("touched ground");
         } else {
           this.dispatchEvent({
             type: "crashed",
