@@ -6,6 +6,7 @@ import Thermal from "../components/thermal";
 import ParagliderModel from "../components/paraglider";
 import GuiHelper from "../utils/gui";
 import { TrajectoryPoint, TrajectoryPointType } from "../elements/trajectory";
+import { getTerrainHeightBelowPosition } from "../utils/collision";
 
 const ORIGIN = new THREE.Vector3(0, 0, 0);
 const DOWN_DIRECTION = new THREE.Vector3(0, -1, 0);
@@ -70,33 +71,6 @@ const createCentripetalArrow = (
   const dir = new THREE.Vector3(0, -1, 0);
   const arrow = new THREE.ArrowHelper(dir, ORIGIN, len, color);
   return arrow;
-};
-
-const getTerrainHeightBelowPosition = (
-  pos: THREE.Vector3,
-  terrain: THREE.Mesh,
-  water: THREE.Mesh
-): number => {
-  const rayVertical = new THREE.Raycaster(
-    new THREE.Vector3(pos.x, 100000, pos.z), // big enough value for Y
-    new THREE.Vector3(0, -1, 0) // vertical
-  );
-  rayVertical.firstHitOnly = true;
-  if (pos.y < 0) {
-    return NaN; // below water
-  }
-  const intersectsFloor = rayVertical.intersectObjects([terrain]);
-  if (intersectsFloor.length === 1) {
-    const height = intersectsFloor[0].point.y;
-    if (height >= pos.y) {
-      // terrain above pg, crash
-      return NaN;
-    } else {
-      return height;
-    }
-  } else {
-    return NaN;
-  }
 };
 
 export interface ParagliderConstructor {
@@ -239,7 +213,7 @@ class Paraglider extends THREE.EventDispatcher {
           vector: this.position(),
         }); // last point saved
         if (ANTI_CRASH_ENABLED) {
-          this.mesh.position.y += 10;
+          this.mesh.position.y += 20;
         } else {
           this.dispatchEvent({
             type: "crashed",
@@ -342,7 +316,7 @@ class Paraglider extends THREE.EventDispatcher {
     return pgVelocity.add(windVelocity).length();
   }
 
-  move(multiplier: number) {
+  private move(multiplier: number) {
     const drop = this.airSpeed() / this.glidingRatio();
     const downVector = DOWN_DIRECTION.clone().multiplyScalar(multiplier * drop);
     this.dispatchEvent({
