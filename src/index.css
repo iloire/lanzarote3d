@@ -8,8 +8,18 @@ html, body {
 
 .appOptions {
   position: absolute;
-  top: 5%;
-  left: 40px;
+  top: 15%;
+  left: 10%;
+}
+
+.appOptions div.button button{
+  margin-bottom: 1em;
+  font-size: 140%;
+}
+
+.appOptions div.button span {
+  color: white;
+  margin-left: 1em;
 }
 
 .loading {

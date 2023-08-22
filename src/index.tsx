@@ -166,7 +166,7 @@ class App extends React.Component<AppProps, AppState> {
   render() {
     const { loadingProcess, showAppSelection } = this.state;
     const stories = [
-      { story: "game" },
+      { story: "game", description: "The game!" },
       { story: "workshop" },
       { story: "mechanics" },
       { story: "paraglider" },
@@ -180,9 +180,12 @@ class App extends React.Component<AppProps, AppState> {
     ];
 
     const buttons = stories.map((story) => (
-      <button onClick={() => this.navigateTo(story.story)}>
-        {story.story}
-      </button>
+      <div className="button">
+        <button onClick={() => this.navigateTo(story.story)}>
+          {story.story}
+        </button>
+        <span>{story.description || story.story}</span>
+      </div>
     ));
 
     return (
