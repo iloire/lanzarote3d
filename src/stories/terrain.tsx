@@ -77,7 +77,6 @@ const Terrain = {
 
     scene.add(terrainGenerator1(groundGeometry, displacement));
     scene.add(terrainGenerator2(groundGeometry, displacement));
-
     scene.add(waterGenerator());
 
     camera.position.set(4120, 2500, 12000);

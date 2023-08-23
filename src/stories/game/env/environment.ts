@@ -93,7 +93,7 @@ class Environment {
     // scene.add(pg4.getMesh());
   }
 
-  addBoats(terrain: THREE.Mesh) {
+  addBoats(water: THREE.Mesh) {
     const boat = new Boat().load();
     const scale = 3;
     boat.scale.set(scale, scale, scale);
@@ -101,14 +101,14 @@ class Environment {
       [boat],
       new THREE.Vector3(7879, 0, -4445),
       5,
-      terrain,
+      water,
       this.scene
     );
     addMeshAroundArea(
       [boat],
       new THREE.Vector3(8279, 0, -6155),
       4,
-      terrain,
+      water,
       this.scene
     );
   }

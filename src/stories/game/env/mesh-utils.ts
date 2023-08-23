@@ -5,18 +5,15 @@ const getRandomRotation = (): THREE.Euler => {
   return new THREE.Euler(0, rndBetween(0, Math.PI), 0);
 };
 
-const getTerrainHeight = (pos: THREE.Vector3, terrain: THREE.Mesh) => {
+const getTerrainHeight = (x: number, z: number, terrain: THREE.Mesh) => {
   const rayVertical = new THREE.Raycaster(
-    new THREE.Vector3(pos.x, 10000, pos.z), // big enough value for Y
+    new THREE.Vector3(x, 10000, z), // big enough value for Y
     new THREE.Vector3(0, -1, 0) // vertical
   );
   const intersects = rayVertical.intersectObject(terrain);
-  if (intersects.length === 1) {
+  if (intersects.length > 0) {
     return intersects[0].point.y;
   } else {
-    console.error("can not calculate terrain height");
-    console.log(terrain);
-    console.log(rayVertical);
     return NaN;
   }
 };
@@ -45,12 +42,12 @@ export const addMeshAroundArea = (
     const newZ =
       centerPosition.z + (minDistance || 30 + index) * rndIntBetween(1, 10);
 
-    const terrainHeight = getTerrainHeight(
-      new THREE.Vector3(newX, 0, newZ),
-      terrain
-    );
+    const terrainHeight = getTerrainHeight(newX, newZ, terrain);
     if (isNaN(terrainHeight)) {
-      console.error("can not calculate terrain height");
+      console.log(meshTypes);
+      console.log(centerPosition);
+      console.log(terrain);
+      throw new Error("can not calculate terrain height");
       break;
     }
     const meshPos = new THREE.Vector3(newX, terrainHeight, newZ);

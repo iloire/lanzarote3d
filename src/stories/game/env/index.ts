@@ -4,7 +4,7 @@ import Environment from "../env/environment";
 import Weather from "../../../elements/weather";
 
 const BIRDS = false;
-const HGLIDER = true;
+const HGLIDER = false;
 
 export const addGameEnvironment = (
   scene: THREE.Scene,
@@ -19,9 +19,9 @@ export const addGameEnvironment = (
 
   env.addClouds(weather, thermals);
   env.addTrees(terrain);
-  env.addStones(terrain);
-  env.addHouses(terrain);
-  env.addBoats(water);
+  // env.addStones(terrain);
+  // env.addHouses(terrain);
+  // env.addBoats(water);
 
   if (BIRDS) {
     const birdsPath = [
