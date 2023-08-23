@@ -1,15 +1,14 @@
 import * as THREE from "three";
 import Controls from "../utils/controls";
-
 import Sky from "../components/sky";
 import Trajectory from "../elements/trajectory";
 import Paraglider, { ParagliderConstructor } from "../components/pg";
 import Weather, { WeatherOptions } from "../elements/weather";
 import WindIndicator from "../components/wind-indicator";
-import { addGameEnvironment } from "./game/env";
 import Helpers from "../utils/helpers";
 import Stone from "../components/stone";
 import Tree from "../components/tree";
+import Environment from "./env/environment";
 
 const KMH_TO_MS = 3.6;
 
@@ -39,8 +38,7 @@ const Mechanics = {
     const weather = new Weather(WEATHER_SETTINGS);
     weather.addGui(gui);
 
-    const env = addGameEnvironment(scene, terrain, weather, water, gui);
-
+    const env = new Environment(scene);
     const thermals = env.addThermals(weather);
     env.addClouds(weather, thermals);
 
@@ -72,41 +70,10 @@ const Mechanics = {
     const arrow = windIndicator.load(330, pg.position());
     scene.add(arrow);
 
-    // Helpers.drawPoint(scene, sky.getSunPosition());
-
-    // const findCameraIntercept = () => {
-    //   const raycaster = new THREE.Raycaster(
-    //     pg.position(),
-    //     camera.position.clone().sub(pg.position()).normalize()
-    //   );
-    //   const intersects = raycaster.intersectObject(terrain);
-    //   if (intersects.length > 0) {
-    //     console.log("camera intersects", intersects);
-    //     const distance = intersects[0].distance;
-    //     console.log(distance);
-    //     const newPosition = new THREE.Vector3().addVectors(
-    //       camera.position,
-    //       raycaster.ray.direction.multiplyScalar(-1 * distance)
-    //     );
-    //     camera.position.copy(newPosition);
-    //   }
-    // };
-
-    // const stone = new Stone().load();
-    // stone.position.set(0, 1000, 0);
-    // stone.scale.set(100, 100, 100);
-    // scene.add(stone);
-    //
-    // const tree = new Tree().load();
-    // tree.position.set(0, 400, 0);
-    // tree.scale.set(10, 10, 10);
-    // scene.add(tree);
-
     renderer.render(scene, camera); // render before adding trees
     env.addTrees(terrain);
 
     const animate = () => {
-      // findCameraIntercept();
       requestAnimationFrame(animate);
       renderer.render(scene, camera);
       // camera.lookAt(sky.getSunPosition());

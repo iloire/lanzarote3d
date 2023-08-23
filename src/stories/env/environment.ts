@@ -1,19 +1,19 @@
 import * as THREE from "three";
-import Clouds from "../../../components/clouds";
-import Weather from "../../../elements/weather";
-import Thermal, { ThermalDimensions } from "../../../components/thermal";
-import { rndBetween, rndIntBetween } from "../../../utils/math";
-import Tree from "../../../components/tree";
-import PineTree from "../../../components/pinetree";
-import Stone from "../../../components/stone";
-import House, { HouseType } from "../../../components/house";
-import Boat from "../../../components/boat";
-import Birds from "../../../components/birds";
+import Clouds from "../../components/clouds";
+import Weather from "../../elements/weather";
+import Thermal, { ThermalDimensions } from "../../components/thermal";
+import { rndBetween, rndIntBetween } from "../../utils/math";
+import Tree from "../../components/tree";
+import PineTree from "../../components/pinetree";
+import Stone from "../../components/stone";
+import House, { HouseType } from "../../components/house";
+import Boat from "../../components/boat";
+import Birds from "../../components/birds";
 import Paraglider, {
   ParagliderConstructor,
   EnvOptions,
-} from "../../../components/pg";
-import HangGlider from "../../../components/hangglider";
+} from "../../components/pg";
+import HangGlider from "../../components/hangglider";
 import { addMeshAroundArea } from "./mesh-utils";
 import { generateThermalPair } from "./thermal-utils";
 

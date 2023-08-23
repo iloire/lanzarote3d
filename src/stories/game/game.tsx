@@ -87,6 +87,8 @@ const Game = {
 
     const bgMusic = new BackgroundSound();
 
+    // must render before adding env
+    renderer.render(scene, camera);
     const env = addGameEnvironment(scene, terrain, weather, water, gui);
     const thermals = env.getThermals();
 
@@ -284,7 +286,7 @@ const Game = {
 
     addWindIndicatorToScene(scene, pg, weather);
 
-    renderer.render(scene, camera); // must render before adding trees
+    renderer.render(scene, camera);
 
     // Game start
     pg.setPosition(locations[0].position);

@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { rndBetween, rndIntBetween } from "../../../utils/math";
+import { rndBetween, rndIntBetween } from "../../utils/math";
 
 const getRandomRotation = (): THREE.Euler => {
   return new THREE.Euler(0, rndBetween(0, Math.PI), 0);

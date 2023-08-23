@@ -1,7 +1,7 @@
 import * as THREE from "three";
-import Thermal from "../../../components/thermal";
+import Thermal from "../../components/thermal";
 import Environment from "../env/environment";
-import Weather from "../../../elements/weather";
+import Weather from "../../elements/weather";
 
 const BIRDS = false;
 const HGLIDER = false;
@@ -19,9 +19,9 @@ export const addGameEnvironment = (
 
   env.addClouds(weather, thermals);
   env.addTrees(terrain);
-  // env.addStones(terrain);
-  // env.addHouses(terrain);
-  // env.addBoats(water);
+  env.addStones(terrain);
+  env.addHouses(terrain);
+  env.addBoats(water);
 
   if (BIRDS) {
     const birdsPath = [
