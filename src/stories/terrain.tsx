@@ -5,6 +5,49 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import textureImg from "../textures/h-map-lanzarote.png";
 
+const terrainGenerator1 = (groundGeo, displacement) => {
+  const groundMaterial = new THREE.MeshPhongMaterial({
+    wireframe: true,
+    color: "red",
+    reflectivity: 0.4,
+    displacementMap: displacement,
+    displacementScale: 623,
+    displacementBias: 0.2,
+    map: displacement,
+  });
+  const mesh = new THREE.Mesh(groundGeo, groundMaterial);
+  mesh.rotation.x = -Math.PI / 2;
+  mesh.position.set(0, -20, 0);
+  return mesh;
+};
+
+const terrainGenerator2 = (groundGeo, displacement) => {
+  const groundMaterial2 = new THREE.MeshPhongMaterial({
+    color: "yellow",
+    reflectivity: 0.4,
+    displacementMap: displacement,
+    displacementScale: 323,
+    displacementBias: 0.2,
+    map: displacement,
+  });
+  const mesh = new THREE.Mesh(groundGeo, groundMaterial2);
+  mesh.rotation.x = -Math.PI / 2;
+  mesh.position.set(0, -20, 0);
+  return mesh;
+};
+
+const waterGenerator = () => {
+  const waterGeometry = new THREE.PlaneGeometry(10000, 10000, 300, 300);
+  const waterMaterial = new THREE.MeshPhongMaterial({
+    wireframe: false,
+    color: "blue",
+    // displacementBias: 2,
+  });
+  const mesh = new THREE.Mesh(waterGeometry, waterMaterial);
+  mesh.rotation.x = -Math.PI / 2;
+  return mesh;
+};
+
 const Terrain = {
   load: async (
     camera: THREE.PerspectiveCamera,
@@ -19,7 +62,7 @@ const Terrain = {
     terrain.visible = false;
 
     const controls = Controls.createControls(camera, renderer);
-    
+
     sky.updateSunPosition(14);
 
     const animate = () => {
@@ -29,50 +72,15 @@ const Terrain = {
     animate();
 
     const loader = new THREE.TextureLoader();
-
     const displacement = loader.load(textureImg);
     const groundGeometry = new THREE.PlaneGeometry(10000, 10000, 300, 300);
-    const groundMaterial = new THREE.MeshPhongMaterial({
-      wireframe: true,
-      color: "red",
-      reflectivity: 0.4,
-      displacementMap: displacement,
-      displacementScale: 623,
-      displacementBias: 0.2,
-      map: displacement,
-    });
-    const mesh = new THREE.Mesh(groundGeometry, groundMaterial);
-    mesh.rotation.x = -Math.PI / 2;
-    mesh.position.set(0, -20, 0);
-    scene.add(mesh);
 
+    scene.add(terrainGenerator1(groundGeometry, displacement));
+    scene.add(terrainGenerator2(groundGeometry, displacement));
 
-    const groundMaterial2 = new THREE.MeshPhongMaterial({
-      color: "yellow",
-      reflectivity: 0.4,
-      displacementMap: displacement,
-      displacementScale: 323,
-      displacementBias: 0.2,
-      map: displacement,
-    });
-    const mesh2 = new THREE.Mesh(groundGeometry, groundMaterial2);
-    mesh2.rotation.x = -Math.PI / 2;
-    mesh2.position.set(0, -20, 0);
-    scene.add(mesh2);
-
-
-    const waterGeometry = new THREE.PlaneGeometry(10000, 10000, 300, 300);
-    const waterMaterial = new THREE.MeshPhongMaterial({
-      wireframe: false,
-      color: "blue",
-      // displacementBias: 2,
-    });
-    const meshWater = new THREE.Mesh(waterGeometry, waterMaterial);
-    meshWater.rotation.x = -Math.PI / 2;
-    scene.add(meshWater);
+    scene.add(waterGenerator());
 
     camera.position.set(4120, 2500, 12000);
-    controls.target = mesh.position;
   },
 };
 
