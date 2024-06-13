@@ -1,4 +1,6 @@
 declare module "*.glb";
+declare module "*.mtl";
+declare module "*.obj";
 declare module "*.drc";
 declare module "*.wav";
 declare module "*.mp3";

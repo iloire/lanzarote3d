@@ -57,6 +57,14 @@ module.exports = {
         type: "asset/resource",
       },
       {
+        test: /\.(obj)$/,
+        type: "asset/resource",
+      },
+      {
+        test: /\.(mtl)$/,
+        type: "asset/resource",
+      },
+      {
         test: /\.(drc)$/,
         type: "asset/resource",
       },

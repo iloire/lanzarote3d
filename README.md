@@ -50,3 +50,5 @@
 - Fix pause over starting menu
 - Loading progress
 - Pilot harness visibility
+- Ground touching
+- End game if ground touching for a while or way behind ground level

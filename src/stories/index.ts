@@ -7,6 +7,7 @@ import Night from "./night";
 import Terrain from "./terrain";
 import Workshop from "./workshop";
 import Paraglider from "./paraglider";
+import AdriPilot from "./adri";
 import HangGlider from "./hangglider";
 import Cloud from "./cloud";
 import Clouds from "./clouds";
@@ -21,6 +22,7 @@ const Stories = {
   terrain: Terrain.load,
   workshop: Workshop.load,
   paraglider: Paraglider.load,
+  adri: AdriPilot.load,
   hangglider: HangGlider.load,
   cloud: Cloud.load,
   clouds: Clouds.load,

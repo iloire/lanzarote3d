@@ -91,7 +91,7 @@ class App extends React.Component<AppProps, AppState> {
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
       },
-      false
+      false,
     );
 
     const sky: Sky = new Sky(20, 3);
@@ -119,7 +119,7 @@ class App extends React.Component<AppProps, AppState> {
       1,
       200000,
       renderer,
-      island
+      island,
     );
     camera.addGui(gui);
     scene.add(camera);
@@ -170,6 +170,7 @@ class App extends React.Component<AppProps, AppState> {
       { story: "workshop" },
       { story: "mechanics" },
       { story: "paraglider" },
+      { story: "adri" },
       { story: "hangglider" },
       { story: "terrain" },
       { story: "night" },

@@ -1,0 +1,8 @@
+# MagicaVoxel @ Ephtracy
+
+newmtl palette
+illum 1
+Ka 0.000 0.000 0.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+map_Kd https://gist.githubusercontent.com/noonat/1131091/raw/3ef186720b1bb6e704c46aebf57a42677d1638af/cube.mtl

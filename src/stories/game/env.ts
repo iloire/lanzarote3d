@@ -5,6 +5,11 @@ import Weather from "../../elements/weather";
 
 const BIRDS = false;
 const HGLIDER = false;
+const HOUSES = false;
+const CLOUDS = false;
+const TREES = false;
+const STONES = false;
+const BOATS = false;
 
 export const addGameEnvironment = (
   scene: THREE.Scene,
@@ -17,11 +22,11 @@ export const addGameEnvironment = (
 
   const thermals = env.addThermals(weather);
 
-  env.addClouds(weather, thermals);
-  env.addTrees(terrain);
-  env.addStones(terrain);
-  env.addHouses(terrain);
-  env.addBoats(water);
+  CLOUDS && env.addClouds(weather, thermals);
+  TREES && env.addTrees(terrain);
+  STONES && env.addStones(terrain);
+  HOUSES && env.addHouses(terrain);
+  BOATS && env.addBoats(water);
 
   if (BIRDS) {
     const birdsPath = [
