@@ -68,7 +68,7 @@ const Workshop = {
     };
 
     const lookAt = mesh.position.clone().add(new THREE.Vector3(0, 0, 0));
-    camera.position.set(20, 192, 121);
+    camera.position.set(320, 92, 11);
     camera.lookAt(lookAt);
     controls.target = lookAt;
     animate();
