@@ -94,7 +94,7 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     const sky: Sky = new Sky(20, 3);
-    const skyMesh = sky.addToScene(scene);
+    sky.addToScene(scene);
     sky.addGui(gui);
 
     const water = new Water().load(sky.getSunPosition());
@@ -109,7 +109,7 @@ class App extends React.Component<AppProps, AppState> {
     const island = await Island.load(loadingManager);
     const scale = 20000;
     island.scale.set(scale, scale, scale);
-    island.position.set(0, 0, 0);
+    island.position.set(0, -10, 0);
     scene.add(island);
 
     const camera = new Camera(
