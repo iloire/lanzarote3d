@@ -1,8 +1,6 @@
 import * as THREE from "three";
 import Controls from "../utils/controls";
 import Sky from "../components/sky";
-import React from "react";
-import { createRoot } from "react-dom/client";
 import Paraglider from "../components/paraglider";
 import Boat from "../components/boat";
 import House, { HouseType } from "../components/house";

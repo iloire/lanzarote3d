@@ -6,8 +6,6 @@ import Stats from "three/examples/jsm/libs/stats.module";
 import * as THREE from "three";
 import Sky from "./components/sky";
 
-import Animations from "./utils/animations";
-import Models from "./utils/models";
 import Water from "./components/water";
 
 import Island from "./components/island";
@@ -146,7 +144,7 @@ class App extends React.Component<AppProps, AppState> {
     const story = urlParams.get("story");
     console.log("loading story:", story);
     if (story && Stories[story]) {
-      this.setState({ showAppSelection: false });
+      this.setState({ showAppSelection: (story !== 'game') });
       await Stories[story](camera, scene, renderer, island, water, sky, gui);
     } else {
       this.setState({ showAppSelection: true });
