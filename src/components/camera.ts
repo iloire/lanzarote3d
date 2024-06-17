@@ -8,12 +8,6 @@ import GuiHelper from "../utils/gui";
 const DEFAULT_FOLLOW_DISTANCE = 30;
 const DEFAULT_ANGLE = Math.PI / 1.4;
 
-const getObjectPosition = (obj: THREE.Object3D) => {
-  const pos = new THREE.Vector3();
-  obj.getWorldPosition(pos);
-  return pos;
-};
-
 export enum CameraMode {
   FirstPersonView = 1,
   FollowTarget = 2,
@@ -177,7 +171,7 @@ class Camera extends THREE.PerspectiveCamera {
     newPosition: THREE.Vector3,
     newTarget: THREE.Vector3,
     duration: number = 2000,
-    cb: any = () => {}
+    cb: any = () => { }
   ) {
     Animations.animateCamera(
       this,

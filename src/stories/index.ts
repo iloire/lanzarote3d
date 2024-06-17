@@ -10,6 +10,7 @@ import Paraglider from "./paraglider";
 import HangGlider from "./hangglider";
 import Cloud from "./cloud";
 import Clouds from "./clouds";
+import PhotoBooth from "./photobooth";
 
 const Stories = {
   default: Default.load,
@@ -24,6 +25,7 @@ const Stories = {
   hangglider: HangGlider.load,
   cloud: Cloud.load,
   clouds: Clouds.load,
+  photobooth: PhotoBooth.load,
 };
 
 export default Stories;

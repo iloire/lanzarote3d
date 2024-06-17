@@ -25,10 +25,11 @@ class Menu extends React.Component {
       { story: "clouds" },
       { story: "flyzones" },
       { story: "daytime" },
+      { story: "photobooth" },
     ];
 
     const buttons = stories.map((story) => (
-      <div className="button">
+      <div className="button" key={story.story}>
         <button onClick={() => this.navigateTo(story.story)}>
           {story.story}
         </button>

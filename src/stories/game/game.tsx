@@ -4,12 +4,10 @@ import * as THREE from "three";
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 import BackgroundSound from "../../audio/background";
 import Paraglider, { ParagliderConstructor } from "../../components/pg";
-import Animations from "../../utils/animations";
-import Helpers from "../../utils/helpers";
 import Vario from "../../audio/vario";
 import Weather, { WeatherOptions } from "../../elements/weather";
 import Camera, { CameraMode } from "../../components/camera";
-import UIControls, { View, FirstPersonViewLook } from "./ui-controls";
+import UIControls, { FirstPersonViewLook } from "./ui-controls";
 import Trajectory from "../../elements/trajectory";
 import Analytics from "../../elements/analytics";
 import { GameStartOptions, GameStatus } from "./types";
@@ -236,7 +234,7 @@ const Game = {
     );
     root.render(uiControls);
 
-    function touchedGround() {}
+    function touchedGround() { }
 
     function finishGame() {
       analytics.trackEvent("game-crash", pg.getTrajectory().length.toString());

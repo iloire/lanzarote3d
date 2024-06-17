@@ -147,6 +147,7 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ showAppSelection: (story !== 'game') });
       await Stories[story](camera, scene, renderer, island, water, sky, gui);
     } else {
+      console.log('no story found', story);
       this.setState({ showAppSelection: true });
     }
 
