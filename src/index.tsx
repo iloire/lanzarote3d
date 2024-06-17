@@ -14,6 +14,7 @@ import Island from "./components/island";
 
 import Stories from "./stories/index";
 import Camera from "./components/camera";
+import Menu from './menu';
 
 import WebGL from "./WebGL";
 
@@ -165,28 +166,6 @@ class App extends React.Component<AppProps, AppState> {
 
   render() {
     const { loadingProcess, showAppSelection } = this.state;
-    const stories = [
-      { story: "game", description: "The game!" },
-      { story: "workshop" },
-      { story: "mechanics" },
-      { story: "paraglider" },
-      { story: "hangglider" },
-      { story: "terrain" },
-      { story: "night" },
-      { story: "cloud" },
-      { story: "clouds" },
-      { story: "flyzones" },
-      { story: "daytime" },
-    ];
-
-    const buttons = stories.map((story) => (
-      <div className="button">
-        <button onClick={() => this.navigateTo(story.story)}>
-          {story.story}
-        </button>
-        <span>{story.description || story.story}</span>
-      </div>
-    ));
 
     return (
       <div className="lanzarote">
@@ -198,7 +177,7 @@ class App extends React.Component<AppProps, AppState> {
           </div>
         )}
 
-        {showAppSelection ? <div className="appOptions">{buttons}</div> : ""}
+        {showAppSelection && <Menu />}
         <canvas className="webgl"></canvas>
       </div>
     );
