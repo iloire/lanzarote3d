@@ -1,8 +1,5 @@
 import * as THREE from "three";
-import Controls from "../utils/controls";
 import Sky from "../components/sky";
-import React from "react";
-import { createRoot } from "react-dom/client";
 import textureImg from "../textures/h-map-lanzarote.png";
 
 const terrainGenerator1 = (groundGeo, displacement) => {
@@ -17,7 +14,6 @@ const terrainGenerator1 = (groundGeo, displacement) => {
   });
   const mesh = new THREE.Mesh(groundGeo, groundMaterial);
   mesh.rotation.x = -Math.PI / 2;
-  mesh.position.set(0, -20, 0);
   return mesh;
 };
 
@@ -32,7 +28,21 @@ const terrainGenerator2 = (groundGeo, displacement) => {
   });
   const mesh = new THREE.Mesh(groundGeo, groundMaterial2);
   mesh.rotation.x = -Math.PI / 2;
-  mesh.position.set(0, -20, 0);
+  return mesh;
+};
+
+const terrainGenerator3 = (groundGeo, displacement) => {
+  const groundMaterial2 = new THREE.MeshPhongMaterial({
+    wireframe: true,
+    color: "yellow",
+    reflectivity: 0.4,
+    displacementMap: displacement,
+    displacementScale: 323,
+    displacementBias: 0.2,
+    map: displacement,
+  });
+  const mesh = new THREE.Mesh(groundGeo, groundMaterial2);
+  mesh.rotation.x = -Math.PI / 2;
   return mesh;
 };
 
@@ -61,7 +71,6 @@ const Terrain = {
     water.visible = false;
     terrain.visible = false;
 
-    const controls = Controls.createControls(camera, renderer);
 
     sky.updateSunPosition(14);
 
@@ -75,8 +84,18 @@ const Terrain = {
     const displacement = loader.load(textureImg);
     const groundGeometry = new THREE.PlaneGeometry(10000, 10000, 300, 300);
 
-    scene.add(terrainGenerator1(groundGeometry, displacement));
-    scene.add(terrainGenerator2(groundGeometry, displacement));
+    const mesh1 = terrainGenerator1(groundGeometry, displacement);
+    mesh1.position.set(0, -20, 10);
+
+    const mesh2 = terrainGenerator2(groundGeometry, displacement);
+    mesh2.position.set(0, -20, 1900);
+
+    const mesh3 = terrainGenerator3(groundGeometry, displacement);
+    mesh3.position.set(0, -20, 4900);
+
+    scene.add(mesh1);
+    scene.add(mesh2);
+    scene.add(mesh3);
     scene.add(waterGenerator());
 
     camera.position.set(4120, 2500, 12000);
