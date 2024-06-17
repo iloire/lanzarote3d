@@ -3,13 +3,15 @@ import { Water as WaterEffect } from "three/examples/jsm/objects/Water";
 import waterTexture from "../textures/waternormals.jpg";
 import Models from "../utils/models";
 
-const USE_PLAIN_WATER = false;
+const USE_PLAIN_WATER = true;
 
 export default class Water {
   load(sunPosition: THREE.Vector3) {
     const waterGeometry = new THREE.PlaneGeometry(100000, 100000);
     if (USE_PLAIN_WATER) {
-      const mat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+      const mat = new THREE.MeshLambertMaterial({ color: 0x6CB4EE });
+      mat.transparent = true;
+      mat.opacity = 0.7;
       const meshWater = new THREE.Mesh(waterGeometry, mat);
       meshWater.rotation.x = -Math.PI / 2;
       return meshWater;

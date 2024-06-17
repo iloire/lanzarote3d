@@ -35,7 +35,7 @@ const PhotoBooth = {
 
     const env = new Environment(scene);
     const weather = new Weather(WEATHER_SETTINGS);
-    const thermals = env.addThermals(weather);
+    const thermals = env.addThermals(weather, 1);
     env.addClouds(weather, thermals);
     env.addTrees(terrain);
     env.addStones(terrain);

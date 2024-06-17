@@ -3,11 +3,8 @@ import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import Camera, { CameraMode } from "../components/camera";
-import Animations from "../utils/animations";
-import Controls from "../utils/controls";
 import locations from "./locations/lanzarote";
 
-const initial = new THREE.Vector3(7, 880, 5);
 
 const FlyZones = {
   load: (camera: Camera, scene: THREE.Scene, renderer) => {

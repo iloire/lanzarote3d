@@ -1,13 +1,22 @@
 import * as THREE from "three";
 import Weather from "../../elements/weather";
 import Thermal, { ThermalDimensions } from "../../components/thermal";
-import { rndBetween, rndIntBetween } from "../../utils/math";
+import { rndIntBetween } from "../../utils/math";
 
-const THERMAL_OPACITY = 0.04;
 
 const generateRandomLcl = (lclLevel: number): number => {
   return lclLevel + rndIntBetween(-200, 3000);
 };
+
+
+export type ThermalGenerationOptions = {
+  position: THREE.Vector3,
+  weather: Weather,
+  superThermal: boolean,
+  dimensions?: ThermalDimensions,
+  opacity?: number;
+}
+
 
 const generateRandomThermalDimensions = (
   lclLevel: number,
@@ -23,32 +32,29 @@ const generateRandomThermalDimensions = (
 };
 
 export const generateThermalPair = (
-  position: THREE.Vector3,
-  weather: Weather,
-  superThermal: boolean = false,
-  dimensions?: ThermalDimensions
+  options: ThermalGenerationOptions
 ): Thermal[] => {
   const thermal = new Thermal(
-    dimensions ||
-      generateRandomThermalDimensions(weather.getLclLevel(), superThermal),
-    position,
-    THERMAL_OPACITY,
-    weather,
+    options.dimensions ||
+    generateRandomThermalDimensions(options.weather.getLclLevel(), options.superThermal),
+    options.position,
+    options.opacity,
+    options.weather,
     true,
-    superThermal
+    options.superThermal
   );
 
   const interiorThermalDimensions = {
     bottomRadius: rndIntBetween(190, 250) / 2,
     topRadius: rndIntBetween(400, 600) / 2,
-    height: generateRandomLcl(weather.getLclLevel()),
+    height: generateRandomLcl(options.weather.getLclLevel()),
   };
 
   const thermalInside = new Thermal(
     interiorThermalDimensions,
-    position,
-    THERMAL_OPACITY,
-    weather,
+    options.position,
+    options.opacity,
+    options.weather,
     false,
     false
   );

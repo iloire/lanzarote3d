@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import Clouds from "../../components/clouds";
 import Weather from "../../elements/weather";
-import Thermal, { ThermalDimensions } from "../../components/thermal";
+import Thermal from "../../components/thermal";
 import { rndBetween, rndIntBetween } from "../../utils/math";
 import Tree from "../../components/tree";
 import PineTree from "../../components/pinetree";
@@ -15,7 +15,7 @@ import Paraglider, {
 } from "../../components/pg";
 import HangGlider from "../../components/hangglider";
 import { addMeshAroundArea } from "./mesh-utils";
-import { generateThermalPair } from "./thermal-utils";
+import { generateThermalPair, ThermalGenerationOptions } from "./thermal-utils";
 
 const KMH_TO_MS = 3.6;
 const THERMAL_OPACITY = 0.04;
@@ -225,48 +225,30 @@ class Environment {
     );
   }
 
-  addThermals(weather: Weather): Thermal[] {
-    const lclLevel = weather.getLclLevel();
+  addThermals(weather: Weather, opacity: number = 0.05): Thermal[] {
     // famara
-    const t1 = generateThermalPair(new THREE.Vector3(5727, 0, -535), weather);
-    const t2 = generateThermalPair(new THREE.Vector3(7127, 0, -1405), weather);
-    const t3 = generateThermalPair(new THREE.Vector3(3027, 0, 1005), weather);
-
-    // tenesar
-    const t4 = generateThermalPair(new THREE.Vector3(-4827, 0, -855), weather);
-
-    // mirador
-    const t5 = generateThermalPair(
-      new THREE.Vector3(15027, 0, -12555),
+    const options: ThermalGenerationOptions = {
+      position: new THREE.Vector3(5727, 0, -535),
       weather,
-      true
-    );
+      superThermal: false,
+      opacity
+    };
 
-    // pq
-    const t6 = generateThermalPair(new THREE.Vector3(-6227, 0, 14055), weather);
-    // mala
-    const t7 = generateThermalPair(new THREE.Vector3(14227, 0, -3755), weather);
-
-    // close to pq
-    const t8 = generateThermalPair(new THREE.Vector3(-3927, 0, 9830), weather);
-    const t9 = generateThermalPair(new THREE.Vector3(592, 0, 5530), weather);
-
-    const superT1 = generateThermalPair(
-      new THREE.Vector3(15027, 0, -12555),
-      weather,
-      true
-    );
-
-    const allThermals = t1
-      .concat(t2)
-      .concat(t3)
-      .concat(t4)
-      .concat(t5)
-      .concat(t6)
-      .concat(t7)
-      .concat(t8)
-      .concat(t9)
-      .concat(superT1);
+    const allThermals = generateThermalPair(options)
+      .concat(generateThermalPair({ ...options, position: new THREE.Vector3(7127, 0, -1405) }))
+      .concat(generateThermalPair({ ...options, position: new THREE.Vector3(3027, 0, 1005) }))
+      // tenesar
+      .concat(generateThermalPair({ ...options, position: new THREE.Vector3(-4827, 0, -855) }))
+      // mirador
+      .concat(generateThermalPair({ ...options, position: new THREE.Vector3(15027, 0, -12555) }))
+      //pq
+      .concat(generateThermalPair({ ...options, position: new THREE.Vector3(-6227, 0, 14055) }))
+      //mala
+      .concat(generateThermalPair({ ...options, position: new THREE.Vector3(14227, 0, -3755) }))
+      // pq
+      .concat(generateThermalPair({ ...options, position: new THREE.Vector3(-3927, 0, 9830) }))
+      .concat(generateThermalPair({ ...options, position: new THREE.Vector3(592, 0, 5530) }))
+      .concat(generateThermalPair({ ...options, position: new THREE.Vector3(15027, 0, -12555), superThermal: true }))
 
     allThermals.forEach((t) => {
       this.scene.add(t.getMesh());
