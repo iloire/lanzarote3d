@@ -8,7 +8,6 @@ import { TrajectoryPoint, TrajectoryPointType } from "../elements/trajectory";
 import { getTerrainHeightBelowPosition } from "../utils/collision";
 import { addDebugArrowsToParaglider } from "./pg-debug";
 import {
-  ORIGIN,
   FORWARD_DIRECTION,
   UP_DIRECTION,
   DOWN_DIRECTION,

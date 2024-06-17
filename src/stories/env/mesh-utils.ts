@@ -47,7 +47,7 @@ export const addMeshAroundArea = (
       console.log(meshTypes);
       console.log(centerPosition);
       console.log(terrain);
-      throw new Error("can not calculate terrain height");
+      throw new Error("can not calculate terrain height. Perphaps you need to render the scene first");
       break;
     }
     const meshPos = new THREE.Vector3(newX, terrainHeight, newZ);
