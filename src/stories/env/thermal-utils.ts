@@ -25,8 +25,8 @@ const generateRandomThermalDimensions = (
   const multiplier = isSuperThermal ? 1.4 : 1;
   const heightMultiplier = isSuperThermal ? 1.3 : 1;
   return {
-    bottomRadius: rndIntBetween(420 * multiplier, 490 * multiplier),
-    topRadius: rndIntBetween(500 * multiplier, 700 * multiplier),
+    bottomRadius: rndIntBetween(400 * multiplier, 440 * multiplier),
+    topRadius: rndIntBetween(500 * multiplier, 900 * multiplier),
     height: generateRandomLcl(lclLevel) * heightMultiplier,
   };
 };
@@ -34,9 +34,12 @@ const generateRandomThermalDimensions = (
 export const generateThermalPair = (
   options: ThermalGenerationOptions
 ): Thermal[] => {
+
+  const dimensions = options.dimensions ||
+    generateRandomThermalDimensions(options.weather.getLclLevel(), options.superThermal);
+
   const thermal = new Thermal(
-    options.dimensions ||
-    generateRandomThermalDimensions(options.weather.getLclLevel(), options.superThermal),
+    dimensions,
     options.position,
     options.opacity,
     options.weather,
@@ -44,19 +47,19 @@ export const generateThermalPair = (
     options.superThermal
   );
 
-  const interiorThermalDimensions = {
-    bottomRadius: rndIntBetween(190, 250) / 2,
-    topRadius: rndIntBetween(400, 600) / 2,
-    height: generateRandomLcl(options.weather.getLclLevel()),
+  const coreDimensions = {
+    bottomRadius: dimensions.bottomRadius * 0.4,
+    topRadius: dimensions.topRadius * 0.6,
+    height: dimensions.height
   };
 
-  const thermalInside = new Thermal(
-    interiorThermalDimensions,
+  const core = new Thermal(
+    coreDimensions,
     options.position,
     options.opacity,
     options.weather,
     false,
     false
   );
-  return [thermal, thermalInside];
+  return [thermal, core];
 };
