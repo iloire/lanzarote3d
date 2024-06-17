@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
-import Models from "../utils/models";
 import Weather from "../elements/weather";
 import Thermal from "../components/thermal";
 import ParagliderModel from "../components/paraglider";

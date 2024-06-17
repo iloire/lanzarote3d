@@ -1,13 +1,9 @@
 import * as THREE from "three";
 import Controls from "../utils/controls";
 import Sky from "../components/sky";
-import Trajectory from "../elements/trajectory";
 import Paraglider, { ParagliderConstructor } from "../components/pg";
 import Weather, { WeatherOptions } from "../elements/weather";
 import WindIndicator from "../components/wind-indicator";
-import Helpers from "../utils/helpers";
-import Stone from "../components/stone";
-import Tree from "../components/tree";
 import Environment from "./env/environment";
 
 const KMH_TO_MS = 3.6;
