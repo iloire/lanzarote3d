@@ -27,7 +27,7 @@ const ParagliderWorkshop = {
 
     const paraglider = new Paraglider();
     const mesh = await paraglider.load(gui);
-    mesh.position.set(0, 0, 0);
+    mesh.position.set(-300, -30, 0);
     scene.add(mesh);
 
     paraglider.breakLeft();
