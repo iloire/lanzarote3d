@@ -8,7 +8,7 @@ const lineMat = new THREE.LineBasicMaterial({
   opacity: 0.01,
 });
 
-const numeroCajones = 16;
+const numeroCajones = 40;
 
 type HalfWing = {
   wingBreakSystem: THREE.Object3D;
@@ -21,6 +21,7 @@ const createCajon = (
   deep: number,
   mat: THREE.MeshLambertMaterial
 ): THREE.Mesh => {
+
   const geo = new THREE.BoxGeometry(w, h, deep);
   const cajon = new THREE.Mesh(geo, mat);
   cajon.castShadow = true;
@@ -33,15 +34,19 @@ const createHalfWing = (scale?: THREE.Vector3): HalfWing => {
   let distanceCajon = 0;
   const points = []; // array to hold the points of the line segments
   const wingBreakSystem = new THREE.Group();
-  for (let i = 0; i < numeroCajones; i++) {
-    const w = 2 + i * 0.5;
-    const h = 0.5 + i * 0.2;
-    const deep = 8 + i * 2.8;
-    distanceCajon += w * 0.8;
+
+  let x = 0;
+
+  for (let n = 0; n < numeroCajones; n++) {
+    const w = 2;
+    const h = n * 0.2;
+    const deep = 8 + n * 1.2;
+
+    distanceCajon += w;
 
     const cajon = createCajon(w, h, deep, mat_wing);
 
-    const x = i * 1.9 - 2 * h;
+    x = x + (numeroCajones - n) * 0.1;
     cajon.position.set(x, distanceCajon, 0);
 
     const breakDeep = deep / 10;
@@ -51,13 +56,13 @@ const createHalfWing = (scale?: THREE.Vector3): HalfWing => {
     group.add(cajon);
     wingBreakSystem.add(breakBox);
 
-    if (i % 8 === 0) {
+    if (n % 6 === 0) {
       //lines
       const carabinerLocation = new THREE.Vector3(-84.5, 75, -3);
-      points.push(new THREE.Vector3(i * 1.5, distanceCajon, deep * 0.5));
+      points.push(new THREE.Vector3(x, distanceCajon, deep * 0.5));
       points.push(carabinerLocation);
 
-      points.push(new THREE.Vector3(i * 1.5, distanceCajon, -deep * 0.5));
+      points.push(new THREE.Vector3(x, distanceCajon, -deep * 0.5));
       points.push(carabinerLocation);
     }
   }
@@ -96,7 +101,7 @@ class Glider {
 
     this.leftWing = createHalfWing(new THREE.Vector3(1, 1, -1));
     this.rightWing = createHalfWing(new THREE.Vector3(1, -1, -1));
-    this.rightWing.wing.translateY(155);
+    this.rightWing.wing.translateY(numeroCajones * 4);
 
     this.fullWing.add(this.leftWing.wing);
     this.fullWing.add(this.rightWing.wing);
