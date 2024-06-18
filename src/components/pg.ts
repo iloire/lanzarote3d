@@ -112,8 +112,13 @@ class Paraglider extends THREE.EventDispatcher {
       lineBackColor: '#ffffff',
       numeroCajones: 20
     };
-    const pilotOptions = {};
-    this.paragliderModel = new ParagliderModel({ glider: gliderOptions, pilot: pilotOptions });
+    const pilotOptions = {
+      head: { helmetColor: '#ffff00' }
+    }
+    this.paragliderModel = new ParagliderModel({
+      glider: gliderOptions,
+      pilot: pilotOptions
+    });
     const mesh = await this.paragliderModel.load(gui);
     mesh.scale.set(scale, scale, scale);
     this.mesh = mesh;

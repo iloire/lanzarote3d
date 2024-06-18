@@ -70,7 +70,11 @@ class ParagliderModel {
     wing.position.x = 22;
     mesh.add(wing);
 
-    this.pilot = new Pilot({ helmetColor: '#ffff00' });
+    const pilotOptions = {
+      head: { helmetColor: '#ffff00' }
+    }
+
+    this.pilot = new Pilot(pilotOptions);
     this.pilotMesh = this.pilot.load();
 
     const scale = 0.03;

@@ -23,7 +23,9 @@ const paragliders = [
         lineBackColor: '#ffffff',
         numeroCajones: 30
       },
-      pilot: {}
+      pilot: {
+        head: { helmetColor: '#ffff00' }
+      }
     },
     position: new THREE.Vector3(6827, 880, -555)
   },
@@ -37,7 +39,9 @@ const paragliders = [
         lineBackColor: '#ffffff',
         numeroCajones: 50
       },
-      pilot: {}
+      pilot: {
+        head: { helmetColor: '#ffff00' }
+      }
     },
     position: new THREE.Vector3(6727, 780, -555)
   },
@@ -51,7 +55,9 @@ const paragliders = [
         lineBackColor: '#ffffff',
         numeroCajones: 20
       },
-      pilot: {}
+      pilot: {
+        head: { helmetColor: '#ffff00' }
+      }
     },
     position: new THREE.Vector3(6627, 980, -535)
   }
@@ -68,14 +74,6 @@ const PhotoBooth = {
     const initialPos = new THREE.Vector3(6827, 880, -555);
     const lookAt = new THREE.Vector3(7827, 880, -1555);
     camera.animateTo(initialPos, lookAt, 0);
-    const gliderOptions = {
-      wingColor1: '#c30010',
-      wingColor2: '#b100cd',
-      breakColor: '#ffffff',
-      lineFrontColor: '#ffffff',
-      lineBackColor: '#ffffff',
-      numeroCajones: 30
-    };
 
     paragliders.forEach(async p => {
       const paraglider = new Paraglider(p.pg);

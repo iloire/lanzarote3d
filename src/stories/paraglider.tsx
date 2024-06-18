@@ -32,7 +32,7 @@ const ParagliderWorkshop = {
       lineBackColor: '#ffffff',
       numeroCajones: 40
     };
-    const pilotOptions = {};
+    const pilotOptions = { head: {} };
 
     const options = {
       glider: gliderOptions,
