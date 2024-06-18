@@ -46,8 +46,6 @@ const generateCloud = async (): Promise<THREE.Object3D> => {
   return group;
 };
 
-const experimental = true;
-
 const tweakSize = (mesh: THREE.Object3D, interval: number) => {
   const min = 0.95,
     max = 1.05;
