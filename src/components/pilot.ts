@@ -12,6 +12,7 @@ export type PilotOptions = {
   skinColor?: string;
   suitColor?: string;
   suitColor2?: string;
+  shoesColor?: string;
   carabinercolor?: string;
 };
 

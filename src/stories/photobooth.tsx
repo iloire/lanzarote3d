@@ -28,7 +28,8 @@ const tandems = [
           head: { helmetColor: '#ffff00' }
         },
         passenger: {
-          head: { helmetColor: '#ffff00' }
+          head: { helmetColor: '#ffffff' },
+          suitColor: 'red', suitColor2: 'green'
         }
       },
     },

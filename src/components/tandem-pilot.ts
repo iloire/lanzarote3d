@@ -19,6 +19,38 @@ export type TandemPilotOptions = {
   passenger: PilotOptions;
 }
 
+const getPilotLegs = (options: PilotOptions, armRotation: number) => {
+  const shoesMat = getColoredMaterial(options.shoesColor || '#333');
+  const pantsMat = getColoredMaterial(options.suitColor2 || '#666');
+
+  const group = new THREE.Group();
+
+  //legs
+  const legGeo = new THREE.BoxGeometry(50, 490, 60);
+  const legRight = new THREE.Mesh(legGeo, pantsMat);
+  legRight.position.x = -130;
+  legRight.position.y = -750;
+  legRight.position.z = 150;
+  group.add(legRight);
+
+  const legLeft = legRight.clone();
+  legLeft.translateX(260);
+  group.add(legLeft);
+
+  //feet
+  const feetGeo = new THREE.BoxGeometry(70, 70, 160);
+  const feetRight = new THREE.Mesh(feetGeo, shoesMat);
+  feetRight.position.x = -130;
+  feetRight.position.y = -990;
+  feetRight.position.z = 180;
+  group.add(feetRight);
+
+  const feetLeft = feetRight.clone();
+  feetLeft.translateX(260);
+  group.add(feetLeft);
+
+  return group;
+}
 
 const getPilotArms = (options: PilotOptions, armRotation: number) => {
   const suitMat = getColoredMaterial(options.suitColor || '#333');
@@ -93,6 +125,7 @@ class TandemPilot {
     group.add(carabinerRight);
 
     group.add(getPilotArms(options, armRotation));
+    group.add(getPilotLegs(options, 0));
 
     return group;
   }

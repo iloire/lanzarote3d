@@ -30,10 +30,10 @@ const ParagliderWorkshop = {
 
     const tandem = new TandemPilot({
       pilot: {
-        head: {}, suitColor: 'blue'
+        head: {}, suitColor: 'blue', shoesColor: 'black'
       },
       passenger: {
-        head: {}, suitColor: 'orange'
+        head: {}, suitColor: 'orange', shoesColor: 'gray'
       }
     });
     const meshTandem = await tandem.load();
