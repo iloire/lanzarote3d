@@ -100,7 +100,7 @@ const Game = {
 
     const pg = new Paraglider(pgOptions, envOptions, DEBUG);
     const vario = new Vario(pg);
-    const pgMesh = await pg.loadModel(0.05, gui);
+    const pgMesh = await pg.loadModel(0.001, gui);
     const box = new THREE.BoxHelper(pgMesh, 0xffff00);
     if (DEBUG) {
       scene.add(box);
