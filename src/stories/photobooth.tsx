@@ -21,7 +21,7 @@ const paragliders = [
         breakColor: '#ffffff',
         lineFrontColor: '#ffffff',
         lineBackColor: '#ffffff',
-        numeroCajones: 30
+        numeroCajones: 35
       },
       pilot: {
         head: { helmetColor: '#ffff00' }
@@ -53,7 +53,7 @@ const paragliders = [
         breakColor: '#ffffff',
         lineFrontColor: '#ffffff',
         lineBackColor: '#ffffff',
-        numeroCajones: 20
+        numeroCajones: 40
       },
       pilot: {
         head: { helmetColor: '#ffff00' }

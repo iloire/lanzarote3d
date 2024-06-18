@@ -45,23 +45,23 @@ const createHalfWing = (options: GliderOptions): HalfWing => {
   const lineLocations = []; // array to hold the points of the line segments
   const wingBreakSystem = new THREE.Group();
 
-  let x = 0;
+  let shape = 0;
 
   for (let n = 0; n < options.numeroCajones; n++) {
     const cajonWidth = halfWingLength / options.numeroCajones;
     const cajonHeight = 10 + n * 5;
-    const deep = 300 + n * 30;
+    const deep = 300 + n * 35;
 
     distanceCajon += cajonWidth;
 
     const cajon = createCajon(cajonWidth, cajonHeight, deep, mat_wing);
 
-    x = x + (options.numeroCajones - n) * 2.05;
-    cajon.position.set(x, distanceCajon, 0);
+    shape = shape + (options.numeroCajones - n) * 3.05;
+    cajon.position.set(shape, distanceCajon, 0);
 
     const breakDeep = deep / 10;
     const breakBox = createCajon(cajonWidth, cajonHeight, breakDeep, mat_break);
-    breakBox.position.set(x, distanceCajon, deep / 2);
+    breakBox.position.set(shape, distanceCajon, deep / 2);
 
     group.add(cajon);
     wingBreakSystem.add(breakBox);
@@ -69,10 +69,10 @@ const createHalfWing = (options: GliderOptions): HalfWing => {
     if (n % 8 === 0) {
       //lines
       const carabinerLocation = new THREE.Vector3(-3000, halfWingLength, 0);
-      lineLocations.push(new THREE.Vector3(x, distanceCajon, deep * 0.5));
+      lineLocations.push(new THREE.Vector3(shape, distanceCajon, deep * 0.5));
       lineLocations.push(carabinerLocation);
 
-      lineLocations.push(new THREE.Vector3(x, distanceCajon, -deep * 0.5));
+      lineLocations.push(new THREE.Vector3(shape, distanceCajon, -deep * 0.5));
       lineLocations.push(carabinerLocation);
     }
   }
