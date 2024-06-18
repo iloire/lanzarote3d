@@ -9,7 +9,6 @@
 
 ## Screenshots
 
-![Screenshot](https://raw.githubusercontent.com/iloire/lanzarote3d/master/screenshots/screenshot2.png)
 ![Screenshot](https://raw.githubusercontent.com/iloire/lanzarote3d/master/screenshots/screenshot3.png)
 
 ## Height map
