@@ -12,6 +12,7 @@ import Cloud from "./cloud";
 import Clouds from "./clouds";
 import PhotoBooth from "./photobooth";
 import Glider from "./glider";
+import Pilot from "./pilot";
 
 const Stories = {
   default: Default.load,
@@ -28,6 +29,7 @@ const Stories = {
   clouds: Clouds.load,
   photobooth: PhotoBooth.load,
   glider: Glider.load,
+  pilot: Pilot.load,
 };
 
 export default Stories;

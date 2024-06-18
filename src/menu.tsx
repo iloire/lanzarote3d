@@ -18,6 +18,7 @@ class Menu extends React.Component {
       { story: "workshop" },
       { story: "mechanics" },
       { story: "paraglider" },
+      { story: "pilot" },
       { story: "glider" },
       { story: "hangglider" },
       { story: "terrain" },
