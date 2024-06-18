@@ -292,6 +292,7 @@ class Paraglider extends THREE.EventDispatcher {
     });
 
     const inHowManyThermals = this.countInsideHowManyThermals();
+    console.log(inHowManyThermals)
     const liftThermal = 2 * inHowManyThermals; // this.isInsideAnyThermal() ? 2 : 0;
     const liftThermalVector = UP_DIRECTION.clone().multiplyScalar(
       multiplier * liftThermal

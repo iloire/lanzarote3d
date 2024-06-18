@@ -144,7 +144,7 @@ const PhotoBooth = {
 
     const env = new Environment(scene);
     const weather = new Weather(WEATHER_SETTINGS);
-    const thermals = env.addThermals(weather, 0);
+    const thermals = env.generateThermals(weather, 0);
     const cloudOptions = { colors: ['#F64A8A', '#F987C5', '#DE3163'] }
 
     env.addClouds(weather, thermals, cloudOptions);

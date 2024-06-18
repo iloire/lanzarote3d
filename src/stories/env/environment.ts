@@ -229,7 +229,17 @@ class Environment {
     );
   }
 
+
+
   addThermals(weather: Weather, opacity: number = 0.05): Thermal[] {
+    const thermals = this.generateThermals(weather, opacity);
+    thermals.forEach((t) => {
+      this.scene.add(t.getMesh());
+    });
+    return thermals;
+  }
+
+  generateThermals(weather: Weather, opacity: number = 0.05): Thermal[] {
     // famara
     const options: ThermalGenerationOptions = {
       position: new THREE.Vector3(5727, 0, -535),
@@ -254,9 +264,6 @@ class Environment {
       .concat(generateThermalPair({ ...options, position: new THREE.Vector3(592, 0, 5530) }))
       .concat(generateThermalPair({ ...options, position: new THREE.Vector3(15027, 0, -12555), superThermal: true }))
 
-    allThermals.forEach((t) => {
-      this.scene.add(t.getMesh());
-    });
 
     this.thermals.concat(allThermals);
 
