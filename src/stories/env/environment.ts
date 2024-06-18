@@ -229,8 +229,6 @@ class Environment {
     );
   }
 
-
-
   addThermals(weather: Weather, opacity: number = 0.05): Thermal[] {
     const thermals = this.generateThermals(weather, opacity);
     thermals.forEach((t) => {
