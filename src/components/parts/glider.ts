@@ -7,11 +7,11 @@ const halfWingLength = 80;
 const numeroCajones = 40;
 
 export type GliderOptions = {
-  wingColor1: number;
-  wingColor2: number;
-  breakColor: number;
-  lineFrontColor: number;
-  lineBackColor: number;
+  wingColor1: string;
+  wingColor2: string;
+  breakColor: string;
+  lineFrontColor: string;
+  lineBackColor: string;
 }
 
 type HalfWing = {
@@ -41,9 +41,12 @@ const createHalfWing = (options: GliderOptions, scale?: THREE.Vector3): HalfWing
     opacity: 0.01,
   });
 
+  console.log(options)
+  console.log(mat_wing)
+
   const group = new THREE.Mesh();
   let distanceCajon = 0;
-  const points = []; // array to hold the points of the line segments
+  const lineLocations = []; // array to hold the points of the line segments
   const wingBreakSystem = new THREE.Group();
 
   let x = 0;
@@ -70,19 +73,20 @@ const createHalfWing = (options: GliderOptions, scale?: THREE.Vector3): HalfWing
     if (n % 6 === 0) {
       //lines
       const carabinerLocation = new THREE.Vector3(-84.5, 75, -3);
-      points.push(new THREE.Vector3(x, distanceCajon, deep * 0.5));
-      points.push(carabinerLocation);
+      lineLocations.push(new THREE.Vector3(x, distanceCajon, deep * 0.5));
+      lineLocations.push(carabinerLocation);
 
-      points.push(new THREE.Vector3(x, distanceCajon, -deep * 0.5));
-      points.push(carabinerLocation);
+      lineLocations.push(new THREE.Vector3(x, distanceCajon, -deep * 0.5));
+      lineLocations.push(carabinerLocation);
     }
   }
   group.add(wingBreakSystem);
   group.rotateZ(Math.PI / 2);
   group.rotateX(Math.PI / 2);
-  const geometry = new THREE.BufferGeometry().setFromPoints(points); // create the geometry from the points
+  const geometry = new THREE.BufferGeometry().setFromPoints(lineLocations); // create the geometry from the points
   const lineSegments = new THREE.LineSegments(geometry, lineMat); // create the line segments
   group.add(lineSegments);
+
   if (scale) {
     group.scale.set(scale.x, scale.y, scale.z);
   }

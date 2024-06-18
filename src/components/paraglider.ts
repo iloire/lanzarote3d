@@ -54,13 +54,13 @@ class ParagliderModel {
   async load(gui?: any): Promise<THREE.Object3D> {
     const mesh = new THREE.Object3D();
     const gliderOptions = {
-      wingColor1: 0xc2c2c2,
-      wingColor2: 0x0044444,
-      breakColor: 0x333333,
-      lineFrontColor: 0x66666,
-      lineBackColor: 0x000000
+      wingColor1: '#c30010',
+      wingColor2: '#b100cd',
+      breakColor: '#ffffff',
+      lineFrontColor: '#ffffff',
+      lineBackColor: '#ffffff'
+    };
 
-    }
     this.glider = new Glider(gliderOptions);
 
     const wing = this.glider.createWing();

@@ -22,11 +22,11 @@ const GliderStory = {
     sky.updateSunPosition(12);
 
     const gliderOptions = {
-      wingColor1: 0xc2c2c2,
-      wingColor2: 0x0044444,
-      breakColor: 0x333333,
-      lineFrontColor: 0x66666,
-      lineBackColor: 0x000000
+      wingColor1: '#c30010',
+      wingColor2: '#b100cd',
+      breakColor: '#333333',
+      lineFrontColor: '#000000',
+      lineBackColor: '#333333'
     };
     const glider = new Glider(gliderOptions);
 
