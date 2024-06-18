@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import Thermal from "../../components/thermal";
 import Environment from "../env/environment";
 import Weather from "../../elements/weather";
 

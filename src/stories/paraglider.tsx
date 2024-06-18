@@ -23,7 +23,6 @@ const ParagliderWorkshop = {
 
     const controls = Controls.createControls(camera, renderer);
     sky.updateSunPosition(12);
-    //
 
     const paraglider = new Paraglider();
     const mesh = await paraglider.load(gui);
