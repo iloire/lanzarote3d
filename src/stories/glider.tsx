@@ -21,7 +21,14 @@ const GliderStory = {
     const controls = Controls.createControls(camera, renderer);
     sky.updateSunPosition(12);
 
-    const glider = new Glider();
+    const gliderOptions = {
+      wingColor1: 0xc2c2c2,
+      wingColor2: 0x0044444,
+      breakColor: 0x333333,
+      lineFrontColor: 0x66666,
+      lineBackColor: 0x000000
+    };
+    const glider = new Glider(gliderOptions);
 
     const wing = glider.createWing();
     scene.add(wing);

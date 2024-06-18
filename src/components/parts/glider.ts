@@ -1,16 +1,18 @@
 import * as THREE from "three";
 import GuiHelper from "../../utils/gui";
 
-const mat_wing = new THREE.MeshLambertMaterial({ color: 0x00ffff });
-const mat_break = new THREE.MeshLambertMaterial({ color: 0xffffff });
-const lineMat = new THREE.LineBasicMaterial({
-  color: 0xc2c2c2,
-  opacity: 0.01,
-});
 
 
 const halfWingLength = 80;
 const numeroCajones = 40;
+
+export type GliderOptions = {
+  wingColor1: number;
+  wingColor2: number;
+  breakColor: number;
+  lineFrontColor: number;
+  lineBackColor: number;
+}
 
 type HalfWing = {
   wingBreakSystem: THREE.Object3D;
@@ -31,7 +33,14 @@ const createCajon = (
   return cajon;
 };
 
-const createHalfWing = (scale?: THREE.Vector3): HalfWing => {
+const createHalfWing = (options: GliderOptions, scale?: THREE.Vector3): HalfWing => {
+  const mat_wing = new THREE.MeshLambertMaterial({ color: options.wingColor1 });
+  const mat_break = new THREE.MeshLambertMaterial({ color: options.breakColor });
+  const lineMat = new THREE.LineBasicMaterial({
+    color: options.lineBackColor,
+    opacity: 0.01,
+  });
+
   const group = new THREE.Mesh();
   let distanceCajon = 0;
   const points = []; // array to hold the points of the line segments
@@ -80,10 +89,18 @@ const createHalfWing = (scale?: THREE.Vector3): HalfWing => {
   return { wing: group, wingBreakSystem };
 };
 
+
+
 class Glider {
   leftWing: HalfWing;
   rightWing: HalfWing;
   fullWing: THREE.Mesh;
+
+  options: GliderOptions
+
+  constructor(options: GliderOptions) {
+    this.options = options;
+  }
 
   breakLeft() {
     this.leftWing.wingBreakSystem.position.x = -3;
@@ -101,8 +118,8 @@ class Glider {
   createWing(): THREE.Mesh {
     this.fullWing = new THREE.Mesh();
 
-    this.leftWing = createHalfWing(new THREE.Vector3(1, 1, -1));
-    this.rightWing = createHalfWing(new THREE.Vector3(1, -1, -1));
+    this.leftWing = createHalfWing(this.options, new THREE.Vector3(1, 1, -1));
+    this.rightWing = createHalfWing(this.options, new THREE.Vector3(1, -1, -1));
     this.rightWing.wing.translateY(halfWingLength * 2);
 
     this.fullWing.add(this.leftWing.wing);
