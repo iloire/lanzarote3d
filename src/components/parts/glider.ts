@@ -59,7 +59,7 @@ const createHalfWing = (options: GliderOptions): HalfWing => {
 
     const cajon = createCajon(cajonWidth, cajonHeight, deep, mat_wing);
 
-    shape = shape + (options.numeroCajones - n) * 3.05;
+    shape = shape + (options.numeroCajones - n) ^ 2 * 13.05;
     cajon.position.set(shape, distanceCajon, 0);
 
     const breakDeep = deep / 10;
@@ -70,7 +70,7 @@ const createHalfWing = (options: GliderOptions): HalfWing => {
     const frontCajon = createCajon(cajonWidth, cajonHeight, frontCajonDeep, mat_frontCajon);
     frontCajon.position.set(shape, distanceCajon, -deep / 2 - frontCajonDeep);
 
-    if (n % 8 === 0) {
+    if (n % 12 === 0) {
       //lines
       const carabinerLocation = new THREE.Vector3(-3000, halfWingLength, 0);
       lineLocations.push(new THREE.Vector3(shape, distanceCajon, deep * 0.5));
