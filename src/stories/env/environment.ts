@@ -16,6 +16,7 @@ import Paraglider, {
 import HangGlider from "../../components/hangglider";
 import { addMeshAroundArea } from "./mesh-utils";
 import { generateThermalPair, ThermalGenerationOptions } from "./thermal-utils";
+import { CloudOptions } from "../../components/cloud";
 
 const KMH_TO_MS = 3.6;
 const THERMAL_OPACITY = 0.04;
@@ -261,7 +262,8 @@ class Environment {
 
   async addClouds(
     weather: Weather,
-    thermals: Thermal[]
+    thermals: Thermal[],
+    options: CloudOptions
   ): Promise<THREE.Object3D[]> {
     const lclLevel = weather.getLclLevel();
     // from thermals
@@ -269,7 +271,7 @@ class Environment {
     const clouds = await Promise.all(
       mainThermals.map((t) => {
         if (t.isSuperThermal()) {
-          return new Clouds().load(
+          return new Clouds(options).load(
             3,
             new THREE.Vector3(
               t.getPosition().x,
@@ -278,7 +280,7 @@ class Environment {
             )
           );
         } else {
-          return new Clouds().load(
+          return new Clouds(options).load(
             1,
             new THREE.Vector3(
               t.getPosition().x,
@@ -299,7 +301,7 @@ class Environment {
       { x: 2600, y: 2300, z: 842 },
       { x: -3600, y: 2300, z: 8042 },
     ].map(async (pos) => {
-      const cloud = await new Clouds().load(
+      const cloud = await new Clouds(options).load(
         1,
         new THREE.Vector3(pos.x, pos.y, pos.z)
       );

@@ -36,7 +36,7 @@ const Mechanics = {
 
     const env = new Environment(scene);
     const thermals = env.addThermals(weather);
-    env.addClouds(weather, thermals);
+    env.addClouds(weather, thermals, {});
 
     sky.updateSunPosition(20);
 

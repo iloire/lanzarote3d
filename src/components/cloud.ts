@@ -2,13 +2,10 @@ import * as THREE from "three";
 import { rndBetween, rndIntBetween } from "../utils/math";
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 
-const mat_cloud = new THREE.MeshLambertMaterial({ color: 0xffffff });
-const mat_cloud2 = new THREE.MeshLambertMaterial({ color: 0x666666 });
-const mat_cloud3 = new THREE.MeshLambertMaterial({ color: 0x999999 });
 
-const materials = [mat_cloud, mat_cloud2, mat_cloud3];
 
 const generateCloudPart = (
+  options: CloudOptions,
   radius: number,
   scale: number,
   material: THREE.Material
@@ -25,7 +22,12 @@ const generateCloudPart = (
   return cloudPart;
 };
 
-const generateCloud = async (): Promise<THREE.Object3D> => {
+const generateCloud = async (options: CloudOptions): Promise<THREE.Object3D> => {
+  const mat_cloud = new THREE.MeshLambertMaterial({ color: options.colors && options.colors[0] || 0xffffff });
+  const mat_cloud2 = new THREE.MeshLambertMaterial({ color: options.colors && options.colors[1] || 0x666666 });
+  const mat_cloud3 = new THREE.MeshLambertMaterial({ color: options.colors && options.colors[2] || 0x999999 });
+  const materials = [mat_cloud, mat_cloud2, mat_cloud3];
+
   const radius = 40;
   const r = rndBetween;
   const n = rndIntBetween(3, 8);
@@ -38,7 +40,7 @@ const generateCloud = async (): Promise<THREE.Object3D> => {
     const posX = 1.7 * radius * r(-1 * i, i);
     const posY = 0.3 * radius * r(-1 * i, i);
     const posZ = 1.2 * radius * r(-1 * i, i);
-    const p = generateCloudPart(radius, scale, material);
+    const p = generateCloudPart(options, radius, scale, material);
     p.position.set(posX, posY, posZ);
     group.add(p);
   }
@@ -76,11 +78,21 @@ const tweakPos = (mesh: THREE.Object3D, interval: number) => {
     .start();
 };
 
+export type CloudOptions = {
+  colors?: string[]
+}
+
 class Cloud {
+  options: CloudOptions;
+
+  constructor(options: CloudOptions) {
+    this.options = options;
+  }
+
   interval: number;
 
   async load(): Promise<THREE.Object3D> {
-    const mesh = await generateCloud();
+    const mesh = await generateCloud(this.options);
     const interval = 3000;
     this.interval = setInterval(() => {
       mesh.children.forEach((m) => {

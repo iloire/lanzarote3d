@@ -71,7 +71,7 @@ const PhotoBooth = {
     terrain: THREE.Mesh,
     water: THREE.Mesh,
   ) => {
-    const initialPos = new THREE.Vector3(6800, 870, -495);
+    const initialPos = new THREE.Vector3(6800, 870, -475);
     camera.animateTo(initialPos, paragliders[0].position, 0);
 
     paragliders.forEach(async p => {
@@ -90,7 +90,8 @@ const PhotoBooth = {
     const env = new Environment(scene);
     const weather = new Weather(WEATHER_SETTINGS);
     const thermals = env.addThermals(weather, 0);
-    env.addClouds(weather, thermals);
+    const cloudOptions = { colors: ['#F64A8A', '#F987C5', '#DE3163'] }
+    env.addClouds(weather, thermals, cloudOptions);
     env.addTrees(terrain);
     env.addStones(terrain);
     env.addHouses(terrain);

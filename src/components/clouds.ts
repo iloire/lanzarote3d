@@ -1,4 +1,4 @@
-import Cloud from "./cloud";
+import Cloud, { CloudOptions } from "./cloud";
 import * as THREE from "three";
 
 const randomNumber = (min: number, max: number) => Math.random() * min + max;
@@ -8,8 +8,8 @@ const getRandomSign = (): number => {
   return randomBoolean ? 1 : -1;
 };
 
-const getRandomCloud = async () => {
-  const cloud = await new Cloud().load();
+const getRandomCloud = async (options: CloudOptions) => {
+  const cloud = await new Cloud(options).load();
   const boundingBox = new THREE.Box3().setFromObject(cloud);
   const size = new THREE.Vector3();
   boundingBox.getSize(size);
@@ -31,11 +31,16 @@ const random = (min: number, max: number): number =>
   Math.floor(Math.random() * (max - min)) + min;
 
 class Clouds {
+  options: CloudOptions;
+
+  constructor(options: CloudOptions) {
+    this.options = options;
+  }
   async load(scale: number, pos: THREE.Vector3): Promise<THREE.Object3D> {
     const group = new THREE.Group();
     const nClouds = random(2, 5);
     for (let i = 0; i < nClouds; i++) {
-      const cloud = await getRandomCloud();
+      const cloud = await getRandomCloud(this.options);
       group.add(cloud);
       group.position.copy(pos);
     }
