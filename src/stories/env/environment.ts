@@ -177,9 +177,28 @@ class Environment {
     addMeshAroundArea([stone], pos, 100, terrain, this.scene, 200, 2);
   }
 
-  addTrees(terrain: THREE.Mesh) {
+  addPines(terrain: THREE.Mesh) {
+    addMeshAroundArea(
+      [
+        () => {
+          const pineTree = new PineTree().load();
+          const scalePineTree = 10;
+          pineTree.scale.set(scalePineTree, scalePineTree, scalePineTree);
+          return pineTree;
+        },
+      ],
+      new THREE.Vector3(8379, 0, -2145),
+      100,
+      terrain,
+      this.scene,
+      400,
+      5
+    );
+  }
+
+
+  addTrees(terrain: THREE.Mesh, scale: number = 2) {
     const tree = new Tree().load();
-    const scale = 1;
     tree.scale.set(scale, scale, scale);
     addMeshAroundArea(
       [tree],
@@ -206,22 +225,6 @@ class Environment {
       terrain,
       this.scene,
       40,
-      5
-    );
-    addMeshAroundArea(
-      [
-        () => {
-          const pineTree = new PineTree().load();
-          const scalePineTree = 10;
-          pineTree.scale.set(scalePineTree, scalePineTree, scalePineTree);
-          return pineTree;
-        },
-      ],
-      new THREE.Vector3(8379, 0, -2145),
-      100,
-      terrain,
-      this.scene,
-      400,
       5
     );
   }

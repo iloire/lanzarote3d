@@ -11,7 +11,6 @@ const Animations = {
     time: number = 2000,
     callBack?: () => void
   ) => {
-    console.log("animation started");
     const tween = new TWEEN.Tween({
       x1: camera.position.x,
       y1: camera.position.y,
@@ -31,7 +30,7 @@ const Animations = {
       },
       time
     );
-    tween.onUpdate(function (object) {
+    tween.onUpdate(function(object) {
       camera.position.x = object.x1;
       camera.position.y = object.y1;
       camera.position.z = object.z1;
@@ -40,8 +39,7 @@ const Animations = {
       controls.target.z = object.z2;
       controls.update();
     });
-    tween.onComplete(function () {
-      console.log("animation done ");
+    tween.onComplete(function() {
       controls.enabled = true;
       callBack && callBack();
     });

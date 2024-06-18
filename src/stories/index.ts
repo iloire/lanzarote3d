@@ -11,6 +11,7 @@ import HangGlider from "./hangglider";
 import Cloud from "./cloud";
 import Clouds from "./clouds";
 import PhotoBooth from "./photobooth";
+import Animation from "./animation";
 import Glider from "./glider";
 import Pilot from "./pilot";
 
@@ -28,6 +29,7 @@ const Stories = {
   cloud: Cloud.load,
   clouds: Clouds.load,
   photobooth: PhotoBooth.load,
+  animation: Animation.load,
   glider: Glider.load,
   pilot: Pilot.load,
 };

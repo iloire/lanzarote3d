@@ -109,7 +109,36 @@ const paragliders = [
   }
 ];
 
-const PhotoBooth = {
+function getOffsetPosition(camera: Camera, target: THREE.Vector3, offsetDistance: number): THREE.Vector3 {
+  const direction = target.clone().sub(camera.position).normalize();
+  return target.clone().sub(direction.multiplyScalar(offsetDistance));
+}
+
+function flyThroughTargets(camera: Camera, targets: THREE.Vector3[], offsetDistance: number, duration: number) {
+  let tweenChain = new TWEEN.Tween(camera.position)
+    .to(getOffsetPosition(camera, targets[0], offsetDistance), duration)
+    .easing(TWEEN.Easing.Quadratic.InOut)
+    .onUpdate(() => {
+      camera.lookAt(targets[0]);
+    });
+
+  // for (let i = 1; i < targets.length; i++) {
+  //   console.log('go')
+  //   tweenChain = tweenChain.chain(
+  //     new TWEEN.Tween(camera.position)
+  //       .to(getOffsetPosition(camera, targets[i], offsetDistance), duration)
+  //       .easing(TWEEN.Easing.Quadratic.InOut)
+  //       .onUpdate(() => {
+  //         camera.lookAt(targets[i]);
+  //       })
+  //   );
+  // }
+  //
+  tweenChain.start();
+}
+
+
+const Animation = {
   load: async (
     camera: Camera,
     scene: THREE.Scene,
@@ -146,9 +175,9 @@ const PhotoBooth = {
     const weather = new Weather(WEATHER_SETTINGS);
     const thermals = env.addThermals(weather, 0);
     const cloudOptions = { colors: ['#F64A8A', '#F987C5', '#DE3163'] }
-
     env.addClouds(weather, thermals, cloudOptions);
     env.addTrees(terrain);
+    env.addStones(terrain);
     env.addHouses(terrain);
     env.addBoats(water);
 
@@ -159,7 +188,8 @@ const PhotoBooth = {
       requestAnimationFrame(animate);
     };
     animate();
+    flyThroughTargets(camera, paragliders.map(p => p.position), 10, 10000);
   },
 };
 
-export default PhotoBooth;
+export default Animation;

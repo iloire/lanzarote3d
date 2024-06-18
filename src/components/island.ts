@@ -22,7 +22,7 @@ const loadFromBlenderModel = async (manager: THREE.LoadingManager) => {
   const mesh = await Models.loadSimple(model, manager);
   mesh.material = new THREE.MeshStandardMaterial({
     // map: await loadTexture(manager),
-    // wireframe: true,
+    wireframe: true,
     depthTest: true,
   });
   mesh.geometry.boundsTree = new MeshBVH(mesh.geometry);
