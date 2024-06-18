@@ -22,8 +22,16 @@ const PhotoBooth = {
     const initialPos = new THREE.Vector3(6827, 880, -555);
     const lookAt = new THREE.Vector3(7827, 880, -1555);
     camera.animateTo(initialPos, lookAt, 0);
+    const gliderOptions = {
+      wingColor1: '#c30010',
+      wingColor2: '#b100cd',
+      breakColor: '#ffffff',
+      lineFrontColor: '#ffffff',
+      lineBackColor: '#ffffff',
+      numeroCajones: 20
+    };
 
-    const paraglider = new Paraglider();
+    const paraglider = new Paraglider({ glider: gliderOptions });
     const mesh = await paraglider.load();
     mesh.position.copy(initialPos);
     const scale = 0.1;

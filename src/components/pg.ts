@@ -104,7 +104,15 @@ class Paraglider extends THREE.EventDispatcher {
   }
 
   async loadModel(scale: number, gui?: any): Promise<THREE.Object3D> {
-    this.paragliderModel = new ParagliderModel();
+    const gliderOptions = {
+      wingColor1: '#c30010',
+      wingColor2: '#b100cd',
+      breakColor: '#ffffff',
+      lineFrontColor: '#ffffff',
+      lineBackColor: '#ffffff',
+      numeroCajones: 20
+    };
+    this.paragliderModel = new ParagliderModel({ glider: gliderOptions });
     const mesh = await this.paragliderModel.load(gui);
     mesh.scale.set(scale, scale, scale);
     this.mesh = mesh;

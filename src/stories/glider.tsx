@@ -26,10 +26,12 @@ const GliderStory = {
       wingColor2: '#b100cd',
       breakColor: '#333333',
       lineFrontColor: '#000000',
-      lineBackColor: '#333333'
-    };
-    const glider = new Glider(gliderOptions);
+      lineBackColor: '#333333',
+      numeroCajones: 10,
 
+    };
+
+    const glider = new Glider(gliderOptions);
     const wing = glider.createWing();
     scene.add(wing);
 

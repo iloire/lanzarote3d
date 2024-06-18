@@ -24,7 +24,20 @@ const ParagliderWorkshop = {
     const controls = Controls.createControls(camera, renderer);
     sky.updateSunPosition(12);
 
-    const paraglider = new Paraglider();
+    const gliderOptions = {
+      wingColor1: '#c30010',
+      wingColor2: '#b100cd',
+      breakColor: '#ffffff',
+      lineFrontColor: '#ffffff',
+      lineBackColor: '#ffffff',
+      numeroCajones: 40
+    };
+
+    const options = {
+      glider: gliderOptions
+    }
+
+    const paraglider = new Paraglider(options);
     const mesh = await paraglider.load(gui);
     mesh.position.set(-300, -30, 0);
     scene.add(mesh);

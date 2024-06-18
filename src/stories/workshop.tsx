@@ -33,7 +33,15 @@ const Workshop = {
     // const plane = new THREE.Mesh(planeGeo, material);
     // scene.add(plane);
 
-    const paraglider = new Paraglider();
+    const gliderOptions = {
+      wingColor1: '#c30010',
+      wingColor2: '#b100cd',
+      breakColor: '#ffffff',
+      lineFrontColor: '#ffffff',
+      lineBackColor: '#ffffff',
+      numeroCajones: 10
+    };
+    const paraglider = new Paraglider({ glider: gliderOptions });
     const mesh = await paraglider.load(gui);
     mesh.position.set(0, 0, 0);
     scene.add(mesh);

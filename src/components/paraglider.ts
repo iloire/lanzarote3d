@@ -1,14 +1,22 @@
 import * as THREE from "three";
 import Pilot from "./pilot";
-import Glider from "./parts/glider";
+import Glider, { GliderOptions } from "./parts/glider";
 import GuiHelper from "../utils/gui";
 
+export type ParagliderOptions = {
+  glider: GliderOptions;
+}
 
 class ParagliderModel {
   glider: Glider;
   pilot: Pilot;
   pilotMesh: THREE.Object3D;
   axesHelper: THREE.AxesHelper;
+  options: ParagliderOptions;
+
+  constructor(options: ParagliderOptions) {
+    this.options = options;
+  }
 
   showAxesHelper() {
     this.axesHelper.visible = true;
@@ -53,15 +61,8 @@ class ParagliderModel {
 
   async load(gui?: any): Promise<THREE.Object3D> {
     const mesh = new THREE.Object3D();
-    const gliderOptions = {
-      wingColor1: '#c30010',
-      wingColor2: '#b100cd',
-      breakColor: '#ffffff',
-      lineFrontColor: '#ffffff',
-      lineBackColor: '#ffffff'
-    };
 
-    this.glider = new Glider(gliderOptions);
+    this.glider = new Glider(this.options.glider);
 
     const wing = this.glider.createWing();
     wing.position.y = 80;

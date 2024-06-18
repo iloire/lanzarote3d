@@ -1,10 +1,7 @@
 import * as THREE from "three";
 import GuiHelper from "../../utils/gui";
 
-
-
 const halfWingLength = 80;
-const numeroCajones = 40;
 
 export type GliderOptions = {
   wingColor1: string;
@@ -12,6 +9,7 @@ export type GliderOptions = {
   breakColor: string;
   lineFrontColor: string;
   lineBackColor: string;
+  numeroCajones: number;
 }
 
 type HalfWing = {
@@ -41,9 +39,6 @@ const createHalfWing = (options: GliderOptions, scale?: THREE.Vector3): HalfWing
     opacity: 0.01,
   });
 
-  console.log(options)
-  console.log(mat_wing)
-
   const group = new THREE.Mesh();
   let distanceCajon = 0;
   const lineLocations = []; // array to hold the points of the line segments
@@ -51,8 +46,9 @@ const createHalfWing = (options: GliderOptions, scale?: THREE.Vector3): HalfWing
 
   let x = 0;
 
-  for (let n = 0; n < numeroCajones; n++) {
-    const w = halfWingLength / numeroCajones;
+  for (let n = 0; n < options.numeroCajones; n++) {
+    console.log('wo')
+    const w = halfWingLength / options.numeroCajones;
     const h = n * 0.2;
     const deep = 8 + n * 1.2;
 
@@ -60,7 +56,7 @@ const createHalfWing = (options: GliderOptions, scale?: THREE.Vector3): HalfWing
 
     const cajon = createCajon(w, h, deep, mat_wing);
 
-    x = x + (numeroCajones - n) * 0.05;
+    x = x + (options.numeroCajones - n) * 0.05;
     cajon.position.set(x, distanceCajon, 0);
 
     const breakDeep = deep / 10;
