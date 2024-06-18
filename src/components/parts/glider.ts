@@ -8,6 +8,8 @@ const lineMat = new THREE.LineBasicMaterial({
   opacity: 0.01,
 });
 
+
+const halfWingLength = 80;
 const numeroCajones = 40;
 
 type HalfWing = {
@@ -38,7 +40,7 @@ const createHalfWing = (scale?: THREE.Vector3): HalfWing => {
   let x = 0;
 
   for (let n = 0; n < numeroCajones; n++) {
-    const w = 2;
+    const w = halfWingLength / numeroCajones;
     const h = n * 0.2;
     const deep = 8 + n * 1.2;
 
@@ -46,7 +48,7 @@ const createHalfWing = (scale?: THREE.Vector3): HalfWing => {
 
     const cajon = createCajon(w, h, deep, mat_wing);
 
-    x = x + (numeroCajones - n) * 0.1;
+    x = x + (numeroCajones - n) * 0.05;
     cajon.position.set(x, distanceCajon, 0);
 
     const breakDeep = deep / 10;
@@ -101,7 +103,7 @@ class Glider {
 
     this.leftWing = createHalfWing(new THREE.Vector3(1, 1, -1));
     this.rightWing = createHalfWing(new THREE.Vector3(1, -1, -1));
-    this.rightWing.wing.translateY(numeroCajones * 4);
+    this.rightWing.wing.translateY(halfWingLength * 2);
 
     this.fullWing.add(this.leftWing.wing);
     this.fullWing.add(this.rightWing.wing);
