@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 import Paraglider from "../components/paraglider";
+import Tandem from "../components/tandem";
 import Camera from "../components/camera";
 import Environment from "./env/environment";
 import Weather, { WeatherOptions } from "../elements/weather";
@@ -11,6 +12,29 @@ const WEATHER_SETTINGS: WeatherOptions = {
   lclLevel: 1800,
 };
 
+const tandems = [
+  {
+    pg: {
+      glider: {
+        wingColor1: '#c30010',
+        wingColor2: '#b100cd',
+        breakColor: '#ffffff',
+        lineFrontColor: '#ffffff',
+        lineBackColor: '#ffffff',
+        numeroCajones: 35
+      },
+      pilot: {
+        pilot: {
+          head: { helmetColor: '#ffff00' }
+        },
+        passenger: {
+          head: { helmetColor: '#ffff00' }
+        }
+      },
+    },
+    position: new THREE.Vector3(6837, 850, -535)
+  }
+];
 
 const paragliders = [
   {
@@ -60,8 +84,24 @@ const paragliders = [
       }
     },
     position: new THREE.Vector3(6777, 920, -535)
+  },
+  {
+    pg: {
+      glider: {
+        wingColor1: '#FFA500',
+        wingColor2: '#b100cd',
+        breakColor: '#ffffff',
+        lineFrontColor: '#ffffff',
+        lineBackColor: '#ffffff',
+        numeroCajones: 40
+      },
+      pilot: {
+        head: { helmetColor: '#ffff00' }
+      }
+    },
+    position: new THREE.Vector3(6777, 920, -535)
   }
-]
+];
 
 const PhotoBooth = {
   load: async (
@@ -83,6 +123,15 @@ const PhotoBooth = {
       scene.add(mesh);
     });
 
+
+    tandems.forEach(async p => {
+      const tandem = new Tandem(p.pg);
+      const mesh = await tandem.load();
+      mesh.position.copy(p.position);
+      const scale = 0.001; // mm to m
+      mesh.scale.set(scale, scale, scale);
+      scene.add(mesh);
+    });
 
     // must render before adding env
     renderer.render(scene, camera);
