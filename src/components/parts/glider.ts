@@ -36,7 +36,8 @@ const createHalfWing = (options: GliderOptions): HalfWing => {
   const mat_break = new THREE.MeshLambertMaterial({ color: options.breakColor });
   const lineMat = new THREE.LineBasicMaterial({
     color: options.lineBackColor,
-    opacity: 0.01,
+    transparent: true,
+    opacity: 0.2,
   });
 
   const group = new THREE.Mesh();
