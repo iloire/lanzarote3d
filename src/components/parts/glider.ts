@@ -50,7 +50,7 @@ const createHalfWing = (options: GliderOptions): HalfWing => {
   for (let n = 0; n < options.numeroCajones; n++) {
     const cajonWidth = halfWingLength / options.numeroCajones;
     const cajonHeight = 10 + n * 5;
-    const deep = 300 + n * 35;
+    const deep = 700 + n * 35;
 
     distanceCajon += cajonWidth;
 
@@ -76,6 +76,7 @@ const createHalfWing = (options: GliderOptions): HalfWing => {
       lineLocations.push(carabinerLocation);
     }
   }
+
   group.add(wingBreakSystem);
   group.rotateZ(Math.PI / 2);
   group.rotateX(Math.PI / 2);
