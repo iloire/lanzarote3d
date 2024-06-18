@@ -28,6 +28,7 @@ const GliderStory = {
       breakColor: '#333333',
       lineFrontColor: '#000000',
       lineBackColor: '#333333',
+      inletsColor: '#333333',
       numeroCajones: 30,
     };
 

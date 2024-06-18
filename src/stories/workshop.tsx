@@ -39,6 +39,7 @@ const Workshop = {
       breakColor: '#ffffff',
       lineFrontColor: '#ffffff',
       lineBackColor: '#ffffff',
+      inletsColor: '#333333',
       numeroCajones: 40
     };
 

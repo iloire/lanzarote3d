@@ -28,6 +28,7 @@ const ParagliderWorkshop = {
       breakColor: '#ffffff',
       lineFrontColor: '#ffffff',
       lineBackColor: '#ffffff',
+      inletsColor: '#333333',
       numeroCajones: 40
     };
     const pilotOptions = { head: {} };

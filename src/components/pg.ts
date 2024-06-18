@@ -110,6 +110,7 @@ class Paraglider extends THREE.EventDispatcher {
       breakColor: '#ffffff',
       lineFrontColor: '#ffffff',
       lineBackColor: '#ffffff',
+      inletsColor: '#333333',
       numeroCajones: 20
     };
     const pilotOptions = {

@@ -21,6 +21,7 @@ const tandems = [
         breakColor: '#ffffff',
         lineFrontColor: '#ffffff',
         lineBackColor: '#ffffff',
+        inletsColor: '#333333',
         numeroCajones: 35
       },
       pilot: {
@@ -46,6 +47,7 @@ const paragliders = [
         breakColor: '#ffffff',
         lineFrontColor: '#ffffff',
         lineBackColor: '#ffffff',
+        inletsColor: '#333333',
         numeroCajones: 35
       },
       pilot: {
@@ -62,6 +64,7 @@ const paragliders = [
         breakColor: '#ffffff',
         lineFrontColor: '#ffffff',
         lineBackColor: '#ffffff',
+        inletsColor: '#333333',
         numeroCajones: 50
       },
       pilot: {
@@ -78,6 +81,7 @@ const paragliders = [
         breakColor: '#ffffff',
         lineFrontColor: '#ffffff',
         lineBackColor: '#ffffff',
+        inletsColor: '#333333',
         numeroCajones: 40
       },
       pilot: {
@@ -94,6 +98,7 @@ const paragliders = [
         breakColor: '#ffffff',
         lineFrontColor: '#ffffff',
         lineBackColor: '#ffffff',
+        inletsColor: '#333333',
         numeroCajones: 40
       },
       pilot: {
