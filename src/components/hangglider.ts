@@ -22,7 +22,7 @@ class HangGliderModel extends AutoFlier {
     wingMesh.position.x = -40;
 
     // pilot
-    this.pilot = new Pilot({ helmetColor: 0xff0000 });
+    this.pilot = new Pilot({ helmetColor: '#ff0000' });
     const pilotMesh = this.pilot.load();
     const pilotScale = 0.03;
     pilotMesh.scale.set(pilotScale, pilotScale, pilotScale);

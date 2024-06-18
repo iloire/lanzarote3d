@@ -1,53 +1,52 @@
 import * as THREE from "three";
 
-const getColoredMaterial = (color: number) => {
+const getColoredMaterial = (color: string) => {
   return new THREE.MeshStandardMaterial({
     color,
     side: THREE.DoubleSide,
   });
 };
 
-const skinMat = getColoredMaterial(0xe0bea5);
-const eyeMat = getColoredMaterial(0xffffff);
-const pupilaMat = getColoredMaterial(0x333);
-const subBodyMat = getColoredMaterial(0x666);
-const lipMat = getColoredMaterial(0x333);
-const carabinerMat = getColoredMaterial(0xff0000);
-const suitMat = getColoredMaterial(0x333);
 
 const getHead = (options: PilotOptions): THREE.Group => {
   const group = new THREE.Group();
 
+  const skinMat = getColoredMaterial(options.skinColor || '#e0bea5');
   const headGeo = new THREE.BoxGeometry(300, 350, 280);
   const head = new THREE.Mesh(headGeo, skinMat);
   group.add(head);
 
   //Helmet
-  const helmetMat = getColoredMaterial(options.helmetColor);
+  const helmetTopMat = getColoredMaterial(options.helmetColor || '#ff0000');
   const helmetGeo = new THREE.BoxGeometry(400, 190, 390);
-  const helmet = new THREE.Mesh(helmetGeo, helmetMat);
+  const helmet = new THREE.Mesh(helmetGeo, helmetTopMat);
   helmet.position.x = 0;
   helmet.position.z = 0;
   helmet.position.y = 180;
   head.add(helmet);
 
-  const helmet2Geo = new THREE.BoxGeometry(400, 220, 290);
-  const helmet2 = new THREE.Mesh(helmet2Geo, helmetMat);
-  helmet2.position.x = 0;
-  helmet2.position.z = -20;
-  helmet2.position.y = 0;
-  head.add(helmet2);
+  const helmetSeparatorMat = getColoredMaterial(options.helmetColor2 || '#666666');
+  const helmetSeparatorGeo = new THREE.BoxGeometry(420, 40, 400);
+  const suitMat = getColoredMaterial(options.suitColor || '#333');
+  const helmetSeparator = new THREE.Mesh(helmetSeparatorGeo, helmetSeparatorMat);
+  helmetSeparator.position.x = 0;
+  helmetSeparator.position.z = 0;
+  helmetSeparator.position.y = 100;
+  head.add(helmetSeparator);
 
-  const hatBottomGeo = new THREE.BoxGeometry(420, 40, 400);
-  const hatBottom = new THREE.Mesh(hatBottomGeo, suitMat);
-  hatBottom.position.x = 0;
-  hatBottom.position.z = 0;
-  hatBottom.position.y = 100;
-  head.add(hatBottom);
+  const helmetBottomMat = getColoredMaterial(options.helmetColor3 || '#ffffff');
+  const helmetBottomGeo = new THREE.BoxGeometry(400, 220, 290);
+  const helmetBottom = new THREE.Mesh(helmetBottomGeo, helmetBottomMat);
+  helmetBottom.position.x = 0;
+  helmetBottom.position.z = -20;
+  helmetBottom.position.y = 0;
+  head.add(helmetBottom);
+
 
   //glasses
   const glassGeo = new THREE.BoxGeometry(120, 78, 10);
   //Retinas Left
+  const eyeMat = getColoredMaterial(options.eyeColor || '#ffffff');
   const glassLeft = new THREE.Mesh(glassGeo, eyeMat);
   glassLeft.position.x = -80;
   glassLeft.position.y = 4;
@@ -71,6 +70,7 @@ const getHead = (options: PilotOptions): THREE.Group => {
   //Retinas
   const retina = new THREE.BoxGeometry(25, 25, 5);
   //Retinas Left
+  const pupilaMat = getColoredMaterial('#333');
   const retinaLeft = new THREE.Mesh(retina, pupilaMat);
   retinaLeft.position.x = -80;
   retinaLeft.position.y = 5;
@@ -92,6 +92,7 @@ const getHead = (options: PilotOptions): THREE.Group => {
   head.add(mouth);
 
   //lip
+  const lipMat = getColoredMaterial('#333');
   const lipGeo = new THREE.BoxGeometry(40, 20, 50);
   const lip = new THREE.Mesh(lipGeo, lipMat);
   lip.position.x = 0;
@@ -105,7 +106,14 @@ const getHead = (options: PilotOptions): THREE.Group => {
 const BREAK_Y_MOVE = 90;
 
 type PilotOptions = {
-  helmetColor?: number;
+  helmetColor?: string;
+  helmetColor2?: string;
+  helmetColor3?: string;
+  skinColor?: string;
+  suitColor?: string;
+  suitColor2?: string;
+  eyeColor?: string;
+  carabinercolor?: string;
 };
 
 class Pilot {
@@ -130,6 +138,9 @@ class Pilot {
   getBody(): THREE.Group {
     const group = new THREE.Group();
 
+    const suitMat = getColoredMaterial(this.options.suitColor || '#333');
+    const skinMat = getColoredMaterial(this.options.skinColor || '#e0bea5');
+
     const bodyGeo = new THREE.BoxGeometry(250, 420, 1400);
     this.body = new THREE.Mesh(bodyGeo, suitMat);
     this.body.position.x = 0;
@@ -137,6 +148,7 @@ class Pilot {
     this.body.position.z = 200;
     group.add(this.body);
 
+    const subBodyMat = getColoredMaterial(this.options.suitColor || '#666');
     const subBodyGeo = new THREE.BoxGeometry(150, 420, 400);
     const subBody = new THREE.Mesh(subBodyGeo, subBodyMat);
     subBody.position.x = 0;
@@ -175,6 +187,7 @@ class Pilot {
 
     // carabiner
     const carabinerGeo = new THREE.BoxGeometry(40, 30, 50);
+    const carabinerMat = getColoredMaterial(this.options.carabinercolor || '#ff0000');
     const carabinerLeft = new THREE.Mesh(carabinerGeo, carabinerMat);
     carabinerLeft.position.set(90, -180, 275);
 
