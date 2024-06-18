@@ -28,7 +28,7 @@ const getHead = (options: PilotHeadOptions): THREE.Group => {
   return pilotHead.load();
 };
 
-const BREAK_Y_MOVE = 90;
+const BREAK_Y_MOVE = 50; //cm
 
 class Pilot {
   armRight: THREE.Mesh;
@@ -55,7 +55,7 @@ class Pilot {
     const suitMat = getColoredMaterial(this.options.suitColor || '#333');
     const skinMat = getColoredMaterial(this.options.skinColor || '#e0bea5');
 
-    const bodyGeo = new THREE.BoxGeometry(250, 420, 1400);
+    const bodyGeo = new THREE.BoxGeometry(250, 420, 1200);
     this.body = new THREE.Mesh(bodyGeo, suitMat);
     this.body.position.x = 0;
     this.body.position.y = -390;

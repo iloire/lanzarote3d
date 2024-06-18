@@ -26,7 +26,6 @@ const createCajon = (
 const createHalfWing = (scale?: THREE.Vector3): HalfWing => {
   const group = new THREE.Mesh();
   let distanceCajon = 0;
-  const points = []; // array to hold the points of the line segments
   for (let i = 0; i < numeroCajones; i++) {
     const w = 2 + i * 0.5;
     const h = 0.5 + i * 0.2;

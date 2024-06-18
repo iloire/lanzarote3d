@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import GuiHelper from "../../utils/gui";
 
-const halfWingLength = 80;
+const halfWingLength = 4000; // mm
 
 export type GliderOptions = {
   wingColor1: string;
@@ -31,7 +31,7 @@ const createCajon = (
   return cajon;
 };
 
-const createHalfWing = (options: GliderOptions, scale?: THREE.Vector3): HalfWing => {
+const createHalfWing = (options: GliderOptions): HalfWing => {
   const mat_wing = new THREE.MeshLambertMaterial({ color: options.wingColor1 });
   const mat_break = new THREE.MeshLambertMaterial({ color: options.breakColor });
   const lineMat = new THREE.LineBasicMaterial({
@@ -47,28 +47,27 @@ const createHalfWing = (options: GliderOptions, scale?: THREE.Vector3): HalfWing
   let x = 0;
 
   for (let n = 0; n < options.numeroCajones; n++) {
-    console.log('wo')
-    const w = halfWingLength / options.numeroCajones;
-    const h = n * 0.2;
-    const deep = 8 + n * 1.2;
+    const cajonWidth = halfWingLength / options.numeroCajones;
+    const cajonHeight = 10 + n * 5;
+    const deep = 300 + n * 30;
 
-    distanceCajon += w;
+    distanceCajon += cajonWidth;
 
-    const cajon = createCajon(w, h, deep, mat_wing);
+    const cajon = createCajon(cajonWidth, cajonHeight, deep, mat_wing);
 
-    x = x + (options.numeroCajones - n) * 0.05;
+    x = x + (options.numeroCajones - n) * 2.05;
     cajon.position.set(x, distanceCajon, 0);
 
     const breakDeep = deep / 10;
-    const breakBox = createCajon(w, h, breakDeep, mat_break);
+    const breakBox = createCajon(cajonWidth, cajonHeight, breakDeep, mat_break);
     breakBox.position.set(x, distanceCajon, deep / 2);
 
     group.add(cajon);
     wingBreakSystem.add(breakBox);
 
-    if (n % 6 === 0) {
+    if (n % 8 === 0) {
       //lines
-      const carabinerLocation = new THREE.Vector3(-84.5, 75, -3);
+      const carabinerLocation = new THREE.Vector3(-3000, halfWingLength, 0);
       lineLocations.push(new THREE.Vector3(x, distanceCajon, deep * 0.5));
       lineLocations.push(carabinerLocation);
 
@@ -83,9 +82,6 @@ const createHalfWing = (options: GliderOptions, scale?: THREE.Vector3): HalfWing
   const lineSegments = new THREE.LineSegments(geometry, lineMat); // create the line segments
   group.add(lineSegments);
 
-  if (scale) {
-    group.scale.set(scale.x, scale.y, scale.z);
-  }
   return { wing: group, wingBreakSystem };
 };
 
@@ -118,14 +114,18 @@ class Glider {
   createWing(): THREE.Mesh {
     this.fullWing = new THREE.Mesh();
 
-    this.leftWing = createHalfWing(this.options, new THREE.Vector3(1, 1, -1));
-    this.rightWing = createHalfWing(this.options, new THREE.Vector3(1, -1, -1));
+    this.leftWing = createHalfWing(this.options);
+    this.leftWing.wing.scale.z = -1;
+
+    this.rightWing = { wing: this.leftWing.wing.clone(), wingBreakSystem: this.leftWing.wingBreakSystem.clone() };
+    this.rightWing.wing.scale.y = -1;
     this.rightWing.wing.translateY(halfWingLength * 2);
 
     this.fullWing.add(this.leftWing.wing);
     this.fullWing.add(this.rightWing.wing);
 
-    this.fullWing.translateZ(-78);
+    this.fullWing.translateZ(-1 * halfWingLength);
+    this.fullWing.translateY(3000);
     return this.fullWing;
   }
 

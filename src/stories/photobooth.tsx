@@ -27,7 +27,7 @@ const paragliders = [
         head: { helmetColor: '#ffff00' }
       }
     },
-    position: new THREE.Vector3(6827, 880, -555)
+    position: new THREE.Vector3(6827, 860, -555)
   },
   {
     pg: {
@@ -59,7 +59,7 @@ const paragliders = [
         head: { helmetColor: '#ffff00' }
       }
     },
-    position: new THREE.Vector3(6627, 980, -535)
+    position: new THREE.Vector3(6777, 920, -535)
   }
 ]
 
@@ -71,15 +71,14 @@ const PhotoBooth = {
     terrain: THREE.Mesh,
     water: THREE.Mesh,
   ) => {
-    const initialPos = new THREE.Vector3(6827, 880, -555);
-    const lookAt = new THREE.Vector3(7827, 880, -1555);
-    camera.animateTo(initialPos, lookAt, 0);
+    const initialPos = new THREE.Vector3(6800, 880, -495);
+    camera.animateTo(initialPos, paragliders[0].position, 0);
 
     paragliders.forEach(async p => {
       const paraglider = new Paraglider(p.pg);
       const mesh = await paraglider.load();
       mesh.position.copy(p.position);
-      const scale = 0.1;
+      const scale = 0.001; // mm to m
       mesh.scale.set(scale, scale, scale);
       scene.add(mesh);
     });

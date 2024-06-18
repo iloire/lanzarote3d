@@ -12,6 +12,7 @@ const GliderStory = {
     terrain: THREE.Mesh,
     water: THREE.Mesh,
     sky: Sky,
+    gui
   ) => {
     terrain.visible = false;
     water.visible = false;
@@ -27,21 +28,20 @@ const GliderStory = {
       breakColor: '#333333',
       lineFrontColor: '#000000',
       lineBackColor: '#333333',
-      numeroCajones: 10,
-
+      numeroCajones: 30,
     };
 
     const glider = new Glider(gliderOptions);
-    const wing = glider.createWing();
-    scene.add(wing);
+    const mesh = await glider.load(gui);
+    scene.add(mesh);
 
     const animate = () => {
       requestAnimationFrame(animate);
       renderer.render(scene, camera);
     };
 
-    const lookAt = wing.position.clone().add(new THREE.Vector3(0, 0, 0));
-    camera.position.set(350, 9, 0);
+    const lookAt = mesh.position.clone();
+    camera.position.set(8000, 2000, 800);
     camera.lookAt(lookAt);
     controls.target = lookAt;
     animate();

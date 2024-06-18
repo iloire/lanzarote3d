@@ -66,8 +66,8 @@ class ParagliderModel {
     this.glider = new Glider(this.options.glider);
 
     const wing = this.glider.createWing();
-    wing.position.y = 80;
-    wing.position.x = 22;
+    wing.position.y = 2800;
+    wing.position.x = 300;
     mesh.add(wing);
 
     const pilotOptions = {
@@ -77,11 +77,10 @@ class ParagliderModel {
     this.pilot = new Pilot(pilotOptions);
     this.pilotMesh = this.pilot.load();
 
-    const scale = 0.03;
-    this.pilotMesh.scale.set(scale, scale, scale);
     this.pilotMesh.position.x = 17;
     this.pilotMesh.position.z = -0.4;
     this.pilotMesh.rotateY(Math.PI / 2);
+
     mesh.add(this.pilotMesh);
 
     if (gui) {
