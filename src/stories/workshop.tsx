@@ -41,7 +41,8 @@ const Workshop = {
       lineBackColor: '#ffffff',
       numeroCajones: 10
     };
-    const paraglider = new Paraglider({ glider: gliderOptions });
+    const pilotOptions = {};
+    const paraglider = new Paraglider({ glider: gliderOptions, pilot: pilotOptions });
     const mesh = await paraglider.load(gui);
     mesh.position.set(0, 0, 0);
     scene.add(mesh);

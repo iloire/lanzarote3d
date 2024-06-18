@@ -1,5 +1,16 @@
 import * as THREE from "three";
 
+export type PilotOptions = {
+  helmetColor?: string;
+  helmetColor2?: string;
+  helmetColor3?: string;
+  skinColor?: string;
+  suitColor?: string;
+  suitColor2?: string;
+  eyeColor?: string;
+  carabinercolor?: string;
+};
+
 const getColoredMaterial = (color: string) => {
   return new THREE.MeshStandardMaterial({
     color,
@@ -104,17 +115,6 @@ const getHead = (options: PilotOptions): THREE.Group => {
 };
 
 const BREAK_Y_MOVE = 90;
-
-type PilotOptions = {
-  helmetColor?: string;
-  helmetColor2?: string;
-  helmetColor3?: string;
-  skinColor?: string;
-  suitColor?: string;
-  suitColor2?: string;
-  eyeColor?: string;
-  carabinercolor?: string;
-};
 
 class Pilot {
   armRight: THREE.Mesh;

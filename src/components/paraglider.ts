@@ -1,10 +1,11 @@
 import * as THREE from "three";
-import Pilot from "./pilot";
+import Pilot, { PilotOptions } from "./pilot";
 import Glider, { GliderOptions } from "./parts/glider";
 import GuiHelper from "../utils/gui";
 
 export type ParagliderOptions = {
   glider: GliderOptions;
+  pilot: PilotOptions;
 }
 
 class ParagliderModel {

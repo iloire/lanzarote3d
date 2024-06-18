@@ -11,6 +11,52 @@ const WEATHER_SETTINGS: WeatherOptions = {
   lclLevel: 1800,
 };
 
+
+const paragliders = [
+  {
+    pg: {
+      glider: {
+        wingColor1: '#c30010',
+        wingColor2: '#b100cd',
+        breakColor: '#ffffff',
+        lineFrontColor: '#ffffff',
+        lineBackColor: '#ffffff',
+        numeroCajones: 30
+      },
+      pilot: {}
+    },
+    position: new THREE.Vector3(6827, 880, -555)
+  },
+  {
+    pg: {
+      glider: {
+        wingColor1: '#FFA500',
+        wingColor2: '#b100cd',
+        breakColor: '#ffffff',
+        lineFrontColor: '#ffffff',
+        lineBackColor: '#ffffff',
+        numeroCajones: 50
+      },
+      pilot: {}
+    },
+    position: new THREE.Vector3(6727, 780, -555)
+  },
+  {
+    pg: {
+      glider: {
+        wingColor1: '#FFA500',
+        wingColor2: '#b100cd',
+        breakColor: '#ffffff',
+        lineFrontColor: '#ffffff',
+        lineBackColor: '#ffffff',
+        numeroCajones: 20
+      },
+      pilot: {}
+    },
+    position: new THREE.Vector3(6627, 980, -535)
+  }
+]
+
 const PhotoBooth = {
   load: async (
     camera: Camera,
@@ -28,15 +74,18 @@ const PhotoBooth = {
       breakColor: '#ffffff',
       lineFrontColor: '#ffffff',
       lineBackColor: '#ffffff',
-      numeroCajones: 20
+      numeroCajones: 30
     };
 
-    const paraglider = new Paraglider({ glider: gliderOptions });
-    const mesh = await paraglider.load();
-    mesh.position.copy(initialPos);
-    const scale = 0.1;
-    mesh.scale.set(scale, scale, scale);
-    scene.add(mesh);
+    paragliders.forEach(async p => {
+      const paraglider = new Paraglider(p.pg);
+      const mesh = await paraglider.load();
+      mesh.position.copy(p.position);
+      const scale = 0.1;
+      mesh.scale.set(scale, scale, scale);
+      scene.add(mesh);
+    });
+
 
     // must render before adding env
     renderer.render(scene, camera);
