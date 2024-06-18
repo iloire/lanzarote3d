@@ -67,8 +67,8 @@ type SkyOptions = {
 };
 
 const defaultSkyOptions: SkyOptions = {
-  turbidity: 2,
-  rayleigh: 3,
+  turbidity: 0.40,
+  rayleigh: 0,
   mieCoefficient: 0.005,
   mieDirectionalG: 0.8,
 };
