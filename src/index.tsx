@@ -97,7 +97,7 @@ class App extends React.Component<AppProps, AppState> {
     sky.addToScene(scene);
     sky.addGui(gui);
 
-    const water = new Water().load(sky.getSunPosition());
+    const water = new Water({ size: 500000 }).load(sky.getSunPosition());
     scene.add(water);
     // Helpers.drawSphericalPosition(30, 90, 100, scene);
 

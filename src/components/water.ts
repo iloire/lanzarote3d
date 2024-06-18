@@ -5,9 +5,19 @@ import Models from "../utils/models";
 
 const USE_PLAIN_WATER = true;
 
+export type WaterOptions = {
+  size: number;
+}
+
 export default class Water {
+  options: WaterOptions;
+
+  constructor(options: WaterOptions) {
+    this.options = options;
+  }
+
   load(sunPosition: THREE.Vector3) {
-    const waterGeometry = new THREE.PlaneGeometry(100000, 100000);
+    const waterGeometry = new THREE.PlaneGeometry(this.options.size, this.options.size);
     if (USE_PLAIN_WATER) {
       const mat = new THREE.MeshLambertMaterial({ color: 0x6CB4EE });
       mat.transparent = true;
