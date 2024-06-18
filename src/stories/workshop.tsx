@@ -39,12 +39,14 @@ const Workshop = {
       breakColor: '#ffffff',
       lineFrontColor: '#ffffff',
       lineBackColor: '#ffffff',
-      numeroCajones: 10
+      numeroCajones: 40
     };
+
     const pilotOptions = { head: {} };
     const paraglider = new Paraglider({ glider: gliderOptions, pilot: pilotOptions });
     const mesh = await paraglider.load(gui);
     mesh.position.set(0, 0, 0);
+    mesh.scale.set(0.01, 0.01, 0.01);
     scene.add(mesh);
 
     const boat = new Boat();
@@ -77,7 +79,7 @@ const Workshop = {
     };
 
     const lookAt = mesh.position.clone().add(new THREE.Vector3(0, 0, 0));
-    camera.position.set(320, 92, 11);
+    camera.position.set(132, 80, 11);
     camera.lookAt(lookAt);
     controls.target = lookAt;
     animate();
