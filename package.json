@@ -41,6 +41,7 @@
   "scripts": {
     "clean": "rm -R dist || true",
     "start": "webpack serve --mode development --open --hot",
+    "dev": "yarn start",
     "build": "webpack --mode production",
     "build-staging": "yarn clean && yarn build",
     "delete-staging-AWS-bucket": "aws s3 rm s3://lanzarote3d --recursive",
