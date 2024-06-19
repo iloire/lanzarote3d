@@ -138,7 +138,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
-    const defaultStory = 'photobooth';
+    const defaultStory = 'animation';
     const story = urlParams.get("story") || defaultStory;
     console.log("loading story:", story);
     if (story && Stories[story]) {
