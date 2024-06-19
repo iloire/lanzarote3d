@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import PilotHead, { PilotHeadOptions } from './parts/pilot-head';
+import CocoonHarness from "./parts/cocoon-harness";
 
 export type PilotOptions = {
   head: {
@@ -53,23 +54,12 @@ class Pilot {
   getBody(): THREE.Group {
     const group = new THREE.Group();
 
+    const harness = new CocoonHarness({ color1: '#333', color2: '#666' });
+
     const suitMat = getColoredMaterial(this.options.suitColor || '#333');
     const skinMat = getColoredMaterial(this.options.skinColor || '#e0bea5');
 
-    const bodyGeo = new THREE.BoxGeometry(250, 420, 1200);
-    this.body = new THREE.Mesh(bodyGeo, suitMat);
-    this.body.position.x = 0;
-    this.body.position.y = -390;
-    this.body.position.z = 200;
-    group.add(this.body);
-
-    const subBodyMat = getColoredMaterial(this.options.suitColor || '#666');
-    const subBodyGeo = new THREE.BoxGeometry(150, 420, 400);
-    const subBody = new THREE.Mesh(subBodyGeo, subBodyMat);
-    subBody.position.x = 0;
-    subBody.position.y = -385;
-    subBody.position.z = 400;
-    group.add(subBody);
+    group.add(harness.load());
 
     //arms
     const armGeo = new THREE.BoxGeometry(50, 390, 60);
