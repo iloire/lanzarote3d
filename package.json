@@ -45,7 +45,7 @@
     "build": "webpack --mode production",
     "build-staging": "yarn clean && yarn build",
     "delete-staging-AWS-bucket": "aws s3 rm s3://lanzarote3d --recursive",
-    "deploy-staging": "yarn build-staging && yarn tag-staging && yarn delete-staging-AWS-bucket && yarn upload-staging-AWS-bucket && yarn invalidate-staging-cache",
+    "deploy-staging": "yarn build-staging && yarn tag-staging && yarn delete-staging-AWS-bucket && yarn upload-staging-AWS-bucket",
     "upload-staging-AWS-bucket": "aws s3 cp dist s3://lanzarote3d --recursive",
     "tag-staging": "git tag STAGING-$(date '+%F_%H%M')",
     "test": "jest --watch"
