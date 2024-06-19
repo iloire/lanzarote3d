@@ -34,9 +34,9 @@
     "ts-jest": "^29.0.5",
     "ts-loader": "^9.4.2",
     "typescript": "^4.9.5",
-    "webpack": "^5.75.0",
-    "webpack-cli": "^5.0.1",
-    "webpack-dev-server": "^4.11.1"
+    "webpack": "^5.92.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.0.4"
   },
   "scripts": {
     "clean": "rm -R dist || true",
@@ -44,9 +44,9 @@
     "dev": "yarn start",
     "build": "webpack --mode production",
     "build-staging": "yarn clean && yarn build",
-    "delete-staging-AWS-bucket": "aws s3 rm s3://lanzarote3d --recursive",
-    "deploy-staging": "yarn build-staging && yarn tag-staging && yarn delete-staging-AWS-bucket && yarn upload-staging-AWS-bucket",
-    "upload-staging-AWS-bucket": "aws s3 cp dist s3://lanzarote3d --recursive",
+    "delete-staging": "aws s3 rm s3://lanzarote3d --recursive",
+    "deploy-staging": "yarn build-staging && yarn tag-staging && yarn delete-staging && yarn upload-staging",
+    "upload-staging": "aws s3 cp dist s3://lanzarote3d --recursive",
     "tag-staging": "git tag STAGING-$(date '+%F_%H%M')",
     "test": "jest --watch"
   },
