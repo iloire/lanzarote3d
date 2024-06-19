@@ -49,7 +49,7 @@ class CocoonHarness {
     subBody.position.z = 400;
     group.add(subBody);
 
-    const cola = getSquare(200, 300, 400, 0, -300, -400);
+    const cola = getSquare(200, 500, 400, 0, -300, -400);
     group.add(cola)
 
     const front = getSquare(200, 300, 400, 0, -400, 800);
