@@ -16,8 +16,8 @@ const tandems = [
   {
     pg: {
       glider: {
-        wingColor1: '#c30010',
-        wingColor2: '#b100cd',
+        wingColor1: 'orange',
+        wingColor2: 'green',
         breakColor: '#ffffff',
         lineFrontColor: '#ffffff',
         lineBackColor: '#ffffff',
@@ -42,7 +42,7 @@ const paragliders = [
   {
     pg: {
       glider: {
-        wingColor1: '#c30010',
+        wingColor1: 'red',
         wingColor2: '#b100cd',
         breakColor: '#ffffff',
         lineFrontColor: '#ffffff',
@@ -51,7 +51,7 @@ const paragliders = [
         numeroCajones: 35
       },
       pilot: {
-        head: { helmetColor: '#ffff00' }
+        head: { helmetColor: 'red' }
       }
     },
     position: new THREE.Vector3(6827, 860, -555)
@@ -59,7 +59,7 @@ const paragliders = [
   {
     pg: {
       glider: {
-        wingColor1: '#FFA500',
+        wingColor1: 'yellow',
         wingColor2: '#b100cd',
         breakColor: '#ffffff',
         lineFrontColor: '#ffffff',
@@ -68,7 +68,7 @@ const paragliders = [
         numeroCajones: 50
       },
       pilot: {
-        head: { helmetColor: '#ffff00' }
+        head: { helmetColor: 'green' }
       }
     },
     position: new THREE.Vector3(6727, 780, -555)
@@ -76,8 +76,8 @@ const paragliders = [
   {
     pg: {
       glider: {
-        wingColor1: '#FFA500',
-        wingColor2: '#b100cd',
+        wingColor1: 'black',
+        wingColor2: 'white',
         breakColor: '#ffffff',
         lineFrontColor: '#ffffff',
         lineBackColor: '#ffffff',
@@ -91,9 +91,10 @@ const paragliders = [
     position: new THREE.Vector3(6777, 920, -535)
   },
   {
+    // fabio
     pg: {
       glider: {
-        wingColor1: '#FFA500',
+        wingColor1: 'purple',
         wingColor2: '#b100cd',
         breakColor: '#ffffff',
         lineFrontColor: '#ffffff',
@@ -102,7 +103,7 @@ const paragliders = [
         numeroCajones: 40
       },
       pilot: {
-        head: { helmetColor: '#ffff00' }
+        head: { helmetColor: 'black' }
       }
     },
     position: new THREE.Vector3(6777, 920, -535)
