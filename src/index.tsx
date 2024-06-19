@@ -139,10 +139,11 @@ class App extends React.Component<AppProps, AppState> {
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
     const defaultStory = 'animation';
-    const story = urlParams.get("story") || defaultStory;
+    const storyParam = urlParams.get("story")
+    const story = storyParam || defaultStory;
     console.log("loading story:", story);
     if (story && Stories[story]) {
-      this.setState({ showAppSelection: (story !== 'game') });
+      this.setState({ showAppSelection: (!!storyParam && story !== 'game') });
       await Stories[story](camera, scene, renderer, island, water, sky, gui);
     } else {
       console.log('no story found', story);
