@@ -136,12 +136,10 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    // const helper = new THREE.CameraHelper(camera);
-    // scene.add(helper);
-
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
-    const story = urlParams.get("story");
+    const defaultStory = 'photobooth';
+    const story = urlParams.get("story") || defaultStory;
     console.log("loading story:", story);
     if (story && Stories[story]) {
       this.setState({ showAppSelection: (story !== 'game') });
