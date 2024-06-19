@@ -21,8 +21,8 @@ class CocoonHarness {
   }
 
   load(): THREE.Object3D {
-    const getSquare = (w, h, z, posX, posY, posZ) => {
-      const suitMat = getColoredMaterial(this.options.color1 || '#333');
+    const getSquare = (w, h, z, posX, posY, posZ, color) => {
+      const suitMat = getColoredMaterial(color);
       const geo = new THREE.BoxGeometry(w, h, z);
       const mesh = new THREE.Mesh(geo, suitMat);
       mesh.position.x = posX;
@@ -49,10 +49,16 @@ class CocoonHarness {
     subBody.position.z = 400;
     group.add(subBody);
 
-    const cola = getSquare(200, 500, 400, 0, -300, -400);
+    const cola = getSquare(150, 400, 300, 0, -350, -300, '#333');
     group.add(cola)
 
-    const front = getSquare(200, 300, 400, 0, -400, 800);
+    const cola2 = getSquare(100, 300, 400, 0, -320, -430, '#333');
+    group.add(cola2)
+
+    const colaAdorno = getSquare(170, 40, 400, 0, -400, -400, '#666');
+    group.add(colaAdorno)
+
+    const front = getSquare(200, 300, 400, 0, -400, 800, '#333');
     group.add(front)
 
     const reserveHandleMat = getColoredMaterial('red');
