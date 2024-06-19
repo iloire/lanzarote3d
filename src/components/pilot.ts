@@ -120,7 +120,7 @@ class Pilot {
 
   load(): THREE.Object3D {
     const group = new THREE.Group();
-    this.head = getHead(this.options);
+    this.head = getHead(this.options.head);
     group.add(this.head);
     group.add(this.getBody());
     return group;
