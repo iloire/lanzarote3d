@@ -46,16 +46,24 @@ const createHalfWing = (options: GliderOptions): HalfWing => {
     transparent: true,
     opacity: 0.2,
   });
+  const breakLineMat = new THREE.LineBasicMaterial({
+    color: 'yellow',
+    transparent: true,
+    opacity: 0.4,
+  });
 
   const group = new THREE.Mesh();
   let distanceCajon = 0;
   const lineLocations = []; // array to hold the points of the line segments
+  const breakLineLocations = []; // array to hold the points of the line segments
   const wingBreakSystem = new THREE.Group();
   const frontCajones = new THREE.Group();
 
   let shape = 0;
 
   const carabinerLocation = new THREE.Vector3(-3000, halfWingLength - (options.carabinersSeparationMM || defaultCarabinersSeparationMM) / 2, 0);
+  const handsLocation = new THREE.Vector3(-3100, halfWingLength - (options.carabinersSeparationMM || defaultCarabinersSeparationMM) / 2, 120);
+  const breaksJoinLocation = new THREE.Vector3(-2400, halfWingLength / 1.1, 250);
 
   for (let n = 0; n < options.numeroCajones; n++) {
     const cajonWidth = halfWingLength / options.numeroCajones;
@@ -79,6 +87,9 @@ const createHalfWing = (options: GliderOptions): HalfWing => {
 
     if (n % 12 === 0) {
       //lines
+      breakLineLocations.push(new THREE.Vector3(shape, distanceCajon, deep * 0.5));
+      breakLineLocations.push(breaksJoinLocation);
+
       lineLocations.push(new THREE.Vector3(shape, distanceCajon, deep * 0.5));
       lineLocations.push(carabinerLocation);
 
@@ -99,9 +110,26 @@ const createHalfWing = (options: GliderOptions): HalfWing => {
 
   group.rotateZ(Math.PI / 2);
   group.rotateX(Math.PI / 2);
-  const geometry = new THREE.BufferGeometry().setFromPoints(lineLocations); // create the geometry from the points
-  const lineSegments = new THREE.LineSegments(geometry, lineMat); // create the line segments
+
+  //lines
+  const geometryLines = new THREE.BufferGeometry().setFromPoints(lineLocations); // create the geometry from the points
+  const lineSegments = new THREE.LineSegments(geometryLines, lineMat); // create the line segments
   group.add(lineSegments);
+
+  // break lines
+  const geometryBreakLines = new THREE.BufferGeometry().setFromPoints(breakLineLocations); // create the geometry from the points
+  const breakLineSegments = new THREE.LineSegments(geometryBreakLines, breakLineMat); // create the line segments
+  group.add(breakLineSegments);
+
+  // break join to hands
+  const breakJoinToHandLocations = [];
+  breakJoinToHandLocations.push(breaksJoinLocation);
+  breakJoinToHandLocations.push(handsLocation);
+
+  const geometryBreakJoinToHand = new THREE.BufferGeometry().setFromPoints(breakJoinToHandLocations); // create the geometry from the points
+  const breakJoinToHandSegments = new THREE.LineSegments(geometryBreakJoinToHand, breakLineMat); // create the line segments
+  group.add(breakJoinToHandSegments);
+  //
 
   return { wing: group, wingBreakSystem };
 };
