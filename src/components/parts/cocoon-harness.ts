@@ -76,11 +76,11 @@ class CocoonHarness {
     group.add(front)
 
     const reserveHandleMat = getColoredMaterial('red');
-    const reserveHandleGeo = new THREE.BoxGeometry(90, 42, 130);
+    const reserveHandleGeo = new THREE.BoxGeometry(70, 45, 130);
     const reserve = new THREE.Mesh(reserveHandleGeo, reserveHandleMat);
-    reserve.position.x = -110;
-    reserve.position.y = -295;
-    reserve.position.z = 300;
+    reserve.position.x = -1 * width / 2;
+    reserve.position.y = -410;
+    reserve.position.z = 180;
     group.add(reserve);
 
     // carabiner
