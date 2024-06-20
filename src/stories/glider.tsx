@@ -41,8 +41,8 @@ const GliderStory = {
       renderer.render(scene, camera);
     };
 
-    const lookAt = mesh.position.clone();
-    camera.position.set(8000, 2000, 800);
+    const lookAt = new THREE.Vector3(0, 0, 0);
+    camera.position.set(8000, 0, 0);
     camera.lookAt(lookAt);
     controls.target = lookAt;
     animate();

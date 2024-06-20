@@ -29,9 +29,14 @@ const ParagliderWorkshop = {
       lineFrontColor: '#ffffff',
       lineBackColor: '#ffffff',
       inletsColor: '#333333',
-      numeroCajones: 40
+      numeroCajones: 40,
+      bandLength: 500,
+      carabinersSeparationMM: 300
     };
-    const pilotOptions = { head: {} };
+    const pilotOptions = {
+      head: {},
+      carabinerColor: '#333',
+    };
 
     const options = {
       glider: gliderOptions,

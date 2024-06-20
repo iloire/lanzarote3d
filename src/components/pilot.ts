@@ -14,7 +14,7 @@ export type PilotOptions = {
   suitColor?: string;
   suitColor2?: string;
   shoesColor?: string;
-  carabinercolor?: string;
+  carabinerColor?: string;
 };
 
 const getColoredMaterial = (color: string) => {
@@ -54,7 +54,7 @@ class Pilot {
   getBody(): THREE.Group {
     const group = new THREE.Group();
 
-    const harness = new CocoonHarness({ color1: '#333', color2: '#666' });
+    const harness = new CocoonHarness({ color1: '#333', color2: '#666', carabinerColor: this.options.carabinerColor || 'pink', carabinerSeparationMM: 300 });
 
     const suitMat = getColoredMaterial(this.options.suitColor || '#333');
     const skinMat = getColoredMaterial(this.options.skinColor || '#e0bea5');
@@ -90,20 +90,8 @@ class Pilot {
     this.armRight.rotateZ(-1 * armRotation);
     this.armRight.rotateX(-1 * armRotation);
 
-    // carabiner
-    const carabinerGeo = new THREE.BoxGeometry(40, 30, 50);
-    const carabinerMat = getColoredMaterial(this.options.carabinercolor || '#ff0000');
-    const carabinerLeft = new THREE.Mesh(carabinerGeo, carabinerMat);
-    carabinerLeft.position.set(90, -180, 275);
-
-    const carabinerRight = carabinerLeft.clone();
-    carabinerRight.position.set(-90, -180, 275);
-
     group.add(this.armLeft);
     group.add(this.armRight);
-
-    group.add(carabinerLeft);
-    group.add(carabinerRight);
 
     return group;
   }

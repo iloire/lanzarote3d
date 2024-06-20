@@ -10,7 +10,16 @@ const getColoredMaterial = (color: string) => {
 export type CocoonHarnessOptions = {
   color1: string;
   color2: string;
+  carabinerColor: string;
+  carabinerSeparationMM: number;
+  width?: number;
+  height?: number;
+  depth?: number;
 }
+
+const DEFAULT_WIDTH = 400;
+const DEFAULT_HEIGHT = 400;
+const DEFAULT_DEPTH = 700;
 
 
 class CocoonHarness {
@@ -31,22 +40,27 @@ class CocoonHarness {
       return mesh;
     }
 
+    const width = this.options.width || DEFAULT_WIDTH;
+    const height = this.options.height || DEFAULT_HEIGHT;
+    const depth = this.options.depth || DEFAULT_DEPTH;
+
     const suitMat = getColoredMaterial(this.options.color1 || '#333');
 
     const group = new THREE.Group();
-    const bodyGeo = new THREE.BoxGeometry(250, 420, 800);
-    const body = new THREE.Mesh(bodyGeo, suitMat);
+
+    const mainGeo = new THREE.BoxGeometry(width, height, depth);
+    const body = new THREE.Mesh(mainGeo, suitMat);
     body.position.x = 0;
     body.position.y = -390;
-    body.position.z = 200;
+    body.position.z = 100;
     group.add(body);
 
     const subBodyMat = getColoredMaterial(this.options.color1 || '#666');
-    const subBodyGeo = new THREE.BoxGeometry(150, 420, 400);
+    const subBodyGeo = new THREE.BoxGeometry(width * 0.8, height * 0.8, 400);
     const subBody = new THREE.Mesh(subBodyGeo, subBodyMat);
     subBody.position.x = 0;
-    subBody.position.y = -385;
-    subBody.position.z = 400;
+    subBody.position.y = -395;
+    subBody.position.z = height;
     group.add(subBody);
 
     const cola = getSquare(150, 400, 300, 0, -350, -300, '#333');
@@ -68,6 +82,17 @@ class CocoonHarness {
     reserve.position.y = -295;
     reserve.position.z = 300;
     group.add(reserve);
+
+    // carabiner
+    const carabinerGeo = new THREE.BoxGeometry(50, 30, 30);
+    const carabinerMat = getColoredMaterial(this.options.carabinerColor || '#333');
+    const carabinerLeft = new THREE.Mesh(carabinerGeo, carabinerMat);
+    carabinerLeft.position.set(this.options.carabinerSeparationMM / 2, -180, 280);
+
+    const carabinerRight = carabinerLeft.clone();
+    carabinerRight.position.set(-1 * this.options.carabinerSeparationMM / 2, -180, 280);
+    group.add(carabinerLeft);
+    group.add(carabinerRight);
 
     return group;
   }

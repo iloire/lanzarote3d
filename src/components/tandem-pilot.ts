@@ -114,7 +114,7 @@ class TandemPilot {
 
     // carabiner
     const carabinerGeo = new THREE.BoxGeometry(40, 30, 50);
-    const carabinerMat = getColoredMaterial(options.carabinercolor || '#ff0000');
+    const carabinerMat = getColoredMaterial(options.carabinerColor || '#ff0000');
     const carabinerLeft = new THREE.Mesh(carabinerGeo, carabinerMat);
     carabinerLeft.position.set(90, -180, 275);
 

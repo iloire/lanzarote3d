@@ -2,6 +2,10 @@ import * as THREE from "three";
 import GuiHelper from "../../utils/gui";
 
 const halfWingLength = 4000; // mm
+const DEFAULT_BAND_LENGTH = 400; //mm
+const defaultCarabinersSeparationMM = 300;
+
+const BAND_WIDTH = 30;
 
 export type GliderOptions = {
   wingColor1: string;
@@ -11,6 +15,8 @@ export type GliderOptions = {
   lineFrontColor: string;
   lineBackColor: string;
   numeroCajones: number;
+  carabinersSeparationMM?: number;
+  bandLength?: number;
 }
 
 type HalfWing = {
@@ -24,7 +30,6 @@ const createCajon = (
   deep: number,
   mat: THREE.MeshLambertMaterial
 ): THREE.Mesh => {
-
   const geo = new THREE.BoxGeometry(w, h, deep);
   const cajon = new THREE.Mesh(geo, mat);
   cajon.castShadow = true;
@@ -50,6 +55,8 @@ const createHalfWing = (options: GliderOptions): HalfWing => {
 
   let shape = 0;
 
+  const carabinerLocation = new THREE.Vector3(-3000, halfWingLength - (options.carabinersSeparationMM || defaultCarabinersSeparationMM) / 2, 0);
+
   for (let n = 0; n < options.numeroCajones; n++) {
     const cajonWidth = halfWingLength / options.numeroCajones;
     const cajonHeight = 10 + n * 5;
@@ -72,7 +79,6 @@ const createHalfWing = (options: GliderOptions): HalfWing => {
 
     if (n % 12 === 0) {
       //lines
-      const carabinerLocation = new THREE.Vector3(-3000, halfWingLength, 0);
       lineLocations.push(new THREE.Vector3(shape, distanceCajon, deep * 0.5));
       lineLocations.push(carabinerLocation);
 
@@ -84,6 +90,10 @@ const createHalfWing = (options: GliderOptions): HalfWing => {
     frontCajones.add(frontCajon);
   }
 
+  const band = createBand({ color: 'red', bandLength: options.bandLength });
+  band.position.copy(carabinerLocation);
+
+  group.add(band);
   group.add(wingBreakSystem);
   group.add(frontCajones);
 
@@ -96,6 +106,24 @@ const createHalfWing = (options: GliderOptions): HalfWing => {
   return { wing: group, wingBreakSystem };
 };
 
+
+type BandOptions = {
+  color: string;
+  bandLength: number;
+
+}
+const createBand = (options: BandOptions) => {
+  const bandLength = options.bandLength || DEFAULT_BAND_LENGTH;
+  const mat = new THREE.MeshLambertMaterial({ color: options.color });
+  const group = new THREE.Mesh();
+  const geo = new THREE.BoxGeometry(BAND_WIDTH, bandLength, 7);
+  const band = new THREE.Mesh(geo, mat);
+  band.castShadow = true;
+  band.rotation.set(0, 0, Math.PI / 2);
+  band.translateY(bandLength / 2);
+  group.add(band);
+  return group;
+}
 
 
 class Glider {
@@ -136,7 +164,7 @@ class Glider {
     this.fullWing.add(this.rightWing.wing);
 
     this.fullWing.translateZ(-1 * halfWingLength);
-    this.fullWing.translateY(3000);
+    this.fullWing.translateY(3000 + (this.options.bandLength || DEFAULT_BAND_LENGTH));
     return this.fullWing;
   }
 

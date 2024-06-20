@@ -65,9 +65,9 @@ class ParagliderModel {
 
     this.glider = new Glider(this.options.glider);
 
-    const wing = this.glider.createWing();
-    wing.position.y = 2800;
-    wing.position.x = 300;
+    const wing = await this.glider.load();
+    wing.translateY(-300);
+    wing.translateX(300);
     mesh.add(wing);
 
 
