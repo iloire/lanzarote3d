@@ -5,9 +5,9 @@ export enum PilotHeadType {
 }
 
 const DEFAULT_OPTIONS = {
-  helmetColor: 'red',
+  helmetColor: 'yellow',
   helmetColor2: 'white',
-  helmetColor3: 'red',
+  helmetColor3: '#c2c2c2',
   skinColor: '#e0bea5',
   beardColor: '#cc613d',
   eyeColor: 'white',
@@ -142,18 +142,45 @@ const getWarriorHead = (options: PilotHeadOptions): THREE.Group => {
 
   brow.rotation.x = 130;
 
-  //Helmet
-  const helmetTopMat = getColoredMaterial(options.helmetColor);
-  const helmetGeo = new THREE.BoxGeometry(2, 0.90, 1.90);
-  const helmet = new THREE.Mesh(helmetGeo, helmetTopMat);
-  helmet.position.x = 0;
-  helmet.position.z = 0;
-  helmet.position.y = 3.10;
-  group.add(helmet);
+  const helmet = getDefaultHelmet(options);
+  helmet.scale.set(0.006, 0.006, 0.006);
+  helmet.translateY(2.2);
+  helmet.translateZ(-0.3);
+  group.add(helmet)
 
   const scale = 200;
   group.translateY(-230);
   group.scale.set(scale, scale, scale);
+  return group;
+}
+
+
+const getDefaultHelmet = (options: PilotHeadOptions): THREE.Group => {
+  const group = new THREE.Group();
+  //Helmet
+  const helmetTopMat = getColoredMaterial(options.helmetColor);
+  const helmetGeo = new THREE.BoxGeometry(400, 190, 390);
+  const helmet = new THREE.Mesh(helmetGeo, helmetTopMat);
+  helmet.position.x = 0;
+  helmet.position.z = 0;
+  helmet.position.y = 180;
+  group.add(helmet);
+
+  const helmetSeparatorMat = getColoredMaterial(options.helmetColor2);
+  const helmetSeparatorGeo = new THREE.BoxGeometry(420, 40, 400);
+  const helmetSeparator = new THREE.Mesh(helmetSeparatorGeo, helmetSeparatorMat);
+  helmetSeparator.position.x = 0;
+  helmetSeparator.position.z = 0;
+  helmetSeparator.position.y = 100;
+  group.add(helmetSeparator);
+
+  const helmetBottomMat = getColoredMaterial(options.helmetColor3);
+  const helmetBottomGeo = new THREE.BoxGeometry(400, 220, 290);
+  const helmetBottom = new THREE.Mesh(helmetBottomGeo, helmetBottomMat);
+  helmetBottom.position.x = 0;
+  helmetBottom.position.z = -20;
+  helmetBottom.position.y = 0;
+  group.add(helmetBottom);
   return group;
 }
 
@@ -165,31 +192,7 @@ const getDefaultHead = (options: PilotHeadOptions): THREE.Group => {
   const head = new THREE.Mesh(headGeo, skinMat);
   group.add(head);
 
-  //Helmet
-  const helmetTopMat = getColoredMaterial(options.helmetColor);
-  const helmetGeo = new THREE.BoxGeometry(400, 190, 390);
-  const helmet = new THREE.Mesh(helmetGeo, helmetTopMat);
-  helmet.position.x = 0;
-  helmet.position.z = 0;
-  helmet.position.y = 180;
-  head.add(helmet);
-
-  const helmetSeparatorMat = getColoredMaterial(options.helmetColor2);
-  const helmetSeparatorGeo = new THREE.BoxGeometry(420, 40, 400);
-  const helmetSeparator = new THREE.Mesh(helmetSeparatorGeo, helmetSeparatorMat);
-  helmetSeparator.position.x = 0;
-  helmetSeparator.position.z = 0;
-  helmetSeparator.position.y = 100;
-  head.add(helmetSeparator);
-
-  const helmetBottomMat = getColoredMaterial(options.helmetColor3);
-  const helmetBottomGeo = new THREE.BoxGeometry(400, 220, 290);
-  const helmetBottom = new THREE.Mesh(helmetBottomGeo, helmetBottomMat);
-  helmetBottom.position.x = 0;
-  helmetBottom.position.z = -20;
-  helmetBottom.position.y = 0;
-  head.add(helmetBottom);
-
+  group.add(getDefaultHelmet(options));
 
   //glasses
   const glassGeo = new THREE.BoxGeometry(120, 78, 10);
