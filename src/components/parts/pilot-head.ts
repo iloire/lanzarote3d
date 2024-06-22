@@ -4,11 +4,23 @@ export enum PilotHeadType {
   Default, Warrior
 }
 
+const DEFAULT_OPTIONS = {
+  helmetColor: 'red',
+  helmetColor2: 'white',
+  helmetColor3: 'red',
+  skinColor: '#e0bea5',
+  beardColor: '#cc613d',
+  eyeColor: 'white',
+  glassesColor: 'pink',
+  headType: PilotHeadType.Default
+}
+
 export type PilotHeadOptions = {
   helmetColor?: string;
   helmetColor2?: string;
   helmetColor3?: string;
   skinColor?: string;
+  beardColor?: string;
   eyeColor?: string;
   glassesColor?: string;
   headType?: PilotHeadType;
@@ -22,12 +34,10 @@ const getColoredMaterial = (color: string) => {
 };
 
 const getWarriorHead = (options: PilotHeadOptions): THREE.Group => {
-
-
   function addBeard() {
     const group = new THREE.Group();
     const material = new THREE.MeshPhongMaterial({
-      color: 0xcc613d,
+      color: options.beardColor,
       flatShading: true
     });
 
@@ -105,7 +115,7 @@ const getWarriorHead = (options: PilotHeadOptions): THREE.Group => {
   }
 
   const group = new THREE.Group();
-  const skinMat = getColoredMaterial(options.skinColor || '#e0bea5');
+  const skinMat = getColoredMaterial(options.skinColor);
   const headGeo = new THREE.BoxGeometry(1.5, 1.5, 1.2);
   const head = new THREE.Mesh(headGeo, skinMat);
 
@@ -133,7 +143,7 @@ const getWarriorHead = (options: PilotHeadOptions): THREE.Group => {
   brow.rotation.x = 130;
 
   //Helmet
-  const helmetTopMat = getColoredMaterial(options.helmetColor || '#ff0000');
+  const helmetTopMat = getColoredMaterial(options.helmetColor);
   const helmetGeo = new THREE.BoxGeometry(2, 0.90, 1.90);
   const helmet = new THREE.Mesh(helmetGeo, helmetTopMat);
   helmet.position.x = 0;
@@ -150,13 +160,13 @@ const getWarriorHead = (options: PilotHeadOptions): THREE.Group => {
 const getDefaultHead = (options: PilotHeadOptions): THREE.Group => {
   const group = new THREE.Group();
 
-  const skinMat = getColoredMaterial(options.skinColor || '#e0bea5');
+  const skinMat = getColoredMaterial(options.skinColor);
   const headGeo = new THREE.BoxGeometry(300, 350, 280);
   const head = new THREE.Mesh(headGeo, skinMat);
   group.add(head);
 
   //Helmet
-  const helmetTopMat = getColoredMaterial(options.helmetColor || '#ff0000');
+  const helmetTopMat = getColoredMaterial(options.helmetColor);
   const helmetGeo = new THREE.BoxGeometry(400, 190, 390);
   const helmet = new THREE.Mesh(helmetGeo, helmetTopMat);
   helmet.position.x = 0;
@@ -164,7 +174,7 @@ const getDefaultHead = (options: PilotHeadOptions): THREE.Group => {
   helmet.position.y = 180;
   head.add(helmet);
 
-  const helmetSeparatorMat = getColoredMaterial(options.helmetColor2 || '#666666');
+  const helmetSeparatorMat = getColoredMaterial(options.helmetColor2);
   const helmetSeparatorGeo = new THREE.BoxGeometry(420, 40, 400);
   const helmetSeparator = new THREE.Mesh(helmetSeparatorGeo, helmetSeparatorMat);
   helmetSeparator.position.x = 0;
@@ -172,7 +182,7 @@ const getDefaultHead = (options: PilotHeadOptions): THREE.Group => {
   helmetSeparator.position.y = 100;
   head.add(helmetSeparator);
 
-  const helmetBottomMat = getColoredMaterial(options.helmetColor3 || '#ffffff');
+  const helmetBottomMat = getColoredMaterial(options.helmetColor3);
   const helmetBottomGeo = new THREE.BoxGeometry(400, 220, 290);
   const helmetBottom = new THREE.Mesh(helmetBottomGeo, helmetBottomMat);
   helmetBottom.position.x = 0;
@@ -183,8 +193,9 @@ const getDefaultHead = (options: PilotHeadOptions): THREE.Group => {
 
   //glasses
   const glassGeo = new THREE.BoxGeometry(120, 78, 10);
+
   //Retinas Left
-  const eyeMat = getColoredMaterial(options.eyeColor || '#ffffff');
+  const eyeMat = getColoredMaterial(options.eyeColor);
   const glassLeft = new THREE.Mesh(glassGeo, eyeMat);
   glassLeft.position.x = -80;
   glassLeft.position.y = 4;
@@ -198,7 +209,7 @@ const getDefaultHead = (options: PilotHeadOptions): THREE.Group => {
   head.add(glassRight);
 
   //glass middle
-  const glassesMat = getColoredMaterial(options.glassesColor || '#333');
+  const glassesMat = getColoredMaterial(options.glassesColor);
   const glassMiddleGeo = new THREE.BoxGeometry(40, 10, 10);
   const glassu = new THREE.Mesh(glassMiddleGeo, glassesMat);
   glassu.position.x = 0;
@@ -247,7 +258,10 @@ class PilotHead {
   options: PilotHeadOptions;
 
   constructor(options: PilotHeadOptions) {
-    this.options = options;
+    this.options = {
+      ...DEFAULT_OPTIONS,
+      ...options
+    };
   }
 
   load(): THREE.Group {

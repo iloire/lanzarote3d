@@ -62,9 +62,6 @@ const paragliders = [
       glider: {
         wingColor1: 'red',
         wingColor2: '#b100cd',
-        breakColor: '#ffffff',
-        lineFrontColor: '#ffffff',
-        lineBackColor: '#ffffff',
         inletsColor: '#333333',
         numeroCajones: 35
       },
@@ -79,9 +76,6 @@ const paragliders = [
       glider: {
         wingColor1: 'yellow',
         wingColor2: '#b100cd',
-        breakColor: '#ffffff',
-        lineFrontColor: '#ffffff',
-        lineBackColor: '#ffffff',
         inletsColor: '#333333',
         numeroCajones: 50
       },
@@ -96,9 +90,6 @@ const paragliders = [
       glider: {
         wingColor1: 'black',
         wingColor2: 'white',
-        breakColor: '#ffffff',
-        lineFrontColor: '#ffffff',
-        lineBackColor: '#ffffff',
         inletsColor: '#333333',
         numeroCajones: 40
       },
@@ -114,9 +105,6 @@ const paragliders = [
       glider: {
         wingColor1: 'purple',
         wingColor2: '#b100cd',
-        breakColor: '#ffffff',
-        lineFrontColor: '#ffffff',
-        lineBackColor: '#ffffff',
         inletsColor: '#333333',
         numeroCajones: 40
       },

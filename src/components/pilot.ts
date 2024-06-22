@@ -2,8 +2,17 @@ import * as THREE from "three";
 import PilotHead, { PilotHeadOptions } from './parts/pilot-head';
 import CocoonHarness from "./parts/cocoon-harness";
 
+const DEFAULT_OPTIONS = {
+  head: {},
+  skinColor: '#e0bea5',
+  suitColor: '#333',
+  suitColor2: '#666',
+  shoesColor: 'red',
+  carabinerColor: 'silver'
+}
+
 export type PilotOptions = {
-  head: PilotHeadOptions;
+  head?: PilotHeadOptions;
   skinColor?: string;
   suitColor?: string;
   suitColor2?: string;
@@ -34,7 +43,10 @@ class Pilot {
   options: PilotOptions;
 
   constructor(options: PilotOptions) {
-    this.options = options;
+    this.options = {
+      ...DEFAULT_OPTIONS,
+      ...options
+    };
   }
 
   showHead() {
@@ -48,10 +60,15 @@ class Pilot {
   getBody(): THREE.Group {
     const group = new THREE.Group();
 
-    const harness = new CocoonHarness({ color1: '#333', color2: '#666', carabinerColor: this.options.carabinerColor || 'pink', carabinerSeparationMM: 300 });
+    const harness = new CocoonHarness({
+      color1: '#333',
+      color2: '#666',
+      carabinerColor: this.options.carabinerColor,
+      carabinerSeparationMM: 300
+    });
 
-    const suitMat = getColoredMaterial(this.options.suitColor || '#333');
-    const skinMat = getColoredMaterial(this.options.skinColor || '#e0bea5');
+    const suitMat = getColoredMaterial(this.options.suitColor);
+    const skinMat = getColoredMaterial(this.options.skinColor);
 
     group.add(harness.load());
 

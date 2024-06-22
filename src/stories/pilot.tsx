@@ -24,7 +24,7 @@ const ParagliderWorkshop = {
     const controls = Controls.createControls(camera, renderer);
     sky.updateSunPosition(12);
 
-    const pilot = new Pilot({ head: {} });
+    const pilot = new Pilot({});
     const mesh = await pilot.load();
     mesh.position.set(-3000, -3000, -5000);
     scene.add(mesh);
@@ -36,7 +36,7 @@ const ParagliderWorkshop = {
 
     const tandem = new TandemPilot({
       pilot: {
-        head: {}, suitColor: 'blue', shoesColor: 'black'
+        head: {}, suitColor: 'green', shoesColor: 'black'
       },
       passenger: {
         head: {}, suitColor: 'orange', shoesColor: 'gray'

@@ -45,14 +45,11 @@ const paragliders = [
       glider: {
         wingColor1: '#c30010',
         wingColor2: '#b100cd',
-        breakColor: '#ffffff',
-        lineFrontColor: '#ffffff',
-        lineBackColor: '#ffffff',
-        inletsColor: '#333333',
+        inletsColor: 'pink',
         numeroCajones: 35
       },
       pilot: {
-        head: { helmetColor: '#ffff00', headType: PilotHeadType.Warrior }
+        head: { helmetColor: '#333', headType: PilotHeadType.Warrior }
       },
     },
     position: new THREE.Vector3(6827, 860, -555)
@@ -62,14 +59,11 @@ const paragliders = [
       glider: {
         wingColor1: '#FFA500',
         wingColor2: '#b100cd',
-        breakColor: '#ffffff',
-        lineFrontColor: '#ffffff',
-        lineBackColor: '#ffffff',
-        inletsColor: '#333333',
+        inletsColor: 'white',
         numeroCajones: 50
       },
       pilot: {
-        head: { helmetColor: '#ffff00', headType: PilotHeadType.Warrior }
+        head: { helmetColor: '#ffff00' }
       }
     },
     position: new THREE.Vector3(6727, 780, -555)
@@ -79,9 +73,6 @@ const paragliders = [
       glider: {
         wingColor1: '#FFA500',
         wingColor2: '#b100cd',
-        breakColor: '#ffffff',
-        lineFrontColor: '#ffffff',
-        lineBackColor: '#ffffff',
         inletsColor: '#333333',
         numeroCajones: 40
       },
@@ -96,10 +87,7 @@ const paragliders = [
       glider: {
         wingColor1: '#FFA500',
         wingColor2: '#b100cd',
-        breakColor: '#ffffff',
-        lineFrontColor: '#ffffff',
-        lineBackColor: '#ffffff',
-        inletsColor: '#333333',
+        inletsColor: 'pink',
         numeroCajones: 40
       },
       pilot: {

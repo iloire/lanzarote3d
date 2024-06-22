@@ -7,14 +7,24 @@ const defaultCarabinersSeparationMM = 300;
 
 const BAND_WIDTH = 30;
 
+const DEFAULT_OPTIONS: GliderOptions = {
+  wingColor1: '#FFA500',
+  wingColor2: '#b100cd',
+  breakColor: '#ffffff',
+  lineFrontColor: '#ffffff',
+  lineBackColor: '#ffffff',
+  inletsColor: '#333333',
+  numeroCajones: 40
+}
+
 export type GliderOptions = {
-  wingColor1: string;
-  wingColor2: string;
-  breakColor: string;
-  inletsColor: string;
-  lineFrontColor: string;
-  lineBackColor: string;
-  numeroCajones: number;
+  wingColor1?: string;
+  wingColor2?: string;
+  breakColor?: string;
+  inletsColor?: string;
+  lineFrontColor?: string;
+  lineBackColor?: string;
+  numeroCajones?: number;
   carabinersSeparationMM?: number;
   bandLength?: number;
 }
@@ -162,7 +172,10 @@ class Glider {
   options: GliderOptions
 
   constructor(options: GliderOptions) {
-    this.options = options;
+    this.options = {
+      ...DEFAULT_OPTIONS,
+      ...options
+    };
   }
 
   breakLeft() {
