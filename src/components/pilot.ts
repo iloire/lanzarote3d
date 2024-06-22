@@ -3,13 +3,7 @@ import PilotHead, { PilotHeadOptions } from './parts/pilot-head';
 import CocoonHarness from "./parts/cocoon-harness";
 
 export type PilotOptions = {
-  head: {
-    helmetColor?: string;
-    helmetColor2?: string;
-    helmetColor3?: string;
-    skinColor?: string;
-    eyeColor?: string;
-  },
+  head: PilotHeadOptions;
   skinColor?: string;
   suitColor?: string;
   suitColor2?: string;

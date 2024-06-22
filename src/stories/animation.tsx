@@ -5,6 +5,7 @@ import Tandem from "../components/tandem";
 import Camera from "../components/camera";
 import Environment from "./env/environment";
 import Weather, { WeatherOptions } from "../elements/weather";
+import { PilotHeadType } from "../components/parts/pilot-head";
 
 const WEATHER_SETTINGS: WeatherOptions = {
   windDirectionDegreesFromNorth: 310,
@@ -12,24 +13,41 @@ const WEATHER_SETTINGS: WeatherOptions = {
   lclLevel: 1800,
 };
 
+
+const defaultGlider = {
+  wingColor1: 'orange',
+  wingColor2: 'green',
+  breakColor: '#ffffff',
+  lineFrontColor: '#ffffff',
+  lineBackColor: '#ffffff',
+  inletsColor: '#333333',
+  numeroCajones: 35
+}
+
+const defaultHead = {
+  helmetColor: '#ffff00',
+  headType: PilotHeadType.Default
+}
+
+const defaultPilot = {
+  head: {
+    ...defaultHead
+  }
+}
+
+
 const tandems = [
   {
     pg: {
       glider: {
-        wingColor1: 'orange',
-        wingColor2: 'green',
-        breakColor: '#ffffff',
-        lineFrontColor: '#ffffff',
-        lineBackColor: '#ffffff',
-        inletsColor: '#333333',
-        numeroCajones: 35
+        ...defaultGlider
       },
       pilot: {
         pilot: {
-          head: { helmetColor: '#ffff00' }
+          ...defaultPilot
         },
         passenger: {
-          head: { helmetColor: '#ffffff' },
+          head: { ...defaultHead },
           suitColor: 'red', suitColor2: 'green'
         }
       },
@@ -51,7 +69,7 @@ const paragliders = [
         numeroCajones: 35
       },
       pilot: {
-        head: { helmetColor: 'red' }
+        ...defaultPilot
       }
     },
     position: new THREE.Vector3(6827, 860, -555)
@@ -68,7 +86,7 @@ const paragliders = [
         numeroCajones: 50
       },
       pilot: {
-        head: { helmetColor: 'green' }
+        ...defaultPilot
       }
     },
     position: new THREE.Vector3(6727, 780, -555)
@@ -85,7 +103,7 @@ const paragliders = [
         numeroCajones: 40
       },
       pilot: {
-        head: { helmetColor: '#ffff00' }
+        ...defaultPilot
       }
     },
     position: new THREE.Vector3(6777, 920, -535)
@@ -103,7 +121,7 @@ const paragliders = [
         numeroCajones: 40
       },
       pilot: {
-        head: { helmetColor: 'black' }
+        ...defaultPilot
       }
     },
     position: new THREE.Vector3(6777, 920, -535)

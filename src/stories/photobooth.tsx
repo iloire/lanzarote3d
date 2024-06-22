@@ -3,6 +3,7 @@ import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 import Paraglider from "../components/paraglider";
 import Tandem from "../components/tandem";
 import Camera from "../components/camera";
+import { PilotHeadType } from "../components/parts/pilot-head";
 import Environment from "./env/environment";
 import Weather, { WeatherOptions } from "../elements/weather";
 
@@ -26,12 +27,12 @@ const tandems = [
       },
       pilot: {
         pilot: {
-          head: { helmetColor: '#ffff00' }
+          head: { helmetColor: '#ffff00', headType: PilotHeadType.Warrior }
         },
         passenger: {
           head: { helmetColor: '#ffffff' },
           suitColor: 'red', suitColor2: 'green'
-        }
+        },
       },
     },
     position: new THREE.Vector3(6837, 850, -535)
@@ -51,8 +52,8 @@ const paragliders = [
         numeroCajones: 35
       },
       pilot: {
-        head: { helmetColor: '#ffff00' }
-      }
+        head: { helmetColor: '#ffff00', headType: PilotHeadType.Warrior }
+      },
     },
     position: new THREE.Vector3(6827, 860, -555)
   },
@@ -68,7 +69,7 @@ const paragliders = [
         numeroCajones: 50
       },
       pilot: {
-        head: { helmetColor: '#ffff00' }
+        head: { helmetColor: '#ffff00', headType: PilotHeadType.Warrior }
       }
     },
     position: new THREE.Vector3(6727, 780, -555)
@@ -102,7 +103,7 @@ const paragliders = [
         numeroCajones: 40
       },
       pilot: {
-        head: { helmetColor: '#ffff00' }
+        head: { helmetColor: '#ffff00', headType: PilotHeadType.Warrior }
       }
     },
     position: new THREE.Vector3(6777, 920, -535)

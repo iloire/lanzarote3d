@@ -3,6 +3,7 @@ import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 import Weather from "../elements/weather";
 import Thermal from "../components/thermal";
 import ParagliderModel from "../components/paraglider";
+import PilotHeadType from '../components/parts/pilot-head';
 import GuiHelper from "../utils/gui";
 import { TrajectoryPoint, TrajectoryPointType } from "../elements/trajectory";
 import { getTerrainHeightBelowPosition } from "../utils/collision";

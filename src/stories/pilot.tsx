@@ -4,6 +4,7 @@ import Sky from "../components/sky";
 import Pilot from "../components/pilot";
 import TandemPilot from "../components/tandem-pilot";
 import Helpers from "../utils/helpers";
+import { PilotHeadType } from "../components/parts/pilot-head";
 
 const ParagliderWorkshop = {
   load: async (
@@ -27,6 +28,11 @@ const ParagliderWorkshop = {
     const mesh = await pilot.load();
     mesh.position.set(-3000, -3000, -5000);
     scene.add(mesh);
+
+    const pilotWarrior = new Pilot({ head: { headType: PilotHeadType.Warrior } });
+    const meshWarrior = await pilotWarrior.load();
+    meshWarrior.position.set(-4300, -3300, -5000);
+    scene.add(meshWarrior);
 
     const tandem = new TandemPilot({
       pilot: {
