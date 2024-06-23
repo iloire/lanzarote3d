@@ -33,7 +33,7 @@ const getHead = (options: PilotHeadOptions): THREE.Group => {
   return pilotHead.load();
 };
 
-const BREAK_Y_MOVE = 50; //cm
+const BREAK_Y_MOVE = 180; //mm
 
 class Pilot {
   armRight: THREE.Mesh;
@@ -132,12 +132,15 @@ class Pilot {
     this.armLeft.position.y = -1 * BREAK_Y_MOVE;
   }
 
+  breakLeftRelease() {
+    this.armLeft.position.y = 0;
+  }
+
   breakRight() {
     this.armRight.position.y = -1 * BREAK_Y_MOVE;
   }
 
-  handsUp() {
-    this.armLeft.position.y = 0;
+  breakRightRelease() {
     this.armRight.position.y = 0;
   }
 }

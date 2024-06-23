@@ -3,7 +3,8 @@ import { createRoot } from "react-dom/client";
 import * as THREE from "three";
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 import BackgroundSound from "../../audio/background";
-import Paraglider, { ParagliderConstructor } from "../../components/base/flier";
+import Flier, { FlierConstructor } from "../../components/base/flier";
+import Paraglider from "../../components/paraglider";
 import Vario from "../../audio/vario";
 import Weather, { WeatherOptions } from "../../elements/weather";
 import Camera, { CameraMode } from "../../components/camera";
@@ -37,26 +38,20 @@ const WEATHER_SETTINGS: WeatherOptions = {
   lclLevel: 1800,
 };
 
-const pgOptions: ParagliderConstructor = {
-  glidingRatio: 9,
-  trimSpeed: 35 / KMH_TO_MS,
-  fullSpeedBarSpeed: 45 / KMH_TO_MS,
-  bigEarsSpeed: 27 / KMH_TO_MS,
-};
 
 const addWindIndicatorToScene = (
   scene: THREE.Scene,
-  pg: Paraglider,
+  flier: Flier,
   weather: Weather
 ) => {
   const windIndicator = new WindIndicator(40);
   const arrow = windIndicator.load(
     WEATHER_SETTINGS.windDirectionDegreesFromNorth,
-    pg.position().add(pg.direction())
+    flier.position().add(flier.direction())
   );
   scene.add(arrow);
-  pg.addEventListener("position", (event) => {
-    arrow.position.copy(event.position).add(pg.direction().multiplyScalar(300));
+  flier.addEventListener("position", (event) => {
+    arrow.position.copy(event.position).add(flier.direction().multiplyScalar(300));
   });
 
   weather.addEventListener("wind-directionChange", (event) => {
@@ -98,15 +93,34 @@ const Game = {
       perfStats,
     };
 
-    const pg = new Paraglider(pgOptions, envOptions, DEBUG);
+    const gliderOptions = {
+      wingColor1: '#c30010',
+      wingColor2: '#b100cd',
+      numeroCajones: 40
+    };
+    const pilotOptions = {}
+    const paragliderFlyable = new Paraglider({
+      glider: gliderOptions,
+      pilot: pilotOptions
+    });
+    const mesh = await paragliderFlyable.load(gui);
+    const scale = 0.01;
+    mesh.scale.set(scale, scale, scale);
+
+
+    const pgOptions: FlierConstructor = {
+      glidingRatio: 9,
+      trimSpeed: 35 / KMH_TO_MS,
+      fullSpeedBarSpeed: 45 / KMH_TO_MS,
+      bigEarsSpeed: 27 / KMH_TO_MS,
+      flyable: paragliderFlyable
+    };
+
+    const pg = new Flier(pgOptions, envOptions, DEBUG);
     const vario = new Vario(pg);
-    const pgMesh = await pg.loadModel(0.001, gui);
-    const box = new THREE.BoxHelper(pgMesh, 0xffff00);
-    if (DEBUG) {
-      scene.add(box);
-    }
     pg.addGui(gui);
-    scene.add(pgMesh);
+
+    scene.add(mesh);
 
     document.addEventListener("keydown", onDocumentKeyDown, false);
 
@@ -154,11 +168,6 @@ const Game = {
 
     function setCameraMode(mode) {
       camera.setCameraMode(mode, pg);
-      if (mode === CameraMode.FirstPersonView) {
-        pg.setFirstPersonView(true);
-      } else {
-        pg.setFirstPersonView(false);
-      }
     }
 
     const uiControls = (
@@ -170,17 +179,17 @@ const Game = {
         showDebugInfo={true}
         defaultGameSpeed={3}
         defaultCameraMode={INITIAL_CAMERA_MODE}
-        onLeftBreak={() => {
-          pg.leftBreakInput();
+        onLeftInput={() => {
+          pg.leftInput();
         }}
-        onLeftBreakRelease={() => {
-          pg.leftBreakRelease();
+        onLeftInputRelease={() => {
+          pg.leftRelease();
         }}
-        onRightBreak={() => {
-          pg.rightBreakInput();
+        onRightInput={() => {
+          pg.rightInput();
         }}
-        onRightBreakRelease={() => {
-          pg.rightBreakRelease();
+        onRightInputRelease={() => {
+          pg.rightRelease();
         }}
         onBreakUIChange={(direction: number) => {
           pg.directionInput(direction);
@@ -293,7 +302,6 @@ const Game = {
     camera.lookAt(locations[0].lookAt);
 
     const animate = () => {
-      box.update();
       vario.updateReading(pg.altitude());
       perfStats.frameStart();
       perfStats.wrapFunction("tween", () => {

@@ -26,10 +26,10 @@ type UIControlsProps = {
   showDebugInfo: boolean;
   onBreakUIChange: (direction: number) => void;
   onViewUIChange: (direction: FirstPersonViewLook) => void;
-  onLeftBreak: () => void;
-  onLeftBreakRelease: () => void;
-  onRightBreak: () => void;
-  onRightBreakRelease: () => void;
+  onLeftInput: () => void;
+  onLeftInputRelease: () => void;
+  onRightInput: () => void;
+  onRightInputRelease: () => void;
   onGameStart: (
     options: GameStartOptions,
     fnHideStartButton: () => void
@@ -279,19 +279,19 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
   };
 
   handleLeft = () => {
-    this.props.onLeftBreak();
+    this.props.onLeftInput();
   };
 
   handleLeftRelease = () => {
-    this.props.onLeftBreakRelease();
+    this.props.onLeftInputRelease();
   };
 
   handleRight = () => {
-    this.props.onRightBreak();
+    this.props.onRightInput();
   };
 
   handleRightRelease = () => {
-    this.props.onRightBreakRelease();
+    this.props.onRightInputRelease();
   };
 
   handlePause = () => {

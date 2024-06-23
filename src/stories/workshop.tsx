@@ -36,9 +36,6 @@ const Workshop = {
     const gliderOptions = {
       wingColor1: '#c30010',
       wingColor2: '#b100cd',
-      breakColor: '#ffffff',
-      lineFrontColor: '#ffffff',
-      lineBackColor: '#ffffff',
       inletsColor: '#333333',
       numeroCajones: 40
     };
@@ -71,8 +68,6 @@ const Workshop = {
     pineTreeMesh.position.set(20, 0, 30);
     scene.add(pineTreeMesh);
 
-    paraglider.breakLeft();
-    // paraglider.breakRight();
 
     const animate = () => {
       requestAnimationFrame(animate);

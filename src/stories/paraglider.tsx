@@ -47,8 +47,6 @@ const ParagliderWorkshop = {
     const mesh = await paraglider.load(gui);
     scene.add(mesh);
 
-    paraglider.breakLeft();
-    paraglider.breakRight();
 
     const animate = () => {
       requestAnimationFrame(animate);

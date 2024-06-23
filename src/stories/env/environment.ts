@@ -2,36 +2,17 @@ import * as THREE from "three";
 import Clouds from "../../components/clouds";
 import Weather from "../../elements/weather";
 import Thermal from "../../components/thermal";
-import { rndBetween, rndIntBetween } from "../../utils/math";
+import { rndIntBetween } from "../../utils/math";
 import Tree from "../../components/tree";
 import PineTree from "../../components/pinetree";
 import Stone from "../../components/stone";
 import House, { HouseType } from "../../components/house";
 import Boat from "../../components/boat";
 import Birds from "../../components/birds";
-import Paraglider, {
-  ParagliderConstructor,
-  EnvOptions,
-} from "../../components/base/flier";
 import HangGlider from "../../components/hangglider";
 import { addMeshAroundArea } from "./mesh-utils";
 import { generateThermalPair, ThermalGenerationOptions } from "./thermal-utils";
 import { CloudOptions } from "../../components/cloud";
-
-const KMH_TO_MS = 3.6;
-const THERMAL_OPACITY = 0.04;
-
-const createPg = async (
-  options: ParagliderConstructor,
-  env: EnvOptions,
-  pos: THREE.Vector3
-): Promise<Paraglider> => {
-  const pg = new Paraglider(options, env, false);
-  const pgMesh = await pg.loadModel(1);
-  pg.setPosition(pos);
-  pg.init();
-  return pg;
-};
 
 class Environment {
   birds: Birds;
@@ -58,40 +39,6 @@ class Environment {
     this.hg = new HangGlider();
     const hgMesh = await this.hg.load(path, gui);
     this.scene.add(hgMesh);
-  }
-
-  async addOtherGliders(
-    weather: Weather,
-    terrain: THREE.Mesh,
-    water: THREE.Mesh
-  ) {
-    const pgOptions: ParagliderConstructor = {
-      glidingRatio: 9,
-      trimSpeed: 35 / KMH_TO_MS,
-      fullSpeedBarSpeed: 45 / KMH_TO_MS,
-      bigEarsSpeed: 27 / KMH_TO_MS,
-    };
-    const envOptions = {
-      weather,
-      terrain,
-      water,
-      thermals: [],
-    };
-    const pos = new THREE.Vector3(1379, 600, -545);
-    const pg = await createPg(pgOptions, envOptions, pos);
-    this.scene.add(pg.getMesh());
-
-    const pos2 = new THREE.Vector3(3379, 900, -1545);
-    const pg2 = await createPg(pgOptions, envOptions, pos2);
-    this.scene.add(pg2.getMesh());
-
-    // const pos3 = new THREE.Vector3(379, 1200, -145);
-    // const pg3 = await createPg(pgOptions, weather, terrain, water, pos3);
-    // scene.add(pg3.getMesh());
-    //
-    // const pos4 = new THREE.Vector3(8179, 1200, -3945);
-    // const pg4 = await createPg(pgOptions, weather, terrain, water, pos4);
-    // scene.add(pg4.getMesh());
   }
 
   addBoats(water: THREE.Mesh) {

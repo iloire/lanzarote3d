@@ -2,16 +2,15 @@ import * as THREE from "three";
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 import Weather from "../../elements/weather";
 import Thermal from "../../components/thermal";
-import ParagliderModel from "../../components/paraglider";
 import GuiHelper from "../../utils/gui";
 import { TrajectoryPoint, TrajectoryPointType } from "../../elements/trajectory";
 import { getTerrainHeightBelowPosition } from "../../utils/collision";
-import { addDebugArrowsToParaglider } from "./../pg-debug";
 import {
   FORWARD_DIRECTION,
   UP_DIRECTION,
   DOWN_DIRECTION,
 } from "./../common";
+import IFlyable from './IFlyable';
 
 const ANTI_CRASH_ENABLED = false;
 const TICK_INTERVAL = 25;
@@ -21,11 +20,12 @@ const getRotationValue = (wrapSpeed: number): number => {
   return Math.PI / (60 - 50 * multiplier);
 };
 
-export interface ParagliderConstructor {
+export interface FlierConstructor {
   glidingRatio: number;
   trimSpeed: number;
   fullSpeedBarSpeed: number;
   bigEarsSpeed: number;
+  flyable: IFlyable;
 }
 
 export interface EnvOptions {
@@ -37,8 +37,7 @@ export interface EnvOptions {
 }
 
 class Flier extends THREE.EventDispatcher {
-  paragliderModel: ParagliderModel;
-  options: ParagliderConstructor;
+  options: FlierConstructor;
   weather: Weather;
   terrain: THREE.Mesh;
   water: THREE.Mesh;
@@ -47,11 +46,12 @@ class Flier extends THREE.EventDispatcher {
   ears: boolean;
   interval: number = null;
   mesh: THREE.Object3D;
+  flyable: IFlyable;
   wrapSpeed: number = 1;
   flyingTime: number = 0;
   metersFlown: number = 0;
-  isLeftBreaking: boolean;
-  isRightBreaking: boolean;
+  isLeftInput: boolean;
+  isRightInput: boolean;
   trajectory: TrajectoryPoint[] = [];
   tickCounter: number = 0;
   __rollAngleRadians: number = 0;
@@ -65,7 +65,7 @@ class Flier extends THREE.EventDispatcher {
   perfStats: any; // stats
 
   constructor(
-    options: ParagliderConstructor,
+    options: FlierConstructor,
     envOptions: EnvOptions,
     debug?: boolean
   ) {
@@ -78,6 +78,8 @@ class Flier extends THREE.EventDispatcher {
     this.water = envOptions.water;
     this.thermals = envOptions.thermals;
     this.perfStats = envOptions.perfStats;
+    this.mesh = options.flyable.getMesh();
+    this.flyable = options.flyable;
   }
 
   isInsideThermal = (thermal: Thermal): boolean => {
@@ -86,10 +88,6 @@ class Flier extends THREE.EventDispatcher {
     const inTheTermal = thermalBB.containsBox(pgBB);
     return inTheTermal;
   };
-
-  setFirstPersonView(isFirstPersonView: boolean) {
-    this.paragliderModel.setFirstPersonView(isFirstPersonView);
-  }
 
   countInsideHowManyThermals(): number {
     return this.thermals.filter(this.isInsideThermal).length;
@@ -101,27 +99,6 @@ class Flier extends THREE.EventDispatcher {
 
   updateWrapSpeed(value: number) {
     this.wrapSpeed = value;
-  }
-
-  async loadModel(scale: number, gui?: any): Promise<THREE.Object3D> {
-    const gliderOptions = {
-      wingColor1: '#c30010',
-      wingColor2: '#b100cd',
-      numeroCajones: 40
-    };
-    const pilotOptions = {}
-    this.paragliderModel = new ParagliderModel({
-      glider: gliderOptions,
-      pilot: pilotOptions
-    });
-    const mesh = await this.paragliderModel.load(gui);
-    mesh.scale.set(scale, scale, scale);
-    this.mesh = mesh;
-    if (this.debug) {
-      addDebugArrowsToParaglider(this);
-      this.paragliderModel.showAxesHelper();
-    }
-    return mesh;
   }
 
   init() {
@@ -186,10 +163,10 @@ class Flier extends THREE.EventDispatcher {
 
     const turnMultiplier = THREE.MathUtils.clamp(multiplier, 0, 0.07);
     if (this.__directionInput === 0) {
-      if (this.isLeftBreaking) {
+      if (this.isLeftInput) {
         this.rotationInertia -=
           turnMultiplier * keyBreakMultiplier * rotationSmoother;
-      } else if (this.isRightBreaking) {
+      } else if (this.isRightInput) {
         this.rotationInertia +=
           turnMultiplier * keyBreakMultiplier * rotationSmoother;
       } else if (Math.abs(this.rotationInertia) > 0) {
@@ -211,14 +188,6 @@ class Flier extends THREE.EventDispatcher {
         this.rotationInertia +=
           turnMultiplier * this.__directionInput * rotationSmoother;
       }
-    }
-
-    if (this.__directionInput > 0 || this.isRightBreaking) {
-      this.paragliderModel.breakRight();
-    } else if (this.__directionInput < 0 || this.isLeftBreaking) {
-      this.paragliderModel.breakLeft();
-    } else {
-      this.paragliderModel.handsUp();
     }
 
     this.rotationInertia = THREE.MathUtils.clamp(this.rotationInertia, -50, 50);
@@ -286,7 +255,6 @@ class Flier extends THREE.EventDispatcher {
     });
 
     const inHowManyThermals = this.countInsideHowManyThermals();
-    console.log(inHowManyThermals)
     const liftThermal = 2 * inHowManyThermals; // this.isInsideAnyThermal() ? 2 : 0;
     const liftThermalVector = UP_DIRECTION.clone().multiplyScalar(
       multiplier * liftThermal
@@ -336,6 +304,7 @@ class Flier extends THREE.EventDispatcher {
     });
 
     const pgWindGui = gui.addFolder("Paraglider wing");
+
     pgWindGui
       .add(this.options, "trimSpeed", 20 / 3.6, 70 / 3.6)
       .name("trim speed")
@@ -363,22 +332,38 @@ class Flier extends THREE.EventDispatcher {
 
   directionInput(direction: number) {
     this.__directionInput = direction;
+    if (direction > 0) {
+      this.flyable.right();
+    } else if (direction < 0) {
+      this.flyable.left();
+    } else {
+      this.flyable.rightRelease();
+      this.flyable.leftRelease();
+    }
   }
 
-  leftBreakInput() {
-    this.isLeftBreaking = true;
+  leftInput() {
+    console.log('left input');
+    this.isLeftInput = true;
+    this.flyable.left();
   }
 
-  leftBreakRelease() {
-    this.isLeftBreaking = false;
+  leftRelease() {
+    console.log('leftrelease');
+    this.isLeftInput = false;
+    this.flyable.leftRelease();
   }
 
-  rightBreakInput() {
-    this.isRightBreaking = true;
+  rightInput() {
+    console.log('right');
+    this.isRightInput = true;
+    this.flyable.right();
   }
 
-  rightBreakRelease() {
-    this.isRightBreaking = false;
+  rightRelease() {
+    console.log('rightrelease');
+    this.isRightInput = false;
+    this.flyable.rightRelease();
   }
 
   hasTouchedGround(terrain: THREE.Mesh, water: THREE.Mesh): boolean {
@@ -457,10 +442,6 @@ class Flier extends THREE.EventDispatcher {
     return this.mesh.position.clone();
   }
 
-  getPilotPosition(): THREE.Vector3 {
-    return this.position().add(this.paragliderModel.getPilotPosition());
-  }
-
   setPosition(pos: THREE.Vector3) {
     this.mesh.position.copy(pos);
   }
@@ -482,11 +463,9 @@ class Flier extends THREE.EventDispatcher {
   toggleSpeedBar() {
     if (this.speedBar) {
       this.speedBar = false;
-      this.paragliderModel.releaseSpeedBar();
       console.log("speed bar off");
     } else {
       this.speedBar = true;
-      this.paragliderModel.speedBar();
       console.log("speed bar on");
     }
   }

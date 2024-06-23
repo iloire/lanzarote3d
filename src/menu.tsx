@@ -16,7 +16,7 @@ class Menu extends React.Component {
     const stories = [
       { story: "game", description: "The game!" },
       { story: "workshop" },
-      { story: "mechanics" },
+      { story: "flier" },
       { story: "paraglider" },
       { story: "pilot" },
       { story: "glider" },

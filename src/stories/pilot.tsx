@@ -33,6 +33,7 @@ const ParagliderWorkshop = {
     const meshWarrior = await pilotWarrior.load();
     meshWarrior.position.set(-4300, -3300, -5000);
     scene.add(meshWarrior);
+    pilotWarrior.breakLeft();
 
     const tandem = new TandemPilot({
       pilot: {

@@ -2,13 +2,15 @@ import * as THREE from "three";
 import Pilot, { PilotOptions } from "./pilot";
 import Glider, { GliderOptions } from "./parts/glider";
 import GuiHelper from "../utils/gui";
+import IFlyable from './base/IFlyable';
 
 export type ParagliderOptions = {
   glider: GliderOptions;
   pilot: PilotOptions;
 }
 
-class ParagliderModel {
+class Paraglider implements IFlyable {
+  mesh: THREE.Object3D;
   glider: Glider;
   pilot: Pilot;
   pilotMesh: THREE.Object3D;
@@ -27,19 +29,24 @@ class ParagliderModel {
     this.axesHelper.visible = !this.axesHelper.visible;
   }
 
-  breakLeft() {
+  left() {
     this.glider.breakLeft();
     this.pilot.breakLeft();
+    console.log('paraglider model left');
   }
 
-  breakRight() {
+  leftRelease() {
+    this.pilot.breakLeftRelease();
+  }
+
+  right() {
     this.glider.breakRight();
     this.pilot.breakRight();
+    console.log('paraglider model right');
   }
 
-  handsUp() {
-    this.glider.handsUp();
-    this.pilot.handsUp();
+  rightRelease() {
+    this.pilot.breakRightRelease();
   }
 
   speedBar() {
@@ -50,25 +57,23 @@ class ParagliderModel {
     this.pilot.releaseSpeedBar();
   }
 
-  setFirstPersonView(isFirstPersonView: boolean) {
-    if (isFirstPersonView) {
-      console.log("hide");
-      this.pilot.hideHead();
-    } else {
-      console.log("show");
-      this.pilot.showHead();
+
+  getMesh() {
+    if (!this.mesh) {
+      throw Error('mesh not loaded - use load');
     }
+    return this.mesh;
   }
 
   async load(gui?: any): Promise<THREE.Object3D> {
-    const mesh = new THREE.Object3D();
+    this.mesh = new THREE.Object3D();
 
     this.glider = new Glider(this.options.glider);
 
     const wing = await this.glider.load();
     wing.translateY(-300);
     wing.translateX(300);
-    mesh.add(wing);
+    this.mesh.add(wing);
 
 
     this.pilot = new Pilot(this.options.pilot);
@@ -78,22 +83,19 @@ class ParagliderModel {
     this.pilotMesh.position.z = -0.4;
     this.pilotMesh.rotateY(Math.PI / 2);
 
-    mesh.add(this.pilotMesh);
+    this.mesh.add(this.pilotMesh);
 
     if (gui) {
       GuiHelper.addLocationGui(gui, "Pilot model", this.pilotMesh);
-      GuiHelper.addLocationGui(gui, "Paraglider model", mesh);
+      GuiHelper.addLocationGui(gui, "Paraglider model", this.mesh);
     }
 
     this.axesHelper = new THREE.AxesHelper(100);
     this.axesHelper.visible = false;
-    mesh.add(this.axesHelper);
-    return mesh;
+    this.mesh.add(this.axesHelper);
+    return this.mesh;
   }
 
-  getPilotPosition(): THREE.Vector3 {
-    return this.pilotMesh.position.clone();
-  }
 }
 
-export default ParagliderModel;
+export default Paraglider;
