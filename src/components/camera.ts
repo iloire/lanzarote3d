@@ -152,6 +152,7 @@ class Camera extends THREE.PerspectiveCamera {
   lookDown() {
     this.angleY += this.angleIncrement;
   }
+
   zoomIn() {
     this.distance -= this.distanceIncrement;
   }

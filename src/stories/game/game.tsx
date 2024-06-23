@@ -98,15 +98,17 @@ const Game = {
       wingColor2: '#b100cd',
       numeroCajones: 40
     };
+
     const pilotOptions = {}
+
     const paragliderFlyable = new Paraglider({
       glider: gliderOptions,
       pilot: pilotOptions
     });
+
     const mesh = await paragliderFlyable.load(gui);
     const scale = 0.01;
     mesh.scale.set(scale, scale, scale);
-
 
     const pgOptions: FlierConstructor = {
       glidingRatio: 9,
@@ -157,14 +159,12 @@ const Game = {
     nav
       .add(settings, "wrapSpeed", 1, 20)
       .listen()
-      .onChange((value) => {
+      .onChange((value: number) => {
         wrapSpeedChange(value);
       });
 
     let gameStatus = GameStatus.NonStarted;
 
-    const rootElement = document.getElementById("ui-controls");
-    const root = createRoot(rootElement);
 
     function setCameraMode(mode) {
       camera.setCameraMode(mode, pg);
@@ -241,6 +241,8 @@ const Game = {
         }}
       />
     );
+
+    const root = createRoot(document.getElementById("ui-controls"));
     root.render(uiControls);
 
     function touchedGround() { }
@@ -268,6 +270,13 @@ const Game = {
       gameStatus = GameStatus.Finished;
     }
 
+
+    function setTitleScreen() {
+      const cameraStartLocation = new THREE.Vector3(68000, 899, -500);
+      camera.position.copy(cameraStartLocation);
+      setCameraMode(CameraMode.OrbitControl);
+    }
+
     function startGame(options: GameStartOptions) {
       analytics.trackEvent("game-start");
       weather.changeWindSpeed(options.windSpeedMetresPerSecond);
@@ -278,7 +287,9 @@ const Game = {
       }
       pg.setPosition(options.startingLocation.position);
       pg.init();
+
       setCameraMode(INITIAL_CAMERA_MODE);
+
       if (FOG_ENABLED) {
         const fogColor = 0x000000;
         // const fog = new THREE.FogExp2(fogColor, 0.0002);
@@ -293,15 +304,21 @@ const Game = {
 
     addWindIndicatorToScene(scene, pg, weather);
 
+    setTitleScreen();
+
     renderer.render(scene, camera);
 
-    // Game start
-    pg.setPosition(locations[0].position);
-    pg.getMesh().rotation.y = 1.2; // TODO: should implemente a setDirection on pg
-    setCameraMode(CameraMode.FirstPersonView);
-    camera.lookAt(locations[0].lookAt);
-
     const animate = () => {
+
+      if (gameStatus !== GameStatus.Started) {
+
+        const timeMultiplier = 0.000008;
+        camera.position.x = 32000 * Math.sin(Date.now() * timeMultiplier);
+        camera.position.y = 950;
+        camera.position.z = 3000 * Math.cos(Date.now() * timeMultiplier);
+        camera.lookAt(new THREE.Vector3(0, 500, 0));
+      }
+
       vario.updateReading(pg.altitude());
       perfStats.frameStart();
       perfStats.wrapFunction("tween", () => {
