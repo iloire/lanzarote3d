@@ -168,6 +168,12 @@ const Game = {
 
     function setCameraMode(mode) {
       camera.setCameraMode(mode, pg);
+      const mesh = pg.getMesh();
+      if (mode === CameraMode.FirstPersonView) {
+        mesh.visible = false;
+      } else {
+        mesh.visible = true;
+      }
     }
 
     const uiControls = (
