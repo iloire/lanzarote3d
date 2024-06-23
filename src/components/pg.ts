@@ -108,14 +108,9 @@ class Paraglider extends THREE.EventDispatcher {
     const gliderOptions = {
       wingColor1: '#c30010',
       wingColor2: '#b100cd',
-      breakColor: '#ffffff',
-      lineFrontColor: '#ffffff',
-      lineBackColor: '#ffffff',
-      inletsColor: '#333333',
       numeroCajones: 40
     };
     const pilotOptions = {
-      head: { helmetColor: '#ffff00' }
     }
     this.paragliderModel = new ParagliderModel({
       glider: gliderOptions,
