@@ -24,7 +24,7 @@ type UIControlsProps = {
   defaultGameSpeed: number;
   defaultCameraMode: CameraMode;
   showDebugInfo: boolean;
-  onBreakUIChange: (direction: number) => void;
+  onTurnMouseInputChange: (direction: number) => void;
   onViewUIChange: (direction: FirstPersonViewLook) => void;
   onLeftInput: () => void;
   onLeftInputRelease: () => void;
@@ -345,7 +345,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
   };
 
   handleBreakUIChange = (direction: number) => {
-    this.props.onBreakUIChange(direction);
+    this.props.onTurnMouseInputChange(direction);
   };
 
   handleViewUIChange = (direction: FirstPersonViewLook) => {

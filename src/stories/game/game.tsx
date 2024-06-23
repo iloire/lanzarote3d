@@ -191,7 +191,7 @@ const Game = {
         onRightInputRelease={() => {
           pg.rightRelease();
         }}
-        onBreakUIChange={(direction: number) => {
+        onTurnMouseInputChange={(direction: number) => {
           pg.directionInput(direction);
         }}
         onViewUIChange={(direction: FirstPersonViewLook) => {

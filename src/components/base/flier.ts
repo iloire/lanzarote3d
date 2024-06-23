@@ -254,7 +254,10 @@ class Flier extends THREE.EventDispatcher {
     });
 
     const inHowManyThermals = this.countInsideHowManyThermals();
-    const liftThermal = 2 * inHowManyThermals; // this.isInsideAnyThermal() ? 2 : 0;
+    if (inHowManyThermals > 0) {
+      console.log(inHowManyThermals, 'thermals')
+    }
+    const liftThermal = 2 * inHowManyThermals;
     const liftThermalVector = UP_DIRECTION.clone().multiplyScalar(
       multiplier * liftThermal
     );
