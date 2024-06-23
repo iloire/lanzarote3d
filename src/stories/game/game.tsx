@@ -280,6 +280,8 @@ const Game = {
         vario.start();
       }
       pg.setPosition(options.startingLocation.position);
+
+      pg.rotate(-134, 0);
       pg.init();
 
       setCameraMode(INITIAL_CAMERA_MODE);

@@ -211,7 +211,6 @@ class Flier extends THREE.EventDispatcher {
 
   rotate(yRotationIncrement: number = 0, zAngle: number) {
     const maxAngle = 75;
-    const startRotation = this.mesh.rotation;
 
     const yRotation =
       this.mesh.rotation.y +

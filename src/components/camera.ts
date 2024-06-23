@@ -5,8 +5,9 @@ import Animations from "../utils/animations";
 import Controls from "../utils/controls";
 import GuiHelper from "../utils/gui";
 
-const DEFAULT_FOLLOW_DISTANCE = 30;
-const DEFAULT_ANGLE = Math.PI / 1.4;
+const DEFAULT_FOLLOW_DISTANCE = 180;
+const DEFAULT_ANGLE = -Math.PI / 5.8;
+const DEFAULT_ANGLE_Y = Math.PI / 0.4;
 
 export enum CameraMode {
   FirstPersonView = 1,
@@ -73,7 +74,7 @@ class Camera extends THREE.PerspectiveCamera {
   terrain: THREE.Mesh;
   controls: OrbitControls;
   angle: number = DEFAULT_ANGLE;
-  angleY: number = 1.4;
+  angleY: number = DEFAULT_ANGLE_Y;
   distance: number = DEFAULT_FOLLOW_DISTANCE;
   angleIncrement: number = 0.02;
   distanceIncrement: number = 0.9;
@@ -222,10 +223,6 @@ class Camera extends THREE.PerspectiveCamera {
     this.controls.update();
   }
 
-  private viewWithOffset(offset: THREE.Vector3) {
-    this.position.copy(this.target.position()).add(offset);
-    this.lookAt(this.target.position());
-  }
 }
 
 export default Camera;
