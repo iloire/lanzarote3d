@@ -4,6 +4,9 @@ html, body {
   height: 100%;
   width: 100%;
   overflow: hidden;
+  font-family: "Ubuntu Mono", monospace;
+  font-weight: 400;
+  font-style: normal;
 }
 
 .appOptions {
@@ -232,14 +235,19 @@ html, body {
   position: absolute;
   top: 20px;
   left: 20px;
-  width: 180px;
+  width: 220px;
   padding: 10px 10px;
+  text-transform: lowercase;
+}
+
+#vario-info span {
+  color: #c2c2c2;
 }
 
 #paraglider-position {
   position: absolute;
   top: 20px;
-  left: 240px;
+  left: 280px;
   width: 180px;
 }
 
@@ -248,7 +256,7 @@ html, body {
   top: 20px;
   right: 20px;
   padding: 5px 10px;
-  width: 160px;
+  width: 180px;
 }
 
 #paraglider-info {

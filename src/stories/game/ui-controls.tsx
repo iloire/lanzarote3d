@@ -456,24 +456,24 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
 
     const varioInfo = isGameStarted ? (
       <div id="vario-info" className="UIBox">
-        <div id="vario-delta">Δ: {delta} m/s</div>
-        <div id="vario-altitude">Alt.: {altitude} m.</div>
+        <div id="vario-delta"><span className="prefix">Δ:</span> {delta} <span className="sufix">m/s</span></div>
+        <div id="vario-altitude"><span className="prefix">Alt.:</span> {altitude} m.</div>
         <div id="height-above-ground">
-          Alt. above terrain: {heightAboveGround} m.
+          <span className="prefix">Alt. above terrain:</span> {heightAboveGround} m.
         </div>
-        <div id="vario-ground-speed">Ground speed: {groundSpeed} km/h</div>
-        <div id="pg-flying-time">Flight time: {flyingTime} min.</div>
-        <div id="pg-meters-flown">Flight distance: {distanceFlown}</div>
-        <div id="pg-gliding-ratio">Gliding ratio: {glidingRatio}</div>
+        <div id="vario-ground-speed"><span className="prefix">Ground speed:</span> {groundSpeed} <span className="prefix">km/h</span></div>
+        <div id="pg-flying-time"><span className="prefix">Flight time:</span> {flyingTime} <span className="prefix">min.</span></div>
+        <div id="pg-meters-flown"><span className="prefix">Flight distance:</span> {distanceFlown}</div>
+        <div id="pg-gliding-ratio"><span className="prefix">Gliding ratio:</span> {glidingRatio}</div>
         {showDebugInfo && (
-          <div id="pg-thermal-lift">Thermal lift : {thermalLift} m/s</div>
+          <div id="pg-thermal-lift"><span className="prefix">Thermal lift :</span> {thermalLift} <span className="prefix">m/s</span></div>
         )}
         {showDebugInfo && (
-          <div id="pg-dynamic-lift">Soaring lift : {dynamicLift} m/s</div>
+          <div id="pg-dynamic-lift"><span className="prefix">Soaring lift :</span> {dynamicLift} <span className="prefix">m/s</span></div>
         )}
-        {showDebugInfo && <div id="pg-drop">PG sink rate : {drop} m/s</div>}
+        {showDebugInfo && <div id="pg-drop"><span className="prefix">PG sink rate :</span> {drop} <span className="prefix">m/s</span></div>}
         {showDebugInfo && (
-          <div id="pg-gradient">Terrain gradient : {gradient}</div>
+          <div id="pg-gradient"><span className="prefix">Terrain gradient :</span> {gradient}</div>
         )}
       </div>
     ) : (

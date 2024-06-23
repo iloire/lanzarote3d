@@ -16,7 +16,8 @@ export const addGameEnvironment = (
 
   const thermals = env.addThermals(weather);
 
-  env.addClouds(weather, thermals, {});
+  const cloudOptions = { colors: ['#F64A8A', '#F987C5', '#DE3163'] }
+  env.addClouds(weather, thermals, cloudOptions);
   env.addTrees(terrain);
   env.addStones(terrain);
   env.addHouses(terrain);
