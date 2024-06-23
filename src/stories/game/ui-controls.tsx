@@ -173,7 +173,8 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     this.setUpViewUI();
   }
 
-  applyViewMouseMove(e, target, isMouseDown) {
+
+  getMouseDirection(e, target) {
     const rect = target.getBoundingClientRect();
     const x = e.clientX - rect.left; //x position within the element.
     const y = e.clientY - rect.top; //y position within the element.
@@ -181,9 +182,15 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     const percentageY = y / rect.height;
     const directionX = (percentageX - 0.5) * 100;
     const directionY = (percentageY - 0.5) * 100;
-    this.handleViewUIChange({ x: directionX, y: directionY });
+    return { x: directionX, y: directionY };
+  }
+
+
+  applyNavigationMouseMove(e, target, isMouseDown) {
+    const direction = this.getMouseDirection(e, target);
+    this.handleViewUIChange(direction);
     if (isMouseDown) {
-      this.handleBreakUIChange(directionX);
+      this.handleBreakUIChange(direction.x);
     }
   }
 
@@ -191,12 +198,12 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     let mouseDown = false;
     const viewUIelement = document.getElementById("root");
     viewUIelement.onmousemove = (e: any) => {
-      this.applyViewMouseMove(e, e.target, mouseDown);
+      this.applyNavigationMouseMove(e, e.target, mouseDown);
     };
     viewUIelement.onmousedown = (e: any) => {
       if (e.button == 0) {
         mouseDown = true;
-        this.applyViewMouseMove(e, e.target, mouseDown);
+        this.applyNavigationMouseMove(e, e.target, mouseDown);
       }
     };
     viewUIelement.onmouseup = (e: any) => {

@@ -271,12 +271,6 @@ const Game = {
     }
 
 
-    function setTitleScreen() {
-      const cameraStartLocation = new THREE.Vector3(68000, 899, -500);
-      camera.position.copy(cameraStartLocation);
-      setCameraMode(CameraMode.OrbitControl);
-    }
-
     function startGame(options: GameStartOptions) {
       analytics.trackEvent("game-start");
       weather.changeWindSpeed(options.windSpeedMetresPerSecond);
@@ -304,14 +298,11 @@ const Game = {
 
     addWindIndicatorToScene(scene, pg, weather);
 
-    setTitleScreen();
-
     renderer.render(scene, camera);
 
     const animate = () => {
 
       if (gameStatus !== GameStatus.Started) {
-
         const timeMultiplier = 0.000008;
         camera.position.x = 32000 * Math.sin(Date.now() * timeMultiplier);
         camera.position.y = 950;
