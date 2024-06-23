@@ -194,12 +194,16 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       this.applyViewMouseMove(e, e.target, mouseDown);
     };
     viewUIelement.onmousedown = (e: any) => {
-      mouseDown = true;
-      this.applyViewMouseMove(e, e.target, mouseDown);
+      if (e.button == 0) {
+        mouseDown = true;
+        this.applyViewMouseMove(e, e.target, mouseDown);
+      }
     };
     viewUIelement.onmouseup = (e: any) => {
-      mouseDown = false;
-      this.handleBreakUIChange(0);
+      if (e.button == 0) {
+        mouseDown = false;
+        this.handleBreakUIChange(0);
+      }
     };
   }
 
