@@ -12,7 +12,7 @@ import Birds from "../../components/birds";
 import Paraglider, {
   ParagliderConstructor,
   EnvOptions,
-} from "../../components/pg";
+} from "../../components/base/flier";
 import HangGlider from "../../components/hangglider";
 import { addMeshAroundArea } from "./mesh-utils";
 import { generateThermalPair, ThermalGenerationOptions } from "./thermal-utils";

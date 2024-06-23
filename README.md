@@ -50,3 +50,4 @@
 - Fix pause over starting menu
 - Loading progress
 - Pilot harness visibility
+- Decouple vario, camera, ui from Flier

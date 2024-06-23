@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import Paraglider from "./pg";
+import Paraglider from "./base/flier";
 import {
   ORIGIN,
   FORWARD_DIRECTION,

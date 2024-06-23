@@ -5,7 +5,7 @@ import beep800 from "./beep/audiocheck.net_sin_800Hz_-3dBFS_0.3s.wav";
 import beep1000 from "./beep/audiocheck.net_sin_1000Hz_-3dBFS_0.3s.wav";
 import beep1200 from "./beep/audiocheck.net_sin_1200Hz_-3dBFS_0.3s.wav";
 import * as THREE from "three";
-import Paraglider from "../components/pg";
+import Paraglider from "../components/base/flier";
 
 class Vario extends THREE.EventDispatcher {
   sound: any;

@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import Paraglider from "../components/pg";
+import Paraglider from "../components/base/flier";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import Animations from "../utils/animations";
 import Controls from "../utils/controls";

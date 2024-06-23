@@ -1,18 +1,17 @@
 import * as THREE from "three";
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
-import Weather from "../elements/weather";
-import Thermal from "../components/thermal";
-import ParagliderModel from "../components/paraglider";
-import PilotHeadType from '../components/parts/pilot-head';
-import GuiHelper from "../utils/gui";
-import { TrajectoryPoint, TrajectoryPointType } from "../elements/trajectory";
-import { getTerrainHeightBelowPosition } from "../utils/collision";
-import { addDebugArrowsToParaglider } from "./pg-debug";
+import Weather from "../../elements/weather";
+import Thermal from "../../components/thermal";
+import ParagliderModel from "../../components/paraglider";
+import GuiHelper from "../../utils/gui";
+import { TrajectoryPoint, TrajectoryPointType } from "../../elements/trajectory";
+import { getTerrainHeightBelowPosition } from "../../utils/collision";
+import { addDebugArrowsToParaglider } from "./../pg-debug";
 import {
   FORWARD_DIRECTION,
   UP_DIRECTION,
   DOWN_DIRECTION,
-} from "./common";
+} from "./../common";
 
 const ANTI_CRASH_ENABLED = false;
 const TICK_INTERVAL = 25;
@@ -37,7 +36,7 @@ export interface EnvOptions {
   perfStats?: any; //stats
 }
 
-class Paraglider extends THREE.EventDispatcher {
+class Flier extends THREE.EventDispatcher {
   paragliderModel: ParagliderModel;
   options: ParagliderConstructor;
   weather: Weather;
@@ -110,8 +109,7 @@ class Paraglider extends THREE.EventDispatcher {
       wingColor2: '#b100cd',
       numeroCajones: 40
     };
-    const pilotOptions = {
-    }
+    const pilotOptions = {}
     this.paragliderModel = new ParagliderModel({
       glider: gliderOptions,
       pilot: pilotOptions
@@ -536,4 +534,4 @@ class Paraglider extends THREE.EventDispatcher {
   }
 }
 
-export default Paraglider;
+export default Flier;

@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import * as THREE from "three";
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 import BackgroundSound from "../../audio/background";
-import Paraglider, { ParagliderConstructor } from "../../components/pg";
+import Paraglider, { ParagliderConstructor } from "../../components/base/flier";
 import Vario from "../../audio/vario";
 import Weather, { WeatherOptions } from "../../elements/weather";
 import Camera, { CameraMode } from "../../components/camera";

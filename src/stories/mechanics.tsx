@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import Controls from "../utils/controls";
 import Sky from "../components/sky";
-import Paraglider, { ParagliderConstructor } from "../components/pg";
+import Paraglider, { ParagliderConstructor } from "../components/base/flier";
 import Weather, { WeatherOptions } from "../elements/weather";
 import WindIndicator from "../components/wind-indicator";
 import Environment from "./env/environment";
