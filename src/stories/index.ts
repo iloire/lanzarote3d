@@ -14,6 +14,7 @@ import PhotoBooth from "./photobooth";
 import Animation from "./animation";
 import Glider from "./glider";
 import Pilot from "./pilot";
+import Adri from "./adri";
 
 const Stories = {
   default: Default.load,
@@ -32,6 +33,7 @@ const Stories = {
   animation: Animation.load,
   glider: Glider.load,
   pilot: Pilot.load,
+  adri: Adri.load,
 };
 
 export default Stories;

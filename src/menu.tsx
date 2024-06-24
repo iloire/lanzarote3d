@@ -29,6 +29,7 @@ class Menu extends React.Component {
       { story: "daytime" },
       { story: "photobooth" },
       { story: "animation" },
+      { story: "adri" },
     ];
 
     const buttons = stories.map((story) => (

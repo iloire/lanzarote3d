@@ -1,5 +1,6 @@
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import * as THREE from "three";
 
 const defaultManager = new THREE.LoadingManager();
@@ -16,8 +17,20 @@ function modelLoader(url, draco: boolean, manager?: THREE.LoadingManager) {
   });
 }
 
+function objLoader(url, manager?: THREE.LoadingManager) {
+  const man = manager || defaultManager;
+  const loader = new OBJLoader(man);
+  return new Promise((resolve, reject) => {
+    loader.load(url, (data) => resolve(data), null, reject);
+  });
+}
+
 const Models = {
   manager: defaultManager,
+  loadObj: async (model: string, manager?: THREE.LoadingManager): Promise<THREE.Object3D> => {
+    const obj: any = await objLoader(model, manager);
+    return obj;
+  },
   loadGltf: async (model: string, manager?: THREE.LoadingManager) => {
     return modelLoader(model, false, manager);
   },
