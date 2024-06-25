@@ -6,7 +6,7 @@ import TandemPilot from "../components/tandem-pilot";
 import Helpers from "../utils/helpers";
 import { PilotHeadType } from "../components/parts/pilot-head";
 
-const ParagliderWorkshop = {
+const PilotStory = {
   load: async (
     camera: THREE.PerspectiveCamera,
     scene: THREE.Scene,
@@ -60,4 +60,4 @@ const ParagliderWorkshop = {
   },
 };
 
-export default ParagliderWorkshop;
+export default PilotStory;
