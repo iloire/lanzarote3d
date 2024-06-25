@@ -162,7 +162,6 @@ const getWarriorHead = (options: PilotHeadOptions): THREE.Group => {
   return group;
 }
 
-
 const getDefaultHelmet = (options: PilotHeadOptions): THREE.Group => {
   const group = new THREE.Group();
   //Helmet
@@ -191,8 +190,6 @@ const getDefaultHelmet = (options: PilotHeadOptions): THREE.Group => {
   group.add(helmetBottom);
   return group;
 }
-
-
 
 const getDefaultHead = (options: PilotHeadOptions): THREE.Group => {
   const group = new THREE.Group();

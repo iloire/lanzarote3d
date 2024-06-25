@@ -4,9 +4,8 @@ import { PilotHeadOptions } from "../pilot-head";
 const getSunGlasses1 = (options: PilotHeadOptions): THREE.Group => {
   const group = new THREE.Group();
 
-  //glasses
   const glassGeo = new THREE.BoxGeometry(150, 105, 10);
-  const sunGlassMat = new THREE.MeshBasicMaterial({ color: 0x111111 });
+  const sunGlassMat = new THREE.MeshBasicMaterial({ color: 'blue' });
 
   const glassLeft = new THREE.Mesh(glassGeo, sunGlassMat);
   glassLeft.position.x = -80;
