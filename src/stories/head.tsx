@@ -51,7 +51,6 @@ const HeadStory = {
 
     camera.position.set(0, 30, 8000);
     camera.lookAt(scene.position);
-    controls.target = scene.position;
     animate();
   },
 };
