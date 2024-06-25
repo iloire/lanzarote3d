@@ -14,22 +14,23 @@ class Menu extends React.Component {
 
   render() {
     const stories = [
-      { story: "game", description: "The game!" },
-      { story: "workshop" },
-      { story: "flier" },
-      { story: "paraglider" },
-      { story: "pilot" },
-      { story: "glider" },
-      { story: "hangglider" },
-      { story: "terrain" },
-      { story: "night" },
+      { story: "adri" },
+      { story: "animation" },
       { story: "cloud" },
       { story: "clouds" },
-      { story: "flyzones" },
       { story: "daytime" },
+      { story: "flier" },
+      { story: "flyzones" },
+      { story: "head" },
+      { story: "game", description: "The game!" },
+      { story: "glider" },
+      { story: "hangglider" },
+      { story: "night" },
+      { story: "paraglider" },
       { story: "photobooth" },
-      { story: "animation" },
-      { story: "adri" },
+      { story: "pilot" },
+      { story: "terrain" },
+      { story: "workshop" },
     ];
 
     const buttons = stories.map((story) => (
