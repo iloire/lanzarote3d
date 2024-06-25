@@ -4,7 +4,7 @@ import Sky from "../components/sky";
 import Pilot from "../components/pilot";
 import TandemPilot from "../components/tandem-pilot";
 import Helpers from "../utils/helpers";
-import { PilotHeadType } from "../components/parts/pilot-head";
+import { GlassesType, PilotHeadType } from "../components/parts/pilot-head";
 
 const PilotStory = {
   load: async (
@@ -24,16 +24,20 @@ const PilotStory = {
     const controls = Controls.createControls(camera, renderer);
     sky.updateSunPosition(12);
 
-    const pilot = new Pilot({});
-    const mesh = await pilot.load();
-    mesh.position.set(-3000, -3000, -5000);
-    scene.add(mesh);
+    const pilots = [
+      { head: { helmetColor: 'red' } },
+      { head: { glassesType: GlassesType.SunGlasses1 } },
+      { head: { headType: PilotHeadType.Warrior } }
+    ]
 
-    const pilotWarrior = new Pilot({ head: { headType: PilotHeadType.Warrior } });
-    const meshWarrior = await pilotWarrior.load();
-    meshWarrior.position.set(-4300, -3300, -5000);
-    scene.add(meshWarrior);
-    pilotWarrior.breakLeft();
+    let x = 0;
+    pilots.forEach(async options => {
+      const pilot = new Pilot(options);
+      const mesh = await pilot.load();
+      mesh.position.set(x, -300, -500);
+      scene.add(mesh);
+      x += 1000;
+    })
 
     const tandem = new TandemPilot({
       pilot: {
@@ -44,7 +48,7 @@ const PilotStory = {
       }
     });
     const meshTandem = await tandem.load();
-    meshTandem.position.set(-2000, -3000, -5000);
+    meshTandem.position.set(-2000, -300, -500);
     scene.add(meshTandem);
 
     const animate = () => {
@@ -52,10 +56,8 @@ const PilotStory = {
       renderer.render(scene, camera);
     };
 
-    const lookAt = mesh.position.clone().add(new THREE.Vector3(0, 0, 0));
-    camera.position.set(25, 9, 0);
-    camera.lookAt(lookAt);
-    controls.target = lookAt;
+    camera.position.set(0, 0, 8000);
+    camera.lookAt(scene.position);
     animate();
   },
 };
