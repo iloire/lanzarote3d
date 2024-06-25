@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import Controls from "../utils/controls";
 import Sky from "../components/sky";
-import PilotHead, { PilotHeadType } from "../components/parts/pilot-head";
+import PilotHead, { GlassesType, PilotHeadType } from "../components/parts/pilot-head";
 import Helpers from "../utils/helpers";
 
 const HeadStory = {
@@ -25,6 +25,10 @@ const HeadStory = {
     const heads = [
       {
         headType: PilotHeadType.Default
+      },
+      {
+        headType: PilotHeadType.Default,
+        glassesType: GlassesType.SunGlasses1
       },
       {
         headType: PilotHeadType.Warrior
