@@ -27,7 +27,7 @@ function objLoader(url, manager?: THREE.LoadingManager) {
 
 const Models = {
   manager: defaultManager,
-  loadObj: async (model: string, manager?: THREE.LoadingManager): Promise<THREE.Object3D> => {
+  loadObj: async (model: string, manager?: THREE.LoadingManager) => {
     const obj: any = await objLoader(model, manager);
     return obj;
   },

@@ -3,7 +3,8 @@ import Controls from "../utils/controls";
 import Sky from "../components/sky";
 import Helpers from "../utils/helpers";
 import Models from "../utils/models";
-import model from '../models/adri.obj';
+import adriModel from '../models/adri.obj';
+import texturePng from '../models/adri.png';
 
 
 const AdriStory = {
@@ -24,7 +25,15 @@ const AdriStory = {
     const controls = Controls.createControls(camera, renderer);
     sky.updateSunPosition(12);
 
-    const mesh = await Models.loadObj(model);
+    const mesh = await Models.loadObj(adriModel);
+    const textureLoader = new THREE.TextureLoader();
+    const texture = textureLoader.load(texturePng);
+    mesh.traverse(function(child) {
+      if (child.isMesh) {
+        child.material.map = texture;
+      }
+    });
+
     const scale = 100;
     mesh.scale.set(scale, scale, scale);
     scene.add(mesh);
