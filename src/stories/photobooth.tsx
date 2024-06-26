@@ -61,7 +61,7 @@ const paraglidersVoxel: ParagliderVoxelConfig[] = [
         textureFile: adriTextureImage
       },
     },
-    position: new THREE.Vector3(6897, 890, -505)
+    position: new THREE.Vector3(6897, 920, -705)
   }];
 
 
@@ -138,7 +138,7 @@ const PhotoBooth = {
     water: THREE.Mesh,
   ) => {
     const initialPos = new THREE.Vector3(6800, 870, -475);
-    camera.animateTo(initialPos, paragliders[0].position, 0);
+    camera.animateTo(initialPos, paraglidersVoxel[0].position, 0);
 
     paragliders.forEach(async p => {
       const paraglider = new Paraglider(p.pg);
@@ -180,7 +180,6 @@ const PhotoBooth = {
     env.addTrees(terrain);
     env.addHouses(terrain);
     env.addBoats(water);
-
 
     const animate = () => {
       TWEEN.update();

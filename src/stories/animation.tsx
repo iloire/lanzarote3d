@@ -144,7 +144,6 @@ function flyThroughTargets(camera: Camera, targets: THREE.Vector3[], offsetDista
   tweenChain.start();
 }
 
-
 const Animation = {
   load: async (
     camera: Camera,
@@ -189,13 +188,58 @@ const Animation = {
     env.addBoats(water);
 
 
+
+    const points: THREE.Vector3[] = paragliders.map(p => p.position);
+
+    let pointIndex = 0;
+    const radius = 30;
+    const speed = 0.01; // Adjust speed as needed
+
+    function animateCamera() {
+      if (pointIndex >= points.length) {
+        pointIndex = 0;
+      }
+      console.log(pointIndex)
+      const target = points[pointIndex];
+      const duration = 2000; // 2 seconds to reach the next point
+
+      new TWEEN.Tween(camera.position)
+        .to({ x: target.x, y: target.y, z: target.z + radius }, duration)
+        .easing(TWEEN.Easing.Quadratic.InOut)
+        .onComplete(() => {
+          orbitAroundPoint(target);
+        })
+        .start();
+
+      pointIndex++;
+    }
+
+    function orbitAroundPoint(target: THREE.Vector3) {
+      let angle = 0;
+
+      function orbit() {
+        angle += speed;
+        camera.position.x = target.x + radius * Math.cos(angle);
+        camera.position.z = target.z + radius * Math.sin(angle);
+        camera.lookAt(target);
+        if (angle < Math.PI * 2) {
+          requestAnimationFrame(orbit);
+        } else {
+          console.log('animate camera')
+          animateCamera();
+        }
+      }
+
+      orbit();
+    }
     const animate = () => {
       TWEEN.update();
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
     };
+    // flyThroughTargets(camera, paragliders.map(p => p.position), 10, 2000);
+    animateCamera();
     animate();
-    flyThroughTargets(camera, paragliders.map(p => p.position), 10, 2000);
   },
 };
 
