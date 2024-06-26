@@ -27,6 +27,7 @@ class Menu extends React.Component {
       { story: "hangglider" },
       { story: "night" },
       { story: "paraglider" },
+      { story: "paragliderVoxel" },
       { story: "photobooth" },
       { story: "pilot" },
       { story: "terrain" },

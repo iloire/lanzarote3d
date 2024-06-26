@@ -1,11 +1,14 @@
 import * as THREE from "three";
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
-import Paraglider from "../components/paraglider";
+import Paraglider, { ParagliderOptions } from "../components/paraglider";
+import ParagliderVoxel, { ParagliderVoxelOptions } from "../components/paraglider-voxel";
 import Tandem from "../components/tandem";
 import Camera from "../components/camera";
 import { PilotHeadType } from "../components/parts/pilot-head";
 import Environment from "./env/environment";
 import Weather, { WeatherOptions } from "../elements/weather";
+import adriModel from '../models/adri.obj';
+import adriTextureImage from '../models/adri.png';
 
 const WEATHER_SETTINGS: WeatherOptions = {
   windDirectionDegreesFromNorth: 310,
@@ -39,7 +42,35 @@ const tandems = [
   }
 ];
 
-const paragliders = [
+type ParagliderVoxelConfig = {
+  pg: ParagliderVoxelOptions,
+  position: any
+}
+
+const paraglidersVoxel: ParagliderVoxelConfig[] = [
+  {
+    pg: {
+      glider: {
+        wingColor1: '#c30010',
+        wingColor2: '#b100cd',
+        inletsColor: 'pink',
+        numeroCajones: 35
+      },
+      pilot: {
+        objFile: adriModel,
+        textureFile: adriTextureImage
+      },
+    },
+    position: new THREE.Vector3(6897, 890, -505)
+  }];
+
+
+type ParagliderConfig = {
+  pg: ParagliderOptions,
+  position: any
+}
+
+const paragliders: ParagliderConfig[] = [
   {
     pg: {
       glider: {
@@ -114,6 +145,15 @@ const PhotoBooth = {
       const mesh = await paraglider.load();
       mesh.position.copy(p.position);
       const scale = 0.001; // mm to m
+      mesh.scale.set(scale, scale, scale);
+      scene.add(mesh);
+    });
+
+    paraglidersVoxel.forEach(async p => {
+      const paraglider = new ParagliderVoxel(p.pg);
+      const mesh = await paraglider.load();
+      mesh.position.copy(p.position);
+      const scale = 0.01; // mm to m
       mesh.scale.set(scale, scale, scale);
       scene.add(mesh);
     });

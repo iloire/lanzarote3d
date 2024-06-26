@@ -1,41 +1,43 @@
-import Default from "./default";
-import FlyZones from "./flyzones";
-import Game from "./game/game";
-import DayTime from "./daytime";
-import Night from "./night";
-import Terrain from "./terrain";
-import Workshop from "./workshop";
-import Paraglider from "./paraglider";
-import FlierPG from "./flier-pg";
-import HangGlider from "./hangglider";
+import Animation from "./animation";
 import Cloud from "./cloud";
 import Clouds from "./clouds";
-import PhotoBooth from "./photobooth";
-import Animation from "./animation";
+import DayTime from "./daytime";
+import Default from "./default";
+import FlierPG from "./flier-pg";
+import FlyZones from "./flyzones";
+import Game from "./game/game";
 import Glider from "./glider";
-import Pilot from "./pilot";
+import HangGlider from "./hangglider";
 import Head from "./head";
+import Night from "./night";
+import Paraglider from "./paraglider";
+import ParagliderVoxel from "./paraglider-voxel";
+import PhotoBooth from "./photobooth";
+import Pilot from "./pilot";
+import Terrain from "./terrain";
 import Voxel from "./voxel";
+import Workshop from "./workshop";
 
 const Stories = {
-  default: Default.load,
-  flyzones: FlyZones.load,
-  game: Game.load,
-  daytime: DayTime.load,
-  night: Night.load,
-  terrain: Terrain.load,
-  workshop: Workshop.load,
-  paraglider: Paraglider.load,
-  flier: FlierPG.load,
-  hangglider: HangGlider.load,
+  animation: Animation.load,
   cloud: Cloud.load,
   clouds: Clouds.load,
-  photobooth: PhotoBooth.load,
-  animation: Animation.load,
+  daytime: DayTime.load,
+  default: Default.load,
+  flier: FlierPG.load,
+  flyzones: FlyZones.load,
+  game: Game.load,
   glider: Glider.load,
-  pilot: Pilot.load,
+  hangglider: HangGlider.load,
   head: Head.load,
+  night: Night.load,
+  paraglider: Paraglider.load,
+  paragliderVoxel: ParagliderVoxel.load,
+  photobooth: PhotoBooth.load,
+  pilot: Pilot.load,
+  terrain: Terrain.load,
   voxel: Voxel.load,
+  workshop: Workshop.load,
 };
 
 export default Stories;
