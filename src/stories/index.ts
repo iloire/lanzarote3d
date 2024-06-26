@@ -15,7 +15,7 @@ import Animation from "./animation";
 import Glider from "./glider";
 import Pilot from "./pilot";
 import Head from "./head";
-import Adri from "./adri";
+import Voxel from "./voxel";
 
 const Stories = {
   default: Default.load,
@@ -35,7 +35,7 @@ const Stories = {
   glider: Glider.load,
   pilot: Pilot.load,
   head: Head.load,
-  adri: Adri.load,
+  voxel: Voxel.load,
 };
 
 export default Stories;

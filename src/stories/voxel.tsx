@@ -2,12 +2,11 @@ import * as THREE from "three";
 import Controls from "../utils/controls";
 import Sky from "../components/sky";
 import Helpers from "../utils/helpers";
-import Models from "../utils/models";
 import adriModel from '../models/adri.obj';
 import texturePng from '../models/adri.png';
 import PilotVoxel from "../components/pilot-voxel";
 
-const AdriStory = {
+const VoxelStory = {
   load: async (
     camera: THREE.PerspectiveCamera,
     scene: THREE.Scene,
@@ -49,4 +48,4 @@ const AdriStory = {
   },
 };
 
-export default AdriStory;
+export default VoxelStory;
