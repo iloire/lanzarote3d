@@ -5,7 +5,7 @@ import Helpers from "../utils/helpers";
 import Models from "../utils/models";
 import adriModel from '../models/adri.obj';
 import texturePng from '../models/adri.png';
-
+import PilotVoxel from "../components/pilot-voxel";
 
 const AdriStory = {
   load: async (
@@ -25,14 +25,12 @@ const AdriStory = {
     const controls = Controls.createControls(camera, renderer);
     sky.updateSunPosition(12);
 
-    const mesh = await Models.loadObj(adriModel);
-    const textureLoader = new THREE.TextureLoader();
-    const texture = textureLoader.load(texturePng);
-    mesh.traverse(function(child) {
-      if (child.isMesh) {
-        child.material.map = texture;
-      }
-    });
+
+    const adri = new PilotVoxel({
+      objFile: adriModel,
+      textureFile: texturePng
+    })
+    const mesh = await adri.load();
 
     const scale = 100;
     mesh.scale.set(scale, scale, scale);
