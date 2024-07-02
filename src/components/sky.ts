@@ -57,8 +57,6 @@ const calculateSunPosition = (
   return sunPosition;
 };
 
-const USE_DIRECTIONAL_LIGHT = true;
-
 type SkyOptions = {
   turbidity: number;
   rayleigh: number;
@@ -91,7 +89,10 @@ export default class Sky extends THREE.Object3D {
     super();
     this.sunPosition = calculateSunPosition(timeOfDayInHours, monthOfTheYear);
     this.monthOfTheYear = monthOfTheYear;
-    this.skyOptions = skyOptions || defaultSkyOptions;
+    this.skyOptions = {
+      ...defaultSkyOptions,
+      ...skyOptions
+    };
 
     this.sky = new SkyExample();
     this.sky.material.uniforms["sunPosition"].value.copy(this.sunPosition);
@@ -120,21 +121,20 @@ export default class Sky extends THREE.Object3D {
       monthOfTheYear
     );
 
-    if (USE_DIRECTIONAL_LIGHT) {
-      this.directionalLight = new THREE.DirectionalLight(
-        0xffffff,
-        lightIntensity
-      );
-      this.directionalLight.castShadow = true;
-      this.directionalLight.position.copy(
-        this.sunPosition.clone().multiplyScalar(100000)
-      );
+    this.directionalLight = new THREE.DirectionalLight(
+      0xffffff,
+      lightIntensity
+    );
 
-      // this.directionalLightHelper = new THREE.DirectionalLightHelper(
-      //   this.directionalLight,
-      //   1000
-      // );
-    }
+    this.directionalLight.castShadow = true;
+    this.directionalLight.position.copy(
+      this.sunPosition.clone().multiplyScalar(100000)
+    );
+
+    // this.directionalLightHelper = new THREE.DirectionalLightHelper(
+    //   this.directionalLight,
+    //   1000
+    // );
 
     this.ambientLight = new THREE.AmbientLight(0xffffff, lightIntensity);
   }
@@ -157,19 +157,31 @@ export default class Sky extends THREE.Object3D {
   addGui(gui) {
     const skyGui = gui.addFolder("Sky");
     skyGui
-      .add(this.ambientLight, "intensity", 0, 1)
+      .add(this.ambientLight, "intensity", 0, 10)
       .name("ambient.intensity")
       .listen();
+
     if (this.directionalLight) {
       skyGui
-        .add(this.directionalLight, "intensity", 0, 1)
+        .add(this.directionalLight, "intensity", 0, 10)
         .name("directional.intensity")
         .listen();
     }
+
     skyGui
-      .add(this.pointLight, "intensity", 0, 1)
+      .add(this.pointLight, "intensity", 0, 10)
       .name("pointLight.intensity")
       .listen();
+
+    const skyUniforms = this.sky.material.uniforms;
+    for (const key in this.skyOptions) {
+      if (skyUniforms[key]) {
+        skyGui
+          .add(skyUniforms[key], 'value', 0, 1)
+          .name("skyOptions." + key)
+          .listen();
+      }
+    }
 
     this.addSkyGui(gui);
   }
