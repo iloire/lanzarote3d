@@ -9,3 +9,10 @@ export type Location = {
   idealSunPositionDegrees: number;
   availableForPlaying: boolean;
 };
+
+export type Media = {
+  title: string;
+  position: THREE.Vector3;
+  imgUrl: string;
+  videoUrl: string;
+};
