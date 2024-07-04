@@ -25,7 +25,7 @@ const FlyZones = {
     ));
     root.render(<div className="points">{buttons}</div>);
 
-    media.forEach(async (media) => {
+    const meshes = await Promise.all(media.map(async (media) => {
       const videoFrame = new VideoFrame({
         imgUrl: media.imgUrl,
         videoUrl: media.videoUrl,
@@ -36,7 +36,8 @@ const FlyZones = {
       mesh.scale.set(scale, scale, scale);
       mesh.position.copy(media.position);
       scene.add(mesh);
-    });
+      return mesh;
+    }));
 
 
     const initial = locations[0];
@@ -46,6 +47,9 @@ const FlyZones = {
       TWEEN.update();
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
+      meshes.forEach((mesh) => {
+        mesh.lookAt(camera.position)
+      });
     };
     animate();
   },
