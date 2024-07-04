@@ -26,7 +26,11 @@ const FlyZones = {
     root.render(<div className="points">{buttons}</div>);
 
     media.forEach(async (media) => {
-      const videoFrame = new VideoFrame({ imgUrl: media.imgUrl, videoUrl: media.videoUrl });
+      const videoFrame = new VideoFrame({
+        imgUrl: media.imgUrl,
+        videoUrl: media.videoUrl,
+        camera: camera
+      });
       const mesh = await videoFrame.load();
       const scale = 300;
       mesh.scale.set(scale, scale, scale);
