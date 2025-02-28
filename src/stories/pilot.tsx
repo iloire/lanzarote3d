@@ -27,16 +27,21 @@ const PilotStory = {
     const pilots = [
       { head: { helmetColor: 'red' } },
       { head: { glassesType: GlassesType.SunGlasses1 } },
-      { head: { headType: PilotHeadType.Warrior } }
+      { head: { headType: PilotHeadType.Default } },
+      { head: { headType: PilotHeadType.Warrior } },
+      { head: { headType: PilotHeadType.Skeleton } },
+      { head: { headType: PilotHeadType.Devil } },
+      { head: { headType: PilotHeadType.DevilWithHelmet } },
+      { head: { headType: PilotHeadType.Dino } }
     ]
 
-    let x = 0;
+    let x = -1400;
     pilots.forEach(async options => {
       const pilot = new Pilot(options);
       const mesh = await pilot.load();
       mesh.position.set(x, -300, -500);
       scene.add(mesh);
-      x += 1000;
+      x += 600;
     })
 
     const tandem = new TandemPilot({
