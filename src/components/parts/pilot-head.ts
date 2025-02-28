@@ -3,7 +3,7 @@ import getDefaultGlasses from "./glasses/default";
 import getSunGlasses1 from "./glasses/sunglasses1";
 
 export enum PilotHeadType {
-  Default, Warrior, Skeleton, Devil
+  Default, Warrior, Skeleton, Devil, DevilWithHelmet, Dino
 }
 
 export enum GlassesType {
@@ -387,9 +387,10 @@ const getDefaultHead = (options: PilotHeadOptions): THREE.Group => {
 
 const getDevilHead = (options: PilotHeadOptions): THREE.Group => {
   const group = new THREE.Group();
-  const skinMaterial = getColoredMaterial('#ff4444'); // Reddish skin
-  const hornMaterial = getColoredMaterial('#333333'); // Dark horns
-  const eyeMaterial = getColoredMaterial('#ffff00'); // Yellow eyes
+  const skinMaterial = getColoredMaterial('#ff4444');
+  const hornMaterial = getColoredMaterial('#333333');
+  const eyeMaterial = getColoredMaterial('#ffff00');
+  const pupilMaterial = getColoredMaterial('#000000');
   
   // Head base - made slightly larger
   const headGeo = new THREE.BoxGeometry(1.8, 2, 1.6);
@@ -413,6 +414,14 @@ const getDevilHead = (options: PilotHeadOptions): THREE.Group => {
   
   leftEye.position.set(-0.4, 2.2, 0.8);
   rightEye.position.set(0.4, 2.2, 0.8);
+  
+  // Add black pupils
+  const pupilGeo = new THREE.BoxGeometry(0.15, 0.15, 0.21); // Slightly larger on z-axis to prevent z-fighting
+  const leftPupil = new THREE.Mesh(pupilGeo, pupilMaterial);
+  const rightPupil = new THREE.Mesh(pupilGeo, pupilMaterial);
+  
+  leftPupil.position.set(-0.4, 2.2, 0.81);
+  rightPupil.position.set(0.4, 2.2, 0.81);
   
   // Sharper pointed chin
   const chinGeo = new THREE.ConeGeometry(0.5, 0.8, 4);
@@ -450,6 +459,156 @@ const getDevilHead = (options: PilotHeadOptions): THREE.Group => {
   return group;
 };
 
+const getDevilHelmet = (options: PilotHeadOptions): THREE.Group => {
+  const devilHead = getDevilHead(options);
+  
+  // Create helmet parts
+  const helmetGroup = new THREE.Group();
+  const helmetMaterial = getColoredMaterial('#FFD700'); // Gold color for helmet
+  
+  // Main helmet piece (slightly larger than head to fit horns)
+  const helmetGeo = new THREE.BoxGeometry(2, 2.2, 1.8);
+  const helmet = new THREE.Mesh(helmetGeo, helmetMaterial);
+  helmet.position.set(0, 2, -0.1); // Slightly back to show face
+  
+  // Helmet side pieces
+  const sidePieceGeo = new THREE.BoxGeometry(0.4, 1.5, 1.8);
+  const leftSide = new THREE.Mesh(sidePieceGeo, helmetMaterial);
+  const rightSide = new THREE.Mesh(sidePieceGeo, helmetMaterial);
+  
+  leftSide.position.set(-1.1, 1.8, -0.1);
+  rightSide.position.set(1.1, 1.8, -0.1);
+  
+  // Top crest
+  const crestGeo = new THREE.BoxGeometry(0.3, 1.2, 1.4);
+  const crest = new THREE.Mesh(crestGeo, helmetMaterial);
+  crest.position.set(0, 3.2, -0.2);
+  
+  // Add holes for horns (negative spaces)
+  const hornHoleGeo = new THREE.CylinderGeometry(0.3, 0.3, 2.2, 8);
+  const leftHornHole = new THREE.Mesh(hornHoleGeo, new THREE.MeshBasicMaterial({ 
+    colorWrite: false, 
+    depthWrite: true 
+  }));
+  const rightHornHole = new THREE.Mesh(hornHoleGeo, new THREE.MeshBasicMaterial({ 
+    colorWrite: false, 
+    depthWrite: true 
+  }));
+  
+  leftHornHole.position.set(-0.5, 2.5, 0);
+  rightHornHole.position.set(0.5, 2.5, 0);
+  leftHornHole.rotation.z = -0.3;
+  rightHornHole.rotation.z = 0.3;
+  
+  helmetGroup.add(helmet);
+  helmetGroup.add(leftSide);
+  helmetGroup.add(rightSide);
+  helmetGroup.add(crest);
+  helmetGroup.add(leftHornHole);
+  helmetGroup.add(rightHornHole);
+  
+  const scale = 200;
+  helmetGroup.translateY(-230);
+  helmetGroup.scale.set(scale, scale, scale);
+  
+  // Create final group combining devil head and helmet
+  const finalGroup = new THREE.Group();
+  finalGroup.add(devilHead);
+  finalGroup.add(helmetGroup);
+  
+  return finalGroup;
+};
+
+const getDinoHead = (options: PilotHeadOptions): THREE.Group => {
+  const group = new THREE.Group();
+  const skinMaterial = getColoredMaterial('#4CAF50'); // Green skin
+  const darkMaterial = getColoredMaterial('#2E7D32'); // Darker green for details
+  const eyeMaterial = getColoredMaterial('#FDD835'); // Yellow eyes
+  const pupilMaterial = getColoredMaterial('#000000'); // Black pupils
+  
+  // Main head shape (elongated for snout)
+  const headGeo = new THREE.BoxGeometry(1.4, 1.2, 2.5);
+  const head = new THREE.Mesh(headGeo, skinMaterial);
+  head.position.set(0, 2, 0.4);
+  
+  // Upper jaw/snout
+  const snoutGeo = new THREE.BoxGeometry(1.2, 0.8, 1.8);
+  const snout = new THREE.Mesh(snoutGeo, skinMaterial);
+  snout.position.set(0, 1.8, 1.5);
+  
+  // Lower jaw
+  const jawGeo = new THREE.BoxGeometry(1.1, 0.5, 1.6);
+  const jaw = new THREE.Mesh(jawGeo, skinMaterial);
+  jaw.position.set(0, 1.4, 1.4);
+  
+  // Eyes with pupils
+  const eyeGeo = new THREE.BoxGeometry(0.4, 0.4, 0.2);
+  const leftEye = new THREE.Mesh(eyeGeo, eyeMaterial);
+  const rightEye = new THREE.Mesh(eyeGeo, eyeMaterial);
+  
+  leftEye.position.set(-0.5, 2.3, 1.2);
+  rightEye.position.set(0.5, 2.3, 1.2);
+  
+  const pupilGeo = new THREE.BoxGeometry(0.2, 0.2, 0.21);
+  const leftPupil = new THREE.Mesh(pupilGeo, pupilMaterial);
+  const rightPupil = new THREE.Mesh(pupilGeo, pupilMaterial);
+  
+  leftPupil.position.set(-0.5, 2.3, 1.3);
+  rightPupil.position.set(0.5, 2.3, 1.3);
+  
+  // Head spikes
+  const spikeGeo = new THREE.ConeGeometry(0.15, 0.5, 4);
+  const spikes: THREE.Mesh[] = [];
+  
+  // Create 5 spikes along the head
+  for (let i = 0; i < 5; i++) {
+    const spike = new THREE.Mesh(spikeGeo, darkMaterial);
+    spike.rotation.x = -Math.PI / 6; // Tilt back slightly
+    spike.position.set(0, 2.4, 0.8 - (i * 0.4));
+    spikes.push(spike);
+  }
+  
+  // Teeth
+  const toothGeo = new THREE.ConeGeometry(0.08, 0.2, 4);
+  const teeth: THREE.Mesh[] = [];
+  
+  // Upper teeth
+  for (let i = 0; i < 6; i++) {
+    const tooth = new THREE.Mesh(toothGeo, getColoredMaterial('#FFFFFF'));
+    tooth.rotation.x = Math.PI;
+    tooth.position.set(-0.3 + (i * 0.12), 1.6, 2);
+    teeth.push(tooth);
+  }
+  
+  // Nostrils
+  const nostrilGeo = new THREE.BoxGeometry(0.15, 0.15, 0.15);
+  const leftNostril = new THREE.Mesh(nostrilGeo, darkMaterial);
+  const rightNostril = new THREE.Mesh(nostrilGeo, darkMaterial);
+  
+  leftNostril.position.set(-0.3, 1.9, 2.2);
+  rightNostril.position.set(0.3, 1.9, 2.2);
+  
+  // Add all elements to group
+  group.add(head);
+  group.add(snout);
+  group.add(jaw);
+  group.add(leftEye);
+  group.add(rightEye);
+  group.add(leftPupil);
+  group.add(rightPupil);
+  group.add(leftNostril);
+  group.add(rightNostril);
+  
+  spikes.forEach(spike => group.add(spike));
+  teeth.forEach(tooth => group.add(tooth));
+  
+  const scale = 200;
+  group.translateY(-230);
+  group.scale.set(scale, scale, scale);
+  
+  return group;
+};
+
 class PilotHead {
   options: PilotHeadOptions;
 
@@ -467,6 +626,12 @@ class PilotHead {
       return getSkeletonHead(this.options);
     } else if (this.options.headType === PilotHeadType.Devil) {
       return getDevilHead(this.options);
+    } else if (this.options.headType === PilotHeadType.DevilWithHelmet) {
+      return getDevilHelmet(this.options);
+    } else if (this.options.headType === PilotHeadType.Default) {
+      return getDefaultHead(this.options);
+    } else if (this.options.headType === PilotHeadType.Dino) {
+      return getDinoHead(this.options);
     } else {
       return getDefaultHead(this.options);
     }

@@ -23,25 +23,15 @@ const HeadStory = {
     sky.updateSunPosition(12);
 
     const heads = [
-      {
-        headType: PilotHeadType.Default
-      },
-      {
-        headType: PilotHeadType.Default,
-        glassesType: GlassesType.SunGlasses1
-      },
-      {
-        headType: PilotHeadType.Warrior
-      },
-      {
-        headType: PilotHeadType.Skeleton
-      },
-      {
-        headType: PilotHeadType.Devil
-      }
+      { headType: PilotHeadType.Default },
+      { headType: PilotHeadType.Default, glassesType: GlassesType.SunGlasses1 },
+      ...Object.keys(PilotHeadType)
+        .filter(key => isNaN(Number(key)))
+        .filter(key => PilotHeadType[key] !== PilotHeadType.Default)
+        .map(key => ({ headType: PilotHeadType[key] }))
     ];
 
-    let x = 0;
+    let x = -2000;
     heads.forEach(async headOptions => {
       const head = new PilotHead(headOptions);
       const mesh = await head.load();
