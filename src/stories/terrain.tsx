@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import Sky from "../components/sky";
 import textureImg from "../textures/h-map-lanzarote.png";
-
+import Controls from "../utils/controls";
 const terrainGenerator1 = (groundGeo, displacement) => {
   const groundMaterial = new THREE.MeshPhongMaterial({
     wireframe: true,
@@ -71,7 +71,6 @@ const Terrain = {
     water.visible = false;
     terrain.visible = false;
 
-
     sky.updateSunPosition(14);
 
     const animate = () => {
@@ -99,6 +98,7 @@ const Terrain = {
     scene.add(waterGenerator());
 
     camera.position.set(4120, 2500, 12000);
+    const controls = Controls.createControls(camera, renderer);
   },
 };
 

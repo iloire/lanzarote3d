@@ -24,6 +24,7 @@ const Night = {
     animate();
     camera.position.set(-21200, 2500, 23000);
     controls.target = sky.getSunPosition();
+    controls.update();
   },
 };
 
