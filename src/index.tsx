@@ -34,7 +34,7 @@ const createRenderer = (sizes) => {
 };
 
 interface AppProps {
-  // Define your component props here
+  initialStory?: string;
 }
 
 interface AppState {
@@ -42,7 +42,7 @@ interface AppState {
   showAppSelection: boolean;
 }
 
-class App extends React.Component<AppProps, AppState> {
+export class App extends React.Component<AppProps, AppState> {
   renderer: any;
 
   state = {
@@ -133,7 +133,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
-    const storyParam = urlParams.get("story")
+    const storyParam = urlParams.get("story") || this.props.initialStory;
     const story = storyParam;
     console.log("loading story:", story);
     if (story && Stories[story]) {
@@ -179,7 +179,7 @@ class App extends React.Component<AppProps, AppState> {
 const rootElement = document.getElementById("root");
 if (WebGL.isWebGLAvailable()) {
   const root = createRoot(rootElement);
-  root.render(<App />);
+  root.render(<App initialStory="default" />);
 } else {
   const warning = WebGL.getWebGLErrorMessage();
   rootElement.appendChild(warning);
