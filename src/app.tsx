@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import GUI from "lil-gui";
 import Stats from "three/examples/jsm/libs/stats.module";
@@ -18,7 +18,39 @@ THREE.Cache.enabled = true;
 const gui = new GUI();
 gui.hide();
 
-const createRenderer = (sizes) => {
+interface AppProps {
+  initialStory?: string;
+}
+
+interface SceneConfig {
+  sizes: {
+    width: number;
+    height: number;
+  };
+  scale: number;
+  islandPosition: [number, number, number];
+  cameraSettings: {
+    fov: number;
+    near: number;
+    far: number;
+  };
+}
+
+const SCENE_CONFIG: SceneConfig = {
+  sizes: {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  },
+  scale: 20000,
+  islandPosition: [0, -10, 0],
+  cameraSettings: {
+    fov: 45,
+    near: 1,
+    far: 200000,
+  },
+};
+
+const createRenderer = (sizes: { width: number; height: number }) => {
   const renderer = new THREE.WebGLRenderer({
     // powerPreference: "low-power" ,
     powerPreference: "high-performance",
@@ -33,158 +65,116 @@ const createRenderer = (sizes) => {
   return renderer;
 };
 
-interface AppProps {
-  initialStory?: string;
-}
+const App: React.FC<AppProps> = ({ initialStory }) => {
+  const [loadingProcess, setLoadingProcess] = useState(0);
+  const [showAppSelection, setShowAppSelection] = useState(false);
+  const [renderer, setRenderer] = useState<THREE.WebGLRenderer | null>(null);
 
-interface AppState {
-  loadingProcess: number;
-  showAppSelection: boolean;
-}
-
-export class App extends React.Component<AppProps, AppState> {
-  renderer: any;
-
-  state = {
-    loadingProcess: 0,
-    showAppSelection: false,
-  };
-
-  constructor(props: AppProps) {
-    super(props);
-    this.renderer = null;
-  }
-
-  async componentDidMount() {
-    if (!this.renderer) {
-      await this.initThree();
-    }
-  }
-
-  componentWillUnmount() {
-    this.setState = () => {
-      return;
-    };
-  }
-
-  initThree = async () => {
-    const sizes = {
-      width: window.innerWidth,
-      height: window.innerHeight,
-    };
-
-    const renderer = createRenderer(sizes);
-    this.renderer = renderer;
-
+  const initThree = async () => {
+    const renderer = createRenderer(SCENE_CONFIG.sizes);
+    setRenderer(renderer);
+    
     const scene = new THREE.Scene();
-
-    window.addEventListener(
-      "resize",
-      () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-      },
-      false
-    );
-
-    const sky: Sky = new Sky(20, 3);
+    
+    // Sky setup
+    const sky = new Sky(20, 3);
     sky.addToScene(scene);
     sky.addGui(gui);
 
+    // Water setup
     const water = new Water({ size: 500000 }).load(sky.getSunPosition());
     scene.add(water);
-    // Helpers.drawSphericalPosition(30, 90, 100, scene);
 
+    // Loading manager
     const loadingManager = new THREE.LoadingManager();
-    loadingManager.onProgress = async (url, loaded, total) => {
-      this.setState({ loadingProcess: Math.floor((loaded / total) * 100) });
+    loadingManager.onProgress = (_, loaded, total) => {
+      setLoadingProcess(Math.floor((loaded / total) * 100));
     };
 
+    // Island setup
     const island = await Island.load(loadingManager);
-    const scale = 20000;
-    island.scale.set(scale, scale, scale);
-    island.position.set(0, -10, 0);
+    island.scale.set(SCENE_CONFIG.scale, SCENE_CONFIG.scale, SCENE_CONFIG.scale);
+    island.position.set(...SCENE_CONFIG.islandPosition);
     scene.add(island);
 
+    // Camera setup
     const camera = new Camera(
-      45,
-      sizes.width / sizes.height,
-      1,
-      200000,
+      SCENE_CONFIG.cameraSettings.fov,
+      SCENE_CONFIG.sizes.width / SCENE_CONFIG.sizes.height,
+      SCENE_CONFIG.cameraSettings.near,
+      SCENE_CONFIG.cameraSettings.far,
       renderer,
       island
     );
     camera.addGui(gui);
     scene.add(camera);
 
-    document.addEventListener("keydown", onDocumentKeyDown, false);
-    function onDocumentKeyDown(event) {
-      const keyCode = event.which;
-      if (keyCode == 90) {
-        //z
-        if (gui._hidden) {
-          gui.show();
-        } else {
-          gui.hide();
-        }
-      }
-    }
+    // Event listeners
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
 
+    document.addEventListener("keydown", (event) => {
+      if (event.key.toLowerCase() === 'z') {
+        gui._hidden ? gui.show() : gui.hide();
+      }
+    });
+
+    // Story handling
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
-    const storyParam = urlParams.get("story") || this.props.initialStory;
-    const story = storyParam;
-    console.log("loading story:", story);
-    if (story && Stories[story]) {
-      this.setState({ showAppSelection: (!!storyParam && story !== 'game') });
-      await Stories[story](camera, scene, renderer, island, water, sky, gui);
+    const storyParam = urlParams.get("story") || initialStory;
+    
+    if (storyParam && Stories[storyParam]) {
+      setShowAppSelection(!!storyParam && storyParam !== 'game');
+      await Stories[storyParam](camera, scene, renderer, island, water, sky, gui);
     } else {
-      console.log('no story found', story);
-      this.setState({ showAppSelection: true });
+      console.log('no story found', storyParam);
+      setShowAppSelection(true);
     }
 
-    function animate() {
+    // Animation loop
+    const animate = () => {
       requestAnimationFrame(animate);
       stats.update();
-    }
+    };
     animate();
+    
     console.log("triangles:", renderer.info.render.triangles);
   };
 
-  navigateTo(story: string) {
-    window.location.href = "?story=" + story;
-  }
+  useEffect(() => {
+    if (!renderer) {
+      initThree();
+    }
+    
+    return () => {
+      // Cleanup
+      renderer?.dispose();
+    };
+  }, []);
 
-  render() {
-    const { loadingProcess, showAppSelection } = this.state;
+  const navigateTo = (story: string) => {
+    window.location.href = `?story=${story}`;
+  };
 
-    return (
-      <div className="lanzarote">
-        {loadingProcess === 100 ? (
-          ""
-        ) : (
-          <div className="loading">
-            <span className="progress">LOADING {loadingProcess} %</span>
-          </div>
-        )}
-
-        {showAppSelection && <Menu />}
-        <canvas className="webgl"></canvas>
-      </div>
-    );
-  }
-}
-
-const rootElement = document.getElementById("root");
-if (WebGL.isWebGLAvailable()) {
-  const root = createRoot(rootElement);
-  root.render(<App initialStory="default" />);
-} else {
-  const warning = WebGL.getWebGLErrorMessage();
-  rootElement.appendChild(warning);
-}
+  return (
+    <div className="lanzarote">
+      {loadingProcess !== 100 && (
+        <div className="loading">
+          <span className="progress">LOADING {loadingProcess} %</span>
+        </div>
+      )}
+      {showAppSelection && <Menu />}
+      <canvas className="webgl" />
+    </div>
+  );
+};
 
 const stats = Stats();
 stats.showPanel(0);
-document.getElementById("stats").appendChild(stats.dom);
+document.getElementById("stats")?.appendChild(stats.dom);
+
+export default App;
