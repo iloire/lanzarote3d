@@ -32,6 +32,9 @@ const HeadStory = {
       },
       {
         headType: PilotHeadType.Warrior
+      },
+      {
+        headType: PilotHeadType.Skeleton
       }
     ];
 
