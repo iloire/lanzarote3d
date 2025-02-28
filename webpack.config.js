@@ -3,10 +3,13 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-  entry: "./src/index.tsx",
+  entry: {
+    main: "./src/index.tsx",
+    animation1: "./src/apps/animation1/index.tsx"
+  },
   output: {
     path: path.join(__dirname, "/dist"),
-    filename: "bundle.js",
+    filename: "[name].bundle.js",
   },
   externals: {
     rStats: "rStats",
@@ -79,6 +82,13 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "./src/index.html"),
+      chunks: ['main'],
+      filename: 'index.html'
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(__dirname, "./src/apps/animation1/index.html"),
+      chunks: ['animation1'],
+      filename: 'animation1.html'
     }),
   ],
 };

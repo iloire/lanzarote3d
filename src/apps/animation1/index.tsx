@@ -3,15 +3,15 @@ import { createRoot } from "react-dom/client";
 import GUI from "lil-gui";
 import Stats from "three/examples/jsm/libs/stats.module";
 import * as THREE from "three";
-import Sky from "./components/sky";
-import Water from "./components/water";
-import Island from "./components/island";
-import Stories from "./stories/index";
-import Camera from "./components/camera";
-import Menu from './menu';
-import WebGL from "./WebGL";
+import Sky from "../../components/sky";
+import Water from "../../components/water";
+import Island from "../../components/island";
+import Stories from "../../stories/index";
+import Camera from "../../components/camera";
+import Menu from '../../menu';
+import WebGL from "../../WebGL";
 
-import "./index.css";
+import "../../index.css";
 
 THREE.Cache.enabled = true;
 
@@ -131,18 +131,7 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
-    const storyParam = urlParams.get("story")
-    const story = storyParam;
-    console.log("loading story:", story);
-    if (story && Stories[story]) {
-      this.setState({ showAppSelection: (!!storyParam && story !== 'game') });
-      await Stories[story](camera, scene, renderer, island, water, sky, gui);
-    } else {
-      console.log('no story found', story);
-      this.setState({ showAppSelection: true });
-    }
+    await Stories.animation(camera, scene, renderer, island, water);
 
     function animate() {
       requestAnimationFrame(animate);
@@ -152,12 +141,8 @@ class App extends React.Component<AppProps, AppState> {
     console.log("triangles:", renderer.info.render.triangles);
   };
 
-  navigateTo(story: string) {
-    window.location.href = "?story=" + story;
-  }
-
   render() {
-    const { loadingProcess, showAppSelection } = this.state;
+    const { loadingProcess } = this.state;
 
     return (
       <div className="lanzarote">
@@ -168,8 +153,6 @@ class App extends React.Component<AppProps, AppState> {
             <span className="progress">LOADING {loadingProcess} %</span>
           </div>
         )}
-
-        {showAppSelection && <Menu />}
         <canvas className="webgl"></canvas>
       </div>
     );
