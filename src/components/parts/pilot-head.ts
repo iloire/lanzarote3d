@@ -3,7 +3,7 @@ import getDefaultGlasses from "./glasses/default";
 import getSunGlasses1 from "./glasses/sunglasses1";
 
 export enum PilotHeadType {
-  Default, Warrior, Skeleton
+  Default, Warrior, Skeleton, Devil
 }
 
 export enum GlassesType {
@@ -385,6 +385,70 @@ const getDefaultHead = (options: PilotHeadOptions): THREE.Group => {
   return group;
 };
 
+const getDevilHead = (options: PilotHeadOptions): THREE.Group => {
+  const group = new THREE.Group();
+  const skinMaterial = getColoredMaterial('#ff4444'); // Reddish skin
+  const hornMaterial = getColoredMaterial('#333333'); // Dark horns
+  const eyeMaterial = getColoredMaterial('#ffff00'); // Yellow eyes
+  
+  // Head base - made slightly larger
+  const headGeo = new THREE.BoxGeometry(1.8, 2, 1.6);
+  const head = new THREE.Mesh(headGeo, skinMaterial);
+  head.position.set(0, 2, 0);
+  
+  // Larger, more prominent horns
+  const hornGeo = new THREE.ConeGeometry(0.25, 1.2, 8);
+  const leftHorn = new THREE.Mesh(hornGeo, hornMaterial);
+  const rightHorn = new THREE.Mesh(hornGeo, hornMaterial);
+  
+  leftHorn.position.set(-0.5, 3, 0);
+  rightHorn.position.set(0.5, 3, 0);
+  leftHorn.rotation.z = -0.3;
+  rightHorn.rotation.z = 0.3;
+  
+  // Larger, more menacing eyes
+  const eyeGeo = new THREE.BoxGeometry(0.4, 0.25, 0.2);
+  const leftEye = new THREE.Mesh(eyeGeo, eyeMaterial);
+  const rightEye = new THREE.Mesh(eyeGeo, eyeMaterial);
+  
+  leftEye.position.set(-0.4, 2.2, 0.8);
+  rightEye.position.set(0.4, 2.2, 0.8);
+  
+  // Sharper pointed chin
+  const chinGeo = new THREE.ConeGeometry(0.5, 0.8, 4);
+  const chin = new THREE.Mesh(chinGeo, skinMaterial);
+  chin.rotation.x = Math.PI;
+  chin.position.set(0, 1.2, 0);
+  
+  // Evil grin - made wider and more pronounced
+  const mouthGeo = new THREE.BoxGeometry(1, 0.15, 0.2);
+  const mouth = new THREE.Mesh(mouthGeo, getColoredMaterial('#000000'));
+  mouth.position.set(0, 1.7, 0.8);
+  
+  // Add small fangs
+  const fangGeo = new THREE.ConeGeometry(0.08, 0.2, 4);
+  const leftFang = new THREE.Mesh(fangGeo, getColoredMaterial('#ffffff'));
+  const rightFang = new THREE.Mesh(fangGeo, getColoredMaterial('#ffffff'));
+  
+  leftFang.position.set(-0.25, 1.6, 0.8);
+  rightFang.position.set(0.25, 1.6, 0.8);
+  
+  group.add(head);
+  group.add(leftHorn);
+  group.add(rightHorn);
+  group.add(leftEye);
+  group.add(rightEye);
+  group.add(chin);
+  group.add(mouth);
+  group.add(leftFang);
+  group.add(rightFang);
+
+  const scale = 200;
+  group.translateY(-230);
+  group.scale.set(scale, scale, scale);
+  
+  return group;
+};
 
 class PilotHead {
   options: PilotHeadOptions;
@@ -401,6 +465,8 @@ class PilotHead {
       return getWarriorHead(this.options);
     } else if (this.options.headType === PilotHeadType.Skeleton) {
       return getSkeletonHead(this.options);
+    } else if (this.options.headType === PilotHeadType.Devil) {
+      return getDevilHead(this.options);
     } else {
       return getDefaultHead(this.options);
     }

@@ -35,6 +35,9 @@ const HeadStory = {
       },
       {
         headType: PilotHeadType.Skeleton
+      },
+      {
+        headType: PilotHeadType.Devil
       }
     ];
 
@@ -42,9 +45,9 @@ const HeadStory = {
     heads.forEach(async headOptions => {
       const head = new PilotHead(headOptions);
       const mesh = await head.load();
-      mesh.position.set(x, -30, -50);
+      mesh.position.set(x, -100, -10);
       scene.add(mesh);
-      x += 1000;
+      x += 800;
     })
 
     const animate = () => {
@@ -52,7 +55,7 @@ const HeadStory = {
       renderer.render(scene, camera);
     };
 
-    camera.position.set(0, 30, 8000);
+    camera.position.set(0, 1000, 8000);
     camera.lookAt(scene.position);
     animate();
   },
