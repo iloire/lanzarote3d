@@ -1,4 +1,5 @@
 import Animation from "./animation";
+import Animation2 from "./animation2";
 import Cloud from "./cloud";
 import Clouds from "./clouds";
 import Default from "./default";
@@ -19,6 +20,7 @@ import Workshop from "./workshop";
 
 const Stories = {
   animation: Animation.load,
+  animation2: Animation2.load,
   cloud: Cloud.load,
   clouds: Clouds.load,
   default: Default.load,
