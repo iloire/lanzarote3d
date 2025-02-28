@@ -130,7 +130,7 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    await Stories.animation(camera, scene, renderer, island, water);
+    await Stories.game(camera, scene, renderer, island, water, sky, gui);
 
     function animate() {
       requestAnimationFrame(animate);
