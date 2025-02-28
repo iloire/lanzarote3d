@@ -1,7 +1,6 @@
 import Animation from "./animation";
 import Cloud from "./cloud";
 import Clouds from "./clouds";
-import DayTime from "./daytime";
 import Default from "./default";
 import FlierPG from "./flier-pg";
 import FlyZones from "./flyzones";
@@ -22,7 +21,6 @@ const Stories = {
   animation: Animation.load,
   cloud: Cloud.load,
   clouds: Clouds.load,
-  daytime: DayTime.load,
   default: Default.load,
   flier: FlierPG.load,
   flyzones: FlyZones.load,

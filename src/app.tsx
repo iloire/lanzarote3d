@@ -20,6 +20,7 @@ gui.hide();
 
 interface AppProps {
   initialStory?: string;
+  showAppSelection?: boolean;
 }
 
 interface SceneConfig {
@@ -65,9 +66,9 @@ const createRenderer = (sizes: { width: number; height: number }) => {
   return renderer;
 };
 
-const App: React.FC<AppProps> = ({ initialStory }) => {
+const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAppSelection = false }) => {
   const [loadingProcess, setLoadingProcess] = useState(0);
-  const [showAppSelection, setShowAppSelection] = useState(false);
+  const [showAppSelection, setShowAppSelection] = useState(initialShowAppSelection);
   const [renderer, setRenderer] = useState<THREE.WebGLRenderer | null>(null);
 
   const initThree = async () => {
@@ -122,18 +123,7 @@ const App: React.FC<AppProps> = ({ initialStory }) => {
       }
     });
 
-    // Story handling
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
-    const storyParam = urlParams.get("story") || initialStory;
-    
-    if (storyParam && Stories[storyParam]) {
-      setShowAppSelection(!!storyParam && storyParam !== 'game');
-      await Stories[storyParam](camera, scene, renderer, island, water, sky, gui);
-    } else {
-      console.log('no story found', storyParam);
-      setShowAppSelection(true);
-    }
+     await Stories[initialStory](camera, scene, renderer, island, water, sky, gui);
 
     // Animation loop
     const animate = () => {

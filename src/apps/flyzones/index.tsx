@@ -11,7 +11,7 @@ THREE.Cache.enabled = true;
 const rootElement = document.getElementById("root");
 if (WebGL.isWebGLAvailable()) {
   const root = createRoot(rootElement);
-  root.render(<App initialStory="animation"  showAppSelection={true}/>);
+  root.render(<App initialStory="flyzones"  />);
 } else {
   const warning = WebGL.getWebGLErrorMessage();
   rootElement.appendChild(warning);

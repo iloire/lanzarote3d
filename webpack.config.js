@@ -6,7 +6,8 @@ module.exports = {
   entry: {
     main: "./src/apps/main/index.tsx",
     animation1: "./src/apps/animation1/index.tsx",
-    game: "./src/apps/game/index.tsx"
+    game: "./src/apps/game/index.tsx",
+    flyzones: "./src/apps/flyzones/index.tsx"
   },
   output: {
     path: path.join(__dirname, "/dist"),
@@ -95,6 +96,11 @@ module.exports = {
       template: path.join(__dirname, "./src/apps/game/index.html"),
       chunks: ['game'],
       filename: 'game.html'
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(__dirname, "./src/apps/flyzones/index.html"),
+      chunks: ['flyzones'],
+      filename: 'flyzones.html'
     }),
   ],
 };
