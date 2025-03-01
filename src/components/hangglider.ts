@@ -4,8 +4,21 @@ import Wing from "./parts/wing";
 import GuiHelper from "../utils/gui";
 import Models from "../utils/models";
 import AutoFlier from "./base/auto-flier";
+import { PilotHeadType } from "./parts/pilot-head";
 
 const BREAK_ROTATION = 0.05;
+
+const DEFAULT_OPTIONS = {
+  head: {
+    headType: PilotHeadType.Default,
+    helmetOptions: {
+      color: '#ffffff',
+      color2: '#cccccc',
+      color3: '#999999'
+    }
+  }
+  // ... rest of options
+};
 
 class HangGliderModel extends AutoFlier {
   wing: Wing;
@@ -22,7 +35,7 @@ class HangGliderModel extends AutoFlier {
     wingMesh.position.x = -40;
 
     // pilot
-    this.pilot = new Pilot({ head: { helmetColor: '#ff0000' } });
+    this.pilot = new Pilot(DEFAULT_OPTIONS);
     const pilotMesh = this.pilot.load();
     const pilotScale = 0.03;
     pilotMesh.scale.set(pilotScale, pilotScale, pilotScale);

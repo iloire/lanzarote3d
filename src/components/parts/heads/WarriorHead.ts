@@ -1,5 +1,7 @@
 import * as THREE from "three";
 import { BaseHead } from "./BaseHead";
+import { DefaultHelmet } from "../helmets/DefaultHelmet";
+import { HelmetOptions } from "../helmets/types";
 
 export class WarriorHead extends BaseHead {
   private addBeard(): THREE.Group {
@@ -80,26 +82,14 @@ export class WarriorHead extends BaseHead {
     return group;
   }
 
-  private getDefaultHelmet(): THREE.Group {
-    const group = new THREE.Group();
-    const helmetTopMat = this.getColoredMaterial(this.options.helmetColor);
-    const helmetGeo = new THREE.BoxGeometry(400, 190, 390);
-    const helmet = new THREE.Mesh(helmetGeo, helmetTopMat);
-    helmet.position.set(0, 180, 0);
-    group.add(helmet);
-
-    const helmetSeparatorMat = this.getColoredMaterial(this.options.helmetColor2);
-    const helmetSeparatorGeo = new THREE.BoxGeometry(420, 40, 400);
-    const helmetSeparator = new THREE.Mesh(helmetSeparatorGeo, helmetSeparatorMat);
-    helmetSeparator.position.set(0, 100, 0);
-    group.add(helmetSeparator);
-
-    const helmetBottomMat = this.getColoredMaterial(this.options.helmetColor3);
-    const helmetBottomGeo = new THREE.BoxGeometry(400, 220, 290);
-    const helmetBottom = new THREE.Mesh(helmetBottomGeo, helmetBottomMat);
-    helmetBottom.position.set(0, 0, -20);
-    group.add(helmetBottom);
-    return group;
+  private getHelmet(): THREE.Group {
+    const helmetOptions: HelmetOptions = {
+      color: '#ffffff',
+      color2: '#cccccc',
+      color3: '#999999'
+    };
+    const helmet = new DefaultHelmet(helmetOptions);
+    return helmet.load();
   }
 
   load(): THREE.Group {
@@ -131,7 +121,7 @@ export class WarriorHead extends BaseHead {
 
     brow.rotation.x = 130;
 
-    const helmet = this.getDefaultHelmet();
+    const helmet = this.getHelmet();
     helmet.scale.set(0.006, 0.006, 0.006);
     helmet.translateY(2.2);
     helmet.translateZ(-0.3);

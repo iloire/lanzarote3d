@@ -3,35 +3,17 @@ import { BaseHead } from "./BaseHead";
 import { GlassesType } from "../pilot-head";
 import getDefaultGlasses from "../glasses/default";
 import getSunGlasses1 from "../glasses/sunglasses1";
+import { DefaultHelmet } from "../helmets/DefaultHelmet";
+import { HelmetOptions } from "../helmets/types";
 
 export class DefaultHead extends BaseHead {
   private getDefaultHelmet(): THREE.Group {
-    const group = new THREE.Group();
-    //Helmet
-    const helmetTopMat = this.getColoredMaterial(this.options.helmetColor);
-    const helmetGeo = new THREE.BoxGeometry(400, 190, 390);
-    const helmet = new THREE.Mesh(helmetGeo, helmetTopMat);
-    helmet.position.x = 0;
-    helmet.position.z = 0;
-    helmet.position.y = 180;
-    group.add(helmet);
-
-    const helmetSeparatorMat = this.getColoredMaterial(this.options.helmetColor2);
-    const helmetSeparatorGeo = new THREE.BoxGeometry(420, 40, 400);
-    const helmetSeparator = new THREE.Mesh(helmetSeparatorGeo, helmetSeparatorMat);
-    helmetSeparator.position.x = 0;
-    helmetSeparator.position.z = 0;
-    helmetSeparator.position.y = 100;
-    group.add(helmetSeparator);
-
-    const helmetBottomMat = this.getColoredMaterial(this.options.helmetColor3);
-    const helmetBottomGeo = new THREE.BoxGeometry(400, 220, 290);
-    const helmetBottom = new THREE.Mesh(helmetBottomGeo, helmetBottomMat);
-    helmetBottom.position.x = 0;
-    helmetBottom.position.z = -20;
-    helmetBottom.position.y = 0;
-    group.add(helmetBottom);
-    return group;
+    const helmet = new DefaultHelmet(this.options.helmetOptions || {
+      color: '#ffffff',
+      color2: '#cccccc',
+      color3: '#999999'
+    });
+    return helmet.load();
   }
 
   load(): THREE.Group {

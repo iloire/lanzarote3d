@@ -3,6 +3,7 @@ import Controls from "../utils/controls";
 import Sky from "../components/sky";
 import Paraglider from "../components/paraglider";
 import Helpers from "../utils/helpers";
+import { PilotHeadType } from "../components/parts/pilot-head";
 
 const ParagliderWorkshop = {
   load: async (
@@ -34,7 +35,14 @@ const ParagliderWorkshop = {
       carabinersSeparationMM: 300
     };
     const pilotOptions = {
-      head: {},
+      head: {
+        headType: PilotHeadType.Default,
+        helmetOptions: {
+          color: '#ffffff',
+          color2: '#cccccc',
+          color3: '#999999'
+        }
+      },
       carabinerColor: '#333',
     };
 

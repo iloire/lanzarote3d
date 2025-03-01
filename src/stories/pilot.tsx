@@ -25,14 +25,24 @@ const PilotStory = {
     sky.updateSunPosition(12);
 
     const pilots = [
-      { head: { helmetColor: 'red' } },
-      { head: { glassesType: GlassesType.SunGlasses1 } },
-      { head: { headType: PilotHeadType.Default } },
-      { head: { headType: PilotHeadType.Warrior } },
-      { head: { headType: PilotHeadType.Skeleton } },
-      { head: { headType: PilotHeadType.Devil } },
-      { head: { headType: PilotHeadType.DevilWithHelmet } },
-      { head: { headType: PilotHeadType.Dino } }
+      {
+        head: {
+          headType: PilotHeadType.Default,
+          helmetOptions: {
+            color: '#ffff00',
+            color2: '#cccccc',
+            color3: '#999999'
+          }
+        }
+      },
+      {
+        head: {
+          headType: PilotHeadType.Default,
+          glassesType: GlassesType.SunGlasses1
+        }
+      },
+      { head: { headType: PilotHeadType.Warrior } }
+>>>>>>> d2adb0b (feat: refactor heads and helmets)
     ]
 
     let x = -1400;
@@ -46,10 +56,14 @@ const PilotStory = {
 
     const tandem = new TandemPilot({
       pilot: {
-        head: {}, suitColor: 'green', shoesColor: 'black'
+        head: { headType: PilotHeadType.Default },
+        suitColor: 'green',
+        shoesColor: 'black'
       },
       passenger: {
-        head: {}, suitColor: 'orange', shoesColor: 'gray'
+        head: { headType: PilotHeadType.Default },
+        suitColor: 'orange',
+        shoesColor: 'gray'
       }
     });
     const meshTandem = await tandem.load();

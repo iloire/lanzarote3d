@@ -3,39 +3,41 @@ import { DefaultHead } from "./heads/DefaultHead";
 import { WarriorHead } from "./heads/WarriorHead";
 import { SkeletonHead } from "./heads/SkeletonHead";
 import { DevilHead } from "./heads/DevilHead";
-import { DevilWithHelmet } from "./heads/DevilWithHelmet";
 import { DinoHead } from "./heads/DinoHead";
+import { HelmetType, HelmetOptions } from "./helmets/types";
 
 export enum PilotHeadType {
-  Default, Warrior, Skeleton, Devil, DevilWithHelmet, Dino
+  Default, Warrior, Skeleton, Devil, Dino
 }
 
 export enum GlassesType {
   Default, SunGlasses1
 }
 
+export interface PilotHeadOptions {
+  headType: PilotHeadType;
+  helmetType?: HelmetType;
+  helmetOptions?: HelmetOptions;
+  glassesType?: GlassesType;
+  skinColor?: string;
+  beardColor?: string;
+  eyeColor?: string;
+  glassesColor?: string;
+}
+
 const DEFAULT_OPTIONS = {
-  helmetColor: 'yellow',
-  helmetColor2: 'white',
-  helmetColor3: '#c2c2c2',
   skinColor: '#e0bea5',
   beardColor: '#cc613d',
   eyeColor: 'white',
   glassesColor: 'pink',
   headType: PilotHeadType.Default,
-  glassesType: GlassesType.Default
-}
-
-export type PilotHeadOptions = {
-  helmetColor?: string;
-  helmetColor2?: string;
-  helmetColor3?: string;
-  skinColor?: string;
-  beardColor?: string;
-  eyeColor?: string;
-  glassesColor?: string;
-  headType?: PilotHeadType;
-  glassesType?: GlassesType;
+  glassesType: GlassesType.Default,
+  helmetType: HelmetType.Default,
+  helmetOptions: {
+    color: 'yellow',
+    color2: 'white',
+    color3: '#c2c2c2'
+  }
 }
 
 class PilotHead {
@@ -56,8 +58,6 @@ class PilotHead {
         return new SkeletonHead(this.options).load();
       case PilotHeadType.Devil:
         return new DevilHead(this.options).load();
-      case PilotHeadType.DevilWithHelmet:
-        return new DevilWithHelmet(this.options).load();
       case PilotHeadType.Dino:
         return new DinoHead(this.options).load();
       case PilotHeadType.Default:

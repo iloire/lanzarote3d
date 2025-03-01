@@ -17,7 +17,7 @@ import Pilot from "./pilot";
 import Terrain from "./terrain";
 import Voxel from "./voxel";
 import Workshop from "./workshop";
-
+import Helmet from "./helmet";
 const Stories = {
   animation: Animation.load,
   animation2: Animation2.load,
@@ -30,6 +30,7 @@ const Stories = {
   glider: Glider.load,
   hangglider: HangGlider.load,
   head: Head.load,
+  helmet: Helmet.load,
   night: Night.load,
   paraglider: Paraglider.load,
   paragliderVoxel: ParagliderVoxel.load,

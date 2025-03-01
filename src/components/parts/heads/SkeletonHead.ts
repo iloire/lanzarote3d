@@ -1,12 +1,14 @@
 import * as THREE from "three";
 import { BaseHead } from "./BaseHead";
+import { DefaultHelmet } from "../helmets/DefaultHelmet";
+import { HelmetOptions } from "../helmets/types";
 
 export class SkeletonHead extends BaseHead {
   private getSkeletonHelmet(): THREE.Group {
     const group = new THREE.Group();
-    const mainMat = this.getColoredMaterial(this.options.helmetColor);
-    const accentMat = this.getColoredMaterial(this.options.helmetColor2);
-    const metalMat = this.getColoredMaterial(this.options.helmetColor3);
+    const mainMat = this.getColoredMaterial(this.options.helmetOptions?.color || '#ffffff');
+    const accentMat = this.getColoredMaterial(this.options.helmetOptions?.color2 || '#cccccc');
+    const metalMat = this.getColoredMaterial(this.options.helmetOptions?.color3 || '#999999');
 
     // Main helmet shell - made more angular
     const helmetGeo = new THREE.BoxGeometry(400, 200, 390);
@@ -76,6 +78,16 @@ export class SkeletonHead extends BaseHead {
     backSpikes.forEach(spike => group.add(spike));
 
     return group;
+  }
+
+  private getHelmet(): THREE.Group {
+    const helmetOptions: HelmetOptions = {
+      color: '#ffffff',
+      color2: '#cccccc',
+      color3: '#999999'
+    };
+    const helmet = new DefaultHelmet(helmetOptions);
+    return helmet.load();
   }
 
   load(): THREE.Group {

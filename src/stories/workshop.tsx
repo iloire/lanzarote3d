@@ -6,6 +6,7 @@ import Boat from "../components/boat";
 import House, { HouseType } from "../components/house";
 import PineTree from "../components/pinetree";
 import Helpers from "../utils/helpers";
+import { PilotHeadType } from "../components/parts/pilot-head";
 
 const createLabel = (text: string, position: THREE.Vector3) => {
   const canvas = document.createElement('canvas');
@@ -62,7 +63,16 @@ const Workshop = {
       numeroCajones: 40
     };
 
-    const pilotOptions = { head: {} };
+    const pilotOptions = {
+      head: {
+        headType: PilotHeadType.Default,
+        helmetOptions: {
+          color: '#ffffff',
+          color2: '#cccccc',
+          color3: '#999999'
+        }
+      }
+    };
     const paraglider = new Paraglider({ glider: gliderOptions, pilot: pilotOptions });
     const mesh = await paraglider.load(gui);
     mesh.position.set(0, 0, 0);

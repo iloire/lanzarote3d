@@ -1,14 +1,23 @@
 import * as THREE from "three";
-import PilotHead, { PilotHeadOptions } from './parts/pilot-head';
+import PilotHead, { PilotHeadOptions, PilotHeadType } from './parts/pilot-head';
 import CocoonHarness from "./parts/cocoon-harness";
+import { HelmetType } from './parts/helmets/types';
 
 const DEFAULT_OPTIONS = {
-  head: {},
+  head: {
+    headType: PilotHeadType.Default,
+    helmetType: HelmetType.Default,
+    helmetOptions: {
+      color: '#ffffff',
+      color2: '#cccccc',
+      color3: '#999999'
+    }
+  },
   skinColor: '#e0bea5',
-  suitColor: '#333',
-  suitColor2: '#666',
-  shoesColor: 'red',
-  carabinerColor: 'silver'
+  suitColor: '#ff0000',
+  suitColor2: '#cc0000',
+  shoesColor: '#333333',
+  carabinerColor: '#666666'
 }
 
 export type PilotOptions = {

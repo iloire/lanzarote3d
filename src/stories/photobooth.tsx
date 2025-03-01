@@ -9,6 +9,8 @@ import Environment from "./env/environment";
 import Weather, { WeatherOptions } from "../elements/weather";
 import adriModel from '../models/adri.obj';
 import adriTextureImage from '../models/adri.png';
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
+import { FontLoader, Font } from 'three/examples/jsm/loaders/FontLoader';
 
 const WEATHER_SETTINGS: WeatherOptions = {
   windDirectionDegreesFromNorth: 310,
@@ -30,11 +32,26 @@ const tandems = [
       },
       pilot: {
         pilot: {
-          head: { helmetColor: '#ffff00', headType: PilotHeadType.Warrior }
+          head: {
+            headType: PilotHeadType.Default,
+            helmetOptions: {
+              color: '#ffff00',
+              color2: '#cccccc',
+              color3: '#999999'
+            }
+          }
         },
         passenger: {
-          head: { helmetColor: '#ffffff' },
-          suitColor: 'red', suitColor2: 'green'
+          head: {
+            headType: PilotHeadType.Default,
+            helmetOptions: {
+              color: '#ffffff',
+              color2: '#cccccc',
+              color3: '#999999'
+            }
+          },
+          suitColor: 'red',
+          suitColor2: 'green'
         },
       },
     },
@@ -80,7 +97,14 @@ const paragliders: ParagliderConfig[] = [
         numeroCajones: 35
       },
       pilot: {
-        head: { helmetColor: '#333', headType: PilotHeadType.Warrior }
+        head: {
+          headType: PilotHeadType.Default,
+          helmetOptions: {
+            color: '#ffff00',
+            color2: '#cccccc',
+            color3: '#999999'
+          }
+        }
       },
     },
     position: new THREE.Vector3(6827, 860, -555)
@@ -94,7 +118,14 @@ const paragliders: ParagliderConfig[] = [
         numeroCajones: 50
       },
       pilot: {
-        head: { helmetColor: '#ffff00' }
+        head: {
+          headType: PilotHeadType.Default,
+          helmetOptions: {
+            color: '#ffff00',
+            color2: '#cccccc',
+            color3: '#999999'
+          }
+        }
       }
     },
     position: new THREE.Vector3(6727, 780, -555)
@@ -108,7 +139,14 @@ const paragliders: ParagliderConfig[] = [
         numeroCajones: 40
       },
       pilot: {
-        head: { helmetColor: '#ffff00' }
+        head: {
+          headType: PilotHeadType.Default,
+          helmetOptions: {
+            color: '#ffff00',
+            color2: '#cccccc',
+            color3: '#999999'
+          }
+        }
       }
     },
     position: new THREE.Vector3(6777, 920, -535)
@@ -122,7 +160,14 @@ const paragliders: ParagliderConfig[] = [
         numeroCajones: 40
       },
       pilot: {
-        head: { helmetColor: '#ffff00', headType: PilotHeadType.Warrior }
+        head: {
+          headType: PilotHeadType.Default,
+          helmetOptions: {
+            color: '#ffff00',
+            color2: '#cccccc',
+            color3: '#999999'
+          }
+        }
       }
     },
     position: new THREE.Vector3(6777, 920, -535)
@@ -140,32 +185,72 @@ const PhotoBooth = {
     const initialPos = new THREE.Vector3(6800, 870, -475);
     camera.animateTo(initialPos, paraglidersVoxel[0].position, 0);
 
-    paragliders.forEach(async p => {
+    // Load font first
+    const fontLoader = new FontLoader();
+    const font = await new Promise<Font>((resolve) => {
+      fontLoader.load('/fonts/helvetiker_regular.typeface.json', resolve);
+    });
+
+    // Helper function to create label
+    const createLabel = (text: string, position: THREE.Vector3) => {
+      const geometry = new TextGeometry(text, {
+        font: font,
+        size: 50,
+        height: 5,
+      });
+      const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      const textMesh = new THREE.Mesh(geometry, material);
+      
+      // Center the text
+      geometry.computeBoundingBox();
+      const centerOffset = -0.5 * (geometry.boundingBox.max.x - geometry.boundingBox.min.x);
+      textMesh.position.copy(position);
+      textMesh.position.x += centerOffset;
+      textMesh.position.y -= 200; // Position below the object
+      
+      return textMesh;
+    };
+
+    // Add labels for paragliders
+    paragliders.forEach(async (p, index) => {
       const paraglider = new Paraglider(p.pg);
       const mesh = await paraglider.load();
       mesh.position.copy(p.position);
-      const scale = 0.001; // mm to m
+      const scale = 0.001;
       mesh.scale.set(scale, scale, scale);
       scene.add(mesh);
+
+      // Add label
+      const label = createLabel(`Paraglider ${index + 1}`, p.position);
+      scene.add(label);
     });
 
-    paraglidersVoxel.forEach(async p => {
+    // Add labels for voxel paragliders
+    paraglidersVoxel.forEach(async (p, index) => {
       const paraglider = new ParagliderVoxel(p.pg);
       const mesh = await paraglider.load();
       mesh.position.copy(p.position);
-      const scale = 0.01; // mm to m
+      const scale = 0.01;
       mesh.scale.set(scale, scale, scale);
       scene.add(mesh);
+
+      // Add label
+      const label = createLabel(`Voxel Paraglider ${index + 1}`, p.position);
+      scene.add(label);
     });
 
-
-    tandems.forEach(async p => {
+    // Add labels for tandems
+    tandems.forEach(async (p, index) => {
       const tandem = new Tandem(p.pg);
       const mesh = await tandem.load();
       mesh.position.copy(p.position);
-      const scale = 0.001; // mm to m
+      const scale = 0.001;
       mesh.scale.set(scale, scale, scale);
       scene.add(mesh);
+
+      // Add label
+      const label = createLabel(`Tandem ${index + 1}`, p.position);
+      scene.add(label);
     });
 
     // must render before adding env

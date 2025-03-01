@@ -14,7 +14,7 @@ const getDefaultGlasses = (options: PilotHeadOptions): THREE.Group => {
   const glassGeo = new THREE.BoxGeometry(120, 78, 10);
 
   //Retinas Left
-  const eyeMat = getColoredMaterial(options.eyeColor);
+  const eyeMat = getColoredMaterial(options.eyeColor || 'white');
   const glassLeft = new THREE.Mesh(glassGeo, eyeMat);
   glassLeft.position.x = -80;
   glassLeft.position.y = 4;
@@ -29,7 +29,7 @@ const getDefaultGlasses = (options: PilotHeadOptions): THREE.Group => {
   group.add(glassRight);
 
   //glass middle
-  const glassesMat = getColoredMaterial(options.glassesColor);
+  const glassesMat = getColoredMaterial(options.glassesColor || 'pink');
   const glassMiddleGeo = new THREE.BoxGeometry(40, 10, 10);
   const glassu = new THREE.Mesh(glassMiddleGeo, glassesMat);
   glassu.position.x = 0;
