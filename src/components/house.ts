@@ -121,32 +121,7 @@ class House {
       garageDoorFrame.position.copy(garageDoor.position);
       mesh.add(garageDoorFrame);
     } else if (this.type === HouseType.Large) {
-      // Add second floor windows
-      const upperWindow = window.clone();
-      const upperFrame = new THREE.Mesh(new THREE.BoxGeometry(5, 5, 4.5), mat_frame);
-      upperWindow.position.set(9, this.height/2 + 2, 4);
-      upperFrame.position.copy(upperWindow.position);
-      mesh.add(upperWindow);
-      mesh.add(upperFrame);
 
-      const upperWindow2 = window2.clone();
-      const upperFrame2 = upperFrame.clone();
-      upperWindow2.position.set(9, this.height/2 + 2, -4);
-      upperFrame2.position.copy(upperWindow2.position);
-      mesh.add(upperWindow2);
-      mesh.add(upperFrame2);
-
-      // Add balcony
-      const balconyGeo = new THREE.BoxGeometry(8, 1, 6);
-      const balcony = new THREE.Mesh(balconyGeo, mat_balcony);
-      balcony.position.set(9, this.height/2, 0);
-      mesh.add(balcony);
-
-      // Add balcony railings
-      const railingGeo = new THREE.BoxGeometry(0.3, 3, 6);
-      const railing = new THREE.Mesh(railingGeo, mat_frame);
-      railing.position.set(13, this.height/2 + 1.5, 0);
-      mesh.add(railing);
 
       // Add garage similar to medium house
       const garageGeo = new THREE.BoxGeometry(15, this.height - 15, 20);
