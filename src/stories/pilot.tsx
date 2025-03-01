@@ -42,7 +42,6 @@ const PilotStory = {
         }
       },
       { head: { headType: PilotHeadType.Warrior } }
->>>>>>> d2adb0b (feat: refactor heads and helmets)
     ]
 
     let x = -1400;
