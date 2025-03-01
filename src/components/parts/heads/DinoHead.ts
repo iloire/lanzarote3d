@@ -84,6 +84,8 @@ export class DinoHead extends BaseHead {
     
     spikes.forEach(spike => group.add(spike));
     teeth.forEach(tooth => group.add(tooth));
+
+    group.add(this.getHelmet());
     
     return this.applyDefaultScale(group);
   }

@@ -1,7 +1,9 @@
 import * as THREE from "three";
 import { BaseHead } from "./BaseHead";
 import { DefaultHelmet } from "../helmets/DefaultHelmet";
-import { HelmetOptions } from "../helmets/types";
+import { HelmetOptions, HelmetType } from "../helmets/types";
+import { FullFaceHelmet } from "../helmets/FullFaceHelmet";
+import { HelmetWithHorns } from "../helmets/HelmetWithHorns";
 
 export class WarriorHead extends BaseHead {
   private addBeard(): THREE.Group {
@@ -80,16 +82,6 @@ export class WarriorHead extends BaseHead {
     mustacheLeft.rotation.z = Math.PI / 8;
     mustacheRight.rotation.z = -Math.PI / 8;
     return group;
-  }
-
-  private getHelmet(): THREE.Group {
-    const helmetOptions: HelmetOptions = {
-      color: '#ffffff',
-      color2: '#cccccc',
-      color3: '#999999'
-    };
-    const helmet = new DefaultHelmet(helmetOptions);
-    return helmet.load();
   }
 
   load(): THREE.Group {

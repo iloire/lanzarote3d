@@ -9,8 +9,6 @@ import Environment from "./env/environment";
 import Weather, { WeatherOptions } from "../elements/weather";
 import adriModel from '../models/adri.obj';
 import adriTextureImage from '../models/adri.png';
-import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
-import { FontLoader, Font } from 'three/examples/jsm/loaders/FontLoader';
 
 const WEATHER_SETTINGS: WeatherOptions = {
   windDirectionDegreesFromNorth: 310,
@@ -185,72 +183,34 @@ const PhotoBooth = {
     const initialPos = new THREE.Vector3(6800, 870, -475);
     camera.animateTo(initialPos, paraglidersVoxel[0].position, 0);
 
-    // Load font first
-    const fontLoader = new FontLoader();
-    const font = await new Promise<Font>((resolve) => {
-      fontLoader.load('/fonts/helvetiker_regular.typeface.json', resolve);
-    });
-
-    // Helper function to create label
-    const createLabel = (text: string, position: THREE.Vector3) => {
-      const geometry = new TextGeometry(text, {
-        font: font,
-        size: 50,
-        height: 5,
-      });
-      const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
-      const textMesh = new THREE.Mesh(geometry, material);
-      
-      // Center the text
-      geometry.computeBoundingBox();
-      const centerOffset = -0.5 * (geometry.boundingBox.max.x - geometry.boundingBox.min.x);
-      textMesh.position.copy(position);
-      textMesh.position.x += centerOffset;
-      textMesh.position.y -= 200; // Position below the object
-      
-      return textMesh;
-    };
-
-    // Add labels for paragliders
-    paragliders.forEach(async (p, index) => {
+    // Add paragliders without labels
+    paragliders.forEach(async (p) => {
       const paraglider = new Paraglider(p.pg);
       const mesh = await paraglider.load();
       mesh.position.copy(p.position);
       const scale = 0.001;
       mesh.scale.set(scale, scale, scale);
       scene.add(mesh);
-
-      // Add label
-      const label = createLabel(`Paraglider ${index + 1}`, p.position);
-      scene.add(label);
     });
 
-    // Add labels for voxel paragliders
-    paraglidersVoxel.forEach(async (p, index) => {
+    // Add voxel paragliders without labels
+    paraglidersVoxel.forEach(async (p) => {
       const paraglider = new ParagliderVoxel(p.pg);
       const mesh = await paraglider.load();
       mesh.position.copy(p.position);
       const scale = 0.01;
       mesh.scale.set(scale, scale, scale);
       scene.add(mesh);
-
-      // Add label
-      const label = createLabel(`Voxel Paraglider ${index + 1}`, p.position);
-      scene.add(label);
     });
 
-    // Add labels for tandems
-    tandems.forEach(async (p, index) => {
+    // Add tandems without labels
+    tandems.forEach(async (p) => {
       const tandem = new Tandem(p.pg);
       const mesh = await tandem.load();
       mesh.position.copy(p.position);
       const scale = 0.001;
       mesh.scale.set(scale, scale, scale);
       scene.add(mesh);
-
-      // Add label
-      const label = createLabel(`Tandem ${index + 1}`, p.position);
-      scene.add(label);
     });
 
     // must render before adding env

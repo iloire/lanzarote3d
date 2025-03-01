@@ -71,6 +71,8 @@ export class DevilHead extends BaseHead {
     group.add(leftFang);
     group.add(rightFang);
 
+    group.add(this.getHelmet());
+
     return this.applyDefaultScale(group);
   }
 } 

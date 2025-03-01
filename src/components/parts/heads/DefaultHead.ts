@@ -3,18 +3,9 @@ import { BaseHead } from "./BaseHead";
 import { GlassesType } from "../pilot-head";
 import getDefaultGlasses from "../glasses/default";
 import getSunGlasses1 from "../glasses/sunglasses1";
-import { DefaultHelmet } from "../helmets/DefaultHelmet";
-import { HelmetOptions } from "../helmets/types";
 
 export class DefaultHead extends BaseHead {
-  private getDefaultHelmet(): THREE.Group {
-    const helmet = new DefaultHelmet(this.options.helmetOptions || {
-      color: '#ffffff',
-      color2: '#cccccc',
-      color3: '#999999'
-    });
-    return helmet.load();
-  }
+ 
 
   load(): THREE.Group {
     const group = new THREE.Group();
@@ -24,7 +15,7 @@ export class DefaultHead extends BaseHead {
     const head = new THREE.Mesh(headGeo, skinMat);
     group.add(head);
 
-    group.add(this.getDefaultHelmet());
+    group.add(this.getHelmet());
 
     if (this.options.glassesType === GlassesType.SunGlasses1) {
       head.add(getSunGlasses1(this.options));
