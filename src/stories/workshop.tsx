@@ -7,6 +7,35 @@ import House, { HouseType } from "../components/house";
 import PineTree from "../components/pinetree";
 import Helpers from "../utils/helpers";
 
+const createLabel = (text: string, position: THREE.Vector3) => {
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  canvas.width = 256;
+  canvas.height = 64;
+
+  if (context) {
+    context.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.font = 'bold 32px Arial';
+    context.fillStyle = '#ffffff';
+    context.textAlign = 'center';
+    context.fillText(text, canvas.width / 2, canvas.height / 2 + 8);
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  const material = new THREE.MeshBasicMaterial({
+    map: texture,
+    transparent: true,
+    side: THREE.DoubleSide,
+    depthTest: false
+  });
+  const geometry = new THREE.PlaneGeometry(12, 3);
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.position.copy(position);
+  mesh.position.y = -10;
+  return mesh;
+};
+
 const Workshop = {
   load: async (
     camera: THREE.PerspectiveCamera,
@@ -25,13 +54,6 @@ const Workshop = {
     const controls = Controls.createControls(camera, renderer);
     sky.updateSunPosition(12);
     //
-    // const planeGeo = new THREE.PlaneGeometry(100, 100);
-    // const material = new THREE.MeshBasicMaterial({
-    //   color: 0x666666,
-    //   side: THREE.DoubleSide,
-    // });
-    // const plane = new THREE.Mesh(planeGeo, material);
-    // scene.add(plane);
 
     const gliderOptions = {
       wingColor1: '#c30010',
@@ -52,15 +74,35 @@ const Workshop = {
     boatMesh.position.set(20, 0, 30);
     scene.add(boatMesh);
 
+    const labels: THREE.Mesh[] = [];
+
     const houseSmall = new House(HouseType.Small);
     const houseSmallMesh = houseSmall.load(gui);
-    houseSmallMesh.position.set(-40, 0, 60);
+    houseSmallMesh.position.set(0, 0, 0);
     scene.add(houseSmallMesh);
+    labels.push(createLabel('Small House', new THREE.Vector3(0, -10, 0)));
+    scene.add(labels[labels.length - 1]);
 
-    const house = new House(HouseType.Medium);
-    const houseMesh = house.load(gui);
-    houseMesh.position.set(40, 0, 30);
-    scene.add(houseMesh);
+    const houseMedium = new House(HouseType.Medium);
+    const houseMediumMesh = houseMedium.load(gui);
+    houseMediumMesh.position.set(0, 0, 30);
+    scene.add(houseMediumMesh);
+    labels.push(createLabel('Medium House', new THREE.Vector3(0, -10, 30)));
+    scene.add(labels[labels.length - 1]);
+
+    const houseLarge = new House(HouseType.Large);
+    const houseLargeMesh = houseLarge.load(gui);
+    houseLargeMesh.position.set(0, 0, 60);
+    scene.add(houseLargeMesh);
+    labels.push(createLabel('Large House', new THREE.Vector3(0, -10, 60)));
+    scene.add(labels[labels.length - 1]);
+
+    const houseModern = new House(HouseType.Modern);
+    const houseModernMesh = houseModern.load(gui);
+    houseModernMesh.position.set(0, 0, 90);
+    scene.add(houseModernMesh);
+    labels.push(createLabel('Modern House', new THREE.Vector3(0, -10, 90)));
+    scene.add(labels[labels.length - 1]);
 
     const pineTree = new PineTree();
     const pineTreeMesh = pineTree.load();
@@ -68,14 +110,18 @@ const Workshop = {
     pineTreeMesh.position.set(20, 0, 30);
     scene.add(pineTreeMesh);
 
-
     const animate = () => {
       requestAnimationFrame(animate);
+      
+      labels.forEach(label => {
+        label.quaternion.copy(camera.quaternion);
+      });
+      
       renderer.render(scene, camera);
     };
 
-    const lookAt = mesh.position.clone().add(new THREE.Vector3(0, 0, 0));
-    camera.position.set(132, 80, 11);
+    const lookAt = new THREE.Vector3(0, 0, 45);  // Center point between all houses
+    camera.position.set(200, 100, -100);  // Further away and better angle
     camera.lookAt(lookAt);
     controls.target = lookAt;
     animate();
