@@ -24,7 +24,6 @@ const VoxelStory = {
     const controls = Controls.createControls(camera, renderer);
     sky.updateSunPosition(12);
 
-
     const adri = new PilotVoxel({
       objFile: adriModel,
       textureFile: texturePng
@@ -40,8 +39,8 @@ const VoxelStory = {
       renderer.render(scene, camera);
     };
 
-    const lookAt = new THREE.Vector3(0, 0, 0);
-    camera.position.set(8000, 0, 0);
+    const lookAt = new THREE.Vector3(0, 300, 0);
+    camera.position.set(500, 1400, 1000);
     camera.lookAt(lookAt);
     controls.target = lookAt;
     animate();

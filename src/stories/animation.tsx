@@ -6,6 +6,7 @@ import Camera from "../components/camera";
 import Environment from "./env/environment";
 import Weather, { WeatherOptions } from "../elements/weather";
 import { PilotHeadType } from "../components/parts/pilot-head";
+import Controls from "../utils/controls";
 
 const WEATHER_SETTINGS: WeatherOptions = {
   windDirectionDegreesFromNorth: 310,
@@ -128,19 +129,6 @@ function flyThroughTargets(camera: Camera, targets: THREE.Vector3[], offsetDista
     .onUpdate(() => {
       camera.lookAt(targets[0]);
     });
-
-  // for (let i = 1; i < targets.length; i++) {
-  //   console.log('go')
-  //   tweenChain = tweenChain.chain(
-  //     new TWEEN.Tween(camera.position)
-  //       .to(getOffsetPosition(camera, targets[i], offsetDistance), duration)
-  //       .easing(TWEEN.Easing.Quadratic.InOut)
-  //       .onUpdate(() => {
-  //         camera.lookAt(targets[i]);
-  //       })
-  //   );
-  // }
-  //
   tweenChain.start();
 }
 
@@ -152,6 +140,7 @@ const Animation = {
     terrain: THREE.Mesh,
     water: THREE.Mesh,
   ) => {
+    const controls = Controls.createControls(camera, renderer);
     const initialPos = new THREE.Vector3(6740, 892, -296);
     camera.animateTo(initialPos, paragliders[0].position, 0);
 
@@ -187,8 +176,6 @@ const Animation = {
     env.addHouses(terrain);
     env.addBoats(water);
 
-
-
     const points: THREE.Vector3[] = paragliders.map(p => p.position);
 
     let pointIndex = 0;
@@ -199,15 +186,16 @@ const Animation = {
       if (pointIndex >= points.length) {
         pointIndex = 0;
       }
-      console.log(pointIndex)
       const target = points[pointIndex];
       const duration = 2000; // 2 seconds to reach the next point
+
+      animate()
 
       new TWEEN.Tween(camera.position)
         .to({ x: target.x, y: target.y, z: target.z + radius }, duration)
         .easing(TWEEN.Easing.Quadratic.InOut)
         .onComplete(() => {
-          orbitAroundPoint(target);
+          // orbitAroundPoint(target);
         })
         .start();
 
@@ -236,6 +224,7 @@ const Animation = {
       TWEEN.update();
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
+      controls.update();
     };
     // flyThroughTargets(camera, paragliders.map(p => p.position), 10, 2000);
     animateCamera();

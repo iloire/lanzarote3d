@@ -39,10 +39,11 @@ const GliderStory = {
     const animate = () => {
       requestAnimationFrame(animate);
       renderer.render(scene, camera);
+      controls.update();
     };
 
-    const lookAt = new THREE.Vector3(0, 0, 0);
-    camera.position.set(8000, 0, 0);
+    const lookAt = new THREE.Vector3(1000, 2000, 0);
+    camera.position.set(5000, -3000, 4000);
     camera.lookAt(lookAt);
     controls.target = lookAt;
     animate();

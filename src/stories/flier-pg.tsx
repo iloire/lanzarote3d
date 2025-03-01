@@ -6,6 +6,7 @@ import Camera from "../components/camera";
 import Flier, { FlierConstructor } from "../components/base/flier";
 import Helpers from "../utils/helpers";
 import Weather, { WeatherOptions } from "../elements/weather";
+import Controls from "../utils/controls";
 
 const KMH_TO_MS = 3.6;
 
@@ -27,6 +28,8 @@ const ParagliderWorkshop = {
   ) => {
     terrain.visible = true;
     water.visible = true;
+
+    const controls = Controls.createControls(camera, renderer);
 
     Helpers.createHelpers(scene);
 
@@ -82,6 +85,7 @@ const ParagliderWorkshop = {
       const lookAt = mesh.position.clone().add(new THREE.Vector3(0, 0, 0));
       camera.lookAt(lookAt);
       TWEEN.update();
+      controls.update();
     };
 
     animate();

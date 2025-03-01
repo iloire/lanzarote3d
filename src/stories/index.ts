@@ -1,6 +1,5 @@
 import Animation from "./animation";
 import Animation2 from "./animation2";
-import Cloud from "./cloud";
 import Clouds from "./clouds";
 import Default from "./default";
 import FlierPG from "./flier-pg";
@@ -22,7 +21,6 @@ const Stories = {
   animation: Animation.load,
   animation2: Animation2.load,
   animation3: Animation2.load,
-  cloud: Cloud.load,
   clouds: Clouds.load,
   default: Default.load,
   flier: FlierPG.load,

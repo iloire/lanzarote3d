@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { createRoot } from "react-dom/client";
 import GUI from "lil-gui";
 import Stats from "three/examples/jsm/libs/stats.module";
 import * as THREE from "three";
@@ -9,7 +8,6 @@ import Island from "./components/island";
 import Stories from "./stories/index";
 import Camera from "./components/camera";
 import Menu from './menu';
-import WebGL from "./WebGL";
 
 import "./index.css";
 
