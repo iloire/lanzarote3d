@@ -41,23 +41,23 @@ const HeadStory = {
     const heads = Object.keys(PilotHeadType)
       .filter(key => isNaN(Number(key)))
       .reduce((acc, headKey) => {
-        // Base helmet options with random colors
-        const baseHelmetOptions: HelmetOptions = {
-          color: toHexColor(Math.floor(Math.random()*16777215)),
-          color2: toHexColor(Math.floor(Math.random()*16777215)),
-          color3: toHexColor(Math.floor(Math.random()*16777215))
-        };
 
         // For each head type
         Object.keys(HelmetType)
           .filter(key => isNaN(Number(key)))
           .forEach(helmetKey => {
 
-
             // Add head with helmet and each glasses type
             Object.keys(GlassesType)
               .filter(key => isNaN(Number(key)))
               .forEach(glassesKey => {
+                // helmet options with random colors
+                const baseHelmetOptions: HelmetOptions = {
+                  color: toHexColor(Math.floor(Math.random() * 16777215)),
+                  color2: toHexColor(Math.floor(Math.random() * 16777215)),
+                  color3: toHexColor(Math.floor(Math.random() * 16777215))
+                };
+
                 acc.push({
                   headType: PilotHeadType[headKey],
                   helmetType: HelmetType[helmetKey],
@@ -66,23 +66,23 @@ const HeadStory = {
                 });
               });
           });
-        
+
         return acc;
       }, [] as PilotHeadOptions[]);
 
     let x = -2000;
     let z = 0;
     const ITEMS_PER_ROW = 5;
-    
+
     heads.forEach((headOptions, index) => {
       const head = new PilotHead(headOptions);
       const mesh = head.load();
-      
+
       // Calculate grid position
       const row = Math.floor(index / ITEMS_PER_ROW);
       const col = index % ITEMS_PER_ROW;
       mesh.position.set(x + (col * 800), -100, z + (row * 1000));
-      
+
       scene.add(mesh);
 
       // Create HTML label
@@ -95,22 +95,21 @@ const HeadStory = {
       label.style.textAlign = 'center';
       label.style.fontSize = '14px';
       label.style.fontFamily = 'Arial, sans-serif';
-      
+
       // Fix the enum value display
-      const headTypeName = Object.keys(PilotHeadType).find(key => 
+      const headTypeName = Object.keys(PilotHeadType).find(key =>
         PilotHeadType[key] === headOptions.headType
       );
-      const helmetTypeName = Object.keys(HelmetType).find(key => 
+      const helmetTypeName = Object.keys(HelmetType).find(key =>
         HelmetType[key] === headOptions.helmetType
       );
-      const glassesTypeName = headOptions.glassesType ? Object.keys(GlassesType).find(key => 
+      const glassesTypeName = headOptions.glassesType ? Object.keys(GlassesType).find(key =>
         GlassesType[key] === headOptions.glassesType
       ) : null;
 
-      label.innerHTML = `<strong>${headTypeName}</strong><br>helmet:${helmetTypeName}${
-        glassesTypeName ? '<br> glasses:' + glassesTypeName : ''
-      }`;
-      
+      label.innerHTML = `<strong>${headTypeName}</strong><br>helmet:${helmetTypeName}${glassesTypeName ? '<br> glasses:' + glassesTypeName : ''
+        }`;
+
       labelContainer.appendChild(label);
 
       // Update label position in animation loop
@@ -134,14 +133,14 @@ const HeadStory = {
 
     const animate = () => {
       requestAnimationFrame(animate);
-      
+
       // Update all labels
       scene.traverse((object) => {
         if ((object as any).updateLabel) {
           (object as any).updateLabel();
         }
       });
-      
+
       renderer.render(scene, camera);
     };
 

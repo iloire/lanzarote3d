@@ -21,6 +21,7 @@ import Helmet from "./helmet";
 const Stories = {
   animation: Animation.load,
   animation2: Animation2.load,
+  animation3: Animation2.load,
   cloud: Cloud.load,
   clouds: Clouds.load,
   default: Default.load,
