@@ -19,7 +19,6 @@ const GliderStory = {
 
     Helpers.createHelpers(scene);
 
-    const controls = Controls.createControls(camera, renderer);
     sky.updateSunPosition(12);
 
     const gliderOptions = {
@@ -39,13 +38,9 @@ const GliderStory = {
     const animate = () => {
       requestAnimationFrame(animate);
       renderer.render(scene, camera);
-      controls.update();
     };
 
-    const lookAt = new THREE.Vector3(1000, 2000, 0);
-    camera.position.set(5000, -3000, 4000);
-    camera.lookAt(lookAt);
-    controls.target = lookAt;
+    camera.position.set(-11200, 2500, -415);
     animate();
   },
 };

@@ -52,7 +52,6 @@ const Workshop = {
 
     Helpers.createHelpers(scene);
 
-    const controls = Controls.createControls(camera, renderer);
     sky.updateSunPosition(12);
     //
 
@@ -133,7 +132,6 @@ const Workshop = {
     const lookAt = new THREE.Vector3(0, 0, 45);  // Center point between all houses
     camera.position.set(200, 100, -100);  // Further away and better angle
     camera.lookAt(lookAt);
-    controls.target = lookAt;
     animate();
   },
 };

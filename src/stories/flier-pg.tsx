@@ -29,7 +29,7 @@ const ParagliderWorkshop = {
     terrain.visible = true;
     water.visible = true;
 
-    const controls = Controls.createControls(camera, renderer);
+    // const controls = Controls.createControls(camera, renderer);
 
     Helpers.createHelpers(scene);
 
@@ -83,9 +83,9 @@ const ParagliderWorkshop = {
       requestAnimationFrame(animate);
       renderer.render(scene, camera);
       const lookAt = mesh.position.clone().add(new THREE.Vector3(0, 0, 0));
+      // controls.update();
       camera.lookAt(lookAt);
       TWEEN.update();
-      controls.update();
     };
 
     animate();

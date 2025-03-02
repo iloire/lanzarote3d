@@ -21,7 +21,6 @@ const HangGliderWorkshop = {
 
     Helpers.createHelpers(scene);
 
-    const controls = Controls.createControls(camera, renderer);
     sky.updateSunPosition(12);
     //
 
@@ -38,7 +37,6 @@ const HangGliderWorkshop = {
     const lookAt = mesh.position.clone().add(new THREE.Vector3(0, 0, 0));
     camera.position.set(225, -70, 90);
     camera.lookAt(lookAt);
-    controls.target = lookAt;
     animate();
   },
 };

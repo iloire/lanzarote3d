@@ -98,7 +98,6 @@ const Terrain = {
     scene.add(waterGenerator());
 
     camera.position.set(4120, 2500, 12000);
-    const controls = Controls.createControls(camera, renderer);
   },
 };
 

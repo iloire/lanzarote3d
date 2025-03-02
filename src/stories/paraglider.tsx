@@ -20,7 +20,6 @@ const ParagliderWorkshop = {
 
     Helpers.createHelpers(scene);
 
-    const controls = Controls.createControls(camera, renderer);
     sky.updateSunPosition(12);
 
     const gliderOptions = {
@@ -64,7 +63,6 @@ const ParagliderWorkshop = {
     const lookAt = mesh.position.clone().add(new THREE.Vector3(0, 0, 0));
     camera.position.set(8000, 250, 300);
     camera.lookAt(lookAt);
-    controls.target = lookAt;
     animate();
   },
 };

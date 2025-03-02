@@ -140,7 +140,6 @@ const Animation = {
     terrain: THREE.Mesh,
     water: THREE.Mesh,
   ) => {
-    const controls = Controls.createControls(camera, renderer);
     const initialPos = new THREE.Vector3(6740, 892, -296);
     camera.animateTo(initialPos, paragliders[0].position, 0);
 
@@ -224,7 +223,6 @@ const Animation = {
       TWEEN.update();
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
-      controls.update();
     };
     // flyThroughTargets(camera, paragliders.map(p => p.position), 10, 2000);
     animateCamera();

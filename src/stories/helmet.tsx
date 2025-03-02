@@ -27,7 +27,6 @@ const HelmetStory = {
 
     Helpers.createHelpers(scene);
 
-    const controls = Controls.createControls(camera, renderer);
     sky.updateSunPosition(12);
 
     // Create container for labels

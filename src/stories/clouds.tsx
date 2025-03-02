@@ -20,8 +20,6 @@ const CloudsWorkshop = {
     Helpers.createHelpers(scene);
     sky.updateSunPosition(12);
 
-    const controls = Controls.createControls(camera, renderer);
-
     const options = { colors: ['#F64A8A', '#F987C5', '#DE3163'] }
     const mesh = await new Clouds(options).load(1, new THREE.Vector3(0, 0, 0));
     mesh.scale.set(0.1, 0.1, 0.1);
@@ -36,7 +34,6 @@ const CloudsWorkshop = {
     const lookAt = mesh.position.clone().add(new THREE.Vector3(0, 0, 0));
     camera.position.set(150, 30, 130);
     camera.lookAt(lookAt);
-    controls.target = lookAt;
     animate();
   },
 };

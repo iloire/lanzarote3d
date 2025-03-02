@@ -21,7 +21,6 @@ const PilotStory = {
 
     Helpers.createHelpers(scene);
 
-    const controls = Controls.createControls(camera, renderer);
     sky.updateSunPosition(12);
 
     const pilots = [

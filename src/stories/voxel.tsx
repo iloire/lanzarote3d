@@ -21,7 +21,6 @@ const VoxelStory = {
 
     Helpers.createHelpers(scene);
 
-    const controls = Controls.createControls(camera, renderer);
     sky.updateSunPosition(12);
 
     const adri = new PilotVoxel({
@@ -42,7 +41,6 @@ const VoxelStory = {
     const lookAt = new THREE.Vector3(0, 300, 0);
     camera.position.set(500, 1400, 1000);
     camera.lookAt(lookAt);
-    controls.target = lookAt;
     animate();
   },
 };
