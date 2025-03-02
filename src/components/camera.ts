@@ -2,7 +2,6 @@ import * as THREE from "three";
 import Paraglider from "../components/base/flier";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import Animations from "../utils/animations";
-import Controls from "../utils/controls";
 import GuiHelper from "../utils/gui";
 
 const DEFAULT_FOLLOW_DISTANCE = 180;
@@ -12,7 +11,6 @@ const DEFAULT_ANGLE_Y = Math.PI / 0.4;
 export enum CameraMode {
   FirstPersonView = 1,
   FollowTarget = 2,
-  OrbitControl = 6,
 }
 
 let isLeftViewing = false;

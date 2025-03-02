@@ -256,7 +256,6 @@ const Game = {
 
       const trajectory = new Trajectory(pg.getTrajectory(), 15);
       scene.add(trajectory.getMesh());
-      setCameraMode(CameraMode.OrbitControl);
 
       const trajectoryPoints = trajectory.getPoints();
       if (trajectoryPoints.length) {
