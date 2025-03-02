@@ -363,7 +363,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
           onClick={() =>
             this.handleStart(
               6,
-              location.idealWindDirectionDegreesFromNorth,
+              200, //hard coded temporal
               location
             )
           }

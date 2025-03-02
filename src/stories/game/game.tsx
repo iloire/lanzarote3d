@@ -281,7 +281,7 @@ const Game = {
         bgMusic.play();
         vario.start();
       }
-      pg.setPosition(options.startingLocation.position);
+      pg.setPosition(options.startingLocation.takeoffs[0].position);
 
       pg.rotate(-134, 0);
       pg.init();
