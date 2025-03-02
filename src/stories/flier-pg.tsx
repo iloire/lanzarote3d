@@ -6,8 +6,8 @@ import Camera from "../components/camera";
 import Flier, { FlierConstructor } from "../components/base/flier";
 import Helpers from "../utils/helpers";
 import Weather, { WeatherOptions } from "../elements/weather";
-import Controls from "../utils/controls";
-
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+    
 const KMH_TO_MS = 3.6;
 
 const WEATHER_SETTINGS: WeatherOptions = {
@@ -24,7 +24,8 @@ const ParagliderWorkshop = {
     terrain: THREE.Mesh,
     water: THREE.Mesh,
     sky: Sky,
-    gui
+    gui,
+    controls: OrbitControls
   ) => {
     terrain.visible = true;
     water.visible = true;
@@ -73,7 +74,7 @@ const ParagliderWorkshop = {
       perfStats: null,
     };
 
-    camera.animateTo(initialCamPos, initialPGPos, 200);
+    camera.animateTo(initialCamPos, initialPGPos, 200, controls);
 
     const pg = new Flier(pgOptions, envOptions, false);
     pg.addGui(gui);

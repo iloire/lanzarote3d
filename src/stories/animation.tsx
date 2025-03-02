@@ -7,6 +7,8 @@ import Environment from "./env/environment";
 import Weather, { WeatherOptions } from "../elements/weather";
 import { PilotHeadType } from "../components/parts/pilot-head";
 import Controls from "../utils/controls";
+import Sky from "../components/sky";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 const WEATHER_SETTINGS: WeatherOptions = {
   windDirectionDegreesFromNorth: 310,
@@ -139,9 +141,12 @@ const Animation = {
     renderer,
     terrain: THREE.Mesh,
     water: THREE.Mesh,
+    sky: Sky,
+    gui,
+    controls: OrbitControls
   ) => {
     const initialPos = new THREE.Vector3(6740, 892, -296);
-    camera.animateTo(initialPos, paragliders[0].position, 0);
+    camera.animateTo(initialPos, paragliders[0].position, 0, controls);
 
     paragliders.forEach(async p => {
       const paraglider = new Paraglider(p.pg);

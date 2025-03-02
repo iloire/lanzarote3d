@@ -6,12 +6,22 @@ import Camera, { CameraMode } from "../components/camera";
 import locations from "./locations/lanzarote";
 import media from "./locations/media";
 import VideoFrame from "../components/video-frame";
-
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import Sky from "../components/sky";
 const FlyZones = {
-  load: async (camera: Camera, scene: THREE.Scene, renderer) => {
+  load: async (
+    camera: Camera,
+    scene: THREE.Scene,
+    renderer,
+    terrain: THREE.Mesh,
+    water: THREE.Mesh,
+    sky: Sky,
+    gui,
+    controls: OrbitControls
+  ) => {
 
     const navigateTo = (point: THREE.Vector3, lookAt: THREE.Vector3) => {
-      camera.animateTo(point, lookAt, 1000, () => {
+      camera.animateTo(point, lookAt, 1000, controls, () => {
         console.log("done");
       });
     };

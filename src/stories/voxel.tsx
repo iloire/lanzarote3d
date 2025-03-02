@@ -5,7 +5,7 @@ import Helpers from "../utils/helpers";
 import adriModel from '../models/adri.obj';
 import texturePng from '../models/adri.png';
 import PilotVoxel from "../components/pilot-voxel";
-
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 const VoxelStory = {
   load: async (
     camera: THREE.PerspectiveCamera,
@@ -14,7 +14,8 @@ const VoxelStory = {
     terrain: THREE.Mesh,
     water: THREE.Mesh,
     sky: Sky,
-    gui
+    gui,
+    controls: OrbitControls
   ) => {
     terrain.visible = false;
     water.visible = false;
@@ -41,6 +42,7 @@ const VoxelStory = {
     const lookAt = new THREE.Vector3(0, 300, 0);
     camera.position.set(500, 1400, 1000);
     camera.lookAt(lookAt);
+    controls.update();
     animate();
   },
 };

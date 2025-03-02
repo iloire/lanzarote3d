@@ -72,7 +72,6 @@ class Camera extends THREE.PerspectiveCamera {
   mode: CameraMode;
   target: Paraglider;
   terrain: THREE.Mesh;
-  controls: OrbitControls;
   angle: number = DEFAULT_ANGLE;
   angleY: number = DEFAULT_ANGLE_Y;
   distance: number = DEFAULT_FOLLOW_DISTANCE;
@@ -93,7 +92,6 @@ class Camera extends THREE.PerspectiveCamera {
   ) {
     super(fov, aspect, near, far);
     this.terrain = terrain;
-    this.controls = Controls.createControls(this, renderer);
   }
 
   addGui(gui) {
@@ -119,8 +117,6 @@ class Camera extends THREE.PerspectiveCamera {
       this.followTarget();
     } else if (this.mode === CameraMode.FirstPersonView) {
       this.firstPersonView();
-    } else if (this.mode === CameraMode.OrbitControl) {
-      this.orbitView();
     } else {
       throw new Error("invalid camera mode");
     }
@@ -173,11 +169,12 @@ class Camera extends THREE.PerspectiveCamera {
     newPosition: THREE.Vector3,
     newTarget: THREE.Vector3,
     duration: number = 2000,
+    controls: OrbitControls,
     cb: any = () => { }
   ) {
     Animations.animateCamera(
       this,
-      this.controls,
+      controls,
       newPosition,
       newTarget,
       duration,
@@ -217,12 +214,6 @@ class Camera extends THREE.PerspectiveCamera {
     this.rotateY(-1 * this.viewRotationHorizontal * 1.5);
     this.rotateX(-1 * this.viewRotationVertical * 1.5);
   }
-
-  orbitView() {
-    this.controls.target = this.target.position();
-    this.controls.update();
-  }
-
 }
 
 export default Camera;

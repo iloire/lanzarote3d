@@ -9,6 +9,8 @@ import Environment from "./env/environment";
 import Weather, { WeatherOptions } from "../elements/weather";
 import adriModel from '../models/adri.obj';
 import adriTextureImage from '../models/adri.png';
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import Sky from "../components/sky";  
 
 const WEATHER_SETTINGS: WeatherOptions = {
   windDirectionDegreesFromNorth: 310,
@@ -179,9 +181,12 @@ const Animation3 = {
     renderer,
     terrain: THREE.Mesh,
     water: THREE.Mesh,
+    sky: Sky,
+    gui,
+    controls: OrbitControls
   ) => {
     const initialPos = new THREE.Vector3(6714, 949, -525);
-    camera.animateTo(initialPos, paraglidersVoxel[0].position, 0);
+    camera.animateTo(initialPos, paraglidersVoxel[0].position, 0, controls);
 
     // // Add paragliders
     // paragliders.forEach(async (p) => {
@@ -230,6 +235,7 @@ const Animation3 = {
       TWEEN.update();
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
+      controls.update();
     };
     animate();
   },

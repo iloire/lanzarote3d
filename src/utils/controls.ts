@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 const Controls = {
-  createControls: (camera: THREE.PerspectiveCamera, renderer) => {
+  createControls: (camera: THREE.PerspectiveCamera, renderer): OrbitControls => {
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.panSpeed = 1.0;
     controls.rotateSpeed = 1.2;

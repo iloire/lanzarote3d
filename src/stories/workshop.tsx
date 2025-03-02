@@ -7,7 +7,7 @@ import House, { HouseType } from "../components/house";
 import PineTree from "../components/pinetree";
 import Helpers from "../utils/helpers";
 import { PilotHeadType } from "../components/parts/pilot-head";
-
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 const createLabel = (text: string, position: THREE.Vector3) => {
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d');
@@ -45,7 +45,8 @@ const Workshop = {
     terrain: THREE.Mesh,
     water: THREE.Mesh,
     sky: Sky,
-    gui
+    gui,
+    controls: OrbitControls
   ) => {
     terrain.visible = false;
     water.visible = false;
@@ -127,6 +128,7 @@ const Workshop = {
       });
       
       renderer.render(scene, camera);
+      controls.update();
     };
 
     const lookAt = new THREE.Vector3(0, 0, 45);  // Center point between all houses

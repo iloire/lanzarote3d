@@ -8,6 +8,7 @@ import Island from "./components/island";
 import Stories from "./stories/index";
 import Camera from "./components/camera";
 import Menu from './menu';
+import Controls from "./utils/controls";
 
 import "./index.css";
 
@@ -121,7 +122,8 @@ const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAp
       }
     });
 
-     await Stories[initialStory](camera, scene, renderer, island, water, sky, gui);
+    const controls = Controls.createControls(camera, renderer);
+    await Stories[initialStory](camera, scene, renderer, island, water, sky, gui, controls);
 
     // Animation loop
     const animate = () => {

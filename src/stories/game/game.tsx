@@ -17,7 +17,7 @@ import locations from "../locations/lanzarote";
 import WindIndicator from "../../components/wind-indicator";
 import Sky from "../../components/sky";
 import PerfStats from "../../utils/stats";
-
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 const KMH_TO_MS = 3.6;
 
 const FOG_ENABLED = true;
@@ -69,7 +69,8 @@ const Game = {
     terrain: THREE.Mesh,
     water: THREE.Mesh,
     sky: Sky,
-    gui
+    gui,
+    controls: OrbitControls
   ) => {
     const perfStats = new PerfStats(renderer, "rs-base");
 
@@ -270,7 +271,9 @@ const Game = {
           first.vector.add(
             new THREE.Vector3(0, 30, 0).add(weather.getWindVelocity(-250))
           ),
-          pg.position()
+          pg.position(),
+          0,
+          controls
         );
       }
       gameStatus = GameStatus.Finished;
