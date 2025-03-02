@@ -1,7 +1,9 @@
 import * as THREE from "three";
 
 export type Location = {
+  id: string;
   title: string;
+  description: string;
   position: THREE.Vector3;
   lookFrom: THREE.Vector3;
   lookAt: THREE.Vector3;
@@ -11,8 +13,9 @@ export type Location = {
 };
 
 export type Media = {
+  id: string;
   title: string;
-  position: THREE.Vector3;
-  imgUrl: string;
-  videoUrl: string;
+  description: string;
+  type: "image" | "video";
+  url: string;
 };

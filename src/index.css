@@ -284,3 +284,58 @@ body {
   top: inherit !important;
   left: 10px !important;
 }
+
+.marker-label {
+  color: white;
+  font-size: 16px;
+  padding: 2px 8px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 4px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.location-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 20px;
+  border-radius: 8px;
+  z-index: 1000;
+  max-width: 80vw;
+  max-height: 80vh;
+  overflow: auto;
+}
+
+.popup-content {
+  position: relative;
+}
+
+.popup-content h2 {
+  margin-top: 0;
+}
+
+.popup-content img,
+.popup-content video {
+  max-width: 100%;
+  margin: 10px 0;
+}
+
+.close-popup {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #ff4444;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.close-popup:hover {
+  background: #ff6666;
+}
