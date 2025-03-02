@@ -1,27 +1,20 @@
 import * as THREE from "three";
-import Controls from "../utils/controls";
-import Sky from "../components/sky";
 import Helpers from "../utils/helpers";
 import { HelmetOptions, HelmetType } from "../components/parts/helmets/types";
 import { DefaultHelmet } from "../components/parts/helmets/DefaultHelmet";
 import { FullFaceHelmet } from "../components/parts/helmets/FullFaceHelmet";
 import { HelmetWithHorns } from "../components/parts/helmets/HelmetWithHorns";
+import { StoryOptions } from "./types";
 
 const toHexColor = (num: number): string => {
   const hex = num.toString(16);
   return '#' + '0'.repeat(6 - hex.length) + hex;
 };
 
-const HelmetStory = {
-  load: async (
-    camera: THREE.PerspectiveCamera,
-    scene: THREE.Scene,
-    renderer,
-    terrain: THREE.Mesh,
-    water: THREE.Mesh,
-    sky: Sky,
-    gui
-  ) => {
+const HelmetWorkshop = {
+  load: async (options: StoryOptions) => {
+    const { camera, scene, renderer, terrain, water, sky } = options;
+    
     terrain.visible = false;
     water.visible = false;
 
@@ -153,4 +146,4 @@ const HelmetStory = {
   },
 };
 
-export default HelmetStory; 
+export default HelmetWorkshop; 

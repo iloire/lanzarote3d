@@ -5,17 +5,12 @@ import Pilot from "../components/pilot";
 import TandemPilot from "../components/tandem-pilot";
 import Helpers from "../utils/helpers";
 import { GlassesType, PilotHeadType } from "../components/parts/pilot-head";
+import { StoryOptions } from "./types";
 
-const PilotStory = {
-  load: async (
-    camera: THREE.PerspectiveCamera,
-    scene: THREE.Scene,
-    renderer,
-    terrain: THREE.Mesh,
-    water: THREE.Mesh,
-    sky: Sky,
-    gui
-  ) => {
+const PilotWorkshop = {
+  load: async (options: StoryOptions) => {
+    const { camera, scene, renderer, terrain, water, sky,  } = options;
+    
     terrain.visible = false;
     water.visible = false;
 
@@ -79,4 +74,4 @@ const PilotStory = {
   },
 };
 
-export default PilotStory;
+export default PilotWorkshop;

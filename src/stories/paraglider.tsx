@@ -1,20 +1,13 @@
 import * as THREE from "three";
-import Controls from "../utils/controls";
-import Sky from "../components/sky";
 import Paraglider from "../components/paraglider";
 import Helpers from "../utils/helpers";
 import { PilotHeadType } from "../components/parts/pilot-head";
+import { StoryOptions } from "./types";
 
 const ParagliderWorkshop = {
-  load: async (
-    camera: THREE.PerspectiveCamera,
-    scene: THREE.Scene,
-    renderer,
-    terrain: THREE.Mesh,
-    water: THREE.Mesh,
-    sky: Sky,
-    gui
-  ) => {
+  load: async (options: StoryOptions) => {
+    const { camera, scene, renderer, terrain, water, sky, gui } = options;
+    
     terrain.visible = false;
     water.visible = false;
 
@@ -45,12 +38,12 @@ const ParagliderWorkshop = {
       carabinerColor: '#333',
     };
 
-    const options = {
+    const paragliderOptions = {
       glider: gliderOptions,
       pilot: pilotOptions
     }
 
-    const paraglider = new Paraglider(options);
+    const paraglider = new Paraglider(paragliderOptions);
     const mesh = await paraglider.load(gui);
     scene.add(mesh);
 

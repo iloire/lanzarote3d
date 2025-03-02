@@ -18,6 +18,7 @@ import WindIndicator from "../../components/wind-indicator";
 import Sky from "../../components/sky";
 import PerfStats from "../../utils/stats";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { StoryOptions } from "../types";
 const KMH_TO_MS = 3.6;
 
 const FOG_ENABLED = true;
@@ -62,16 +63,9 @@ const addWindIndicatorToScene = (
 const analytics = new Analytics();
 
 const Game = {
-  load: async (
-    camera: Camera,
-    scene: THREE.Scene,
-    renderer,
-    terrain: THREE.Mesh,
-    water: THREE.Mesh,
-    sky: Sky,
-    gui,
-    controls: OrbitControls
-  ) => {
+  load: async (options: StoryOptions) => {
+    const { camera, scene, renderer, terrain, water, sky, gui, controls } = options;
+    
     const perfStats = new PerfStats(renderer, "rs-base");
 
     sky.updateSunPosition(TIME_OF_DAY);

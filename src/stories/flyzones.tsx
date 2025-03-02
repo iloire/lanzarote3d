@@ -2,23 +2,14 @@ import * as THREE from "three";
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 import React from "react";
 import { createRoot } from "react-dom/client";
-import Camera, { CameraMode } from "../components/camera";
 import locations from "./locations/lanzarote";
 import media from "./locations/media";
 import VideoFrame from "../components/video-frame";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import Sky from "../components/sky";
+import { StoryOptions } from "./types";
+
 const FlyZones = {
-  load: async (
-    camera: Camera,
-    scene: THREE.Scene,
-    renderer,
-    terrain: THREE.Mesh,
-    water: THREE.Mesh,
-    sky: Sky,
-    gui,
-    controls: OrbitControls
-  ) => {
+  load: async (options: StoryOptions) => {
+    const { camera, scene, renderer, controls } = options;
 
     const navigateTo = (point: THREE.Vector3, lookAt: THREE.Vector3) => {
       camera.animateTo(point, lookAt, 1000, controls, () => {

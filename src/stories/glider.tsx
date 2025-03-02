@@ -3,17 +3,12 @@ import Controls from "../utils/controls";
 import Sky from "../components/sky";
 import Glider from "../components/parts/glider";
 import Helpers from "../utils/helpers";
+import { StoryOptions } from "./types";
 
-const GliderStory = {
-  load: async (
-    camera: THREE.PerspectiveCamera,
-    scene: THREE.Scene,
-    renderer,
-    terrain: THREE.Mesh,
-    water: THREE.Mesh,
-    sky: Sky,
-    gui
-  ) => {
+const GliderWorkshop = {
+  load: async (options: StoryOptions) => {
+    const { camera, scene, renderer, terrain, water, sky, gui, controls } = options;
+    
     terrain.visible = false;
     water.visible = false;
 
@@ -38,6 +33,7 @@ const GliderStory = {
     const animate = () => {
       requestAnimationFrame(animate);
       renderer.render(scene, camera);
+      controls.update();
     };
 
     camera.position.set(-11200, 2500, -415);
@@ -45,4 +41,4 @@ const GliderStory = {
   },
 };
 
-export default GliderStory;
+export default GliderWorkshop;

@@ -9,6 +9,9 @@ import Stories from "./stories/index";
 import Camera from "./components/camera";
 import Menu from './menu';
 import Controls from "./utils/controls";
+import { StoryOptions } from "./stories/types";
+import Animation from "./stories/animation";
+import PhotoBooth from "./stories/photobooth";
 
 import "./index.css";
 
@@ -123,7 +126,19 @@ const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAp
     });
 
     const controls = Controls.createControls(camera, renderer);
-    await Stories[initialStory](camera, scene, renderer, island, water, sky, gui, controls);
+
+    const storyOptions: StoryOptions = {
+      camera,
+      scene,
+      renderer,
+      terrain: island,
+      water,
+      sky,
+      gui,
+      controls
+    };
+
+    await Stories[initialStory](storyOptions);
 
     // Animation loop
     const animate = () => {

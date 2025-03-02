@@ -11,6 +11,7 @@ import adriModel from '../models/adri.obj';
 import adriTextureImage from '../models/adri.png';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import Sky from "../components/sky";
+import { StoryOptions } from "./types";
 
 const WEATHER_SETTINGS: WeatherOptions = {
   windDirectionDegreesFromNorth: 310,
@@ -175,16 +176,9 @@ const paragliders: ParagliderConfig[] = [
 ];
 
 const PhotoBooth = {
-  load: async (
-    camera: Camera,
-    scene: THREE.Scene,
-    renderer,
-    terrain: THREE.Mesh,
-    water: THREE.Mesh,
-    sky: Sky,
-    gui,
-    controls: OrbitControls
-  ) => {
+  load: async (options: StoryOptions) => {
+    const { camera, scene, renderer, terrain, water, controls } = options;
+    
     const initialPos = new THREE.Vector3(6800, 870, -475);
     camera.animateTo(initialPos, paraglidersVoxel[0].position, 0, controls);
 

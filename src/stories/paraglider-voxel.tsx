@@ -5,17 +5,12 @@ import ParagliderVoxel from "../components/paraglider-voxel";
 import Helpers from "../utils/helpers";
 import adriModel from '../models/adri.obj';
 import adriTextureImage from '../models/adri.png';
+import { StoryOptions } from "./types";
 
-const ParagliderWorkshop = {
-  load: async (
-    camera: THREE.PerspectiveCamera,
-    scene: THREE.Scene,
-    renderer,
-    terrain: THREE.Mesh,
-    water: THREE.Mesh,
-    sky: Sky,
-    gui
-  ) => {
+const ParagliderVoxelWorkshop = {
+  load: async (options: StoryOptions) => {
+    const { camera, scene, renderer, terrain, water, sky, gui  } = options;
+    
     terrain.visible = false;
     water.visible = false;
 
@@ -41,12 +36,12 @@ const ParagliderWorkshop = {
       textureFile: adriTextureImage
     }
 
-    const options = {
+    const paragliderOptions = {
       glider: gliderOptions,
       pilot: pilotOptions
     }
 
-    const paraglider = new ParagliderVoxel(options);
+    const paraglider = new ParagliderVoxel(paragliderOptions);
     const mesh = await paraglider.load(gui);
     scene.add(mesh);
 
@@ -63,4 +58,4 @@ const ParagliderWorkshop = {
   },
 };
 
-export default ParagliderWorkshop;
+export default ParagliderVoxelWorkshop;

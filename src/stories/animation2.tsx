@@ -8,6 +8,7 @@ import Weather, { WeatherOptions } from "../elements/weather";
 import { PilotHeadType } from "../components/parts/pilot-head";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import Sky from "../components/sky";
+import { StoryOptions } from "./types";
 
 const WEATHER_SETTINGS: WeatherOptions = {
   windDirectionDegreesFromNorth: 310,
@@ -123,17 +124,10 @@ function getOffsetPosition(camera: Camera, target: THREE.Vector3, offsetDistance
   return target.clone().sub(direction.multiplyScalar(offsetDistance));
 }
 
-const Animation = {
-  load: async (
-    camera: Camera,
-    scene: THREE.Scene,
-    renderer,
-    terrain: THREE.Mesh,
-    water: THREE.Mesh,
-    sky: Sky,
-    gui,
-    controls: OrbitControls
-  ) => {
+const Animation2 = {
+  load: async (options: StoryOptions) => {
+    const { camera, scene, renderer, terrain, water, controls } = options;
+    
     const initialPos = new THREE.Vector3(6740, 892, -296);
     camera.animateTo(initialPos, paragliders[0].position, 0, controls);
 
@@ -204,4 +198,4 @@ const Animation = {
   },
 };
 
-export default Animation;
+export default Animation2;

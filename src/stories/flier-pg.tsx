@@ -1,12 +1,10 @@
 import * as THREE from "three";
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
-import Sky from "../components/sky";
 import Paraglider from "../components/paraglider";
-import Camera from "../components/camera";
 import Flier, { FlierConstructor } from "../components/base/flier";
 import Helpers from "../utils/helpers";
 import Weather, { WeatherOptions } from "../elements/weather";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { StoryOptions } from "./types";
     
 const KMH_TO_MS = 3.6;
 
@@ -17,20 +15,11 @@ const WEATHER_SETTINGS: WeatherOptions = {
 };
 
 const ParagliderWorkshop = {
-  load: async (
-    camera: Camera,
-    scene: THREE.Scene,
-    renderer,
-    terrain: THREE.Mesh,
-    water: THREE.Mesh,
-    sky: Sky,
-    gui,
-    controls: OrbitControls
-  ) => {
+  load: async (options: StoryOptions) => {
+    const { camera, scene, renderer, terrain, water, sky, gui, controls } = options;
+    
     terrain.visible = true;
     water.visible = true;
-
-    // const controls = Controls.createControls(camera, renderer);
 
     Helpers.createHelpers(scene);
 
@@ -84,9 +73,10 @@ const ParagliderWorkshop = {
       requestAnimationFrame(animate);
       renderer.render(scene, camera);
       const lookAt = mesh.position.clone().add(new THREE.Vector3(0, 0, 0));
-      // controls.update();
       camera.lookAt(lookAt);
       TWEEN.update();
+      controls.update(); 
+
     };
 
     animate();

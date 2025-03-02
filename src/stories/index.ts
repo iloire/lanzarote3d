@@ -1,3 +1,4 @@
+import { StoryOptions } from "./types";
 import Animation from "./animation";
 import Animation2 from "./animation2";
 import Animation3 from "./animation3";
@@ -17,7 +18,10 @@ import Terrain from "./terrain";
 import Voxel from "./voxel";
 import Workshop from "./workshop";
 import Helmet from "./helmet";
-const Stories = {
+
+export type StoryFunction = (options: StoryOptions) => Promise<any>;
+
+const Stories: Record<string, StoryFunction> = {
   animation: Animation.load,
   animation2: Animation2.load,
   animation3: Animation3.load,

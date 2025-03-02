@@ -1,22 +1,14 @@
 import * as THREE from "three";
-import Controls from "../utils/controls";
-import Sky from "../components/sky";
 import Helpers from "../utils/helpers";
 import adriModel from '../models/adri.obj';
 import texturePng from '../models/adri.png';
 import PilotVoxel from "../components/pilot-voxel";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-const VoxelStory = {
-  load: async (
-    camera: THREE.PerspectiveCamera,
-    scene: THREE.Scene,
-    renderer,
-    terrain: THREE.Mesh,
-    water: THREE.Mesh,
-    sky: Sky,
-    gui,
-    controls: OrbitControls
-  ) => {
+import { StoryOptions } from "./types";
+
+const VoxelWorkshop = {
+  load: async (options: StoryOptions) => {
+    const { camera, scene, renderer, terrain, water, sky, controls } = options;
+    
     terrain.visible = false;
     water.visible = false;
 
@@ -47,4 +39,4 @@ const VoxelStory = {
   },
 };
 
-export default VoxelStory;
+export default VoxelWorkshop;

@@ -1,13 +1,12 @@
 import * as THREE from "three";
-import Controls from "../utils/controls";
-import Sky from "../components/sky";
 import Paraglider from "../components/paraglider";
 import Boat from "../components/boat";
 import House, { HouseType } from "../components/house";
 import PineTree from "../components/pinetree";
 import Helpers from "../utils/helpers";
 import { PilotHeadType } from "../components/parts/pilot-head";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { StoryOptions } from "./types";
+
 const createLabel = (text: string, position: THREE.Vector3) => {
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d');
@@ -38,16 +37,9 @@ const createLabel = (text: string, position: THREE.Vector3) => {
 };
 
 const Workshop = {
-  load: async (
-    camera: THREE.PerspectiveCamera,
-    scene: THREE.Scene,
-    renderer,
-    terrain: THREE.Mesh,
-    water: THREE.Mesh,
-    sky: Sky,
-    gui,
-    controls: OrbitControls
-  ) => {
+  load: async (options: StoryOptions) => {
+    const { camera, scene, renderer, terrain, water, sky, gui, controls } = options;
+    
     terrain.visible = false;
     water.visible = false;
 

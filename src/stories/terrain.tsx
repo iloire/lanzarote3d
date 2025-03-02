@@ -1,7 +1,7 @@
 import * as THREE from "three";
-import Sky from "../components/sky";
 import textureImg from "../textures/h-map-lanzarote.png";
-import Controls from "../utils/controls";
+import { StoryOptions } from "./types";
+
 const terrainGenerator1 = (groundGeo, displacement) => {
   const groundMaterial = new THREE.MeshPhongMaterial({
     wireframe: true,
@@ -58,16 +58,10 @@ const waterGenerator = () => {
   return mesh;
 };
 
-const Terrain = {
-  load: async (
-    camera: THREE.PerspectiveCamera,
-    scene: THREE.Scene,
-    renderer,
-    terrain: THREE.Mesh,
-    water: THREE.Mesh,
-    sky: Sky,
-    gui
-  ) => {
+const TerrainWorkshop = {
+  load: async (options: StoryOptions) => {
+    const { camera, scene, renderer, terrain, water, sky, controls } = options;
+    
     water.visible = false;
     terrain.visible = false;
 
@@ -76,6 +70,7 @@ const Terrain = {
     const animate = () => {
       requestAnimationFrame(animate);
       renderer.render(scene, camera);
+      controls.update();
     };
     animate();
 
@@ -101,4 +96,4 @@ const Terrain = {
   },
 };
 
-export default Terrain;
+export default TerrainWorkshop;

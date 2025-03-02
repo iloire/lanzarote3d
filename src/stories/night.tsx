@@ -1,20 +1,12 @@
 import * as THREE from "three";
-import Controls from "../utils/controls";
-import Sky from "../components/sky";
 import React from "react";
 import { createRoot } from "react-dom/client";
+import { StoryOptions } from "./types";
 
 const Night = {
-  load: async (
-    camera: THREE.PerspectiveCamera,
-    scene: THREE.Scene,
-    renderer,
-    terrain: THREE.Mesh,
-    water: THREE.Mesh,
-    sky: Sky,
-    gui
-  ) => {
-    const controls = Controls.createControls(camera, renderer);
+  load: async (options: StoryOptions) => {
+    const { camera, scene, renderer,  sky,  controls } = options;
+    
     sky.updateSunPosition(2);
 
     const animate = () => {

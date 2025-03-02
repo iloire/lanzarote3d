@@ -4,22 +4,17 @@ import Sky from "../components/sky";
 import PilotHead, { GlassesType, PilotHeadType, PilotHeadOptions } from "../components/parts/pilot-head";
 import Helpers from "../utils/helpers";
 import { HelmetOptions, HelmetType } from "../components/parts/helmets/types";
+import { StoryOptions } from "./types";
 
 const toHexColor = (num: number): string => {
   const hex = num.toString(16);
   return '#' + '0'.repeat(6 - hex.length) + hex;
 };
 
-const HeadStory = {
-  load: async (
-    camera: THREE.PerspectiveCamera,
-    scene: THREE.Scene,
-    renderer,
-    terrain: THREE.Mesh,
-    water: THREE.Mesh,
-    sky: Sky,
-    gui
-  ) => {
+const Head = {
+  load: async (options: StoryOptions) => {
+    const { camera, scene, renderer, terrain, water, sky, gui, controls } = options;
+    
     terrain.visible = false;
     water.visible = false;
 
@@ -154,4 +149,4 @@ const HeadStory = {
   },
 };
 
-export default HeadStory;
+export default Head;

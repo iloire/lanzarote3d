@@ -1,21 +1,15 @@
 import * as THREE from "three";
-import Controls from "../utils/controls";
 import Sky from "../components/sky";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import HangGlider from "../components/hangglider";
 import Helpers from "../utils/helpers";
+import { StoryOptions } from "./types";
 
 const HangGliderWorkshop = {
-  load: async (
-    camera: THREE.PerspectiveCamera,
-    scene: THREE.Scene,
-    renderer,
-    terrain: THREE.Mesh,
-    water: THREE.Mesh,
-    sky: Sky,
-    gui
-  ) => {
+  load: async (options: StoryOptions) => {
+    const { camera, scene, renderer, terrain, water, sky, gui } = options;
+    
     terrain.visible = false;
     water.visible = false;
 
@@ -25,7 +19,8 @@ const HangGliderWorkshop = {
     //
 
     const hg = new HangGlider();
-    const mesh = await hg.load(gui);
+    const mesh = await hg.load([], gui);
+
     mesh.position.set(0, 0, 0);
     scene.add(mesh);
 
