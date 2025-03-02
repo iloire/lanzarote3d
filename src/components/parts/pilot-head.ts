@@ -3,11 +3,10 @@ import { DefaultHead } from "./heads/DefaultHead";
 import { WarriorHead } from "./heads/WarriorHead";
 import { SkeletonHead } from "./heads/SkeletonHead";
 import { DevilHead } from "./heads/DevilHead";
-import { DinoHead } from "./heads/DinoHead";
 import { HelmetType, HelmetOptions } from "./helmets/types";
 
 export enum PilotHeadType {
-  Default, Warrior, Skeleton, Devil, Dino
+  Default, Warrior, Skeleton, Devil
 }
 
 export enum GlassesType {
@@ -58,8 +57,6 @@ class PilotHead {
         return new SkeletonHead(this.options).load();
       case PilotHeadType.Devil:
         return new DevilHead(this.options).load();
-      case PilotHeadType.Dino:
-        return new DinoHead(this.options).load();
       case PilotHeadType.Default:
       default:
         return new DefaultHead(this.options).load();

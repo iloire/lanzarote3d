@@ -118,7 +118,8 @@ export class WarriorHead extends BaseHead {
     helmet.translateY(2.2);
     helmet.translateZ(-0.3);
     group.add(helmet);
+    group.scale.set(200,200,200);
 
-    return this.applyDefaultScale(group);
+    return group;
   }
 } 

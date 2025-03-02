@@ -19,13 +19,6 @@ export abstract class BaseHead {
     });
   }
 
-  protected applyDefaultScale(group: THREE.Group) {
-    const scale = 200;
-    group.translateY(-230);
-    group.scale.set(scale, scale, scale);
-    return group;
-  }
-
   protected getHelmet(): THREE.Group {
     switch (this.options.helmetType) {
       case HelmetType.Default:

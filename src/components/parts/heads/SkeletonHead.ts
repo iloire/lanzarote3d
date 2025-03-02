@@ -72,7 +72,8 @@ export class SkeletonHead extends BaseHead {
     group.add(teethGroup);
 
     group.add(this.getHelmet());
+    group.scale.set(200,200,200);
 
-    return this.applyDefaultScale(group);
+    return group;
   }
 } 
