@@ -175,7 +175,6 @@ const Animation = {
 
     let pointIndex = 0;
     const radius = 30;
-    const speed = 0.01; // Adjust speed as needed
 
     function animateCamera() {
       if (pointIndex >= points.length) {
@@ -184,37 +183,19 @@ const Animation = {
       const target = points[pointIndex];
       const duration = 2000; // 2 seconds to reach the next point
 
-      animate()
+      animate();
 
       new TWEEN.Tween(camera.position)
         .to({ x: target.x, y: target.y, z: target.z + radius }, duration)
         .easing(TWEEN.Easing.Quadratic.InOut)
         .onComplete(() => {
-          // orbitAroundPoint(target);
         })
         .start();
 
       pointIndex++;
     }
 
-    function orbitAroundPoint(target: THREE.Vector3) {
-      let angle = 0;
 
-      function orbit() {
-        angle += speed;
-        camera.position.x = target.x + radius * Math.cos(angle);
-        camera.position.z = target.z + radius * Math.sin(angle);
-        camera.lookAt(target);
-        if (angle < Math.PI * 2) {
-          requestAnimationFrame(orbit);
-        } else {
-          console.log('animate camera')
-          animateCamera();
-        }
-      }
-
-      orbit();
-    }
     const animate = () => {
       TWEEN.update();
       renderer.render(scene, camera);
