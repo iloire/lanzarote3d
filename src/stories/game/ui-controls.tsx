@@ -7,7 +7,7 @@ import Weather from "../../elements/weather";
 import arrowLeftImg from "../../img/left-chevron.png";
 import arrowRightImg from "../../img/right-chevron.png";
 import { GameStartOptions } from "./types";
-import { Location } from "../../stories/locations/index";
+import { Location } from "../flyzones/locations/index";
 
 const KMH_TO_MS = 3.6;
 

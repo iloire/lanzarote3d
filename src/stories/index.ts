@@ -4,7 +4,7 @@ import Animation2 from "./animation2";
 import Animation3 from "./animation3";
 import Clouds from "./clouds";
 import FlierPG from "./flier-pg";
-import FlyZones from "./flyzones";
+import FlyZones from "./flyzones/index";
 import Game from "./game/game";
 import Glider from "./glider";
 import HangGlider from "./hangglider";

@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Location } from "../locations/index";
+import { Location } from "../flyzones/locations/index";
 
 export type GameStartOptions = {
   startingLocation: Location;

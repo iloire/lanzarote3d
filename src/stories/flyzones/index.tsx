@@ -3,8 +3,8 @@ import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import locations from "./locations/lanzarote";
-import VideoFrame from "../components/video-frame";
-import { StoryOptions } from "./types";
+// import VideoFrame from "../components/video-frame";
+import { StoryOptions } from "../types";
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { Takeoff, Media, Location } from "./locations";
 
@@ -20,15 +20,17 @@ type Marker = {
 
 // Constants
 const TAKEOFF_VISIBILITY_THRESHOLD = 15000;
-const LOCATION_VISIBILITY_THRESHOLD = 10000; // New constant for location pins
+
 const PIN_COLORS = {
   location: { main: 0xff0000, emissive: 0x440000 },
   takeoff: { main: 0x000000, emissive: 0x000044 },
 };
+
 const PIN_SIZES = {
   location: { radius: 300, height: 1500 },
   takeoff: { radius: 150, height: 800 },
 };
+
 const PIN_FADE_DURATION = 200; // milliseconds
 
 const FlyZones = {
@@ -238,15 +240,15 @@ const FlyZones = {
       });
       
       // Update hover states
-      raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(scene.children);
-      const hoveredMarker = intersects.find(i => i.object.userData.hoverable)?.object;
+      // raycaster.setFromCamera(mouse, camera);
+      // const intersects = raycaster.intersectObjects(scene.children);
+      // const hoveredMarker = intersects.find(i => i.object.userData.hoverable)?.object;
       
-      if (hoveredMarker !== hoveredObject) {
-        markers.find(m => m.pin === hoveredObject)?.unhoverAnimation.start();
-        markers.find(m => m.pin === hoveredMarker)?.hoverAnimation.start();
-        hoveredObject = hoveredMarker || null;
-      }
+      // if (hoveredMarker !== hoveredObject) {
+      //   markers.find(m => m.pin === hoveredObject)?.unhoverAnimation.start();
+      //   markers.find(m => m.pin === hoveredMarker)?.hoverAnimation.start();
+      //   hoveredObject = hoveredMarker || null;
+      // }
 
       renderer.render(scene, camera);
       labelRenderer.render(scene, camera);
