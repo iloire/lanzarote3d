@@ -219,6 +219,7 @@ const Animation = {
       TWEEN.update();
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
+      controls.update();
     };
     // flyThroughTargets(camera, paragliders.map(p => p.position), 10, 2000);
     animateCamera();
