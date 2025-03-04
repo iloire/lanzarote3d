@@ -83,7 +83,8 @@ const FlyZones = {
             popupContainer,
             navigateTo,
             location,
-            camera
+            camera,
+            takeoff.conditions
           )
         ));
 

@@ -3,7 +3,7 @@ import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { Media } from "./locations";
 import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
-import { FlyZoneShape, LandingSpot, Location } from "./locations/index";
+import { FlyZoneShape, LandingSpot, Location, WindCondition } from "./locations/index";
 import Paraglider from '../../components/paraglider';
 import { PilotHeadType } from "../../components/parts/pilot-head";
 
@@ -188,11 +188,22 @@ export const createMarker = async (
   popupContainer: HTMLDivElement,
   navigateTo: (position: THREE.Vector3, location?: Location) => void,
   location: Location | undefined,
-  camera: THREE.Camera
+  camera: THREE.Camera,
+  conditions?: WindCondition[]
 ): Promise<Marker> => {
-  // Await the pin creation
   const pin = await createPinMesh(type);
   setupPinBasics(pin, position, type);
+  
+  // Add wind arrow for takeoffs
+  if (type === MarkerType.TAKEOFF && conditions && conditions.length > 0) {
+    const bestConditions = conditions.reduce((best, current) => 
+      current.rating > best.rating ? current : best, conditions[0]
+    );
+    const windArrow = createWindArrow(bestConditions.direction.ideal);
+        
+    pin.add(windArrow);
+  }
+  
   scene.add(pin);
 
   // Add label
@@ -501,4 +512,43 @@ export const createLandingSpotMarker = (
   arrow.userData.showPopup = showPopup;
   
   return group;
+};
+
+export const createWindArrow = (windDirection: number) => {
+  // Create arrow geometry - make it much longer
+  const height = 1000;  // Increased from 500
+  const radius = 50;
+  
+  // Create arrow body (cylinder)
+  const bodyGeometry = new THREE.CylinderGeometry(radius/3, radius/3, height * 0.7, 8);
+  const bodyMaterial = new THREE.MeshPhongMaterial({ 
+    color: 0x0066ff,
+    transparent: true,
+    opacity: 0.8 
+  });
+  const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+  
+  // Create arrow head (cone)
+  const headGeometry = new THREE.ConeGeometry(radius, height * 0.3, 8);
+  const headMaterial = new THREE.MeshPhongMaterial({ 
+    color: 0x0066ff,
+    transparent: true,
+    opacity: 0.8 
+  });
+  const head = new THREE.Mesh(headGeometry, headMaterial);
+  head.position.y = height * 0.5;
+  
+  // Create arrow group
+  const arrow = new THREE.Group();
+  arrow.add(body);
+  arrow.add(head);
+  
+  // First rotate arrow to horizontal position
+  arrow.rotation.z = Math.PI / 2;
+  
+  // Then rotate to point into wind direction
+  // Add 180° because we want arrow to point where wind is coming from
+  arrow.rotation.y = THREE.MathUtils.degToRad(windDirection + 180);
+  
+  return arrow;
 }; 

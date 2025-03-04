@@ -1,11 +1,16 @@
 import * as THREE from "three";
 
-export type Condition = {
-  from: number;
-  to: number;
-  minWindKmh: number;
-  maxWindKmh: number;
-  rating: number;
+export type WindCondition = {
+  direction: {
+    ideal: number;     // Ideal wind direction in degrees (0-360, where 0/360 is North)
+    tolerance: number; // Acceptable deviation from ideal in degrees
+  };
+  speed: {
+    min: number;      // Minimum wind speed in km/h
+    max: number;      // Maximum wind speed in km/h
+    ideal: number;    // Ideal wind speed in km/h
+  };
+  rating: number;     // 1-5 rating for these conditions
 };
 
 export type Takeoff = {
@@ -14,14 +19,14 @@ export type Takeoff = {
   description: string;
   position: THREE.Vector3;
   coordinates: GPS;
-  conditions: Condition[];
+  conditions: WindCondition[];  // Array of conditions
   mediaItems: Media[];
 };
 
 export type GPS = {
   latitude: number;
   longitude: number;
-  altitude?: number;
+  altitude: number;
 };
 
 export type LandingSpot = {

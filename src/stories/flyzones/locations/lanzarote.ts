@@ -25,11 +25,31 @@ const locations: Location[] = [
           altitude: 880,
         },
         conditions: [
-          { from: 20, to: 30, minWindKmh: 10, maxWindKmh: 20, rating: 1 },
-          { from: 30, to: 40, minWindKmh: 20, maxWindKmh: 30, rating: 2 },
-          { from: 40, to: 50, minWindKmh: 30, maxWindKmh: 40, rating: 3 },
-          { from: 50, to: 60, minWindKmh: 40, maxWindKmh: 50, rating: 4 },
-          { from: 60, to: 70, minWindKmh: 50, maxWindKmh: 60, rating: 5 },
+          {
+            direction: {
+              ideal: 280,     // NW wind
+              tolerance: 30
+            },
+            speed: {
+              min: 15,
+              max: 30,
+              ideal: 20
+            },
+            rating: 5
+          },
+          {
+            direction: {
+              ideal: 350,    // N wind
+              tolerance: 20
+            },
+            speed: {
+              min: 10,
+              max: 25,
+              ideal: 15
+            },
+            rating: 4
+          },
+     
         ],
         mediaItems: [
           {
@@ -52,11 +72,31 @@ const locations: Location[] = [
           altitude: 880,
         },
         conditions: [
-          { from: 20, to: 30, minWindKmh: 10, maxWindKmh: 20, rating: 1 },
-          { from: 30, to: 40, minWindKmh: 20, maxWindKmh: 30, rating: 2 },
-          { from: 40, to: 50, minWindKmh: 30, maxWindKmh: 40, rating: 3 },
-          { from: 50, to: 60, minWindKmh: 40, maxWindKmh: 50, rating: 4 },
-          { from: 60, to: 70, minWindKmh: 50, maxWindKmh: 60, rating: 5 },
+          {
+            direction: {
+              ideal: 280,     // NW wind
+              tolerance: 30
+            },
+            speed: {
+              min: 15,
+              max: 30,
+              ideal: 20
+            },
+            rating: 5
+          },
+          {
+            direction: {
+              ideal: 350,    // N wind
+              tolerance: 20
+            },
+            speed: {
+              min: 10,
+              max: 25,
+              ideal: 15
+            },
+            rating: 4
+          },
+     
         ],
         mediaItems: [
           {
@@ -79,11 +119,31 @@ const locations: Location[] = [
           altitude: 880,
         },
         conditions: [
-          { from: 20, to: 30, minWindKmh: 10, maxWindKmh: 20, rating: 1 },
-          { from: 30, to: 40, minWindKmh: 20, maxWindKmh: 30, rating: 2 },
-          { from: 40, to: 50, minWindKmh: 30, maxWindKmh: 40, rating: 3 },
-          { from: 50, to: 60, minWindKmh: 40, maxWindKmh: 50, rating: 4 },
-          { from: 60, to: 70, minWindKmh: 50, maxWindKmh: 60, rating: 5 },
+          {
+            direction: {
+              ideal: 280,     // NW wind
+              tolerance: 30
+            },
+            speed: {
+              min: 15,
+              max: 30,
+              ideal: 20
+            },
+            rating: 5
+          },
+          {
+            direction: {
+              ideal: 350,    // N wind
+              tolerance: 20
+            },
+            speed: {
+              min: 10,
+              max: 25,
+              ideal: 15
+            },
+            rating: 4
+          },
+     
         ],
         mediaItems: [
           {
@@ -199,11 +259,42 @@ const locations: Location[] = [
           altitude: 380,
         },
         conditions: [
-          { from: 20, to: 30, minWindKmh: 10, maxWindKmh: 20, rating: 1 },
-          { from: 30, to: 40, minWindKmh: 20, maxWindKmh: 30, rating: 2 },
-          { from: 40, to: 50, minWindKmh: 30, maxWindKmh: 40, rating: 3 },
-          { from: 50, to: 60, minWindKmh: 40, maxWindKmh: 50, rating: 4 },
-          { from: 60, to: 70, minWindKmh: 50, maxWindKmh: 60, rating: 5 },
+          {
+            direction: {
+              ideal: 45,     // NE wind
+              tolerance: 30
+            },
+            speed: {
+              min: 15,
+              max: 30,
+              ideal: 20
+            },
+            rating: 5
+          },
+          {
+            direction: {
+              ideal: 35,     // NNE wind
+              tolerance: 25
+            },
+            speed: {
+              min: 10,
+              max: 25,
+              ideal: 15
+            },
+            rating: 4
+          },
+          {
+            direction: {
+              ideal: 55,     // ENE wind
+              tolerance: 20
+            },
+            speed: {
+              min: 20,
+              max: 35,
+              ideal: 25
+            },
+            rating: 3
+          }
         ],
         mediaItems: [
           {
@@ -240,11 +331,30 @@ const locations: Location[] = [
           altitude: 380,
         },
         conditions: [
-          { from: 20, to: 30, minWindKmh: 10, maxWindKmh: 20, rating: 1 },
-          { from: 30, to: 40, minWindKmh: 20, maxWindKmh: 30, rating: 2 },
-          { from: 40, to: 50, minWindKmh: 30, maxWindKmh: 40, rating: 3 },
-          { from: 50, to: 60, minWindKmh: 40, maxWindKmh: 50, rating: 4 },
-          { from: 60, to: 70, minWindKmh: 50, maxWindKmh: 60, rating: 5 },
+          {
+            direction: {
+              ideal: 45,
+              tolerance: 30
+            },
+            speed: {
+              min: 15,
+              max: 30,
+              ideal: 20
+            },
+            rating: 5
+          },
+          {
+            direction: {
+              ideal: 35,
+              tolerance: 25
+            },
+            speed: {
+              min: 10,
+              max: 25,
+              ideal: 15
+            },
+            rating: 4
+          }
         ],
         mediaItems: [
           {
@@ -359,11 +469,30 @@ const locations: Location[] = [
           altitude: 580,
         },
         conditions: [
-          { from: 20, to: 30, minWindKmh: 10, maxWindKmh: 20, rating: 1 },
-          { from: 30, to: 40, minWindKmh: 20, maxWindKmh: 30, rating: 2 },
-          { from: 40, to: 50, minWindKmh: 30, maxWindKmh: 40, rating: 3 },
-          { from: 50, to: 60, minWindKmh: 40, maxWindKmh: 50, rating: 4 },
-          { from: 60, to: 70, minWindKmh: 50, maxWindKmh: 60, rating: 5 },
+          {
+            direction: {
+              ideal: 40,
+              tolerance: 30
+            },
+            speed: {
+              min: 15,
+              max: 30,
+              ideal: 20
+            },
+            rating: 5
+          },
+          {
+            direction: {
+              ideal: 50,
+              tolerance: 25
+            },
+            speed: {
+              min: 20,
+              max: 35,
+              ideal: 25
+            },
+            rating: 4
+          }
         ],
         mediaItems: [
           {
@@ -485,11 +614,30 @@ const locations: Location[] = [
           altitude: 580,
         },
         conditions: [
-          { from: 20, to: 30, minWindKmh: 10, maxWindKmh: 20, rating: 1 },
-          { from: 30, to: 40, minWindKmh: 20, maxWindKmh: 30, rating: 2 },
-          { from: 40, to: 50, minWindKmh: 30, maxWindKmh: 40, rating: 3 },
-          { from: 50, to: 60, minWindKmh: 40, maxWindKmh: 50, rating: 4 },
-          { from: 60, to: 70, minWindKmh: 50, maxWindKmh: 60, rating: 5 },
+          {
+            direction: {
+              ideal: 45,
+              tolerance: 30
+            },
+            speed: {
+              min: 15,
+              max: 30,
+              ideal: 20
+            },
+            rating: 5
+          },
+          {
+            direction: {
+              ideal: 60,
+              tolerance: 25
+            },
+            speed: {
+              min: 20,
+              max: 35,
+              ideal: 25
+            },
+            rating: 4
+          }
         ],
         mediaItems: [
           {
