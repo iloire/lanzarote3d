@@ -53,7 +53,12 @@
     "upload-flyzones": "aws s3 cp dist s3://lanzarote-flyzones-eu --recursive",
     "build-flyzones": "yarn clean && webpack --config webpack.flyzones.js --mode production",
     "deploy-flyzones": "yarn build-flyzones && yarn tag-flyzones && yarn delete-flyzones && yarn upload-flyzones",
-    "tag-flyzones": "git tag FLYZONES-$(date '+%F_%H%M')"
+    "tag-flyzones": "git tag FLYZONES-$(date '+%F_%H%M')",
+    "delete-placeholder": "aws s3 rm s3://lanzaroteparagliding-placeholder --recursive",
+    "upload-placeholder": "aws s3 cp dist s3://lanzaroteparagliding-placeholder --recursive",
+    "build-placeholder": "yarn clean && webpack --config webpack.placeholder.js --mode production",
+    "deploy-placeholder": "yarn build-placeholder && yarn tag-placeholder && yarn delete-placeholder && yarn upload-placeholder",
+    "tag-placeholder": "git tag PLACEHOLDER-$(date '+%F_%H%M')"
   },
   "types": "index.d.ts",
   "author": "ivan l.",
