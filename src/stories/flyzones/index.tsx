@@ -21,7 +21,7 @@ const FlyZones = {
 
     const navigateTo = (position: THREE.Vector3, showTakeoffs: boolean = false) => {
       const lookAtPos = position.clone();
-      const offset = showTakeoffs ? 5000 : 20000;
+      const offset = showTakeoffs ? 3000 : 20000;
       const cameraPos = position.clone().add(new THREE.Vector3(offset, offset, offset));
       camera.animateTo(cameraPos, lookAtPos, 1000, controls);
     };
@@ -89,12 +89,19 @@ const FlyZones = {
       // Update marker visibility
       markers.forEach(marker => {
         const distance = camera.position.distanceTo(marker.pin.position);
-        const shouldBeVisible = marker.isTakeoff
-          ? distance < TAKEOFF_VISIBILITY_THRESHOLD  // Show takeoffs only when CLOSE
-          : distance >= TAKEOFF_VISIBILITY_THRESHOLD; // Show locations only when FAR
+        const shouldBeVisible = marker.isTakeoff 
+          ? distance < TAKEOFF_VISIBILITY_THRESHOLD  // Show takeoffs when CLOSE
+          : distance > TAKEOFF_VISIBILITY_THRESHOLD; // Show locations when FAR
+        
+        console.log({
+          type: marker.isTakeoff ? 'takeoff' : 'location',
+          distance: Math.round(distance),
+          threshold: TAKEOFF_VISIBILITY_THRESHOLD,
+          shouldBeVisible,
+          currentlyVisible: marker.pin.visible
+        });
+        
         marker.setVisibility(shouldBeVisible);
-        console.log(shouldBeVisible, marker.isTakeoff ? 'takeoff' : 'location', distance);
-
       });
 
       // Update hover states

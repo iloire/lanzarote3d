@@ -119,13 +119,14 @@ export const createMarker = (
   const setVisibility = (visible: boolean) => {
     if (visible !== pin.visible) {
       fadeAnimation.stop();
+      pin.visible = visible;
+      label.visible = visible;
+      
       fadeAnimation
-        .to({ opacity: visible ? 0.8 : 0 }, PIN_FADE_DURATION)
-        .start()
-        .onComplete(() => {
-          pin.visible = visible;
-          label.visible = visible;
-        });
+        .to({ 
+          opacity: visible ? 0.8 : 0 
+        }, PIN_FADE_DURATION)
+        .start();
     }
   };
 
