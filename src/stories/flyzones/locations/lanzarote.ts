@@ -45,7 +45,7 @@ const locations: Location[] = [
         id: "pechos-bajos",
         title: "Pechos Bajos Takeoff",
         description: "Pechos Bajos.",
-        position: new THREE.Vector3(6427, 980, -655),
+        position: new THREE.Vector3(5598, 406, 464),
         coordinates: {
           latitude: 28.9167,
           longitude: -13.6333,
@@ -109,6 +109,14 @@ const locations: Location[] = [
         { 
           position: new THREE.Vector3(7897, 2500, -755),
           radius: 3000
+        },
+        { 
+          position: new THREE.Vector3(6866, 8, -3467),
+          radius: 1000
+        },
+        { 
+          position: new THREE.Vector3(9489, 220, -5467),
+          radius: 1000
         }
       ],
       color: FLYZONE_COLORS.safe
@@ -116,9 +124,9 @@ const locations: Location[] = [
     landingSpots: [
       {
         id: "famara-beach-main",
-        title: "Famara Beach Main Landing",
+        title: "Famara Beach ",
         description: "Main landing area on Famara beach",
-        position: new THREE.Vector3(6827, 500, 0),
+        position: new THREE.Vector3(6866, 8, -3467),
         coordinates: {
           latitude: 28.9167,
           longitude: -13.6333,
