@@ -13,22 +13,19 @@ import {
   type Marker,
   setupLabelRenderer,
   setupPopupContainer,
-  VISIBILITY_THRESHOLDS
+  VISIBILITY_THRESHOLDS,
+  MarkerType,
+  createCustomFlyZone
 } from './helpers';
 
 const FlyZones = {
   load: async (options: StoryOptions) => {
     const { camera, scene, renderer, controls } = options;
 
-    // Add mode tracking
-    let currentMode: 'location' | 'takeoff' = 'location';
-
     const navigateTo = (position: THREE.Vector3, location?: Location) => {
       const lookAtPos = position.clone();
       
       if (location) {
-        // Switching to location mode
-        currentMode = 'location';
         // Use location's camera configuration
         const view = location.cameraView;
         const distance = view.distance || 20000;
@@ -39,8 +36,6 @@ const FlyZones = {
         
         camera.animateTo(cameraPos, lookAt, 1000, controls);
       } else {
-        // Switching to takeoff mode
-        currentMode = 'takeoff';
         const offset = 3000;
         const cameraPos = position.clone().add(new THREE.Vector3(offset, offset, offset));
         camera.animateTo(cameraPos, lookAtPos, 1000, controls);
@@ -60,36 +55,63 @@ const FlyZones = {
         location.title,
         location.description,
         [],
-        false, // isTakeoff = false
+        MarkerType.LOCATION,
         scene,
         popupContainer,
         navigateTo,
-        location,  // Pass the location object
-        camera     // Pass the camera
+        location,
+        camera
       );
       console.log('Created location marker:', {
         title: location.title,
-        isTakeoff: locationMarker.isTakeoff,
+        type: locationMarker.type,
         pinType: locationMarker.pin.userData.type
       });
 
       // Create takeoff markers
-      const takeoffMarkers = location.takeoffs.map(takeoff => {
-        return createMarker(
+      const takeoffMarkers = location.takeoffs.map(takeoff => 
+        createMarker(
           takeoff.position,
           takeoff.title,
           takeoff.description,
           takeoff.mediaItems,
-          true, // isTakeoff = true
+          MarkerType.TAKEOFF,
           scene,
           popupContainer,
           navigateTo,
-          location,  // Pass the location object
-          camera     // Pass the camera
-        );
-      });
+          location,
+          camera
+        )
+      );
 
-      return [...allMarkers, locationMarker, ...takeoffMarkers];
+      // Create landing spot markers
+      const landingMarkers = location.landingSpots?.map(spot => 
+        createMarker(
+          spot.position,
+          spot.title,
+          spot.description,
+          spot.mediaItems,
+          MarkerType.LANDING,
+          scene,
+          popupContainer,
+          navigateTo,
+          location,
+          camera
+        )
+      ) || [];
+
+      // Create flyzone for location
+      let flyzone;
+      if (location.flyzone) {
+        flyzone = createCustomFlyZone(location.flyzone);
+        flyzone.visible = false;
+        scene.add(flyzone);
+      }
+
+      // Associate flyzone with location marker
+      locationMarker.flyzone = flyzone;
+
+      return [...allMarkers, locationMarker, ...takeoffMarkers, ...landingMarkers];
     }, [] as Marker[]);
 
     console.log(markers);
@@ -144,39 +166,20 @@ const FlyZones = {
     const animate = () => {
       TWEEN.update();
 
-      // Update marker visibility
+      // Update marker visibility based on camera distance
       markers.forEach(marker => {
         const distance = camera.position.distanceTo(marker.pin.position);
-        
-        if (currentMode === 'location') {
-          // In location mode, only show location markers
-          marker.setVisibility(!marker.isTakeoff && distance > VISIBILITY_THRESHOLDS.LOCATION_PIN);
-          
-          // Hide all landing spots and fly zones
-          if (marker.landingSpots) {
-            marker.landingSpots.forEach(spot => {
-              spot.visible = false;
-            });
-          }
-          if (marker.flyzone) {
-            marker.flyzone.visible = false;
-          }
-        } else {
-          // In takeoff mode, show everything based on distance
-          const shouldBeVisible = marker.isTakeoff 
-            ? distance < VISIBILITY_THRESHOLDS.TAKEOFF_PIN
-            : distance > VISIBILITY_THRESHOLDS.LOCATION_PIN;
-          marker.setVisibility(shouldBeVisible);
+        const isDetailView = distance < VISIBILITY_THRESHOLDS.DETAIL_VIEW;
 
-          // Show landing spots and fly zones based on distance
-          if (marker.landingSpots) {
-            marker.landingSpots.forEach(spot => {
-              spot.visible = distance < VISIBILITY_THRESHOLDS.LANDING;
-            });
-          }
-          if (marker.flyzone) {
-            marker.flyzone.visible = distance < VISIBILITY_THRESHOLDS.FLYZONE;
-          }
+        if (marker.type === MarkerType.LOCATION) {
+          // Show location markers only when far away
+          marker.setVisibility(!isDetailView);         
+        } else {
+          // Show takeoff markers and other details only when close
+          marker.setVisibility(isDetailView);
+        }
+        if (marker.flyzone) {
+          marker.flyzone.visible = isDetailView;
         }
       });
 
