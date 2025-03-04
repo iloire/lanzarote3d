@@ -39,16 +39,20 @@ export type LandingSpot = {
   mediaItems: Media[];
 };
 
-export type FlyZonePoint = {
+export type FlightPhase = {
+  type: 'takeoff' | 'climb' | 'ridge' | 'landing' | 'approach';
   position: THREE.Vector3;
-  radius: number; // Radius at this height
+  dimensions: {
+    width: number;   // X axis
+    height: number;  // Y axis (vertical space for this phase)
+    length: number;  // Z axis
+  };
+  nextPhases?: string[];
 };
 
 export type FlyZoneShape = {
-  points: FlyZonePoint[];
+  phases: Record<string, FlightPhase>;
   color?: number;
-  minHeight?: number;
-  maxHeight?: number;
 };
 
 export type CameraView = {

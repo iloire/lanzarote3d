@@ -157,33 +157,77 @@ const locations: Location[] = [
       }
     ],
     flyzone: {
-      points: [
-        { 
+      phases: {
+        'takeoff-main': {
+          type: 'takeoff',
           position: new THREE.Vector3(6927, 280, -655),
-          radius: 200
+          dimensions: {
+            width: 400,    // Area to take off
+            height: 200,   // Vertical space needed
+            length: 400    // Front to back space
+          },
+          nextPhases: ['climb-1']
         },
-        { 
+        'climb-1': {
+          type: 'climb',
           position: new THREE.Vector3(7127, 480, -655),
-          radius: 400
+          dimensions: {
+            width: 800,    // Wider area for turning
+            height: 400,   // Climbing space
+            length: 800    // Space to move forward
+          },
+          nextPhases: ['climb-2', 'ridge-1']
         },
-        { 
+        'ridge-1': {
+          type: 'ridge',
           position: new THREE.Vector3(7327, 830, -655),
-          radius: 600
+          dimensions: {
+            width: 1200,   // Wide area for ridge soaring
+            height: 600,   // Vertical range
+            length: 600    // Ridge length
+          },
+          nextPhases: ['ridge-2', 'approach-1']
         },
-        { 
-          position: new THREE.Vector3(7527, 1200, -1255),
-          radius: 800
+        'climb-2': {
+          type: 'climb',
+          position: new THREE.Vector3(7527, 680, -655),
+          dimensions: {
+            width: 1000,    // Wider area for turning
+            height: 400,   // Climbing space
+            length: 1000    // Space to move forward
+          },
+          nextPhases: ['climb-3', 'ridge-2']
         },
-        { 
+        'ridge-2': {
+          type: 'ridge',
+          position: new THREE.Vector3(7727, 1030, -655),
+          dimensions: {
+            width: 1500,   // Wide area for ridge soaring
+            height: 800,   // Vertical range
+            length: 800    // Ridge length
+          },
+          nextPhases: ['approach-1']
+        },
+        'approach-1': {
+          type: 'approach',
           position: new THREE.Vector3(6866, 800, -2467),
-          radius: 600
+          dimensions: {
+            width: 1000,    // Wide area for approach
+            height: 600,    // Vertical range for descent
+            length: 1000    // Length of approach path
+          },
+          nextPhases: ['landing-main']
         },
-        { 
+        'landing-main': {
+          type: 'landing',
           position: new THREE.Vector3(6866, 200, -3467),
-          radius: 400
+          dimensions: {
+            width: 800,     // Landing area width
+            height: 400,    // Height range for final
+            length: 800     // Landing area length
+          }
         }
-      ],
-      color: FLYZONE_COLORS.safe
+      }
     },
     landingSpots: [
       {
@@ -386,21 +430,38 @@ const locations: Location[] = [
       },
     ],
     flyzone: {
-      points: [
-        { 
+      phases: {
+        'takeoff-main': {
+          type: 'takeoff',
           position: new THREE.Vector3(-4827, 380, -855),
-          radius: 800
+          dimensions: {
+            width: 800,
+            height: 200,
+            length: 800
+          },
+          nextPhases: ['climb-1']
         },
-        { 
+        'climb-1': {
+          type: 'climb',
           position: new THREE.Vector3(-4827, 1000, -855),
-          radius: 1500
+          dimensions: {
+            width: 1500,
+            height: 900,
+            length: 1500
+          },
+          nextPhases: ['ridge-1']
         },
-        { 
+        'ridge-1': {
+          type: 'ridge',
           position: new THREE.Vector3(-4827, 2000, -955),
-          radius: 2000
+          dimensions: {
+            width: 2000,
+            height: 1000,
+            length: 2000
+          },
+          nextPhases: ['ridge-2', 'approach-1']
         }
-      ],
-      color: FLYZONE_COLORS.caution
+      }
     },
     landingSpots: [
       {
@@ -510,21 +571,38 @@ const locations: Location[] = [
       },
     ],
     flyzone: {
-      points: [
-        { 
+      phases: {
+        'takeoff-main': {
+          type: 'takeoff',
           position: new THREE.Vector3(-6227, 580, 14055),
-          radius: 1000
+          dimensions: {
+            width: 1000,
+            height: 220,
+            length: 1000
+          },
+          nextPhases: ['climb-1']
         },
-        { 
+        'climb-1': {
+          type: 'climb',
           position: new THREE.Vector3(-6227, 1200, 14055),
-          radius: 1800
+          dimensions: {
+            width: 1800,
+            height: 700,
+            length: 1800
+          },
+          nextPhases: ['ridge-1']
         },
-        { 
+        'ridge-1': {
+          type: 'ridge',
           position: new THREE.Vector3(-6227, 2000, 14155),
-          radius: 2500
+          dimensions: {
+            width: 2500,
+            height: 1000,
+            length: 2500
+          },
+          nextPhases: ['ridge-2', 'approach-1']
         }
-      ],
-      color: FLYZONE_COLORS.safe
+      }
     },
     landingSpots: [
       {
@@ -656,21 +734,38 @@ const locations: Location[] = [
      
     ],
     flyzone: {
-      points: [
-        { 
+      phases: {
+        'takeoff-main': {
+          type: 'takeoff',
           position: new THREE.Vector3(15027, 580, -12555),
-          radius: 1200
+          dimensions: {
+            width: 1200,
+            height: 420,
+            length: 1200
+          },
+          nextPhases: ['climb-1']
         },
-        { 
+        'climb-1': {
+          type: 'climb',
           position: new THREE.Vector3(15027, 1500, -12555),
-          radius: 2000
+          dimensions: {
+            width: 2000,
+            height: 1000,
+            length: 2000
+          },
+          nextPhases: ['ridge-1']
         },
-        { 
+        'ridge-1': {
+          type: 'ridge',
           position: new THREE.Vector3(15127, 2500, -12655),
-          radius: 3000
+          dimensions: {
+            width: 3000,
+            height: 1000,
+            length: 3000
+          },
+          nextPhases: ['landing-main']
         }
-      ],
-      color: FLYZONE_COLORS.caution
+      }
     },
     landingSpots: [
       {

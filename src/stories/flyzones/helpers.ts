@@ -3,7 +3,7 @@ import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { Media } from "./locations";
 import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
-import { FlyZoneShape, LandingSpot, Location, WindCondition, FlyZonePoint } from "./locations/index";
+import { FlyZoneShape, LandingSpot, Location, WindCondition, FlightPhase } from "./locations/index";
 import Paraglider from '../../components/paraglider';
 import { PilotHeadType } from "../../components/parts/pilot-head";
 
@@ -386,19 +386,34 @@ export const setupPopupContainer = () => {
 export const createCustomFlyZone = (shape: FlyZoneShape) => {
   const group = new THREE.Group();
   
-  // Create spheres for each point
-  shape.points.forEach((point, index) => {
-    // Create sphere geometry
-    const sphereGeometry = new THREE.SphereGeometry(point.radius, 32, 32);
+  // Create boxes for each phase
+  const phases = Object.keys(shape.phases).map(key => ({
+    id: key,
+    ...shape.phases[key]
+  }));
+  
+  phases.forEach((phase) => {
+    // Create box geometry
+    const boxGeometry = new THREE.BoxGeometry(
+      phase.dimensions.width,
+      phase.dimensions.height,
+      phase.dimensions.length
+    );
     
-    // Create material with transparency and color based on height
+    // Create material with transparency and color based on phase type
     const color = new THREE.Color();
-    if (point.position.y < 1000) {
-      color.setHex(FLYZONE_COLORS.danger);
-    } else if (point.position.y < 2000) {
-      color.setHex(FLYZONE_COLORS.caution);
-    } else {
-      color.setHex(FLYZONE_COLORS.safe);
+    switch (phase.type) {
+      case 'takeoff':
+        color.setHex(FLYZONE_COLORS.danger);
+        break;
+      case 'landing':
+        color.setHex(FLYZONE_COLORS.caution);
+        break;
+      case 'ridge':
+        color.setHex(FLYZONE_COLORS.safe);
+        break;
+      default:
+        color.setHex(shape.color || FLYZONE_COLORS.safe);
     }
     
     const material = new THREE.MeshBasicMaterial({
@@ -408,20 +423,20 @@ export const createCustomFlyZone = (shape: FlyZoneShape) => {
       wireframe: true
     });
     
-    // Create sphere mesh
-    const sphere = new THREE.Mesh(sphereGeometry, material);
-    sphere.position.copy(point.position);
+    // Create box mesh
+    const box = new THREE.Mesh(boxGeometry, material);
+    box.position.copy(phase.position);
     
     // Add wireframe
     const wireframe = new THREE.LineSegments(
-      new THREE.WireframeGeometry(sphereGeometry),
+      new THREE.EdgesGeometry(boxGeometry),
       new THREE.LineBasicMaterial({
         color: 0xffffff,
         transparent: true,
         opacity: 0.3
       })
     );
-    sphere.add(wireframe);
+    box.add(wireframe);
     
     // Add height indicator line
     const lineMaterial = new THREE.LineDashedMaterial({
@@ -433,34 +448,38 @@ export const createCustomFlyZone = (shape: FlyZoneShape) => {
     });
 
     const lineGeometry = new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(point.position.x, 0, point.position.z),
-      point.position
+      new THREE.Vector3(phase.position.x, 0, phase.position.z),
+      phase.position
     ]);
 
     const line = new THREE.Line(lineGeometry, lineMaterial);
     line.computeLineDistances();
     group.add(line);
     
-    // Add connecting line to next point if it exists
-    if (index < shape.points.length - 1) {
-      const nextPoint = shape.points[index + 1];
-      const connectionGeometry = new THREE.BufferGeometry().setFromPoints([
-        point.position,
-        nextPoint.position
-      ]);
-      
-      const connectionLine = new THREE.Line(
-        connectionGeometry,
-        new THREE.LineBasicMaterial({
-          color: 0xffffff,
-          transparent: true,
-          opacity: 0.3
-        })
-      );
-      group.add(connectionLine);
+    // Add connecting lines to next phases
+    if (phase.nextPhases) {
+      phase.nextPhases.forEach(nextPhaseId => {
+        const nextPhase = shape.phases[nextPhaseId];
+        if (nextPhase) {
+          const connectionGeometry = new THREE.BufferGeometry().setFromPoints([
+            phase.position,
+            nextPhase.position
+          ]);
+          
+          const connectionLine = new THREE.Line(
+            connectionGeometry,
+            new THREE.LineBasicMaterial({
+              color: 0xffffff,
+              transparent: true,
+              opacity: 0.3
+            })
+          );
+          group.add(connectionLine);
+        }
+      });
     }
     
-    group.add(sphere);
+    group.add(box);
   });
   
   return group;
@@ -567,24 +586,4 @@ export const createWindArrow = (windDirection: number) => {
   arrow.rotation.y = THREE.MathUtils.degToRad(windDirection + 180);
   
   return arrow;
-};
-
-const addWindArrows = (mesh: THREE.Mesh, windDirection: number, shape: FlyZoneShape) => {
-  const arrows = [];
-  const spacing = 1000; // Space between arrows
-  
-  shape.points.forEach(point => {
-    for (let y = 0; y < point.position.y; y += spacing) {
-      const arrow = createWindArrow(windDirection);
-      arrow.scale.set(0.3, 0.3, 0.3);
-      arrow.position.set(
-        point.position.x,
-        y,
-        point.position.z
-      );
-      arrows.push(arrow);
-    }
-  });
-  
-  mesh.add(...arrows);
 }; 
