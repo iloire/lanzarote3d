@@ -53,7 +53,7 @@ const locations: Location[] = [
           radius: 2000
         },
         { 
-          position: new THREE.Vector3(6897, 2500, -755),
+          position: new THREE.Vector3(7897, 2500, -755),
           radius: 3000
         }
       ],
@@ -111,7 +111,7 @@ const locations: Location[] = [
       }
     ],
     cameraView: {
-      position: new THREE.Vector3(1, 0.7, -1).normalize(), // View from Northeast
+      position: new THREE.Vector3(-2, 0.7, 1).normalize(), // View from NorthWest
       distance: 5000 // Distance in world units
     }
   },

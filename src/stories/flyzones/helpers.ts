@@ -104,12 +104,14 @@ export const createPopupContent = (title: string, description: string, mediaItem
 };
 
 export type Marker = {
-  pin: THREE.Mesh;
+  pin: THREE.Object3D;
+  isTakeoff: boolean;
   hoverAnimation: TWEEN.Tween<any>;
   unhoverAnimation: TWEEN.Tween<any>;
   showPopup: () => void;
-  isTakeoff: boolean;
   setVisibility: (visible: boolean) => void;
+  landingSpots?: THREE.Object3D[];
+  flyzone?: THREE.Object3D;
 };
 
 export const createMarker = (
@@ -153,43 +155,24 @@ export const createMarker = (
     .easing(TWEEN.Easing.Quadratic.InOut)
     .duration(PIN_FADE_DURATION);
 
-  // Create flyzone and landing spots for location markers
-  let flyzone: THREE.Mesh | null = null;
-  let landingSpots: THREE.Group[] = [];
-  
-  if (!isTakeoff && location) {
-    console.log('Creating location marker with:', {
-      hasLocation: !!location,
-      hasFlyzone: !!location.flyzone,
-      hasLandingSpots: !!location.landingSpots,
-      flyzonePoints: location.flyzone?.points.length,
-      landingSpotsCount: location.landingSpots?.length
-    });
+  // Create landing spots if this is a location marker
+  let landingSpots: THREE.Object3D[] | undefined;
+  let flyzone: THREE.Object3D | undefined;
 
-    // Create flyzone
-    if (location.flyzone) {
-      flyzone = createCustomFlyZone(location.flyzone);
-      flyzone.visible = false;
-      scene.add(flyzone);
-      console.log('Created flyzone:', {
-        position: flyzone.position,
-        visible: flyzone.visible
-      });
-    }
-    
-    // Create landing spots
+  if (location && !isTakeoff) {
     if (location.landingSpots) {
       landingSpots = location.landingSpots.map(spot => {
         const marker = createLandingSpotMarker(spot, popupContainer);
         marker.visible = false;
         scene.add(marker);
-        console.log('Created landing spot:', {
-          title: spot.title,
-          position: spot.position,
-          visible: marker.visible
-        });
         return marker;
       });
+    }
+
+    if (location.flyzone) {
+      flyzone = createCustomFlyZone(location.flyzone);
+      flyzone.visible = false;
+      scene.add(flyzone);
     }
   }
 
@@ -214,7 +197,7 @@ export const createMarker = (
         flyzone.visible = distance < VISIBILITY_THRESHOLDS.FLYZONE;
       }
       
-      landingSpots.forEach(spot => {
+      landingSpots?.forEach(spot => {
         spot.visible = distance < VISIBILITY_THRESHOLDS.LANDING;
       });
 
@@ -259,13 +242,15 @@ export const createMarker = (
     }
   };
 
-  return { 
-    pin, 
-    hoverAnimation: hover, 
-    unhoverAnimation: unhover, 
-    showPopup, 
-    isTakeoff: pin.userData.isTakeoff,
-    setVisibility 
+  return {
+    pin,
+    isTakeoff,
+    hoverAnimation: hover,
+    unhoverAnimation: unhover,
+    showPopup,
+    setVisibility,
+    landingSpots,
+    flyzone
   };
 };
 

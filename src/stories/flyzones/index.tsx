@@ -8,7 +8,7 @@ import { StoryOptions } from "../types";
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { Takeoff, Media, Location } from "./locations";
 import {
-  TAKEOFF_VISIBILITY_THRESHOLD,
+  TAKEOFF_VISIBILITY_THRESHOLD, 
   createMarker,
   type Marker,
   setupLabelRenderer,
@@ -20,24 +20,27 @@ const FlyZones = {
   load: async (options: StoryOptions) => {
     const { camera, scene, renderer, controls } = options;
 
+    // Add mode tracking
+    let currentMode: 'location' | 'takeoff' = 'location';
+
     const navigateTo = (position: THREE.Vector3, location?: Location) => {
       const lookAtPos = position.clone();
       
       if (location) {
+        // Switching to location mode
+        currentMode = 'location';
         // Use location's camera configuration
         const view = location.cameraView;
         const distance = view.distance || 20000;
         
-        // Calculate camera position based on the configured direction and distance
         const cameraDirection = view.position.clone().multiplyScalar(distance);
         const cameraPos = position.clone().add(cameraDirection);
-        
-        // Use specific lookAt point if provided, otherwise look at location position
         const lookAt = view.lookAt ? view.lookAt.clone() : lookAtPos;
         
         camera.animateTo(cameraPos, lookAt, 1000, controls);
       } else {
-        // Default behavior for takeoffs or when no location is provided
+        // Switching to takeoff mode
+        currentMode = 'takeoff';
         const offset = 3000;
         const cameraPos = position.clone().add(new THREE.Vector3(offset, offset, offset));
         camera.animateTo(cameraPos, lookAtPos, 1000, controls);
@@ -144,10 +147,37 @@ const FlyZones = {
       // Update marker visibility
       markers.forEach(marker => {
         const distance = camera.position.distanceTo(marker.pin.position);
-        const shouldBeVisible = marker.isTakeoff 
-          ? distance < VISIBILITY_THRESHOLDS.TAKEOFF_PIN
-          : distance > VISIBILITY_THRESHOLDS.LOCATION_PIN;
-        marker.setVisibility(shouldBeVisible);
+        
+        if (currentMode === 'location') {
+          // In location mode, only show location markers
+          marker.setVisibility(!marker.isTakeoff && distance > VISIBILITY_THRESHOLDS.LOCATION_PIN);
+          
+          // Hide all landing spots and fly zones
+          if (marker.landingSpots) {
+            marker.landingSpots.forEach(spot => {
+              spot.visible = false;
+            });
+          }
+          if (marker.flyzone) {
+            marker.flyzone.visible = false;
+          }
+        } else {
+          // In takeoff mode, show everything based on distance
+          const shouldBeVisible = marker.isTakeoff 
+            ? distance < VISIBILITY_THRESHOLDS.TAKEOFF_PIN
+            : distance > VISIBILITY_THRESHOLDS.LOCATION_PIN;
+          marker.setVisibility(shouldBeVisible);
+
+          // Show landing spots and fly zones based on distance
+          if (marker.landingSpots) {
+            marker.landingSpots.forEach(spot => {
+              spot.visible = distance < VISIBILITY_THRESHOLDS.LANDING;
+            });
+          }
+          if (marker.flyzone) {
+            marker.flyzone.visible = distance < VISIBILITY_THRESHOLDS.FLYZONE;
+          }
+        }
       });
 
       // Update hover states
