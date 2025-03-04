@@ -419,8 +419,8 @@ export const createCustomFlyZone = (shape: FlyZoneShape) => {
     const material = new THREE.MeshBasicMaterial({
       color: color,
       transparent: true,
-      opacity: 0.2,
-      wireframe: true
+      opacity: 0.3,
+      wireframe: false
     });
     
     // Create box mesh
