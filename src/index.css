@@ -42,13 +42,24 @@ body {
   position: absolute;
   top: 20px;
   left: 20px;
+  z-index: 1000;
+  pointer-events: auto;
 }
 
 .points button {
   padding: 5px 10px;
-  border-radius: 5%;
+  border-radius: 5px;
   font-family: Helvetica, Arial, sans-serif;
   text-align: center;
+  margin-bottom: 5px;
+  background: white;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  display: block;
+}
+
+.points button:hover {
+  background: #f0f0f0;
 }
 
 .UIBox {
