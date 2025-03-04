@@ -12,7 +12,8 @@ import {
   createMarker,
   type Marker,
   setupLabelRenderer,
-  setupPopupContainer
+  setupPopupContainer,
+  VISIBILITY_THRESHOLDS
 } from './helpers';
 
 const FlyZones = {
@@ -43,7 +44,8 @@ const FlyZones = {
         scene,
         popupContainer,
         navigateTo,
-        location  // Pass the entire location object
+        location,  // Pass the location object
+        camera     // Pass the camera
       );
       console.log('Created location marker:', {
         title: location.title,
@@ -62,7 +64,8 @@ const FlyZones = {
           scene,
           popupContainer,
           navigateTo,
-          location  // Pass the location object for context
+          location,  // Pass the location object
+          camera     // Pass the camera
         );
       });
 
@@ -89,26 +92,18 @@ const FlyZones = {
         onMouseMove(event);
         
         raycaster.setFromCamera(mouse, camera);
-        // Only intersect with visible objects
         const intersects = raycaster.intersectObjects(
           scene.children.filter(obj => obj.visible)
         );
         
-        console.log('Click intersects:', intersects.map(i => ({
-          type: i.object.userData.type,
-          isTakeoff: i.object.userData.isTakeoff,
-          visible: i.object.visible
-        })));
-        
-        const clickedMarker = intersects.find(i => i.object.userData.hoverable)?.object;
-        if (clickedMarker) {
-          console.log('Clicked on marker:', {
-            type: clickedMarker.userData.type,
-            isTakeoff: clickedMarker.userData.isTakeoff,
-            visible: clickedMarker.visible
-          });
-          const marker = markers.find(m => m.pin === clickedMarker);
-          marker?.showPopup();
+        const clickedObject = intersects.find(i => i.object.userData.clickable)?.object;
+        if (clickedObject) {
+          if (clickedObject.userData.type === 'landing') {
+            clickedObject.userData.showPopup();
+          } else {
+            const marker = markers.find(m => m.pin === clickedObject);
+            marker?.showPopup();
+          }
         }
       };
 
@@ -133,8 +128,8 @@ const FlyZones = {
       markers.forEach(marker => {
         const distance = camera.position.distanceTo(marker.pin.position);
         const shouldBeVisible = marker.isTakeoff 
-          ? distance < TAKEOFF_VISIBILITY_THRESHOLD
-          : distance > TAKEOFF_VISIBILITY_THRESHOLD;
+          ? distance < VISIBILITY_THRESHOLDS.TAKEOFF_PIN
+          : distance > VISIBILITY_THRESHOLDS.LOCATION_PIN;
         marker.setVisibility(shouldBeVisible);
       });
 

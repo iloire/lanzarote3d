@@ -31,6 +31,7 @@ export type LandingSpot = {
   position: THREE.Vector3;
   coordinates: GPS;
   safety: 'primary' | 'secondary' | 'emergency';
+  mediaItems: Media[];
 };
 
 export type FlyZonePoint = {

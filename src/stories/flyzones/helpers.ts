@@ -32,6 +32,14 @@ export const LANDING_COLORS = {
   emergency: 0xff0000
 };
 
+// Add new constants for visibility thresholds
+export const VISIBILITY_THRESHOLDS = {
+  LOCATION_PIN: 15000, // Show location pin when far
+  TAKEOFF_PIN: 15000,  // Show takeoff pins when close
+  FLYZONE: 20000,      // Show flyzone when moderately close
+  LANDING: 15000       // Show landing spots when close
+};
+
 export const createPinMesh = (isTakeoff: boolean) => {
   const colors = isTakeoff ? PIN_COLORS.takeoff : PIN_COLORS.location;
   const sizes = isTakeoff ? PIN_SIZES.takeoff : PIN_SIZES.location;
@@ -113,7 +121,8 @@ export const createMarker = (
   scene: THREE.Scene,
   popupContainer: HTMLDivElement,
   navigateTo: (position: THREE.Vector3, showTakeoffs: boolean) => void,
-  location?: Location
+  location: Location | undefined,
+  camera: THREE.Camera
 ): Marker => {
   console.log('Creating marker:', {
     title,
@@ -171,7 +180,7 @@ export const createMarker = (
     // Create landing spots
     if (location.landingSpots) {
       landingSpots = location.landingSpots.map(spot => {
-        const marker = createLandingSpotMarker(spot);
+        const marker = createLandingSpotMarker(spot, popupContainer);
         marker.visible = false;
         scene.add(marker);
         console.log('Created landing spot:', {
@@ -185,19 +194,30 @@ export const createMarker = (
   }
 
   const setVisibility = (visible: boolean) => {
+    const distance = camera.position.distanceTo(position);
+    
     if (visible !== pin.visible) {
       fadeAnimation.stop();
-      pin.visible = visible;
-      label.visible = visible;
       
-      // Show/hide flyzone and landing spots
-      if (flyzone) {
-        flyzone.visible = visible;
+      // Location pin visibility (show when far)
+      if (!isTakeoff) {
+        pin.visible = distance > VISIBILITY_THRESHOLDS.LOCATION_PIN;
+        label.visible = distance > VISIBILITY_THRESHOLDS.LOCATION_PIN;
+      } else {
+        // Takeoff pin visibility (show when close)
+        pin.visible = distance < VISIBILITY_THRESHOLDS.TAKEOFF_PIN;
+        label.visible = distance < VISIBILITY_THRESHOLDS.TAKEOFF_PIN;
       }
-      landingSpots.forEach(spot => {
-        spot.visible = visible;
-      });
+
+      // Flyzone and landing spots visibility (show when close to location)
+      if (flyzone) {
+        flyzone.visible = distance < VISIBILITY_THRESHOLDS.FLYZONE;
+      }
       
+      landingSpots.forEach(spot => {
+        spot.visible = distance < VISIBILITY_THRESHOLDS.LANDING;
+      });
+
       fadeAnimation
         .to({ opacity: visible ? 0.8 : 0 }, PIN_FADE_DURATION)
         .start();
@@ -350,21 +370,24 @@ export const createCustomFlyZone = (shape: FlyZoneShape) => {
   return mesh;
 };
 
-export const createLandingSpotMarker = (landingSpot: LandingSpot) => {
+export const createLandingSpotMarker = (
+  landingSpot: LandingSpot,
+  popupContainer: HTMLDivElement
+) => {
   // Create a flat circle with an arrow pointing down
-  const circleGeometry = new THREE.CircleGeometry(200, 32); // Increased size
-  const arrowGeometry = new THREE.ConeGeometry(100, 200, 32); // Increased size
+  const circleGeometry = new THREE.CircleGeometry(200, 32);
+  const arrowGeometry = new THREE.ConeGeometry(100, 200, 32);
   
   const material = new THREE.MeshBasicMaterial({
     color: LANDING_COLORS[landingSpot.safety],
     transparent: true,
     opacity: 0.8,
     side: THREE.DoubleSide,
-    depthWrite: false // Ensure transparency works correctly
+    depthWrite: false
   });
 
   const circle = new THREE.Mesh(circleGeometry, material);
-  circle.rotation.x = -Math.PI / 2; // Lay flat
+  circle.rotation.x = -Math.PI / 2;
   
   const arrow = new THREE.Mesh(arrowGeometry, material);
   arrow.position.y = 100;
@@ -376,8 +399,37 @@ export const createLandingSpotMarker = (landingSpot: LandingSpot) => {
   
   // Add label
   const label = createLabel(landingSpot.title);
-  label.position.y = 300; // Raised label position
+  label.position.y = 300;
   group.add(label);
+
+  // Add user data for interaction
+  circle.userData.hoverable = true;
+  circle.userData.clickable = true;
+  circle.userData.type = 'landing';
+  circle.userData.landingSpot = landingSpot;
+
+  // Add click handler
+  const showPopup = () => {
+    console.log('Showing landing spot popup for:', landingSpot.title);
+    popupContainer.style.display = 'block';
+    const content = createPopupContent(
+      landingSpot.title,
+      landingSpot.description,
+      landingSpot.mediaItems
+    );
+    popupContainer.innerHTML = content;
+
+    const closeButton = popupContainer.querySelector('.close-popup');
+    if (closeButton) {
+      closeButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        popupContainer.style.display = 'none';
+      });
+    }
+  };
+
+  circle.userData.showPopup = showPopup;
+  arrow.userData.showPopup = showPopup;
   
   return group;
 }; 
