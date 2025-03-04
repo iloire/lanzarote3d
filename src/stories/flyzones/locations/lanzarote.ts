@@ -109,7 +109,11 @@ const locations: Location[] = [
           }
         ]
       }
-    ]
+    ],
+    cameraView: {
+      position: new THREE.Vector3(1, 0.7, -1).normalize(), // View from Northeast
+      distance: 5000 // Distance in world units
+    }
   },
   {
     id: "tenesar",
@@ -265,7 +269,11 @@ const locations: Location[] = [
           }
         ]
       }
-    ]
+    ],
+    cameraView: {
+      position: new THREE.Vector3(-0.5, 0.7, -1).normalize(), // View from Southeast
+      distance: 4000
+    }
   },
   {
     id: "orzola",
@@ -387,7 +395,11 @@ const locations: Location[] = [
           }
         ]
       }
-    ]
+    ],
+    cameraView: {
+      position: new THREE.Vector3(0, 0.7, -1).normalize(), // View from South
+      distance: 4500
+    }
   },
   {
     id: "playa-quemada",
@@ -510,7 +522,11 @@ const locations: Location[] = [
           }
         ]
       }
-    ]
+    ],
+    cameraView: {
+      position: new THREE.Vector3(0.5, 0.7, -1).normalize(), // View from Southwest
+      distance: 4000
+    }
   }
 ];
 

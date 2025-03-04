@@ -120,7 +120,7 @@ export const createMarker = (
   isTakeoff: boolean,
   scene: THREE.Scene,
   popupContainer: HTMLDivElement,
-  navigateTo: (position: THREE.Vector3, showTakeoffs: boolean) => void,
+  navigateTo: (position: THREE.Vector3, location?: Location) => void,
   location: Location | undefined,
   camera: THREE.Camera
 ): Marker => {
@@ -255,7 +255,7 @@ export const createMarker = (
         });
       }
     } else {
-      navigateTo(position, true);
+      navigateTo(position, location);
     }
   };
 

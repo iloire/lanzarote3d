@@ -20,11 +20,28 @@ const FlyZones = {
   load: async (options: StoryOptions) => {
     const { camera, scene, renderer, controls } = options;
 
-    const navigateTo = (position: THREE.Vector3, showTakeoffs: boolean = false) => {
+    const navigateTo = (position: THREE.Vector3, location?: Location) => {
       const lookAtPos = position.clone();
-      const offset = showTakeoffs ? 3000 : 20000;
-      const cameraPos = position.clone().add(new THREE.Vector3(offset, offset, offset));
-      camera.animateTo(cameraPos, lookAtPos, 1000, controls);
+      
+      if (location) {
+        // Use location's camera configuration
+        const view = location.cameraView;
+        const distance = view.distance || 20000;
+        
+        // Calculate camera position based on the configured direction and distance
+        const cameraDirection = view.position.clone().multiplyScalar(distance);
+        const cameraPos = position.clone().add(cameraDirection);
+        
+        // Use specific lookAt point if provided, otherwise look at location position
+        const lookAt = view.lookAt ? view.lookAt.clone() : lookAtPos;
+        
+        camera.animateTo(cameraPos, lookAt, 1000, controls);
+      } else {
+        // Default behavior for takeoffs or when no location is provided
+        const offset = 3000;
+        const cameraPos = position.clone().add(new THREE.Vector3(offset, offset, offset));
+        camera.animateTo(cameraPos, lookAtPos, 1000, controls);
+      }
     };
 
     // Setup renderers and containers
@@ -166,7 +183,7 @@ const FlyZones = {
       const root = createRoot(rootElement);
       const buttons = locations.map(location => (
         <div key={location.id}>
-          <button onClick={() => navigateTo(location.position, true)}>
+          <button onClick={() => navigateTo(location.position, location)}>
             {location.title}
           </button>
         </div>

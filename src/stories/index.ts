@@ -18,6 +18,7 @@ import Terrain from "./terrain";
 import Voxel from "./voxel";
 import Workshop from "./workshop";
 import Helmet from "./helmet";
+import VoxelExample from "./voxel/index";
 
 export type StoryFunction = (options: StoryOptions) => Promise<any>;
 
@@ -40,6 +41,7 @@ const Stories: Record<string, StoryFunction> = {
   pilot: Pilot.load,
   terrain: Terrain.load,
   voxel: Voxel.load,
+  voxelExample: VoxelExample.load,  
   workshop: Workshop.load,
 };
 

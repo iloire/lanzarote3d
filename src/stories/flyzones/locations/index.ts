@@ -46,6 +46,12 @@ export type FlyZoneShape = {
   maxHeight?: number;
 };
 
+export type CameraView = {
+  position: THREE.Vector3;  // Camera position relative to location
+  lookAt?: THREE.Vector3;   // Optional specific look-at point (defaults to location position)
+  distance?: number;        // Optional distance override
+};
+
 export type Location = {
   id: string;
   title: string;
@@ -55,6 +61,7 @@ export type Location = {
   coordinates: GPS;
   flyzone?: FlyZoneShape;
   landingSpots?: LandingSpot[];
+  cameraView: CameraView;  // Add camera view configuration
 };
 
 export type Media = {

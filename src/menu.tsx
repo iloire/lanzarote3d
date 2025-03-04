@@ -15,6 +15,7 @@ class Menu extends React.Component {
   render() {
     const stories = [
       { story: "voxel" },
+      { story: "voxelExample" },
       { story: "animation" },
       { story: "animation2" },
       { story: "animation3" },
