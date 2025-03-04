@@ -17,7 +17,7 @@ const locations: Location[] = [
         id: "pechos-altos",
         title: "Pechos Altos Takeoff",
         description: "Pechos Altos is a beautiful beach with a long sandy stretch and clear waters. It's a popular spot for windsurfing and kiteboarding enthusiasts.",
-        position: new THREE.Vector3(6827, 880, -555),
+        position: new THREE.Vector3(6827, 880, -655),
         coordinates: {
           latitude: 28.9167,
           longitude: -13.6333,

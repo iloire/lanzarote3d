@@ -64,15 +64,19 @@ export const createLabel = (title: string) => {
 };
 
 export const createPopupContent = (title: string, description: string, mediaItems: Media[]) => {
+  const mediaContent = mediaItems.map(mediaItem => 
+    mediaItem.type === 'image' 
+      ? `<img src="${mediaItem.url}" alt="${mediaItem.title || ''}">`
+      : `<video controls><source src="${mediaItem.url}" type="video/mp4"></video>`
+  ).join('');
+
   return `
     <div class="popup-content">
       <h2>${title}</h2>
       <p>${description || 'No description available'}</p>
-      ${mediaItems.map(mediaItem => 
-        mediaItem.type === 'image' 
-          ? `<img src="${mediaItem.url}" alt="${mediaItem.title}">`
-          : `<video controls><source src="${mediaItem.url}" type="video/mp4"></video>`
-      ).join('')}
+      <div class="media-container">
+        ${mediaContent}
+      </div>
       <button class="close-popup">Close</button>
     </div>
   `;
@@ -97,7 +101,12 @@ export const createMarker = (
   popupContainer: HTMLDivElement,
   navigateTo: (position: THREE.Vector3, showTakeoffs: boolean) => void
 ): Marker => {
-  console.log('createMarker', isTakeoff, title, description);
+  console.log('Creating marker:', {
+    title,
+    isTakeoff,
+    mediaItems,
+    hasPopupContainer: !!popupContainer
+  });
   const pin = createPinMesh(isTakeoff);
   pin.position.copy(position);
   pin.position.y += isTakeoff ? 20 : 40;
@@ -105,6 +114,11 @@ export const createMarker = (
   pin.visible = !isTakeoff;
   pin.userData.hoverable = true;
   pin.userData.clickable = true;
+  pin.userData.type = isTakeoff ? 'takeoff' : 'location';
+  pin.userData.isTakeoff = isTakeoff;
+  
+  // Make sure the pin can receive raycasts
+  pin.raycast = new THREE.Mesh().raycast;
 
   const { hover, unhover } = createHoverAnimations(pin, isTakeoff);
   
@@ -131,18 +145,48 @@ export const createMarker = (
   };
 
   const showPopup = () => {
-    if (isTakeoff) {
+    if (pin.userData.isTakeoff) {
+      console.log('Showing popup for:', title);
+      console.log('Popup container before:', {
+        display: popupContainer.style.display,
+        zIndex: popupContainer.style.zIndex,
+        className: popupContainer.className
+      });
+      
       popupContainer.style.display = 'block';
-      popupContainer.innerHTML = createPopupContent(title, description, mediaItems);
-      popupContainer.querySelector('.close-popup')?.addEventListener('click', 
-        () => { popupContainer.style.display = 'none'; }
-      );
+      const content = createPopupContent(title, description, mediaItems);
+      popupContainer.innerHTML = content;
+      
+      // Force a reflow
+      void popupContainer.offsetHeight;
+      
+      console.log('Popup container after:', {
+        display: popupContainer.style.display,
+        zIndex: popupContainer.style.zIndex,
+        className: popupContainer.className,
+        content: popupContainer.innerHTML
+      });
+
+      const closeButton = popupContainer.querySelector('.close-popup');
+      if (closeButton) {
+        closeButton.addEventListener('click', (e) => {
+          e.stopPropagation();
+          popupContainer.style.display = 'none';
+        });
+      }
     } else {
       navigateTo(position, true);
     }
   };
 
-  return { pin, hoverAnimation: hover, unhoverAnimation: unhover, showPopup, isTakeoff, setVisibility };
+  return { 
+    pin, 
+    hoverAnimation: hover, 
+    unhoverAnimation: unhover, 
+    showPopup, 
+    isTakeoff: pin.userData.isTakeoff,
+    setVisibility 
+  };
 };
 
 export const setupLabelRenderer = () => {
@@ -156,9 +200,26 @@ export const setupLabelRenderer = () => {
 };
 
 export const setupPopupContainer = () => {
+  // Remove existing popup container if it exists
+  const existingContainer = document.querySelector('.location-popup');
+  if (existingContainer) {
+    existingContainer.remove();
+  }
+
   const container = document.createElement('div');
   container.style.display = 'none';
   container.className = 'location-popup';
+  // Add some debug styling to make sure it's visible
+  container.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+  container.style.zIndex = '9999';
   document.body.appendChild(container);
+
+  // Debug log when display changes
+  const originalSetProperty = container.style.setProperty;
+  container.style.setProperty = function(prop, value) {
+    console.log(`Setting ${prop} to ${value}`);
+    return originalSetProperty.call(this, prop, value);
+  };
+
   return container;
 }; 

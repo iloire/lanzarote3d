@@ -29,33 +29,49 @@ const FlyZones = {
     // Setup renderers and containers
     const labelRenderer = setupLabelRenderer();
     const popupContainer = setupPopupContainer();
+    console.log('Initialized popup container:', popupContainer); // Debug log
 
     // Create markers
-    const markers = locations.reduce((allMarkers, location) => [
-      ...allMarkers,
-      createMarker(
+    const markers = locations.reduce((allMarkers, location) => {
+      // Create location marker
+      const locationMarker = createMarker(
         location.position,
         location.title,
         location.description,
         [],
-        false,
+        false, // isTakeoff = false
         scene,
         popupContainer,
         navigateTo
-      ),
-      ...location.takeoffs.map(takeoff =>
-        createMarker(
+      );
+      console.log('Created location marker:', {
+        title: location.title,
+        isTakeoff: locationMarker.isTakeoff,
+        pinType: locationMarker.pin.userData.type
+      });
+
+      // Create takeoff markers
+      const takeoffMarkers = location.takeoffs.map(takeoff => {
+        const marker = createMarker(
           takeoff.position,
           takeoff.title,
           takeoff.description,
           takeoff.mediaItems,
-          true,
+          true, // isTakeoff = true
           scene,
           popupContainer,
           navigateTo
-        )
-      )
-    ], [] as Marker[]);
+        );
+        console.log('Created takeoff marker:', {
+          title: takeoff.title,
+          isTakeoff: marker.isTakeoff,
+          pinType: marker.pin.userData.type
+        });
+        return marker;
+      });
+
+      return [...allMarkers, locationMarker, ...takeoffMarkers];
+    }, [] as Marker[]);
 
     console.log(markers);
 
@@ -66,16 +82,47 @@ const FlyZones = {
       const mouse = new THREE.Vector2();
       let hoveredObject: THREE.Object3D | null = null;
 
-      window.addEventListener('mousemove', (event) => {
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-      });
+      const onMouseMove = (event: MouseEvent) => {
+        const rect = renderer.domElement.getBoundingClientRect();
+        mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+      };
 
-      window.addEventListener('click', () => {
-        if (hoveredObject) {
-          markers.find(m => m.pin === hoveredObject)?.showPopup();
+      const onClick = (event: MouseEvent) => {
+        console.log('Canvas clicked', event);
+        onMouseMove(event);
+        
+        raycaster.setFromCamera(mouse, camera);
+        // Only intersect with visible objects
+        const intersects = raycaster.intersectObjects(
+          scene.children.filter(obj => obj.visible)
+        );
+        
+        console.log('Click intersects:', intersects.map(i => ({
+          type: i.object.userData.type,
+          isTakeoff: i.object.userData.isTakeoff,
+          visible: i.object.visible
+        })));
+        
+        const clickedMarker = intersects.find(i => i.object.userData.hoverable)?.object;
+        if (clickedMarker) {
+          console.log('Clicked on marker:', {
+            type: clickedMarker.userData.type,
+            isTakeoff: clickedMarker.userData.isTakeoff,
+            visible: clickedMarker.visible
+          });
+          const marker = markers.find(m => m.pin === clickedMarker);
+          marker?.showPopup();
         }
-      });
+      };
+
+      // Add event listeners
+      renderer.domElement.addEventListener('mousemove', onMouseMove);
+      renderer.domElement.addEventListener('click', onClick);
+      
+      // Make sure canvas can receive focus and events
+      renderer.domElement.style.outline = 'none';
+      renderer.domElement.tabIndex = 1;
 
       return { raycaster, mouse, hoveredObject };
     };
@@ -90,23 +137,23 @@ const FlyZones = {
       markers.forEach(marker => {
         const distance = camera.position.distanceTo(marker.pin.position);
         const shouldBeVisible = marker.isTakeoff 
-          ? distance < TAKEOFF_VISIBILITY_THRESHOLD  // Show takeoffs when CLOSE
-          : distance > TAKEOFF_VISIBILITY_THRESHOLD; // Show locations when FAR
-        
-        console.log({
-          type: marker.isTakeoff ? 'takeoff' : 'location',
-          distance: Math.round(distance),
-          threshold: TAKEOFF_VISIBILITY_THRESHOLD,
-          shouldBeVisible,
-          currentlyVisible: marker.pin.visible
-        });
-        
+          ? distance < TAKEOFF_VISIBILITY_THRESHOLD
+          : distance > TAKEOFF_VISIBILITY_THRESHOLD;
         marker.setVisibility(shouldBeVisible);
       });
 
       // Update hover states
       raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(scene.children);
+      const intersects = raycaster.intersectObjects(
+        scene.children.filter(obj => obj.visible)
+      );
+      
+      // Only log raycast hits if they're hoverable
+      const hoverableHits = intersects.filter(i => i.object.userData.hoverable);
+      if (hoverableHits.length > 0) {
+        // console.log('Hovering over:', hoverableHits.map(i => i.object.userData.type));
+      }
+
       const hoveredMarker = intersects.find(i => i.object.userData.hoverable)?.object;
 
       if (hoveredMarker !== hoveredObject) {
