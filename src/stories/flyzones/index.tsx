@@ -48,71 +48,77 @@ const FlyZones = {
     console.log('Initialized popup container:', popupContainer); // Debug log
 
     // Create markers
-    const markers = locations.reduce((allMarkers, location) => {
-      // Create location marker
-      const locationMarker = createMarker(
-        location.position,
-        location.title,
-        location.description,
-        [],
-        MarkerType.LOCATION,
-        scene,
-        popupContainer,
-        navigateTo,
-        location,
-        camera
-      );
-      console.log('Created location marker:', {
-        title: location.title,
-        type: locationMarker.type,
-        pinType: locationMarker.pin.userData.type
-      });
-
-      // Create takeoff markers
-      const takeoffMarkers = location.takeoffs.map(takeoff => 
-        createMarker(
-          takeoff.position,
-          takeoff.title,
-          takeoff.description,
-          takeoff.mediaItems,
-          MarkerType.TAKEOFF,
+    const createMarkers = async () => {
+      const markerArrays = await Promise.all(locations.map(async location => {
+        // Create location marker
+        const locationMarker = await createMarker(
+          location.position,
+          location.title,
+          location.description,
+          [],
+          MarkerType.LOCATION,
           scene,
           popupContainer,
           navigateTo,
           location,
           camera
-        )
-      );
+        );
+        console.log('Created location marker:', {
+          title: location.title,
+          type: locationMarker.type,
+          pinType: locationMarker.pin.userData.type
+        });
 
-      // Create landing spot markers
-      const landingMarkers = location.landingSpots?.map(spot => 
-        createMarker(
-          spot.position,
-          spot.title,
-          spot.description,
-          spot.mediaItems,
-          MarkerType.LANDING,
-          scene,
-          popupContainer,
-          navigateTo,
-          location,
-          camera
-        )
-      ) || [];
+        // Create takeoff markers
+        const takeoffMarkers = await Promise.all(location.takeoffs.map(async takeoff => 
+          createMarker(
+            takeoff.position,
+            takeoff.title,
+            takeoff.description,
+            takeoff.mediaItems,
+            MarkerType.TAKEOFF,
+            scene,
+            popupContainer,
+            navigateTo,
+            location,
+            camera
+          )
+        ));
 
-      // Create flyzone for location
-      let flyzone;
-      if (location.flyzone) {
-        flyzone = createCustomFlyZone(location.flyzone);
-        flyzone.visible = false;
-        scene.add(flyzone);
-      }
+        // Create landing spot markers
+        const landingMarkers = await Promise.all((location.landingSpots || []).map(async spot => 
+          createMarker(
+            spot.position,
+            spot.title,
+            spot.description,
+            spot.mediaItems,
+            MarkerType.LANDING,
+            scene,
+            popupContainer,
+            navigateTo,
+            location,
+            camera
+          )
+        ));
 
-      // Associate flyzone with location marker
-      locationMarker.flyzone = flyzone;
+        // Create and associate flyzone
+        let flyzone;
+        if (location.flyzone) {
+          flyzone = createCustomFlyZone(location.flyzone);
+          flyzone.visible = false;
+          scene.add(flyzone);
+          locationMarker.flyzone = flyzone;
+        }
 
-      return [...allMarkers, locationMarker, ...takeoffMarkers, ...landingMarkers];
-    }, [] as Marker[]);
+        return [locationMarker, ...takeoffMarkers, ...landingMarkers];
+      }));
+
+      // Use reduce instead of flat()
+      return markerArrays.reduce((acc, curr) => [...acc, ...curr], []);
+    };
+
+    // Use the markers
+    const markers = await createMarkers();
 
     console.log(markers);
 
@@ -140,11 +146,22 @@ const FlyZones = {
         
         const clickedObject = intersects.find(i => i.object.userData.clickable)?.object;
         if (clickedObject) {
-          if (clickedObject.userData.type === 'landing') {
-            clickedObject.userData.showPopup();
-          } else {
-            const marker = markers.find(m => m.pin === clickedObject);
-            marker?.showPopup();
+          // Find the marker that owns this object
+          const marker = markers.find(m => {
+            // Check if it's the main pin
+            if (m.pin === clickedObject) return true;
+            
+            // Check if it's part of a landing spot
+            if (m.type === MarkerType.LANDING) {
+              // Check if clickedObject is a child of this marker's pin
+              return Array.from(m.pin.children).some(child => child === clickedObject);
+            }
+            
+            return false;
+          });
+          
+          if (marker) {
+            marker.showPopup();
           }
         }
       };

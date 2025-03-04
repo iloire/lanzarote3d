@@ -4,6 +4,8 @@ import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { Media } from "./locations";
 import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { FlyZoneShape, LandingSpot, Location } from "./locations/index";
+import Paraglider from '../../components/paraglider';
+import { PilotHeadType } from "../../components/parts/pilot-head";
 
 // Constants
 export const TAKEOFF_VISIBILITY_THRESHOLD = 15000;
@@ -74,13 +76,20 @@ export const createBounceAnimation = (pin: THREE.Mesh, isTakeoff: boolean) => {
     .start();
 };
 
-export const createHoverAnimations = (pin: THREE.Mesh, isTakeoff: boolean) => {
-  const colors = isTakeoff ? PIN_COLORS[MarkerType.TAKEOFF] : PIN_COLORS[MarkerType.LOCATION];
+export const createHoverAnimations = (pin: THREE.Object3D, isTakeoff: boolean) => {
+  if (isMeshWithMaterial(pin)) {
+    const colors = isTakeoff ? PIN_COLORS[MarkerType.TAKEOFF] : PIN_COLORS[MarkerType.LOCATION];
+    return {
+      hover: new TWEEN.Tween(pin.material)
+        .to({ opacity: 1, emissive: new THREE.Color(colors.main) }, 200),
+      unhover: new TWEEN.Tween(pin.material)
+        .to({ opacity: 0.8, emissive: new THREE.Color(colors.emissive) }, 200)
+    };
+  }
+  // Return no-op animations for non-mesh objects
   return {
-    hover: new TWEEN.Tween(pin.material)
-      .to({ opacity: 1, emissive: new THREE.Color(colors.main) }, 200),
-    unhover: new TWEEN.Tween(pin.material)
-      .to({ opacity: 0.8, emissive: new THREE.Color(colors.emissive) }, 200)
+    hover: new TWEEN.Tween({}).to({}, 0),
+    unhover: new TWEEN.Tween({}).to({}, 0)
   };
 };
 
@@ -112,18 +121,23 @@ export const createPopupContent = (title: string, description: string, mediaItem
   `;
 };
 
+// Update Marker type to handle both types
 export type Marker = {
-  pin: THREE.Mesh<THREE.BufferGeometry, THREE.MeshPhongMaterial>;
+  pin: THREE.Object3D;  // More generic type to handle both Paraglider and Mesh
   type: MarkerType;
   hoverAnimation: TWEEN.Tween<any>;
   unhoverAnimation: TWEEN.Tween<any>;
   showPopup: () => void;
   setVisibility: (visible: boolean) => void;
-  landingSpots?: THREE.Object3D[];
   flyzone?: THREE.Object3D;
 };
 
-export const createMarker = (
+// Add type guard
+const isMeshWithMaterial = (obj: THREE.Object3D): obj is THREE.Mesh<THREE.BufferGeometry, THREE.MeshPhongMaterial> => {
+  return obj instanceof THREE.Mesh && 'material' in obj;
+};
+
+export const createMarker = async (
   position: THREE.Vector3,
   title: string,
   description: string,
@@ -134,9 +148,45 @@ export const createMarker = (
   navigateTo: (position: THREE.Vector3, location?: Location) => void,
   location: Location | undefined,
   camera: THREE.Camera
-): Marker => {
-  // Create the basic pin structure
-  const pin = createPinMesh(type);
+): Promise<Marker> => {
+
+  const gliderOptions = {
+    wingColor1: '#c30010',
+    wingColor2: '#b100cd',
+    breakColor: '#ffffff',
+    lineFrontColor: '#ffffff',
+    lineBackColor: '#ffffff',
+    inletsColor: '#333333',
+    numeroCajones: 40,
+    bandLength: 500,
+    carabinersSeparationMM: 300
+  };
+  const pilotOptions = {
+    head: {
+      headType: PilotHeadType.Default,
+      helmetOptions: {
+        color: '#ffffff',
+        color2: '#cccccc',
+        color3: '#999999'
+      }
+    },
+    carabinerColor: '#333',
+  };
+
+  const paragliderOptions = {
+    glider: gliderOptions,
+    pilot: pilotOptions
+  }
+
+  // Create pin or paraglider based on type
+  const paraglider = await new Paraglider(paragliderOptions).load();
+  const scale = 0.1;
+  paraglider.scale.set(scale, scale, scale);
+
+  const pin = type === MarkerType.TAKEOFF 
+    ? createPinMesh(type)
+    : createPinMesh(type);
+
   setupPinBasics(pin, position, type);
   scene.add(pin);
 
@@ -182,7 +232,7 @@ export const createMarker = (
 };
 
 // Helper functions
-const setupPinBasics = (pin: THREE.Mesh, position: THREE.Vector3, type: MarkerType) => {
+const setupPinBasics = (pin: THREE.Object3D, position: THREE.Vector3, type: MarkerType) => {
   pin.position.copy(position);
   pin.position.y += type === MarkerType.LOCATION ? 40 : 20;
   pin.rotation.x = Math.PI;
@@ -190,37 +240,25 @@ const setupPinBasics = (pin: THREE.Mesh, position: THREE.Vector3, type: MarkerTy
   pin.userData.hoverable = true;
   pin.userData.clickable = true;
   pin.userData.type = type;
-  pin.raycast = new THREE.Mesh().raycast;
-};
-
-const createFadeAnimation = (pin: THREE.Mesh) => {
-  return new TWEEN.Tween(pin.material)
-    .easing(TWEEN.Easing.Quadratic.InOut)
-    .duration(PIN_FADE_DURATION);
-};
-
-const createLocationElements = (location: Location | undefined, scene: THREE.Scene, popupContainer: HTMLDivElement) => {
-  if (!location) return { landingSpots: undefined, flyzone: undefined };
-
-  const landingSpots = location.landingSpots?.map(spot => {
-    const marker = createLandingSpotMarker(spot, popupContainer);
-    marker.visible = false;
-    scene.add(marker);
-    return marker;
-  });
-
-  let flyzone;
-  if (location.flyzone) {
-    flyzone = createCustomFlyZone(location.flyzone);
-    flyzone.visible = false;
-    scene.add(flyzone);
+  if (pin instanceof THREE.Mesh) {
+    pin.raycast = new THREE.Mesh().raycast;
   }
-
-  return { landingSpots, flyzone };
 };
 
+const createFadeAnimation = (pin: THREE.Object3D) => {
+  if (isMeshWithMaterial(pin)) {
+    return new TWEEN.Tween(pin.material)
+      .easing(TWEEN.Easing.Quadratic.InOut)
+      .duration(PIN_FADE_DURATION);
+  }
+  // Return no-op animation for non-mesh objects
+  return new TWEEN.Tween({}).to({}, 0);
+};
+
+
+// Update createVisibilityHandler
 const createVisibilityHandler = (params: {
-  pin: THREE.Mesh<THREE.BufferGeometry, THREE.MeshPhongMaterial>,
+  pin: THREE.Object3D,  // More generic type
   label: CSS2DObject,
   type: MarkerType,
   position: THREE.Vector3,
@@ -233,18 +271,19 @@ const createVisibilityHandler = (params: {
     const distance = camera.position.distanceTo(position);
     const isDetailView = distance < VISIBILITY_THRESHOLDS.DETAIL_VIEW;
     
-    // Set pin and label visibility
     pin.visible = type === MarkerType.LOCATION 
       ? visible && !isDetailView 
       : visible && isDetailView;
     label.visible = pin.visible;
 
-    // Handle fade animation
-    if (pin.material.opacity !== (pin.visible ? 0.8 : 0)) {
-      fadeAnimation.stop();
-      fadeAnimation
-        .to({ opacity: pin.visible ? 0.8 : 0 }, PIN_FADE_DURATION)
-        .start();
+    // Handle fade animation only for mesh pins
+    if (isMeshWithMaterial(pin)) {
+      if (pin.material.opacity !== (pin.visible ? 0.8 : 0)) {
+        fadeAnimation.stop();
+        fadeAnimation
+          .to({ opacity: pin.visible ? 0.8 : 0 }, PIN_FADE_DURATION)
+          .start();
+      }
     }
   };
 };
