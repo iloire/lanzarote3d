@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { Media } from "./locations";
+import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 
 // Constants
 export const TAKEOFF_VISIBILITY_THRESHOLD = 15000;
@@ -96,6 +97,7 @@ export const createMarker = (
   popupContainer: HTMLDivElement,
   navigateTo: (position: THREE.Vector3, showTakeoffs: boolean) => void
 ): Marker => {
+  console.log('createMarker', isTakeoff, title, description);
   const pin = createPinMesh(isTakeoff);
   pin.position.copy(position);
   pin.position.y += isTakeoff ? 20 : 40;
@@ -140,4 +142,22 @@ export const createMarker = (
   };
 
   return { pin, hoverAnimation: hover, unhoverAnimation: unhover, showPopup, isTakeoff, setVisibility };
+};
+
+export const setupLabelRenderer = () => {
+  const labelRenderer = new CSS2DRenderer();
+  labelRenderer.setSize(window.innerWidth, window.innerHeight);
+  labelRenderer.domElement.style.position = 'absolute';
+  labelRenderer.domElement.style.top = '0px';
+  labelRenderer.domElement.style.pointerEvents = 'none';
+  document.body.appendChild(labelRenderer.domElement);
+  return labelRenderer;
+};
+
+export const setupPopupContainer = () => {
+  const container = document.createElement('div');
+  container.style.display = 'none';
+  container.className = 'location-popup';
+  document.body.appendChild(container);
+  return container;
 }; 

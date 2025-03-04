@@ -9,37 +9,15 @@ import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRe
 import { Takeoff, Media, Location } from "./locations";
 import {
   TAKEOFF_VISIBILITY_THRESHOLD,
-  PIN_FADE_DURATION,
-  createPinMesh,
-  createLabel,
-  createPopupContent,
-  createHoverAnimations,
   createMarker,
-  type Marker
+  type Marker,
+  setupLabelRenderer,
+  setupPopupContainer
 } from './helpers';
 
 const FlyZones = {
   load: async (options: StoryOptions) => {
     const { camera, scene, renderer, controls } = options;
-    
-    // Setup functions
-    const setupLabelRenderer = () => {
-      const labelRenderer = new CSS2DRenderer();
-      labelRenderer.setSize(window.innerWidth, window.innerHeight);
-      labelRenderer.domElement.style.position = 'absolute';
-      labelRenderer.domElement.style.top = '0px';
-      labelRenderer.domElement.style.pointerEvents = 'none';
-      document.body.appendChild(labelRenderer.domElement);
-      return labelRenderer;
-    };
-
-    const setupPopupContainer = () => {
-      const container = document.createElement('div');
-      container.style.display = 'none';
-      container.className = 'location-popup';
-      document.body.appendChild(container);
-      return container;
-    };
 
     const navigateTo = (position: THREE.Vector3, showTakeoffs: boolean = false) => {
       const lookAtPos = position.clone();
@@ -56,21 +34,21 @@ const FlyZones = {
     const markers = locations.reduce((allMarkers, location) => [
       ...allMarkers,
       createMarker(
-        location.position, 
-        location.title, 
-        location.description, 
-        [], 
+        location.position,
+        location.title,
+        location.description,
+        [],
         false,
         scene,
         popupContainer,
         navigateTo
       ),
-      ...location.takeoffs.map(takeoff => 
+      ...location.takeoffs.map(takeoff =>
         createMarker(
-          takeoff.position, 
-          takeoff.title, 
-          takeoff.description, 
-          takeoff.mediaItems, 
+          takeoff.position,
+          takeoff.title,
+          takeoff.description,
+          takeoff.mediaItems,
           true,
           scene,
           popupContainer,
@@ -80,7 +58,7 @@ const FlyZones = {
     ], [] as Marker[]);
 
     console.log(markers);
-    
+
 
     // Setup interaction
     const setupInteraction = () => {
@@ -107,23 +85,23 @@ const FlyZones = {
     // Render loop
     const animate = () => {
       TWEEN.update();
-      
+
       // Update marker visibility
       markers.forEach(marker => {
         const distance = camera.position.distanceTo(marker.pin.position);
-        const shouldBeVisible = marker.isTakeoff 
+        const shouldBeVisible = marker.isTakeoff
           ? distance < TAKEOFF_VISIBILITY_THRESHOLD  // Show takeoffs only when CLOSE
           : distance >= TAKEOFF_VISIBILITY_THRESHOLD; // Show locations only when FAR
         marker.setVisibility(shouldBeVisible);
         console.log(shouldBeVisible, marker.isTakeoff ? 'takeoff' : 'location', distance);
 
       });
-      
+
       // Update hover states
       raycaster.setFromCamera(mouse, camera);
       const intersects = raycaster.intersectObjects(scene.children);
       const hoveredMarker = intersects.find(i => i.object.userData.hoverable)?.object;
-      
+
       if (hoveredMarker !== hoveredObject) {
         markers.find(m => m.pin === hoveredObject)?.unhoverAnimation.start();
         markers.find(m => m.pin === hoveredMarker)?.hoverAnimation.start();
@@ -139,7 +117,7 @@ const FlyZones = {
     const createUI = () => {
       const rootElement = document.getElementById("legend-points");
       if (!rootElement) return;
-      
+
       const root = createRoot(rootElement);
       const buttons = locations.map(location => (
         <div key={location.id}>
