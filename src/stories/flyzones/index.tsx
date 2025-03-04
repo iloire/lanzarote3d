@@ -18,6 +18,8 @@ import {
   createCustomFlyZone
 } from './helpers';
 
+
+
 const FlyZones = {
   load: async (options: StoryOptions) => {
     const { camera, scene, renderer, controls } = options;
@@ -141,25 +143,27 @@ const FlyZones = {
         
         raycaster.setFromCamera(mouse, camera);
         const intersects = raycaster.intersectObjects(
-          scene.children.filter(obj => obj.visible)
+          scene.children.filter(obj => obj.visible),
+          true  // Set to true to check descendants
         );
         
         const clickedObject = intersects.find(i => i.object.userData.clickable)?.object;
         if (clickedObject) {
-          // Find the marker that owns this object
-          const marker = markers.find(m => {
-            // Check if it's the main pin
-            if (m.pin === clickedObject) return true;
+          // Find the marker by traversing up the object hierarchy
+          const findRootMarker = (obj: THREE.Object3D): Marker | undefined => {
+            // Check if this object is a root marker
+            const marker = markers.find(m => m.pin === obj);
+            if (marker) return marker;
             
-            // Check if it's part of a landing spot
-            if (m.type === MarkerType.LANDING) {
-              // Check if clickedObject is a child of this marker's pin
-              return Array.from(m.pin.children).some(child => child === clickedObject);
+            // If not, check its parent
+            if (obj.parent) {
+              return findRootMarker(obj.parent);
             }
             
-            return false;
-          });
-          
+            return undefined;
+          };
+
+          const marker = findRootMarker(clickedObject);
           if (marker) {
             marker.showPopup();
           }

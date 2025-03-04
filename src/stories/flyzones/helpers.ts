@@ -20,15 +20,15 @@ export enum MarkerType {
 // Update PIN_COLORS to use MarkerType
 export const PIN_COLORS = {
   [MarkerType.LOCATION]: { main: 0xff0000, emissive: 0x440000 },
-  [MarkerType.TAKEOFF]: { main: 0x000000, emissive: 0x000044 },
-  [MarkerType.LANDING]: { main: 0x00ff00, emissive: 0x004400 },
+  [MarkerType.TAKEOFF]: { main: 0x00ff00, emissive: 0x000044 },
+  [MarkerType.LANDING]: { main: 0x0000ff, emissive: 0x004400 },
 };
 
 // Update PIN_SIZES to use MarkerType
 export const PIN_SIZES = {
   [MarkerType.LOCATION]: { radius: 300, height: 1500 },
-  [MarkerType.TAKEOFF]: { radius: 150, height: 800 },
-  [MarkerType.LANDING]: { radius: 200, height: 1000 },
+  [MarkerType.TAKEOFF]: { radius: 100, height: 150 },
+  [MarkerType.LANDING]: { radius: 300, height: 50 },
 };
 
 export const PIN_FADE_DURATION = 200;
@@ -51,7 +51,7 @@ export const VISIBILITY_THRESHOLDS = {
   DETAIL_VIEW: 15000,     // Switch to detailed view when closer than this
 };
 
-export const createPinMesh = (type: MarkerType) => {
+export const createPinMesh = async (type: MarkerType) => {
   const colors = PIN_COLORS[type];
   const sizes = PIN_SIZES[type];
   
@@ -62,7 +62,48 @@ export const createPinMesh = (type: MarkerType) => {
     transparent: true,
     opacity: 0.8
   });
-  return new THREE.Mesh(geometry, material);
+
+  const gliderOptions = {
+    wingColor1: '#c30010',
+    wingColor2: '#b100cd',
+    breakColor: '#ffffff',
+    lineFrontColor: '#ffffff',
+    lineBackColor: '#ffffff',
+    inletsColor: '#333333',
+    numeroCajones: 40,
+    bandLength: 500,
+    carabinersSeparationMM: 300
+  };
+  const pilotOptions = {
+    head: {
+      headType: PilotHeadType.Default,
+      helmetOptions: {
+        color: '#ffffff',
+        color2: '#cccccc',
+        color3: '#999999'
+      }
+    },
+    carabinerColor: '#333',
+  };
+
+  const paragliderOptions = {
+    glider: gliderOptions,
+    pilot: pilotOptions
+  }
+
+  // Create pin or paraglider based on type
+  const paraglider = await new Paraglider(paragliderOptions).load();
+  const scale = 0.1;
+  paraglider.scale.set(scale, scale, scale);
+  paraglider.position.y = 160;
+
+  const mesh = new THREE.Mesh(geometry, material);
+  const group = new THREE.Group();
+  group.add(mesh);
+  if (type === MarkerType.TAKEOFF) {
+    group.add(paraglider);
+  }
+  return group;
 };
 
 export const createBounceAnimation = (pin: THREE.Mesh, isTakeoff: boolean) => {
@@ -149,44 +190,8 @@ export const createMarker = async (
   location: Location | undefined,
   camera: THREE.Camera
 ): Promise<Marker> => {
-
-  const gliderOptions = {
-    wingColor1: '#c30010',
-    wingColor2: '#b100cd',
-    breakColor: '#ffffff',
-    lineFrontColor: '#ffffff',
-    lineBackColor: '#ffffff',
-    inletsColor: '#333333',
-    numeroCajones: 40,
-    bandLength: 500,
-    carabinersSeparationMM: 300
-  };
-  const pilotOptions = {
-    head: {
-      headType: PilotHeadType.Default,
-      helmetOptions: {
-        color: '#ffffff',
-        color2: '#cccccc',
-        color3: '#999999'
-      }
-    },
-    carabinerColor: '#333',
-  };
-
-  const paragliderOptions = {
-    glider: gliderOptions,
-    pilot: pilotOptions
-  }
-
-  // Create pin or paraglider based on type
-  const paraglider = await new Paraglider(paragliderOptions).load();
-  const scale = 0.1;
-  paraglider.scale.set(scale, scale, scale);
-
-  const pin = type === MarkerType.TAKEOFF 
-    ? createPinMesh(type)
-    : createPinMesh(type);
-
+  // Await the pin creation
+  const pin = await createPinMesh(type);
   setupPinBasics(pin, position, type);
   scene.add(pin);
 
@@ -234,12 +239,22 @@ export const createMarker = async (
 // Helper functions
 const setupPinBasics = (pin: THREE.Object3D, position: THREE.Vector3, type: MarkerType) => {
   pin.position.copy(position);
-  pin.position.y += type === MarkerType.LOCATION ? 40 : 20;
-  pin.rotation.x = Math.PI;
+  pin.position.y += type === MarkerType.LOCATION ? 0 : 0;
+  // pin.rotation.x = Math.PI;
   pin.visible = type === MarkerType.LOCATION;
-  pin.userData.hoverable = true;
-  pin.userData.clickable = true;
-  pin.userData.type = type;
+
+  // Set userData for the group and all its children
+  const setUserData = (obj: THREE.Object3D) => {
+    obj.userData.hoverable = true;
+    obj.userData.clickable = true;
+    obj.userData.type = type;
+    
+    // Recursively set for children
+    obj.children.forEach(setUserData);
+  };
+  setUserData(pin);
+
+  // Set raycast for meshes
   if (pin instanceof THREE.Mesh) {
     pin.raycast = new THREE.Mesh().raycast;
   }
