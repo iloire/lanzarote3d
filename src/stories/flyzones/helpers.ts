@@ -3,6 +3,7 @@ import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { Media } from "./locations";
 import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
+import { FlyZoneShape, LandingSpot, Location } from "./locations/index";
 
 // Constants
 export const TAKEOFF_VISIBILITY_THRESHOLD = 15000;
@@ -18,6 +19,18 @@ export const PIN_SIZES = {
 };
 
 export const PIN_FADE_DURATION = 200;
+
+export const FLYZONE_COLORS = {
+  safe: 0x00ff00,
+  caution: 0xffff00,
+  danger: 0xff0000
+};
+
+export const LANDING_COLORS = {
+  primary: 0x00ff00,
+  secondary: 0xffff00,
+  emergency: 0xff0000
+};
 
 export const createPinMesh = (isTakeoff: boolean) => {
   const colors = isTakeoff ? PIN_COLORS.takeoff : PIN_COLORS.location;
@@ -99,7 +112,8 @@ export const createMarker = (
   isTakeoff: boolean,
   scene: THREE.Scene,
   popupContainer: HTMLDivElement,
-  navigateTo: (position: THREE.Vector3, showTakeoffs: boolean) => void
+  navigateTo: (position: THREE.Vector3, showTakeoffs: boolean) => void,
+  location?: Location
 ): Marker => {
   console.log('Creating marker:', {
     title,
@@ -130,16 +144,62 @@ export const createMarker = (
     .easing(TWEEN.Easing.Quadratic.InOut)
     .duration(PIN_FADE_DURATION);
 
+  // Create flyzone and landing spots for location markers
+  let flyzone: THREE.Mesh | null = null;
+  let landingSpots: THREE.Group[] = [];
+  
+  if (!isTakeoff && location) {
+    console.log('Creating location marker with:', {
+      hasLocation: !!location,
+      hasFlyzone: !!location.flyzone,
+      hasLandingSpots: !!location.landingSpots,
+      flyzonePoints: location.flyzone?.points.length,
+      landingSpotsCount: location.landingSpots?.length
+    });
+
+    // Create flyzone
+    if (location.flyzone) {
+      flyzone = createCustomFlyZone(location.flyzone);
+      flyzone.visible = false;
+      scene.add(flyzone);
+      console.log('Created flyzone:', {
+        position: flyzone.position,
+        visible: flyzone.visible
+      });
+    }
+    
+    // Create landing spots
+    if (location.landingSpots) {
+      landingSpots = location.landingSpots.map(spot => {
+        const marker = createLandingSpotMarker(spot);
+        marker.visible = false;
+        scene.add(marker);
+        console.log('Created landing spot:', {
+          title: spot.title,
+          position: spot.position,
+          visible: marker.visible
+        });
+        return marker;
+      });
+    }
+  }
+
   const setVisibility = (visible: boolean) => {
     if (visible !== pin.visible) {
       fadeAnimation.stop();
       pin.visible = visible;
       label.visible = visible;
       
+      // Show/hide flyzone and landing spots
+      if (flyzone) {
+        flyzone.visible = visible;
+      }
+      landingSpots.forEach(spot => {
+        spot.visible = visible;
+      });
+      
       fadeAnimation
-        .to({ 
-          opacity: visible ? 0.8 : 0 
-        }, PIN_FADE_DURATION)
+        .to({ opacity: visible ? 0.8 : 0 }, PIN_FADE_DURATION)
         .start();
     }
   };
@@ -222,4 +282,102 @@ export const setupPopupContainer = () => {
   };
 
   return container;
+};
+
+export const createCustomFlyZone = (shape: FlyZoneShape) => {
+  const { points, color = FLYZONE_COLORS.safe } = shape;
+  
+  // Create a custom geometry by connecting the points
+  const geometry = new THREE.BufferGeometry();
+  const vertices: number[] = [];
+  const indices: number[] = [];
+  
+  // Create circular cross-sections at each point
+  points.forEach((point, heightIndex) => {
+    const segments = 32; // Number of segments in each circle
+    const baseIndex = heightIndex * segments;
+    
+    // Create vertices for this circle
+    for (let i = 0; i < segments; i++) {
+      const angle = (i / segments) * Math.PI * 2;
+      const x = point.position.x + Math.cos(angle) * point.radius;
+      const z = point.position.z + Math.sin(angle) * point.radius;
+      vertices.push(x, point.position.y, z);
+    }
+    
+    // Create faces between this circle and the next
+    if (heightIndex < points.length - 1) {
+      for (let i = 0; i < segments; i++) {
+        const next = (i + 1) % segments;
+        indices.push(
+          baseIndex + i,
+          baseIndex + segments + i,
+          baseIndex + next,
+          baseIndex + segments + i,
+          baseIndex + segments + next,
+          baseIndex + next
+        );
+      }
+    }
+  });
+  
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  
+  const material = new THREE.MeshBasicMaterial({
+    color: shape.color || FLYZONE_COLORS.safe,
+    transparent: true,
+    opacity: 0.3,
+    side: THREE.DoubleSide,
+    wireframe: true,
+    depthWrite: false // Ensure transparency works correctly
+  });
+  
+  const mesh = new THREE.Mesh(geometry, material);
+  
+  // Add wireframe outline for better visibility
+  const wireframe = new THREE.LineSegments(
+    new THREE.WireframeGeometry(geometry),
+    new THREE.LineBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.5
+    })
+  );
+  mesh.add(wireframe);
+  
+  return mesh;
+};
+
+export const createLandingSpotMarker = (landingSpot: LandingSpot) => {
+  // Create a flat circle with an arrow pointing down
+  const circleGeometry = new THREE.CircleGeometry(200, 32); // Increased size
+  const arrowGeometry = new THREE.ConeGeometry(100, 200, 32); // Increased size
+  
+  const material = new THREE.MeshBasicMaterial({
+    color: LANDING_COLORS[landingSpot.safety],
+    transparent: true,
+    opacity: 0.8,
+    side: THREE.DoubleSide,
+    depthWrite: false // Ensure transparency works correctly
+  });
+
+  const circle = new THREE.Mesh(circleGeometry, material);
+  circle.rotation.x = -Math.PI / 2; // Lay flat
+  
+  const arrow = new THREE.Mesh(arrowGeometry, material);
+  arrow.position.y = 100;
+  
+  const group = new THREE.Group();
+  group.add(circle);
+  group.add(arrow);
+  group.position.copy(landingSpot.position);
+  
+  // Add label
+  const label = createLabel(landingSpot.title);
+  label.position.y = 300; // Raised label position
+  group.add(label);
+  
+  return group;
 }; 

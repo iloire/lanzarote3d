@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { Location } from "./index";
+import { FLYZONE_COLORS } from "../helpers";
 
 const locations: Location[] = [
   {
@@ -41,6 +42,49 @@ const locations: Location[] = [
         ],
       }
     ],
+    flyzone: {
+      points: [
+        { 
+          position: new THREE.Vector3(6817, 880, -555),
+          radius: 1000
+        },
+        { 
+          position: new THREE.Vector3(6887, 1500, -555),
+          radius: 2000
+        },
+        { 
+          position: new THREE.Vector3(6897, 2500, -755),
+          radius: 3000
+        }
+      ],
+      color: FLYZONE_COLORS.safe
+    },
+    landingSpots: [
+      {
+        id: "famara-beach-main",
+        title: "Famara Beach Main Landing",
+        description: "Main landing area on Famara beach",
+        position: new THREE.Vector3(6827, 500, 0),
+        coordinates: {
+          latitude: 28.9167,
+          longitude: -13.6333,
+          altitude: 0
+        },
+        safety: 'primary'
+      },
+      {
+        id: "famara-beach-emergency",
+        title: "Emergency Landing",
+        description: "Emergency landing area",
+        position: new THREE.Vector3(6927, 100, -1000),
+        coordinates: {
+          latitude: 28.9167,
+          longitude: -13.6333,
+          altitude: 100
+        },
+        safety: 'emergency'
+      }
+    ]
   },
   {
     id: "tenesar",

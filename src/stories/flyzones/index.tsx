@@ -42,7 +42,8 @@ const FlyZones = {
         false, // isTakeoff = false
         scene,
         popupContainer,
-        navigateTo
+        navigateTo,
+        location  // Pass the entire location object
       );
       console.log('Created location marker:', {
         title: location.title,
@@ -52,7 +53,7 @@ const FlyZones = {
 
       // Create takeoff markers
       const takeoffMarkers = location.takeoffs.map(takeoff => {
-        const marker = createMarker(
+        return createMarker(
           takeoff.position,
           takeoff.title,
           takeoff.description,
@@ -60,14 +61,9 @@ const FlyZones = {
           true, // isTakeoff = true
           scene,
           popupContainer,
-          navigateTo
+          navigateTo,
+          location  // Pass the location object for context
         );
-        console.log('Created takeoff marker:', {
-          title: takeoff.title,
-          isTakeoff: marker.isTakeoff,
-          pinType: marker.pin.userData.type
-        });
-        return marker;
       });
 
       return [...allMarkers, locationMarker, ...takeoffMarkers];

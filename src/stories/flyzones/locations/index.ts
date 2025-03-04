@@ -24,6 +24,27 @@ export type GPS = {
   altitude?: number;
 };
 
+export type LandingSpot = {
+  id: string;
+  title: string;
+  description: string;
+  position: THREE.Vector3;
+  coordinates: GPS;
+  safety: 'primary' | 'secondary' | 'emergency';
+};
+
+export type FlyZonePoint = {
+  position: THREE.Vector3;
+  radius: number; // Radius at this height
+};
+
+export type FlyZoneShape = {
+  points: FlyZonePoint[];
+  color?: number;
+  minHeight?: number;
+  maxHeight?: number;
+};
+
 export type Location = {
   id: string;
   title: string;
@@ -31,6 +52,8 @@ export type Location = {
   takeoffs: Takeoff[];
   position: THREE.Vector3;
   coordinates: GPS;
+  flyzone?: FlyZoneShape;
+  landingSpots?: LandingSpot[];
 };
 
 export type Media = {
