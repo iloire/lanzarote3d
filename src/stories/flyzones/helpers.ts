@@ -3,7 +3,7 @@ import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { Media } from "./locations";
 import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
-import { FlyZoneShape, LandingSpot, Location, WindCondition } from "./locations/index";
+import { FlyZoneShape, LandingSpot, Location, WindCondition, FlyZonePoint } from "./locations/index";
 import Paraglider from '../../components/paraglider';
 import { PilotHeadType } from "../../components/parts/pilot-head";
 
@@ -384,70 +384,86 @@ export const setupPopupContainer = () => {
 };
 
 export const createCustomFlyZone = (shape: FlyZoneShape) => {
-  const points = shape.points;
-  const segments = 32; // Number of segments for each circle
-  const vertices: number[] = [];
-  const indices: number[] = [];
+  const group = new THREE.Group();
   
-  // Create vertices for each point
-  points.forEach((point, i) => {
-    const center = point.position;
-    const radius = point.radius;
+  // Create spheres for each point
+  shape.points.forEach((point, index) => {
+    // Create sphere geometry
+    const sphereGeometry = new THREE.SphereGeometry(point.radius, 32, 32);
     
-    // Create circle vertices
-    for (let j = 0; j < segments; j++) {
-      const theta = (j / segments) * Math.PI * 2;
-      const x = center.x + radius * Math.cos(theta);
-      const y = center.y;
-      const z = center.z + radius * Math.sin(theta);
-      vertices.push(x, y, z);
+    // Create material with transparency and color based on height
+    const color = new THREE.Color();
+    if (point.position.y < 1000) {
+      color.setHex(FLYZONE_COLORS.danger);
+    } else if (point.position.y < 2000) {
+      color.setHex(FLYZONE_COLORS.caution);
+    } else {
+      color.setHex(FLYZONE_COLORS.safe);
     }
     
-    // Create indices for triangles
-    if (i > 0) {
-      const baseIndex = (i - 1) * segments;
-      for (let j = 0; j < segments; j++) {
-        const next = (j + 1) % segments;
-        indices.push(
-          baseIndex + j,
-          baseIndex + next,
-          baseIndex + segments + j,
-          baseIndex + segments + j,
-          baseIndex + next,
-          baseIndex + segments + next
-        );
-      }
-    }
-  });
-  
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-  geometry.setIndex(indices);
-  geometry.computeVertexNormals();
-  
-  const material = new THREE.MeshBasicMaterial({
-    color: shape.color || FLYZONE_COLORS.safe,
-    transparent: true,
-    opacity: 0.3,
-    side: THREE.DoubleSide,
-    wireframe: true,
-    depthWrite: false
-  });
-  
-  const mesh = new THREE.Mesh(geometry, material);
-  
-  // Add wireframe outline for better visibility
-  const wireframe = new THREE.LineSegments(
-    new THREE.WireframeGeometry(geometry),
-    new THREE.LineBasicMaterial({
-      color: 0xffffff,
+    const material = new THREE.MeshBasicMaterial({
+      color: color,
       transparent: true,
-      opacity: 0.5
-    })
-  );
-  mesh.add(wireframe);
+      opacity: 0.2,
+      wireframe: true
+    });
+    
+    // Create sphere mesh
+    const sphere = new THREE.Mesh(sphereGeometry, material);
+    sphere.position.copy(point.position);
+    
+    // Add wireframe
+    const wireframe = new THREE.LineSegments(
+      new THREE.WireframeGeometry(sphereGeometry),
+      new THREE.LineBasicMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.3
+      })
+    );
+    sphere.add(wireframe);
+    
+    // Add height indicator line
+    const lineMaterial = new THREE.LineDashedMaterial({
+      color: 0xffffff,
+      opacity: 0.5,
+      transparent: true,
+      dashSize: 50,
+      gapSize: 50,
+    });
+
+    const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(point.position.x, 0, point.position.z),
+      point.position
+    ]);
+
+    const line = new THREE.Line(lineGeometry, lineMaterial);
+    line.computeLineDistances();
+    group.add(line);
+    
+    // Add connecting line to next point if it exists
+    if (index < shape.points.length - 1) {
+      const nextPoint = shape.points[index + 1];
+      const connectionGeometry = new THREE.BufferGeometry().setFromPoints([
+        point.position,
+        nextPoint.position
+      ]);
+      
+      const connectionLine = new THREE.Line(
+        connectionGeometry,
+        new THREE.LineBasicMaterial({
+          color: 0xffffff,
+          transparent: true,
+          opacity: 0.3
+        })
+      );
+      group.add(connectionLine);
+    }
+    
+    group.add(sphere);
+  });
   
-  return mesh;
+  return group;
 };
 
 export const createLandingSpotMarker = (
@@ -551,4 +567,24 @@ export const createWindArrow = (windDirection: number) => {
   arrow.rotation.y = THREE.MathUtils.degToRad(windDirection + 180);
   
   return arrow;
+};
+
+const addWindArrows = (mesh: THREE.Mesh, windDirection: number, shape: FlyZoneShape) => {
+  const arrows = [];
+  const spacing = 1000; // Space between arrows
+  
+  shape.points.forEach(point => {
+    for (let y = 0; y < point.position.y; y += spacing) {
+      const arrow = createWindArrow(windDirection);
+      arrow.scale.set(0.3, 0.3, 0.3);
+      arrow.position.set(
+        point.position.x,
+        y,
+        point.position.z
+      );
+      arrows.push(arrow);
+    }
+  });
+  
+  mesh.add(...arrows);
 }; 

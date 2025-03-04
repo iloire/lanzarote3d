@@ -159,24 +159,28 @@ const locations: Location[] = [
     flyzone: {
       points: [
         { 
-          position: new THREE.Vector3(6817, 880, -555),
-          radius: 1000
+          position: new THREE.Vector3(6927, 280, -655),
+          radius: 200
         },
         { 
-          position: new THREE.Vector3(6887, 1500, -555),
-          radius: 2000
+          position: new THREE.Vector3(7127, 480, -655),
+          radius: 400
         },
         { 
-          position: new THREE.Vector3(7897, 2500, -755),
-          radius: 3000
+          position: new THREE.Vector3(7327, 830, -655),
+          radius: 600
         },
         { 
-          position: new THREE.Vector3(6866, 8, -3467),
-          radius: 1000
+          position: new THREE.Vector3(7527, 1200, -1255),
+          radius: 800
         },
         { 
-          position: new THREE.Vector3(9489, 220, -5467),
-          radius: 1000
+          position: new THREE.Vector3(6866, 800, -2467),
+          radius: 600
+        },
+        { 
+          position: new THREE.Vector3(6866, 200, -3467),
+          radius: 400
         }
       ],
       color: FLYZONE_COLORS.safe
