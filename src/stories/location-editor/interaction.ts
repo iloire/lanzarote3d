@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { EditorState, createNewLocation, addTakeoff, addLandingSpot, addFlyZonePhase } from "./state";
+import { EditorState, createNewLocation, addTakeoff, addLandingSpot, addFlyZonePhase, saveToLocalStorage } from "./state";
 
 export const setupInteraction = (
   renderer: THREE.WebGLRenderer,
@@ -82,6 +82,7 @@ export const setupInteraction = (
           if (!state.currentLocation) {
             createNewLocation(state, position, scene);
             console.log("Created new location at", position);
+            saveToLocalStorage(state);
           } else {
             alert("You already have a location. Only one location can be edited at a time.");
           }
@@ -91,6 +92,7 @@ export const setupInteraction = (
           if (state.currentLocation) {
             addTakeoff(state, position, scene);
             console.log("Added takeoff at", position);
+            saveToLocalStorage(state);
           } else {
             alert("Please create a location first.");
           }
@@ -100,6 +102,7 @@ export const setupInteraction = (
           if (state.currentLocation) {
             addLandingSpot(state, position, scene);
             console.log("Added landing spot at", position);
+            saveToLocalStorage(state);
           } else {
             alert("Please create a location first.");
           }
@@ -109,6 +112,7 @@ export const setupInteraction = (
           if (state.currentLocation) {
             addFlyZonePhase(state, position, scene);
             console.log(`Added ${state.flyZonePhaseType} flyzone phase at`, position);
+            saveToLocalStorage(state);
           } else {
             alert("Please create a location first.");
           }
@@ -127,6 +131,7 @@ export const setupInteraction = (
             if (!state.currentLocation) {
               createNewLocation(state, fallbackPosition, scene);
               console.log("Created new location at fallback position");
+              saveToLocalStorage(state);
             }
             break;
           case 'takeoff':

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { createRoot } from "react-dom/client";
-import { EditorState, resetLocation, undoLastAction } from "./state";
+import { EditorState, resetLocation, undoLastAction, clearLocalStorage } from "./state";
 
 interface EditorUIProps {
   state: EditorState;
@@ -43,6 +43,18 @@ const EditorUI: React.FC<EditorUIProps> = ({ state }) => {
     }
   };
   
+  // Add a function to handle clearing localStorage
+  const handleClearStorage = () => {
+    const scene = (window as any).__editorScene;
+    if (scene) {
+      clearLocalStorage();
+      resetLocation(state, scene);
+      setLocation(null);
+    } else {
+      console.error("Scene not available for clearing storage");
+    }
+  };
+  
   if (!location) {
     return (
       <div className="editor-ui">
@@ -65,6 +77,7 @@ const EditorUI: React.FC<EditorUIProps> = ({ state }) => {
           <button className="undo-button" onClick={handleUndo}>Undo Last Action</button>
           <button className="reset-button" onClick={handleReset}>Reset Location</button>
         </div>
+        <button className="clear-storage-button" onClick={handleClearStorage}>Clear Saved Data</button>
       </div>
       <div className="editor-instructions">
         <p>Current Mode: <strong>{state.mode}</strong></p>

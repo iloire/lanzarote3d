@@ -580,4 +580,168 @@ export const undoLastAction = (state: EditorState, scene: THREE.Scene): void => 
   }
   
   console.log("Undo complete");
+};
+
+// Add these functions to save and load state from localStorage
+
+// Save the current state to localStorage
+export const saveToLocalStorage = (state: EditorState): void => {
+  if (!state.currentLocation) return;
+  
+  try {
+    // Create a serializable version of the state (without THREE.js objects)
+    const serializable = {
+      currentLocation: {
+        ...state.currentLocation,
+        position: {
+          x: state.currentLocation.position.x,
+          y: state.currentLocation.position.y,
+          z: state.currentLocation.position.z
+        },
+        cameraView: {
+          position: {
+            x: state.currentLocation.cameraView.position.x,
+            y: state.currentLocation.cameraView.position.y,
+            z: state.currentLocation.cameraView.position.z
+          },
+          distance: state.currentLocation.cameraView.distance
+        },
+        takeoffs: state.currentLocation.takeoffs.map(t => ({
+          ...t,
+          position: {
+            x: t.position.x,
+            y: t.position.y,
+            z: t.position.z
+          },
+          // Remove the marker reference as it can't be serialized
+          marker: null
+        })),
+        landingSpots: state.currentLocation.landingSpots.map(l => ({
+          ...l,
+          position: {
+            x: l.position.x,
+            y: l.position.y,
+            z: l.position.z
+          },
+          // Remove the marker reference as it can't be serialized
+          marker: null
+        })),
+        flyzone: {
+          phases: Object.keys(state.currentLocation.flyzone.phases).reduce((acc, key) => {
+            const phase = state.currentLocation.flyzone.phases[key];
+            acc[key] = {
+              ...phase,
+              position: {
+                x: phase.position.x,
+                y: phase.position.y,
+                z: phase.position.z
+              },
+              // Remove the object reference as it can't be serialized
+              object: null
+            };
+            return acc;
+          }, {} as Record<string, any>),
+          object: null
+        }
+      },
+      mode: state.mode,
+      flyZonePhaseType: state.flyZonePhaseType
+    };
+    
+    localStorage.setItem('locationEditor', JSON.stringify(serializable));
+    console.log('State saved to localStorage');
+  } catch (error) {
+    console.error('Failed to save state to localStorage:', error);
+  }
+};
+
+// Load state from localStorage and recreate the THREE.js objects
+export const loadFromLocalStorage = (scene: THREE.Scene): EditorState | null => {
+  try {
+    const saved = localStorage.getItem('locationEditor');
+    if (!saved) return null;
+    
+    const parsed = JSON.parse(saved);
+    
+    // Create a new state with the saved data
+    const state: EditorState = {
+      currentLocation: null,
+      selectedItem: null,
+      mode: parsed.mode || 'location',
+      flyZonePhaseType: parsed.flyZonePhaseType || 'takeoff',
+      markers: [],
+      flyZones: [],
+      history: []
+    };
+    
+    if (parsed.currentLocation) {
+      // Recreate the location with THREE.js objects
+      const position = new THREE.Vector3(
+        parsed.currentLocation.position.x,
+        parsed.currentLocation.position.y,
+        parsed.currentLocation.position.z
+      );
+      
+      // Create the location
+      const location = createNewLocation(state, position, scene);
+      
+      // Update with saved properties
+      location.id = parsed.currentLocation.id;
+      location.title = parsed.currentLocation.title;
+      location.description = parsed.currentLocation.description;
+      location.cameraView.position = new THREE.Vector3(
+        parsed.currentLocation.cameraView.position.x,
+        parsed.currentLocation.cameraView.position.y,
+        parsed.currentLocation.cameraView.position.z
+      );
+      location.cameraView.distance = parsed.currentLocation.cameraView.distance;
+      
+      // Recreate takeoffs
+      if (parsed.currentLocation.takeoffs && Array.isArray(parsed.currentLocation.takeoffs)) {
+        // Clear the takeoffs array that was created by createNewLocation
+        location.takeoffs = [];
+        
+        parsed.currentLocation.takeoffs.forEach((t: any) => {
+          const position = new THREE.Vector3(t.position.x, t.position.y, t.position.z);
+          addTakeoff(state, position, scene);
+        });
+      }
+      
+      // Recreate landing spots
+      if (parsed.currentLocation.landingSpots && Array.isArray(parsed.currentLocation.landingSpots)) {
+        // Clear the landing spots array that was created by createNewLocation
+        location.landingSpots = [];
+        
+        parsed.currentLocation.landingSpots.forEach((l: any) => {
+          const position = new THREE.Vector3(l.position.x, l.position.y, l.position.z);
+          addLandingSpot(state, position, scene);
+        });
+      }
+      
+      // Recreate flyzone phases
+      if (parsed.currentLocation.flyzone && parsed.currentLocation.flyzone.phases) {
+        // Clear the phases object that was created by createNewLocation
+        location.flyzone.phases = {};
+        
+        Object.keys(parsed.currentLocation.flyzone.phases).forEach((key) => {
+          const phase = parsed.currentLocation.flyzone.phases[key];
+          const position = new THREE.Vector3(phase.position.x, phase.position.y, phase.position.z);
+          state.flyZonePhaseType = phase.type;
+          addFlyZonePhase(state, position, scene);
+        });
+      }
+    }
+    
+    console.log('State loaded from localStorage');
+    return state;
+  } catch (error) {
+    console.error('Failed to load state from localStorage:', error);
+    return null;
+  }
+};
+
+// Clear localStorage
+export const clearLocalStorage = (): void => {
+  localStorage.removeItem('locationEditor');
+  console.log('LocationEditor localStorage cleared');
 }; 

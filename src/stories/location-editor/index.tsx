@@ -6,7 +6,7 @@ import { StoryOptions } from "../types";
 import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import { setupLabelRenderer } from "../flyzones/helpers";
-import { EditorState, createNewLocation, addTakeoff, addLandingSpot, addFlyZonePhase, exportLocationData, resetLocation, undoLastAction } from "./state";
+import { EditorState, createNewLocation, addTakeoff, addLandingSpot, addFlyZonePhase, exportLocationData, resetLocation, undoLastAction, saveToLocalStorage, loadFromLocalStorage, clearLocalStorage } from "./state";
 import { createEditorUI } from "./ui";
 import { setupInteraction } from "./interaction";
 import "./styles.css"; // Import the CSS
@@ -25,15 +25,23 @@ const LocationEditor = {
     (window as any).__editorScene = scene;
 
     // Initialize editor state
-    const editorState: EditorState = {
-      currentLocation: null,
-      selectedItem: null,
-      mode: "location", // Start in location creation mode
-      flyZonePhaseType: "takeoff",
-      markers: [],
-      flyZones: [],
-      history: [] // Initialize history array
-    };
+    let editorState: EditorState;
+    const savedState = loadFromLocalStorage(scene);
+
+    if (savedState) {
+      editorState = savedState;
+      console.log("Loaded state from localStorage:", editorState);
+    } else {
+      editorState = {
+        currentLocation: null,
+        selectedItem: null,
+        mode: "location", // Start in location creation mode
+        flyZonePhaseType: "takeoff",
+        markers: [],
+        flyZones: [],
+        history: []
+      };
+    }
 
     // Setup renderers and containers
     const labelRenderer = setupLabelRenderer();
@@ -50,25 +58,29 @@ const LocationEditor = {
       .onChange((value: string) => {
         console.log(`Switched to ${value} mode`);
         updateCursorStyle(value);
+        saveState(); // Save after mode change
       });
     
     // FlyZone phase type selection (only visible in flyzone mode)
     const flyZoneFolder = editorFolder.addFolder('FlyZone Settings');
     flyZoneFolder.open(); // Make sure the folder is open
     flyZoneFolder.add(editorState, 'flyZonePhaseType', ['takeoff', 'ridge', 'approach', 'landing'])
-      .name('Phase Type');
+      .name('Phase Type')
+      .onChange(() => {
+        saveState(); // Save after flyzone type change
+      });
     
     // Export button
     editorFolder.add({ exportData: () => exportLocationData(editorState) }, 'exportData')
       .name('Export Location Data');
     
     // Reset button
-    editorFolder.add({ resetLocation: () => resetLocation(editorState, scene) }, 'resetLocation')
-      .name('Reset Location')
-      .onChange(() => {
-        // Update UI after reset
-        createEditorUI(editorState);
-      });
+    editorFolder.add({ resetLocation: () => {
+      resetLocation(editorState, scene);
+      clearLocalStorage(); // Clear localStorage when resetting
+      createEditorUI(editorState);
+    }}, 'resetLocation')
+      .name('Reset Location');
 
     // Undo button
     editorFolder.add({ undoLastAction: () => undoLastAction(editorState, scene) }, 'undoLastAction')
@@ -77,6 +89,19 @@ const LocationEditor = {
         // Update UI after undo
         createEditorUI(editorState);
       });
+
+    // Add a function to save state after changes
+    const saveState = () => {
+      saveToLocalStorage(editorState);
+    };
+
+    // Add a clear storage button to the GUI
+    editorFolder.add({ clearStorage: () => {
+      clearLocalStorage();
+      resetLocation(editorState, scene);
+      createEditorUI(editorState);
+    }}, 'clearStorage')
+      .name('Clear Saved Data');
 
     // Make sure terrain is clickable
     if (terrain) {
