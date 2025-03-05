@@ -8,6 +8,7 @@ export interface EditorState {
   flyZonePhaseType: "takeoff" | "ridge" | "approach" | "landing";
   markers: THREE.Object3D[];
   flyZones: THREE.Object3D[];
+  history: EditorAction[];
 }
 
 export interface EditorLocation {
@@ -62,6 +63,13 @@ export interface EditorFlightPhase {
   object: THREE.Object3D;
 }
 
+// Define an action type for history tracking
+export interface EditorAction {
+  type: 'add_takeoff' | 'add_landing' | 'add_flyzone' | 'create_location';
+  object: THREE.Object3D;
+  data?: any; // Additional data if needed
+}
+
 // Create a new location
 export const createNewLocation = (state: EditorState, position: THREE.Vector3, scene: THREE.Scene): EditorLocation => {
   // Create a default location
@@ -91,6 +99,12 @@ export const createNewLocation = (state: EditorState, position: THREE.Vector3, s
   state.currentLocation = newLocation;
   state.selectedItem = newLocation;
   
+  // Add to history
+  state.history.push({
+    type: 'create_location',
+    object: marker
+  });
+  
   return newLocation;
 };
 
@@ -111,6 +125,13 @@ export const addTakeoff = (state: EditorState, position: THREE.Vector3, scene: T
   state.markers.push(takeoff.marker);
   state.currentLocation.takeoffs.push(takeoff);
   state.selectedItem = takeoff;
+  
+  // Add to history
+  state.history.push({
+    type: 'add_takeoff',
+    object: takeoff.marker,
+    data: takeoff
+  });
   
   return takeoff;
 };
@@ -133,6 +154,13 @@ export const addLandingSpot = (state: EditorState, position: THREE.Vector3, scen
   state.markers.push(landingSpot.marker);
   state.currentLocation.landingSpots.push(landingSpot);
   state.selectedItem = landingSpot;
+  
+  // Add to history
+  state.history.push({
+    type: 'add_landing',
+    object: landingSpot.marker,
+    data: landingSpot
+  });
   
   return landingSpot;
 };
@@ -163,6 +191,13 @@ export const addFlyZonePhase = (
   state.flyZones.push(phase.object);
   state.currentLocation.flyzone.phases[phaseId] = phase;
   state.selectedItem = phase;
+  
+  // Add to history
+  state.history.push({
+    type: 'add_flyzone',
+    object: phase.object,
+    data: { phaseId, phase }
+  });
   
   return phase;
 };
@@ -491,4 +526,58 @@ export const resetLocation = (state: EditorState, scene: THREE.Scene): void => {
   } else {
     console.log("No location to reset.");
   }
+};
+
+// Add the undo function
+export const undoLastAction = (state: EditorState, scene: THREE.Scene): void => {
+  if (state.history.length === 0) {
+    console.log("Nothing to undo");
+    return;
+  }
+  
+  const lastAction = state.history.pop();
+  if (!lastAction) return;
+  
+  console.log("Undoing action:", lastAction.type);
+  
+  // Remove the object from the scene
+  scene.remove(lastAction.object);
+  
+  // Remove from appropriate arrays and update state
+  switch (lastAction.type) {
+    case 'create_location':
+      state.currentLocation = null;
+      state.markers = state.markers.filter(m => m !== lastAction.object);
+      break;
+      
+    case 'add_takeoff':
+      if (state.currentLocation) {
+        state.currentLocation.takeoffs = state.currentLocation.takeoffs.filter(
+          t => t.marker !== lastAction.object
+        );
+        state.markers = state.markers.filter(m => m !== lastAction.object);
+      }
+      break;
+      
+    case 'add_landing':
+      if (state.currentLocation) {
+        state.currentLocation.landingSpots = state.currentLocation.landingSpots.filter(
+          l => l.marker !== lastAction.object
+        );
+        state.markers = state.markers.filter(m => m !== lastAction.object);
+      }
+      break;
+      
+    case 'add_flyzone':
+      if (state.currentLocation && lastAction.data) {
+        const { phaseId } = lastAction.data;
+        if (phaseId && state.currentLocation.flyzone.phases[phaseId]) {
+          delete state.currentLocation.flyzone.phases[phaseId];
+        }
+        state.flyZones = state.flyZones.filter(f => f !== lastAction.object);
+      }
+      break;
+  }
+  
+  console.log("Undo complete");
 }; 

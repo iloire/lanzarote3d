@@ -103,16 +103,37 @@
   cursor: pointer;
 }
 
+.button-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.undo-button {
+  background: #2196F3;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  flex: 1;
+  transition: background-color 0.3s;
+}
+
+.undo-button:hover {
+  background: #0b7dda;
+}
+
 .reset-button {
   background: #f44336;
   color: white;
   border: none;
   padding: 8px 15px;
-  margin-top: 10px;
   border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
-  width: 100%;
+  flex: 1;
   transition: background-color 0.3s;
 }
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { createRoot } from "react-dom/client";
-import { EditorState, resetLocation } from "./state";
+import { EditorState, resetLocation, undoLastAction } from "./state";
 
 interface EditorUIProps {
   state: EditorState;
@@ -26,6 +26,23 @@ const EditorUI: React.FC<EditorUIProps> = ({ state }) => {
     }
   };
   
+  // Add the handleUndo function
+  const handleUndo = () => {
+    const scene = (window as any).__editorScene;
+    if (scene) {
+      undoLastAction(state, scene);
+      // If we're undoing the location creation, set location to null
+      if (!state.currentLocation) {
+        setLocation(null);
+      } else {
+        // Force a re-render
+        setLocation({...state.currentLocation});
+      }
+    } else {
+      console.error("Scene not available for undo");
+    }
+  };
+  
   if (!location) {
     return (
       <div className="editor-ui">
@@ -44,7 +61,10 @@ const EditorUI: React.FC<EditorUIProps> = ({ state }) => {
         <p>Takeoffs: {location.takeoffs.length}</p>
         <p>Landing Spots: {location.landingSpots.length}</p>
         <p>FlyZone Phases: {Object.keys(location.flyzone.phases).length}</p>
-        <button className="reset-button" onClick={handleReset}>Reset Location</button>
+        <div className="button-group">
+          <button className="undo-button" onClick={handleUndo}>Undo Last Action</button>
+          <button className="reset-button" onClick={handleReset}>Reset Location</button>
+        </div>
       </div>
       <div className="editor-instructions">
         <p>Current Mode: <strong>{state.mode}</strong></p>

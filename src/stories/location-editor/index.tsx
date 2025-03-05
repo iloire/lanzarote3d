@@ -6,7 +6,7 @@ import { StoryOptions } from "../types";
 import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import { setupLabelRenderer } from "../flyzones/helpers";
-import { EditorState, createNewLocation, addTakeoff, addLandingSpot, addFlyZonePhase, exportLocationData, resetLocation } from "./state";
+import { EditorState, createNewLocation, addTakeoff, addLandingSpot, addFlyZonePhase, exportLocationData, resetLocation, undoLastAction } from "./state";
 import { createEditorUI } from "./ui";
 import { setupInteraction } from "./interaction";
 import "./styles.css"; // Import the CSS
@@ -31,7 +31,8 @@ const LocationEditor = {
       mode: "location", // Start in location creation mode
       flyZonePhaseType: "takeoff",
       markers: [],
-      flyZones: []
+      flyZones: [],
+      history: [] // Initialize history array
     };
 
     // Setup renderers and containers
@@ -66,6 +67,14 @@ const LocationEditor = {
       .name('Reset Location')
       .onChange(() => {
         // Update UI after reset
+        createEditorUI(editorState);
+      });
+
+    // Undo button
+    editorFolder.add({ undoLastAction: () => undoLastAction(editorState, scene) }, 'undoLastAction')
+      .name('Undo Last Action')
+      .onChange(() => {
+        // Update UI after undo
         createEditorUI(editorState);
       });
 
