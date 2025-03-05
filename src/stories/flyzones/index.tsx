@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 import React from "react";
 import { createRoot } from "react-dom/client";
-import locations from "./locations/lanzarote";
+import locations from "./locations";
 // import VideoFrame from "../components/video-frame";
 import { StoryOptions } from "../types";
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
@@ -13,21 +13,11 @@ import {
   setupPopupContainer,
   VISIBILITY_THRESHOLDS,
   MarkerType,
-  createCustomFlyZone
-} from './helpers';
-
-import {
+  createCustomFlyZone,
   createMarker,
   setupLabelRenderer,
-  createPinMesh,
-  createHoverAnimations,
-  createWindArrow,
-  createLabel,
-  createFadeAnimation,
-  createVisibilityHandler,
-  createPopupHandler,
-  setupPinBasics
 } from './helpers';
+
 
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 

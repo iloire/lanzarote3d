@@ -1,82 +1,93 @@
 import * as THREE from "three";
+import famara from './famara';
+import teguise from './teguise';
+import macher from './macher';
 
-export type WindCondition = {
-  direction: {
-    ideal: number;     // Ideal wind direction in degrees (0-360, where 0/360 is North)
-    tolerance: number; // Acceptable deviation from ideal in degrees
-  };
+export interface Media {
+  type: 'image' | 'video';
+  url: string;
+  title?: string;
+}
+
+export interface WindDirection {
+  ideal: number;
+  range: [number, number];
+}
+
+export interface WindCondition {
+  direction: WindDirection;
   speed: {
-    min: number;      // Minimum wind speed in km/h
-    max: number;      // Maximum wind speed in km/h
-    ideal: number;    // Ideal wind speed in km/h
+    min: number;
+    max: number;
+    ideal: number;
   };
-  rating: number;     // 1-5 rating for these conditions
-};
+  rating: number;
+  description: string;
+}
 
-export type Takeoff = {
+export interface Takeoff {
   id: string;
   title: string;
   description: string;
   position: THREE.Vector3;
-  coordinates: GPS;
-  conditions: WindCondition[];  // Array of conditions
+  elevation: number;
+  conditions: WindCondition[];
   mediaItems: Media[];
-};
+}
 
-export type GPS = {
-  latitude: number;
-  longitude: number;
-  altitude: number;
-};
-
-export type LandingSpot = {
+export interface LandingSpot {
   id: string;
   title: string;
   description: string;
   position: THREE.Vector3;
-  coordinates: GPS;
-  safety: 'primary' | 'secondary' | 'emergency';
+  elevation: number;
+  type: 'primary' | 'secondary' | 'emergency';
   mediaItems: Media[];
-};
+}
 
-export type FlightPhase = {
-  type: 'takeoff' | 'climb' | 'ridge' | 'landing' | 'approach';
+export interface FlightPhase {
+  type: 'takeoff' | 'landing' | 'ridge' | 'approach';
   position: THREE.Vector3;
   dimensions: {
-    width: number;   // X axis
-    height: number;  // Y axis (vertical space for this phase)
-    length: number;  // Z axis
+    width: number;
+    height: number;
+    length: number;
   };
   nextPhases?: string[];
-};
+}
 
-export type FlyZoneShape = {
-  phases: Record<string, FlightPhase>;
+export interface FlyZoneShape {
   color?: number;
-};
+  phases: {
+    [key: string]: FlightPhase;
+  };
+}
 
-export type CameraView = {
-  position: THREE.Vector3;  // Camera position relative to location
-  lookAt?: THREE.Vector3;   // Optional specific look-at point (defaults to location position)
-  distance?: number;        // Optional distance override
-};
-
-export type Location = {
+export interface Location {
   id: string;
   title: string;
   description: string;
-  takeoffs: Takeoff[];
   position: THREE.Vector3;
-  coordinates: GPS;
-  flyzone?: FlyZoneShape;
+  cameraView: {
+    position: THREE.Vector3;
+    lookAt?: THREE.Vector3;
+    distance?: number;
+  };
+  takeoffs: Takeoff[];
   landingSpots?: LandingSpot[];
-  cameraView: CameraView;  // Add camera view configuration
-};
+  flyzone?: FlyZoneShape;
+}
 
-export type Media = {
-  id: string;
-  title: string;
-  description: string;
-  type: "image" | "video";
-  url: string;
-};
+export { default as famara } from './famara';
+export { default as teguise } from './teguise';
+export { default as macher } from './macher';
+
+
+
+const locations: Location[] = [
+  famara,
+  teguise,
+  macher
+];
+
+export default locations;

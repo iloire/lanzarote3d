@@ -13,7 +13,7 @@ import Trajectory from "../../elements/trajectory";
 import Analytics from "../../elements/analytics";
 import { GameStartOptions, GameStatus } from "./types";
 import { addGameEnvironment } from "./env";
-import locations from "../flyzones/locations/lanzarote";
+import locations from "./lanzarote";
 import WindIndicator from "../../components/wind-indicator";
 import Sky from "../../components/sky";
 import PerfStats from "../../utils/stats";
