@@ -8,19 +8,19 @@ import { MeshBVH, acceleratedRaycast } from "three-mesh-bvh";
 THREE.Mesh.prototype.raycast = acceleratedRaycast;
 
 
-const loadTexture = async (manager): Promise<any> => {
-  const textureLoader = new THREE.TextureLoader(manager);
-  const texture = await textureLoader.load(textureImg);
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(5, 5);
-  return texture;
-};
+// const loadTexture = async (manager): Promise<any> => {
+//   const textureLoader = new THREE.TextureLoader(manager);
+//   const texture = await textureLoader.load(textureImg);
+//   texture.wrapS = THREE.RepeatWrapping;
+//   texture.wrapT = THREE.RepeatWrapping;
+//   texture.repeat.set(5, 5);
+//   return texture;
+// };
 
 const loadFromBlenderModel = async (manager: THREE.LoadingManager) => {
   const mesh = await Models.loadSimple(model, manager);
   mesh.material = new THREE.MeshStandardMaterial({
-    map: await loadTexture(manager),
+    // map: await loadTexture(manager),
     wireframe: true,
     depthTest: true,
   });
