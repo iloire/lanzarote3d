@@ -6,7 +6,7 @@ import { StoryOptions } from "../types";
 import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import { setupLabelRenderer } from "../flyzones/helpers";
-import { EditorState, createNewLocation, addTakeoff, addLandingSpot, addFlyZonePhase, exportLocationData } from "./state";
+import { EditorState, createNewLocation, addTakeoff, addLandingSpot, addFlyZonePhase, exportLocationData, resetLocation } from "./state";
 import { createEditorUI } from "./ui";
 import { setupInteraction } from "./interaction";
 import "./styles.css"; // Import the CSS
@@ -20,6 +20,9 @@ const LocationEditor = {
     console.log("Location Editor loading...");
     console.log("Scene:", scene);
     console.log("Terrain:", terrain);
+
+    // Store scene in window for UI access
+    (window as any).__editorScene = scene;
 
     // Initialize editor state
     const editorState: EditorState = {
@@ -57,6 +60,14 @@ const LocationEditor = {
     // Export button
     editorFolder.add({ exportData: () => exportLocationData(editorState) }, 'exportData')
       .name('Export Location Data');
+    
+    // Reset button
+    editorFolder.add({ resetLocation: () => resetLocation(editorState, scene) }, 'resetLocation')
+      .name('Reset Location')
+      .onChange(() => {
+        // Update UI after reset
+        createEditorUI(editorState);
+      });
 
     // Make sure terrain is clickable
     if (terrain) {

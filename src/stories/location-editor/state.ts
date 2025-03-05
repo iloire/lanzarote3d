@@ -466,4 +466,29 @@ const createFlyZonePhaseMarker = (position: THREE.Vector3, type: string): THREE.
   box.userData.phaseType = type;
   
   return box;
+};
+
+// Add this function to the state.ts file
+export const resetLocation = (state: EditorState, scene: THREE.Scene): void => {
+  if (state.currentLocation) {
+    // Remove all markers from the scene
+    state.markers.forEach(marker => {
+      scene.remove(marker);
+    });
+    
+    // Remove all flyzone objects
+    state.flyZones.forEach(flyzone => {
+      scene.remove(flyzone);
+    });
+    
+    // Reset the state
+    state.currentLocation = null;
+    state.selectedItem = null;
+    state.markers = [];
+    state.flyZones = [];
+    
+    console.log("Location reset. All markers and flyzones removed.");
+  } else {
+    console.log("No location to reset.");
+  }
 }; 

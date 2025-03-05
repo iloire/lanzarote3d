@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { createRoot } from "react-dom/client";
-import { EditorState } from "./state";
+import { EditorState, resetLocation } from "./state";
 
 interface EditorUIProps {
   state: EditorState;
@@ -13,6 +13,18 @@ const EditorUI: React.FC<EditorUIProps> = ({ state }) => {
   useEffect(() => {
     setLocation(state.currentLocation);
   }, [state.currentLocation]);
+  
+  // Handle reset button click
+  const handleReset = () => {
+    // Get the scene from the window object
+    const scene = (window as any).__editorScene;
+    if (scene) {
+      resetLocation(state, scene);
+      setLocation(null);
+    } else {
+      console.error("Scene not available for reset");
+    }
+  };
   
   if (!location) {
     return (
@@ -32,6 +44,7 @@ const EditorUI: React.FC<EditorUIProps> = ({ state }) => {
         <p>Takeoffs: {location.takeoffs.length}</p>
         <p>Landing Spots: {location.landingSpots.length}</p>
         <p>FlyZone Phases: {Object.keys(location.flyzone.phases).length}</p>
+        <button className="reset-button" onClick={handleReset}>Reset Location</button>
       </div>
       <div className="editor-instructions">
         <p>Current Mode: <strong>{state.mode}</strong></p>
