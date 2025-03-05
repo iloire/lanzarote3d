@@ -144,6 +144,15 @@ export const setupPinBasics = (pin: THREE.Object3D, position: THREE.Vector3, typ
   pin.userData.type = type;
   pin.userData.hoverable = true;
   pin.userData.clickable = true;
+  
+  // Make sure all children inherit the clickable property
+  pin.traverse(child => {
+    if (child !== pin) {
+      child.userData.type = type;
+      child.userData.clickable = true;
+      // We don't set hoverable on children to avoid multiple hover events
+    }
+  });
 };
 
 export const createHoverAnimations = (pin: THREE.Object3D, isTakeoff: boolean) => {

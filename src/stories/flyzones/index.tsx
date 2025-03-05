@@ -250,36 +250,65 @@ const FlyZones = {
       };
 
       const onClick = (event: MouseEvent) => {
-        console.log('Canvas clicked', event);
         onMouseMove(event);
         
         raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObjects(
-          scene.children.filter(obj => obj.visible),
-          true  // Set to true to check descendants
-        );
+        // Important: Use recursive=true to check all descendants
+        const intersects = raycaster.intersectObjects(scene.children, true);
         
+        // Debug what we're clicking on
+        console.log('Click intersects:', intersects.map(i => ({
+          type: i.object.userData.type,
+          clickable: i.object.userData.clickable,
+          name: i.object.name
+        })));
+        
+        // Find the first clickable object
         const clickedObject = intersects.find(i => i.object.userData.clickable)?.object;
+        
         if (clickedObject) {
+          console.log('Clicked on object:', clickedObject);
+          
           // Find the marker by traversing up the object hierarchy
-          const findRootMarker = (obj: THREE.Object3D): Marker | undefined => {
-            // Check if this object is a root marker
+          const findMarkerForObject = (obj: THREE.Object3D): Marker | undefined => {
+            // Check if this object is directly a marker pin
             const marker = markers.find(m => m.pin === obj);
-            if (marker) return marker;
+            if (marker) {
+              console.log('Found marker directly:', marker);
+              return marker;
+            }
             
-            // If not, check its parent
-            if (obj.parent) {
-              return findRootMarker(obj.parent);
+            // If not, check if it's a child of a marker pin
+            for (const marker of markers) {
+              if (isDescendantOf(obj, marker.pin)) {
+                console.log('Found marker as ancestor:', marker);
+                return marker;
+              }
             }
             
             return undefined;
           };
-
-          const marker = findRootMarker(clickedObject);
+          
+          const marker = findMarkerForObject(clickedObject);
           if (marker) {
+            console.log('Triggering popup for marker:', marker);
             marker.showPopup();
+          } else {
+            console.log('No marker found for clicked object');
           }
         }
+      };
+
+      // Helper function to check if an object is a descendant of another
+      const isDescendantOf = (obj: THREE.Object3D, potentialAncestor: THREE.Object3D): boolean => {
+        let current = obj;
+        while (current && current !== scene) {
+          if (current === potentialAncestor) {
+            return true;
+          }
+          current = current.parent!;
+        }
+        return false;
       };
 
       // Add event listeners
@@ -333,9 +362,27 @@ const FlyZones = {
       const hoveredMarker = intersects.find(i => i.object.userData.hoverable)?.object;
 
       if (hoveredMarker !== hoveredObject) {
-        markers.find(m => m.pin === hoveredObject)?.unhoverAnimation.start();
-        markers.find(m => m.pin === hoveredMarker)?.hoverAnimation.start();
-        hoveredObject = hoveredMarker || null;
+        // Find the marker by traversing up the object hierarchy
+        const findRootMarker = (obj: THREE.Object3D): Marker | undefined => {
+          // Check if this object is a root marker
+          const marker = markers.find(m => m.pin === obj);
+          if (marker) return marker;
+          
+          // If not, check its parent
+          if (obj.parent && obj.parent !== scene) {
+            return findRootMarker(obj.parent);
+          }
+          
+          return undefined;
+        };
+
+        const oldMarker = hoveredObject ? findRootMarker(hoveredObject) : undefined;
+        const newMarker = hoveredMarker ? findRootMarker(hoveredMarker) : undefined;
+
+        if (oldMarker) oldMarker.unhoverAnimation.start();
+        if (newMarker) newMarker.hoverAnimation.start();
+        
+        hoveredObject = hoveredMarker;
       }
 
       renderer.render(scene, camera);
