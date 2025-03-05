@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { FlyZoneShape } from '../locations';
-import { FLYZONE_COLORS } from './constants';
+import { FLYZONE_COLORS, WIND_ARROW } from './constants';
 import { getConfig } from '../config';
 
 export const createCustomFlyZone = (shape: FlyZoneShape) => {
@@ -107,28 +107,37 @@ export const createCustomFlyZone = (shape: FlyZoneShape) => {
 };
 
 export const createWindArrow = (windDirection: number) => {
-  // Create arrow geometry
-  const height = 1000;
-  const radius = 50;
-  
   // Create arrow body (cylinder)
-  const bodyGeometry = new THREE.CylinderGeometry(radius/3, radius/3, height * 0.7, 8);
+  const bodyGeometry = new THREE.CylinderGeometry(
+    WIND_ARROW.radius/3, 
+    WIND_ARROW.radius/3, 
+    WIND_ARROW.height * WIND_ARROW.bodyRatio, 
+    8
+  );
+  
   const bodyMaterial = new THREE.MeshPhongMaterial({ 
-    color: 0x0066ff,
+    color: WIND_ARROW.color,
     transparent: true,
-    opacity: 0.8 
+    opacity: WIND_ARROW.opacity 
   });
+  
   const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
   
   // Create arrow head (cone)
-  const headGeometry = new THREE.ConeGeometry(radius, height * 0.3, 8);
+  const headGeometry = new THREE.ConeGeometry(
+    WIND_ARROW.radius, 
+    WIND_ARROW.height * WIND_ARROW.headRatio, 
+    8
+  );
+  
   const headMaterial = new THREE.MeshPhongMaterial({ 
-    color: 0x0066ff,
+    color: WIND_ARROW.color,
     transparent: true,
-    opacity: 0.8 
+    opacity: WIND_ARROW.opacity 
   });
+  
   const head = new THREE.Mesh(headGeometry, headMaterial);
-  head.position.y = height * 0.5;
+  head.position.y = WIND_ARROW.height * WIND_ARROW.bodyRatio / 2;
   
   // Create arrow group
   const arrow = new THREE.Group();
