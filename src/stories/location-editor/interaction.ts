@@ -10,10 +10,50 @@ export const setupInteraction = (
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
   
+  // Track mouse down position and time to distinguish between clicks and drags
+  let mouseDownPosition = new THREE.Vector2();
+  let mouseDownTime = 0;
+  let isDragging = false;
+  
+  const onMouseDown = (event: MouseEvent) => {
+    const rect = renderer.domElement.getBoundingClientRect();
+    mouseDownPosition.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    mouseDownPosition.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    mouseDownTime = Date.now();
+    isDragging = false;
+  };
+  
   const onMouseMove = (event: MouseEvent) => {
     const rect = renderer.domElement.getBoundingClientRect();
     mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    
+    // Check if we're dragging (moved more than a small threshold)
+    if (!isDragging && mouseDownTime > 0) {
+      const dx = mouse.x - mouseDownPosition.x;
+      const dy = mouse.y - mouseDownPosition.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      
+      // If moved more than a small threshold, consider it a drag
+      if (distance > 0.01) {
+        isDragging = true;
+      }
+    }
+  };
+  
+  const onMouseUp = (event: MouseEvent) => {
+    // Only process as a click if:
+    // 1. Not dragging
+    // 2. Short duration (less than 300ms)
+    const clickDuration = Date.now() - mouseDownTime;
+    
+    if (!isDragging && clickDuration < 300) {
+      onClick(event);
+    }
+    
+    // Reset tracking variables
+    mouseDownTime = 0;
+    isDragging = false;
   };
   
   const onClick = (event: MouseEvent) => {
@@ -122,8 +162,12 @@ export const setupInteraction = (
   };
   
   // Add event listeners
+  renderer.domElement.addEventListener('mousedown', onMouseDown);
   renderer.domElement.addEventListener('mousemove', onMouseMove);
-  renderer.domElement.addEventListener('click', onClick);
+  renderer.domElement.addEventListener('mouseup', onMouseUp);
+  
+  // Remove the direct click listener
+  // renderer.domElement.addEventListener('click', onClick);
   
   return { raycaster, mouse };
 }; 
