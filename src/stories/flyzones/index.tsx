@@ -16,6 +16,7 @@ import {
   createCustomFlyZone,
   createMarker,
   setupLabelRenderer,
+  createSimpleMarker,
 } from './helpers';
 
 
@@ -85,7 +86,42 @@ const FlyZones = {
       opacityFolder.add(config.opacity, 'lines', 0, 1).name('Lines');
     }
 
-    const navigateTo = (position: THREE.Vector3, location?: Location) => {
+    // Add these declarations at the beginning of the load function
+    let landingMarkers: THREE.Object3D[] = [];
+    let landingMarkersVisible = true;
+
+    // Define the setter function
+    const setLandingMarkersVisible = (visible: boolean) => {
+      landingMarkersVisible = visible;
+    };
+
+    // First, let's define a function to load landing markers
+    const loadLandingMarkers = async () => {
+      // Clear existing landing markers
+      landingMarkers.forEach(marker => {
+        scene.remove(marker);
+      });
+      landingMarkers = [];
+      
+      // Get the current location's landing spots
+      if (!currentLocation || !currentLocation.landingSpots) return;
+      
+      // Create markers for each landing spot
+      for (const landingSpot of currentLocation.landingSpots) {
+        try {
+          const marker = await createSimpleMarker(landingSpot.position, MarkerType.LANDING);
+          marker.pin.userData.id = landingSpot.id;
+          scene.add(marker.pin);
+          landingMarkers.push(marker.pin);
+        } catch (error) {
+          console.error("Error creating landing marker:", error);
+        }
+      }
+    };
+
+    let currentLocation: Location | undefined;
+
+    const navigateTo = async (position: THREE.Vector3, location?: Location) => {
       const lookAtPos = position.clone();
       
       if (location) {
@@ -117,6 +153,9 @@ const FlyZones = {
           .easing(TWEEN.Easing.Cubic.InOut)
           .onUpdate(() => controls.update())
           .start();
+
+        currentLocation = location;
+        await loadLandingMarkers(); // Load landing markers for the new location
       } else {
         const offset = 3000;
         const targetPos = position.clone().add(new THREE.Vector3(offset, offset, offset));
@@ -386,6 +425,16 @@ const FlyZones = {
       if (!rootElement) return;
 
       const root = createRoot(rootElement);
+      
+      const toggleLandingsButton = (
+        <button 
+          onClick={() => toggleLandingMarkers(!landingMarkersVisible)}
+          className={landingMarkersVisible ? "active" : ""}
+        >
+          {landingMarkersVisible ? "Hide Landings" : "Show Landings"}
+        </button>
+      );
+      
       const buttons = locations.map(location => (
         <div key={location.id}>
           <button onClick={() => navigateTo(location.position, location)}>
@@ -393,7 +442,15 @@ const FlyZones = {
           </button>
         </div>
       ));
-      root.render(<div className="points">{buttons}</div>);
+      
+      root.render(
+        <div className="points">
+          {buttons}
+          <div className="toggle-buttons">
+            {toggleLandingsButton}
+          </div>
+        </div>
+      );
     };
 
     // Initialize
@@ -401,6 +458,26 @@ const FlyZones = {
     window.addEventListener('resize', () => labelRenderer.setSize(window.innerWidth, window.innerHeight));
     navigateTo(locations[0].position);
     animate();
+
+    // Update the toggle function to also update clickability
+    const toggleLandingMarkers = (visible: boolean) => {
+      landingMarkers.forEach(marker => {
+        marker.visible = visible;
+        
+        // Also update the clickable property to prevent invisible markers from being clickable
+        marker.userData.clickable = visible;
+        
+        // Update all children as well
+        marker.traverse(child => {
+          if (child !== marker) {
+            child.visible = visible;
+            child.userData.clickable = visible;
+          }
+        });
+      });
+      
+      setLandingMarkersVisible(visible);
+    };
   },
 };
 

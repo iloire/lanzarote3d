@@ -7,7 +7,6 @@ import { PilotHeadType } from '../../../components/parts/pilot-head';
 import { createLabel, createPopupContent, createPopupHandler } from './popup';
 import { CSS2DObject, CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { Location, Media } from '../locations';
-import { Marker } from './types';
 import { createWindArrow } from './flyzone';
 
 export const setupLabelRenderer = () => {
@@ -19,6 +18,41 @@ export const setupLabelRenderer = () => {
   document.body.appendChild(labelRenderer.domElement);
   return labelRenderer;
 };
+
+export class MarkerObject {
+  pin: THREE.Object3D;
+  type: MarkerType;
+  hoverAnimation: () => void;
+  unhoverAnimation: () => void;
+  showPopup: () => void;
+  setVisibility: (visible: boolean) => void;
+  flyzone?: THREE.Object3D;
+  
+  constructor(pin: THREE.Object3D, type: MarkerType) {
+    this.pin = pin;
+    this.type = type;
+    this.hoverAnimation = () => {};
+    this.unhoverAnimation = () => {};
+    this.showPopup = () => {};
+    this.setVisibility = () => {};
+  }
+  
+  get userData() {
+    return this.pin.userData;
+  }
+  
+  get visible() {
+    return this.pin.visible;
+  }
+  
+  set visible(value: boolean) {
+    this.pin.visible = value;
+  }
+  
+  traverse(callback: (object: THREE.Object3D) => void) {
+    this.pin.traverse(callback);
+  }
+}
 
 export const createMarker = async (
   position: THREE.Vector3,
@@ -32,7 +66,7 @@ export const createMarker = async (
   location: Location | undefined,
   camera: THREE.Camera,
   conditions?: any[]
-): Promise<Marker> => {
+): Promise<MarkerObject> => {
   const pin = await createPinMesh(type);
   setupPinBasics(pin, position, type);
   
@@ -77,22 +111,21 @@ export const createMarker = async (
     navigateTo
   });
 
-  return {
-    pin,
-    type,
-    hoverAnimation: hover,
-    unhoverAnimation: unhover,
-    showPopup,
-    setVisibility,
-    flyzone: undefined  // Will be set by caller if needed
-  };
+  const marker = new MarkerObject(pin, type);
+  marker.hoverAnimation = hover;
+  marker.unhoverAnimation = unhover;
+  marker.showPopup = showPopup;
+  marker.setVisibility = setVisibility;
+  marker.flyzone = undefined;  // Will be set by caller if needed
+
+  return marker;
 };
 
 export const createPinMesh = async (type: MarkerType) => {
   const colors = PIN_COLORS[type];
   const sizes = PIN_SIZES[type];
   
-  const geometry = new THREE.CylinderGeometry(0, sizes.radius, sizes.height, 12, 1);
+  const geometry = new THREE.CylinderGeometry(sizes.radius/3, sizes.radius, sizes.height, 12, 1);
   const material = new THREE.MeshPhongMaterial({ 
     color: colors.main,
     emissive: colors.emissive,
@@ -125,6 +158,7 @@ export const createPinMesh = async (type: MarkerType) => {
   };
 
   const mesh = new THREE.Mesh(geometry, material);
+  mesh.position.add(new THREE.Vector3(0, sizes.height/2, 0));
   const group = new THREE.Group();
   group.add(mesh);
 
@@ -224,4 +258,32 @@ export const createVisibilityHandler = (params: {
 
 const isMeshWithMaterial = (obj: THREE.Object3D): obj is THREE.Mesh<THREE.BufferGeometry, THREE.MeshPhongMaterial> => {
   return obj instanceof THREE.Mesh && 'material' in obj;
+};
+
+// Add a simplified version of createMarker for landing markers
+export const createSimpleMarker = async (
+  position: THREE.Vector3,
+  type: MarkerType
+): Promise<MarkerObject> => {
+  const pin = await createPinMesh(type);
+  setupPinBasics(pin, position, type);
+  
+  // Setup animations
+  const { hover, unhover } = createHoverAnimations(pin, type === MarkerType.TAKEOFF);
+  
+  // Create a simple marker using the MarkerObject class
+  const marker = new MarkerObject(pin, type);
+  marker.hoverAnimation = hover;
+  marker.unhoverAnimation = unhover;
+  marker.showPopup = () => {};
+  marker.setVisibility = (visible: boolean) => {
+    pin.visible = visible;
+    pin.traverse(child => {
+      if (child !== pin) {
+        child.visible = visible;
+      }
+    });
+  };
+  
+  return marker;
 }; 

@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { Location, Takeoff, LandingSpot, FlightPhase, FlyZoneShape } from "../flyzones/locations";
 
 export interface EditorState {
@@ -335,55 +336,169 @@ export default flyzone;`;
 
 // Helper functions to create markers
 const createLocationMarker = (position: THREE.Vector3): THREE.Object3D => {
-  const geometry = new THREE.CylinderGeometry(300, 300, 1500, 12, 1);
-  const material = new THREE.MeshPhongMaterial({ 
-    color: 0xff0000,
-    emissive: 0x440000,
-    transparent: true,
-    opacity: 0.8
-  });
-  
-  const mesh = new THREE.Mesh(geometry, material);
+  // Create a group to hold the marker elements
   const group = new THREE.Group();
-  group.add(mesh);
-  group.position.copy(position);
-  group.userData.type = 'location';
+  
+  // Create a smaller sphere for the location point
+  const sphere = new THREE.Mesh(
+    new THREE.SphereGeometry(50, 16, 16), // Reduced size from typical 100 to 50
+    new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+  );
+  
+  // Position the sphere at ground level
+  sphere.position.copy(position);
+  
+  // Create a vertical line from ground to a height above
+  const lineHeight = 200; // Height of the vertical line
+  const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(0, lineHeight, 0)
+  ]);
+  
+  const line = new THREE.Line(
+    lineGeometry,
+    new THREE.LineBasicMaterial({ color: 0x00ff00 })
+  );
+  
+  // Position the line at the marker position
+  line.position.copy(position);
+  
+  // Add a label for the location
+  const labelDiv = document.createElement('div');
+  labelDiv.className = 'marker-label';
+  labelDiv.textContent = 'Location';
+  labelDiv.style.color = 'white';
+  labelDiv.style.backgroundColor = 'rgba(0, 128, 0, 0.7)';
+  labelDiv.style.padding = '2px 6px';
+  labelDiv.style.borderRadius = '3px';
+  labelDiv.style.fontSize = '12px';
+  
+  const label = new CSS2DObject(labelDiv);
+  label.position.set(0, lineHeight + 20, 0); // Position above the line
+  
+  // Add everything to the group
+  group.add(sphere);
+  group.add(line);
+  group.add(label);
+  
+  // Set user data for identification
+  group.userData = {
+    type: 'location',
+    locationId: `location-${Date.now()}`
+  };
   
   return group;
 };
 
+// Create a marker for a takeoff
 const createTakeoffMarker = (position: THREE.Vector3): THREE.Object3D => {
-  const geometry = new THREE.CylinderGeometry(0, 100, 150, 12, 1);
-  const material = new THREE.MeshPhongMaterial({ 
-    color: 0x00ff00,
-    emissive: 0x004400,
-    transparent: true,
-    opacity: 0.8
-  });
-  
-  const mesh = new THREE.Mesh(geometry, material);
+  // Create a group to hold the marker elements
   const group = new THREE.Group();
-  group.add(mesh);
-  group.position.copy(position);
-  group.userData.type = 'takeoff';
+  
+  // Create a smaller cone for the takeoff point
+  const cone = new THREE.Mesh(
+    new THREE.ConeGeometry(40, 80, 16), // Smaller cone
+    new THREE.MeshBasicMaterial({ color: 0x0088ff })
+  );
+  
+  // Position the cone at ground level with the tip pointing up
+  cone.position.copy(position);
+  cone.rotation.x = Math.PI; // Flip the cone to point upward
+  
+  // Create a vertical line from ground to a height above
+  const lineHeight = 150; // Height of the vertical line
+  const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(0, lineHeight, 0)
+  ]);
+  
+  const line = new THREE.Line(
+    lineGeometry,
+    new THREE.LineBasicMaterial({ color: 0x0088ff })
+  );
+  
+  // Position the line at the marker position
+  line.position.copy(position);
+  
+  // Add a label for the takeoff
+  const labelDiv = document.createElement('div');
+  labelDiv.className = 'marker-label';
+  labelDiv.textContent = 'Takeoff';
+  labelDiv.style.color = 'white';
+  labelDiv.style.backgroundColor = 'rgba(0, 136, 255, 0.7)';
+  labelDiv.style.padding = '2px 6px';
+  labelDiv.style.borderRadius = '3px';
+  labelDiv.style.fontSize = '12px';
+  
+  const label = new CSS2DObject(labelDiv);
+  label.position.set(0, lineHeight + 20, 0); // Position above the line
+  
+  // Add everything to the group
+  group.add(cone);
+  group.add(line);
+  group.add(label);
+  
+  // Set user data for identification
+  group.userData = {
+    type: 'takeoff',
+    takeoffId: `takeoff-${Date.now()}`
+  };
   
   return group;
 };
 
+// Create a marker for a landing spot
 const createLandingMarker = (position: THREE.Vector3): THREE.Object3D => {
-  const geometry = new THREE.CylinderGeometry(300, 300, 50, 12, 1);
-  const material = new THREE.MeshPhongMaterial({ 
-    color: 0x0000ff,
-    emissive: 0x000044,
-    transparent: true,
-    opacity: 0.8
-  });
-  
-  const mesh = new THREE.Mesh(geometry, material);
+  // Create a group to hold the marker elements
   const group = new THREE.Group();
-  group.add(mesh);
-  group.position.copy(position);
-  group.userData.type = 'landing';
+  
+  // Create a smaller cylinder for the landing point
+  const cylinder = new THREE.Mesh(
+    new THREE.CylinderGeometry(40, 40, 20, 16), // Smaller cylinder
+    new THREE.MeshBasicMaterial({ color: 0xff8800 })
+  );
+  
+  // Position the cylinder at ground level
+  cylinder.position.copy(position);
+  
+  // Create a vertical line from ground to a height above
+  const lineHeight = 150; // Height of the vertical line
+  const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(0, lineHeight, 0)
+  ]);
+  
+  const line = new THREE.Line(
+    lineGeometry,
+    new THREE.LineBasicMaterial({ color: 0xff8800 })
+  );
+  
+  // Position the line at the marker position
+  line.position.copy(position);
+  
+  // Add a label for the landing spot
+  const labelDiv = document.createElement('div');
+  labelDiv.className = 'marker-label';
+  labelDiv.textContent = 'Landing';
+  labelDiv.style.color = 'white';
+  labelDiv.style.backgroundColor = 'rgba(255, 136, 0, 0.7)';
+  labelDiv.style.padding = '2px 6px';
+  labelDiv.style.borderRadius = '3px';
+  labelDiv.style.fontSize = '12px';
+  
+  const label = new CSS2DObject(labelDiv);
+  label.position.set(0, lineHeight + 20, 0); // Position above the line
+  
+  // Add everything to the group
+  group.add(cylinder);
+  group.add(line);
+  group.add(label);
+  
+  // Set user data for identification
+  group.userData = {
+    type: 'landing',
+    landingId: `landing-${Date.now()}`
+  };
   
   return group;
 };
