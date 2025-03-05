@@ -9,38 +9,148 @@ import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRe
 import { Takeoff, Media, Location } from "./locations";
 import {
   TAKEOFF_VISIBILITY_THRESHOLD, 
-  createMarker,
   type Marker,
-  setupLabelRenderer,
   setupPopupContainer,
   VISIBILITY_THRESHOLDS,
   MarkerType,
   createCustomFlyZone
 } from './helpers';
 
+import {
+  createMarker,
+  setupLabelRenderer,
+  createPinMesh,
+  createHoverAnimations,
+  createWindArrow,
+  createLabel,
+  createFadeAnimation,
+  createVisibilityHandler,
+  createPopupHandler,
+  setupPinBasics
+} from './helpers';
 
+import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
+
+import { 
+  getConfig, 
+  updateConfig, 
+  defaultConfig 
+} from './config';
 
 const FlyZones = {
   load: async (options: StoryOptions) => {
-    const { camera, scene, renderer, controls } = options;
+    const { camera, scene, renderer, controls, gui } = options;
+
+    // Add configuration controls to GUI if available
+    if (gui) {
+      const config = getConfig();
+      const flyzonesFolder = gui.addFolder('Flyzones');
+      
+      // Display settings
+      const displayFolder = flyzonesFolder.addFolder('Display');
+      
+      displayFolder.add(config.display, 'flyzone')
+        .name('Show Flyzones')
+        .onChange((value: boolean) => {
+          updateConfig({ display: { flyzone: value } });
+          // Update visibility of existing flyzones
+          markers.forEach(marker => {
+            if (marker.flyzone) {
+              marker.flyzone.visible = value && 
+                camera.position.distanceTo(marker.pin.position) < VISIBILITY_THRESHOLDS.DETAIL_VIEW;
+            }
+          });
+        });
+
+      displayFolder.add(config.display, 'markers')
+        .name('Show Markers')
+        .onChange((value: boolean) => {
+          updateConfig({ display: { markers: value } });
+          markers.forEach(marker => {
+            marker.pin.visible = value;
+          });
+        });
+
+      displayFolder.add(config.display, 'labels')
+        .name('Show Labels')
+        .onChange((value: boolean) => {
+          updateConfig({ display: { labels: value } });
+          // Update label visibility
+          markers.forEach(marker => {
+            const label = marker.pin.children.find(child => child instanceof CSS2DObject);
+            if (label) label.visible = value;
+          });
+        });
+      
+      // Colors settings
+      const colorsFolder = flyzonesFolder.addFolder('Colors');
+      colorsFolder.addColor(config.colors, 'takeoff').name('Takeoff Zone');
+      colorsFolder.addColor(config.colors, 'landing').name('Landing Zone');
+      colorsFolder.addColor(config.colors, 'ridge').name('Ridge Zone');
+      colorsFolder.addColor(config.colors, 'approach').name('Approach Zone');
+      
+      // Opacity settings
+      const opacityFolder = flyzonesFolder.addFolder('Opacity');
+      opacityFolder.add(config.opacity, 'boxes', 0, 1).name('Boxes');
+      opacityFolder.add(config.opacity, 'lines', 0, 1).name('Lines');
+    }
 
     const navigateTo = (position: THREE.Vector3, location?: Location) => {
       const lookAtPos = position.clone();
       
       if (location) {
-        // Use location's camera configuration
         const view = location.cameraView;
         const distance = view.distance || 20000;
         
+        // Calculate target camera position
         const cameraDirection = view.position.clone().multiplyScalar(distance);
-        const cameraPos = position.clone().add(cameraDirection);
-        const lookAt = view.lookAt ? view.lookAt.clone() : lookAtPos;
-        
-        camera.animateTo(cameraPos, lookAt, 1000, controls);
+        const targetPos = position.clone().add(cameraDirection);
+        const targetLookAt = view.lookAt ? view.lookAt.clone() : lookAtPos;
+
+        // Animate camera position
+        new TWEEN.Tween(camera.position)
+          .to({
+            x: targetPos.x,
+            y: targetPos.y,
+            z: targetPos.z
+          }, 1000)
+          .easing(TWEEN.Easing.Cubic.InOut)
+          .start();
+
+        // Animate controls target
+        new TWEEN.Tween(controls.target)
+          .to({
+            x: targetLookAt.x,
+            y: targetLookAt.y,
+            z: targetLookAt.z
+          }, 1000)
+          .easing(TWEEN.Easing.Cubic.InOut)
+          .onUpdate(() => controls.update())
+          .start();
       } else {
         const offset = 3000;
-        const cameraPos = position.clone().add(new THREE.Vector3(offset, offset, offset));
-        camera.animateTo(cameraPos, lookAtPos, 1000, controls);
+        const targetPos = position.clone().add(new THREE.Vector3(offset, offset, offset));
+
+        // Animate camera position
+        new TWEEN.Tween(camera.position)
+          .to({
+            x: targetPos.x,
+            y: targetPos.y,
+            z: targetPos.z
+          }, 1000)
+          .easing(TWEEN.Easing.Cubic.InOut)
+          .start();
+
+        // Animate controls target
+        new TWEEN.Tween(controls.target)
+          .to({
+            x: lookAtPos.x,
+            y: lookAtPos.y,
+            z: lookAtPos.z
+          }, 1000)
+          .easing(TWEEN.Easing.Cubic.InOut)
+          .onUpdate(() => controls.update())
+          .start();
       }
     };
 
@@ -48,6 +158,75 @@ const FlyZones = {
     const labelRenderer = setupLabelRenderer();
     const popupContainer = setupPopupContainer();
     console.log('Initialized popup container:', popupContainer); // Debug log
+
+    // Create a marker
+    const createMarker = async (
+      position: THREE.Vector3,
+      title: string,
+      description: string,
+      mediaItems: any[],
+      type: MarkerType,
+      scene: THREE.Scene,
+      popupContainer: HTMLDivElement,
+      navigateTo: (position: THREE.Vector3, location?: Location) => void,
+      location: Location | undefined,
+      camera: THREE.Camera,
+      conditions?: any[]
+    ): Promise<Marker> => {
+      const pin = await createPinMesh(type);
+      setupPinBasics(pin, position, type);
+      
+      // Add wind arrow for takeoffs
+      if (type === MarkerType.TAKEOFF && conditions && conditions.length > 0) {
+        const bestConditions = conditions.reduce((best, current) => 
+          current.rating > best.rating ? current : best, conditions[0]
+        );
+        const windArrow = createWindArrow(bestConditions.direction.ideal);
+        pin.add(windArrow);
+      }
+      
+      scene.add(pin);
+
+      // Add label
+      const label = createLabel(title);
+      pin.add(label);
+
+      // Setup animations
+      const { hover, unhover } = createHoverAnimations(pin, type === MarkerType.TAKEOFF);
+      const fadeAnimation = createFadeAnimation(pin);
+
+      // Create visibility handler
+      const setVisibility = createVisibilityHandler({
+        pin,
+        label,
+        type,
+        position,
+        camera,
+        fadeAnimation
+      });
+
+      // Create popup handler
+      const showPopup = createPopupHandler({
+        type,
+        title,
+        description,
+        mediaItems,
+        position,
+        location,
+        popupContainer,
+        navigateTo
+      });
+
+      return {
+        pin,
+        type,
+        hoverAnimation: hover,
+        unhoverAnimation: unhover,
+        showPopup,
+        setVisibility,
+        flyzone: undefined  // Will be set by caller if needed
+      };
+    };
 
     // Create markers
     const createMarkers = async () => {
@@ -108,7 +287,8 @@ const FlyZones = {
         let flyzone;
         if (location.flyzone) {
           flyzone = createCustomFlyZone(location.flyzone);
-          flyzone.visible = false;
+          // Use config to determine initial visibility
+          flyzone.visible = getConfig().display.flyzone;
           scene.add(flyzone);
           locationMarker.flyzone = flyzone;
         }
@@ -200,8 +380,10 @@ const FlyZones = {
           // Show takeoff markers and other details only when close
           marker.setVisibility(isDetailView);
         }
+        
+        // Update flyzone visibility based on config and distance
         if (marker.flyzone) {
-          marker.flyzone.visible = isDetailView;
+          marker.flyzone.visible = getConfig().display.flyzone && isDetailView;
         }
       });
 
