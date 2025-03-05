@@ -2,7 +2,8 @@ import * as THREE from "three";
 import { Location, Takeoff, LandingSpot, FlightPhase, FlyZoneShape } from "../flyzones/locations";
 
 export interface EditorState {
-  currentLocation: EditorLocation | null;
+  locations: EditorLocation[];
+  currentLocationIndex: number | null;
   selectedItem: any | null;
   mode: "location" | "takeoff" | "landing" | "flyzone";
   flyZonePhaseType: "takeoff" | "ridge" | "approach" | "landing";
@@ -95,14 +96,16 @@ export const createNewLocation = (state: EditorState, position: THREE.Vector3, s
   scene.add(marker);
   state.markers.push(marker);
   
-  // Update state
-  state.currentLocation = newLocation;
+  // Add to locations array and set as current
+  state.locations.push(newLocation);
+  state.currentLocationIndex = state.locations.length - 1;
   state.selectedItem = newLocation;
   
   // Add to history
   state.history.push({
     type: 'create_location',
-    object: marker
+    object: marker,
+    data: { locationIndex: state.currentLocationIndex }
   });
   
   return newLocation;
@@ -110,11 +113,11 @@ export const createNewLocation = (state: EditorState, position: THREE.Vector3, s
 
 // Add a takeoff to the current location
 export const addTakeoff = (state: EditorState, position: THREE.Vector3, scene: THREE.Scene): EditorTakeoff | null => {
-  if (!state.currentLocation) return null;
+  if (state.currentLocationIndex === null) return null;
   
   const takeoff: EditorTakeoff = {
     id: `takeoff-${Date.now()}`,
-    title: `Takeoff ${state.currentLocation.takeoffs.length + 1}`,
+    title: `Takeoff ${state.locations[state.currentLocationIndex].takeoffs.length + 1}`,
     description: "Description of the takeoff",
     position: position.clone(),
     elevation: position.y,
@@ -123,7 +126,7 @@ export const addTakeoff = (state: EditorState, position: THREE.Vector3, scene: T
   
   scene.add(takeoff.marker);
   state.markers.push(takeoff.marker);
-  state.currentLocation.takeoffs.push(takeoff);
+  state.locations[state.currentLocationIndex].takeoffs.push(takeoff);
   state.selectedItem = takeoff;
   
   // Add to history
@@ -138,11 +141,11 @@ export const addTakeoff = (state: EditorState, position: THREE.Vector3, scene: T
 
 // Add a landing spot to the current location
 export const addLandingSpot = (state: EditorState, position: THREE.Vector3, scene: THREE.Scene): EditorLandingSpot | null => {
-  if (!state.currentLocation) return null;
+  if (state.currentLocationIndex === null) return null;
   
   const landingSpot: EditorLandingSpot = {
     id: `landing-${Date.now()}`,
-    title: `Landing ${state.currentLocation.landingSpots.length + 1}`,
+    title: `Landing ${state.locations[state.currentLocationIndex].landingSpots.length + 1}`,
     description: "Description of the landing spot",
     position: position.clone(),
     elevation: position.y,
@@ -152,7 +155,7 @@ export const addLandingSpot = (state: EditorState, position: THREE.Vector3, scen
   
   scene.add(landingSpot.marker);
   state.markers.push(landingSpot.marker);
-  state.currentLocation.landingSpots.push(landingSpot);
+  state.locations[state.currentLocationIndex].landingSpots.push(landingSpot);
   state.selectedItem = landingSpot;
   
   // Add to history
@@ -171,9 +174,9 @@ export const addFlyZonePhase = (
   position: THREE.Vector3, 
   scene: THREE.Scene
 ): EditorFlightPhase | null => {
-  if (!state.currentLocation) return null;
+  if (state.currentLocationIndex === null) return null;
   
-  const phaseId = `${state.flyZonePhaseType}-${Object.keys(state.currentLocation.flyzone.phases).length + 1}`;
+  const phaseId = `${state.flyZonePhaseType}-${Object.keys(state.locations[state.currentLocationIndex].flyzone.phases).length + 1}`;
   
   const phase: EditorFlightPhase = {
     type: state.flyZonePhaseType,
@@ -189,7 +192,7 @@ export const addFlyZonePhase = (
   
   scene.add(phase.object);
   state.flyZones.push(phase.object);
-  state.currentLocation.flyzone.phases[phaseId] = phase;
+  state.locations[state.currentLocationIndex].flyzone.phases[phaseId] = phase;
   state.selectedItem = phase;
   
   // Add to history
@@ -202,200 +205,132 @@ export const addFlyZonePhase = (
   return phase;
 };
 
-// Export location data as formatted TypeScript code
-export const exportLocationData = (state: EditorState): string => {
-  if (!state.currentLocation) {
-    alert("No location to export!");
-    return "";
+// Add this function to copy text to clipboard
+export const copyToClipboard = (text: string): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text)
+        .then(() => {
+          console.log('Text copied to clipboard');
+          resolve();
+        })
+        .catch(err => {
+          console.error('Failed to copy text: ', err);
+          reject(err);
+        });
+    } else {
+      // Fallback for older browsers
+      try {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        if (successful) {
+          console.log('Text copied to clipboard (fallback)');
+          resolve();
+        } else {
+          console.error('Failed to copy text (fallback)');
+          reject(new Error('Failed to copy text'));
+        }
+      } catch (err) {
+        console.error('Failed to copy text (fallback): ', err);
+        reject(err);
+      }
+    }
+  });
+};
+
+// Modify the exportLocationData function to return the data
+export const exportLocationData = (state: EditorState): { metadata: string, takeoffs: string, landingSpots: string, flyzone: string } => {
+  const currentLocation = getCurrentLocation(state);
+  if (!currentLocation) {
+    alert('No location to export');
+    return { metadata: '', takeoffs: '', landingSpots: '', flyzone: '' };
   }
-  
-  const location = state.currentLocation;
-  
-  // Format the location data as TypeScript code
-  const metadataCode = `
-import * as THREE from 'three';
+
+  // Generate metadata.ts
+  const metadata = `import * as THREE from 'three';
 import { LocationMetadata } from '../index';
 
 const metadata: LocationMetadata = {
-  id: '${location.id}',
-  title: '${location.title}',
-  description: '${location.description}',
-  position: new THREE.Vector3(${location.position.x}, ${location.position.y}, ${location.position.z}),
+  id: '${currentLocation.id}',
+  title: '${currentLocation.title}',
+  description: '${currentLocation.description}',
+  position: new THREE.Vector3(${currentLocation.position.x}, ${currentLocation.position.y}, ${currentLocation.position.z}),
   cameraView: {
-    position: new THREE.Vector3(${location.cameraView.position.x}, ${location.cameraView.position.y}, ${location.cameraView.position.z}),
-    distance: ${location.cameraView.distance}
+    position: new THREE.Vector3(${currentLocation.cameraView.position.x}, ${currentLocation.cameraView.position.y}, ${currentLocation.cameraView.position.z}),
+    distance: ${currentLocation.cameraView.distance}
   }
 };
 
 export default metadata;`;
 
-  const takeoffsCode = `
-import * as THREE from 'three';
+  // Generate takeoffs.ts
+  const takeoffs = `import * as THREE from 'three';
 import { Takeoff } from '../index';
 
 const takeoffs: Takeoff[] = [
-  ${location.takeoffs.map(takeoff => `{
-    id: '${takeoff.id}',
-    title: '${takeoff.title}',
-    description: '${takeoff.description}',
-    position: new THREE.Vector3(${takeoff.position.x}, ${takeoff.position.y}, ${takeoff.position.z}),
-    elevation: ${takeoff.elevation},
-    conditions: [
-      {
-        direction: {
-          ideal: 320,
-          range: [290, 350]
-        },
-        speed: {
-          min: 10,
-          max: 25,
-          ideal: 15
-        },
-        rating: 5,
-        description: 'Perfect conditions'
-      }
-    ],
-    mediaItems: [
-      {
-        type: 'image',
-        url: '/assets/images/takeoff.jpg',
-        title: 'Takeoff'
-      }
-    ]
-  }`).join(',\n  ')}
+${currentLocation.takeoffs.map(t => `  {
+    id: '${t.id}',
+    title: '${t.title}',
+    description: '${t.description}',
+    position: new THREE.Vector3(${t.position.x}, ${t.position.y}, ${t.position.z}),
+    elevation: ${t.elevation}
+  }`).join(',\n')}
 ];
 
 export default takeoffs;`;
 
-  const landingSpotsCode = `
-import * as THREE from 'three';
+  // Generate landingSpots.ts
+  const landingSpots = `import * as THREE from 'three';
 import { LandingSpot } from '../index';
 
 const landingSpots: LandingSpot[] = [
-  ${location.landingSpots.map(landing => `{
-    id: '${landing.id}',
-    title: '${landing.title}',
-    description: '${landing.description}',
-    position: new THREE.Vector3(${landing.position.x}, ${landing.position.y}, ${landing.position.z}),
-    elevation: ${landing.elevation},
-    type: '${landing.type}',
-    mediaItems: [
-      {
-        type: 'image',
-        url: '/assets/images/landing.jpg',
-        title: 'Landing Area'
-      }
-    ]
-  }`).join(',\n  ')}
+${currentLocation.landingSpots.map(l => `  {
+    id: '${l.id}',
+    title: '${l.title}',
+    description: '${l.description}',
+    position: new THREE.Vector3(${l.position.x}, ${l.position.y}, ${l.position.z}),
+    elevation: ${l.elevation},
+    type: '${l.type}'
+  }`).join(',\n')}
 ];
 
 export default landingSpots;`;
 
-  const flyzoneCode = `
-import * as THREE from 'three';
-import { FlyZoneShape } from '../index';
+  // Generate flyzone.ts
+  const flyzone = `import * as THREE from 'three';
+import { FlyZone, FlightPhase } from '../index';
 
-const flyzone: FlyZoneShape = {
-  phases: {
-    ${Object.keys(location.flyzone.phases).map(key => `${key}: {
-      type: '${location.flyzone.phases[key].type}',
-      position: new THREE.Vector3(${location.flyzone.phases[key].position.x}, ${location.flyzone.phases[key].position.y}, ${location.flyzone.phases[key].position.z}),
-      dimensions: {
-        width: ${location.flyzone.phases[key].dimensions.width},
-        height: ${location.flyzone.phases[key].dimensions.height},
-        length: ${location.flyzone.phases[key].dimensions.length}
-      }${location.flyzone.phases[key].nextPhases && location.flyzone.phases[key].nextPhases.length > 0 ? `,
-      nextPhases: [${location.flyzone.phases[key].nextPhases.map(p => `'${p}'`).join(', ')}]` : ''}
-    }`).join(',\n    ')}
-  }
+const phases: Record<string, FlightPhase> = {
+${Object.keys(currentLocation.flyzone.phases).map(id => {
+  const phase = currentLocation.flyzone.phases[id];
+  return `  '${id}': {
+    type: '${phase.type}',
+    position: new THREE.Vector3(${phase.position.x}, ${phase.position.y}, ${phase.position.z}),
+    dimensions: {
+      width: ${phase.dimensions.width},
+      height: ${phase.dimensions.height},
+      length: ${phase.dimensions.length}
+    }${phase.nextPhases ? `,
+    nextPhases: [${phase.nextPhases.map(p => `'${p}'`).join(', ')}]` : ''}
+  }`;
+}).join(',\n')}
+};
+
+const flyzone: FlyZone = {
+  phases
 };
 
 export default flyzone;`;
 
-  const indexCode = `
-import { Location } from '../index';
-import metadata from './metadata';
-import takeoffs from './takeoffs';
-import landingSpots from './landingSpots';
-import flyzone from './flyzone';
-
-const ${location.id.replace(/-/g, '_')}: Location = {
-  ...metadata,
-  takeoffs,
-  landingSpots,
-  flyzone
-};
-
-export default ${location.id.replace(/-/g, '_')};`;
-
-  // Display the code in a modal or console
-  console.log("=== METADATA ===");
-  console.log(metadataCode);
-  console.log("\n=== TAKEOFFS ===");
-  console.log(takeoffsCode);
-  console.log("\n=== LANDING SPOTS ===");
-  console.log(landingSpotsCode);
-  console.log("\n=== FLYZONE ===");
-  console.log(flyzoneCode);
-  console.log("\n=== INDEX ===");
-  console.log(indexCode);
-  
-  // Create a modal to display the code
-  const modal = document.createElement('div');
-  modal.className = 'export-modal';
-  modal.innerHTML = `
-    <div class="export-modal-content">
-      <h2>Location Data Export</h2>
-      <div class="export-tabs">
-        <button class="tab-button active" data-tab="metadata">metadata.ts</button>
-        <button class="tab-button" data-tab="takeoffs">takeoffs.ts</button>
-        <button class="tab-button" data-tab="landingSpots">landingSpots.ts</button>
-        <button class="tab-button" data-tab="flyzone">flyzone.ts</button>
-        <button class="tab-button" data-tab="index">index.ts</button>
-      </div>
-      <div class="export-tab-content active" id="metadata-content">
-        <pre>${metadataCode}</pre>
-      </div>
-      <div class="export-tab-content" id="takeoffs-content">
-        <pre>${takeoffsCode}</pre>
-      </div>
-      <div class="export-tab-content" id="landingSpots-content">
-        <pre>${landingSpotsCode}</pre>
-      </div>
-      <div class="export-tab-content" id="flyzone-content">
-        <pre>${flyzoneCode}</pre>
-      </div>
-      <div class="export-tab-content" id="index-content">
-        <pre>${indexCode}</pre>
-      </div>
-      <button class="close-modal">Close</button>
-    </div>
-  `;
-  document.body.appendChild(modal);
-  
-  // Add event listeners for tabs
-  const tabButtons = modal.querySelectorAll('.tab-button');
-  tabButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      // Remove active class from all buttons and content
-      tabButtons.forEach(b => b.classList.remove('active'));
-      const tabContents = modal.querySelectorAll('.export-tab-content');
-      tabContents.forEach(c => c.classList.remove('active'));
-      
-      // Add active class to clicked button and corresponding content
-      button.classList.add('active');
-      const tabName = button.getAttribute('data-tab');
-      document.getElementById(`${tabName}-content`).classList.add('active');
-    });
-  });
-  
-  // Add event listener for close button
-  const closeButton = modal.querySelector('.close-modal');
-  closeButton.addEventListener('click', () => {
-    modal.remove();
-  });
-  
-  return "Data exported successfully!";
+  return { metadata, takeoffs, landingSpots, flyzone };
 };
 
 // Helper functions to create markers
@@ -505,7 +440,7 @@ const createFlyZonePhaseMarker = (position: THREE.Vector3, type: string): THREE.
 
 // Add this function to the state.ts file
 export const resetLocation = (state: EditorState, scene: THREE.Scene): void => {
-  if (state.currentLocation) {
+  if (state.currentLocationIndex !== null) {
     // Remove all markers from the scene
     state.markers.forEach(marker => {
       scene.remove(marker);
@@ -517,7 +452,23 @@ export const resetLocation = (state: EditorState, scene: THREE.Scene): void => {
     });
     
     // Reset the state
-    state.currentLocation = null;
+    state.locations[state.currentLocationIndex] = {
+      id: '',
+      title: '',
+      description: '',
+      position: new THREE.Vector3(),
+      cameraView: {
+        position: new THREE.Vector3(),
+        distance: 0
+      },
+      takeoffs: [],
+      landingSpots: [],
+      flyzone: {
+        phases: {},
+        object: null
+      }
+    };
+    state.currentLocationIndex = null;
     state.selectedItem = null;
     state.markers = [];
     state.flyZones = [];
@@ -546,13 +497,13 @@ export const undoLastAction = (state: EditorState, scene: THREE.Scene): void => 
   // Remove from appropriate arrays and update state
   switch (lastAction.type) {
     case 'create_location':
-      state.currentLocation = null;
+      state.locations.pop();
       state.markers = state.markers.filter(m => m !== lastAction.object);
       break;
       
     case 'add_takeoff':
-      if (state.currentLocation) {
-        state.currentLocation.takeoffs = state.currentLocation.takeoffs.filter(
+      if (state.currentLocationIndex !== null) {
+        state.locations[state.currentLocationIndex].takeoffs = state.locations[state.currentLocationIndex].takeoffs.filter(
           t => t.marker !== lastAction.object
         );
         state.markers = state.markers.filter(m => m !== lastAction.object);
@@ -560,8 +511,8 @@ export const undoLastAction = (state: EditorState, scene: THREE.Scene): void => 
       break;
       
     case 'add_landing':
-      if (state.currentLocation) {
-        state.currentLocation.landingSpots = state.currentLocation.landingSpots.filter(
+      if (state.currentLocationIndex !== null) {
+        state.locations[state.currentLocationIndex].landingSpots = state.locations[state.currentLocationIndex].landingSpots.filter(
           l => l.marker !== lastAction.object
         );
         state.markers = state.markers.filter(m => m !== lastAction.object);
@@ -569,10 +520,10 @@ export const undoLastAction = (state: EditorState, scene: THREE.Scene): void => 
       break;
       
     case 'add_flyzone':
-      if (state.currentLocation && lastAction.data) {
+      if (state.currentLocationIndex !== null && lastAction.data) {
         const { phaseId } = lastAction.data;
-        if (phaseId && state.currentLocation.flyzone.phases[phaseId]) {
-          delete state.currentLocation.flyzone.phases[phaseId];
+        if (phaseId && state.locations[state.currentLocationIndex].flyzone.phases[phaseId]) {
+          delete state.locations[state.currentLocationIndex].flyzone.phases[phaseId];
         }
         state.flyZones = state.flyZones.filter(f => f !== lastAction.object);
       }
@@ -586,27 +537,25 @@ export const undoLastAction = (state: EditorState, scene: THREE.Scene): void => 
 
 // Save the current state to localStorage
 export const saveToLocalStorage = (state: EditorState): void => {
-  if (!state.currentLocation) return;
-  
   try {
     // Create a serializable version of the state (without THREE.js objects)
     const serializable = {
-      currentLocation: {
-        ...state.currentLocation,
+      locations: state.locations.map(location => ({
+        ...location,
         position: {
-          x: state.currentLocation.position.x,
-          y: state.currentLocation.position.y,
-          z: state.currentLocation.position.z
+          x: location.position.x,
+          y: location.position.y,
+          z: location.position.z
         },
         cameraView: {
           position: {
-            x: state.currentLocation.cameraView.position.x,
-            y: state.currentLocation.cameraView.position.y,
-            z: state.currentLocation.cameraView.position.z
+            x: location.cameraView.position.x,
+            y: location.cameraView.position.y,
+            z: location.cameraView.position.z
           },
-          distance: state.currentLocation.cameraView.distance
+          distance: location.cameraView.distance
         },
-        takeoffs: state.currentLocation.takeoffs.map(t => ({
+        takeoffs: location.takeoffs.map(t => ({
           ...t,
           position: {
             x: t.position.x,
@@ -616,7 +565,7 @@ export const saveToLocalStorage = (state: EditorState): void => {
           // Remove the marker reference as it can't be serialized
           marker: null
         })),
-        landingSpots: state.currentLocation.landingSpots.map(l => ({
+        landingSpots: location.landingSpots.map(l => ({
           ...l,
           position: {
             x: l.position.x,
@@ -627,8 +576,8 @@ export const saveToLocalStorage = (state: EditorState): void => {
           marker: null
         })),
         flyzone: {
-          phases: Object.keys(state.currentLocation.flyzone.phases).reduce((acc, key) => {
-            const phase = state.currentLocation.flyzone.phases[key];
+          phases: Object.keys(location.flyzone.phases).reduce((acc, key) => {
+            const phase = location.flyzone.phases[key];
             acc[key] = {
               ...phase,
               position: {
@@ -643,7 +592,8 @@ export const saveToLocalStorage = (state: EditorState): void => {
           }, {} as Record<string, any>),
           object: null
         }
-      },
+      })),
+      currentLocationIndex: state.currentLocationIndex,
       mode: state.mode,
       flyZonePhaseType: state.flyZonePhaseType
     };
@@ -665,7 +615,8 @@ export const loadFromLocalStorage = (scene: THREE.Scene): EditorState | null => 
     
     // Create a new state with the saved data
     const state: EditorState = {
-      currentLocation: null,
+      locations: [],
+      currentLocationIndex: parsed.currentLocationIndex || null,
       selectedItem: null,
       mode: parsed.mode || 'location',
       flyZonePhaseType: parsed.flyZonePhaseType || 'takeoff',
@@ -674,62 +625,64 @@ export const loadFromLocalStorage = (scene: THREE.Scene): EditorState | null => 
       history: []
     };
     
-    if (parsed.currentLocation) {
-      // Recreate the location with THREE.js objects
-      const position = new THREE.Vector3(
-        parsed.currentLocation.position.x,
-        parsed.currentLocation.position.y,
-        parsed.currentLocation.position.z
-      );
-      
-      // Create the location
-      const location = createNewLocation(state, position, scene);
-      
-      // Update with saved properties
-      location.id = parsed.currentLocation.id;
-      location.title = parsed.currentLocation.title;
-      location.description = parsed.currentLocation.description;
-      location.cameraView.position = new THREE.Vector3(
-        parsed.currentLocation.cameraView.position.x,
-        parsed.currentLocation.cameraView.position.y,
-        parsed.currentLocation.cameraView.position.z
-      );
-      location.cameraView.distance = parsed.currentLocation.cameraView.distance;
-      
-      // Recreate takeoffs
-      if (parsed.currentLocation.takeoffs && Array.isArray(parsed.currentLocation.takeoffs)) {
-        // Clear the takeoffs array that was created by createNewLocation
-        location.takeoffs = [];
+    if (parsed.locations && Array.isArray(parsed.locations)) {
+      // Recreate each location
+      parsed.locations.forEach((savedLocation: any) => {
+        const position = new THREE.Vector3(
+          savedLocation.position.x,
+          savedLocation.position.y,
+          savedLocation.position.z
+        );
         
-        parsed.currentLocation.takeoffs.forEach((t: any) => {
-          const position = new THREE.Vector3(t.position.x, t.position.y, t.position.z);
-          addTakeoff(state, position, scene);
-        });
-      }
-      
-      // Recreate landing spots
-      if (parsed.currentLocation.landingSpots && Array.isArray(parsed.currentLocation.landingSpots)) {
-        // Clear the landing spots array that was created by createNewLocation
-        location.landingSpots = [];
+        // Create a new location
+        const location = createNewLocation(state, position, scene);
         
-        parsed.currentLocation.landingSpots.forEach((l: any) => {
-          const position = new THREE.Vector3(l.position.x, l.position.y, l.position.z);
-          addLandingSpot(state, position, scene);
-        });
-      }
-      
-      // Recreate flyzone phases
-      if (parsed.currentLocation.flyzone && parsed.currentLocation.flyzone.phases) {
-        // Clear the phases object that was created by createNewLocation
-        location.flyzone.phases = {};
+        // Update with saved properties
+        location.id = savedLocation.id;
+        location.title = savedLocation.title;
+        location.description = savedLocation.description;
+        location.cameraView.position = new THREE.Vector3(
+          savedLocation.cameraView.position.x,
+          savedLocation.cameraView.position.y,
+          savedLocation.cameraView.position.z
+        );
+        location.cameraView.distance = savedLocation.cameraView.distance;
         
-        Object.keys(parsed.currentLocation.flyzone.phases).forEach((key) => {
-          const phase = parsed.currentLocation.flyzone.phases[key];
-          const position = new THREE.Vector3(phase.position.x, phase.position.y, phase.position.z);
-          state.flyZonePhaseType = phase.type;
-          addFlyZonePhase(state, position, scene);
-        });
-      }
+        // Recreate takeoffs
+        if (savedLocation.takeoffs && Array.isArray(savedLocation.takeoffs)) {
+          // Clear the takeoffs array that was created by createNewLocation
+          location.takeoffs = [];
+          
+          savedLocation.takeoffs.forEach((t: any) => {
+            const position = new THREE.Vector3(t.position.x, t.position.y, t.position.z);
+            addTakeoff(state, position, scene);
+          });
+        }
+        
+        // Recreate landing spots
+        if (savedLocation.landingSpots && Array.isArray(savedLocation.landingSpots)) {
+          // Clear the landing spots array that was created by createNewLocation
+          location.landingSpots = [];
+          
+          savedLocation.landingSpots.forEach((l: any) => {
+            const position = new THREE.Vector3(l.position.x, l.position.y, l.position.z);
+            addLandingSpot(state, position, scene);
+          });
+        }
+        
+        // Recreate flyzone phases
+        if (savedLocation.flyzone && savedLocation.flyzone.phases) {
+          // Clear the phases object that was created by createNewLocation
+          location.flyzone.phases = {};
+          
+          Object.keys(savedLocation.flyzone.phases).forEach((key) => {
+            const phase = savedLocation.flyzone.phases[key];
+            const position = new THREE.Vector3(phase.position.x, phase.position.y, phase.position.z);
+            state.flyZonePhaseType = phase.type;
+            addFlyZonePhase(state, position, scene);
+          });
+        }
+      });
     }
     
     console.log('State loaded from localStorage');
@@ -744,4 +697,94 @@ export const loadFromLocalStorage = (scene: THREE.Scene): EditorState | null => 
 export const clearLocalStorage = (): void => {
   localStorage.removeItem('locationEditor');
   console.log('LocationEditor localStorage cleared');
+};
+
+// Helper to get the current location
+export const getCurrentLocation = (state: EditorState): EditorLocation | null => {
+  if (state.currentLocationIndex === null) return null;
+  return state.locations[state.currentLocationIndex] || null;
+};
+
+// Helper to set the current location
+export const setCurrentLocation = (state: EditorState, index: number | null): void => {
+  state.currentLocationIndex = index;
+  state.selectedItem = index !== null ? state.locations[index] : null;
+};
+
+// Delete a location
+export const deleteLocation = (state: EditorState, index: number, scene: THREE.Scene): void => {
+  if (index < 0 || index >= state.locations.length) return;
+  
+  const location = state.locations[index];
+  
+  // Remove all markers for this location
+  const markersToRemove: THREE.Object3D[] = [];
+  
+  // Find the location marker
+  const locationMarker = state.markers.find(m => 
+    m.userData.type === 'location' && m.userData.locationId === location.id
+  );
+  if (locationMarker) markersToRemove.push(locationMarker);
+  
+  // Find takeoff markers
+  location.takeoffs.forEach(t => {
+    if (t.marker) markersToRemove.push(t.marker);
+  });
+  
+  // Find landing spot markers
+  location.landingSpots.forEach(l => {
+    if (l.marker) markersToRemove.push(l.marker);
+  });
+  
+  // Find flyzone objects
+  Object.keys(location.flyzone.phases).forEach(key => {
+    const phase = location.flyzone.phases[key];
+    if (phase.object) markersToRemove.push(phase.object);
+  });
+  
+  // Remove all markers from scene
+  markersToRemove.forEach(marker => {
+    scene.remove(marker);
+    state.markers = state.markers.filter(m => m !== marker);
+  });
+  
+  // Remove from locations array
+  state.locations.splice(index, 1);
+  
+  // Update current location index
+  if (state.currentLocationIndex === index) {
+    if (state.locations.length > 0) {
+      state.currentLocationIndex = Math.min(index, state.locations.length - 1);
+    } else {
+      state.currentLocationIndex = null;
+    }
+  } else if (state.currentLocationIndex !== null && state.currentLocationIndex > index) {
+    // Adjust index if we deleted a location before the current one
+    state.currentLocationIndex--;
+  }
+  
+  // Update selected item
+  state.selectedItem = state.currentLocationIndex !== null 
+    ? state.locations[state.currentLocationIndex] 
+    : null;
+};
+
+// Edit location properties
+export const editLocation = (
+  state: EditorState, 
+  index: number, 
+  properties: Partial<Pick<EditorLocation, 'title' | 'description'>>
+): void => {
+  if (index < 0 || index >= state.locations.length) return;
+  
+  const location = state.locations[index];
+  
+  // Update properties
+  if (properties.title !== undefined) location.title = properties.title;
+  if (properties.description !== undefined) location.description = properties.description;
+  
+  // If this is the current location, update selected item
+  if (state.currentLocationIndex === index) {
+    state.selectedItem = location;
+  }
 }; 

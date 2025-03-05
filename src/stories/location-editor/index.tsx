@@ -33,7 +33,8 @@ const LocationEditor = {
       console.log("Loaded state from localStorage:", editorState);
     } else {
       editorState = {
-        currentLocation: null,
+        locations: [],
+        currentLocationIndex: null,
         selectedItem: null,
         mode: "location", // Start in location creation mode
         flyZonePhaseType: "takeoff",

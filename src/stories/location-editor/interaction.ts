@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { EditorState, createNewLocation, addTakeoff, addLandingSpot, addFlyZonePhase, saveToLocalStorage } from "./state";
+import { EditorState, createNewLocation, addTakeoff, addLandingSpot, addFlyZonePhase, saveToLocalStorage, getCurrentLocation } from "./state";
 
 export const setupInteraction = (
   renderer: THREE.WebGLRenderer,
@@ -75,51 +75,53 @@ export const setupInteraction = (
     if (terrainIntersect) {
       console.log("Terrain intersection found at:", terrainIntersect.point);
       const position = terrainIntersect.point;
+      const currentLocation = getCurrentLocation(state);
       
       // Handle click based on current mode
       switch(state.mode) {
         case 'location':
-          if (!state.currentLocation) {
+          if (state.currentLocationIndex === null) {
             createNewLocation(state, position, scene);
             console.log("Created new location at", position);
             saveToLocalStorage(state);
           } else {
-            alert("You already have a location. Only one location can be edited at a time.");
+            alert("You already have a location selected. To create a new one, deselect the current location first.");
           }
           break;
           
         case 'takeoff':
-          if (state.currentLocation) {
+          if (currentLocation) {
             addTakeoff(state, position, scene);
             console.log("Added takeoff at", position);
             saveToLocalStorage(state);
           } else {
-            alert("Please create a location first.");
+            alert("Please create or select a location first.");
           }
           break;
           
         case 'landing':
-          if (state.currentLocation) {
+          if (currentLocation) {
             addLandingSpot(state, position, scene);
             console.log("Added landing spot at", position);
             saveToLocalStorage(state);
           } else {
-            alert("Please create a location first.");
+            alert("Please create or select a location first.");
           }
           break;
           
         case 'flyzone':
-          if (state.currentLocation) {
+          if (currentLocation) {
             addFlyZonePhase(state, position, scene);
             console.log(`Added ${state.flyZonePhaseType} flyzone phase at`, position);
             saveToLocalStorage(state);
           } else {
-            alert("Please create a location first.");
+            alert("Please create or select a location first.");
           }
           break;
       }
     } else {
       console.log("No terrain intersection found");
+      const currentLocation = getCurrentLocation(state);
       
       // As a fallback, use a point at the camera's target position
       if (event.shiftKey) {
@@ -128,25 +130,28 @@ export const setupInteraction = (
         
         switch(state.mode) {
           case 'location':
-            if (!state.currentLocation) {
+            if (state.currentLocationIndex === null) {
               createNewLocation(state, fallbackPosition, scene);
               console.log("Created new location at fallback position");
               saveToLocalStorage(state);
             }
             break;
           case 'takeoff':
-            if (state.currentLocation) {
+            if (currentLocation) {
               addTakeoff(state, fallbackPosition, scene);
+              saveToLocalStorage(state);
             }
             break;
           case 'landing':
-            if (state.currentLocation) {
+            if (currentLocation) {
               addLandingSpot(state, fallbackPosition, scene);
+              saveToLocalStorage(state);
             }
             break;
           case 'flyzone':
-            if (state.currentLocation) {
+            if (currentLocation) {
               addFlyZonePhase(state, fallbackPosition, scene);
+              saveToLocalStorage(state);
             }
             break;
         }

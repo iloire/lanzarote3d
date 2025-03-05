@@ -156,4 +156,143 @@
 
 .clear-storage-button:hover {
   background: #757575;
+}
+
+.location-list {
+  margin-bottom: 15px;
+  background: rgba(40, 40, 40, 0.8);
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #555;
+}
+
+.location-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.location-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 10px;
+  margin-bottom: 5px;
+  background: rgba(60, 60, 60, 0.8);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.location-list li.active {
+  background: #2196F3;
+  color: white;
+}
+
+.location-list li span {
+  flex: 1;
+}
+
+.delete-button {
+  background: none;
+  border: none;
+  color: #ff5252;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 5px;
+}
+
+.delete-button:hover {
+  color: #ff1744;
+}
+
+.location-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.edit-button {
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.edit-button:hover {
+  background: #388e3c;
+}
+
+.location-edit .form-group {
+  margin-bottom: 10px;
+}
+
+.location-edit label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.location-edit input,
+.location-edit textarea {
+  width: 100%;
+  padding: 8px;
+  background: rgba(30, 30, 30, 0.8);
+  border: 1px solid #555;
+  border-radius: 3px;
+  color: white;
+}
+
+.location-edit textarea {
+  height: 80px;
+  resize: vertical;
+}
+
+.location-description {
+  font-style: italic;
+  color: #ccc;
+  margin-bottom: 15px;
+}
+
+.copy-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.copy-button {
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.copy-button:hover {
+  background: #388e3c;
+}
+
+.button-row {
+  display: flex;
+  gap: 10px;
+}
+
+.export-button {
+  background: #ff9800;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.export-button:hover {
+  background: #f57c00;
 } 
