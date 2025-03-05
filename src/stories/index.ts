@@ -19,7 +19,7 @@ import Voxel from "./voxel";
 import Workshop from "./workshop";
 import Helmet from "./helmet";
 import VoxelExample from "./voxel/index";
-
+import LocationEditor from "./location-editor";
 export type StoryFunction = (options: StoryOptions) => Promise<any>;
 
 const Stories: Record<string, StoryFunction> = {
@@ -29,6 +29,7 @@ const Stories: Record<string, StoryFunction> = {
   clouds: Clouds.load,
   flier: FlierPG.load,
   flyzones: FlyZones.load,
+  locationEditor: LocationEditor.load,
   game: Game.load,
   glider: Glider.load,
   hangglider: HangGlider.load,

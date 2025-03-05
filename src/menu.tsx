@@ -22,6 +22,7 @@ class Menu extends React.Component {
       { story: "clouds" },
       { story: "flier" },
       { story: "flyzones" },
+      { story: "locationEditor" },
       { story: "head" },
       { story: "helmet" },
       { story: "game", description: "The game!" },
