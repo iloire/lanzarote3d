@@ -1,8 +1,11 @@
 import * as THREE from "three";
-import famara from './famara';
-import teguise from './teguise';
-import macher from './macher';
 
+// Import locations
+import famara from './famara/index';
+import teguise from './teguise/index';
+import macher from './macher/index';
+
+// Export type definitions
 export interface Media {
   type: 'image' | 'video';
   url: string;
@@ -63,7 +66,7 @@ export interface FlyZoneShape {
   };
 }
 
-export interface Location {
+export interface LocationMetadata {
   id: string;
   title: string;
   description: string;
@@ -73,17 +76,20 @@ export interface Location {
     lookAt?: THREE.Vector3;
     distance?: number;
   };
+}
+
+export interface Location extends LocationMetadata {
   takeoffs: Takeoff[];
   landingSpots?: LandingSpot[];
   flyzone?: FlyZoneShape;
 }
 
-export { default as famara } from './famara';
-export { default as teguise } from './teguise';
-export { default as macher } from './macher';
+// Export individual locations
+export { default as famara } from './famara/index';
+export { default as teguise } from './teguise/index';
+export { default as macher } from './macher/index';
 
-
-
+// Create a default export with all locations
 const locations: Location[] = [
   famara,
   teguise,
