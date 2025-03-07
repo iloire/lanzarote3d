@@ -3,6 +3,7 @@ export * from './gps-config';
 export * from './marker-config';
 export * from './flyzone-config';
 export * from './wind-config';
+export * from '../config';
 
 // General configuration
 export const defaultConfig = {

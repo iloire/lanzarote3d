@@ -26,8 +26,8 @@ import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import { 
   getConfig, 
   updateConfig, 
-  defaultConfig 
-} from './config';
+  defaultConfig
+} from './config/flyzone-config';
 
 const FlyZones = {
   load: async (options: StoryOptions) => {
