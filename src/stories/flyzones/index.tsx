@@ -18,6 +18,7 @@ import {
   setupLabelRenderer,
   createSimpleMarker,
 } from './helpers';
+import { worldToGPS } from './helpers/gps';
 
 
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
@@ -456,7 +457,7 @@ const FlyZones = {
     // Initialize
     createUI();
     window.addEventListener('resize', () => labelRenderer.setSize(window.innerWidth, window.innerHeight));
-    const initialPosition = new THREE.Vector3(12000, 8000, 19000);
+    const initialPosition = new THREE.Vector3(14000, 8000, 14000);
     navigateTo(initialPosition);
     animate();
 
@@ -478,6 +479,45 @@ const FlyZones = {
       });
       
       setLandingMarkersVisible(visible);
+    };
+
+    // Handle mouse clicks to log coordinates
+    const onMouseClick = (event: MouseEvent) => {
+      // Calculate mouse position in normalized device coordinates
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+      // Update the raycaster with the camera and mouse position
+      raycaster.setFromCamera(mouse, camera);
+
+      // Find intersections with the terrain
+      const intersects = raycaster.intersectObjects(scene.children, true);
+      
+      // If we hit something, log the coordinates
+      if (intersects.length > 0) {
+        const point = intersects[0].point;
+        const gpsCoords = worldToGPS(point);
+        
+        console.log('Click detected:');
+        console.log('3D World Coordinates:', {
+          x: point.x.toFixed(2),
+          y: point.y.toFixed(2),
+          z: point.z.toFixed(2)
+        });
+        console.log('GPS Coordinates:', {
+          latitude: gpsCoords.latitude.toFixed(6),
+          longitude: gpsCoords.longitude.toFixed(6),
+          altitude: gpsCoords.altitude.toFixed(1)
+        });
+      }
+    };
+
+    // Add click event listener
+    renderer.domElement.addEventListener('click', onMouseClick);
+
+    // Return a cleanup function to remove event listeners
+    return () => {
+      renderer.domElement.removeEventListener('click', onMouseClick);
     };
   },
 };

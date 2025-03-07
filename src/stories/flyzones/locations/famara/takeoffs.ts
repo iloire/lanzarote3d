@@ -1,14 +1,21 @@
-
 import * as THREE from 'three';
 import { Takeoff } from '../index';
+import { gpsToWorld } from '../../helpers/gps';
 
 const takeoffs: Takeoff[] = [
   {
-    id: 'takeoff-1741205174736',
-    title: 'Takeoff 1',
-    description: 'Description of the takeoff',
-    position: new THREE.Vector3(5900.595536418577, 613.1881195090017, 602.7302721180077),
-    elevation: 613.1881195090017,
+    id: 'takeoff-famara-cliff',
+    title: 'Famara Cliff Takeoff',
+    description: 'Main takeoff point on the Famara cliff with excellent ridge soaring conditions.',
+    // Define GPS coordinates
+    gps: {
+      latitude: 29.0475,
+      longitude: -13.6339,
+      altitude: 613
+    },
+    // Position is calculated from GPS
+    position: gpsToWorld(29.0475, -13.6339, 613),
+    elevation: 613,
     conditions: [
       {
         direction: {

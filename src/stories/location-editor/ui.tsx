@@ -202,6 +202,12 @@ const EditorUI: React.FC<EditorUIProps> = ({ state }) => {
         </div>
         <p className="location-description">{currentLocation.description}</p>
         <p>Position: X: {currentLocation.position.x.toFixed(2)}, Y: {currentLocation.position.y.toFixed(2)}, Z: {currentLocation.position.z.toFixed(2)}</p>
+        
+        {/* Add GPS coordinates display */}
+        {currentLocation.gps && (
+          <p>GPS: Lat: {currentLocation.gps.latitude.toFixed(6)}, Lon: {currentLocation.gps.longitude.toFixed(6)}, Alt: {currentLocation.gps.altitude.toFixed(1)}m</p>
+        )}
+        
         <p>Takeoffs: {currentLocation.takeoffs.length}</p>
         <p>Landing Spots: {currentLocation.landingSpots.length}</p>
         <p>FlyZone Phases: {Object.keys(currentLocation.flyzone.phases).length}</p>

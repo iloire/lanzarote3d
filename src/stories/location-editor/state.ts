@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { Location, Takeoff, LandingSpot, FlightPhase, FlyZoneShape } from "../flyzones/locations";
+import { gpsToWorld, worldToGPS } from "../flyzones/helpers/gps";
 
 export interface EditorState {
   locations: EditorLocation[];
@@ -18,6 +19,11 @@ export interface EditorLocation {
   title: string;
   description: string;
   position: THREE.Vector3;
+  gps?: {
+    latitude: number;
+    longitude: number;
+    altitude: number;
+  };
   cameraView: {
     position: THREE.Vector3;
     distance: number;
@@ -32,6 +38,11 @@ export interface EditorTakeoff {
   title: string;
   description: string;
   position: THREE.Vector3;
+  gps?: {
+    latitude: number;
+    longitude: number;
+    altitude: number;
+  };
   elevation: number;
   marker: THREE.Object3D;
 }
@@ -41,6 +52,11 @@ export interface EditorLandingSpot {
   title: string;
   description: string;
   position: THREE.Vector3;
+  gps?: {
+    latitude: number;
+    longitude: number;
+    altitude: number;
+  };
   elevation: number;
   type: 'primary' | 'secondary' | 'emergency';
   marker: THREE.Object3D;
@@ -56,6 +72,11 @@ export interface EditorFlyZone {
 export interface EditorFlightPhase {
   type: "takeoff" | "landing" | "ridge" | "approach";
   position: THREE.Vector3;
+  gps?: {
+    latitude: number;
+    longitude: number;
+    altitude: number;
+  };
   dimensions: {
     width: number;
     height: number;
@@ -74,12 +95,16 @@ export interface EditorAction {
 
 // Create a new location
 export const createNewLocation = (state: EditorState, position: THREE.Vector3, scene: THREE.Scene): EditorLocation => {
+  // Calculate GPS coordinates from the position
+  const gps = worldToGPS(position);
+  
   // Create a default location
   const newLocation: EditorLocation = {
     id: `location-${Date.now()}`,
     title: "New Location",
     description: "Description of the new location",
     position: position.clone(),
+    gps: gps,
     cameraView: {
       position: new THREE.Vector3(-0.5, 0.3, 0.5),
       distance: 10000
@@ -116,11 +141,15 @@ export const createNewLocation = (state: EditorState, position: THREE.Vector3, s
 export const addTakeoff = (state: EditorState, position: THREE.Vector3, scene: THREE.Scene): EditorTakeoff | null => {
   if (state.currentLocationIndex === null) return null;
   
+  // Calculate GPS coordinates from the position
+  const gps = worldToGPS(position);
+  
   const takeoff: EditorTakeoff = {
     id: `takeoff-${Date.now()}`,
     title: `Takeoff ${state.locations[state.currentLocationIndex].takeoffs.length + 1}`,
     description: "Description of the takeoff",
     position: position.clone(),
+    gps: gps,
     elevation: position.y,
     marker: createTakeoffMarker(position)
   };
@@ -144,11 +173,15 @@ export const addTakeoff = (state: EditorState, position: THREE.Vector3, scene: T
 export const addLandingSpot = (state: EditorState, position: THREE.Vector3, scene: THREE.Scene): EditorLandingSpot | null => {
   if (state.currentLocationIndex === null) return null;
   
+  // Calculate GPS coordinates from the position
+  const gps = worldToGPS(position);
+  
   const landingSpot: EditorLandingSpot = {
     id: `landing-${Date.now()}`,
     title: `Landing ${state.locations[state.currentLocationIndex].landingSpots.length + 1}`,
     description: "Description of the landing spot",
     position: position.clone(),
+    gps: gps,
     elevation: position.y,
     type: 'primary',
     marker: createLandingMarker(position)
@@ -177,11 +210,15 @@ export const addFlyZonePhase = (
 ): EditorFlightPhase | null => {
   if (state.currentLocationIndex === null) return null;
   
+  // Calculate GPS coordinates from the position
+  const gps = worldToGPS(position);
+  
   const phaseId = `${state.flyZonePhaseType}-${Object.keys(state.locations[state.currentLocationIndex].flyzone.phases).length + 1}`;
   
   const phase: EditorFlightPhase = {
     type: state.flyZonePhaseType,
     position: position.clone(),
+    gps: gps,
     dimensions: {
       width: 400,
       height: 300,
@@ -255,15 +292,21 @@ export const exportLocationData = (state: EditorState): { metadata: string, take
     return { metadata: '', takeoffs: '', landingSpots: '', flyzone: '' };
   }
 
-  // Generate metadata.ts
+  // Generate metadata.ts with GPS coordinates
   const metadata = `import * as THREE from 'three';
 import { LocationMetadata } from '../index';
+import { gpsToWorld } from '../../helpers/gps';
 
 const metadata: LocationMetadata = {
   id: '${currentLocation.id}',
   title: '${currentLocation.title}',
   description: '${currentLocation.description}',
-  position: new THREE.Vector3(${currentLocation.position.x}, ${currentLocation.position.y}, ${currentLocation.position.z}),
+  gps: {
+    latitude: ${currentLocation.gps?.latitude || 0},
+    longitude: ${currentLocation.gps?.longitude || 0},
+    altitude: ${currentLocation.gps?.altitude || 0}
+  },
+  position: gpsToWorld(${currentLocation.gps?.latitude || 0}, ${currentLocation.gps?.longitude || 0}, ${currentLocation.gps?.altitude || 0}),
   cameraView: {
     position: new THREE.Vector3(${currentLocation.cameraView.position.x}, ${currentLocation.cameraView.position.y}, ${currentLocation.cameraView.position.z}),
     distance: ${currentLocation.cameraView.distance}
@@ -272,49 +315,96 @@ const metadata: LocationMetadata = {
 
 export default metadata;`;
 
-  // Generate takeoffs.ts
+  // Generate takeoffs.ts with GPS coordinates
   const takeoffs = `import * as THREE from 'three';
 import { Takeoff } from '../index';
+import { gpsToWorld } from '../../helpers/gps';
 
 const takeoffs: Takeoff[] = [
 ${currentLocation.takeoffs.map(t => `  {
     id: '${t.id}',
     title: '${t.title}',
     description: '${t.description}',
-    position: new THREE.Vector3(${t.position.x}, ${t.position.y}, ${t.position.z}),
-    elevation: ${t.elevation}
+    gps: {
+      latitude: ${t.gps?.latitude || 0},
+      longitude: ${t.gps?.longitude || 0},
+      altitude: ${t.gps?.altitude || 0}
+    },
+    position: gpsToWorld(${t.gps?.latitude || 0}, ${t.gps?.longitude || 0}, ${t.gps?.altitude || 0}),
+    elevation: ${t.elevation},
+    conditions: [
+      {
+        direction: {
+          ideal: 320,
+          range: [290, 350]
+        },
+        speed: {
+          min: 10,
+          max: 25,
+          ideal: 15
+        },
+        rating: 5,
+        description: 'Perfect conditions'
+      }
+    ],
+    mediaItems: [
+      {
+        type: 'image',
+        url: '/assets/images/takeoff.jpg',
+        title: 'Takeoff'
+      }
+    ]
   }`).join(',\n')}
 ];
 
 export default takeoffs;`;
 
-  // Generate landingSpots.ts
+  // Generate landingSpots.ts with GPS coordinates
   const landingSpots = `import * as THREE from 'three';
 import { LandingSpot } from '../index';
+import { gpsToWorld } from '../../helpers/gps';
 
 const landingSpots: LandingSpot[] = [
 ${currentLocation.landingSpots.map(l => `  {
     id: '${l.id}',
     title: '${l.title}',
     description: '${l.description}',
-    position: new THREE.Vector3(${l.position.x}, ${l.position.y}, ${l.position.z}),
+    gps: {
+      latitude: ${l.gps?.latitude || 0},
+      longitude: ${l.gps?.longitude || 0},
+      altitude: ${l.gps?.altitude || 0}
+    },
+    position: gpsToWorld(${l.gps?.latitude || 0}, ${l.gps?.longitude || 0}, ${l.gps?.altitude || 0}),
     elevation: ${l.elevation},
-    type: '${l.type}'
+    type: '${l.type}',
+    mediaItems: [
+      {
+        type: 'image',
+        url: '/assets/images/landing.jpg',
+        title: 'Landing Area'
+      }
+    ]
   }`).join(',\n')}
 ];
 
 export default landingSpots;`;
 
-  // Generate flyzone.ts
+  // Generate flyzone.ts with GPS coordinates
   const flyzone = `import * as THREE from 'three';
 import { FlyZone, FlightPhase } from '../index';
+import { gpsToWorld } from '../../helpers/gps';
 
 const phases: Record<string, FlightPhase> = {
 ${Object.keys(currentLocation.flyzone.phases).map(id => {
   const phase = currentLocation.flyzone.phases[id];
   return `  '${id}': {
     type: '${phase.type}',
-    position: new THREE.Vector3(${phase.position.x}, ${phase.position.y}, ${phase.position.z}),
+    gps: {
+      latitude: ${phase.gps?.latitude || 0},
+      longitude: ${phase.gps?.longitude || 0},
+      altitude: ${phase.gps?.altitude || 0}
+    },
+    position: gpsToWorld(${phase.gps?.latitude || 0}, ${phase.gps?.longitude || 0}, ${phase.gps?.altitude || 0}),
     dimensions: {
       width: ${phase.dimensions.width},
       height: ${phase.dimensions.height},

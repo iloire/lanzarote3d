@@ -6,6 +6,12 @@ import teguise from './teguise/index';
 import macher from './macher/index';
 
 // Export type definitions
+export interface GPS {
+  latitude: number;
+  longitude: number;
+  altitude: number;
+}
+
 export interface Media {
   type: 'image' | 'video';
   url: string;
@@ -33,6 +39,7 @@ export interface Takeoff {
   title: string;
   description: string;
   position: THREE.Vector3;
+  gps?: GPS;
   elevation: number;
   conditions: WindCondition[];
   mediaItems: Media[];
@@ -43,6 +50,7 @@ export interface LandingSpot {
   title: string;
   description: string;
   position: THREE.Vector3;
+  gps?: GPS;
   elevation: number;
   type: 'primary' | 'secondary' | 'emergency';
   mediaItems: Media[];
@@ -51,6 +59,7 @@ export interface LandingSpot {
 export interface FlightPhase {
   type: 'takeoff' | 'landing' | 'ridge' | 'approach';
   position: THREE.Vector3;
+  gps?: GPS;
   dimensions: {
     width: number;
     height: number;
@@ -71,6 +80,7 @@ export interface LocationMetadata {
   title: string;
   description: string;
   position: THREE.Vector3;
+  gps?: GPS;
   cameraView: {
     position: THREE.Vector3;
     lookAt?: THREE.Vector3;
