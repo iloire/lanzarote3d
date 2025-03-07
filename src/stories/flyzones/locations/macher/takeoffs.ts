@@ -1,13 +1,27 @@
 import * as THREE from 'three';
 import { Takeoff } from '../index';
+import { gpsToWorld } from '../../helpers/gps';
+
+// Define GPS coordinates for Macher takeoff
+const takeoffGPS = {
+  id: 'macher-volcano',
+  title: 'Macher Volcano',
+  description: 'A volcanic cone offering unique flying experiences with strong thermals.',
+  gps: {
+    latitude: 28.9510,
+    longitude: -13.6810,
+    altitude: 300
+  }
+};
 
 const takeoffs: Takeoff[] = [
   {
-    id: 'macher-volcano',
-    title: 'Macher Volcano',
-    description: 'A volcanic cone offering unique flying experiences with strong thermals.',
-    position: new THREE.Vector3(-3200, 300, 8100),
-    elevation: 300,
+    id: takeoffGPS.id,
+    title: takeoffGPS.title,
+    description: takeoffGPS.description,
+    gps: takeoffGPS.gps,
+    position: gpsToWorld(takeoffGPS.gps.latitude, takeoffGPS.gps.longitude, takeoffGPS.gps.altitude),
+    elevation: takeoffGPS.gps.altitude,
     conditions: [
       {
         direction: {

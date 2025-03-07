@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { LocationMetadata } from '../index';
 import { gpsToWorld } from '../../helpers/gps';
 
-
+// Real GPS coordinates for Famara
 const gpsCoordinates = {
   latitude: 29.1187513,
   longitude: -13.5654236,
@@ -14,7 +14,7 @@ const metadata: LocationMetadata = {
   title: 'Famara',
   description: 'Famara is a beautiful beach on the northwest coast of Lanzarote, known for its stunning cliffs and excellent paragliding conditions.',
   // Define position using GPS coordinates
-  gps:  gpsCoordinates,
+  gps: gpsCoordinates,
   // The position is automatically calculated from GPS
   position: gpsToWorld(gpsCoordinates.latitude, gpsCoordinates.longitude, gpsCoordinates.altitude),
   cameraView: {

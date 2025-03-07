@@ -12,9 +12,9 @@ export const LANZAROTE_GPS_CONFIG = {
     world: new THREE.Vector3(6642.48, 55.95, -3853.59),
   },
   scale: {
-    metersPerDegreeLatitude: 111320, // Approximate meters per degree at this latitude
-    metersPerDegreeLongitude: 107550, // Approximate meters per degree at this latitude
-    northOffset: 0 // Assuming your world Z axis points north
+    metersPerDegreeLatitude: 111320/2, // Approximate meters per degree at this latitude
+    metersPerDegreeLongitude: 107550/2, // Approximate meters per degree at this latitude
+    northOffset: 180 // Assuming your world Z axis points north
   }
 };
 

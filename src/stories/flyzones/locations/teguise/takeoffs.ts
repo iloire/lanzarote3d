@@ -1,13 +1,27 @@
 import * as THREE from 'three';
 import { Takeoff } from '../index';
+import { gpsToWorld } from '../../helpers/gps';
+
+// Define GPS coordinates for Teguise takeoff
+const takeoffGPS = {
+  id: 'teguise-hill',
+  title: 'Teguise Hill',
+  description: 'A smooth hill takeoff with good thermal development in the afternoons.',
+  gps: {
+    latitude: 29.0660,
+    longitude: -13.5160,
+    altitude: 400
+  }
+};
 
 const takeoffs: Takeoff[] = [
   {
-    id: 'teguise-hill',
-    title: 'Teguise Hill',
-    description: 'A smooth hill takeoff with good thermal development in the afternoons.',
-    position: new THREE.Vector3(5200, 400, 5000),
-    elevation: 400,
+    id: takeoffGPS.id,
+    title: takeoffGPS.title,
+    description: takeoffGPS.description,
+    gps: takeoffGPS.gps,
+    position: gpsToWorld(takeoffGPS.gps.latitude, takeoffGPS.gps.longitude, takeoffGPS.gps.altitude),
+    elevation: takeoffGPS.gps.altitude,
     conditions: [
       {
         direction: {

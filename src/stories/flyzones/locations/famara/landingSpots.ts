@@ -1,37 +1,48 @@
 import * as THREE from 'three';
 import { LandingSpot } from '../index';
+import { gpsToWorld } from '../../helpers/gps';
 
-const landingSpots: LandingSpot[] = [
+// Define GPS coordinates for each landing spot
+const landingGPS = [
   {
-    id: 'landing-1741205174736',
-    title: 'Landing 1',
-    description: 'Description of the landing spot',
-    position: new THREE.Vector3(5217.095273593018, 309.7033643153524, 449.1419222130955),
-    elevation: 309.7033643153524,
-    type: 'primary',
-    mediaItems: [
-      {
-        type: 'image',
-        url: '/assets/images/landing.jpg',
-        title: 'Landing Area'
-      }
-    ]
+    id: 'landing-famara-beach',
+    title: 'Famara Beach Landing',
+    description: 'Wide beach landing area with consistent sea breeze.',
+    gps: {
+      latitude: 29.1180,
+      longitude: -13.5630,
+      altitude: 5
+    },
+    type: 'primary' as const
   },
   {
-    id: 'landing-1741205174736',
-    title: 'Landing 2',
-    description: 'Description of the landing spot',
-    position: new THREE.Vector3(6628.844849248716, 5.94624632533681, -3786.9475078520027),
-    elevation: 5.94624632533681,
-    type: 'primary',
-    mediaItems: [
-      {
-        type: 'image',
-        url: '/assets/images/landing.jpg',
-        title: 'Landing Area'
-      }
-    ]
+    id: 'landing-famara-field',
+    title: 'Famara Field Landing',
+    description: 'Large open field near the town with easy access.',
+    gps: {
+      latitude: 29.1160,
+      longitude: -13.5620,
+      altitude: 15
+    },
+    type: 'primary' as const
   }
 ];
+
+const landingSpots: LandingSpot[] = landingGPS.map(l => ({
+  id: l.id,
+  title: l.title,
+  description: l.description,
+  gps: l.gps,
+  position: gpsToWorld(l.gps.latitude, l.gps.longitude, l.gps.altitude),
+  elevation: l.gps.altitude,
+  type: l.type,
+  mediaItems: [
+    {
+      type: 'image',
+      url: '/assets/images/landing.jpg',
+      title: 'Landing Area'
+    }
+  ]
+}));
 
 export default landingSpots;

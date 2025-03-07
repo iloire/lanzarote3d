@@ -1,37 +1,48 @@
 import * as THREE from 'three';
 import { LandingSpot } from '../index';
+import { gpsToWorld } from '../../helpers/gps';
 
-const landingSpots: LandingSpot[] = [
+// Define GPS coordinates for each landing spot
+const landingGPS = [
   {
     id: 'macher-field',
     title: 'Macher Field',
     description: 'A flat field near the town with good access.',
-    position: new THREE.Vector3(-2800, 15, 8300),
-    elevation: 15,
-    type: 'primary',
-    mediaItems: [
-      {
-        type: 'image',
-        url: '/assets/images/macher-landing.jpg',
-        title: 'Macher Field Landing'
-      }
-    ]
+    gps: {
+      latitude: 28.9515,
+      longitude: -13.6805,
+      altitude: 15
+    },
+    type: 'primary' as const
   },
   {
     id: 'macher-beach',
     title: 'Macher Beach',
     description: 'A small beach landing for emergency use only.',
-    position: new THREE.Vector3(-2600, 5, 8500),
-    elevation: 5,
-    type: 'emergency',
-    mediaItems: [
-      {
-        type: 'image',
-        url: '/assets/images/macher-beach.jpg',
-        title: 'Macher Beach Emergency Landing'
-      }
-    ]
+    gps: {
+      latitude: 28.9520,
+      longitude: -13.6800,
+      altitude: 5
+    },
+    type: 'emergency' as const
   }
 ];
+
+const landingSpots: LandingSpot[] = landingGPS.map(l => ({
+  id: l.id,
+  title: l.title,
+  description: l.description,
+  gps: l.gps,
+  position: gpsToWorld(l.gps.latitude, l.gps.longitude, l.gps.altitude),
+  elevation: l.gps.altitude,
+  type: l.type,
+  mediaItems: [
+    {
+      type: 'image',
+      url: `/assets/images/${l.id}.jpg`,
+      title: `${l.title}`
+    }
+  ]
+}));
 
 export default landingSpots; 
