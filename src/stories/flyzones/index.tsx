@@ -456,7 +456,8 @@ const FlyZones = {
     // Initialize
     createUI();
     window.addEventListener('resize', () => labelRenderer.setSize(window.innerWidth, window.innerHeight));
-    navigateTo(locations[0].position);
+    const initialPosition = new THREE.Vector3(12000, 8000, 19000);
+    navigateTo(initialPosition);
     animate();
 
     // Update the toggle function to also update clickability
