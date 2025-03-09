@@ -5,13 +5,13 @@ import { gpsToWorld } from '../../helpers/gps';
 // Define GPS coordinates for each takeoff
 const takeoffGPS = [
   {
-    id: 'takeoff-famara-cliff',
-    title: 'Famara Cliff Takeoff',
-    description: 'Main takeoff point on the Famara cliff with excellent ridge soaring conditions.',
+    id: 'takeoff-pechos-altos',
+    title: 'Pechos bajos takeoff',
+    description: 'Pechos bajos takeoff',
     gps: {
-      latitude: 29.1195,
-      longitude: -13.5645,
-      altitude: 613
+      latitude: 29.06533833716934,
+      longitude: -13.57604402731929,
+      altitude: 213
     }
   },
   {
