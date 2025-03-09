@@ -16,6 +16,7 @@ export const setupAnimationLoop = (
   landingMarkersVisible: boolean
 ): void => {
   const animate = () => {
+    console.log("Animation frame running");
     requestAnimationFrame(animate);
     TWEEN.update();
     controls.update();

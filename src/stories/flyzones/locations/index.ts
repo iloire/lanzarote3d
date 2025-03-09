@@ -13,7 +13,8 @@ import {
 } from '../helpers/types';
 
 // Import locations
-import famara from './famara/index';
+import famara from './famara';
+import teguise from './teguise';
 
 // Export type definitions
 export {
@@ -30,11 +31,13 @@ export {
 };
 
 // Export individual locations
-export { default as famara } from './famara/index';
+export { default as famara } from './famara';
+export { default as teguise } from './teguise';
 
 // Create a default export with all locations
 const locations: Location[] = [
-  famara
+  famara,
+  teguise
 ];
 
 export default locations;

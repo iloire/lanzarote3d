@@ -58,6 +58,18 @@ const FlyZones = {
     
     // Function to load locations and create markers
     const loadLocations = async () => {
+      console.log("Available locations:", locations);
+      if (locations.length === 0) {
+        console.error("No locations found!");
+        
+        // Add a fallback object if no locations
+        const dummyGeometry = new THREE.BoxGeometry(500, 500, 500);
+        const dummyMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        const dummyCube = new THREE.Mesh(dummyGeometry, dummyMaterial);
+        dummyCube.position.set(0, 250, 0);
+        scene.add(dummyCube);
+      }
+      
       console.log("Loading locations:", locations);
       
       // Create location markers
@@ -197,6 +209,38 @@ const FlyZones = {
         }
       }
     };
+    
+    // Add this function after the labelRenderer setup
+    const setupScene = () => {
+      // Add ambient light to the scene
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+      scene.add(ambientLight);
+      
+      // Add directional light (like sunlight)
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      directionalLight.position.set(1000, 1000, 1000);
+      scene.add(directionalLight);
+      
+      // Set background color (sky blue)
+      scene.background = new THREE.Color(0x87ceeb);
+      
+      // Add a simple ground plane for reference
+      const groundGeometry = new THREE.PlaneGeometry(50000, 50000);
+      const groundMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0x3a7e4f,  // Green color for ground
+        roughness: 0.8,
+        metalness: 0.2
+      });
+      const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+      ground.rotation.x = -Math.PI / 2; // Rotate to be horizontal
+      ground.position.y = -10; // Slightly below origin
+      scene.add(ground);
+      
+      console.log("Scene setup complete");
+    };
+
+    // Call this function before loadLocations
+    setupScene();
     
     // Load locations
     await loadLocations();

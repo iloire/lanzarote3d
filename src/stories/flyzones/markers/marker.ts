@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { TWEEN } from 'three/examples/jsm/libs/tween.module.min.js';
 import { MarkerType } from '../helpers/types';
-import { PIN_COLORS, PIN_SIZES, PIN_FADE_DURATION } from '../helpers/constants';
+import { PIN_COLORS, PIN_SIZES, PIN_FADE_DURATION } from '../config/marker-config';
 import Paraglider from '../../../components/paraglider';
 import { PilotHeadType } from '../../../components/parts/pilot-head';
 import { createLabel, createPopupContent, createPopupHandler } from '../helpers/popup';
