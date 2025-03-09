@@ -21,6 +21,8 @@ export const PIN_FADE_DURATION = 200;
 export const TAKEOFF_VISIBILITY_THRESHOLD = 15000;
 
 export const VISIBILITY_THRESHOLDS = {
-  LOCATION_PIN: 15000,    // Show location pin when far (> 15000)
-  DETAIL_VIEW: 15000,     // Switch to detailed view when closer than this
+  LOCATION_PIN: 5000,  // Show location pins when far away
+  DETAIL_VIEW: 2000,   // Show detailed markers when close
+  TAKEOFF: 3000,       // Show takeoff markers when within this distance
+  LANDING: 3000        // Show landing markers when within this distance
 }; 

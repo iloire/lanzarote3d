@@ -37,6 +37,8 @@ import { setupAnimationLoop } from './animation/loop';
 import { toggleLandingMarkers } from './markers/toggle';
 import './styles/ruler.css';
 import { Marker as MarkerHelper, MarkerObject } from './markers/markers';
+import { createWindArrowsForTakeoff } from './helpers/wind';
+import './styles/popup.css';
 
 const FlyZones = {
   load: async (options: StoryOptions) => {
@@ -97,33 +99,42 @@ const FlyZones = {
           for (const takeoff of location.takeoffs) {
             console.log("Creating marker for takeoff:", takeoff.title);
             
-            // Create a takeoff marker (cone pointing up)
-            const takeoffGeometry = new THREE.ConeGeometry(150, 300, 16);
-            const takeoffMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-            const takeoffMarker = new THREE.Mesh(takeoffGeometry, takeoffMaterial);
-            takeoffMarker.position.copy(takeoff.position);
-            takeoffMarker.rotation.x = Math.PI; // Point the cone upward
-            scene.add(takeoffMarker);
+            // Create a takeoff marker
+            const navigateToWrapper = (position: THREE.Vector3, location?: Location) => {
+              navigateTo(position, camera, controls, location);
+            };
             
-            // Create a label for the takeoff
-            const takeoffLabelDiv = document.createElement('div');
-            takeoffLabelDiv.className = 'takeoff-label';
-            takeoffLabelDiv.textContent = takeoff.title;
-            
-            const takeoffLabel = new CSS2DObject(takeoffLabelDiv);
-            takeoffLabel.position.copy(takeoff.position);
-            takeoffLabel.position.y += 200; // Offset the label above the marker
-            scene.add(takeoffLabel);
+            const takeoffMarker = await createMarker(
+              takeoff.position,
+              takeoff.title,
+              takeoff.description,
+              takeoff.mediaItems,
+              MarkerType.TAKEOFF,
+              scene,
+              popupContainer,
+              navigateToWrapper,
+              currentLocation,
+              camera,
+              takeoff.conditions
+            );
             
             // Add to markers array
             markers.push({
               type: MarkerType.TAKEOFF,
               position: takeoff.position,
               object: takeoffMarker,
-              label: takeoffLabel,
               data: takeoff,
-              pin: takeoffMarker
-            });
+              pin: takeoffMarker,
+              setVisibility: (visible: boolean) => {
+                if (takeoffMarker) {
+                  takeoffMarker.visible = visible;
+                }
+              }
+            } as Marker);
+            
+            // Create wind arrows for this takeoff
+            const windArrows = createWindArrowsForTakeoff(takeoff.position, takeoff.conditions);
+            windArrows.forEach(arrow => scene.add(arrow));
           }
         }
         
@@ -301,13 +312,51 @@ const FlyZones = {
     navigateTo(initialPosition, camera, controls, locations.length > 0 ? locations[0] : undefined);
     
     // Start animation loop
-    setupAnimationLoop(renderer, scene, camera, controls, labelRenderer, markers);
+    setupAnimationLoop(renderer, scene, camera, controls, labelRenderer, markers, landingMarkersVisible);
+    
+    // Setup mouse click handler
+    const handleMouseClick = (event: MouseEvent) => {
+      // Create raycaster and mouse vector
+      const raycaster = new THREE.Raycaster();
+      const mouse = new THREE.Vector2();
+      
+      // Calculate mouse position in normalized device coordinates
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+      
+      // Update the picking ray with the camera and mouse position
+      raycaster.setFromCamera(mouse, camera);
+      
+      // Find intersections with all objects in the scene
+      const intersects = raycaster.intersectObjects(scene.children, true);
+      
+      // Check if we hit any markers
+      for (const intersect of intersects) {
+        let current = intersect.object;
+        
+        // Traverse up to find the root object with userData
+        while (current && current.parent) {
+          if (current.userData && current.userData.isInteractive) {
+            console.log("Clicked on interactive object:", current);
+            if (current.userData.onClick) {
+              current.userData.onClick();
+            }
+            return;
+          }
+          current = current.parent;
+        }
+      }
+    };
+
+    // Add event listener
+    window.addEventListener('click', handleMouseClick);
     
     // Return cleanup function
     return () => {
       cleanupMouseHandler();
       ruler.deactivate();
       document.body.removeChild(labelRenderer.domElement);
+      window.removeEventListener('click', handleMouseClick);
     };
   },
 };

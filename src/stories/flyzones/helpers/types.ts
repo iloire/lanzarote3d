@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { TWEEN } from 'three/examples/jsm/libs/tween.module.min.js';
+import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer';
+import { MarkerObject } from '../markers/markers';
 
 export enum MarkerType {
   LOCATION = 'location',
@@ -7,15 +9,8 @@ export enum MarkerType {
   LANDING = 'landing'
 }
 
-export interface Marker {
-  pin: THREE.Object3D;
-  type: MarkerType;
-  hoverAnimation: TWEEN.Tween<any>;
-  unhoverAnimation: TWEEN.Tween<any>;
-  showPopup: () => void;
-  setVisibility: (visible: boolean) => void;
-  flyzone?: THREE.Object3D;
-}
+// Use the Marker interface from markers.ts
+export { Marker } from '../markers/markers';
 
 // Export type definitions
 export interface GPS {

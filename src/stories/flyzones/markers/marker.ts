@@ -8,6 +8,7 @@ import { createLabel, createPopupContent, createPopupHandler } from '../helpers/
 import { CSS2DObject, CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { Location, Media } from '../locations';
 import { createWindArrow } from '../helpers/flyzone';
+import { worldToScreen } from '../helpers/screen';
 
 export const setupLabelRenderer = () => {
   const labelRenderer = new CSS2DRenderer();
@@ -100,16 +101,76 @@ export const createMarker = async (
   });
 
   // Create popup handler
-  const showPopup = createPopupHandler({
-    type,
-    title,
-    description,
-    mediaItems,
-    position,
-    location,
-    popupContainer,
-    navigateTo
-  });
+  const showPopup = () => {
+    if (!popupContainer) return;
+    
+    console.log("Showing popup for:", title);
+    
+    // Create popup content
+    const popupContent = document.createElement('div');
+    popupContent.className = 'popup-content';
+    
+    // Add close button
+    const closeButton = document.createElement('button');
+    closeButton.className = 'popup-close-btn';
+    closeButton.innerHTML = '&times;'; // × symbol
+    closeButton.onclick = () => {
+      popupContainer.style.display = 'none';
+    };
+    popupContent.appendChild(closeButton);
+    
+    // Add title
+    const titleElement = document.createElement('h2');
+    titleElement.textContent = title || '';
+    popupContent.appendChild(titleElement);
+    
+    // Add description
+    if (description) {
+      const descElement = document.createElement('p');
+      descElement.textContent = description;
+      popupContent.appendChild(descElement);
+    }
+    
+    // Add media items
+    if (mediaItems && mediaItems.length > 0) {
+      const mediaContainer = document.createElement('div');
+      mediaContainer.className = 'media-container';
+      
+      mediaItems.forEach(item => {
+        if (item.type === 'image') {
+          const img = document.createElement('img');
+          img.src = item.url;
+          img.alt = item.title || '';
+          img.className = 'popup-image';
+          mediaContainer.appendChild(img);
+        } else if (item.type === 'video') {
+          const video = document.createElement('video');
+          video.src = item.url;
+          video.controls = true;
+          video.className = 'popup-video';
+          mediaContainer.appendChild(video);
+        }
+      });
+      
+      popupContent.appendChild(mediaContainer);
+    }
+    
+    // Show the popup
+    popupContainer.innerHTML = '';
+    popupContainer.appendChild(popupContent);
+    popupContainer.style.display = 'block';
+    
+    // Position the popup near the marker
+    const screenPosition = worldToScreen(position, camera, setupLabelRenderer());
+    popupContainer.style.left = `${screenPosition.x}px`;
+    popupContainer.style.top = `${screenPosition.y}px`;
+  };
+
+  // Add click event handler to the pin
+  pin.userData.onClick = showPopup;
+
+  // Make the pin interactive
+  pin.userData.isInteractive = true;
 
   const marker = new MarkerObject(pin, type);
   marker.hoverAnimation = hover;
