@@ -1,13 +1,13 @@
 import * as THREE from 'three';
 import { TWEEN } from 'three/examples/jsm/libs/tween.module.min.js';
-import { MarkerType } from './types';
-import { PIN_COLORS, PIN_SIZES, PIN_FADE_DURATION } from './constants';
+import { MarkerType } from '../helpers/types';
+import { PIN_COLORS, PIN_SIZES, PIN_FADE_DURATION } from '../helpers/constants';
 import Paraglider from '../../../components/paraglider';
 import { PilotHeadType } from '../../../components/parts/pilot-head';
-import { createLabel, createPopupContent, createPopupHandler } from './popup';
+import { createLabel, createPopupContent, createPopupHandler } from '../helpers/popup';
 import { CSS2DObject, CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { Location, Media } from '../locations';
-import { createWindArrow } from './flyzone';
+import { createWindArrow } from '../helpers/flyzone';
 
 export const setupLabelRenderer = () => {
   const labelRenderer = new CSS2DRenderer();
@@ -138,15 +138,11 @@ export const createPinMesh = async (type: MarkerType) => {
     wingColor2: '#b100cd',
     breakColor: '#ffffff',
     lineFrontColor: '#ffffff',
-    lineBackColor: '#ffffff',
-    inletsColor: '#333333',
-    numeroCajones: 40,
-    bandLength: 500,
-    carabinersSeparationMM: 300
-  };
-  
-  const pilotOptions = {
-    head: {
+    lineRearColor: '#ffffff',
+    lineMiddleColor: '#ffffff',
+    riserColor: '#ffffff',
+    pilotOptions: {
+      suitColor: '#0000ff',
       headType: PilotHeadType.Default,
       helmetOptions: {
         color: '#ffffff',
@@ -155,6 +151,16 @@ export const createPinMesh = async (type: MarkerType) => {
       }
     },
     carabinerColor: '#333',
+  };
+
+  const pilotOptions = {
+    suitColor: '#0000ff',
+    headType: PilotHeadType.Default,
+    helmetOptions: {
+      color: '#ffffff',
+      color2: '#cccccc',
+      color3: '#999999'
+    }
   };
 
   const mesh = new THREE.Mesh(geometry, material);
