@@ -2,8 +2,6 @@ import * as THREE from "three";
 
 // Import locations
 import famara from './famara/index';
-import teguise from './teguise/index';
-import macher from './macher/index';
 
 // Export type definitions
 export interface GPS {
@@ -57,9 +55,9 @@ export interface LandingSpot {
 }
 
 export interface FlightPhase {
-  type: 'takeoff' | 'landing' | 'ridge' | 'approach';
+  type: string;
+  gps: GPS;
   position: THREE.Vector3;
-  gps?: GPS;
   dimensions: {
     width: number;
     height: number;
@@ -96,14 +94,10 @@ export interface Location extends LocationMetadata {
 
 // Export individual locations
 export { default as famara } from './famara/index';
-export { default as teguise } from './teguise/index';
-export { default as macher } from './macher/index';
 
 // Create a default export with all locations
 const locations: Location[] = [
-  famara,
-  teguise,
-  macher
+  famara
 ];
 
 export default locations;
