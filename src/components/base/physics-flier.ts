@@ -1,10 +1,12 @@
 import * as CANNON from "cannon-es";
+import GUI from 'lil-gui';
 import * as THREE from "three";
 import Thermal from "../../components/thermal";
 import { TrajectoryPoint, TrajectoryPointType } from "../../elements/trajectory";
 import Weather from "../../elements/weather";
 import { getTerrainHeightBelowPosition } from "../../utils/collision";
 import IFlyable from './IFlyable';
+import { ForceVisualization } from './force-visualization';
 
 const ANTI_CRASH_ENABLED = false;
 const TICK_INTERVAL = 25; // 40 Hz update rate
@@ -17,7 +19,6 @@ const LIFT_COEFFICIENT = 1.2;
 const WING_AREA = 25; // m²
 
 // Force visualization constants
-const FORCE_SCALE = 1; // Scale factor for force visualization
 
 interface FlierConstructor {
   flyable: IFlyable;
@@ -43,8 +44,6 @@ export interface PhysicsFlierConstructor extends FlierConstructor {
   wingMesh: THREE.Object3D;
   pilotWeight: number; // in kg
   wingWeight: number; // in kg
-  pilotPosition: THREE.Vector3; // relative to wing position
-  wingPosition: THREE.Vector3; // world position
 }
 
 export interface PhysicsEnvOptions extends EnvOptions {
@@ -84,15 +83,10 @@ class PhysicsFlier extends THREE.EventDispatcher {
   // Physics bodies
   wingBody: CANNON.Body;
   pilotBody: CANNON.Body;
-  wingConstraint: CANNON.HingeConstraint;
+  wingConstraint: CANNON.DistanceConstraint;
 
-  // Force visualization lines
-  private liftArrow: THREE.ArrowHelper;
-  private dragArrow: THREE.ArrowHelper;
-  private windArrow: THREE.ArrowHelper;
-  private thermalArrow: THREE.ArrowHelper;
-  private gravityArrow: THREE.ArrowHelper;
-  private forceGroup: THREE.Group;
+  // Replace force visualization properties with single property
+  private forceVisualization: ForceVisualization;
 
   // Turn control properties
   private turnStrength: number = 0.5; // 0 to 1, controls how sharp the turns are
@@ -124,46 +118,40 @@ class PhysicsFlier extends THREE.EventDispatcher {
 
   private setupPhysics() {
     // Create wing body (main paraglider wing)
-    const wingShape = new CANNON.Box(new CANNON.Vec3(2, 0.1, 2));
+    const wingShape = new CANNON.Box(new CANNON.Vec3(20, 1, 20));
     this.wingBody = new CANNON.Body({
       mass: this.options.wingWeight,
       shape: wingShape,
       material: new CANNON.Material('wing')
     });
-    this.wingBody.position.copy(this.options.wingPosition as any);
+    this.wingBody.position.copy(this.wingMesh.position as any);
     this.wingBody.quaternion.copy(this.wingMesh.quaternion as any);
 
     // Set initial velocity for stable flight
     this.wingBody.velocity.set(0, 0, -10); // Initial forward speed of 10 m/s
 
     // Create pilot body
-    const pilotShape = new CANNON.Sphere(0.5);
+    const pilotShape = new CANNON.Sphere(2);
     this.pilotBody = new CANNON.Body({
       mass: this.options.pilotWeight,
       shape: pilotShape,
       material: new CANNON.Material('pilot')
     });
-    // Position pilot relative to wing position
-    const pilotWorldPos = this.options.wingPosition.clone().add(this.options.pilotPosition);
-    this.pilotBody.position.copy(pilotWorldPos as any);
 
-    // Create hinge constraint between wing and pilot with reduced rotation
-    this.wingConstraint = new CANNON.HingeConstraint(
+    // Position pilot 
+    this.pilotBody.position.copy(this.pilotMesh.position as any);
+
+    // Create constraint between wing and pilot with reduced rotation
+    this.wingConstraint = new CANNON.DistanceConstraint(
       this.wingBody,
       this.pilotBody,
-      {
-        pivotA: new CANNON.Vec3(0, 0, 0),
-        pivotB: this.options.pilotPosition.clone() as any,
-        axisA: new CANNON.Vec3(1, 0, 0),
-        axisB: new CANNON.Vec3(1, 0, 0),
-        maxForce: 1e6
-      }
+      6
     );
 
     // Add bodies and constraints to world
     this.world.addBody(this.wingBody);
-    this.world.addBody(this.pilotBody);
-    this.world.addConstraint(this.wingConstraint);
+    // this.world.addBody(this.pilotBody);
+    // this.world.addConstraint(this.wingConstraint);
 
     // Set up collision materials
     const wingMaterial = new CANNON.Material('wing');
@@ -194,95 +182,12 @@ class PhysicsFlier extends THREE.EventDispatcher {
   }
 
   private setupForceVisualization() {
-    // Create a group to hold all force visualization arrows
-    this.forceGroup = new THREE.Group();
-
-    // Add the force group to the scene
+    // Create force visualization with wing mesh as parent
     if (this.wingMesh.parent) {
-      this.wingMesh.parent.add(this.forceGroup);
+      this.forceVisualization = new ForceVisualization(this.wingMesh.parent);
     } else {
       console.warn('Wing mesh has no parent, force visualization may not be visible');
     }
-
-    // Create materials for different forces with increased opacity
-    const liftMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00, linewidth: 25 });
-    const dragMaterial = new THREE.LineBasicMaterial({ color: 0xff0000, linewidth: 25 });
-    const windMaterial = new THREE.LineBasicMaterial({ color: 0x0000ff, linewidth: 25 });
-    const thermalMaterial = new THREE.LineBasicMaterial({ color: 0xff00ff, linewidth: 25 });
-    const gravityMaterial = new THREE.LineBasicMaterial({ color: 0xffff00, linewidth: 25 });
-
-    // Create arrows for each force
-    this.liftArrow = new THREE.ArrowHelper(
-      new THREE.Vector3(0, 1, 0),
-      new THREE.Vector3(0, 0, 0),
-      10,
-      0x00ff00,
-      2,
-      1
-    );
-    this.liftArrow.line.material = liftMaterial;
-    this.liftArrow.cone.material = liftMaterial;
-
-    this.dragArrow = new THREE.ArrowHelper(
-      new THREE.Vector3(0, 1, 0),
-      new THREE.Vector3(0, 0, 0),
-      10,
-      0xff0000,
-      2,
-      1
-    );
-    this.dragArrow.line.material = dragMaterial;
-    this.dragArrow.cone.material = dragMaterial;
-
-    this.windArrow = new THREE.ArrowHelper(
-      new THREE.Vector3(0, 1, 0),
-      new THREE.Vector3(0, 0, 0),
-      10,
-      0x0000ff,
-      2,
-      1
-    );
-    this.windArrow.line.material = windMaterial;
-    this.windArrow.cone.material = windMaterial;
-
-    this.thermalArrow = new THREE.ArrowHelper(
-      new THREE.Vector3(0, 1, 0),
-      new THREE.Vector3(0, 0, 0),
-      10,
-      0xff00ff,
-      2,
-      1
-    );
-    this.thermalArrow.line.material = thermalMaterial;
-    this.thermalArrow.cone.material = thermalMaterial;
-
-    this.gravityArrow = new THREE.ArrowHelper(
-      new THREE.Vector3(0, 1, 0),
-      new THREE.Vector3(0, 0, 0),
-      10,
-      0xffff00,
-      2,
-      1
-    );
-    this.gravityArrow.line.material = gravityMaterial;
-    this.gravityArrow.cone.material = gravityMaterial;
-
-    // Add all arrows to the group
-    this.forceGroup.add(this.liftArrow);
-    this.forceGroup.add(this.dragArrow);
-    this.forceGroup.add(this.windArrow);
-    this.forceGroup.add(this.thermalArrow);
-    this.forceGroup.add(this.gravityArrow);
-
-    // Set initial visibility to true by default
-    this.forceGroup.visible = true;
-
-    // Log to verify setup
-    console.log('Force visualization setup complete:', {
-      forceGroup: this.forceGroup,
-      wingMeshParent: this.wingMesh.parent,
-      forceGroupParent: this.forceGroup.parent
-    });
   }
 
   private updateForceVisualization() {
@@ -297,55 +202,28 @@ class PhysicsFlier extends THREE.EventDispatcher {
       this.pilotBody.position.z
     );
 
-    // Update lift force visualization with increased scale
+    // Calculate forces
     const liftForce = this.calculateLiftForce(this.wingBody.velocity.length());
-    const liftDirection = new THREE.Vector3(liftForce.x, liftForce.y, liftForce.z).normalize();
-    const liftLength = liftForce.length() * FORCE_SCALE * 5; // Increased scale
-    this.liftArrow.setDirection(liftDirection);
-    this.liftArrow.setLength(liftLength);
-    this.liftArrow.position.copy(wingPos);
-
-    // Update drag force visualization
     const dragForce = this.calculateDragForce(this.wingBody.velocity.length());
-    const dragDirection = new THREE.Vector3(dragForce.x, dragForce.y, dragForce.z).normalize();
-    const dragLength = dragForce.length() * FORCE_SCALE * 5; // Increased scale
-    this.dragArrow.setDirection(dragDirection);
-    this.dragArrow.setLength(dragLength);
-    this.dragArrow.position.copy(wingPos);
-
-    // Update wind force visualization
     const windVelocity = this.weather.getWindVelocity();
     const windForce = new CANNON.Vec3(
       windVelocity.x * this.options.wingWeight * 0.3,
       windVelocity.y * this.options.wingWeight * 0.3,
       windVelocity.z * this.options.wingWeight * 0.3
     );
-    const windDirection = new THREE.Vector3(windForce.x, windForce.y, windForce.z).normalize();
-    const windLength = windForce.length() * FORCE_SCALE * 5; // Increased scale
-    this.windArrow.setDirection(windDirection);
-    this.windArrow.setLength(windLength);
-    this.windArrow.position.copy(wingPos);
-
-    // Update thermal force visualization
-    if (this.isInsideAnyThermal()) {
-      const thermalForce = new CANNON.Vec3(0, this.options.wingWeight * 0.5, 0);
-      const thermalDirection = new THREE.Vector3(thermalForce.x, thermalForce.y, thermalForce.z).normalize();
-      const thermalLength = thermalForce.length() * FORCE_SCALE * 5; // Increased scale
-      this.thermalArrow.setDirection(thermalDirection);
-      this.thermalArrow.setLength(thermalLength);
-      this.thermalArrow.position.copy(wingPos);
-      this.thermalArrow.visible = true;
-    } else {
-      this.thermalArrow.visible = false;
-    }
-
-    // Update gravity force visualization
+    const thermalForce = this.isInsideAnyThermal() ? new CANNON.Vec3(0, this.options.wingWeight * 0.5, 0) : null;
     const gravityForce = new CANNON.Vec3(0, -this.options.pilotWeight * 9.81, 0);
-    const gravityDirection = new THREE.Vector3(0, -1, 0);
-    const gravityLength = gravityForce.length() * FORCE_SCALE * 5; // Increased scale
-    this.gravityArrow.setDirection(gravityDirection);
-    this.gravityArrow.setLength(gravityLength);
-    this.gravityArrow.position.copy(pilotPos);
+
+    // Update force visualization
+    this.forceVisualization.update(
+      wingPos,
+      pilotPos,
+      liftForce,
+      dragForce,
+      windForce,
+      thermalForce,
+      gravityForce
+    );
   }
 
   private applyForces() {
@@ -356,6 +234,9 @@ class PhysicsFlier extends THREE.EventDispatcher {
     // Calculate lift force with reduced magnitude
     const liftForce = this.calculateLiftForce(speed);
     // Apply lift at the center of the wing
+
+    console.log("liftForce", liftForce);
+
     this.wingBody.applyForce(liftForce, new CANNON.Vec3(0, 0, 0));
 
     // Calculate drag force with increased magnitude
@@ -371,6 +252,8 @@ class PhysicsFlier extends THREE.EventDispatcher {
       windVelocity.z * this.options.wingWeight * 0.3
     );
     // Apply wind force at the center of the wing
+    console.log("windForce", windForce);
+
     this.wingBody.applyForce(windForce, new CANNON.Vec3(0, 0, 0));
 
     // Apply thermal forces if inside thermal with reduced magnitude
@@ -388,6 +271,8 @@ class PhysicsFlier extends THREE.EventDispatcher {
   private calculateLiftForce(speed: number): CANNON.Vec3 {
     // Basic lift equation: L = 1/2 * ρ * v² * S * Cl
     const liftMagnitude = 0.5 * AIR_DENSITY * speed * speed * WING_AREA * LIFT_COEFFICIENT * 0.3; // Further reduced lift coefficient
+
+    console.log("liftMagnitude", liftMagnitude);
 
     // Apply lift in the direction perpendicular to the wing's orientation
     const wingNormal = new CANNON.Vec3(0, 1, 0);
@@ -471,7 +356,7 @@ class PhysicsFlier extends THREE.EventDispatcher {
     }, TICK_INTERVAL);
   }
 
-  addGui(gui: any) {
+  addGui(gui: GUI) {
     const folder = gui.addFolder('Physics Flier');
 
     // Add controls for physics parameters
@@ -486,7 +371,15 @@ class PhysicsFlier extends THREE.EventDispatcher {
       });
 
     // Add force visualization toggle
-    folder.add(this.forceGroup, 'visible').name('Show Forces');
+    const forceVisController = {
+      showForces: this.forceVisualization.isVisible(),
+      setShowForces: (value: boolean) => {
+        this.forceVisualization.setVisible(value);
+      }
+    };
+    folder.add(forceVisController, 'showForces')
+      .onChange((value: boolean) => forceVisController.setShowForces(value))
+      .name('Show Forces');
 
     // Add debug controls
     if (this.debug) {

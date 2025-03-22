@@ -26,13 +26,12 @@ const ParagliderWorkshop = {
 
     sky.updateSunPosition(12);
 
-    const initialCamPos = new THREE.Vector3(9800, 870, -475);
-    const initialPGPos = new THREE.Vector3(6900, 970, -475);
+    const initialCamPos = new THREE.Vector3(7100, 470, -475);
+    const initialPGPos = new THREE.Vector3(6900, 370, -475);
 
     // Create physics world
     const world = new CANNON.World();
     world.gravity.set(0, -9.81, 0);
-
 
     const gliderOptions = {
       wingColor1: '#c30010',
@@ -45,16 +44,19 @@ const ParagliderWorkshop = {
       pilot: pilotOptions
     });
 
-    const mesh = await pgFlyable.load(gui);
-    const scale = 0.1;
-    mesh.scale.set(scale, scale, scale);
-    mesh.position.copy(initialPGPos);
+    const combinedMesh = await pgFlyable.load(gui);
+    combinedMesh.position.copy(initialPGPos);
 
     // Create separate meshes for wing and pilot
-    const wingMesh = pgFlyable.glider.fullWing.clone();
-    const pilotMesh = pgFlyable.pilotMesh.clone();
+    const wingMesh = pgFlyable.glider.fullWing;
+    const scale = 0.1;
+    // wingMesh.translateY(-300);
+    // wingMesh.translateX(300);
+    wingMesh.scale.set(scale, scale, scale);
 
-    // Add both meshes to the scene
+    const pilotMesh = pgFlyable.pilotMesh;
+    pilotMesh.scale.set(scale, scale, scale);
+
     scene.add(wingMesh);
     scene.add(pilotMesh);
 
@@ -68,9 +70,7 @@ const ParagliderWorkshop = {
       pilotMesh,
       wingMesh,
       pilotWeight: 80, // 80 kg pilot weight
-      wingWeight: 7, // 7 kg wing weight
-      pilotPosition: pilotMesh.position,
-      wingPosition: wingMesh.position
+      wingWeight: 6, // 7 kg wing weight
     };
 
     const weather = new Weather(WEATHER_SETTINGS);
@@ -91,15 +91,19 @@ const ParagliderWorkshop = {
     pg.init();
 
     setInterval(() => {
-      console.log(pg.getTurnState());
+      // console.log(pg.getTurnState());
       // pg.turnLeft(100);
     }, 100);
 
+    const fps = 10;
     const animate = () => {
-      requestAnimationFrame(animate);
+      setTimeout(() => {
+        requestAnimationFrame(animate);
+      }, 1000 / fps);
+      // requestAnimationFrame(animate);
       renderer.render(scene, camera);
-      // const lookAt = mesh.position.clone().add(new THREE.Vector3(0, 0, 0));
-      // camera.lookAt(lookAt);
+      camera.position.copy(pg.position().clone().add(new THREE.Vector3(330, 420, 410)));
+      camera.lookAt(pg.position());
       TWEEN.update();
       controls.update();
     };

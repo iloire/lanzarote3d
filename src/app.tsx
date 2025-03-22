@@ -1,17 +1,15 @@
-import React, { useEffect, useState } from "react";
 import GUI from "lil-gui";
-import Stats from "three/examples/jsm/libs/stats.module";
+import React, { useEffect, useState } from "react";
 import * as THREE from "three";
+import Stats from "three/examples/jsm/libs/stats.module";
+import Camera from "./components/camera";
+import Island from "./components/island";
 import Sky from "./components/sky";
 import Water from "./components/water";
-import Island from "./components/island";
-import Stories from "./stories/index";
-import Camera from "./components/camera";
 import Menu from './menu';
-import Controls from "./utils/controls";
+import Stories from "./stories/index";
 import { StoryOptions } from "./stories/types";
-import Animation from "./stories/animation";
-import PhotoBooth from "./stories/photobooth";
+import Controls from "./utils/controls";
 
 import "./index.css";
 
@@ -76,9 +74,9 @@ const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAp
   const initThree = async () => {
     const renderer = createRenderer(SCENE_CONFIG.sizes);
     setRenderer(renderer);
-    
+
     const scene = new THREE.Scene();
-    
+
     // Sky setup
     const sky = new Sky(20, 3);
     sky.addToScene(scene);
@@ -146,7 +144,7 @@ const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAp
       stats.update();
     };
     animate();
-    
+
     console.log("triangles:", renderer.info.render.triangles);
   };
 
@@ -154,16 +152,13 @@ const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAp
     if (!renderer) {
       initThree();
     }
-    
+
     return () => {
       // Cleanup
       renderer?.dispose();
     };
   }, []);
 
-  const navigateTo = (story: string) => {
-    window.location.href = `?story=${story}`;
-  };
 
   return (
     <div className="lanzarote">
