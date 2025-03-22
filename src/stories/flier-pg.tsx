@@ -75,6 +75,7 @@ const ParagliderWorkshop = {
 
     const weather = new Weather(WEATHER_SETTINGS);
     weather.addGui(gui);
+
     const envOptions: PhysicsEnvOptions = {
       weather,
       terrain,
@@ -92,7 +93,7 @@ const ParagliderWorkshop = {
 
     setInterval(() => {
       // console.log(pg.getTurnState());
-      // pg.turnLeft(100);
+      pg.turnLeft(100);
     }, 100);
 
     const fps = 10;
@@ -102,8 +103,8 @@ const ParagliderWorkshop = {
       }, 1000 / fps);
       // requestAnimationFrame(animate);
       renderer.render(scene, camera);
-      camera.position.copy(pg.position().clone().add(new THREE.Vector3(330, 420, 410)));
-      camera.lookAt(pg.position());
+      // camera.position.copy(pg.position().clone().add(new THREE.Vector3(3130, 2420, 410)));
+      // camera.lookAt(pg.position());
       TWEEN.update();
       controls.update();
     };
