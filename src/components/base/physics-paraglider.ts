@@ -35,10 +35,6 @@ interface EnvOptions {
 
 export interface PhysicsParagliderConstructor {
   world: CANNON.World;
-  pilotMesh: THREE.Object3D;
-  wingMesh: THREE.Object3D;
-  pilotWeight: number; // in kg
-  wingWeight: number; // in kg
   distanceWingPilot: number; // in meters
 
   glider: ParaglierPart;
@@ -124,7 +120,7 @@ class PhysicsFlier extends THREE.EventDispatcher {
     // Create wing body (main paraglider wing)
     const wingShape = new CANNON.Box(new CANNON.Vec3(20, 1, 20));
     this.gliderBody = new CANNON.Body({
-      mass: this.options.wingWeight,
+      mass: this.options.glider.weight,
       shape: wingShape,
       material: new CANNON.Material('wing')
     });
@@ -132,13 +128,11 @@ class PhysicsFlier extends THREE.EventDispatcher {
     this.gliderBody.position.copy(this.glider.position as any);
     this.gliderBody.quaternion.copy(this.glider.rotation as any);
 
-    // Set initial velocity for stable flight
-    this.gliderBody.velocity.set(0, 0, -10); // Initial forward speed of 10 m/s
 
     // Create pilot body
     const pilotShape = new CANNON.Sphere(2);
     this.pilotBody = new CANNON.Body({
-      mass: this.options.pilotWeight,
+      mass: this.options.pilot.weight,
       shape: pilotShape,
       material: new CANNON.Material('pilot')
     });
@@ -147,6 +141,10 @@ class PhysicsFlier extends THREE.EventDispatcher {
     this.pilot.mesh.position.copy(this.pilot.position as any);
     this.pilotBody.position.copy(this.pilot.position as any);
     this.pilotBody.quaternion.copy(this.pilot.rotation as any);
+
+    // Set initial velocity for stable flight
+    this.gliderBody.velocity.set(-10, 0, -10); // Initial forward speed of 10 m/s
+    this.pilotBody.velocity.set(-10, 0, -10); // Initial forward speed of 10 m/s
 
     // Create constraint between wing and pilot with reduced rotation
     this.gliderLinesConstraint = new CANNON.DistanceConstraint(
@@ -189,10 +187,17 @@ class PhysicsFlier extends THREE.EventDispatcher {
   }
 
   private setupForceVisualization() {
-    this.forceVisualization = new ForceVisualization(this.options.wingMesh.parent);
+    this.forceVisualization = new ForceVisualization(this.options.glider.mesh.parent);
+
+    // Ensure force visualization is visible by default
+    this.forceVisualization.setVisible(true);
+
+    // Log to confirm setup
+    console.log("Force visualization setup complete");
   }
 
   private updateForceVisualization() {
+    // Get positions for visualization
     const wingPos = new THREE.Vector3(
       this.gliderBody.position.x,
       this.gliderBody.position.y,
@@ -204,19 +209,48 @@ class PhysicsFlier extends THREE.EventDispatcher {
       this.pilotBody.position.z
     );
 
-    // Calculate forces
-    const liftForce = this.calculateLiftForce(this.gliderBody.velocity.length());
-    const dragForce = this.calculateDragForce(this.gliderBody.velocity.length());
+    // Calculate forces with safety checks
+    const velocity = this.gliderBody.velocity;
+    const speed = velocity.length();
+
+    // Get forces with error handling
+    let liftForce, dragForce;
+    try {
+      liftForce = this.calculateLiftForce(speed);
+      dragForce = this.calculateDragForce(speed);
+    } catch (e) {
+      console.error("Error calculating forces:", e);
+      // Provide fallback forces
+      liftForce = new CANNON.Vec3(0, 0.1, 0);
+      dragForce = new CANNON.Vec3(0, 0, -0.1);
+    }
+
     const windVelocity = this.weather.getWindVelocity();
     const windForce = new CANNON.Vec3(
-      windVelocity.x * this.options.wingWeight * 0.3,
-      windVelocity.y * this.options.wingWeight * 0.3,
-      windVelocity.z * this.options.wingWeight * 0.3
+      windVelocity.x * this.options.glider.weight * 0.3,
+      windVelocity.y * this.options.glider.weight * 0.3,
+      windVelocity.z * this.options.glider.weight * 0.3
     );
-    const thermalForce = this.isInsideAnyThermal() ? new CANNON.Vec3(0, this.options.wingWeight * 0.5, 0) : null;
-    const gravityForce = new CANNON.Vec3(0, -this.options.pilotWeight * 9.81, 0);
 
-    // Update force visualization
+    // Create thermal force or null if not in thermal
+    const thermalForce = this.isInsideAnyThermal()
+      ? new CANNON.Vec3(0, this.options.glider.weight * 0.5, 0)
+      : null;
+
+    // Create gravity force
+    const gravityForce = new CANNON.Vec3(0, -this.options.pilot.weight * 9.81, 0);
+
+    // Log forces for debugging (with safety checks)
+    console.log("Forces for visualization:", {
+      lift: isNaN(liftForce.length()) ? "ERROR" : liftForce.length().toFixed(2),
+      drag: isNaN(dragForce.length()) ? "ERROR" : dragForce.length().toFixed(2),
+      wind: windForce.length().toFixed(2),
+      thermal: thermalForce ? thermalForce.length().toFixed(2) : "null",
+      gravity: gravityForce.length().toFixed(2),
+      speed: speed.toFixed(2)
+    });
+
+    // Update visualization with current positions and forces
     this.forceVisualization.update(
       wingPos,
       pilotPos,
@@ -233,58 +267,88 @@ class PhysicsFlier extends THREE.EventDispatcher {
     const velocity = this.gliderBody.velocity;
     const speed = velocity.length();
 
+    console.log("velocity", velocity);
+    console.log("speed", speed);
+
+
     // Calculate lift force with reduced magnitude
     const liftForce = this.calculateLiftForce(speed);
+    console.log("liftForce", liftForce);
     // Apply lift at the center of the wing
 
-    this.gliderBody.applyForce(liftForce, new CANNON.Vec3(0, 0, 0));
+    //this.gliderBody.applyForce(liftForce, new CANNON.Vec3(0, 0, 0));
 
     // Calculate drag force with increased magnitude
     const dragForce = this.calculateDragForce(speed);
+    console.log("dragForce", dragForce);
     // Apply drag at the center of the wing
-    this.gliderBody.applyForce(dragForce, new CANNON.Vec3(0, 0, 0));
+    // this.gliderBody.applyForce(dragForce, new CANNON.Vec3(0, 0, 0));
 
     // Apply wind force with reduced magnitude
     const windVelocity = this.weather.getWindVelocity();
     const windForce = new CANNON.Vec3(
-      windVelocity.x * this.options.wingWeight * 0.3,
-      windVelocity.y * this.options.wingWeight * 0.3,
-      windVelocity.z * this.options.wingWeight * 0.3
+      windVelocity.x * this.options.glider.weight * 0.3,
+      windVelocity.y * this.options.glider.weight * 0.3,
+      windVelocity.z * this.options.glider.weight * 0.3
     );
 
-    this.gliderBody.applyForce(windForce, new CANNON.Vec3(0, 0, 0));
+    console.log("windForce", windForce);
+
+    // this.gliderBody.applyForce(windForce, new CANNON.Vec3(0, 0, 0));
+    console.log(this.gliderBody);
 
     // Apply thermal forces if inside thermal with reduced magnitude
     if (this.isInsideAnyThermal()) {
-      const thermalForce = new CANNON.Vec3(0, this.options.wingWeight * 0.5, 0);
       // Apply thermal force at the center of the wing
-      this.gliderBody.applyForce(thermalForce, new CANNON.Vec3(0, 0, 0));
+      // this.gliderBody.applyForce(thermalForce, new CANNON.Vec3(0, 0, 0));
     }
 
     // Apply gravity at the pilot's position (center of mass)
-    const gravityForce = new CANNON.Vec3(0, -this.options.pilotWeight * 9.81, 0);
+    const gravityForce = new CANNON.Vec3(0, -this.options.pilot.weight * 9.81, 0);
     this.pilotBody.applyForce(gravityForce, new CANNON.Vec3(0, 0, 0));
   }
 
   private calculateLiftForce(speed: number): CANNON.Vec3 {
     // Basic lift equation: L = 1/2 * ρ * v² * S * Cl
+    // Check for valid speed to avoid NaN
+    if (speed < 0.001) {
+      // Return zero lift for very small speeds
+      return new CANNON.Vec3(0, 0, 0);
+    }
+
     const liftMagnitude = 0.5 * AIR_DENSITY * speed * speed * WING_AREA * LIFT_COEFFICIENT * 0.3; // Further reduced lift coefficient
 
-    console.log("liftMagnitude", liftMagnitude);
-
+    console.log("liftMagnitude", liftMagnitude, speed, LIFT_COEFFICIENT);
     // Apply lift in the direction perpendicular to the wing's orientation
     const wingNormal = new CANNON.Vec3(0, 1, 0);
     this.gliderBody.quaternion.vmult(wingNormal, wingNormal);
+
+    // Check if wingNormal is valid (not zero length) to avoid NaN
+    if (wingNormal.length() < 0.001) {
+      return new CANNON.Vec3(0, 0.1, 0); // Default small lift if normal is invalid
+    }
 
     return wingNormal.scale(liftMagnitude);
   }
 
   private calculateDragForce(speed: number): CANNON.Vec3 {
     // Basic drag equation: D = 1/2 * ρ * v² * S * Cd
+    // Check for valid speed to avoid NaN
+    if (speed < 0.001) {
+      // Return zero drag for very small speeds
+      return new CANNON.Vec3(0, 0, 0);
+    }
+
     const dragMagnitude = 0.5 * AIR_DENSITY * speed * speed * WING_AREA * DRAG_COEFFICIENT * 1.2; // Slightly reduced drag coefficient
 
     // Apply drag in the opposite direction of velocity
     const dragDirection = this.gliderBody.velocity.clone();
+
+    // Check if velocity is valid (not zero length) to avoid NaN
+    if (dragDirection.length() < 0.001) {
+      return new CANNON.Vec3(0, 0, 0); // Zero drag if velocity is near zero
+    }
+
     dragDirection.normalize();
     dragDirection.scale(-1, dragDirection);
 
@@ -320,7 +384,7 @@ class PhysicsFlier extends THREE.EventDispatcher {
   }
 
   position(): THREE.Vector3 {
-    return this.glider.position;
+    return new THREE.Vector3(this.gliderBody.position.x, this.gliderBody.position.y, this.gliderBody.position.z);
   }
 
   private getLiftValue(): number {
@@ -368,16 +432,95 @@ class PhysicsFlier extends THREE.EventDispatcher {
         this.__gradient = value;
       });
 
-    // Add force visualization toggle
+    // Add force visualization toggle with default to true
     const forceVisController = {
-      showForces: this.forceVisualization.isVisible(),
+      showForces: true,  // Set default to true to make forces visible
       setShowForces: (value: boolean) => {
         this.forceVisualization.setVisible(value);
+        console.log("Force visualization visibility set to:", value);
       }
     };
     folder.add(forceVisController, 'showForces')
       .onChange((value: boolean) => forceVisController.setShowForces(value))
       .name('Show Forces');
+
+    // Ensure forces are visible by default
+    forceVisController.setShowForces(true);
+
+    // Force scale control
+    const forceScaleController = {
+      forceScale: 1.0,
+      update: (value: number) => {
+        if (this.forceVisualization.setScale) {
+          this.forceVisualization.setScale(value);
+        }
+      }
+    };
+
+    // Add force scale control if method exists
+    try {
+      folder.add(forceScaleController, 'forceScale', 0.1, 5.0, 0.1)
+        .onChange((value: number) => forceScaleController.update(value))
+        .name('Force Scale');
+    } catch (e) {
+      console.log("Force scale control not available:", e);
+    }
+
+    // Add force magnitude information section
+    const forceMagFolder = folder.addFolder('Force Magnitudes');
+    const forceMagnitudes = {
+      lift: 0,
+      drag: 0,
+      wind: 0,
+      thermal: 0,
+      gravity: 0,
+      speed: 0,
+      update: () => {
+        try {
+          // Get current velocity
+          const velocity = this.gliderBody.velocity;
+          const speed = velocity.length();
+          forceMagnitudes.speed = parseFloat(speed.toFixed(2));
+
+          // Calculate forces (without actually applying them)
+          const liftForce = this.calculateLiftForce(speed);
+          const dragForce = this.calculateDragForce(speed);
+
+          // Get the wind velocity
+          const windVelocity = this.weather.getWindVelocity();
+          const windForce = new CANNON.Vec3(
+            windVelocity.x * this.options.glider.weight * 0.3,
+            windVelocity.y * this.options.glider.weight * 0.3,
+            windVelocity.z * this.options.glider.weight * 0.3
+          );
+
+          // Calculate thermal force
+          const thermalForce = this.isInsideAnyThermal()
+            ? new CANNON.Vec3(0, this.options.glider.weight * 0.5, 0)
+            : new CANNON.Vec3(0, 0, 0);
+
+          // Calculate gravity force
+          const gravityForce = new CANNON.Vec3(0, -this.options.pilot.weight * 9.81, 0);
+
+          // Update the displayed values
+          forceMagnitudes.lift = parseFloat(isNaN(liftForce.length()) ? "0" : liftForce.length().toFixed(2));
+          forceMagnitudes.drag = parseFloat(isNaN(dragForce.length()) ? "0" : dragForce.length().toFixed(2));
+          forceMagnitudes.wind = parseFloat(windForce.length().toFixed(2));
+          forceMagnitudes.thermal = parseFloat(thermalForce.length().toFixed(2));
+          forceMagnitudes.gravity = parseFloat(gravityForce.length().toFixed(2));
+        } catch (e) {
+          console.error("Error updating force magnitudes:", e);
+        }
+      }
+    };
+
+    // Add force magnitude displays
+    forceMagFolder.add(forceMagnitudes, 'speed').name('Current Speed (m/s)').listen();
+    forceMagFolder.add(forceMagnitudes, 'lift').name('Lift Force (N)').listen();
+    forceMagFolder.add(forceMagnitudes, 'drag').name('Drag Force (N)').listen();
+    forceMagFolder.add(forceMagnitudes, 'wind').name('Wind Force (N)').listen();
+    forceMagFolder.add(forceMagnitudes, 'thermal').name('Thermal Force (N)').listen();
+    forceMagFolder.add(forceMagnitudes, 'gravity').name('Gravity Force (N)').listen();
 
     // Add position and rotation information for glider and pilot
     const positionFolder = folder.addFolder('Positions & Meshes');
@@ -529,6 +672,7 @@ class PhysicsFlier extends THREE.EventDispatcher {
       positionDifferences.update();
       distances.update();
       velocities.update();
+      forceMagnitudes.update(); // Add update for force magnitudes
 
       requestAnimationFrame(updateGUI);
     };

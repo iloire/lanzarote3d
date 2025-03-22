@@ -76,10 +76,6 @@ const ParagliderWorkshop = {
         rotation: new THREE.Quaternion()
       },
       world,
-      pilotMesh,
-      wingMesh,
-      pilotWeight: 80, // 80 kg pilot weight
-      wingWeight: 6, // 7 kg wing weight
       distanceWingPilot: distanceWingPilot, // 10 meters distance between wing and pilot
     };
 
@@ -113,8 +109,8 @@ const ParagliderWorkshop = {
       }, 1000 / fps);
       // requestAnimationFrame(animate);
       renderer.render(scene, camera);
-      // camera.position.copy(pg.position().clone().add(new THREE.Vector3(3130, 2420, 410)));
-      // camera.lookAt(pg.position());
+      camera.position.copy(pg.position().clone().add(new THREE.Vector3(313, 20, 40)));
+      camera.lookAt(pg.position());
       TWEEN.update();
       controls.update();
     };

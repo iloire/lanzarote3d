@@ -41,6 +41,9 @@ export class ForceVisualization {
   private pilotForceGroup: THREE.Group;
   private forceGroup: THREE.Group;
 
+  // Scale factors
+  private customScaleFactor: number = 1.0;
+
   constructor(parent: THREE.Object3D) {
     // Create main force group
     this.forceGroup = new THREE.Group();
@@ -189,6 +192,15 @@ export class ForceVisualization {
     label.visible = length > 0.5; // Lowered threshold to show more labels
   }
 
+  /**
+   * Set the scale factor for all force visualizations
+   * @param scale Scale factor to apply to all forces (default: 1.0)
+   */
+  setScale(scale: number): void {
+    this.customScaleFactor = scale;
+    console.log(`Force visualization scale set to: ${scale}`);
+  }
+
   update(
     wingPosition: THREE.Vector3,
     pilotPosition: THREE.Vector3,
@@ -202,42 +214,112 @@ export class ForceVisualization {
     this.wingForceGroup.position.copy(wingPosition);
     this.pilotForceGroup.position.copy(pilotPosition);
 
+    // Apply custom scale factor to all force visualizations
+    const effectiveWingScale = FORCE_SCALE * WING_FORCE_SCALE * this.customScaleFactor;
+    const effectivePilotScale = FORCE_SCALE * PILOT_FORCE_SCALE * this.customScaleFactor;
+
     // Update forces applied to the WING
 
-    // Update lift force visualization - apply from wing center
-    const liftDirection = new THREE.Vector3(liftForce.x, liftForce.y, liftForce.z).normalize();
-    const liftLength = liftForce.length() * FORCE_SCALE * WING_FORCE_SCALE;
-    this.liftArrow.setDirection(liftDirection);
-    this.liftArrow.setLength(liftLength);
-    this.liftArrow.position.set(0, 0, 0); // Relative to wing group
-    this.updateLabel('lift', new THREE.Vector3(0, 0, 0), liftDirection, liftLength);
+    // Safely extract lift force data
+    try {
+      // Update lift force visualization - apply from wing center
+      const liftDirection = new THREE.Vector3(
+        isNaN(liftForce.x) ? 0 : liftForce.x,
+        isNaN(liftForce.y) ? 1 : liftForce.y,
+        isNaN(liftForce.z) ? 0 : liftForce.z
+      );
 
-    // Update drag force visualization - apply from wing center
-    const dragDirection = new THREE.Vector3(dragForce.x, dragForce.y, dragForce.z).normalize();
-    const dragLength = dragForce.length() * FORCE_SCALE * WING_FORCE_SCALE;
-    this.dragArrow.setDirection(dragDirection);
-    this.dragArrow.setLength(dragLength);
-    this.dragArrow.position.set(0, 0, 0); // Relative to wing group
-    this.updateLabel('drag', new THREE.Vector3(0, 0, 0), dragDirection, dragLength);
+      // Safely normalize the direction
+      if (liftDirection.length() > 0.001) {
+        liftDirection.normalize();
+      } else {
+        liftDirection.set(0, 1, 0); // Default to upward if invalid
+      }
+
+      const liftLength = !isNaN(liftForce.length()) ? liftForce.length() * effectiveWingScale : 0;
+      this.liftArrow.setDirection(liftDirection);
+      this.liftArrow.setLength(Math.max(0, liftLength)); // Ensure non-negative length
+      this.liftArrow.position.set(0, 0, 0); // Relative to wing group
+      this.updateLabel('lift', new THREE.Vector3(0, 0, 0), liftDirection, liftLength);
+    } catch (e) {
+      console.error("Error with lift force visualization:", e);
+      this.liftArrow.visible = false;
+      this.forceLabels['lift'].visible = false;
+    }
+
+    // Safely extract drag force data
+    try {
+      // Update drag force visualization - apply from wing center
+      const dragDirection = new THREE.Vector3(
+        isNaN(dragForce.x) ? 0 : dragForce.x,
+        isNaN(dragForce.y) ? 0 : dragForce.y,
+        isNaN(dragForce.z) ? -1 : dragForce.z
+      );
+
+      // Safely normalize the direction
+      if (dragDirection.length() > 0.001) {
+        dragDirection.normalize();
+      } else {
+        dragDirection.set(0, 0, -1); // Default to backward if invalid
+      }
+
+      const dragLength = !isNaN(dragForce.length()) ? dragForce.length() * effectiveWingScale : 0;
+      this.dragArrow.setDirection(dragDirection);
+      this.dragArrow.setLength(Math.max(0, dragLength)); // Ensure non-negative length
+      this.dragArrow.position.set(0, 0, 0); // Relative to wing group
+      this.updateLabel('drag', new THREE.Vector3(0, 0, 0), dragDirection, dragLength);
+    } catch (e) {
+      console.error("Error with drag force visualization:", e);
+      this.dragArrow.visible = false;
+      this.forceLabels['drag'].visible = false;
+    }
 
     // Update wind force visualization - apply from wing with offset to avoid overlap
-    const windDirection = new THREE.Vector3(windForce.x, windForce.y, windForce.z).normalize();
-    const windLength = windForce.length() * FORCE_SCALE * WING_FORCE_SCALE;
-    this.windArrow.setDirection(windDirection);
-    this.windArrow.setLength(windLength);
-    this.windArrow.position.set(2, 0, 2); // Slight offset to avoid overlap
-    this.updateLabel('wind', new THREE.Vector3(2, 0, 2), windDirection, windLength);
+    try {
+      const windDirection = new THREE.Vector3(windForce.x, windForce.y, windForce.z);
+
+      // Safely normalize the direction
+      if (windDirection.length() > 0.001) {
+        windDirection.normalize();
+      } else {
+        windDirection.set(1, 0, 0); // Default to rightward if invalid
+      }
+
+      const windLength = windForce.length() * effectiveWingScale;
+      this.windArrow.setDirection(windDirection);
+      this.windArrow.setLength(Math.max(0, windLength)); // Ensure non-negative length
+      this.windArrow.position.set(2, 0, 2); // Slight offset to avoid overlap
+      this.updateLabel('wind', new THREE.Vector3(2, 0, 2), windDirection, windLength);
+    } catch (e) {
+      console.error("Error with wind force visualization:", e);
+      this.windArrow.visible = false;
+      this.forceLabels['wind'].visible = false;
+    }
 
     // Update thermal force visualization - apply from wing with offset
-    if (thermalForce && thermalForce.length() > 0.01) {
-      const thermalDirection = new THREE.Vector3(thermalForce.x, thermalForce.y, thermalForce.z).normalize();
-      const thermalLength = thermalForce.length() * FORCE_SCALE * WING_FORCE_SCALE;
-      this.thermalArrow.setDirection(thermalDirection);
-      this.thermalArrow.setLength(thermalLength);
-      this.thermalArrow.position.set(-2, 0, -2); // Offset to avoid overlap
-      this.thermalArrow.visible = true;
-      this.updateLabel('thermal', new THREE.Vector3(-2, 0, -2), thermalDirection, thermalLength);
-    } else {
+    try {
+      if (thermalForce && thermalForce.length() > 0.01) {
+        const thermalDirection = new THREE.Vector3(thermalForce.x, thermalForce.y, thermalForce.z);
+
+        // Safely normalize the direction
+        if (thermalDirection.length() > 0.001) {
+          thermalDirection.normalize();
+        } else {
+          thermalDirection.set(0, 1, 0); // Default to upward if invalid
+        }
+
+        const thermalLength = thermalForce.length() * effectiveWingScale;
+        this.thermalArrow.setDirection(thermalDirection);
+        this.thermalArrow.setLength(Math.max(0, thermalLength)); // Ensure non-negative length
+        this.thermalArrow.position.set(-2, 0, -2); // Offset to avoid overlap
+        this.thermalArrow.visible = true;
+        this.updateLabel('thermal', new THREE.Vector3(-2, 0, -2), thermalDirection, thermalLength);
+      } else {
+        this.thermalArrow.visible = false;
+        this.forceLabels['thermal'].visible = false;
+      }
+    } catch (e) {
+      console.error("Error with thermal force visualization:", e);
       this.thermalArrow.visible = false;
       this.forceLabels['thermal'].visible = false;
     }
@@ -245,16 +327,31 @@ export class ForceVisualization {
     // Update forces applied to the PILOT
 
     // Update gravity force visualization - apply from pilot center
-    const gravityDirection = new THREE.Vector3(gravityForce.x, gravityForce.y, gravityForce.z).normalize();
-    const gravityLength = gravityForce.length() * FORCE_SCALE * PILOT_FORCE_SCALE;
-    this.gravityArrow.setDirection(gravityDirection);
-    this.gravityArrow.setLength(gravityLength);
-    this.gravityArrow.position.set(0, 0, 0); // Relative to pilot group
-    this.updateLabel('gravity', new THREE.Vector3(0, 0, 0), gravityDirection, gravityLength);
+    try {
+      const gravityDirection = new THREE.Vector3(gravityForce.x, gravityForce.y, gravityForce.z);
+
+      // Safely normalize the direction
+      if (gravityDirection.length() > 0.001) {
+        gravityDirection.normalize();
+      } else {
+        gravityDirection.set(0, -1, 0); // Default to downward if invalid
+      }
+
+      const gravityLength = gravityForce.length() * effectivePilotScale;
+      this.gravityArrow.setDirection(gravityDirection);
+      this.gravityArrow.setLength(Math.max(0, gravityLength)); // Ensure non-negative length
+      this.gravityArrow.position.set(0, 0, 0); // Relative to pilot group
+      this.updateLabel('gravity', new THREE.Vector3(0, 0, 0), gravityDirection, gravityLength);
+    } catch (e) {
+      console.error("Error with gravity force visualization:", e);
+      this.gravityArrow.visible = false;
+      this.forceLabels['gravity'].visible = false;
+    }
   }
 
   setVisible(visible: boolean) {
     this.forceGroup.visible = visible;
+    console.log(`Force visualization visibility set to: ${visible}`);
   }
 
   isVisible(): boolean {
