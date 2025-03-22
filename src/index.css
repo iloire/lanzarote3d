@@ -12,19 +12,19 @@ body {
 
 .appOptions {
   position: absolute;
-  top: 5%;
-  left: 5%;
+  top: 3%;
+  left: 3%;
   z-index: 999;
 }
 
 .appOptions div.button button {
-  margin-bottom: 0.7em;
-  font-size: 120%;
+  margin-bottom: 0.4em;
+  font-size: 90%;
 }
 
 .appOptions div.button span {
   color: white;
-  margin-left: 1em;
+  margin-left: 0.5em;
 }
 
 .loading {
@@ -195,8 +195,7 @@ body {
   font-size: 100%;
 }
 
-#game-start-normal {
-}
+#game-start-normal {}
 
 #game-start-strong {
   margin-left: 40px;
