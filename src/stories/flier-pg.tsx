@@ -33,16 +33,6 @@ const ParagliderWorkshop = {
     const world = new CANNON.World();
     world.gravity.set(0, -9.81, 0);
 
-    // Create ground body
-    const groundShape = new CANNON.Plane();
-    const groundBody = new CANNON.Body({
-      type: CANNON.Body.STATIC,
-      shape: groundShape,
-      material: new CANNON.Material('ground')
-    });
-    groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
-    groundBody.position.set(0, 0, 0);
-    world.addBody(groundBody);
 
     const gliderOptions = {
       wingColor1: '#c30010',
@@ -59,7 +49,14 @@ const ParagliderWorkshop = {
     const scale = 0.1;
     mesh.scale.set(scale, scale, scale);
     mesh.position.copy(initialPGPos);
-    scene.add(mesh);
+
+    // Create separate meshes for wing and pilot
+    const wingMesh = pgFlyable.glider.fullWing.clone();
+    const pilotMesh = pgFlyable.pilotMesh.clone();
+
+    // Add both meshes to the scene
+    scene.add(wingMesh);
+    scene.add(pilotMesh);
 
     const pgOptions: PhysicsFlierConstructor = {
       glidingRatio: 9,
@@ -67,7 +64,13 @@ const ParagliderWorkshop = {
       fullSpeedBarSpeed: 45 / KMH_TO_MS,
       bigEarsSpeed: 27 / KMH_TO_MS,
       flyable: pgFlyable,
-      world
+      world,
+      pilotMesh,
+      wingMesh,
+      pilotWeight: 80, // 80 kg pilot weight
+      wingWeight: 7, // 7 kg wing weight
+      pilotPosition: pilotMesh.position,
+      wingPosition: wingMesh.position
     };
 
     const weather = new Weather(WEATHER_SETTINGS);
@@ -89,8 +92,8 @@ const ParagliderWorkshop = {
 
     setInterval(() => {
       console.log(pg.getTurnState());
-      pg.turnLeft(12220);
-    }, 50);
+      // pg.turnLeft(100);
+    }, 100);
 
     const animate = () => {
       requestAnimationFrame(animate);
