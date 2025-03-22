@@ -1,8 +1,8 @@
+import GUI from "lil-gui";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import Camera from "../components/camera";
 import Sky from "../components/sky";
-import { GUI } from "lil-gui";
 
 export interface StoryOptions {
   camera: Camera;

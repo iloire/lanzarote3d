@@ -16,6 +16,7 @@ declare module 'lil-gui' {
     show(): this;
     step(step: number): this;
     updateDisplay(): this;
+    _hidden: boolean;
   }
 
   export interface GUIFolder {
@@ -26,6 +27,7 @@ declare module 'lil-gui' {
     controllers: GUIController[];
     add(object: object, property: string): GUIController;
     add(object: object, property: string, min?: number, max?: number, step?: number): GUIController;
+    add(object: object, property: string, []: any): GUIController;
     addColor(object: object, property: string): GUIController;
     addFolder(name: string): GUIFolder;
     destroy(): void;
@@ -35,6 +37,7 @@ declare module 'lil-gui' {
     remove(controller: GUIController): void;
     removeFolder(folder: GUIFolder): void;
     show(): void;
+    _hidden: boolean;
   }
 
   export default class GUI {
@@ -54,5 +57,6 @@ declare module 'lil-gui' {
     remove(controller: GUIController): void;
     removeFolder(folder: GUIFolder): void;
     show(): void;
+    _hidden: boolean;
   }
 } 

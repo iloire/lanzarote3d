@@ -68,7 +68,7 @@ const createRenderer = (sizes: { width: number; height: number }) => {
 
 const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAppSelection = false }) => {
   const [loadingProcess, setLoadingProcess] = useState(0);
-  const [showAppSelection, setShowAppSelection] = useState(initialShowAppSelection);
+  const [showAppSelection] = useState(initialShowAppSelection);
   const [renderer, setRenderer] = useState<THREE.WebGLRenderer | null>(null);
 
   const initThree = async () => {
