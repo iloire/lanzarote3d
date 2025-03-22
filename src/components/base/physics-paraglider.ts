@@ -381,6 +381,97 @@ class PhysicsFlier extends THREE.EventDispatcher {
       .onChange((value: boolean) => forceVisController.setShowForces(value))
       .name('Show Forces');
 
+    // Add position and rotation information for glider and pilot
+    const positionFolder = folder.addFolder('Positions & Meshes');
+
+    // Glider position display
+    const gliderPosition = {
+      x: 0, y: 0, z: 0,
+      update: () => {
+        gliderPosition.x = parseFloat(this.gliderBody.position.x.toFixed(2));
+        gliderPosition.y = parseFloat(this.gliderBody.position.y.toFixed(2));
+        gliderPosition.z = parseFloat(this.gliderBody.position.z.toFixed(2));
+      }
+    };
+
+    const gliderRotation = {
+      x: 0, y: 0, z: 0, w: 0,
+      update: () => {
+        gliderRotation.x = parseFloat(this.gliderBody.quaternion.x.toFixed(2));
+        gliderRotation.y = parseFloat(this.gliderBody.quaternion.y.toFixed(2));
+        gliderRotation.z = parseFloat(this.gliderBody.quaternion.z.toFixed(2));
+        gliderRotation.w = parseFloat(this.gliderBody.quaternion.w.toFixed(2));
+      }
+    };
+
+    // Pilot position display
+    const pilotPosition = {
+      x: 0, y: 0, z: 0,
+      update: () => {
+        pilotPosition.x = parseFloat(this.pilotBody.position.x.toFixed(2));
+        pilotPosition.y = parseFloat(this.pilotBody.position.y.toFixed(2));
+        pilotPosition.z = parseFloat(this.pilotBody.position.z.toFixed(2));
+      }
+    };
+
+    // Add glider position controls
+    const gliderFolder = positionFolder.addFolder('Glider Body');
+    gliderFolder.add(gliderPosition, 'x').name('X Position').listen();
+    gliderFolder.add(gliderPosition, 'y').name('Y Position').listen();
+    gliderFolder.add(gliderPosition, 'z').name('Z Position').listen();
+    gliderFolder.add(gliderRotation, 'x').name('X Rotation').listen();
+    gliderFolder.add(gliderRotation, 'y').name('Y Rotation').listen();
+    gliderFolder.add(gliderRotation, 'z').name('Z Rotation').listen();
+
+    // Add pilot position controls
+    const pilotFolder = positionFolder.addFolder('Pilot Body');
+    pilotFolder.add(pilotPosition, 'x').name('X Position').listen();
+    pilotFolder.add(pilotPosition, 'y').name('Y Position').listen();
+    pilotFolder.add(pilotPosition, 'z').name('Z Position').listen();
+
+    // Distance between wing and pilot
+    const distances = {
+      current: 0,
+      target: this.options.distanceWingPilot,
+      update: () => {
+        const dx = this.gliderBody.position.x - this.pilotBody.position.x;
+        const dy = this.gliderBody.position.y - this.pilotBody.position.y;
+        const dz = this.gliderBody.position.z - this.pilotBody.position.z;
+        distances.current = parseFloat(Math.sqrt(dx * dx + dy * dy + dz * dz).toFixed(2));
+      }
+    };
+
+    positionFolder.add(distances, 'current').name('Current Distance').listen();
+    positionFolder.add(distances, 'target').name('Target Distance').listen();
+
+    // Physics metrics
+    const metricsFolder = folder.addFolder('Physics Metrics');
+
+    const velocities = {
+      gliderSpeed: 0,
+      pilotSpeed: 0,
+      update: () => {
+        velocities.gliderSpeed = parseFloat(this.gliderBody.velocity.length().toFixed(2));
+        velocities.pilotSpeed = parseFloat(this.pilotBody.velocity.length().toFixed(2));
+      }
+    };
+
+    metricsFolder.add(velocities, 'gliderSpeed').name('Glider Speed').listen();
+    metricsFolder.add(velocities, 'pilotSpeed').name('Pilot Speed').listen();
+
+    // Update the GUI values on each frame
+    const updateGUI = () => {
+      gliderPosition.update();
+      gliderRotation.update();
+      pilotPosition.update();
+      distances.update();
+      velocities.update();
+
+      requestAnimationFrame(updateGUI);
+    };
+
+    updateGUI();
+
     // Add debug controls
     if (this.debug) {
       folder.add(this, 'speedBar').name('Speed Bar');
