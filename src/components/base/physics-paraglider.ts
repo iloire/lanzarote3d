@@ -1,12 +1,11 @@
 import * as CANNON from "cannon-es";
 import GUI from 'lil-gui';
 import * as THREE from "three";
-import Thermal from "../../components/thermal";
 import { TrajectoryPoint, TrajectoryPointType } from "../../elements/trajectory";
 import Weather from "../../elements/weather";
 import { getTerrainHeightBelowPosition } from "../../utils/collision";
-import IFlyable from './IFlyable';
-import { ForceVisualization } from './force-visualization';
+import Thermal from "../thermal";
+import { ForceVisualization } from "./force-visualization";
 
 const ANTI_CRASH_ENABLED = false;
 const TICK_INTERVAL = 25; // 40 Hz update rate
@@ -18,15 +17,11 @@ const DRAG_COEFFICIENT = 0.5;
 const LIFT_COEFFICIENT = 1.2;
 const WING_AREA = 25; // m²
 
-// Force visualization constants
-
-interface FlierConstructor {
-  flyable: IFlyable;
-  world: CANNON.World;
-  glidingRatio: number;
-  trimSpeed: number;
-  fullSpeedBarSpeed: number;
-  bigEarsSpeed: number;
+export type ParaglierPart = {
+  mesh: THREE.Object3D;
+  weight: number;
+  position: THREE.Vector3;
+  rotation: THREE.Quaternion;
 }
 
 interface EnvOptions {
@@ -38,12 +33,21 @@ interface EnvOptions {
   world: CANNON.World;
 }
 
-export interface PhysicsFlierConstructor extends FlierConstructor {
+export interface PhysicsParagliderConstructor {
   world: CANNON.World;
   pilotMesh: THREE.Object3D;
   wingMesh: THREE.Object3D;
   pilotWeight: number; // in kg
   wingWeight: number; // in kg
+  distanceWingPilot: number; // in meters
+
+  glider: ParaglierPart;
+  pilot: ParaglierPart;
+
+  glidingRatio: number;
+  trimSpeed: number;
+  fullSpeedBarSpeed: number;
+  bigEarsSpeed: number;
 }
 
 export interface PhysicsEnvOptions extends EnvOptions {
@@ -51,7 +55,7 @@ export interface PhysicsEnvOptions extends EnvOptions {
 }
 
 class PhysicsFlier extends THREE.EventDispatcher {
-  options: PhysicsFlierConstructor;
+  options: PhysicsParagliderConstructor;
   weather: Weather;
   terrain: THREE.Mesh;
   water: THREE.Mesh;
@@ -60,9 +64,6 @@ class PhysicsFlier extends THREE.EventDispatcher {
   speedBar: boolean;
   ears: boolean;
   interval: number = null;
-  pilotMesh: THREE.Object3D;
-  wingMesh: THREE.Object3D;
-  flyable: IFlyable;
   wrapSpeed: number = 1;
   flyingTime: number = 0;
   metersFlown: number = 0;
@@ -80,6 +81,9 @@ class PhysicsFlier extends THREE.EventDispatcher {
   numberGroundTouches: number = 0;
   perfStats: any;
 
+  glider: ParaglierPart;
+  pilot: ParaglierPart;
+
   // Physics bodies
   wingBody: CANNON.Body;
   pilotBody: CANNON.Body;
@@ -94,7 +98,7 @@ class PhysicsFlier extends THREE.EventDispatcher {
   private isTurningRight: boolean = false;
 
   constructor(
-    options: PhysicsFlierConstructor,
+    options: PhysicsParagliderConstructor,
     envOptions: PhysicsEnvOptions,
     debug?: boolean
   ) {
@@ -108,9 +112,9 @@ class PhysicsFlier extends THREE.EventDispatcher {
     this.thermals = envOptions.thermals;
     this.perfStats = envOptions.perfStats;
     this.world = envOptions.world;
-    this.pilotMesh = options.pilotMesh;
-    this.wingMesh = options.wingMesh;
-    this.flyable = options.flyable;
+
+    this.glider = options.glider;
+    this.pilot = options.pilot;
 
     this.setupPhysics();
     this.setupForceVisualization();
@@ -124,8 +128,8 @@ class PhysicsFlier extends THREE.EventDispatcher {
       shape: wingShape,
       material: new CANNON.Material('wing')
     });
-    this.wingBody.position.copy(this.wingMesh.position as any);
-    this.wingBody.quaternion.copy(this.wingMesh.quaternion as any);
+    this.wingBody.position.copy(this.glider.position as any);
+    this.wingBody.quaternion.copy(this.glider.rotation as any);
 
     // Set initial velocity for stable flight
     this.wingBody.velocity.set(0, 0, -10); // Initial forward speed of 10 m/s
@@ -139,7 +143,8 @@ class PhysicsFlier extends THREE.EventDispatcher {
     });
 
     // Position pilot 
-    this.pilotBody.position.copy(this.pilotMesh.position as any);
+    this.pilotBody.position.copy(this.pilot.position as any);
+    this.pilotBody.quaternion.copy(this.pilot.rotation as any);
 
     // Create constraint between wing and pilot with reduced rotation
     this.wingConstraint = new CANNON.DistanceConstraint(
@@ -150,8 +155,8 @@ class PhysicsFlier extends THREE.EventDispatcher {
 
     // Add bodies and constraints to world
     this.world.addBody(this.wingBody);
-    // this.world.addBody(this.pilotBody);
-    // this.world.addConstraint(this.wingConstraint);
+    this.world.addBody(this.pilotBody);
+    this.world.addConstraint(this.wingConstraint);
 
     // Set up collision materials
     const wingMaterial = new CANNON.Material('wing');
@@ -182,12 +187,7 @@ class PhysicsFlier extends THREE.EventDispatcher {
   }
 
   private setupForceVisualization() {
-    // Create force visualization with wing mesh as parent
-    if (this.wingMesh.parent) {
-      this.forceVisualization = new ForceVisualization(this.wingMesh.parent);
-    } else {
-      console.warn('Wing mesh has no parent, force visualization may not be visible');
-    }
+    this.forceVisualization = new ForceVisualization(this.options.wingMesh.parent);
   }
 
   private updateForceVisualization() {
@@ -322,7 +322,7 @@ class PhysicsFlier extends THREE.EventDispatcher {
   }
 
   position(): THREE.Vector3 {
-    return this.wingMesh.position;
+    return this.glider.position;
   }
 
   private getLiftValue(): number {
@@ -330,7 +330,7 @@ class PhysicsFlier extends THREE.EventDispatcher {
     const velocity = this.wingBody.velocity;
     const speed = velocity.length();
     const wingNormal = new THREE.Vector3(0, 1, 0);
-    wingNormal.applyQuaternion(this.wingMesh.quaternion);
+    wingNormal.applyQuaternion(this.glider.rotation);
 
     // Calculate angle of attack
     const velocityNormalized = new THREE.Vector3(velocity.x, velocity.y, velocity.z).normalize();
@@ -401,10 +401,10 @@ class PhysicsFlier extends THREE.EventDispatcher {
     this.world.step(PHYSICS_TIMESTEP * multiplier);
 
     // Update visual meshes position and rotation
-    this.wingMesh.position.copy(this.wingBody.position as any);
-    this.wingMesh.quaternion.copy(this.wingBody.quaternion as any);
-    this.pilotMesh.position.copy(this.pilotBody.position as any);
-    this.pilotMesh.quaternion.copy(this.pilotBody.quaternion as any);
+    this.glider.position.copy(this.wingBody.position as any);
+    this.glider.rotation.copy(this.wingBody.quaternion as any);
+    this.pilot.position.copy(this.pilotBody.position as any);
+    this.pilot.rotation.copy(this.pilotBody.quaternion as any);
 
     // Update force visualization
     this.updateForceVisualization();

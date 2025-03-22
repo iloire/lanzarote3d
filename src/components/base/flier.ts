@@ -1,14 +1,13 @@
 import * as THREE from "three";
-import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
-import Weather from "../../elements/weather";
 import Thermal from "../../components/thermal";
-import GuiHelper from "../../utils/gui";
 import { TrajectoryPoint, TrajectoryPointType } from "../../elements/trajectory";
+import Weather from "../../elements/weather";
 import { getTerrainHeightBelowPosition } from "../../utils/collision";
+import GuiHelper from "../../utils/gui";
 import {
+  DOWN_DIRECTION,
   FORWARD_DIRECTION,
   UP_DIRECTION,
-  DOWN_DIRECTION,
 } from "./../common";
 import IFlyable from './IFlyable';
 
@@ -78,7 +77,6 @@ class Flier extends THREE.EventDispatcher {
     this.water = envOptions.water;
     this.thermals = envOptions.thermals;
     this.perfStats = envOptions.perfStats;
-    this.mesh = options.flyable.getMesh();
     this.flyable = options.flyable;
   }
 
@@ -278,16 +276,6 @@ class Flier extends THREE.EventDispatcher {
       .add(velocityVector)
       .add(windVector);
 
-    const startPosition = this.position();
-    const nextPosition = this.position().add(combinedMoveVector);
-    const tween = new TWEEN.Tween(startPosition)
-      .to(nextPosition, TICK_INTERVAL) // Set the duration of the animation to 1000 milliseconds (1 second)
-      // .easing(TWEEN.Easing.Quadratic.InOut) // Set the easing function for the animation
-      .onUpdate(() => {
-        // Update the position of the object on each frame of the animation
-        this.mesh.position.copy(startPosition);
-      })
-      .start(); // Start the animation
 
     this.dispatchEvent({ type: "position", position: this.mesh.position });
 

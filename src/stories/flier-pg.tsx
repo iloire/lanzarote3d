@@ -1,8 +1,9 @@
 import * as CANNON from "cannon-es";
 import * as THREE from "three";
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
-import PhysicsFlier, { PhysicsEnvOptions, PhysicsFlierConstructor } from "../components/base/physics-flier";
-import Paraglider from "../components/paraglider";
+import PhysicsFlier, { PhysicsEnvOptions, PhysicsParagliderConstructor } from "../components/base/physics-paraglider";
+import Glider from "../components/parts/glider";
+import Pilot from "../components/pilot";
 import Weather, { WeatherOptions } from "../elements/weather";
 import Helpers from "../utils/helpers";
 import { StoryOptions } from "./types";
@@ -39,38 +40,49 @@ const ParagliderWorkshop = {
       numeroCajones: 40
     };
     const pilotOptions = {}
-    const pgFlyable = new Paraglider({
-      glider: gliderOptions,
-      pilot: pilotOptions
-    });
+    const glider = new Glider(gliderOptions);
+    const wingMesh = await glider.load();
 
-    const combinedMesh = await pgFlyable.load(gui);
-    combinedMesh.position.copy(initialPGPos);
+    wingMesh.translateY(-300);
+    wingMesh.translateX(300);
 
-    // Create separate meshes for wing and pilot
-    const wingMesh = pgFlyable.glider.fullWing;
+    const pilot = new Pilot(pilotOptions);
+    const pilotMesh = await pilot.load();
+
     const scale = 0.1;
-    // wingMesh.translateY(-300);
-    // wingMesh.translateX(300);
     wingMesh.scale.set(scale, scale, scale);
-
-    const pilotMesh = pgFlyable.pilotMesh;
     pilotMesh.scale.set(scale, scale, scale);
+
+    wingMesh.position.copy(initialPGPos);
+    pilotMesh.position.copy(initialPGPos);
 
     scene.add(wingMesh);
     scene.add(pilotMesh);
 
-    const pgOptions: PhysicsFlierConstructor = {
+    const pgOptions: PhysicsParagliderConstructor = {
       glidingRatio: 9,
       trimSpeed: 35 / KMH_TO_MS,
       fullSpeedBarSpeed: 45 / KMH_TO_MS,
       bigEarsSpeed: 27 / KMH_TO_MS,
-      flyable: pgFlyable,
+
+      glider: {
+        mesh: wingMesh,
+        weight: 6,
+        position: initialPGPos,
+        rotation: new THREE.Quaternion()
+      },
+      pilot: {
+        mesh: pilotMesh,
+        weight: 80,
+        position: initialPGPos,
+        rotation: new THREE.Quaternion()
+      },
       world,
       pilotMesh,
       wingMesh,
       pilotWeight: 80, // 80 kg pilot weight
       wingWeight: 6, // 7 kg wing weight
+      distanceWingPilot: 6, // 10 meters distance between wing and pilot
     };
 
     const weather = new Weather(WEATHER_SETTINGS);
