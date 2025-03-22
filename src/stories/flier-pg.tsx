@@ -27,7 +27,7 @@ const ParagliderWorkshop = {
 
     sky.updateSunPosition(12);
 
-    const initialCamPos = new THREE.Vector3(7100, 470, -475);
+    const initialCamPos = new THREE.Vector3(8100, 670, -475);
     const initialPGPos = new THREE.Vector3(6900, 370, -475);
 
     // Create physics world
@@ -43,8 +43,6 @@ const ParagliderWorkshop = {
     const glider = new Glider(gliderOptions);
     const wingMesh = await glider.load();
 
-    wingMesh.translateY(-300);
-    wingMesh.translateX(300);
 
     const pilot = new Pilot(pilotOptions);
     const pilotMesh = await pilot.load();
@@ -53,11 +51,13 @@ const ParagliderWorkshop = {
     wingMesh.scale.set(scale, scale, scale);
     pilotMesh.scale.set(scale, scale, scale);
 
+    scene.add(wingMesh);
+    scene.add(pilotMesh);
+
     wingMesh.position.copy(initialPGPos);
     pilotMesh.position.copy(initialPGPos);
 
-    scene.add(wingMesh);
-    scene.add(pilotMesh);
+    wingMesh.position.add(new THREE.Vector3(300, 300, 0));
 
     const pgOptions: PhysicsParagliderConstructor = {
       glidingRatio: 9,
@@ -105,7 +105,7 @@ const ParagliderWorkshop = {
 
     setInterval(() => {
       // console.log(pg.getTurnState());
-      pg.turnLeft(100);
+      // pg.turnLeft(200);
     }, 100);
 
     const fps = 10;

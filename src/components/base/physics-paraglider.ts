@@ -85,9 +85,9 @@ class PhysicsFlier extends THREE.EventDispatcher {
   pilot: ParaglierPart;
 
   // Physics bodies
-  wingBody: CANNON.Body;
+  gliderBody: CANNON.Body;
   pilotBody: CANNON.Body;
-  wingConstraint: CANNON.DistanceConstraint;
+  gliderLinesConstraint: CANNON.DistanceConstraint;
 
   // Replace force visualization properties with single property
   private forceVisualization: ForceVisualization;
@@ -123,16 +123,16 @@ class PhysicsFlier extends THREE.EventDispatcher {
   private setupPhysics() {
     // Create wing body (main paraglider wing)
     const wingShape = new CANNON.Box(new CANNON.Vec3(20, 1, 20));
-    this.wingBody = new CANNON.Body({
+    this.gliderBody = new CANNON.Body({
       mass: this.options.wingWeight,
       shape: wingShape,
       material: new CANNON.Material('wing')
     });
-    this.wingBody.position.copy(this.glider.position as any);
-    this.wingBody.quaternion.copy(this.glider.rotation as any);
+    this.gliderBody.position.copy(this.glider.position as any);
+    this.gliderBody.quaternion.copy(this.glider.rotation as any);
 
     // Set initial velocity for stable flight
-    this.wingBody.velocity.set(0, 0, -10); // Initial forward speed of 10 m/s
+    this.gliderBody.velocity.set(0, 0, -10); // Initial forward speed of 10 m/s
 
     // Create pilot body
     const pilotShape = new CANNON.Sphere(2);
@@ -147,16 +147,16 @@ class PhysicsFlier extends THREE.EventDispatcher {
     this.pilotBody.quaternion.copy(this.pilot.rotation as any);
 
     // Create constraint between wing and pilot with reduced rotation
-    this.wingConstraint = new CANNON.DistanceConstraint(
-      this.wingBody,
+    this.gliderLinesConstraint = new CANNON.DistanceConstraint(
+      this.gliderBody,
       this.pilotBody,
-      6
+      this.options.distanceWingPilot
     );
 
     // Add bodies and constraints to world
-    this.world.addBody(this.wingBody);
+    this.world.addBody(this.gliderBody);
     this.world.addBody(this.pilotBody);
-    this.world.addConstraint(this.wingConstraint);
+    this.world.addConstraint(this.gliderLinesConstraint);
 
     // Set up collision materials
     const wingMaterial = new CANNON.Material('wing');
@@ -192,9 +192,9 @@ class PhysicsFlier extends THREE.EventDispatcher {
 
   private updateForceVisualization() {
     const wingPos = new THREE.Vector3(
-      this.wingBody.position.x,
-      this.wingBody.position.y,
-      this.wingBody.position.z
+      this.gliderBody.position.x,
+      this.gliderBody.position.y,
+      this.gliderBody.position.z
     );
     const pilotPos = new THREE.Vector3(
       this.pilotBody.position.x,
@@ -203,8 +203,8 @@ class PhysicsFlier extends THREE.EventDispatcher {
     );
 
     // Calculate forces
-    const liftForce = this.calculateLiftForce(this.wingBody.velocity.length());
-    const dragForce = this.calculateDragForce(this.wingBody.velocity.length());
+    const liftForce = this.calculateLiftForce(this.gliderBody.velocity.length());
+    const dragForce = this.calculateDragForce(this.gliderBody.velocity.length());
     const windVelocity = this.weather.getWindVelocity();
     const windForce = new CANNON.Vec3(
       windVelocity.x * this.options.wingWeight * 0.3,
@@ -228,7 +228,7 @@ class PhysicsFlier extends THREE.EventDispatcher {
 
   private applyForces() {
     // Get current velocity
-    const velocity = this.wingBody.velocity;
+    const velocity = this.gliderBody.velocity;
     const speed = velocity.length();
 
     // Calculate lift force with reduced magnitude
@@ -237,12 +237,12 @@ class PhysicsFlier extends THREE.EventDispatcher {
 
     console.log("liftForce", liftForce);
 
-    this.wingBody.applyForce(liftForce, new CANNON.Vec3(0, 0, 0));
+    this.gliderBody.applyForce(liftForce, new CANNON.Vec3(0, 0, 0));
 
     // Calculate drag force with increased magnitude
     const dragForce = this.calculateDragForce(speed);
     // Apply drag at the center of the wing
-    this.wingBody.applyForce(dragForce, new CANNON.Vec3(0, 0, 0));
+    this.gliderBody.applyForce(dragForce, new CANNON.Vec3(0, 0, 0));
 
     // Apply wind force with reduced magnitude
     const windVelocity = this.weather.getWindVelocity();
@@ -254,13 +254,13 @@ class PhysicsFlier extends THREE.EventDispatcher {
     // Apply wind force at the center of the wing
     console.log("windForce", windForce);
 
-    this.wingBody.applyForce(windForce, new CANNON.Vec3(0, 0, 0));
+    this.gliderBody.applyForce(windForce, new CANNON.Vec3(0, 0, 0));
 
     // Apply thermal forces if inside thermal with reduced magnitude
     if (this.isInsideAnyThermal()) {
       const thermalForce = new CANNON.Vec3(0, this.options.wingWeight * 0.5, 0);
       // Apply thermal force at the center of the wing
-      this.wingBody.applyForce(thermalForce, new CANNON.Vec3(0, 0, 0));
+      this.gliderBody.applyForce(thermalForce, new CANNON.Vec3(0, 0, 0));
     }
 
     // Apply gravity at the pilot's position (center of mass)
@@ -276,7 +276,7 @@ class PhysicsFlier extends THREE.EventDispatcher {
 
     // Apply lift in the direction perpendicular to the wing's orientation
     const wingNormal = new CANNON.Vec3(0, 1, 0);
-    this.wingBody.quaternion.vmult(wingNormal, wingNormal);
+    this.gliderBody.quaternion.vmult(wingNormal, wingNormal);
 
     return wingNormal.scale(liftMagnitude);
   }
@@ -286,7 +286,7 @@ class PhysicsFlier extends THREE.EventDispatcher {
     const dragMagnitude = 0.5 * AIR_DENSITY * speed * speed * WING_AREA * DRAG_COEFFICIENT * 1.2; // Slightly reduced drag coefficient
 
     // Apply drag in the opposite direction of velocity
-    const dragDirection = this.wingBody.velocity.clone();
+    const dragDirection = this.gliderBody.velocity.clone();
     dragDirection.normalize();
     dragDirection.scale(-1, dragDirection);
 
@@ -327,7 +327,7 @@ class PhysicsFlier extends THREE.EventDispatcher {
 
   private getLiftValue(): number {
     // Calculate lift based on wing orientation and velocity
-    const velocity = this.wingBody.velocity;
+    const velocity = this.gliderBody.velocity;
     const speed = velocity.length();
     const wingNormal = new THREE.Vector3(0, 1, 0);
     wingNormal.applyQuaternion(this.glider.rotation);
@@ -344,7 +344,7 @@ class PhysicsFlier extends THREE.EventDispatcher {
 
   private getGroundSpeed(): number {
     // Calculate ground speed by projecting velocity onto the ground plane
-    const velocity = this.wingBody.velocity;
+    const velocity = this.gliderBody.velocity;
     const groundVelocity = new CANNON.Vec3(velocity.x, 0, velocity.z);
     return groundVelocity.length();
   }
@@ -401,8 +401,8 @@ class PhysicsFlier extends THREE.EventDispatcher {
     this.world.step(PHYSICS_TIMESTEP * multiplier);
 
     // Update visual meshes position and rotation
-    this.glider.position.copy(this.wingBody.position as any);
-    this.glider.rotation.copy(this.wingBody.quaternion as any);
+    this.glider.position.copy(this.gliderBody.position as any);
+    this.glider.rotation.copy(this.gliderBody.quaternion as any);
     this.pilot.position.copy(this.pilotBody.position as any);
     this.pilot.rotation.copy(this.pilotBody.quaternion as any);
 
@@ -461,7 +461,7 @@ class PhysicsFlier extends THREE.EventDispatcher {
 
     // Apply rotation to physics body with reduced force
     const rotationForce = new CANNON.Vec3(0, this.rotationInertia * rotationSmoother * 0.25, 0); // Reduced from 0.5
-    this.wingBody.applyTorque(rotationForce);
+    this.gliderBody.applyTorque(rotationForce);
 
     if (this.tickCounter % 10 === 0) {
       this.trajectory.push({
