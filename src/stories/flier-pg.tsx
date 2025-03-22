@@ -27,7 +27,7 @@ const ParagliderWorkshop = {
 
     sky.updateSunPosition(12);
 
-    const initialCamPos = new THREE.Vector3(8100, 670, -475);
+    const initialCamPos = new THREE.Vector3(7000, 400, -475);
     const initialPGPos = new THREE.Vector3(6900, 370, -475);
 
     // Create physics world
@@ -47,17 +47,15 @@ const ParagliderWorkshop = {
     const pilot = new Pilot(pilotOptions);
     const pilotMesh = await pilot.load();
 
-    const scale = 0.1;
+    const scale = 0.01;
     wingMesh.scale.set(scale, scale, scale);
     pilotMesh.scale.set(scale, scale, scale);
+    pilotMesh.rotateY(Math.PI / 2);
 
     scene.add(wingMesh);
     scene.add(pilotMesh);
 
-    wingMesh.position.copy(initialPGPos);
-    pilotMesh.position.copy(initialPGPos);
-
-    wingMesh.position.add(new THREE.Vector3(300, 300, 0));
+    const distanceWingPilot = 6;
 
     const pgOptions: PhysicsParagliderConstructor = {
       glidingRatio: 9,
@@ -74,7 +72,7 @@ const ParagliderWorkshop = {
       pilot: {
         mesh: pilotMesh,
         weight: 80,
-        position: initialPGPos,
+        position: initialPGPos.clone().add(new THREE.Vector3(0, -5 * distanceWingPilot, 40)),
         rotation: new THREE.Quaternion()
       },
       world,
@@ -82,7 +80,7 @@ const ParagliderWorkshop = {
       wingMesh,
       pilotWeight: 80, // 80 kg pilot weight
       wingWeight: 6, // 7 kg wing weight
-      distanceWingPilot: 6, // 10 meters distance between wing and pilot
+      distanceWingPilot: distanceWingPilot, // 10 meters distance between wing and pilot
     };
 
     const weather = new Weather(WEATHER_SETTINGS);

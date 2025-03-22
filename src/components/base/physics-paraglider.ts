@@ -128,6 +128,7 @@ class PhysicsFlier extends THREE.EventDispatcher {
       shape: wingShape,
       material: new CANNON.Material('wing')
     });
+    this.glider.mesh.position.copy(this.glider.position as any);
     this.gliderBody.position.copy(this.glider.position as any);
     this.gliderBody.quaternion.copy(this.glider.rotation as any);
 
@@ -143,6 +144,7 @@ class PhysicsFlier extends THREE.EventDispatcher {
     });
 
     // Position pilot 
+    this.pilot.mesh.position.copy(this.pilot.position as any);
     this.pilotBody.position.copy(this.pilot.position as any);
     this.pilotBody.quaternion.copy(this.pilot.rotation as any);
 
@@ -235,8 +237,6 @@ class PhysicsFlier extends THREE.EventDispatcher {
     const liftForce = this.calculateLiftForce(speed);
     // Apply lift at the center of the wing
 
-    console.log("liftForce", liftForce);
-
     this.gliderBody.applyForce(liftForce, new CANNON.Vec3(0, 0, 0));
 
     // Calculate drag force with increased magnitude
@@ -251,8 +251,6 @@ class PhysicsFlier extends THREE.EventDispatcher {
       windVelocity.y * this.options.wingWeight * 0.3,
       windVelocity.z * this.options.wingWeight * 0.3
     );
-    // Apply wind force at the center of the wing
-    console.log("windForce", windForce);
 
     this.gliderBody.applyForce(windForce, new CANNON.Vec3(0, 0, 0));
 
@@ -384,6 +382,9 @@ class PhysicsFlier extends THREE.EventDispatcher {
     // Add position and rotation information for glider and pilot
     const positionFolder = folder.addFolder('Positions & Meshes');
 
+    // Physics body positions
+    const physicsFolder = positionFolder.addFolder('Physics Bodies');
+
     // Glider position display
     const gliderPosition = {
       x: 0, y: 0, z: 0,
@@ -415,7 +416,7 @@ class PhysicsFlier extends THREE.EventDispatcher {
     };
 
     // Add glider position controls
-    const gliderFolder = positionFolder.addFolder('Glider Body');
+    const gliderFolder = physicsFolder.addFolder('Glider Physics Body');
     gliderFolder.add(gliderPosition, 'x').name('X Position').listen();
     gliderFolder.add(gliderPosition, 'y').name('Y Position').listen();
     gliderFolder.add(gliderPosition, 'z').name('Z Position').listen();
@@ -424,10 +425,69 @@ class PhysicsFlier extends THREE.EventDispatcher {
     gliderFolder.add(gliderRotation, 'z').name('Z Rotation').listen();
 
     // Add pilot position controls
-    const pilotFolder = positionFolder.addFolder('Pilot Body');
+    const pilotFolder = physicsFolder.addFolder('Pilot Physics Body');
     pilotFolder.add(pilotPosition, 'x').name('X Position').listen();
     pilotFolder.add(pilotPosition, 'y').name('Y Position').listen();
     pilotFolder.add(pilotPosition, 'z').name('Z Position').listen();
+
+    // Add visual mesh positions
+    const meshFolder = positionFolder.addFolder('Visual Meshes');
+
+    // Glider mesh position display
+    const gliderMeshPosition = {
+      x: 0, y: 0, z: 0,
+      update: () => {
+        gliderMeshPosition.x = parseFloat(this.glider.position.x.toFixed(2));
+        gliderMeshPosition.y = parseFloat(this.glider.position.y.toFixed(2));
+        gliderMeshPosition.z = parseFloat(this.glider.position.z.toFixed(2));
+      }
+    };
+
+    // Pilot mesh position display
+    const pilotMeshPosition = {
+      x: 0, y: 0, z: 0,
+      update: () => {
+        pilotMeshPosition.x = parseFloat(this.pilot.position.x.toFixed(2));
+        pilotMeshPosition.y = parseFloat(this.pilot.position.y.toFixed(2));
+        pilotMeshPosition.z = parseFloat(this.pilot.position.z.toFixed(2));
+      }
+    };
+
+    // Add glider mesh position controls
+    const gliderMeshFolder = meshFolder.addFolder('Glider Mesh');
+    gliderMeshFolder.add(gliderMeshPosition, 'x').name('X Position').listen();
+    gliderMeshFolder.add(gliderMeshPosition, 'y').name('Y Position').listen();
+    gliderMeshFolder.add(gliderMeshPosition, 'z').name('Z Position').listen();
+
+    // Add pilot mesh position controls
+    const pilotMeshFolder = meshFolder.addFolder('Pilot Mesh');
+    pilotMeshFolder.add(pilotMeshPosition, 'x').name('X Position').listen();
+    pilotMeshFolder.add(pilotMeshPosition, 'y').name('Y Position').listen();
+    pilotMeshFolder.add(pilotMeshPosition, 'z').name('Z Position').listen();
+
+    // Position differences (to detect sync issues)
+    const diffFolder = positionFolder.addFolder('Physics vs. Mesh Differences');
+
+    const positionDifferences = {
+      gliderX: 0, gliderY: 0, gliderZ: 0,
+      pilotX: 0, pilotY: 0, pilotZ: 0,
+      update: () => {
+        positionDifferences.gliderX = parseFloat((this.gliderBody.position.x - this.glider.position.x).toFixed(2));
+        positionDifferences.gliderY = parseFloat((this.gliderBody.position.y - this.glider.position.y).toFixed(2));
+        positionDifferences.gliderZ = parseFloat((this.gliderBody.position.z - this.glider.position.z).toFixed(2));
+
+        positionDifferences.pilotX = parseFloat((this.pilotBody.position.x - this.pilot.position.x).toFixed(2));
+        positionDifferences.pilotY = parseFloat((this.pilotBody.position.y - this.pilot.position.y).toFixed(2));
+        positionDifferences.pilotZ = parseFloat((this.pilotBody.position.z - this.pilot.position.z).toFixed(2));
+      }
+    };
+
+    diffFolder.add(positionDifferences, 'gliderX').name('Glider X Diff').listen();
+    diffFolder.add(positionDifferences, 'gliderY').name('Glider Y Diff').listen();
+    diffFolder.add(positionDifferences, 'gliderZ').name('Glider Z Diff').listen();
+    diffFolder.add(positionDifferences, 'pilotX').name('Pilot X Diff').listen();
+    diffFolder.add(positionDifferences, 'pilotY').name('Pilot Y Diff').listen();
+    diffFolder.add(positionDifferences, 'pilotZ').name('Pilot Z Diff').listen();
 
     // Distance between wing and pilot
     const distances = {
@@ -464,6 +524,9 @@ class PhysicsFlier extends THREE.EventDispatcher {
       gliderPosition.update();
       gliderRotation.update();
       pilotPosition.update();
+      gliderMeshPosition.update();
+      pilotMeshPosition.update();
+      positionDifferences.update();
       distances.update();
       velocities.update();
 
