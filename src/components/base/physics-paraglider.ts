@@ -7,15 +7,14 @@ import Thermal from "../thermal";
 import { ForceVisualization } from "./physics-force-visualization";
 import { addParagliderGui } from './physics-paraglider-gui';
 
-const TICK_INTERVAL = 222; // 40 Hz update rate
-const PHYSICS_TIMESTEP = 1 / 1600; // 60 Hz physics simulation
+const TICK_INTERVAL = 40; // 40 Hz update rate
+const PHYSICS_TIMESTEP = 1 / 600; // 60 Hz physics simulation
 
 // Physics constants
 const AIR_DENSITY = 1.225; // kg/m³
 const DRAG_COEFFICIENT = 0.5;
-const LIFT_COEFFICIENT = 1.2;
+const LIFT_COEFFICIENT = 11.2;
 const WING_AREA = 25; // m²
-
 
 // clamp values
 const MAX_SPEED = 40;
@@ -86,8 +85,10 @@ export default class PhysicsFlier extends THREE.EventDispatcher {
   gliderBody: CANNON.Body;
   pilotBody: CANNON.Body;
 
-  leftLineConstraint: CANNON.PointToPointConstraint;
-  rightLineConstraint: CANNON.PointToPointConstraint;
+  frontLeftLineConstraint: CANNON.PointToPointConstraint;
+  frontRightLineConstraint: CANNON.PointToPointConstraint;
+  rearLeftLineConstraint: CANNON.PointToPointConstraint;
+  rearRightLineConstraint: CANNON.PointToPointConstraint;
 
   // Replace force visualization properties with single property
   public forceVisualization: ForceVisualization;
@@ -122,7 +123,7 @@ export default class PhysicsFlier extends THREE.EventDispatcher {
 
   private setupPhysics() {
     // Create wing body (main paraglider wing)
-    const wingShape = new CANNON.Box(new CANNON.Vec3(1, 1, 5));
+    const wingShape = new CANNON.Box(new CANNON.Vec3(3, 0.5, 6));
     this.gliderBody = new CANNON.Body({
       mass: this.options.glider.weight,
       shape: wingShape,
@@ -151,27 +152,46 @@ export default class PhysicsFlier extends THREE.EventDispatcher {
     this.gliderBody.velocity.set(-10, 0, -10); // Initial forward speed of 10 m/s
     this.pilotBody.velocity.set(-10, 0, -10); // Initial forward speed of 10 m/s
 
-    // Create constraint between wing and pilot with reduced rotation
-    const localLeftWingPoint = new CANNON.Vec3(-5, 0, 10);
+    const localFrontLeftWingPoint = new CANNON.Vec3(-5, 0, 0);
+    const localFrontRightWingPoint = new CANNON.Vec3(5, 0, 0);
+    const localRearLeftWingPoint = new CANNON.Vec3(-5, 0, 2);
+    const localRearRightWingPoint = new CANNON.Vec3(5, 0, 2);
+
     const localPilotPoint = new CANNON.Vec3(0, this.options.distanceWingPilot, 0);
-    this.leftLineConstraint = new CANNON.PointToPointConstraint(
+
+    this.frontLeftLineConstraint = new CANNON.PointToPointConstraint(
       this.gliderBody,
-      localLeftWingPoint,
+      localFrontLeftWingPoint,
       this.pilotBody,
       localPilotPoint
     );
 
-    // Create constraint between wing and pilot with reduced rotation
-    const localRightWingPoint = new CANNON.Vec3(5, 0, 0);
-    this.rightLineConstraint = new CANNON.PointToPointConstraint(
+    this.frontRightLineConstraint = new CANNON.PointToPointConstraint(
       this.gliderBody,
-      localRightWingPoint,
+      localFrontRightWingPoint,
       this.pilotBody,
       localPilotPoint
     );
 
-    this.world.addConstraint(this.leftLineConstraint);
-    this.world.addConstraint(this.rightLineConstraint);
+    this.rearLeftLineConstraint = new CANNON.PointToPointConstraint(
+      this.gliderBody,
+      localRearLeftWingPoint,
+      this.pilotBody,
+      localPilotPoint
+    );
+
+    this.rearRightLineConstraint = new CANNON.PointToPointConstraint(
+      this.gliderBody,
+      localRearRightWingPoint,
+      this.pilotBody,
+      localPilotPoint
+    );
+
+    this.world.addConstraint(this.frontLeftLineConstraint);
+    this.world.addConstraint(this.frontRightLineConstraint);
+    this.world.addConstraint(this.rearLeftLineConstraint);
+    this.world.addConstraint(this.rearRightLineConstraint);
+
     // Set up collision materials
 
     const wingMaterial = new CANNON.Material('wing');
