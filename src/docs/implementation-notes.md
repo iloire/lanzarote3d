@@ -29,6 +29,19 @@ The animation loop was redesigned to:
 2. **Self-Contained**: Manages its own animation frame internally
 3. **Proper Cleanup**: Ensures resources are released when unloading
 
+### 4. Code Cleanup
+
+Additional cleanup was performed to remove unused and redundant code:
+
+1. **Removed Debug Statements**: Eliminated all console.log debug statements from the codebase
+2. **Removed Unused Functionality**: 
+   - Removed unused KEY_MAPPING entries (CREATE_PENDULUM, CREATE_CHAIN)
+   - Removed UI button-related controls from the GUI (showButtons, showSphereButtons)
+3. **Fixed Animation Loop**: Removed redundant controls.update() call in the animate function
+4. **Updated Documentation**: All documentation was updated to reflect the streamlined codebase
+
+This cleanup further improved code clarity, reduced bundle size, and removed potentially confusing elements from the user interface.
+
 ## Technical Decisions
 
 ### Physics Configuration

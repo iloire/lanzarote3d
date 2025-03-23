@@ -26,10 +26,9 @@ src/stories/physics/
 Contains utility functions, constants, and common interfaces:
 
 - `PUSH_FORCE_MAGNITUDE`: Base force magnitude for physics interactions
-- `KEY_MAPPING`: Keyboard mapping for controls
+- `KEY_MAPPING`: Keyboard mapping for platform movement and reset functionality
 - `arrayIncludes()`: Helper function for array checking
 - `createPhysicsWorld()`: Function to create and configure a physics world
-- `applyForceToBody()`: Helper for applying forces to physics bodies
 - `PhysicsObjects`: Interface for the physics object container
 
 ### `visualization.ts`
@@ -65,7 +64,7 @@ UI components for interactive controls:
 
 GUI components for physics parameter controls:
 
-- `setupPhysicsControls()`: Sets up the physics control panel in the GUI
+- `setupPhysicsControls()`: Sets up the physics control panel in the GUI with push forces, sphere mass, and auto-rotation settings
 - `storeInitialPositions()`: Stores initial positions for reset functionality
 - `findControllerByProperty()`: Helper to find GUI controllers by property name
 - `PhysicsControlSettings`: Interface for physics control settings

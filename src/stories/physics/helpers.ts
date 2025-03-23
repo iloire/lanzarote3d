@@ -7,8 +7,6 @@ export const PUSH_FORCE_MAGNITUDE = 800; // Strength of push when keys are press
 // Key mappings for controls
 export const KEY_MAPPING = {
   RESET_POSITION: ['KeyX'],          // X: Reset positions
-  CREATE_PENDULUM: ['KeyP'],         // P: Create a pendulum
-  CREATE_CHAIN: ['KeyC'],            // C: Create a chain
   PLATFORM_LEFT: ['KeyQ'],           // Q: Move platform left
   PLATFORM_RIGHT: ['KeyE'],          // E: Move platform right
   PLATFORM_UP: ['KeyW'],            // W: Move platform up
@@ -34,25 +32,6 @@ export function createPhysicsWorld(): CANNON.World {
   return world;
 }
 
-// Helper to apply force to a body in a given direction
-export function applyForceToBody(
-  body: CANNON.Body,
-  direction: CANNON.Vec3,
-  forceMagnitude: number
-): void {
-  if (!body) return;
-
-  // Scale force based on body mass to achieve similar acceleration
-  const scaledForce = forceMagnitude * (body.mass || 1);
-  body.applyForce(
-    new CANNON.Vec3(
-      direction.x * scaledForce,
-      direction.y * scaledForce,
-      direction.z * scaledForce
-    ),
-    new CANNON.Vec3(0, 0, 0) // Apply at center of mass
-  );
-}
 
 // Physics objects container type
 export interface PhysicsObjects {

@@ -91,7 +91,6 @@ const PhysicsChain = {
       if (keysPressed.size > 0) {
         // X-axis movement (left/right)
         if (keysPressed.has(KEY_MAPPING.PLATFORM_LEFT[0])) {
-          console.log('apply force left')
           platformBody.applyForce(
             new CANNON.Vec3(-pushForceControl.platformForce, 0, 0),
             new CANNON.Vec3(0, 0, 0)
@@ -99,7 +98,6 @@ const PhysicsChain = {
         }
 
         if (keysPressed.has(KEY_MAPPING.PLATFORM_RIGHT[0])) {
-          console.log('apply force right')
           platformBody.applyForce(
             new CANNON.Vec3(pushForceControl.platformForce, 0, 0),
             new CANNON.Vec3(0, 0, 0)
@@ -107,7 +105,6 @@ const PhysicsChain = {
         }
 
         if (keysPressed.has(KEY_MAPPING.PLATFORM_UP[0])) {
-          console.log('apply force up')
           platformBody.applyForce(
             new CANNON.Vec3(0, pushForceControl.platformForce, 0),
             new CANNON.Vec3(0, 0, 0)
@@ -115,7 +112,6 @@ const PhysicsChain = {
         }
 
         if (keysPressed.has(KEY_MAPPING.PLATFORM_DOWN[0])) {
-          console.log('apply force down')
           platformBody.applyForce(
             new CANNON.Vec3(0, -pushForceControl.platformForce, 0),
             new CANNON.Vec3(0, 0, 0)
@@ -172,7 +168,6 @@ const PhysicsChain = {
       animationFrameId = requestAnimationFrame(animate);
       updatePhysics();
       renderer.render(scene, camera);
-      controls.update();
     }
 
     // Start the animation loop
