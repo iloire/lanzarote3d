@@ -20,6 +20,8 @@ const ParagliderWorkshop = {
   load: async (options: StoryOptions) => {
     const { camera, scene, renderer, terrain, water, sky, gui, controls } = options;
 
+    gui.show();
+
     terrain.visible = true;
     water.visible = true;
 
@@ -28,7 +30,7 @@ const ParagliderWorkshop = {
     sky.updateSunPosition(12);
 
     const initialCamPos = new THREE.Vector3(7000, 400, -475);
-    const initialPGPos = new THREE.Vector3(6900, 370, -475);
+    const initialPGPos = new THREE.Vector3(6900, 470, -475);
 
     // Create physics world
     const world = new CANNON.World();
@@ -55,7 +57,7 @@ const ParagliderWorkshop = {
     scene.add(wingMesh);
     scene.add(pilotMesh);
 
-    const distanceWingPilot = 6;
+    const distanceWingPilot = 0;
 
     const pgOptions: PhysicsParagliderConstructor = {
       glidingRatio: 9,
@@ -66,14 +68,12 @@ const ParagliderWorkshop = {
       glider: {
         mesh: wingMesh,
         weight: 6,
-        position: initialPGPos,
-        rotation: new THREE.Quaternion()
+        initialPosition: initialPGPos,
       },
       pilot: {
         mesh: pilotMesh,
         weight: 80,
-        position: initialPGPos.clone().add(new THREE.Vector3(0, -5 * distanceWingPilot, 40)),
-        rotation: new THREE.Quaternion()
+        initialPosition: initialPGPos.clone().add(new THREE.Vector3(0, 0, 0)),
       },
       world,
       distanceWingPilot: distanceWingPilot, // 10 meters distance between wing and pilot
@@ -109,7 +109,7 @@ const ParagliderWorkshop = {
       }, 1000 / fps);
       // requestAnimationFrame(animate);
       renderer.render(scene, camera);
-      camera.position.copy(pg.position().clone().add(new THREE.Vector3(313, 20, 40)));
+      // camera.position.copy(pg.position().clone().add(new THREE.Vector3(313, 20, 40)));
       camera.lookAt(pg.position());
       TWEEN.update();
       controls.update();
