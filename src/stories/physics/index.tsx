@@ -6,13 +6,12 @@ import { createBasicPhysicsObjects, updateVisuals } from "./core";
 import { findControllerByProperty, setupPhysicsControls, storeInitialPositions } from "./gui";
 import { arrayIncludes, createPhysicsWorld, KEY_MAPPING } from "./helpers";
 import { createRopes } from "./rope";
-import { createPlatformButtons, createSphereButtons } from "./ui";
+import { createPlatformButtons } from "./ui";
 
 // Store listeners and UI elements for cleanup
 let keyDownListener: ((event: KeyboardEvent) => void) | null = null;
 let keyUpListener: ((event: KeyboardEvent) => void) | null = null;
 let platformButtonsRef: ReturnType<typeof createPlatformButtons> | null = null;
-let sphereButtonsRef: ReturnType<typeof createSphereButtons> | null = null;
 let animationFrameId: number | null = null;
 
 const PhysicsChain = {
@@ -83,19 +82,6 @@ const PhysicsChain = {
       }
     });
 
-    // Create UI buttons for sphere control
-    sphereButtonsRef = createSphereButtons(
-      renderer.domElement.parentElement || document.body,
-      sphereBody,
-      pushForceControl.pushForce
-    );
-
-    // Listen for changes to sphere button visibility
-    findControllerByProperty(physicsFolder, 'showSphereButtons')?.onChange((value: boolean) => {
-      if (sphereButtonsRef?.buttonContainer) {
-        sphereButtonsRef.buttonContainer.style.display = value ? 'grid' : 'none';
-      }
-    });
 
     // Event listeners for keyboard controls
     keyDownListener = (event: KeyboardEvent) => {
@@ -162,7 +148,6 @@ const PhysicsChain = {
 
       // Apply forces from UI buttons
       if (platformButtonsRef) platformButtonsRef.applyButtonForces();
-      if (sphereButtonsRef) sphereButtonsRef.applyButtonForces();
 
       // Auto-rotate the camera if enabled
       if (pushForceControl.isAutoRotate) {
@@ -207,13 +192,11 @@ const PhysicsChain = {
 
     // Clean up UI controls
     if (platformButtonsRef) platformButtonsRef.cleanup();
-    if (sphereButtonsRef) sphereButtonsRef.cleanup();
 
     // Reset references
     keyDownListener = null;
     keyUpListener = null;
     platformButtonsRef = null;
-    sphereButtonsRef = null;
   }
 };
 
