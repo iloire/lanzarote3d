@@ -17,32 +17,6 @@ const WEATHER_SETTINGS: WeatherOptions = {
 };
 
 // Function to create a static box visualization at a specific position
-function createStaticBoxVisualization(
-  scene: THREE.Scene,
-  dimensions: CANNON.Vec3,
-  position: THREE.Vector3,
-  color: number = 0xffff00
-): THREE.Mesh {
-  // Create a Three.js box with the same dimensions as the CANNON.Box
-  // CANNON.Box dimensions are half-extents, so we double them for Three.js
-  const width = dimensions.x * 2;
-  const height = dimensions.y * 2;
-  const depth = dimensions.z * 2;
-
-  const geometry = new THREE.BoxGeometry(width, height, depth);
-  const material = new THREE.MeshBasicMaterial({
-    color: color,
-    wireframe: true,
-    transparent: true,
-    opacity: 0.7
-  });
-
-  const boxMesh = new THREE.Mesh(geometry, material);
-  boxMesh.position.copy(position);
-  scene.add(boxMesh);
-
-  return boxMesh;
-}
 
 const ParagliderWorkshop = {
   load: async (options: StoryOptions) => {
@@ -89,14 +63,6 @@ const ParagliderWorkshop = {
     const pilotBox = Helpers.createMeshVisualization(scene, pilotMesh, 0x00ff00); // Green box for pilot
 
     // Create a static visualization of CANNON.Box(new CANNON.Vec3(10, 1, 10))
-    const boxDimensions = new CANNON.Vec3(10, 1, 10);
-    const boxPosition = initialPGPos.clone().add(new THREE.Vector3(50, 0, 0)); // Position offset from PG
-    const boxVisualization = createStaticBoxVisualization(
-      scene,
-      boxDimensions,
-      boxPosition,
-      0x0000ff // Blue color
-    );
 
     const distanceWingPilot = 10;
 
