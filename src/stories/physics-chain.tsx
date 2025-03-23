@@ -271,7 +271,7 @@ function createRope(
   bodyA: CANNON.Body,
   bodyB: CANNON.Body,
   numSegments: number = 8,
-  ropeThickness: number = 0.2
+  ropeThickness: number = 2.2
 ): {
   bodies: CANNON.Body[],
   constraints: CANNON.PointToPointConstraint[],
@@ -349,6 +349,7 @@ function createRope(
       new CANNON.Vec3(0, 0, 0)  // Connect to center of current body
     );
 
+
     // Add position correction to constraints
     constraint.collideConnected = false;  // Don't let constrained bodies collide
 
@@ -425,7 +426,7 @@ const PhysicsChain = {
 
     // Create physics world
     const world = new CANNON.World();
-    //aaaaaaaaaaaworld.gravity.set(0, -9.82, 0); // Standard gravity
+    // world.gravity.set(0, -9.82, 0); // Standard gravity
 
     // Add stability settings
     // @ts-ignore - CANNON.js typings might not include all solver properties
@@ -499,9 +500,6 @@ const PhysicsChain = {
         physicsObjects.constraints = [...physicsObjects.constraints, ...newConstraints];
         physicsObjects.visualMeshes = [...physicsObjects.visualMeshes, ...newMeshes];
         physicsObjects.constraintLines = [...physicsObjects.constraintLines, ...newLines];
-
-        // Update the selector to include new bodies
-        updateBodySelector();
 
         // Set the last added body as selected
         if (newBodies.length > 0) {
@@ -670,33 +668,7 @@ const PhysicsChain = {
       new THREE.Vector3().copy(body.position as any)
     );
 
-    // Create body selection in GUI
-    function updateBodySelector() {
-      // Remove previous controller if it exists
-      const existingController = physicsFolder.controllers.find(
-        c => (c as any).property === 'selectBody'
-      );
-      if (existingController) {
-        physicsFolder.remove(existingController);
-      }
-
-      // Create options array for selector
-      const options = {};
-      physicsObjects.bodies.forEach((_body, index) => {
-        options[`Body ${index + 1}`] = index;
-      });
-
-      // Add new controller
-      physicsFolder
-        .add(pushState, 'selectedBodyIndex', options)
-        .name('Push Target')
-        .onChange((index: number) => {
-          pushState.selectBody(index);
-        });
-    }
-
     // Initial setup of body selector
-    updateBodySelector();
     pushState.selectBody(0);
 
     // Function to reset all objects to their initial positions
@@ -1078,8 +1050,43 @@ const PhysicsChain = {
       }
     }
 
+    function applyForces() {
+      // gravity
+      // apply gravity force to platform
+      platformBody.applyForce(
+        new CANNON.Vec3(0, -9.82 * platformBody.mass, 0),
+        new CANNON.Vec3(0, 0, 0)
+      );
+
+      // apply gravity force to sphere
+      sphereBody.applyForce(
+        new CANNON.Vec3(0, -9.82 * sphereBody.mass, 0),
+        new CANNON.Vec3(0, 0, 0)
+      );
+
+      // lift
+      // apply lift force to platform in the direction perpendicular to the platform's forward vector
+      platformBody.applyForce(
+        new CANNON.Vec3(0, 9.92 * sphereBody.mass, 0),
+        new CANNON.Vec3(0, 0, 0)
+      );
+
+      // apply a force on the direction of wehre the platform is pointing 
+      const platformForward = new THREE.Vector3().copy(platformBody.quaternion as any).multiply(new THREE.Vector3(1, 0, 0));
+      const forwardForceMagnitude = 1320;
+      platformBody.applyForce(
+        new CANNON.Vec3(platformForward.x * forwardForceMagnitude, platformForward.y * forwardForceMagnitude, platformForward.z * forwardForceMagnitude),
+        new CANNON.Vec3(0, 0, 0)
+      );
+
+      // apply force to the edge of the platform for a rotation effect
+      // platformBody.applyForce(
+      //   new CANNON.Vec3(120, 0, 10),
+      //   new CANNON.Vec3(5, 0, 0)
+      // );
+    }
     // Physics simulation and visualization loop
-    const fps = 160; // Higher FPS for smoother physics
+    const fps = 260; // Higher FPS for smoother physics
     const animate = () => {
       setTimeout(() => {
         requestAnimationFrame(animate);
@@ -1087,6 +1094,9 @@ const PhysicsChain = {
 
       // Step the physics world with more sub-steps for stability
       world.step(1 / 60);
+
+      // apply physics to objects
+      applyForces();
 
       // Apply forces from user input
       applyInputForces();

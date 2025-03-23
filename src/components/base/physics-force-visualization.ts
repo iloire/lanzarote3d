@@ -220,7 +220,6 @@ export class ForceVisualization {
     liftForce: CANNON.Vec3,
     dragForce: CANNON.Vec3,
     windForce: CANNON.Vec3,
-    thermalForce: CANNON.Vec3 | null,
     gravityForce: CANNON.Vec3
   ) {
     // Position the force groups at their respective objects
@@ -309,33 +308,6 @@ export class ForceVisualization {
       this.forceLabels['wind'].visible = false;
     }
 
-    // Update thermal force visualization - apply from wing with offset
-    try {
-      if (thermalForce && thermalForce.length() > 0.01) {
-        const thermalDirection = new THREE.Vector3(thermalForce.x, thermalForce.y, thermalForce.z);
-
-        // Safely normalize the direction
-        if (thermalDirection.length() > 0.001) {
-          thermalDirection.normalize();
-        } else {
-          thermalDirection.set(0, 1, 0); // Default to upward if invalid
-        }
-
-        const thermalLength = thermalForce.length() * effectiveGliderScale;
-        this.thermalArrow.setDirection(thermalDirection);
-        this.thermalArrow.setLength(Math.max(0, thermalLength)); // Ensure non-negative length
-        this.thermalArrow.position.set(-2, 0, -2); // Offset to avoid overlap
-        this.thermalArrow.visible = true;
-        this.updateLabel('thermal', new THREE.Vector3(-2, 0, -2), thermalDirection, thermalLength);
-      } else {
-        this.thermalArrow.visible = false;
-        this.forceLabels['thermal'].visible = false;
-      }
-    } catch (e) {
-      console.error("Error with thermal force visualization:", e);
-      this.thermalArrow.visible = false;
-      this.forceLabels['thermal'].visible = false;
-    }
 
     // Update forces applied to the PILOT
 

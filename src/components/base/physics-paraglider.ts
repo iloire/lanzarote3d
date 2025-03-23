@@ -1,7 +1,7 @@
 import * as CANNON from "cannon-es";
 import GUI from 'lil-gui';
 import * as THREE from "three";
-import { TrajectoryPoint, TrajectoryPointType } from "../../elements/trajectory";
+import { TrajectoryPoint } from "../../elements/trajectory";
 import Weather from "../../elements/weather";
 import Thermal from "../thermal";
 import { ForceVisualization } from "./physics-force-visualization";
@@ -267,23 +267,9 @@ export default class PhysicsFlier extends THREE.EventDispatcher {
       windVelocity.z * this.options.glider.weight * 0.3
     );
 
-    // Create thermal force or null if not in thermal
-    const thermalForce = this.isInsideAnyThermal()
-      ? new CANNON.Vec3(0, this.options.glider.weight * 0.5, 0)
-      : null;
-
     // Create gravity force
     const gravityForce = new CANNON.Vec3(0, -this.options.pilot.weight * 9.81, 0);
 
-    // Log forces for debugging (with safety checks)
-    console.log("Forces for visualization:", {
-      lift: isNaN(liftForce.length()) ? "ERROR" : liftForce.length().toFixed(2),
-      drag: isNaN(dragForce.length()) ? "ERROR" : dragForce.length().toFixed(2),
-      wind: windForce.length().toFixed(2),
-      thermal: thermalForce ? thermalForce.length().toFixed(2) : "null",
-      gravity: gravityForce.length().toFixed(2),
-      speed: speed.toFixed(2)
-    });
 
     // Update visualization with current positions and forces
     this.forceVisualization.update(
@@ -292,7 +278,6 @@ export default class PhysicsFlier extends THREE.EventDispatcher {
       liftForce,
       dragForce,
       windForce,
-      thermalForce,
       gravityForce
     );
   }
@@ -323,11 +308,6 @@ export default class PhysicsFlier extends THREE.EventDispatcher {
 
     // this.gliderBody.applyForce(windForce, new CANNON.Vec3(0, 0, 0));
 
-    // Apply thermal forces if inside thermal with reduced magnitude
-    if (this.isInsideAnyThermal()) {
-      // Apply thermal force at the center of the wing
-      // this.gliderBody.applyForce(thermalForce, new CANNON.Vec3(0, 0, 0));
-    }
 
     // Apply gravity at the pilot's position (center of mass)
     const pilotGravityForce = new CANNON.Vec3(0, -this.options.pilot.weight * 9.81, 0);
@@ -420,30 +400,7 @@ export default class PhysicsFlier extends THREE.EventDispatcher {
     return new THREE.Vector3(this.gliderBody.position.x, this.gliderBody.position.y, this.gliderBody.position.z);
   }
 
-  // private getLiftValue(): number {
-  //   // Calculate lift based on wing orientation and velocity
-  //   const velocity = this.gliderBody.velocity;
-  //   const speed = velocity.length();
-  //   const wingNormal = new THREE.Vector3(0, 1, 0);
-  //   wingNormal.applyQuaternion(this.glider.rotation);
 
-  //   // Calculate angle of attack
-  //   const velocityNormalized = new THREE.Vector3(velocity.x, velocity.y, velocity.z).normalize();
-  //   const angleOfAttack = Math.acos(velocityNormalized.dot(wingNormal));
-
-  //   // Lift increases with speed and angle of attack up to a point
-  //   const liftValue = Math.min(speed * 0.1 * Math.sin(angleOfAttack), 1);
-  //   console.log("liftValue", liftValue, speed, angleOfAttack);
-
-  //   return liftValue;
-  // }
-
-  private getGroundSpeed(): number {
-    // Calculate ground speed by projecting velocity onto the ground plane
-    const velocity = this.gliderBody.velocity;
-    const groundVelocity = new CANNON.Vec3(velocity.x, 0, velocity.z);
-    return groundVelocity.length();
-  }
 
   init() {
     // Start the physics simulation loop
@@ -479,67 +436,6 @@ export default class PhysicsFlier extends THREE.EventDispatcher {
 
     // Update force visualization
     this.updateForceVisualization();
-
-    // if (this.tickCounter % 5 === 0) {
-    //   if (this.hasTouchedGround(this.terrain, this.water)) {
-    //     this.numberGroundTouches++;
-    //     this.dispatchEvent({
-    //       type: "touchedGround",
-    //       groundTouches: this.numberGroundTouches,
-    //     });
-    //     this.trajectory.push({
-    //       type: TrajectoryPointType.TouchGround,
-    //       vector: this.position(),
-    //     });
-    //     if (ANTI_CRASH_ENABLED) {
-    //       console.log("touched ground");
-    //     } else {
-    //       this.dispatchEvent({
-    //         type: "crashed",
-    //       });
-    //     }
-    //   } else {
-    //     // this.lift = this.getLiftValue();
-    //   }
-    // }
-
-    this.flyingTime += multiplier;
-    this.metersFlown += multiplier * this.getGroundSpeed();
-
-    // Handle rotation input with reduced sensitivity and turn strength
-    const rotationSmoother = 0.02; // Reduced from 0.04
-    const keyBreakMultiplier = 4; // Reduced from 8
-    const passiveRecoveryMultiplier = 2; // Reduced from 3
-    const turnMultiplier = THREE.MathUtils.clamp(multiplier * this.turnStrength, 0, 0.015); // Reduced from 0.035
-
-    if (this.__directionInput === 0) {
-      if (this.isTurningLeft) {
-        this.rotationInertia -= turnMultiplier * keyBreakMultiplier * rotationSmoother;
-      } else if (this.isTurningRight) {
-        this.rotationInertia += turnMultiplier * keyBreakMultiplier * rotationSmoother;
-      } else if (Math.abs(this.rotationInertia) > 0) {
-        this.rotationInertia -= passiveRecoveryMultiplier * turnMultiplier * (this.rotationInertia * rotationSmoother);
-      }
-    } else {
-      if (Math.sign(this.__directionInput) !== Math.sign(this.rotationInertia)) {
-        this.rotationInertia += turnMultiplier * this.__directionInput * rotationSmoother;
-      } else {
-        this.rotationInertia += turnMultiplier * this.__directionInput * rotationSmoother;
-      }
-    }
-
-    this.rotationInertia = THREE.MathUtils.clamp(this.rotationInertia, -15, 15); // Reduced from -25, 25
-
-    // Apply rotation to physics body with reduced force
-    // const rotationForce = new CANNON.Vec3(0, this.rotationInertia * rotationSmoother * 0.25, 0); // Reduced from 0.5
-    // this.gliderBody.applyTorque(rotationForce);
-
-    if (this.tickCounter % 10 === 0) {
-      this.trajectory.push({
-        type: this.speedBar ? TrajectoryPointType.SpeedBar : TrajectoryPointType.Normal,
-        vector: this.position(),
-      });
-    }
 
     this.perfStats && this.perfStats.endTick("move");
   }
