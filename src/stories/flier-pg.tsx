@@ -56,6 +56,10 @@ const ParagliderWorkshop = {
     scene.add(wingMesh);
     scene.add(pilotMesh);
 
+    // Add visualization boxes around meshes
+    const wingBox = Helpers.createMeshVisualization(scene, wingMesh, 0xff0000); // Red box for wing
+    const pilotBox = Helpers.createMeshVisualization(scene, pilotMesh, 0x00ff00); // Green box for pilot
+
     const distanceWingPilot = 10;
 
     const pgOptions: PhysicsParagliderConstructor = {
@@ -110,6 +114,11 @@ const ParagliderWorkshop = {
       renderer.render(scene, camera);
       // camera.position.copy(pg.position().clone().add(new THREE.Vector3(313, 20, 40)));
       camera.lookAt(pg.position());
+
+      // Update the BoxHelper objects to match the current state of the meshes
+      wingBox.update();
+      pilotBox.update();
+
       TWEEN.update();
       controls.update();
     };

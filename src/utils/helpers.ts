@@ -55,5 +55,46 @@ const Helpers = {
     grid.add(gridV);
     return grid;
   },
+
+  /**
+   * Creates visualization boxes around a mesh for better visibility during development
+   * @param scene The scene to add the box helper to
+   * @param mesh The mesh to visualize
+   * @param color The color of the box
+   * @param scale Optional scale factor for the custom box (default 1.2)
+   * @returns The BoxHelper object that needs to be updated in the animation loop
+   */
+  createMeshVisualization: function (
+    scene: THREE.Scene,
+    mesh: THREE.Object3D,
+    color: number = 0xff0000,
+    scale: number = 1.2
+  ): THREE.BoxHelper {
+    // Create a bounding box helper
+    const boxHelper = new THREE.BoxHelper(mesh, color);
+    scene.add(boxHelper);
+
+    // Create wireframe box with defined size for better visibility
+    const boundingBox = new THREE.Box3().setFromObject(mesh);
+    const meshSize = new THREE.Vector3();
+    boundingBox.getSize(meshSize);
+
+    // Create custom sized wireframe box slightly larger than the actual object
+    const boxGeometry = new THREE.BoxGeometry(
+      meshSize.x * scale,
+      meshSize.y * scale,
+      meshSize.z * scale
+    );
+    const boxMaterial = new THREE.MeshBasicMaterial({
+      color,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.7
+    });
+    const boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
+    mesh.add(boxMesh); // Add to the original mesh to follow its transformations
+
+    return boxHelper;
+  },
 };
 export default Helpers;
