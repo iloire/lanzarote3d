@@ -31,13 +31,14 @@ export class ForceVisualization {
   private dragArrow: THREE.ArrowHelper;
   private windArrow: THREE.ArrowHelper;
   private thermalArrow: THREE.ArrowHelper;
-  private gravityArrow: THREE.ArrowHelper;
+  private pilotGravityArrow: THREE.ArrowHelper;
+  private gliderGravityArrow: THREE.ArrowHelper;
 
   // Text labels for forces
   private forceLabels: { [key: string]: THREE.Sprite } = {};
 
   // Groups to organize forces by where they're applied
-  private wingForceGroup: THREE.Group;
+  private gliderForceGroup: THREE.Group;
   private pilotForceGroup: THREE.Group;
   private forceGroup: THREE.Group;
 
@@ -50,10 +51,10 @@ export class ForceVisualization {
     parent.add(this.forceGroup);
 
     // Create separate groups for wing and pilot forces
-    this.wingForceGroup = new THREE.Group();
+    this.gliderForceGroup = new THREE.Group();
     this.pilotForceGroup = new THREE.Group();
 
-    this.forceGroup.add(this.wingForceGroup);
+    this.forceGroup.add(this.gliderForceGroup);
     this.forceGroup.add(this.pilotForceGroup);
 
     this.setupArrows();
@@ -92,10 +93,10 @@ export class ForceVisualization {
     this.forceLabels['gravity'] = this.createTextSprite("GRAVITY", COLORS.GRAVITY);
 
     // Add labels to their respective groups
-    this.wingForceGroup.add(this.forceLabels['lift']);
-    this.wingForceGroup.add(this.forceLabels['drag']);
-    this.wingForceGroup.add(this.forceLabels['wind']);
-    this.wingForceGroup.add(this.forceLabels['thermal']);
+    this.gliderForceGroup.add(this.forceLabels['lift']);
+    this.gliderForceGroup.add(this.forceLabels['drag']);
+    this.gliderForceGroup.add(this.forceLabels['wind']);
+    this.gliderForceGroup.add(this.forceLabels['thermal']);
     this.pilotForceGroup.add(this.forceLabels['gravity']);
 
     // Hide labels by default (will be positioned in update)
@@ -154,7 +155,7 @@ export class ForceVisualization {
     );
     this.thermalArrow.line.material = thermalMaterial;
 
-    this.gravityArrow = new THREE.ArrowHelper(
+    this.pilotGravityArrow = new THREE.ArrowHelper(
       new THREE.Vector3(0, -1, 0),
       new THREE.Vector3(0, 0, 0),
       10,
@@ -162,16 +163,28 @@ export class ForceVisualization {
       3,
       1.5
     );
-    this.gravityArrow.line.material = gravityMaterial;
+    this.pilotGravityArrow.line.material = gravityMaterial;
 
+    this.gliderGravityArrow = new THREE.ArrowHelper(
+      new THREE.Vector3(0, -1, 0),
+      new THREE.Vector3(0, 0, 0),
+      10,
+      COLORS.GRAVITY,
+      3,
+      1.5
+    );
+    this.gliderGravityArrow.line.material = gravityMaterial;
     // Add wing-related forces to wing force group
-    this.wingForceGroup.add(this.liftArrow);
-    this.wingForceGroup.add(this.dragArrow);
-    this.wingForceGroup.add(this.windArrow);
-    this.wingForceGroup.add(this.thermalArrow);
+    this.gliderForceGroup.add(this.liftArrow);
+    this.gliderForceGroup.add(this.dragArrow);
+    this.gliderForceGroup.add(this.windArrow);
+    this.gliderForceGroup.add(this.thermalArrow);
 
     // Add pilot-related forces to pilot force group
-    this.pilotForceGroup.add(this.gravityArrow);
+    this.pilotForceGroup.add(this.pilotGravityArrow);
+
+    // Add glider-related forces to glider force group
+    this.gliderForceGroup.add(this.gliderGravityArrow);
 
     // Set initial visibility to true by default
     this.forceGroup.visible = true;
@@ -211,11 +224,11 @@ export class ForceVisualization {
     gravityForce: CANNON.Vec3
   ) {
     // Position the force groups at their respective objects
-    this.wingForceGroup.position.copy(wingPosition);
+    this.gliderForceGroup.position.copy(wingPosition);
     this.pilotForceGroup.position.copy(pilotPosition);
 
     // Apply custom scale factor to all force visualizations
-    const effectiveWingScale = FORCE_SCALE * WING_FORCE_SCALE * this.customScaleFactor;
+    const effectiveGliderScale = FORCE_SCALE * WING_FORCE_SCALE * this.customScaleFactor;
     const effectivePilotScale = FORCE_SCALE * PILOT_FORCE_SCALE * this.customScaleFactor;
 
     // Update forces applied to the WING
@@ -236,7 +249,7 @@ export class ForceVisualization {
         liftDirection.set(0, 1, 0); // Default to upward if invalid
       }
 
-      const liftLength = !isNaN(liftForce.length()) ? liftForce.length() * effectiveWingScale : 0;
+      const liftLength = !isNaN(liftForce.length()) ? liftForce.length() * effectiveGliderScale : 0;
       this.liftArrow.setDirection(liftDirection);
       this.liftArrow.setLength(Math.max(0, liftLength)); // Ensure non-negative length
       this.liftArrow.position.set(0, 0, 0); // Relative to wing group
@@ -263,7 +276,7 @@ export class ForceVisualization {
         dragDirection.set(0, 0, -1); // Default to backward if invalid
       }
 
-      const dragLength = !isNaN(dragForce.length()) ? dragForce.length() * effectiveWingScale : 0;
+      const dragLength = !isNaN(dragForce.length()) ? dragForce.length() * effectiveGliderScale : 0;
       this.dragArrow.setDirection(dragDirection);
       this.dragArrow.setLength(Math.max(0, dragLength)); // Ensure non-negative length
       this.dragArrow.position.set(0, 0, 0); // Relative to wing group
@@ -285,7 +298,7 @@ export class ForceVisualization {
         windDirection.set(1, 0, 0); // Default to rightward if invalid
       }
 
-      const windLength = windForce.length() * effectiveWingScale;
+      const windLength = windForce.length() * effectiveGliderScale;
       this.windArrow.setDirection(windDirection);
       this.windArrow.setLength(Math.max(0, windLength)); // Ensure non-negative length
       this.windArrow.position.set(2, 0, 2); // Slight offset to avoid overlap
@@ -308,7 +321,7 @@ export class ForceVisualization {
           thermalDirection.set(0, 1, 0); // Default to upward if invalid
         }
 
-        const thermalLength = thermalForce.length() * effectiveWingScale;
+        const thermalLength = thermalForce.length() * effectiveGliderScale;
         this.thermalArrow.setDirection(thermalDirection);
         this.thermalArrow.setLength(Math.max(0, thermalLength)); // Ensure non-negative length
         this.thermalArrow.position.set(-2, 0, -2); // Offset to avoid overlap
@@ -338,13 +351,26 @@ export class ForceVisualization {
       }
 
       const gravityLength = gravityForce.length() * effectivePilotScale;
-      this.gravityArrow.setDirection(gravityDirection);
-      this.gravityArrow.setLength(Math.max(0, gravityLength)); // Ensure non-negative length
-      this.gravityArrow.position.set(0, 0, 0); // Relative to pilot group
+      this.pilotGravityArrow.setDirection(gravityDirection);
+      this.pilotGravityArrow.setLength(Math.max(0, gravityLength)); // Ensure non-negative length
+      this.pilotGravityArrow.position.set(0, 0, 0); // Relative to pilot group
       this.updateLabel('gravity', new THREE.Vector3(0, 0, 0), gravityDirection, gravityLength);
     } catch (e) {
       console.error("Error with gravity force visualization:", e);
-      this.gravityArrow.visible = false;
+      this.pilotGravityArrow.visible = false;
+      this.forceLabels['gravity'].visible = false;
+    }
+
+    // Update glider gravity force visualization - apply from glider center
+    try {
+      const gliderGravityDirection = new THREE.Vector3(gravityForce.x, gravityForce.y, gravityForce.z);
+      const gliderGravityLength = gravityForce.length() * effectiveGliderScale;
+      this.gliderGravityArrow.setDirection(gliderGravityDirection);
+      this.gliderGravityArrow.setLength(Math.max(0, gliderGravityLength)); // Ensure non-negative length
+      this.gliderGravityArrow.position.set(0, 0, 0); // Relative to glider group
+    } catch (e) {
+      console.error("Error with glider gravity force visualization:", e);
+      this.gliderGravityArrow.visible = false;
       this.forceLabels['gravity'].visible = false;
     }
   }
