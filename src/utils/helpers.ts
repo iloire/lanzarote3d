@@ -1,3 +1,4 @@
+import * as CANNON from "cannon-es";
 import * as THREE from "three";
 
 const Helpers = {
@@ -95,6 +96,133 @@ const Helpers = {
     mesh.add(boxMesh); // Add to the original mesh to follow its transformations
 
     return boxHelper;
+  },
+
+  /**
+   * Creates a visual representation of a CANNON.Box physics shape
+   * @param scene The scene to add the visualization to
+   * @param body The CANNON body containing the box shape
+   * @param shapeIndex Optional index of the shape in the body's shapes array (defaults to 0)
+   * @param color The color of the wireframe box
+   * @returns The mesh representing the CANNON.Box
+   */
+  createCannonBoxVisualization: function (
+    scene: THREE.Scene,
+    body: CANNON.Body,
+    shapeIndex: number = 0,
+    color: number = 0xffff00
+  ): THREE.Mesh {
+    // Verify the shape exists and is a box
+    if (!body.shapes[shapeIndex] || !(body.shapes[shapeIndex] instanceof CANNON.Box)) {
+      console.error('Shape is not a CANNON.Box or does not exist at specified index');
+      return null;
+    }
+
+    const boxShape = body.shapes[shapeIndex] as CANNON.Box;
+
+    // Get the dimensions from the CANNON.Box
+    // Note: CANNON.Box uses halfExtents, so we double them for Three.js
+    const width = boxShape.halfExtents.x * 2;
+    const height = boxShape.halfExtents.y * 2;
+    const depth = boxShape.halfExtents.z * 2;
+
+    // Create a Three.js box with the same dimensions
+    const geometry = new THREE.BoxGeometry(width, height, depth);
+    const material = new THREE.MeshBasicMaterial({
+      color: color,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.7
+    });
+
+    const boxMesh = new THREE.Mesh(geometry, material);
+    scene.add(boxMesh);
+
+    // Create an update function to keep the mesh position and rotation in sync with the physics body
+    const updateMesh = () => {
+      boxMesh.position.copy(body.position as any);
+      boxMesh.quaternion.copy(body.quaternion as any);
+
+      requestAnimationFrame(updateMesh);
+    };
+
+    // Start the update loop
+    updateMesh();
+
+    return boxMesh;
+  },
+
+  /**
+   * Creates a visual representation of any CANNON.Shape
+   * @param scene The scene to add the visualization to
+   * @param body The CANNON body containing the shape
+   * @param color The color of the wireframe
+   * @returns The object containing the meshes and update function
+   */
+  createCannonShapeVisualization: function (
+    scene: THREE.Scene,
+    body: CANNON.Body,
+    color: number = 0xffff00
+  ): { meshes: THREE.Object3D[], update: () => void } {
+    const meshes: THREE.Object3D[] = [];
+
+    // Create meshes for each shape in the body
+    body.shapes.forEach((shape, index) => {
+      let mesh: THREE.Object3D = null;
+
+      // Handle different types of shapes
+      if (shape instanceof CANNON.Box) {
+        const boxShape = shape as CANNON.Box;
+        const width = boxShape.halfExtents.x * 2;
+        const height = boxShape.halfExtents.y * 2;
+        const depth = boxShape.halfExtents.z * 2;
+
+        const geometry = new THREE.BoxGeometry(width, height, depth);
+        const material = new THREE.MeshBasicMaterial({
+          color: color,
+          wireframe: true,
+          transparent: true,
+          opacity: 0.7
+        });
+
+        mesh = new THREE.Mesh(geometry, material);
+
+        // Apply shape offset and orientation to the mesh
+        if (body.shapeOffsets[index] && body.shapeOrientations[index]) {
+          const offset = body.shapeOffsets[index];
+          const orientation = body.shapeOrientations[index];
+
+          // Create a container to handle offset and orientation
+          const container = new THREE.Object3D();
+          container.position.set(offset.x, offset.y, offset.z);
+          container.quaternion.set(orientation.x, orientation.y, orientation.z, orientation.w);
+
+          container.add(mesh);
+          mesh = container;
+        }
+
+        scene.add(mesh);
+        meshes.push(mesh);
+      }
+      // Add other shape types here as needed (Sphere, Plane, etc.)
+    });
+
+    // Create an update function
+    const update = () => {
+      meshes.forEach(mesh => {
+        if (mesh instanceof THREE.Mesh) {
+          // Direct shape with no offset
+          mesh.position.copy(body.position as any);
+          mesh.quaternion.copy(body.quaternion as any);
+        } else {
+          // Container with shape offset
+          mesh.position.copy(body.position as any);
+          mesh.quaternion.copy(body.quaternion as any);
+        }
+      });
+    };
+
+    return { meshes, update };
   },
 };
 export default Helpers;

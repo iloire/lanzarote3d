@@ -16,6 +16,34 @@ const WEATHER_SETTINGS: WeatherOptions = {
   lclLevel: 1800,
 };
 
+// Function to create a static box visualization at a specific position
+function createStaticBoxVisualization(
+  scene: THREE.Scene,
+  dimensions: CANNON.Vec3,
+  position: THREE.Vector3,
+  color: number = 0xffff00
+): THREE.Mesh {
+  // Create a Three.js box with the same dimensions as the CANNON.Box
+  // CANNON.Box dimensions are half-extents, so we double them for Three.js
+  const width = dimensions.x * 2;
+  const height = dimensions.y * 2;
+  const depth = dimensions.z * 2;
+
+  const geometry = new THREE.BoxGeometry(width, height, depth);
+  const material = new THREE.MeshBasicMaterial({
+    color: color,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.7
+  });
+
+  const boxMesh = new THREE.Mesh(geometry, material);
+  boxMesh.position.copy(position);
+  scene.add(boxMesh);
+
+  return boxMesh;
+}
+
 const ParagliderWorkshop = {
   load: async (options: StoryOptions) => {
     const { camera, scene, renderer, terrain, water, sky, gui, controls } = options;
@@ -56,10 +84,19 @@ const ParagliderWorkshop = {
     scene.add(wingMesh);
     scene.add(pilotMesh);
 
-
     // Add visualization boxes around meshes
     const wingBox = Helpers.createMeshVisualization(scene, wingMesh, 0xff0000); // Red box for wing
     const pilotBox = Helpers.createMeshVisualization(scene, pilotMesh, 0x00ff00); // Green box for pilot
+
+    // Create a static visualization of CANNON.Box(new CANNON.Vec3(10, 1, 10))
+    const boxDimensions = new CANNON.Vec3(10, 1, 10);
+    const boxPosition = initialPGPos.clone().add(new THREE.Vector3(50, 0, 0)); // Position offset from PG
+    const boxVisualization = createStaticBoxVisualization(
+      scene,
+      boxDimensions,
+      boxPosition,
+      0x0000ff // Blue color
+    );
 
     const distanceWingPilot = 10;
 
@@ -101,6 +138,32 @@ const ParagliderWorkshop = {
     pg.addGui(gui);
     pg.init();
 
+    // Visualize physics bodies after initialization
+    let physicsVisualizers = [];
+
+    // Wait for physics bodies to be created and initialized
+    setTimeout(() => {
+      // Visualize the glider physics body (wing)
+      if (pg.gliderBody) {
+        const gliderPhysicsVis = Helpers.createCannonShapeVisualization(
+          scene,
+          pg.gliderBody,
+          0xff00ff // Magenta for glider physics
+        );
+        physicsVisualizers.push(gliderPhysicsVis);
+      }
+
+      // Visualize the pilot physics body
+      if (pg.pilotBody) {
+        const pilotPhysicsVis = Helpers.createCannonShapeVisualization(
+          scene,
+          pg.pilotBody,
+          0x00ffff // Cyan for pilot physics
+        );
+        physicsVisualizers.push(pilotPhysicsVis);
+      }
+    }, 1000); // Short delay to ensure physics bodies are initialized
+
     setInterval(() => {
       // console.log(pg.getTurnState());
       // pg.turnLeft(200);
@@ -119,6 +182,9 @@ const ParagliderWorkshop = {
       // Update the BoxHelper objects to match the current state of the meshes
       wingBox.update();
       pilotBox.update();
+
+      // Update physics visualizers
+      physicsVisualizers.forEach(vis => vis.update && vis.update());
 
       TWEEN.update();
       controls.update();
