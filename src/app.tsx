@@ -136,7 +136,7 @@ const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAp
       controls
     };
 
-    await Stories[initialStory](storyOptions);
+    await Stories[initialStory] ? Stories[initialStory](storyOptions) : Stories.animation(storyOptions);
 
     // Animation loop
     const animate = () => {
