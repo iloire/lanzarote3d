@@ -1,12 +1,8 @@
 import * as THREE from "three";
-import Pilot from "./pilot";
-import Wing from "./parts/wing";
 import GuiHelper from "../utils/gui";
-import Models from "../utils/models";
-import AutoFlier from "./base/auto-flier";
 import { PilotHeadType } from "./parts/pilot-head";
-
-const BREAK_ROTATION = 0.05;
+import Wing from "./parts/wing";
+import Pilot from "./pilot";
 
 const DEFAULT_OPTIONS = {
   head: {
@@ -20,13 +16,12 @@ const DEFAULT_OPTIONS = {
   // ... rest of options
 };
 
-class HangGliderModel extends AutoFlier {
+class HangGliderModel {
   wing: Wing;
   pilot: Pilot;
 
   async load(path: THREE.Vector3[], gui?: any): Promise<THREE.Mesh> {
-    this.path = path;
-    this.mesh = new THREE.Mesh();
+    const mesh = new THREE.Mesh();
 
     // wing
     const wing = new Wing();
@@ -43,26 +38,23 @@ class HangGliderModel extends AutoFlier {
     pilotMesh.position.z = -0.4;
     pilotMesh.rotateY(Math.PI / 2);
 
-    this.mesh.add(pilotMesh);
-    this.mesh.add(wingMesh);
+    mesh.add(pilotMesh);
+    mesh.add(wingMesh);
 
     if (path.length > 1) {
-      this.mesh.position.copy(path[0]);
+      mesh.position.copy(path[0]);
     }
 
     if (gui) {
       GuiHelper.addLocationGui(gui, "Hanglider pilot", pilotMesh);
-      GuiHelper.addLocationGui(gui, "Hanglider", this.mesh);
+      GuiHelper.addLocationGui(gui, "Hanglider", mesh);
     }
 
     this.animate();
-    return this.mesh;
+    return mesh;
   }
 
   animate() {
-    if (this.path.length) {
-      this.move();
-    }
     requestAnimationFrame(() => this.animate());
   }
 }

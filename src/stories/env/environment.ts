@@ -1,18 +1,18 @@
 import * as THREE from "three";
+import Birds from "../../components/birds";
+import Boat from "../../components/boat";
+import { CloudOptions } from "../../components/cloud";
 import Clouds from "../../components/clouds";
-import Weather from "../../elements/weather";
-import Thermal from "../../components/thermal";
-import { rndIntBetween } from "../../utils/math";
-import Tree from "../../components/tree";
+import HangGlider from "../../components/hangglider";
+import House, { HouseType } from "../../components/house";
 import PineTree from "../../components/pinetree";
 import Stone from "../../components/stone";
-import House, { HouseType } from "../../components/house";
-import Boat from "../../components/boat";
-import Birds from "../../components/birds";
-import HangGlider from "../../components/hangglider";
+import Thermal from "../../components/thermal";
+import Tree from "../../components/tree";
+import Weather from "../../elements/weather";
+import { rndIntBetween } from "../../utils/math";
 import { addMeshAroundArea } from "./mesh-utils";
 import { generateThermalPair, ThermalGenerationOptions } from "./thermal-utils";
-import { CloudOptions } from "../../components/cloud";
 
 class Environment {
   birds: Birds;
@@ -26,7 +26,6 @@ class Environment {
 
   updateWrapSpeed(wrapSpeed: number) {
     this.birds && this.birds.updateWrapSpeed(wrapSpeed);
-    this.hg && this.hg.updateWrapSpeed(wrapSpeed);
   }
 
   async addBirds(path: THREE.Vector3[], gui?: any) {
@@ -220,7 +219,6 @@ class Environment {
     thermals: Thermal[],
     options: CloudOptions
   ): Promise<THREE.Object3D[]> {
-    const lclLevel = weather.getLclLevel();
     // from thermals
     const mainThermals = thermals.filter((t) => t.isMainThermal());
     const clouds = await Promise.all(
