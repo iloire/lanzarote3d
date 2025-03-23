@@ -353,7 +353,10 @@ export default class PhysicsFlier extends THREE.EventDispatcher {
 
     // Apply lift in the direction perpendicular to the wing's orientation
     const wingNormal = new CANNON.Vec3(0, 1, 0);
-    this.gliderBody.quaternion.vmult(wingNormal, wingNormal);
+
+    // convert wing normal to world  normal
+    const worldNormal = new CANNON.Vec3(0, 1, 0);
+    this.gliderBody.quaternion.vmult(wingNormal, worldNormal);
 
     // Check if wingNormal is valid (not zero length) to avoid NaN
     if (wingNormal.length() < 0.001) {
@@ -361,7 +364,7 @@ export default class PhysicsFlier extends THREE.EventDispatcher {
       return new CANNON.Vec3(0, 0.1, 0); // Default small lift if normal is invalid
     }
 
-    return wingNormal.scale(liftMagnitude);
+    return worldNormal.scale(liftMagnitude);
   }
 
   public calculateDragForce(speed: number): CANNON.Vec3 {

@@ -302,11 +302,20 @@ const PhysicsChain = {
     // Create push force control
     const pushForceControl = {
       pushForce: PUSH_FORCE_MAGNITUDE,
-      sphereMass: 50, // Default even heavier sphere
-      platformForce: 500 // Force for platform movement
+      sphereMass: 150, // Default even heavier sphere
+      platformForce: 500, // Force for platform movement
+      enableMouseControl: true, // Enable mouse control by default
+      dragMode: 'force' // Default drag mode (can be 'force' or 'direct')
     };
     physicsFolder.add(pushForceControl, 'pushForce', 50, 1000).name('Push Force');
     physicsFolder.add(pushForceControl, 'platformForce', 100, 2000).name('Platform Force');
+    physicsFolder.add(pushForceControl, 'enableMouseControl').name('Mouse Platform Control');
+
+    // Add drag mode selector
+    physicsFolder.add(pushForceControl, 'dragMode', ['force', 'direct']).name('Drag Mode')
+      .onChange((value: string) => {
+        mouseState.dragMode = value as 'force' | 'direct';
+      });
 
     // State for which body to push
     const pushState = {
@@ -326,6 +335,7 @@ const PhysicsChain = {
 
     // Add instructions to the GUI
     const instructionsFolder = gui.addFolder('Controls');
+    instructionsFolder.add({ info: 'Mouse: Click and drag to move platform' }, 'info').disable();
     instructionsFolder.add({ info: 'Q: Move Platform Left' }, 'info').disable();
     instructionsFolder.add({ info: 'W: Move Platform Right' }, 'info').disable();
     instructionsFolder.add({ info: 'Arrow Up: Push Forward' }, 'info').disable();
@@ -397,13 +407,14 @@ const PhysicsChain = {
       angularDamping: 0.5
     });
 
-    // Add constraints to limit platform movement
-    const pendulumFixedPoint = new CANNON.Vec3(platformPos.x, platformPos.y, platformPos.z);
-    const pendulumConstraint = new CANNON.PointToPointConstraint(
+    // Add constraints to limit platform movement - modified to allow horizontal and vertical movement
+
+    // Create a distance constraint instead of a point constraint to allow more movement
+    // @ts-ignore - CANNON.js typings might not include DistanceConstraint
+    const pendulumConstraint = new CANNON.DistanceConstraint(
       platformBody,
-      new CANNON.Vec3(0, 0, 0), // Local point in body
       new CANNON.Body({ mass: 0 }), // Static body
-      pendulumFixedPoint // World point
+      0.5 // Allow small movement (0.5 units)
     );
     world.addConstraint(pendulumConstraint);
 
@@ -417,6 +428,168 @@ const PhysicsChain = {
       0xff0000, // Red for platform
       "Platform"
     );
+
+    // Create mouse control visual indicator
+    const mouseState = {
+      isMouseDown: false,
+      lastMouseX: 0,
+      lastMouseY: 0,
+      mouseSensitivity: 0.5, // Increased from 0.05 for more responsive dragging
+      activeVisualIndicator: null as THREE.Mesh | null, // Visual indicator for active mouse control
+      dragMode: 'force' as 'force' | 'direct', // Mode for dragging: force or direct position control
+      dragPlane: new THREE.Plane(new THREE.Vector3(0, 0, 1)) // Plane for raycasting
+    };
+
+    // Create visual indicator for active mouse control
+    function createMouseControlIndicator(platform: THREE.Mesh) {
+      // Create a visual indicator that shows when mouse control is active
+      const platformSize = new THREE.Vector3();
+      new THREE.Box3().setFromObject(platform).getSize(platformSize);
+
+      const indicatorGeometry = new THREE.RingGeometry(
+        platformSize.x * 0.6, // Inner radius
+        platformSize.x * 0.7, // Outer radius
+        16 // Segments
+      );
+      const indicatorMaterial = new THREE.MeshBasicMaterial({
+        color: 0x00ffff,
+        transparent: true,
+        opacity: 0.7,
+        side: THREE.DoubleSide
+      });
+
+      const indicator = new THREE.Mesh(indicatorGeometry, indicatorMaterial);
+      indicator.rotation.x = Math.PI / 2; // Rotate to be horizontal
+      indicator.visible = false;
+
+      scene.add(indicator);
+      return indicator;
+    }
+
+    // Create mouse control visual indicator
+    mouseState.activeVisualIndicator = createMouseControlIndicator(platformMesh);
+
+    // Mouse event handlers
+    function onMouseDown(event: MouseEvent) {
+      if (!pushForceControl.enableMouseControl) return;
+
+      mouseState.isMouseDown = true;
+      mouseState.lastMouseX = event.clientX;
+      mouseState.lastMouseY = event.clientY;
+
+      // Disable OrbitControls when dragging the platform
+      if (controls && controls.enabled) {
+        controls.enabled = false;
+      }
+
+      // Show visual indicator
+      if (mouseState.activeVisualIndicator) {
+        mouseState.activeVisualIndicator.visible = true;
+
+        // Position the indicator at the platform
+        if (platformMesh) {
+          mouseState.activeVisualIndicator.position.copy(platformMesh.position);
+        }
+      }
+
+      // Set up dragging mode
+      if (mouseState.dragMode === 'direct') {
+        // For direct mode, we need to calculate the intersection with the drag plane
+        mouseState.dragPlane.setFromNormalAndCoplanarPoint(
+          new THREE.Vector3(0, 0, 1), // Normal pointing towards the camera
+          platformMesh.position // Plane contains the platform
+        );
+      }
+    }
+
+    function onMouseMove(event: MouseEvent) {
+      if (!mouseState.isMouseDown || !pushForceControl.enableMouseControl) return;
+
+      if (mouseState.dragMode === 'force') {
+        // Force-based dragging (pushes the platform)
+        const deltaX = event.clientX - mouseState.lastMouseX;
+        const deltaY = mouseState.lastMouseY - event.clientY; // Invert Y for intuitive control
+
+        // Apply force to platform based on mouse movement
+        if (physicsObjects.bodies.length > 0 && platformBody) {
+          const platformMovementForce = pushForceControl.platformForce * mouseState.mouseSensitivity;
+
+          // Apply horizontal and vertical forces based on mouse movement
+          platformBody.applyForce(
+            new CANNON.Vec3(
+              deltaX * platformMovementForce,
+              deltaY * platformMovementForce * 0.5, // Reduced vertical sensitivity
+              0
+            ),
+            new CANNON.Vec3(0, 0, 0)
+          );
+
+          // Also apply direct velocity for more immediate feedback
+          const velocityFactor = 0.1; // Control how fast it follows the mouse
+          platformBody.velocity.x += deltaX * velocityFactor;
+          platformBody.velocity.y += deltaY * velocityFactor * 0.5;
+
+          // Update visual indicator position
+          if (mouseState.activeVisualIndicator && platformMesh) {
+            mouseState.activeVisualIndicator.position.copy(platformMesh.position);
+          }
+        }
+      } else {
+        // Direct position control dragging
+        // Calculate mouse position in 3D space
+        const mousePos = new THREE.Vector2(
+          (event.clientX / window.innerWidth) * 2 - 1,
+          -(event.clientY / window.innerHeight) * 2 + 1
+        );
+
+        // Raycaster for converting mouse position to 3D position
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(mousePos, camera);
+
+        // Find intersection with drag plane
+        const intersection = new THREE.Vector3();
+        if (raycaster.ray.intersectPlane(mouseState.dragPlane, intersection)) {
+          // Limit movement range (optional)
+          intersection.z = platformBody.position.z; // Keep same z position
+
+          // Move the platform towards the intersection point
+          const moveSpeed = 0.2; // Adjust as needed for smoother movement
+          platformBody.position.x += (intersection.x - platformBody.position.x) * moveSpeed;
+          platformBody.position.y += (intersection.y - platformBody.position.y) * moveSpeed;
+
+          // Zero out velocity for more control
+          platformBody.velocity.set(0, 0, 0);
+
+          // Update visual indicator
+          if (mouseState.activeVisualIndicator) {
+            mouseState.activeVisualIndicator.position.copy(platformMesh.position);
+          }
+        }
+      }
+
+      // Update last mouse position
+      mouseState.lastMouseX = event.clientX;
+      mouseState.lastMouseY = event.clientY;
+    }
+
+    function onMouseUp() {
+      mouseState.isMouseDown = false;
+
+      // Re-enable OrbitControls when done dragging
+      if (controls && !controls.enabled) {
+        controls.enabled = true;
+      }
+
+      // Hide visual indicator
+      if (mouseState.activeVisualIndicator) {
+        mouseState.activeVisualIndicator.visible = false;
+      }
+    }
+
+    // Add mouse event listeners
+    renderer.domElement.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
 
     // Add platform to objects
     physicsObjects.bodies.push(platformBody);
@@ -483,7 +656,7 @@ const PhysicsChain = {
         scene,
         platformBody,
         sphereBody,
-        18, // Tripled the number of segments for longer rope
+        20, // Tripled the number of segments for longer rope
         0.15, // Rope thickness
       );
 
@@ -829,6 +1002,7 @@ const PhysicsChain = {
           new THREE.Vector3().copy(body.position as any)
         );
       }
+
     }
 
     // Key up event handler
@@ -922,7 +1096,7 @@ const PhysicsChain = {
     }
 
     // Physics simulation and visualization loop
-    const fps = 60; // Higher FPS for smoother physics
+    const fps = 160; // Higher FPS for smoother physics
     const animate = () => {
       setTimeout(() => {
         requestAnimationFrame(animate);
@@ -941,6 +1115,11 @@ const PhysicsChain = {
           physicsObjects.visualMeshes[index].quaternion.copy(body.quaternion as any);
         }
       });
+
+      // Update mouse control indicator if active
+      if (mouseState.isMouseDown && mouseState.activeVisualIndicator && platformMesh) {
+        mouseState.activeVisualIndicator.position.copy(platformMesh.position);
+      }
 
       // Update constraint lines
       physicsObjects.constraintLines.forEach((line, index) => {
@@ -995,6 +1174,9 @@ const PhysicsChain = {
     return () => {
       document.removeEventListener('keydown', onKeyDown);
       document.removeEventListener('keyup', onKeyUp);
+      renderer.domElement.removeEventListener('mousedown', onMouseDown);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
     };
   },
 };
