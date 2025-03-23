@@ -17,6 +17,41 @@ const WEATHER_SETTINGS: WeatherOptions = {
 };
 
 // Function to create a static box visualization at a specific position
+function createStaticBoxVisualization(
+  scene: THREE.Scene,
+  dimensions: CANNON.Vec3,
+  position: THREE.Vector3,
+  color: number = 0xffff00,
+  label?: string
+): THREE.Mesh {
+  // Create a Three.js box with the same dimensions as the CANNON.Box
+  // CANNON.Box dimensions are half-extents, so we double them for Three.js
+  const width = dimensions.x * 2;
+  const height = dimensions.y * 2;
+  const depth = dimensions.z * 2;
+
+  const geometry = new THREE.BoxGeometry(width, height, depth);
+  const material = new THREE.MeshBasicMaterial({
+    color: color,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.7
+  });
+
+  const boxMesh = new THREE.Mesh(geometry, material);
+  boxMesh.position.copy(position);
+  scene.add(boxMesh);
+
+  // Add label if provided
+  if (label) {
+    // Create a label with an offset above the box
+    const labelOffset = new THREE.Vector3(0, height * 0.6, 0);
+    const size = Math.max(width, height, depth) * 0.25;
+    Helpers.createLabel(scene, label, position, color, size, labelOffset);
+  }
+
+  return boxMesh;
+}
 
 const ParagliderWorkshop = {
   load: async (options: StoryOptions) => {
@@ -63,6 +98,8 @@ const ParagliderWorkshop = {
     const pilotBox = Helpers.createMeshVisualization(scene, pilotMesh, 0x00ff00); // Green box for pilot
 
     // Create a static visualization of CANNON.Box(new CANNON.Vec3(10, 1, 10))
+    const boxDimensions = new CANNON.Vec3(10, 1, 10);
+    const boxPosition = initialPGPos.clone().add(new THREE.Vector3(50, 0, 0)); // Position offset from PG
 
     const distanceWingPilot = 10;
 
@@ -114,7 +151,8 @@ const ParagliderWorkshop = {
         const gliderPhysicsVis = Helpers.createCannonShapeVisualization(
           scene,
           pg.gliderBody,
-          0xff00ff // Magenta for glider physics
+          0xff00ff, // Magenta for glider physics
+          "Glider Physics Body" // Label
         );
         physicsVisualizers.push(gliderPhysicsVis);
       }
@@ -124,7 +162,8 @@ const ParagliderWorkshop = {
         const pilotPhysicsVis = Helpers.createCannonShapeVisualization(
           scene,
           pg.pilotBody,
-          0x00ffff // Cyan for pilot physics
+          0x00ffff, // Cyan for pilot physics
+          "Pilot Physics Body" // Label
         );
         physicsVisualizers.push(pilotPhysicsVis);
       }

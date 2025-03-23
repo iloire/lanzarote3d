@@ -153,18 +153,80 @@ const Helpers = {
   },
 
   /**
-   * Creates a visual representation of any CANNON.Shape
+   * Creates a text label that follows an object
+   * @param scene The scene to add the label to
+   * @param text The text to display in the label
+   * @param position The initial position of the label
+   * @param color The color of the text
+   * @param size The size of the text (default: 1)
+   * @param offset Vector3 offset from the position (default: 0,0,0)
+   * @returns The label mesh
+   */
+  createLabel: function (
+    scene: THREE.Scene,
+    text: string,
+    position: THREE.Vector3,
+    color: number = 0xffffff,
+    size: number = 1,
+    offset: THREE.Vector3 = new THREE.Vector3(0, 0, 0)
+  ): THREE.Object3D {
+    // Create a canvas for the texture
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    canvas.width = 256;
+    canvas.height = 128;
+
+    // Fill the canvas with a transparent background
+    context.fillStyle = 'rgba(0,0,0,0)';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Add text to the canvas
+    context.font = '24px Arial';
+    // Convert color to hex string safely
+    const colorHex = color.toString(16);
+    const paddedColorHex = '000000'.substring(0, 6 - colorHex.length) + colorHex;
+    context.fillStyle = '#' + paddedColorHex;
+    context.textAlign = 'center';
+    context.fillText(text, canvas.width / 2, canvas.height / 2);
+
+    // Create a texture from the canvas
+    const texture = new THREE.CanvasTexture(canvas);
+
+    // Create a sprite material with the texture
+    const material = new THREE.SpriteMaterial({
+      map: texture,
+      transparent: true
+    });
+
+    // Create a sprite with the material
+    const sprite = new THREE.Sprite(material);
+    sprite.scale.set(size * 10, size * 5, 1);
+
+    // Position the sprite
+    sprite.position.copy(position).add(offset);
+
+    // Add to scene
+    scene.add(sprite);
+
+    return sprite;
+  },
+
+  /**
+   * Creates a visual representation of any CANNON.Shape with a label
    * @param scene The scene to add the visualization to
    * @param body The CANNON body containing the shape
    * @param color The color of the wireframe
-   * @returns The object containing the meshes and update function
+   * @param label Optional label text to display
+   * @returns The object containing the meshes, label and update function
    */
   createCannonShapeVisualization: function (
     scene: THREE.Scene,
     body: CANNON.Body,
-    color: number = 0xffff00
-  ): { meshes: THREE.Object3D[], update: () => void } {
+    color: number = 0xffff00,
+    label?: string
+  ): { meshes: THREE.Object3D[], label?: THREE.Object3D, update: () => void } {
     const meshes: THREE.Object3D[] = [];
+    let labelObject: THREE.Object3D = null;
 
     // Create meshes for each shape in the body
     body.shapes.forEach((shape, index) => {
@@ -203,12 +265,71 @@ const Helpers = {
 
         scene.add(mesh);
         meshes.push(mesh);
+      } else if (shape instanceof CANNON.Sphere) {
+        const sphereShape = shape as CANNON.Sphere;
+        const radius = sphereShape.radius;
+
+        const geometry = new THREE.SphereGeometry(radius, 16, 16);
+        const material = new THREE.MeshBasicMaterial({
+          color: color,
+          wireframe: true,
+          transparent: true,
+          opacity: 0.7
+        });
+
+        mesh = new THREE.Mesh(geometry, material);
+
+        // Apply shape offset and orientation
+        if (body.shapeOffsets[index] && body.shapeOrientations[index]) {
+          const offset = body.shapeOffsets[index];
+          const orientation = body.shapeOrientations[index];
+
+          const container = new THREE.Object3D();
+          container.position.set(offset.x, offset.y, offset.z);
+          container.quaternion.set(orientation.x, orientation.y, orientation.z, orientation.w);
+
+          container.add(mesh);
+          mesh = container;
+        }
+
+        scene.add(mesh);
+        meshes.push(mesh);
       }
-      // Add other shape types here as needed (Sphere, Plane, etc.)
+      // Add other shape types here as needed (Plane, etc.)
     });
+
+    // Add label if provided
+    if (label) {
+      // Get estimated size of the body for proper offset
+      let maxSize = 0;
+      body.shapes.forEach(shape => {
+        if (shape instanceof CANNON.Box) {
+          const box = shape as CANNON.Box;
+          maxSize = Math.max(maxSize, box.halfExtents.x * 2, box.halfExtents.y * 2, box.halfExtents.z * 2);
+        } else if (shape instanceof CANNON.Sphere) {
+          const sphere = shape as CANNON.Sphere;
+          maxSize = Math.max(maxSize, sphere.radius * 2);
+        }
+      });
+
+      // Create label with an offset above the shape
+      const labelOffset = new THREE.Vector3(0, maxSize * 0.6, 0);
+      labelObject = this.createLabel(
+        scene,
+        label,
+        new THREE.Vector3().copy(body.position as any),
+        color,
+        maxSize * 0.25,
+        labelOffset
+      );
+
+      // Store offset for later updates
+      labelObject.userData = { offset: labelOffset };
+    }
 
     // Create an update function
     const update = () => {
+      // Update mesh positions and rotations
       meshes.forEach(mesh => {
         if (mesh instanceof THREE.Mesh) {
           // Direct shape with no offset
@@ -220,9 +341,16 @@ const Helpers = {
           mesh.quaternion.copy(body.quaternion as any);
         }
       });
+
+      // Update label position if it exists
+      if (labelObject) {
+        const bodyPos = new THREE.Vector3().copy(body.position as any);
+        const labelOffset = labelObject.userData.offset || new THREE.Vector3(0, 5, 0);
+        labelObject.position.copy(bodyPos).add(labelOffset);
+      }
     };
 
-    return { meshes, update };
-  },
+    return { meshes, label: labelObject, update };
+  }
 };
 export default Helpers;
