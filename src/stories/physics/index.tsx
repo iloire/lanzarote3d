@@ -1,14 +1,19 @@
 import * as CANNON from "cannon-es";
+import { StoryOptions } from "../types";
 
 // Import our modular components
-import { StoryOptions } from "../types";
 import { createBasicPhysicsObjects, updateVisuals } from "./core";
 import { findControllerByProperty, setupPhysicsControls, storeInitialPositions } from "./gui";
 import { arrayIncludes, createPhysicsWorld, KEY_MAPPING } from "./helpers";
 import { createRopes } from "./rope";
-import { createAntiGravityButton, createPlatformButtons, createSphereButtons } from "./ui";
+import { createPlatformButtons, createSphereButtons } from "./ui";
 
-
+// Store listeners and UI elements for cleanup
+let keyDownListener: ((event: KeyboardEvent) => void) | null = null;
+let keyUpListener: ((event: KeyboardEvent) => void) | null = null;
+let platformButtonsRef: ReturnType<typeof createPlatformButtons> | null = null;
+let sphereButtonsRef: ReturnType<typeof createSphereButtons> | null = null;
+let animationFrameId: number | null = null;
 
 const PhysicsChain = {
   load: async (options: StoryOptions) => {
@@ -64,7 +69,7 @@ const PhysicsChain = {
     const keysPressed = new Set<string>();
 
     // Create UI buttons for platform control
-    const platformButtons = createPlatformButtons(
+    platformButtonsRef = createPlatformButtons(
       renderer.domElement.parentElement || document.body,
       platformBody,
       pushForceControl.platformForce
@@ -72,11 +77,13 @@ const PhysicsChain = {
 
     // Listen for changes to button visibility
     findControllerByProperty(physicsFolder, 'showButtons')?.onChange((value: boolean) => {
-      platformButtons.leftButton.parentElement!.style.display = value ? 'flex' : 'none';
+      if (platformButtonsRef?.leftButton?.parentElement) {
+        platformButtonsRef.leftButton.parentElement.style.display = value ? 'flex' : 'none';
+      }
     });
 
     // Create UI buttons for sphere control
-    const sphereButtons = createSphereButtons(
+    sphereButtonsRef = createSphereButtons(
       renderer.domElement.parentElement || document.body,
       sphereBody,
       pushForceControl.pushForce
@@ -84,42 +91,28 @@ const PhysicsChain = {
 
     // Listen for changes to sphere button visibility
     findControllerByProperty(physicsFolder, 'showSphereButtons')?.onChange((value: boolean) => {
-      sphereButtons.buttonContainer.style.display = value ? 'grid' : 'none';
-    });
-
-    // Create the anti-gravity button
-    const antiGravityButton = createAntiGravityButton(
-      renderer.domElement.parentElement || document.body,
-      physicsObjects,
-      pushForceControl.antiGravityForce
-    );
-
-    // Initialize the visibility based on the setting
-    antiGravityButton.buttonContainer.style.display =
-      pushForceControl.showAntiGravityButton ? 'block' : 'none';
-
-    // Add listener for visibility toggle
-    findControllerByProperty(physicsFolder, 'showAntiGravityButton')?.onChange((value: boolean) => {
-      antiGravityButton.buttonContainer.style.display = value ? 'block' : 'none';
+      if (sphereButtonsRef?.buttonContainer) {
+        sphereButtonsRef.buttonContainer.style.display = value ? 'grid' : 'none';
+      }
     });
 
     // Event listeners for keyboard controls
-    function onKeyDown(event: KeyboardEvent) {
+    keyDownListener = (event: KeyboardEvent) => {
       keysPressed.add(event.code);
 
       // Reset positions
       if (arrayIncludes(KEY_MAPPING.RESET_POSITION, event.code)) {
         pushForceControl.resetScene();
       }
-    }
+    };
 
-    function onKeyUp(event: KeyboardEvent) {
+    keyUpListener = (event: KeyboardEvent) => {
       keysPressed.delete(event.code);
-    }
+    };
 
     // Add event listeners
-    window.addEventListener('keydown', onKeyDown);
-    window.addEventListener('keyup', onKeyUp);
+    window.addEventListener('keydown', keyDownListener);
+    window.addEventListener('keyup', keyUpListener);
 
     // Function to apply forces based on keyboard input
     function applyInputForces() {
@@ -142,13 +135,8 @@ const PhysicsChain = {
       }
     }
 
-    // Physics simulation and visualization loop
-    const fps = 160; // Higher FPS for smoother physics
-    const animate = () => {
-      setTimeout(() => {
-        requestAnimationFrame(animate);
-      }, 1000 / fps);
-
+    // Physics update function (internal function)
+    function updatePhysics() {
       // Step the physics world
       world.step(1 / 60);
 
@@ -156,9 +144,8 @@ const PhysicsChain = {
       applyInputForces();
 
       // Apply forces from UI buttons
-      platformButtons.applyButtonForces();
-      sphereButtons.applyButtonForces();
-      antiGravityButton.applyButtonForces();
+      if (platformButtonsRef) platformButtonsRef.applyButtonForces();
+      if (sphereButtonsRef) sphereButtonsRef.applyButtonForces();
 
       // Auto-rotate the camera if enabled
       if (pushForceControl.isAutoRotate) {
@@ -176,30 +163,40 @@ const PhysicsChain = {
 
       // Update visual representations to match physics bodies
       updateVisuals(physicsObjects);
+    }
 
-      // Render the scene
+    // Animation loop
+    function animate() {
+      animationFrameId = requestAnimationFrame(animate);
+      updatePhysics();
       renderer.render(scene, camera);
-    };
+      controls.update();
+    }
 
     // Start the animation loop
     animate();
+  },
 
-    // Cleanup function to remove event listeners when scene changes
-    return () => {
-      platformButtons.cleanup();
-      sphereButtons.cleanup();
-      antiGravityButton.cleanup();
+  unload: async () => {
+    // Stop animation loop
+    if (animationFrameId !== null) {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+    }
 
-      window.removeEventListener('keydown', onKeyDown);
-      window.removeEventListener('keyup', onKeyUp);
+    // Clean up event listeners
+    if (keyDownListener) window.removeEventListener('keydown', keyDownListener);
+    if (keyUpListener) window.removeEventListener('keyup', keyUpListener);
 
-      // Remove the renderer and GUI
-      if (renderer.domElement.parentElement) {
-        renderer.domElement.parentElement.removeChild(renderer.domElement);
-      }
+    // Clean up UI controls
+    if (platformButtonsRef) platformButtonsRef.cleanup();
+    if (sphereButtonsRef) sphereButtonsRef.cleanup();
 
-      gui.destroy();
-    };
+    // Reset references
+    keyDownListener = null;
+    keyUpListener = null;
+    platformButtonsRef = null;
+    sphereButtonsRef = null;
   }
 };
 

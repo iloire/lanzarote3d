@@ -45,8 +45,13 @@ Functions for creating and updating visual representations of physics objects:
 
 Functions for creating rope physics with segments and constraints:
 
-- `createRope()`: Creates a single rope connecting two bodies
-- `createRopes()`: Creates multiple ropes with different attachment points
+- `createRope()`: Creates a single rope connecting two bodies using local attachment points
+- `createRopes()`: Creates multiple ropes with different attachment points on the platform
+
+The rope system connects bodies using local attachment points, which ensures that:
+1. Ropes are properly attached to specific points on the bodies
+2. Rope attachments move with the bodies when they rotate or translate
+3. Forces are properly transmitted through the attachment points
 
 ### `ui.ts`
 
@@ -54,7 +59,6 @@ UI components for interactive controls:
 
 - `createPlatformButtons()`: Creates buttons for controlling the platform
 - `createSphereButtons()`: Creates buttons for controlling the sphere
-- `createAntiGravityButton()`: Creates an anti-gravity button with visual effects
 - `ButtonController`: Interface for button controllers
 
 ### `gui.ts`
@@ -73,34 +77,53 @@ Core setup for the physics simulation:
 - `setupScene()`: Sets up the Three.js scene, camera, and renderer
 - `setupLighting()`: Configures scene lighting
 - `createBasicPhysicsObjects()`: Creates the basic platform and sphere objects
-- `updateVisuals()`: Updates visual representations to match physics state
+- `updateVisuals()`: Updates visual representations to match physics state, properly handling constraint lines using world-space transformation of attachment points
 - `PhysicsScene`: Interface for the basic physics scene setup
 
 ### `index.tsx`
 
 Main entry point that brings everything together:
 
-- Imports and uses all the modular components
-- Sets up the main rendering loop
-- Handles keyboard input and event listeners
-- Manages the animation and physics steps
-- Provides cleanup functionality
+- `load`: Async function that initializes the physics simulation, sets up the animation loop, and handles physics updates
+- `unload`: Cleans up resources and stops the animation loop when the simulation is unloaded
+- Manages keyboard input, UI buttons, and physics updates
+- Handles the internal animation loop using requestAnimationFrame
+
+The simulation follows the standard story pattern:
+1. It initializes resources in the `load` function
+2. It sets up and runs its own animation loop internally
+3. It cleans up resources in the `unload` function
+
+## Physics Rope System
+
+The rope system works by:
+
+1. **Local Attachment Points**: Ropes are attached to specific local points on the platform and sphere
+2. **Segment Chain**: Each rope consists of multiple small physics bodies connected by constraints
+3. **Constraint Visualization**: Visual lines track the positions of constraints, updating in real-time as physics bodies move
+4. **Force Transmission**: Forces applied to the platform or sphere are transmitted through the rope physics
 
 ## Usage
 
-To use the physics simulation, simply import and render the `PhysicsChain` component:
+To use the physics simulation, simply import and load it with your story options:
 
 ```jsx
 import PhysicsChain from "./stories/physics";
 
-const App = () => {
-  return (
-    <div id="container">
-      {PhysicsChain.render({})}
-    </div>
-  );
-};
+// In your application:
+await PhysicsChain.load({
+  scene,
+  camera,
+  renderer,
+  gui,
+  controls
+});
+
+// Later, when you want to unload the simulation:
+await PhysicsChain.unload();
 ```
+
+The simulation handles its own animation loop internally, so there's no need to integrate it with your application's main loop.
 
 ## Extending the Simulation
 
@@ -115,6 +138,7 @@ To add new functionality:
 
 ## Performance Considerations
 
-- The physics simulation runs at a high FPS (160) for smoother physics
+- The physics simulation runs at an optimal frame rate for smoother physics
 - Visual updates are synchronized with the physics world updates
 - Auto-rotation and camera controls are optimized for smooth movement 
+- Constraint visualization is optimized by using proper world-space transformation 

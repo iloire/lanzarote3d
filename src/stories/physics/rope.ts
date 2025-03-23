@@ -12,7 +12,9 @@ export function createRope(
   bodyB: CANNON.Body,
   numSegments: number = 8,
   ropeThickness: number = 0.15,
-  ropeColor: number = 0xcccccc
+  ropeColor: number = 0xcccccc,
+  localPointA: CANNON.Vec3 = new CANNON.Vec3(0, 0, 0),
+  localPointB: CANNON.Vec3 = new CANNON.Vec3(0, 0, 0)
 ): {
   segments: CANNON.Body[],
   constraints: CANNON.PointToPointConstraint[],
@@ -25,9 +27,16 @@ export function createRope(
   const visualMeshes: THREE.Mesh[] = [];
   const constraintLines: THREE.Line[] = [];
 
-  // Calculations for the rope
-  const startPos = new THREE.Vector3().copy(bodyA.position as any);
-  const endPos = new THREE.Vector3().copy(bodyB.position as any);
+  // Calculate world positions for rope endpoints
+  const worldPointA = new CANNON.Vec3();
+  bodyA.pointToWorldFrame(localPointA, worldPointA);
+
+  const worldPointB = new CANNON.Vec3();
+  bodyB.pointToWorldFrame(localPointB, worldPointB);
+
+  // Convert to THREE.Vector3 for calculations
+  const startPos = new THREE.Vector3(worldPointA.x, worldPointA.y, worldPointA.z);
+  const endPos = new THREE.Vector3(worldPointB.x, worldPointB.y, worldPointB.z);
   const direction = new THREE.Vector3().subVectors(endPos, startPos);
   const segmentLength = direction.length() / (numSegments + 1);
 
@@ -37,7 +46,6 @@ export function createRope(
   // Create rope segments
   for (let i = 0; i < numSegments; i++) {
     // Calculate position for this segment
-    const t = (i + 1) / (numSegments + 1);
     const segmentPos = new THREE.Vector3(
       startPos.x + direction.x * segmentLength * (i + 1),
       startPos.y + direction.y * segmentLength * (i + 1),
@@ -69,23 +77,29 @@ export function createRope(
     // Create constraints
     let constraintBodyA: CANNON.Body;
     let constraintBodyB: CANNON.Body;
+    let localPivotA: CANNON.Vec3;
+    let localPivotB: CANNON.Vec3;
 
     if (i === 0) {
       // First segment connects to bodyA
       constraintBodyA = bodyA;
       constraintBodyB = segmentBody;
+      localPivotA = localPointA.clone(); // Use the specified attachment point
+      localPivotB = new CANNON.Vec3(0, 0, 0);
     } else {
       // Other segments connect to previous segment
       constraintBodyA = segments[i - 1];
       constraintBodyB = segmentBody;
+      localPivotA = new CANNON.Vec3(0, 0, 0);
+      localPivotB = new CANNON.Vec3(0, 0, 0);
     }
 
     // Create point-to-point constraint (joint)
     const constraint = new CANNON.PointToPointConstraint(
       constraintBodyA,
-      new CANNON.Vec3(0, 0, 0), // Local point in bodyA
+      localPivotA,
       constraintBodyB,
-      new CANNON.Vec3(0, 0, 0)  // Local point in bodyB
+      localPivotB
     );
 
     world.addConstraint(constraint);
@@ -106,7 +120,7 @@ export function createRope(
     segments[segments.length - 1],
     new CANNON.Vec3(0, 0, 0),
     bodyB,
-    new CANNON.Vec3(0, 0, 0)
+    localPointB // Use the specified attachment point for bodyB
   );
 
   world.addConstraint(finalConstraint);
@@ -166,18 +180,8 @@ export function createRopes(
 
   // Create a rope for each attachment point
   attachmentPoints.forEach((point, index) => {
-    // Create an offset position for the attachment in bodyA
+    // Create a local attachment point for bodyA (the platform)
     const localPointA = new CANNON.Vec3(point.x, 0, point.z);
-
-    // Clone bodyA to create a position with the local offset applied
-    const offsetBodyA = new CANNON.Body({
-      mass: 0,
-      position: new CANNON.Vec3().copy(bodyA.position),
-    });
-
-    // Calculate the world position with the offset
-    offsetBodyA.position.x += localPointA.x;
-    offsetBodyA.position.z += localPointA.z;
 
     // Create the rope with the color for this index (cycling if needed)
     const color = colors[index % colors.length];
@@ -185,11 +189,13 @@ export function createRopes(
     const rope = createRope(
       world,
       scene,
-      offsetBodyA, // Use the offset position instead of the actual bodyA
-      bodyB,
+      bodyA,       // Use the actual bodyA (platform)
+      bodyB,       // Use bodyB (sphere)
       numSegments,
       thickness,
-      color
+      color,
+      localPointA, // Pass the local attachment point for bodyA
+      new CANNON.Vec3(0, 0, 0) // Center of the sphere
     );
 
     ropes.push(rope);

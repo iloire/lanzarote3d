@@ -15,8 +15,6 @@ export interface PhysicsControlSettings {
   resetScene: () => void;
   showButtons: boolean;
   showSphereButtons: boolean;
-  showAntiGravityButton: boolean;
-  antiGravityForce: number;
 }
 
 /**
@@ -57,9 +55,7 @@ export function setupPhysicsControls(
     autoRotateSpeed: 0.1,
     resetScene: resetPositions,
     showButtons: true,
-    showSphereButtons: true,
-    showAntiGravityButton: true,
-    antiGravityForce: 800
+    showSphereButtons: true
   };
 
   // Add controls to GUI
@@ -72,17 +68,11 @@ export function setupPhysicsControls(
   const massController = physicsFolder.add(pushForceControl, 'sphereMass', 10, 300)
     .name('Sphere Mass');
 
-  physicsFolder.add(pushForceControl, 'antiGravityForce', 200, 3000)
-    .name('Anti-Gravity Force');
-
   physicsFolder.add(pushForceControl, 'showButtons')
     .name('Show Platform Buttons');
 
   physicsFolder.add(pushForceControl, 'showSphereButtons')
     .name('Show Sphere Buttons');
-
-  physicsFolder.add(pushForceControl, 'showAntiGravityButton')
-    .name('Show Anti-Gravity Button');
 
   physicsFolder.add(pushForceControl, 'isAutoRotate')
     .name('Auto Rotate');
