@@ -14,8 +14,8 @@ src/stories/physics/
 ├── gui.ts         - GUI controls for physics parameters
 ├── helpers.ts     - Utility functions and constants
 ├── index.tsx      - Main entry point that assembles everything
+├── keyboard.ts    - Keyboard input handling
 ├── rope.ts        - Rope creation and physics functionality
-├── ui.ts          - UI components (buttons and controls)
 └── visualization.ts - Visual representation of physics objects
 ```
 
@@ -30,6 +30,15 @@ Contains utility functions, constants, and common interfaces:
 - `arrayIncludes()`: Helper function for array checking
 - `createPhysicsWorld()`: Function to create and configure a physics world
 - `PhysicsObjects`: Interface for the physics object container
+
+### `keyboard.ts`
+
+Handles keyboard input and applies forces based on key presses:
+
+- `setupKeyboardControls()`: Sets up event listeners and returns functions for force application
+- `KeyboardControlConfig`: Interface for configuring keyboard controls
+- Handles platform movement and reset functionality
+- Provides clean event listener management
 
 ### `visualization.ts`
 

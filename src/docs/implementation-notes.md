@@ -38,7 +38,8 @@ Additional cleanup was performed to remove unused and redundant code:
    - Removed unused KEY_MAPPING entries (CREATE_PENDULUM, CREATE_CHAIN)
    - Removed UI button-related controls from the GUI (showButtons, showSphereButtons)
 3. **Fixed Animation Loop**: Removed redundant controls.update() call in the animate function
-4. **Updated Documentation**: All documentation was updated to reflect the streamlined codebase
+4. **Input Handling Modularization**: Moved all keyboard-related functionality to a dedicated module
+5. **Updated Documentation**: All documentation was updated to reflect the streamlined codebase
 
 This cleanup further improved code clarity, reduced bundle size, and removed potentially confusing elements from the user interface.
 
@@ -61,6 +62,13 @@ This cleanup further improved code clarity, reduced bundle size, and removed pot
 - **Button Positioning**: Dynamically positioned based on renderer container size
 - **Visibility Controls**: All UI elements can be toggled via the GUI
 - **Force Controls**: Separated control values for platform, sphere, and anti-gravity forces
+
+### Input Handling
+
+- **Modular Keyboard Controls**: Keyboard handling is fully encapsulated in its own module
+- **Cleanup Management**: Event listeners are properly registered and removed to prevent memory leaks
+- **Flexible Configuration**: Keyboard controls can be easily configured through a simple interface
+- **Separation of Concerns**: Input handling is completely isolated from the main simulation logic
 
 ## Performance Considerations
 

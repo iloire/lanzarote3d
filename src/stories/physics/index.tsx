@@ -4,13 +4,12 @@ import { StoryOptions } from "../types";
 // Import our modular components
 import { createBasicPhysicsObjects, updateVisuals } from "./core";
 import { setupPhysicsControls, storeInitialPositions } from "./gui";
-import { arrayIncludes, createPhysicsWorld, KEY_MAPPING } from "./helpers";
+import { createPhysicsWorld } from "./helpers";
+import { setupKeyboardControls } from "./keyboard";
 import { createRopes } from "./rope";
 
-
-// Store listeners and UI elements for cleanup
-let keyDownListener: ((event: KeyboardEvent) => void) | null = null;
-let keyUpListener: ((event: KeyboardEvent) => void) | null = null;
+// Store UI elements and animation ID for cleanup
+let keyboardControls: ReturnType<typeof setupKeyboardControls> | null = null;
 let animationFrameId: number | null = null;
 
 const PhysicsChain = {
@@ -64,61 +63,11 @@ const PhysicsChain = {
     // Store initial positions for reset functionality
     storeInitialPositions(physicsObjects);
 
-    // Set to keep track of pressed keys
-    const keysPressed = new Set<string>();
-
-    // Event listeners for keyboard controls
-    keyDownListener = (event: KeyboardEvent) => {
-      keysPressed.add(event.code);
-
-      // Reset positions
-      if (arrayIncludes(KEY_MAPPING.RESET_POSITION, event.code)) {
-        pushForceControl.resetScene();
-      }
-    };
-
-    keyUpListener = (event: KeyboardEvent) => {
-      keysPressed.delete(event.code);
-    };
-
-    // Add event listeners
-    window.addEventListener('keydown', keyDownListener);
-    window.addEventListener('keyup', keyUpListener);
-
-    // Function to apply forces based on keyboard input
-    function applyInputForces() {
-      // Apply platform control forces
-      if (keysPressed.size > 0) {
-        // X-axis movement (left/right)
-        if (keysPressed.has(KEY_MAPPING.PLATFORM_LEFT[0])) {
-          platformBody.applyForce(
-            new CANNON.Vec3(-pushForceControl.platformForce, 0, 0),
-            new CANNON.Vec3(0, 0, 0)
-          );
-        }
-
-        if (keysPressed.has(KEY_MAPPING.PLATFORM_RIGHT[0])) {
-          platformBody.applyForce(
-            new CANNON.Vec3(pushForceControl.platformForce, 0, 0),
-            new CANNON.Vec3(0, 0, 0)
-          );
-        }
-
-        if (keysPressed.has(KEY_MAPPING.PLATFORM_UP[0])) {
-          platformBody.applyForce(
-            new CANNON.Vec3(0, pushForceControl.platformForce, 0),
-            new CANNON.Vec3(0, 0, 0)
-          );
-        }
-
-        if (keysPressed.has(KEY_MAPPING.PLATFORM_DOWN[0])) {
-          platformBody.applyForce(
-            new CANNON.Vec3(0, -pushForceControl.platformForce, 0),
-            new CANNON.Vec3(0, 0, 0)
-          );
-        }
-      }
-    }
+    // Setup keyboard controls
+    keyboardControls = setupKeyboardControls(platformBody, {
+      resetSceneCallback: pushForceControl.resetScene,
+      platformForce: pushForceControl.platformForce
+    });
 
     function applyForces() {
       // apply lift force to platform body
@@ -140,10 +89,11 @@ const PhysicsChain = {
       world.step(1 / 60);
 
       // Apply forces from keyboard input
-      applyInputForces();
+      if (keyboardControls) {
+        keyboardControls.applyInputForces();
+      }
 
       applyForces();
-
 
       // Auto-rotate the camera if enabled
       if (pushForceControl.isAutoRotate) {
@@ -181,13 +131,11 @@ const PhysicsChain = {
       animationFrameId = null;
     }
 
-    // Clean up event listeners
-    if (keyDownListener) window.removeEventListener('keydown', keyDownListener);
-    if (keyUpListener) window.removeEventListener('keyup', keyUpListener);
-
-    // Reset references
-    keyDownListener = null;
-    keyUpListener = null;
+    // Clean up keyboard controls
+    if (keyboardControls) {
+      keyboardControls.cleanup();
+      keyboardControls = null;
+    }
   }
 };
 
