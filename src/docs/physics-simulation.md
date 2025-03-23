@@ -99,6 +99,9 @@ The simulation follows the standard story pattern:
 The rope system works by:
 
 1. **Local Attachment Points**: Ropes are attached to specific local points on the platform and sphere
+   - The platform has ropes attached at each of its four corners (bottom face)
+   - Each rope has a unique color for visual distinction (red, green, blue, yellow)
+   - The attachment points use local coordinates relative to each body's center
 2. **Segment Chain**: Each rope consists of multiple small physics bodies connected by constraints
 3. **Constraint Visualization**: Visual lines track the positions of constraints, updating in real-time as physics bodies move
 4. **Force Transmission**: Forces applied to the platform or sphere are transmitted through the rope physics

@@ -181,7 +181,9 @@ export function createRopes(
   // Create a rope for each attachment point
   attachmentPoints.forEach((point, index) => {
     // Create a local attachment point for bodyA (the platform)
-    const localPointA = new CANNON.Vec3(point.x, 0, point.z);
+    // Set y to -halfExtents.y to attach at the bottom of the platform
+    const shape = bodyA.shapes[0] as CANNON.Box;
+    const localPointA = new CANNON.Vec3(point.x, -shape.halfExtents.y, point.z);
 
     // Create the rope with the color for this index (cycling if needed)
     const color = colors[index % colors.length];

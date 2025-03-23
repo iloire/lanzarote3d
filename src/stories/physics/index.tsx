@@ -18,6 +18,7 @@ let animationFrameId: number | null = null;
 const PhysicsChain = {
   load: async (options: StoryOptions) => {
     const { camera, scene, renderer, gui, controls } = options;
+    gui.show();
 
     // Create physics world
     const world = createPhysicsWorld();
@@ -32,10 +33,10 @@ const PhysicsChain = {
     // Define attachment points for ropes - cast shape to Box type to access halfExtents
     const platformShape = platformBody.shapes[0] as CANNON.Box;
     const attachmentPoints = [
-      { x: -platformShape.halfExtents.x / 2, z: -platformShape.halfExtents.z / 2 },
-      { x: platformShape.halfExtents.x / 2, z: -platformShape.halfExtents.z / 2 },
-      { x: -platformShape.halfExtents.x / 2, z: platformShape.halfExtents.z / 2 },
-      { x: platformShape.halfExtents.x / 2, z: platformShape.halfExtents.z / 2 }
+      { x: -platformShape.halfExtents.x, z: -platformShape.halfExtents.z },
+      { x: platformShape.halfExtents.x, z: -platformShape.halfExtents.z },
+      { x: -platformShape.halfExtents.x, z: platformShape.halfExtents.z },
+      { x: platformShape.halfExtents.x, z: platformShape.halfExtents.z }
     ];
 
     // Create ropes connecting platform and sphere
@@ -46,7 +47,7 @@ const PhysicsChain = {
       sphereBody,
       attachmentPoints,
       {
-        numSegments: 8,
+        numSegments: 20,
         thickness: 0.15,
         colors: [0xff0000, 0x00ff00, 0x0000ff, 0xffff00]
       }
@@ -138,7 +139,7 @@ const PhysicsChain = {
     function applyForces() {
       // apply lift force to platform body
       platformBody.applyForce(
-        new CANNON.Vec3(0, 4100, 0),
+        new CANNON.Vec3(0, 9.92 * sphereBody.mass, 0),
         new CANNON.Vec3(0, 0, 0)
       );
 
