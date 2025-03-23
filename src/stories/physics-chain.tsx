@@ -25,6 +25,143 @@ function arrayIncludes(array: string[], value: string): boolean {
   return array.indexOf(value) !== -1;
 }
 
+// Function to create UI buttons for controlling the platform
+function createPlatformButtons(container: HTMLElement, platformBody: CANNON.Body, platformForce: number): {
+  leftButton: HTMLButtonElement;
+  rightButton: HTMLButtonElement;
+  cleanup: () => void;
+  applyButtonForces: () => void;
+} {
+  // Create container for buttons
+  const buttonContainer = document.createElement('div');
+  buttonContainer.style.position = 'absolute';
+  buttonContainer.style.bottom = '20px';
+  buttonContainer.style.left = '50%';
+  buttonContainer.style.transform = 'translateX(-50%)';
+  buttonContainer.style.display = 'flex';
+  buttonContainer.style.gap = '20px';
+  buttonContainer.style.zIndex = '1000';
+
+  // Create left button
+  const leftButton = document.createElement('button');
+  leftButton.textContent = '← Move Left';
+  leftButton.style.padding = '12px 20px';
+  leftButton.style.fontSize = '16px';
+  leftButton.style.fontWeight = 'bold';
+  leftButton.style.backgroundColor = '#4285f4';
+  leftButton.style.color = 'white';
+  leftButton.style.border = 'none';
+  leftButton.style.borderRadius = '8px';
+  leftButton.style.cursor = 'pointer';
+  leftButton.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+  leftButton.style.transition = 'background-color 0.2s, transform 0.1s';
+
+  // Create right button
+  const rightButton = document.createElement('button');
+  rightButton.textContent = 'Move Right →';
+  rightButton.style.padding = '12px 20px';
+  rightButton.style.fontSize = '16px';
+  rightButton.style.fontWeight = 'bold';
+  rightButton.style.backgroundColor = '#4285f4';
+  rightButton.style.color = 'white';
+  rightButton.style.border = 'none';
+  rightButton.style.borderRadius = '8px';
+  rightButton.style.cursor = 'pointer';
+  rightButton.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+  rightButton.style.transition = 'background-color 0.2s, transform 0.1s';
+
+  // Add buttons to container
+  buttonContainer.appendChild(leftButton);
+  buttonContainer.appendChild(rightButton);
+
+  // Add container to the DOM
+  container.appendChild(buttonContainer);
+
+  // Track button press state
+  const buttonState = {
+    leftPressed: false,
+    rightPressed: false
+  };
+
+  // Button event handlers
+  function onLeftMouseDown() {
+    buttonState.leftPressed = true;
+    leftButton.style.backgroundColor = '#3367d6';
+    leftButton.style.transform = 'translateY(2px)';
+  }
+
+  function onRightMouseDown() {
+    buttonState.rightPressed = true;
+    rightButton.style.backgroundColor = '#3367d6';
+    rightButton.style.transform = 'translateY(2px)';
+  }
+
+  function onLeftMouseUp() {
+    buttonState.leftPressed = false;
+    leftButton.style.backgroundColor = '#4285f4';
+    leftButton.style.transform = 'translateY(0)';
+  }
+
+  function onRightMouseUp() {
+    buttonState.rightPressed = false;
+    rightButton.style.backgroundColor = '#4285f4';
+    rightButton.style.transform = 'translateY(0)';
+  }
+
+  // Add event listeners
+  leftButton.addEventListener('mousedown', onLeftMouseDown);
+  leftButton.addEventListener('touchstart', onLeftMouseDown);
+  leftButton.addEventListener('mouseup', onLeftMouseUp);
+  leftButton.addEventListener('mouseleave', onLeftMouseUp);
+  leftButton.addEventListener('touchend', onLeftMouseUp);
+
+  rightButton.addEventListener('mousedown', onRightMouseDown);
+  rightButton.addEventListener('touchstart', onRightMouseDown);
+  rightButton.addEventListener('mouseup', onRightMouseUp);
+  rightButton.addEventListener('mouseleave', onRightMouseUp);
+  rightButton.addEventListener('touchend', onRightMouseUp);
+
+  // Function to apply forces based on button state
+  function applyButtonForces() {
+    if (buttonState.leftPressed) {
+      platformBody.applyForce(
+        new CANNON.Vec3(-platformForce, 0, 0),
+        new CANNON.Vec3(0, 0, 0)
+      );
+    }
+    if (buttonState.rightPressed) {
+      platformBody.applyForce(
+        new CANNON.Vec3(platformForce, 0, 0),
+        new CANNON.Vec3(0, 0, 0)
+      );
+    }
+  }
+
+  // Cleanup function to remove event listeners
+  function cleanup() {
+    leftButton.removeEventListener('mousedown', onLeftMouseDown);
+    leftButton.removeEventListener('touchstart', onLeftMouseDown);
+    leftButton.removeEventListener('mouseup', onLeftMouseUp);
+    leftButton.removeEventListener('mouseleave', onLeftMouseUp);
+    leftButton.removeEventListener('touchend', onLeftMouseUp);
+
+    rightButton.removeEventListener('mousedown', onRightMouseDown);
+    rightButton.removeEventListener('touchstart', onRightMouseDown);
+    rightButton.removeEventListener('mouseup', onRightMouseUp);
+    rightButton.removeEventListener('mouseleave', onRightMouseUp);
+    rightButton.removeEventListener('touchend', onRightMouseUp);
+
+    container.removeChild(buttonContainer);
+  }
+
+  return {
+    leftButton,
+    rightButton,
+    cleanup,
+    applyButtonForces
+  };
+}
+
 // Function to create a static box visualization at a specific position
 function createBoxVisualization(
   scene: THREE.Scene,
@@ -168,7 +305,7 @@ function createRope(
     const segmentPos = new THREE.Vector3().lerpVectors(startPos, endPos, t);
 
     // Add some slack/curve to the rope - increased for longer ropes
-    const sag = 0.3; // Increased from 0.1 to 0.3 for more pronounced drooping
+    const sag = 0.1; // Increased from 0.1 to 0.3 for more pronounced drooping
     const offset = Math.sin(Math.PI * t) * sag * direction.length();
     segmentPos.y -= offset;
 
@@ -273,8 +410,8 @@ const PhysicsChain = {
 
     gui.show();
 
-    terrain.visible = false;
-    water.visible = false;
+    terrain.visible = true;
+    water.visible = true;
 
     Helpers.createHelpers(scene);
 
@@ -304,18 +441,11 @@ const PhysicsChain = {
       pushForce: PUSH_FORCE_MAGNITUDE,
       sphereMass: 150, // Default even heavier sphere
       platformForce: 500, // Force for platform movement
-      enableMouseControl: true, // Enable mouse control by default
-      dragMode: 'force' // Default drag mode (can be 'force' or 'direct')
+      showButtons: true // Show UI buttons by default
     };
     physicsFolder.add(pushForceControl, 'pushForce', 50, 1000).name('Push Force');
     physicsFolder.add(pushForceControl, 'platformForce', 100, 2000).name('Platform Force');
-    physicsFolder.add(pushForceControl, 'enableMouseControl').name('Mouse Platform Control');
-
-    // Add drag mode selector
-    physicsFolder.add(pushForceControl, 'dragMode', ['force', 'direct']).name('Drag Mode')
-      .onChange((value: string) => {
-        mouseState.dragMode = value as 'force' | 'direct';
-      });
+    physicsFolder.add(pushForceControl, 'showButtons').name('Show UI Buttons');
 
     // State for which body to push
     const pushState = {
@@ -335,7 +465,6 @@ const PhysicsChain = {
 
     // Add instructions to the GUI
     const instructionsFolder = gui.addFolder('Controls');
-    instructionsFolder.add({ info: 'Mouse: Click and drag to move platform' }, 'info').disable();
     instructionsFolder.add({ info: 'Q: Move Platform Left' }, 'info').disable();
     instructionsFolder.add({ info: 'W: Move Platform Right' }, 'info').disable();
     instructionsFolder.add({ info: 'Arrow Up: Push Forward' }, 'info').disable();
@@ -347,6 +476,7 @@ const PhysicsChain = {
     instructionsFolder.add({ info: 'X: Reset Positions' }, 'info').disable();
     instructionsFolder.add({ info: 'P: Create Pendulum' }, 'info').disable();
     instructionsFolder.add({ info: 'C: Create Chain' }, 'info').disable();
+    instructionsFolder.add({ info: 'Mouse: Click and drag to move platform' }, 'info').disable();
 
     instructionsFolder.open();
     physicsFolder.open();
@@ -428,168 +558,6 @@ const PhysicsChain = {
       0xff0000, // Red for platform
       "Platform"
     );
-
-    // Create mouse control visual indicator
-    const mouseState = {
-      isMouseDown: false,
-      lastMouseX: 0,
-      lastMouseY: 0,
-      mouseSensitivity: 0.5, // Increased from 0.05 for more responsive dragging
-      activeVisualIndicator: null as THREE.Mesh | null, // Visual indicator for active mouse control
-      dragMode: 'force' as 'force' | 'direct', // Mode for dragging: force or direct position control
-      dragPlane: new THREE.Plane(new THREE.Vector3(0, 0, 1)) // Plane for raycasting
-    };
-
-    // Create visual indicator for active mouse control
-    function createMouseControlIndicator(platform: THREE.Mesh) {
-      // Create a visual indicator that shows when mouse control is active
-      const platformSize = new THREE.Vector3();
-      new THREE.Box3().setFromObject(platform).getSize(platformSize);
-
-      const indicatorGeometry = new THREE.RingGeometry(
-        platformSize.x * 0.6, // Inner radius
-        platformSize.x * 0.7, // Outer radius
-        16 // Segments
-      );
-      const indicatorMaterial = new THREE.MeshBasicMaterial({
-        color: 0x00ffff,
-        transparent: true,
-        opacity: 0.7,
-        side: THREE.DoubleSide
-      });
-
-      const indicator = new THREE.Mesh(indicatorGeometry, indicatorMaterial);
-      indicator.rotation.x = Math.PI / 2; // Rotate to be horizontal
-      indicator.visible = false;
-
-      scene.add(indicator);
-      return indicator;
-    }
-
-    // Create mouse control visual indicator
-    mouseState.activeVisualIndicator = createMouseControlIndicator(platformMesh);
-
-    // Mouse event handlers
-    function onMouseDown(event: MouseEvent) {
-      if (!pushForceControl.enableMouseControl) return;
-
-      mouseState.isMouseDown = true;
-      mouseState.lastMouseX = event.clientX;
-      mouseState.lastMouseY = event.clientY;
-
-      // Disable OrbitControls when dragging the platform
-      if (controls && controls.enabled) {
-        controls.enabled = false;
-      }
-
-      // Show visual indicator
-      if (mouseState.activeVisualIndicator) {
-        mouseState.activeVisualIndicator.visible = true;
-
-        // Position the indicator at the platform
-        if (platformMesh) {
-          mouseState.activeVisualIndicator.position.copy(platformMesh.position);
-        }
-      }
-
-      // Set up dragging mode
-      if (mouseState.dragMode === 'direct') {
-        // For direct mode, we need to calculate the intersection with the drag plane
-        mouseState.dragPlane.setFromNormalAndCoplanarPoint(
-          new THREE.Vector3(0, 0, 1), // Normal pointing towards the camera
-          platformMesh.position // Plane contains the platform
-        );
-      }
-    }
-
-    function onMouseMove(event: MouseEvent) {
-      if (!mouseState.isMouseDown || !pushForceControl.enableMouseControl) return;
-
-      if (mouseState.dragMode === 'force') {
-        // Force-based dragging (pushes the platform)
-        const deltaX = event.clientX - mouseState.lastMouseX;
-        const deltaY = mouseState.lastMouseY - event.clientY; // Invert Y for intuitive control
-
-        // Apply force to platform based on mouse movement
-        if (physicsObjects.bodies.length > 0 && platformBody) {
-          const platformMovementForce = pushForceControl.platformForce * mouseState.mouseSensitivity;
-
-          // Apply horizontal and vertical forces based on mouse movement
-          platformBody.applyForce(
-            new CANNON.Vec3(
-              deltaX * platformMovementForce,
-              deltaY * platformMovementForce * 0.5, // Reduced vertical sensitivity
-              0
-            ),
-            new CANNON.Vec3(0, 0, 0)
-          );
-
-          // Also apply direct velocity for more immediate feedback
-          const velocityFactor = 0.1; // Control how fast it follows the mouse
-          platformBody.velocity.x += deltaX * velocityFactor;
-          platformBody.velocity.y += deltaY * velocityFactor * 0.5;
-
-          // Update visual indicator position
-          if (mouseState.activeVisualIndicator && platformMesh) {
-            mouseState.activeVisualIndicator.position.copy(platformMesh.position);
-          }
-        }
-      } else {
-        // Direct position control dragging
-        // Calculate mouse position in 3D space
-        const mousePos = new THREE.Vector2(
-          (event.clientX / window.innerWidth) * 2 - 1,
-          -(event.clientY / window.innerHeight) * 2 + 1
-        );
-
-        // Raycaster for converting mouse position to 3D position
-        const raycaster = new THREE.Raycaster();
-        raycaster.setFromCamera(mousePos, camera);
-
-        // Find intersection with drag plane
-        const intersection = new THREE.Vector3();
-        if (raycaster.ray.intersectPlane(mouseState.dragPlane, intersection)) {
-          // Limit movement range (optional)
-          intersection.z = platformBody.position.z; // Keep same z position
-
-          // Move the platform towards the intersection point
-          const moveSpeed = 0.2; // Adjust as needed for smoother movement
-          platformBody.position.x += (intersection.x - platformBody.position.x) * moveSpeed;
-          platformBody.position.y += (intersection.y - platformBody.position.y) * moveSpeed;
-
-          // Zero out velocity for more control
-          platformBody.velocity.set(0, 0, 0);
-
-          // Update visual indicator
-          if (mouseState.activeVisualIndicator) {
-            mouseState.activeVisualIndicator.position.copy(platformMesh.position);
-          }
-        }
-      }
-
-      // Update last mouse position
-      mouseState.lastMouseX = event.clientX;
-      mouseState.lastMouseY = event.clientY;
-    }
-
-    function onMouseUp() {
-      mouseState.isMouseDown = false;
-
-      // Re-enable OrbitControls when done dragging
-      if (controls && !controls.enabled) {
-        controls.enabled = true;
-      }
-
-      // Hide visual indicator
-      if (mouseState.activeVisualIndicator) {
-        mouseState.activeVisualIndicator.visible = false;
-      }
-    }
-
-    // Add mouse event listeners
-    renderer.domElement.addEventListener('mousedown', onMouseDown);
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
 
     // Add platform to objects
     physicsObjects.bodies.push(platformBody);
@@ -1014,6 +982,23 @@ const PhysicsChain = {
     document.addEventListener('keydown', onKeyDown);
     document.addEventListener('keyup', onKeyUp);
 
+    // Create UI buttons for platform control
+    const buttons = createPlatformButtons(
+      renderer.domElement.parentElement || document.body,
+      platformBody,
+      pushForceControl.platformForce
+    );
+
+    // Listen for changes to platform force
+    physicsFolder.controllers.find(c => (c as any).property === 'platformForce')?.onChange((value: number) => {
+      pushForceControl.platformForce = value;
+    });
+
+    // Listen for changes to button visibility
+    physicsFolder.controllers.find(c => (c as any).property === 'showButtons')?.onChange((value: boolean) => {
+      buttons.leftButton.parentElement!.style.display = value ? 'flex' : 'none';
+    });
+
     // Function to apply forces based on currently pressed keys
     function applyInputForces() {
       // Get the target body
@@ -1043,6 +1028,9 @@ const PhysicsChain = {
           );
         }
       }
+
+      // Apply forces from UI buttons
+      buttons.applyButtonForces();
 
       // Check which keys are pressed and apply the corresponding forces
       // Forward force (Up Arrow)
@@ -1116,11 +1104,6 @@ const PhysicsChain = {
         }
       });
 
-      // Update mouse control indicator if active
-      if (mouseState.isMouseDown && mouseState.activeVisualIndicator && platformMesh) {
-        mouseState.activeVisualIndicator.position.copy(platformMesh.position);
-      }
-
       // Update constraint lines
       physicsObjects.constraintLines.forEach((line, index) => {
         // Need to determine which bodies this constraint connects
@@ -1174,9 +1157,7 @@ const PhysicsChain = {
     return () => {
       document.removeEventListener('keydown', onKeyDown);
       document.removeEventListener('keyup', onKeyUp);
-      renderer.domElement.removeEventListener('mousedown', onMouseDown);
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
+      buttons.cleanup();
     };
   },
 };
