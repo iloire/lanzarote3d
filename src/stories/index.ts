@@ -1,4 +1,3 @@
-import { StoryOptions } from "./types";
 import Animation from "./animation";
 import Animation2 from "./animation2";
 import Animation3 from "./animation3";
@@ -9,17 +8,21 @@ import Game from "./game/game";
 import Glider from "./glider";
 import HangGlider from "./hangglider";
 import Head from "./head";
+import Helmet from "./helmet";
+import LocationEditor from "./location-editor";
 import Night from "./night";
 import Paraglider from "./paraglider";
 import ParagliderVoxel from "./paraglider-voxel";
 import PhotoBooth from "./photobooth";
+import PhysicsChain from "./physics-chain";
 import Pilot from "./pilot";
 import Terrain from "./terrain";
+import { StoryOptions } from "./types";
 import Voxel from "./voxel";
-import Workshop from "./workshop";
-import Helmet from "./helmet";
 import VoxelExample from "./voxel/index";
-import LocationEditor from "./location-editor";
+import Workshop from "./workshop";
+
+
 export type StoryFunction = (options: StoryOptions) => Promise<any>;
 
 const Stories: Record<string, StoryFunction> = {
@@ -39,11 +42,13 @@ const Stories: Record<string, StoryFunction> = {
   paraglider: Paraglider.load,
   paragliderVoxel: ParagliderVoxel.load,
   photobooth: PhotoBooth.load,
+  physicsChain: PhysicsChain.load,
   pilot: Pilot.load,
   terrain: Terrain.load,
   voxel: Voxel.load,
-  voxelExample: VoxelExample.load,  
+  voxelExample: VoxelExample.load,
   workshop: Workshop.load,
+  physics: PhysicsChain.load,
 };
 
 export default Stories;
