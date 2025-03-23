@@ -135,6 +135,20 @@ const PhysicsChain = {
       }
     }
 
+    function applyForces() {
+      // apply lift force to platform body
+      platformBody.applyForce(
+        new CANNON.Vec3(0, 4100, 0),
+        new CANNON.Vec3(0, 0, 0)
+      );
+
+      // apply gravity to sphere body
+      sphereBody.applyForce(
+        new CANNON.Vec3(0, -9.82 * sphereBody.mass, 0),
+        new CANNON.Vec3(0, 0, 0)
+      );
+    }
+
     // Physics update function (internal function)
     function updatePhysics() {
       // Step the physics world
@@ -142,6 +156,8 @@ const PhysicsChain = {
 
       // Apply forces from keyboard input
       applyInputForces();
+
+      applyForces();
 
       // Apply forces from UI buttons
       if (platformButtonsRef) platformButtonsRef.applyButtonForces();
