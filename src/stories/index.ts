@@ -14,7 +14,7 @@ import Night from "./night";
 import Paraglider from "./paraglider";
 import ParagliderVoxel from "./paraglider-voxel";
 import PhotoBooth from "./photobooth";
-import PhysicsChain from "./physics-chain";
+import Physics from "./physics";
 import Pilot from "./pilot";
 import Terrain from "./terrain";
 import { StoryOptions } from "./types";
@@ -42,13 +42,12 @@ const Stories: Record<string, StoryFunction> = {
   paraglider: Paraglider.load,
   paragliderVoxel: ParagliderVoxel.load,
   photobooth: PhotoBooth.load,
-  physicsChain: PhysicsChain.load,
   pilot: Pilot.load,
   terrain: Terrain.load,
   voxel: Voxel.load,
   voxelExample: VoxelExample.load,
   workshop: Workshop.load,
-  physics: PhysicsChain.load,
+  physics: Physics.load,
 };
 
 export default Stories;

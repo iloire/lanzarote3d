@@ -1,8 +1,8 @@
 import * as CANNON from "cannon-es";
 import * as THREE from "three";
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
-import Helpers from "../utils/helpers";
-import { StoryOptions } from "./types";
+import Helpers from "../../utils/helpers";
+import { StoryOptions } from "../types";
 
 // Constants for force application
 const PUSH_FORCE_MAGNITUDE = 800; // Strength of push when keys are pressed
