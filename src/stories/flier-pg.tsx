@@ -29,12 +29,11 @@ const ParagliderWorkshop = {
 
     sky.updateSunPosition(12);
 
-    const initialCamPos = new THREE.Vector3(7000, 400, -475);
-    const initialPGPos = new THREE.Vector3(6900, 470, -475);
+    const initialCamPos = new THREE.Vector3(7000, 870, -475);
+    const initialPGPos = new THREE.Vector3(6900, 870, -475);
 
     // Create physics world
     const world = new CANNON.World();
-    world.gravity.set(0, -9.81, 0);
 
     const gliderOptions = {
       wingColor1: '#c30010',
@@ -43,21 +42,21 @@ const ParagliderWorkshop = {
     };
     const pilotOptions = {}
     const glider = new Glider(gliderOptions);
-    const wingMesh = await glider.load();
+    const wingMesh = await glider.load(gui);
 
 
     const pilot = new Pilot(pilotOptions);
     const pilotMesh = await pilot.load();
 
-    const scale = 0.01;
+    const scale = 0.001; // mm to m
     wingMesh.scale.set(scale, scale, scale);
     pilotMesh.scale.set(scale, scale, scale);
-    pilotMesh.rotateY(Math.PI / 2);
+    // pilotMesh.rotateY(Math.PI / 2);
 
     scene.add(wingMesh);
     scene.add(pilotMesh);
 
-    const distanceWingPilot = 0;
+    const distanceWingPilot = 10;
 
     const pgOptions: PhysicsParagliderConstructor = {
       glidingRatio: 9,

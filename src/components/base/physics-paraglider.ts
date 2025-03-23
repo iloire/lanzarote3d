@@ -8,7 +8,7 @@ import { ForceVisualization } from "./force-visualization";
 import { addParagliderGui } from './physics-paraglider-gui';
 
 const TICK_INTERVAL = 25; // 40 Hz update rate
-const PHYSICS_TIMESTEP = 1 / 60; // 60 Hz physics simulation
+const PHYSICS_TIMESTEP = 1 / 600; // 60 Hz physics simulation
 
 // Physics constants
 const AIR_DENSITY = 1.225; // kg/m³
@@ -133,10 +133,13 @@ export default class PhysicsFlier extends THREE.EventDispatcher {
       shape: pilotShape,
       material: new CANNON.Material('pilot')
     });
-
     // Position pilot 
     this.pilot.mesh.position.copy(this.pilot.initialPosition as any);
     this.pilotBody.position.copy(this.pilot.initialPosition as any);
+
+    // add bodies to world
+    this.world.addBody(this.gliderBody);
+    this.world.addBody(this.pilotBody);
 
     // Set initial velocity for stable flight
     this.gliderBody.velocity.set(-10, 0, -10); // Initial forward speed of 10 m/s
@@ -150,36 +153,35 @@ export default class PhysicsFlier extends THREE.EventDispatcher {
     );
 
     // Add bodies and constraints to world
-    this.world.addBody(this.gliderBody);
-    this.world.addBody(this.pilotBody);
+
     this.world.addConstraint(this.gliderLinesConstraint);
 
     // Set up collision materials
-    const wingMaterial = new CANNON.Material('wing');
-    const pilotMaterial = new CANNON.Material('pilot');
-    const groundMaterial = new CANNON.Material('ground');
+    // const wingMaterial = new CANNON.Material('wing');
+    // const pilotMaterial = new CANNON.Material('pilot');
+    // const groundMaterial = new CANNON.Material('ground');
 
-    // Add contact materials with adjusted friction and restitution
-    const wingGroundContact = new CANNON.ContactMaterial(
-      wingMaterial,
-      groundMaterial,
-      {
-        friction: 0.5,
-        restitution: 0.1
-      }
-    );
+    // // Add contact materials with adjusted friction and restitution
+    // const wingGroundContact = new CANNON.ContactMaterial(
+    //   wingMaterial,
+    //   groundMaterial,
+    //   {
+    //     friction: 0.5,
+    //     restitution: 0.1
+    //   }
+    // );
 
-    const pilotGroundContact = new CANNON.ContactMaterial(
-      pilotMaterial,
-      groundMaterial,
-      {
-        friction: 0.7,
-        restitution: 0.05
-      }
-    );
+    // const pilotGroundContact = new CANNON.ContactMaterial(
+    //   pilotMaterial,
+    //   groundMaterial,
+    //   {
+    //     friction: 0.7,
+    //     restitution: 0.05
+    //   }
+    // );
 
-    this.world.addContactMaterial(wingGroundContact);
-    this.world.addContactMaterial(pilotGroundContact);
+    // this.world.addContactMaterial(wingGroundContact);
+    // this.world.addContactMaterial(pilotGroundContact);
   }
 
   private setupForceVisualization() {
@@ -266,7 +268,6 @@ export default class PhysicsFlier extends THREE.EventDispatcher {
     console.log("velocity", velocity);
     console.log("speed", speed);
 
-
     // Calculate lift force with reduced magnitude
     const liftForce = this.calculateLiftForce(speed);
     console.log("liftForce", liftForce);
@@ -292,7 +293,8 @@ export default class PhysicsFlier extends THREE.EventDispatcher {
     }
 
     // Apply gravity at the pilot's position (center of mass)
-    //this.pilotBody.applyForce(gravityForce, new CANNON.Vec3(0, 0, 0));
+    const gravityForce = new CANNON.Vec3(0, -this.options.pilot.weight * 9.81, 0);
+    this.pilotBody.applyForce(gravityForce, new CANNON.Vec3(0, 0, 0));
   }
 
   public calculateLiftForce(speed: number): CANNON.Vec3 {
