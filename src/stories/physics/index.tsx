@@ -46,7 +46,7 @@ const PhysicsChain = {
       attachmentPoints,
       {
         numSegments: 20,
-        thickness: 0.2,
+        thickness: 0.25,
         colors: [0xff0000, 0x00ff00, 0x0000ff, 0xffff00]
       }
     );
@@ -91,6 +91,7 @@ const PhysicsChain = {
       if (keysPressed.size > 0) {
         // X-axis movement (left/right)
         if (keysPressed.has(KEY_MAPPING.PLATFORM_LEFT[0])) {
+          console.log('apply force left')
           platformBody.applyForce(
             new CANNON.Vec3(-pushForceControl.platformForce, 0, 0),
             new CANNON.Vec3(0, 0, 0)
@@ -98,8 +99,25 @@ const PhysicsChain = {
         }
 
         if (keysPressed.has(KEY_MAPPING.PLATFORM_RIGHT[0])) {
+          console.log('apply force right')
           platformBody.applyForce(
             new CANNON.Vec3(pushForceControl.platformForce, 0, 0),
+            new CANNON.Vec3(0, 0, 0)
+          );
+        }
+
+        if (keysPressed.has(KEY_MAPPING.PLATFORM_UP[0])) {
+          console.log('apply force up')
+          platformBody.applyForce(
+            new CANNON.Vec3(0, pushForceControl.platformForce, 0),
+            new CANNON.Vec3(0, 0, 0)
+          );
+        }
+
+        if (keysPressed.has(KEY_MAPPING.PLATFORM_DOWN[0])) {
+          console.log('apply force down')
+          platformBody.applyForce(
+            new CANNON.Vec3(0, -pushForceControl.platformForce, 0),
             new CANNON.Vec3(0, 0, 0)
           );
         }
@@ -109,7 +127,7 @@ const PhysicsChain = {
     function applyForces() {
       // apply lift force to platform body
       platformBody.applyForce(
-        new CANNON.Vec3(0, 19.92 * sphereBody.mass, 0),
+        new CANNON.Vec3(0, 20 * sphereBody.mass, 0),
         new CANNON.Vec3(0, 0, 0)
       );
 
