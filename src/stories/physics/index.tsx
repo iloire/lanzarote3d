@@ -3,15 +3,14 @@ import { StoryOptions } from "../types";
 
 // Import our modular components
 import { createBasicPhysicsObjects, updateVisuals } from "./core";
-import { findControllerByProperty, setupPhysicsControls, storeInitialPositions } from "./gui";
+import { setupPhysicsControls, storeInitialPositions } from "./gui";
 import { arrayIncludes, createPhysicsWorld, KEY_MAPPING } from "./helpers";
 import { createRopes } from "./rope";
-import { createPlatformButtons } from "./ui";
+
 
 // Store listeners and UI elements for cleanup
 let keyDownListener: ((event: KeyboardEvent) => void) | null = null;
 let keyUpListener: ((event: KeyboardEvent) => void) | null = null;
-let platformButtonsRef: ReturnType<typeof createPlatformButtons> | null = null;
 let animationFrameId: number | null = null;
 
 const PhysicsChain = {
@@ -26,7 +25,7 @@ const PhysicsChain = {
     const { physicsObjects, platformBody, sphereBody } = createBasicPhysicsObjects(scene, world);
 
     // Setup physics controls
-    const { folder: physicsFolder, controls: pushForceControl } =
+    const { controls: pushForceControl } =
       setupPhysicsControls(gui, physicsObjects, sphereBody);
 
     // Define attachment points for ropes - cast shape to Box type to access halfExtents
@@ -67,21 +66,6 @@ const PhysicsChain = {
 
     // Set to keep track of pressed keys
     const keysPressed = new Set<string>();
-
-    // Create UI buttons for platform control
-    platformButtonsRef = createPlatformButtons(
-      renderer.domElement.parentElement || document.body,
-      platformBody,
-      pushForceControl.platformForce
-    );
-
-    // Listen for changes to button visibility
-    findControllerByProperty(physicsFolder, 'showButtons')?.onChange((value: boolean) => {
-      if (platformButtonsRef?.leftButton?.parentElement) {
-        platformButtonsRef.leftButton.parentElement.style.display = value ? 'flex' : 'none';
-      }
-    });
-
 
     // Event listeners for keyboard controls
     keyDownListener = (event: KeyboardEvent) => {
@@ -125,7 +109,7 @@ const PhysicsChain = {
     function applyForces() {
       // apply lift force to platform body
       platformBody.applyForce(
-        new CANNON.Vec3(0, 9.92 * sphereBody.mass, 0),
+        new CANNON.Vec3(0, 19.92 * sphereBody.mass, 0),
         new CANNON.Vec3(0, 0, 0)
       );
 
@@ -146,8 +130,6 @@ const PhysicsChain = {
 
       applyForces();
 
-      // Apply forces from UI buttons
-      if (platformButtonsRef) platformButtonsRef.applyButtonForces();
 
       // Auto-rotate the camera if enabled
       if (pushForceControl.isAutoRotate) {
@@ -190,13 +172,9 @@ const PhysicsChain = {
     if (keyDownListener) window.removeEventListener('keydown', keyDownListener);
     if (keyUpListener) window.removeEventListener('keyup', keyUpListener);
 
-    // Clean up UI controls
-    if (platformButtonsRef) platformButtonsRef.cleanup();
-
     // Reset references
     keyDownListener = null;
     keyUpListener = null;
-    platformButtonsRef = null;
   }
 };
 
