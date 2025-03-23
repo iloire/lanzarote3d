@@ -57,6 +57,16 @@ This cleanup further improved code clarity, reduced bundle size, and removed pot
 - **Optimization**: Constraint lines are only recalculated when needed
 - **Visualization**: Constraint lines now accurately follow the transformed attachment points
 
+### Force Visualization
+
+- **Horizontal Force**: A constant directional force can be applied to the platform
+- **Direction Control**: The force direction can be controlled in 360 degrees
+- **Magnitude Control**: The force magnitude can be adjusted via the GUI
+- **Visual Representation**: 
+  - A dynamic arrow helper shows force direction and magnitude
+  - Text label displays the actual force vector components
+  - Label position updates with camera movement for optimal visibility
+
 ### UI Controls
 
 - **Button Positioning**: Dynamically positioned based on renderer container size

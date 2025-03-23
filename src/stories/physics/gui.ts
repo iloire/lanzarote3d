@@ -4,90 +4,81 @@ import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js";
 import { PhysicsObjects } from "./helpers";
 
 /**
- * Interface for physics control settings
+ * Physics control settings
  */
 export interface PhysicsControlSettings {
-  pushForce: number;
-  sphereMass: number;
   platformForce: number;
+  sphereMass: number;
   isAutoRotate: boolean;
   autoRotateSpeed: number;
   resetScene: () => void;
+  horizontalForce: number;
+  horizontalForceDirection: number; // 0-360 degrees
 }
 
 /**
- * Creates physics controls in the GUI
+ * Setup physics controls in the GUI
  */
 export function setupPhysicsControls(
   gui: GUI,
   physicsObjects: PhysicsObjects,
-  sphere: CANNON.Body
+  sphereBody: CANNON.Body
 ): {
-  folder: GUI;
   controls: PhysicsControlSettings;
 } {
-  // Create a folder in the GUI for physics controls
-  const physicsFolder = gui.addFolder('Physics Controls');
+  // Push force control settings
+  const pushForceControl = {
+    platformForce: 50,
+    sphereMass: 5,
+    isAutoRotate: false,
+    autoRotateSpeed: 1,
+    horizontalForce: 30,
+    horizontalForceDirection: 0,
+    resetScene: () => {
+      // Reset all bodies to their initial positions and velocities
+      physicsObjects.bodies?.forEach((body) => {
+        const initialPos = (body as any).initialPosition;
+        const initialQuat = (body as any).initialQuaternion;
 
-  // Function to reset all objects to their initial positions
-  function resetPositions() {
-    if (!physicsObjects.initialPositions) return;
+        if (initialPos && initialQuat) {
+          body.position.copy(initialPos);
+          body.quaternion.copy(initialQuat);
+          body.velocity.set(0, 0, 0);
+          body.angularVelocity.set(0, 0, 0);
+        }
+      });
+    }
+  };
 
-    physicsObjects.bodies.forEach((body, index) => {
-      if (index < physicsObjects.initialPositions.length) {
-        const initialPos = physicsObjects.initialPositions[index];
-        body.position.copy(initialPos as any);
-        body.velocity.set(0, 0, 0);
-        body.angularVelocity.set(0, 0, 0);
-        body.quaternion.set(0, 0, 0, 1);
-      }
+  // Create a force control folder
+  const forceControls = gui.addFolder("Force Controls");
+  forceControls.add(pushForceControl, "platformForce", 0, 200).name("Platform Force");
+  forceControls.add(pushForceControl, "horizontalForce", 0, 100).name("Horizontal Force");
+  forceControls.add(pushForceControl, "horizontalForceDirection", 0, 360).name("Direction (deg)");
+
+  // Create a sphere control folder
+  const sphereControls = gui.addFolder("Sphere Controls");
+  sphereControls.add(pushForceControl, "sphereMass", 10, 200)
+    .name("Sphere Mass")
+    .onChange((value: number) => {
+      sphereBody.mass = value;
+      sphereBody.updateMassProperties();
     });
-  }
 
-  // Create push force control object with defaults
-  const pushForceControl: PhysicsControlSettings = {
-    pushForce: 500,
-    sphereMass: 150,
-    platformForce: 500,
-    isAutoRotate: true,
-    autoRotateSpeed: 0.1,
-    resetScene: resetPositions
-  };
+  // Create a camera control folder
+  const cameraControls = gui.addFolder("Camera Controls");
+  cameraControls.add(pushForceControl, "isAutoRotate").name("Auto Rotate");
+  cameraControls.add(pushForceControl, "autoRotateSpeed", 0.1, 5).name("Rotation Speed");
 
-  // Add controls to GUI
-  physicsFolder.add(pushForceControl, 'pushForce', 50, 1000)
-    .name('Push Force');
+  // Add a reset button
+  gui.add(pushForceControl, "resetScene").name("Reset Scene");
 
-  physicsFolder.add(pushForceControl, 'platformForce', 100, 2000)
-    .name('Platform Force');
+  // Open all folders
+  forceControls.open();
+  sphereControls.open();
+  cameraControls.open();
 
-  const massController = physicsFolder.add(pushForceControl, 'sphereMass', 10, 300)
-    .name('Sphere Mass');
-
-  physicsFolder.add(pushForceControl, 'isAutoRotate')
-    .name('Auto Rotate');
-
-  physicsFolder.add(pushForceControl, 'autoRotateSpeed', 0.01, 0.5)
-    .name('Rotation Speed');
-
-  // Add reset button to GUI
-  physicsFolder.add({ reset: resetPositions }, 'reset')
-    .name('Reset Positions');
-
-  // Add mass controller callback
-  massController.onChange((value: number) => {
-    // Update the sphere's mass when the slider changes
-    sphere.mass = value;
-    sphere.updateMassProperties();
-  });
-
-  // Open the folder by default
-  physicsFolder.open();
-
-  return {
-    folder: physicsFolder,
-    controls: pushForceControl
-  };
+  return { controls: pushForceControl };
 }
 
 /**

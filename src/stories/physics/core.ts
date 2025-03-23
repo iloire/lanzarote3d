@@ -93,7 +93,7 @@ export function createBasicPhysicsObjects(
   ));
 
   const platformBody = new CANNON.Body({
-    mass: 3, // Small mass instead of static
+    mass: 10,
     position: new CANNON.Vec3(platformPos.x, platformPos.y, platformPos.z),
     shape: platformShape,
     type: CANNON.Body.DYNAMIC,
@@ -123,7 +123,7 @@ export function createBasicPhysicsObjects(
   const sphereShape = new CANNON.Sphere(sphereRadius);
 
   const sphereBody = new CANNON.Body({
-    mass: 150, // Default heavy sphere
+    mass: 80,
     position: new CANNON.Vec3(spherePos.x, spherePos.y, spherePos.z),
     shape: sphereShape,
     linearDamping: 0.7,

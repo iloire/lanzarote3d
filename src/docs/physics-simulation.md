@@ -10,13 +10,14 @@ The physics simulation has been refactored into a modular architecture with clea
 
 ```
 src/stories/physics/
-├── core.ts        - Core scene setup and physics initialization
-├── gui.ts         - GUI controls for physics parameters
-├── helpers.ts     - Utility functions and constants
-├── index.tsx      - Main entry point that assembles everything
-├── keyboard.ts    - Keyboard input handling
-├── rope.ts        - Rope creation and physics functionality
-└── visualization.ts - Visual representation of physics objects
+├── core.ts               - Core scene setup and physics initialization
+├── force-visualization.ts - Force visualization with arrow helpers and labels
+├── gui.ts                - GUI controls for physics parameters
+├── helpers.ts            - Utility functions and constants
+├── index.tsx             - Main entry point that assembles everything
+├── keyboard.ts           - Keyboard input handling
+├── rope.ts               - Rope creation and physics functionality
+└── visualization.ts      - Visual representation of physics objects
 ```
 
 ## Module Descriptions
@@ -39,6 +40,15 @@ Handles keyboard input and applies forces based on key presses:
 - `KeyboardControlConfig`: Interface for configuring keyboard controls
 - Handles platform movement and reset functionality
 - Provides clean event listener management
+
+### `force-visualization.ts`
+
+Provides visual representation of forces acting in the simulation:
+
+- `createForceVisualization()`: Creates an arrow helper and label to visualize forces
+- Dynamically updates arrow direction, length, and color based on force magnitude
+- Positions a label in screen space showing the force vector components
+- Ensures proper cleanup of visual elements when the simulation unloads
 
 ### `visualization.ts`
 
