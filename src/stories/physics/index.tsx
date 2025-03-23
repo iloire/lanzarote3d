@@ -46,7 +46,7 @@ const PhysicsChain = {
       attachmentPoints,
       {
         numSegments: 20,
-        thickness: 0.15,
+        thickness: 0.2,
         colors: [0xff0000, 0x00ff00, 0x0000ff, 0xffff00]
       }
     );

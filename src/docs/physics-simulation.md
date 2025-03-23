@@ -100,6 +100,7 @@ The rope system works by:
 
 1. **Local Attachment Points**: Ropes are attached to specific local points on the platform and sphere
    - The platform has ropes attached at each of its four corners (bottom face)
+   - All four ropes connect to a single point at the exact top of the sphere
    - Each rope has a unique color for visual distinction (red, green, blue, yellow)
    - The attachment points use local coordinates relative to each body's center
 2. **Segment Chain**: Each rope consists of multiple small physics bodies connected by constraints

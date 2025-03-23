@@ -185,6 +185,14 @@ export function createRopes(
     const shape = bodyA.shapes[0] as CANNON.Box;
     const localPointA = new CANNON.Vec3(point.x, -shape.halfExtents.y, point.z);
 
+    // Create attachment point at the top of sphere
+    // Get the sphere radius (assuming bodyB's first shape is a sphere)
+    const sphereShape = bodyB.shapes[0] as CANNON.Sphere;
+    const radius = sphereShape.radius;
+
+    // Use a single attachment point at the exact top of the sphere for all ropes
+    const localPointB = new CANNON.Vec3(0, radius, 0);
+
     // Create the rope with the color for this index (cycling if needed)
     const color = colors[index % colors.length];
 
@@ -197,7 +205,7 @@ export function createRopes(
       thickness,
       color,
       localPointA, // Pass the local attachment point for bodyA
-      new CANNON.Vec3(0, 0, 0) // Center of the sphere
+      localPointB  // Attachment point on top of the sphere
     );
 
     ropes.push(rope);
