@@ -2,8 +2,8 @@ import * as CANNON from "cannon-es";
 import * as THREE from "three";
 
 // Force visualization constants with better scaling
-const FORCE_SCALE = 0.1; // Base scale factor for force visualization
-const WING_FORCE_SCALE = 5; // Wing forces need more visibility
+const FORCE_SCALE = 0.01; // Base scale factor for force visualization
+const WING_FORCE_SCALE = 0.2; // Wing forces need more visibility
 const PILOT_FORCE_SCALE = 1; // Pilot forces scale
 
 // Force colors with better distinction

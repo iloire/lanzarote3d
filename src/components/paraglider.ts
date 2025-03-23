@@ -70,10 +70,9 @@ class Paraglider {
     this.glider = new Glider(this.options.glider);
 
     const wing = await this.glider.load();
-    wing.translateY(-300);
-    wing.translateX(300);
+    wing.translateY(-300); //mm
+    wing.translateX(300); //mm  
     this.mesh.add(wing);
-
 
     this.pilot = new Pilot(this.options.pilot);
     this.pilotMesh = this.pilot.load();
@@ -89,8 +88,8 @@ class Paraglider {
       GuiHelper.addLocationGui(gui, "Paraglider model", this.mesh);
     }
 
-    this.axesHelper = new THREE.AxesHelper(100);
-    this.axesHelper.visible = false;
+    this.axesHelper = new THREE.AxesHelper(1200);
+    this.axesHelper.visible = true;
     this.mesh.add(this.axesHelper);
     return this.mesh;
   }

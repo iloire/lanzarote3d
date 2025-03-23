@@ -51,10 +51,11 @@ const ParagliderWorkshop = {
     const scale = 0.001; // mm to m
     wingMesh.scale.set(scale, scale, scale);
     pilotMesh.scale.set(scale, scale, scale);
-    // pilotMesh.rotateY(Math.PI / 2);
+    pilotMesh.rotateY(Math.PI / 2);
 
     scene.add(wingMesh);
     scene.add(pilotMesh);
+
 
     // Add visualization boxes around meshes
     const wingBox = Helpers.createMeshVisualization(scene, wingMesh, 0xff0000); // Red box for wing

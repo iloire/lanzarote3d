@@ -4,17 +4,21 @@ import * as THREE from "three";
 import { TrajectoryPoint, TrajectoryPointType } from "../../elements/trajectory";
 import Weather from "../../elements/weather";
 import Thermal from "../thermal";
-import { ForceVisualization } from "./force-visualization";
+import { ForceVisualization } from "./physics-force-visualization";
 import { addParagliderGui } from './physics-paraglider-gui';
 
-const TICK_INTERVAL = 25; // 40 Hz update rate
-const PHYSICS_TIMESTEP = 1 / 600; // 60 Hz physics simulation
+const TICK_INTERVAL = 222; // 40 Hz update rate
+const PHYSICS_TIMESTEP = 1 / 1600; // 60 Hz physics simulation
 
 // Physics constants
 const AIR_DENSITY = 1.225; // kg/m³
 const DRAG_COEFFICIENT = 0.5;
 const LIFT_COEFFICIENT = 1.2;
 const WING_AREA = 25; // m²
+
+
+// clamp values
+const MAX_SPEED = 40;
 
 export type ParaglierPart = {
   mesh: THREE.Object3D;
@@ -81,7 +85,9 @@ export default class PhysicsFlier extends THREE.EventDispatcher {
   // Physics bodies
   gliderBody: CANNON.Body;
   pilotBody: CANNON.Body;
-  gliderLinesConstraint: CANNON.DistanceConstraint;
+
+  leftLineConstraint: CANNON.PointToPointConstraint;
+  rightLineConstraint: CANNON.PointToPointConstraint;
 
   // Replace force visualization properties with single property
   public forceVisualization: ForceVisualization;
@@ -116,15 +122,15 @@ export default class PhysicsFlier extends THREE.EventDispatcher {
 
   private setupPhysics() {
     // Create wing body (main paraglider wing)
-    const wingShape = new CANNON.Box(new CANNON.Vec3(20, 1, 20));
+    const wingShape = new CANNON.Box(new CANNON.Vec3(10, 1, 10));
     this.gliderBody = new CANNON.Body({
       mass: this.options.glider.weight,
       shape: wingShape,
       material: new CANNON.Material('wing')
     });
-    this.glider.mesh.position.copy(this.glider.initialPosition as any);
-    this.gliderBody.position.copy(this.glider.initialPosition as any);
-
+    const gliderPos = this.glider.initialPosition;
+    this.glider.mesh.position.copy(gliderPos);
+    this.gliderBody.position.copy(gliderPos as any);
 
     // Create pilot body
     const pilotShape = new CANNON.Sphere(2);
@@ -146,16 +152,26 @@ export default class PhysicsFlier extends THREE.EventDispatcher {
     this.pilotBody.velocity.set(-10, 0, -10); // Initial forward speed of 10 m/s
 
     // Create constraint between wing and pilot with reduced rotation
-    this.gliderLinesConstraint = new CANNON.DistanceConstraint(
+    const localLeftWingPoint = new CANNON.Vec3(-5, 0, 10);
+    const localPilotPoint = new CANNON.Vec3(0, this.options.distanceWingPilot, 0);
+    this.leftLineConstraint = new CANNON.PointToPointConstraint(
       this.gliderBody,
+      localLeftWingPoint,
       this.pilotBody,
-      this.options.distanceWingPilot
+      localPilotPoint
     );
 
-    // Add bodies and constraints to world
+    // Create constraint between wing and pilot with reduced rotation
+    const localRightWingPoint = new CANNON.Vec3(5, 0, 0);
+    this.rightLineConstraint = new CANNON.PointToPointConstraint(
+      this.gliderBody,
+      localRightWingPoint,
+      this.pilotBody,
+      localPilotPoint
+    );
 
-    this.world.addConstraint(this.gliderLinesConstraint);
-
+    this.world.addConstraint(this.leftLineConstraint);
+    this.world.addConstraint(this.rightLineConstraint);
     // Set up collision materials
     // const wingMaterial = new CANNON.Material('wing');
     // const pilotMaterial = new CANNON.Material('pilot');
@@ -271,8 +287,8 @@ export default class PhysicsFlier extends THREE.EventDispatcher {
     // Calculate lift force with reduced magnitude
     const liftForce = this.calculateLiftForce(speed);
     console.log("liftForce", liftForce);
-    // Apply lift at the center of the wing
 
+    // Apply lift at the center of the wing
     this.gliderBody.applyForce(liftForce, new CANNON.Vec3(0, 0, 0));
 
     // Calculate drag force with increased magnitude
@@ -309,6 +325,7 @@ export default class PhysicsFlier extends THREE.EventDispatcher {
     const liftMagnitude = 0.04 * AIR_DENSITY * speed * speed * WING_AREA * LIFT_COEFFICIENT * 0.3; // Further reduced lift coefficient
 
     console.log("liftMagnitude", liftMagnitude, speed, LIFT_COEFFICIENT);
+
     // Apply lift in the direction perpendicular to the wing's orientation
     const wingNormal = new CANNON.Vec3(0, 1, 0);
     this.gliderBody.quaternion.vmult(wingNormal, wingNormal);
@@ -425,6 +442,12 @@ export default class PhysicsFlier extends THREE.EventDispatcher {
     // Update visual meshes position and rotation
     this.glider.mesh.position.copy(this.gliderBody.position as any);
     this.pilot.mesh.position.copy(this.pilotBody.position as any);
+
+    // clamp speed
+    const speed = this.gliderBody.velocity.length();
+    if (speed > MAX_SPEED) {
+      this.gliderBody.velocity.scale(MAX_SPEED / speed, this.gliderBody.velocity);
+    }
 
     // Update force visualization
     this.updateForceVisualization();
