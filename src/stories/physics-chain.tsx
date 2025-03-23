@@ -5,7 +5,7 @@ import Helpers from "../utils/helpers";
 import { StoryOptions } from "./types";
 
 // Constants for force application
-const PUSH_FORCE_MAGNITUDE = 300; // Strength of push when keys are pressed
+const PUSH_FORCE_MAGNITUDE = 800; // Strength of push when keys are pressed
 const KEY_MAPPING = {
   PUSH_UP: ['KeyW', 'ArrowUp'],      // W or Up Arrow: Push forward
   PUSH_DOWN: ['KeyS', 'ArrowDown'],  // S or Down Arrow: Push backward
@@ -425,7 +425,7 @@ const PhysicsChain = {
 
     // Create physics world
     const world = new CANNON.World();
-    world.gravity.set(0, -9.82, 0); // Standard gravity
+    //aaaaaaaaaaaworld.gravity.set(0, -9.82, 0); // Standard gravity
 
     // Add stability settings
     // @ts-ignore - CANNON.js typings might not include all solver properties
@@ -443,7 +443,7 @@ const PhysicsChain = {
       platformForce: 500, // Force for platform movement
       showButtons: true // Show UI buttons by default
     };
-    physicsFolder.add(pushForceControl, 'pushForce', 50, 1000).name('Push Force');
+    physicsFolder.add(pushForceControl, 'pushForce', 50, 1500).name('Push Force');
     physicsFolder.add(pushForceControl, 'platformForce', 100, 2000).name('Platform Force');
     physicsFolder.add(pushForceControl, 'showButtons').name('Show UI Buttons');
 
@@ -541,12 +541,7 @@ const PhysicsChain = {
 
     // Create a distance constraint instead of a point constraint to allow more movement
     // @ts-ignore - CANNON.js typings might not include DistanceConstraint
-    const pendulumConstraint = new CANNON.DistanceConstraint(
-      platformBody,
-      new CANNON.Body({ mass: 0 }), // Static body
-      0.5 // Allow small movement (0.5 units)
-    );
-    world.addConstraint(pendulumConstraint);
+    //world.addConstraint(pendulumConstraint);
 
     world.addBody(platformBody);
 
@@ -586,7 +581,7 @@ const PhysicsChain = {
     world.addBody(sphereBody);
 
     // Add mass controller specifically for the main sphere
-    const massController = physicsFolder.add(pushForceControl, 'sphereMass', 10, 200).name('Sphere Mass');
+    const massController = physicsFolder.add(pushForceControl, 'sphereMass', 10, 1200).name('Sphere Mass');
     massController.onChange((value: number) => {
       // Update the sphere's mass when the slider changes
       sphereBody.mass = value;
