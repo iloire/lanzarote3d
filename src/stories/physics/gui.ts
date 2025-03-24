@@ -28,8 +28,8 @@ export function setupPhysicsControls(
 } {
   // Push force control settings
   const pushForceControl = {
-    platformForce: 50,
-    sphereMass: 5,
+    platformForce: 1450,
+    sphereMass: 50,
     isAutoRotate: false,
     autoRotateSpeed: 1,
     horizontalForce: 30,
@@ -52,8 +52,7 @@ export function setupPhysicsControls(
 
   // Create a force control folder
   const forceControls = gui.addFolder("Force Controls");
-  forceControls.add(pushForceControl, "platformForce", 0, 200).name("Platform Force");
-  forceControls.add(pushForceControl, "horizontalForce", 0, 100).name("Horizontal Force");
+  forceControls.add(pushForceControl, "horizontalForce", 0, 400).name("Horizontal Force");
   forceControls.add(pushForceControl, "horizontalForceDirection", 0, 360).name("Direction (deg)");
 
   // Create a sphere control folder

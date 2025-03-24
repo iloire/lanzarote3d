@@ -85,7 +85,7 @@ const PhysicsChain = {
     function applyForces() {
       // Apply lift force to platform body
       platformBody.applyForce(
-        new CANNON.Vec3(0, 20 * sphereBody.mass, 0),
+        new CANNON.Vec3(0, 10 * sphereBody.mass, 0),
         new CANNON.Vec3(0, 0, 0)
       );
 
@@ -140,7 +140,9 @@ const PhysicsChain = {
 
         camera.position.x = Math.cos(angle) * radius;
         camera.position.z = Math.sin(angle) * radius;
-        camera.lookAt(0, 0, 0);
+        camera.position.y = platformBody.position.y + 20;
+        camera.lookAt(platformBody.position as any);
+        controls.update();
       }
 
       // Update the controls
@@ -155,11 +157,16 @@ const PhysicsChain = {
       animationFrameId = requestAnimationFrame(animate);
       updatePhysics();
       renderer.render(scene, camera);
-      camera.lookAt(platformBody.position as any);
     }
 
     // Start the animation loop
     animate();
+
+    // Set camera position to be above the platform
+    camera.position.y = platformBody.position.y + 20;
+    camera.position.x = 100;
+    camera.position.z = 100;
+    camera.lookAt(platformBody.position as any);
   },
 
   unload: async () => {

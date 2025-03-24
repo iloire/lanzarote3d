@@ -46,8 +46,11 @@ export function setupKeyboardControls(
   function applyInputForces() {
     // Apply platform control forces
     if (keysPressed.size > 0) {
+
+
       // X-axis movement (left/right)
       if (keysPressed.has(KEY_MAPPING.PLATFORM_LEFT[0])) {
+        console.log('left', -config.platformForce);
         platformBody.applyForce(
           new CANNON.Vec3(-config.platformForce, 0, 0),
           new CANNON.Vec3(0, 0, 0)
@@ -55,6 +58,7 @@ export function setupKeyboardControls(
       }
 
       if (keysPressed.has(KEY_MAPPING.PLATFORM_RIGHT[0])) {
+        console.log('right', config.platformForce);
         platformBody.applyForce(
           new CANNON.Vec3(config.platformForce, 0, 0),
           new CANNON.Vec3(0, 0, 0)
@@ -62,6 +66,7 @@ export function setupKeyboardControls(
       }
 
       if (keysPressed.has(KEY_MAPPING.PLATFORM_UP[0])) {
+        console.log('up', config.platformForce);
         platformBody.applyForce(
           new CANNON.Vec3(0, config.platformForce, 0),
           new CANNON.Vec3(0, 0, 0)
@@ -69,6 +74,7 @@ export function setupKeyboardControls(
       }
 
       if (keysPressed.has(KEY_MAPPING.PLATFORM_DOWN[0])) {
+        console.log('down', -config.platformForce);
         platformBody.applyForce(
           new CANNON.Vec3(0, -config.platformForce, 0),
           new CANNON.Vec3(0, 0, 0)
