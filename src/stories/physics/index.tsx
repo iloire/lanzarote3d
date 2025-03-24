@@ -141,18 +141,16 @@ const PhysicsChain = {
       }
 
       // Update vector visualization
-      if (vectorVisualizer) {
-        vectorVisualizer.update(
-          new THREE.Vector3().copy(gliderBody.position as any),  // Wing position
-          new THREE.Vector3().copy(pilotBody.position as any),    // Pilot position
-          liftVector,                                               // Lift force
-          dragVector,                                               // Drag force
-          weightVector,                                             // Weight force
-          glideDirection,                                           // Glide direction
-          pushForceControl.leftBreakForce > 0 ? leftBreakVector : null,  // Left break force if active
-          pushForceControl.rightBreakForce > 0 ? rightBreakVector : null  // Right break force if active
-        );
-      }
+      vectorVisualizer.update(
+        new THREE.Vector3().copy(gliderBody.position as any),  // Wing position
+        new THREE.Vector3().copy(pilotBody.position as any),    // Pilot position
+        liftVector,                                               // Lift force
+        dragVector,                                               // Drag force
+        weightVector,                                             // Weight force
+        glideDirection,                                           // Glide direction
+        pushForceControl.leftBreakForce > 0 ? leftBreakVector : null,  // Left break force if active
+        pushForceControl.rightBreakForce > 0 ? rightBreakVector : null  // Right break force if active
+      );
     }
 
     // Physics update function (internal function)
@@ -161,9 +159,7 @@ const PhysicsChain = {
       world.step(1 / 60);
 
       // Apply forces from keyboard input
-      if (keyboardControls) {
-        keyboardControls.applyInputForces();
-      }
+      keyboardControls.applyInputForces(vectorVisualizer);
 
       applyForcesAndDrawVectors();
 

@@ -1,4 +1,6 @@
 import * as CANNON from "cannon-es";
+import * as THREE from "three";
+import { VectorVisualizater } from "../../utils/vector-visualizer";
 import { KEY_MAPPING, arrayIncludes } from "./helpers";
 
 /**
@@ -17,11 +19,12 @@ export function setupKeyboardControls(
 ): {
   keyDownListener: (event: KeyboardEvent) => void;
   keyUpListener: (event: KeyboardEvent) => void;
-  applyInputForces: () => void;
+  applyInputForces: (vectorVisualizer: VectorVisualizater) => void;
   cleanup: () => void;
 } {
   // Set to keep track of pressed keys
   const keysPressed = new Set<string>();
+
 
   // Event listeners for keyboard controls
   const keyDownListener = (event: KeyboardEvent) => {
@@ -42,7 +45,7 @@ export function setupKeyboardControls(
   window.addEventListener('keyup', keyUpListener);
 
   // Function to apply forces based on keyboard input
-  function applyInputForces() {
+  function applyInputForces(vectorVisualizer: VectorVisualizater) {
     // Apply platform control forces
     if (keysPressed.size > 0) {
 
@@ -53,19 +56,25 @@ export function setupKeyboardControls(
 
       if (keysPressed.has(KEY_MAPPING.RIGHT[0])) {
         console.log('right', force);
+
         // when the right key is pressed, the glider will experiment 
         // a drag force in the direction opposite to the movement to the right 
         const dragForce = velocity.negate().scale(breakForceMagnitude);
+        const wingPosition = new THREE.Vector3(0, 0, 3);
+        vectorVisualizer.updateRightBreakVector(wingPosition, dragForce);
         gliderBody.applyForce(
           dragForce,
           new CANNON.Vec3(0, 0, 3)
         );
+
       }
 
       // X-axis movement (left/right)
       if (keysPressed.has(KEY_MAPPING.LEFT[0])) {
         console.log('left', force);
         const dragForce = velocity.negate().scale(breakForceMagnitude);
+        const wingPosition = new THREE.Vector3(0, 0, 3);
+        vectorVisualizer.updateLeftBreakVector(wingPosition, dragForce);
         gliderBody.applyForce(
           dragForce,
           new CANNON.Vec3(3, 0, 0)
