@@ -14,6 +14,8 @@ export interface PhysicsControlSettings {
   resetScene: () => void;
   showVectors: boolean;
   vectorScale: number;
+  leftBreakForce: number;
+  rightBreakForce: number;
 }
 
 /**
@@ -34,6 +36,8 @@ export function setupPhysicsControls(
     autoRotateSpeed: 1,
     showVectors: true,
     vectorScale: 3.0,
+    leftBreakForce: 3.0,
+    rightBreakForce: 3.0,
     resetScene: () => {
       // Reset all bodies to their initial positions and velocities
       physicsObjects.bodies?.forEach((body) => {
@@ -52,6 +56,17 @@ export function setupPhysicsControls(
 
   // Create a force control folder
   const forceControls = gui.addFolder("Force Controls");
+  forceControls.add(pushForceControl, "leftBreakForce", 0, 10)
+    .name("Left Break Force")
+    .onChange(() => {
+      // This will be used by the physics update function
+    });
+
+  forceControls.add(pushForceControl, "rightBreakForce", 0, 10)
+    .name("Right Break Force")
+    .onChange(() => {
+      // This will be used by the physics update function
+    });
 
   // Create a sphere control folder
   const sphereControls = gui.addFolder("Pilot Controls");

@@ -12,6 +12,8 @@ const COLORS = {
   DRAG: 0xff0000,     // Red
   WEIGHT: 0xffff00,   // Yellow
   GLIDE_DIRECTION: 0x0000ff,    // Blue
+  LEFT_BREAK: 0xff00ff,   // Magenta
+  RIGHT_BREAK: 0x00ffff,  // Cyan
 };
 
 // Helper function to convert color number to CSS color string
@@ -30,6 +32,8 @@ export class VectorVisualizater {
   private dragArrow: THREE.ArrowHelper;
   private glideDirectionArrow: THREE.ArrowHelper;
   private weightArrow: THREE.ArrowHelper;
+  private leftBreakArrow: THREE.ArrowHelper;
+  private rightBreakArrow: THREE.ArrowHelper;
 
   // Text labels for forces
   private forceLabels: { [key: string]: THREE.Sprite } = {};
@@ -87,10 +91,15 @@ export class VectorVisualizater {
     this.forceLabels['drag'] = this.createTextSprite("DRAG", COLORS.DRAG);
     this.forceLabels['weight'] = this.createTextSprite("WEIGHT", COLORS.WEIGHT);
     this.forceLabels['glideDirection'] = this.createTextSprite("GLIDE DIRECTION", COLORS.GLIDE_DIRECTION);
+    this.forceLabels['leftBreak'] = this.createTextSprite("LEFT BREAK", COLORS.LEFT_BREAK);
+    this.forceLabels['rightBreak'] = this.createTextSprite("RIGHT BREAK", COLORS.RIGHT_BREAK);
+
     // Add labels to their respective groups
     this.gliderForceGroup.add(this.forceLabels['lift']);
     this.gliderForceGroup.add(this.forceLabels['drag']);
     this.gliderForceGroup.add(this.forceLabels['glideDirection']);
+    this.gliderForceGroup.add(this.forceLabels['leftBreak']);
+    this.gliderForceGroup.add(this.forceLabels['rightBreak']);
     this.pilotForceGroup.add(this.forceLabels['weight']);
 
     // Hide labels by default (will be positioned in update)
@@ -106,6 +115,8 @@ export class VectorVisualizater {
     const dragMaterial = new THREE.LineBasicMaterial({ color: COLORS.DRAG, linewidth: 3 });
     const glideDirectionMaterial = new THREE.LineBasicMaterial({ color: COLORS.GLIDE_DIRECTION, linewidth: 3 });
     const weightMaterial = new THREE.LineBasicMaterial({ color: COLORS.WEIGHT, linewidth: 3 });
+    const leftBreakMaterial = new THREE.LineBasicMaterial({ color: COLORS.LEFT_BREAK, linewidth: 3 });
+    const rightBreakMaterial = new THREE.LineBasicMaterial({ color: COLORS.RIGHT_BREAK, linewidth: 3 });
 
     // Create arrows with more distinctive sizing
     this.liftArrow = new THREE.ArrowHelper(
@@ -128,7 +139,6 @@ export class VectorVisualizater {
     );
     this.dragArrow.line.material = dragMaterial;
 
-
     this.weightArrow = new THREE.ArrowHelper(
       new THREE.Vector3(0, -1, 0),
       new THREE.Vector3(0, 0, 0),
@@ -148,10 +158,35 @@ export class VectorVisualizater {
       1.5
     );
     this.glideDirectionArrow.line.material = glideDirectionMaterial;
+
+    // Create left break arrow
+    this.leftBreakArrow = new THREE.ArrowHelper(
+      new THREE.Vector3(-1, 0, 0),
+      new THREE.Vector3(-5, 0, 0), // Position offset to the left side of the wing
+      10,
+      COLORS.LEFT_BREAK,
+      3,
+      1.5
+    );
+    this.leftBreakArrow.line.material = leftBreakMaterial;
+
+    // Create right break arrow
+    this.rightBreakArrow = new THREE.ArrowHelper(
+      new THREE.Vector3(1, 0, 0),
+      new THREE.Vector3(5, 0, 0), // Position offset to the right side of the wing
+      10,
+      COLORS.RIGHT_BREAK,
+      3,
+      1.5
+    );
+    this.rightBreakArrow.line.material = rightBreakMaterial;
+
     // Add wing-related forces to wing force group
     this.gliderForceGroup.add(this.liftArrow);
     this.gliderForceGroup.add(this.dragArrow);
     this.gliderForceGroup.add(this.glideDirectionArrow);
+    this.gliderForceGroup.add(this.leftBreakArrow);
+    this.gliderForceGroup.add(this.rightBreakArrow);
     this.pilotForceGroup.add(this.weightArrow);
 
     // Set initial visibility to true by default
@@ -182,13 +217,23 @@ export class VectorVisualizater {
     console.log(`Force visualization scale set to: ${scale}`);
   }
 
+  /**
+   * Set visibility of all force visualizations
+   * @param visible Whether the force visualizations should be visible
+   */
+  setVisible(visible: boolean): void {
+    this.forceGroup.visible = visible;
+  }
+
   update(
     wingPosition: THREE.Vector3,
     pilotPosition: THREE.Vector3,
     liftVector: CANNON.Vec3,
     dragVector: CANNON.Vec3,
     weightVector: CANNON.Vec3,
-    glideDirection: CANNON.Vec3
+    glideDirection: CANNON.Vec3,
+    leftBreakVector?: CANNON.Vec3,
+    rightBreakVector?: CANNON.Vec3
   ) {
     // Position the force groups at their respective objects
     this.gliderForceGroup.position.copy(wingPosition);
@@ -289,11 +334,69 @@ export class VectorVisualizater {
       this.forceLabels['glideDirection'].visible = false;
     }
 
-  }
+    // Update left break arrow if provided
+    if (leftBreakVector) {
+      try {
+        const leftBreakDirection = new THREE.Vector3(
+          isNaN(leftBreakVector.x) ? -1 : leftBreakVector.x,
+          isNaN(leftBreakVector.y) ? 0 : leftBreakVector.y,
+          isNaN(leftBreakVector.z) ? 0 : leftBreakVector.z
+        );
 
-  setVisible(visible: boolean) {
-    this.forceGroup.visible = visible;
-    console.log(`Force visualization visibility set to: ${visible}`);
+        // Safely normalize the direction
+        if (leftBreakDirection.length() > 0.001) {
+          leftBreakDirection.normalize();
+        } else {
+          leftBreakDirection.set(-1, 0, 0); // Default to left if invalid
+        }
+
+        const leftBreakLength = !isNaN(leftBreakVector.length()) ? leftBreakVector.length() * effectiveGliderScale : 0;
+        this.leftBreakArrow.setDirection(leftBreakDirection);
+        this.leftBreakArrow.setLength(Math.max(0, leftBreakLength));
+        this.leftBreakArrow.position.set(-5, 0, 0); // Position offset to the left side of the wing
+        this.updateLabel('leftBreak', new THREE.Vector3(-5, 0, 0), leftBreakDirection, leftBreakLength);
+        this.leftBreakArrow.visible = true;
+      } catch (e) {
+        console.error("Error with left break force visualization:", e);
+        this.leftBreakArrow.visible = false;
+        this.forceLabels['leftBreak'].visible = false;
+      }
+    } else {
+      this.leftBreakArrow.visible = false;
+      this.forceLabels['leftBreak'].visible = false;
+    }
+
+    // Update right break arrow if provided
+    if (rightBreakVector) {
+      try {
+        const rightBreakDirection = new THREE.Vector3(
+          isNaN(rightBreakVector.x) ? 1 : rightBreakVector.x,
+          isNaN(rightBreakVector.y) ? 0 : rightBreakVector.y,
+          isNaN(rightBreakVector.z) ? 0 : rightBreakVector.z
+        );
+
+        // Safely normalize the direction
+        if (rightBreakDirection.length() > 0.001) {
+          rightBreakDirection.normalize();
+        } else {
+          rightBreakDirection.set(1, 0, 0); // Default to right if invalid
+        }
+
+        const rightBreakLength = !isNaN(rightBreakVector.length()) ? rightBreakVector.length() * effectiveGliderScale : 0;
+        this.rightBreakArrow.setDirection(rightBreakDirection);
+        this.rightBreakArrow.setLength(Math.max(0, rightBreakLength));
+        this.rightBreakArrow.position.set(5, 0, 0); // Position offset to the right side of the wing
+        this.updateLabel('rightBreak', new THREE.Vector3(5, 0, 0), rightBreakDirection, rightBreakLength);
+        this.rightBreakArrow.visible = true;
+      } catch (e) {
+        console.error("Error with right break force visualization:", e);
+        this.rightBreakArrow.visible = false;
+        this.forceLabels['rightBreak'].visible = false;
+      }
+    } else {
+      this.rightBreakArrow.visible = false;
+      this.forceLabels['rightBreak'].visible = false;
+    }
   }
 
   isVisible(): boolean {

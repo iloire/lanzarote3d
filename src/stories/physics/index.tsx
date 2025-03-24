@@ -110,6 +110,36 @@ const PhysicsChain = {
         new CANNON.Vec3(0, 0, 0)
       );
 
+      // Calculate break forces using GUI control values
+      // Left break force - pulls down and to the left
+      const leftBreakVector = new CANNON.Vec3(
+        -pushForceControl.leftBreakForce * pilotBody.mass,
+        -pushForceControl.leftBreakForce * 0.5 * pilotBody.mass,
+        0
+      );
+
+      // Right break force - pulls down and to the right
+      const rightBreakVector = new CANNON.Vec3(
+        pushForceControl.rightBreakForce * pilotBody.mass,
+        -pushForceControl.rightBreakForce * 0.5 * pilotBody.mass,
+        0
+      );
+
+      // Apply break forces if they are active (value > 0)
+      if (pushForceControl.leftBreakForce > 0) {
+        gliderBody.applyForce(
+          leftBreakVector,
+          new CANNON.Vec3(-5, 0, 0) // Apply on the left side of the wing
+        );
+      }
+
+      if (pushForceControl.rightBreakForce > 0) {
+        gliderBody.applyForce(
+          rightBreakVector,
+          new CANNON.Vec3(5, 0, 0) // Apply on the right side of the wing
+        );
+      }
+
       // Update vector visualization
       if (vectorVisualizer) {
         vectorVisualizer.update(
@@ -118,10 +148,11 @@ const PhysicsChain = {
           liftVector,                                               // Lift force
           dragVector,                                               // Drag force
           weightVector,                                             // Weight force
-          glideDirection                                           // Glide direction
+          glideDirection,                                           // Glide direction
+          pushForceControl.leftBreakForce > 0 ? leftBreakVector : null,  // Left break force if active
+          pushForceControl.rightBreakForce > 0 ? rightBreakVector : null  // Right break force if active
         );
       }
-
     }
 
     // Physics update function (internal function)

@@ -48,27 +48,37 @@ export function setupKeyboardControls(
 
       const force = 1450;
 
-      // X-axis movement (left/right)
-      if (keysPressed.has(KEY_MAPPING.LEFT[0])) {
-        console.log('left', -force);
-        gliderBody.applyForce(
-          new CANNON.Vec3(-force, 0, 0),
-          new CANNON.Vec3(0, 0, 0)
-        );
-      }
+      const velocity = gliderBody.velocity;
+      const breakForceMagnitude = 1200;
 
       if (keysPressed.has(KEY_MAPPING.RIGHT[0])) {
         console.log('right', force);
+        // when the right key is pressed, the glider will experiment 
+        // a drag force in the direction opposite to the movement to the right 
+        const dragForce = velocity.negate().scale(breakForceMagnitude);
         gliderBody.applyForce(
-          new CANNON.Vec3(force, 0, 0),
-          new CANNON.Vec3(0, 0, 0)
+          dragForce,
+          new CANNON.Vec3(0, 0, 3)
+        );
+      }
+
+      // X-axis movement (left/right)
+      if (keysPressed.has(KEY_MAPPING.LEFT[0])) {
+        console.log('left', force);
+        const dragForce = velocity.negate().scale(breakForceMagnitude);
+        gliderBody.applyForce(
+          dragForce,
+          new CANNON.Vec3(3, 0, 0)
         );
       }
 
       if (keysPressed.has(KEY_MAPPING.UP[0])) {
         console.log('up', force);
+        // when the up key is pressed, the glider will experiment a lift force on the top side 
+        const liftForceMagnitude = 1200;
+        const liftForce = new CANNON.Vec3(0, liftForceMagnitude, 0);
         gliderBody.applyForce(
-          new CANNON.Vec3(0, force, 0),
+          liftForce,
           new CANNON.Vec3(0, 0, 0)
         );
       }
