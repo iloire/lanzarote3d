@@ -14,8 +14,8 @@ export interface PhysicsScene {
   controls: OrbitControls;
   world: CANNON.World;
   physicsObjects: PhysicsObjects;
-  platformBody: CANNON.Body;
-  sphereBody: CANNON.Body;
+  gliderBody: CANNON.Body;
+  pilotBody: CANNON.Body;
   animate: () => void;
   cleanup: () => void;
 }
@@ -57,8 +57,8 @@ export function createBasicPhysicsObjects(
   world: CANNON.World
 ): {
   physicsObjects: PhysicsObjects;
-  platformBody: CANNON.Body;
-  sphereBody: CANNON.Body;
+  gliderBody: CANNON.Body;
+  pilotBody: CANNON.Body;
 } {
   // Create container for physics objects
   const physicsObjects: PhysicsObjects = {
@@ -81,45 +81,45 @@ export function createBasicPhysicsObjects(
   };
 
   // Create rectangular platform (anchor)
-  const platformWidth = 12;
-  const platformHeight = 1;
-  const platformDepth = 4;
-  const platformPos = new THREE.Vector3(0, 10, 0);
+  const gliderWidth = 12;
+  const gliderHeight = 1;
+  const gliderDepth = 4;
+  const gliderPos = new THREE.Vector3(0, 10, 0);
 
-  const platformShape = new CANNON.Box(new CANNON.Vec3(
-    platformWidth / 2,
-    platformHeight / 2,
-    platformDepth / 2
+  const gliderShape = new CANNON.Box(new CANNON.Vec3(
+    gliderWidth / 2,
+    gliderHeight / 2,
+    gliderDepth / 2
   ));
 
-  const platformBody = new CANNON.Body({
+  const gliderBody = new CANNON.Body({
     mass: 10,
-    position: new CANNON.Vec3(platformPos.x, platformPos.y, platformPos.z),
-    shape: platformShape,
+    position: new CANNON.Vec3(gliderPos.x, gliderPos.y, gliderPos.z),
+    shape: gliderShape,
     type: CANNON.Body.DYNAMIC,
     linearDamping: 0.5,
     angularDamping: 0.5
   });
 
-  world.addBody(platformBody);
+  world.addBody(gliderBody);
 
   // Create visualization for platform
-  const platformMesh = createBoxVisualization(
+  const gliderMesh = createBoxVisualization(
     scene,
-    new CANNON.Vec3(platformWidth / 2, platformHeight / 2, platformDepth / 2),
-    platformPos,
+    new CANNON.Vec3(gliderWidth / 2, gliderHeight / 2, gliderDepth / 2),
+    gliderPos,
     0xff0000, // Red for platform
-    "Platform"
+    "Glider"
   );
 
   // Add platform to objects
-  physicsObjects.bodies.push(platformBody);
-  physicsObjects.visualMeshes.push(platformMesh);
+  physicsObjects.bodies.push(gliderBody);
+  physicsObjects.visualMeshes.push(gliderMesh);
 
   // Create a single sphere below the platform
   const sphereRadius = 1.5;
   const ropeLength = 24;
-  const spherePos = new THREE.Vector3(platformPos.x, platformPos.y - ropeLength, platformPos.z);
+  const spherePos = new THREE.Vector3(gliderPos.x, gliderPos.y - ropeLength, gliderPos.z);
   const sphereShape = new CANNON.Sphere(sphereRadius);
 
   const sphereBody = new CANNON.Body({
@@ -132,7 +132,7 @@ export function createBasicPhysicsObjects(
   world.addBody(sphereBody);
 
   // Create visualization for the sphere
-  const sphereMesh = createSphereVisualization(
+  const pilotMesh = createSphereVisualization(
     scene,
     sphereRadius,
     spherePos,
@@ -142,9 +142,9 @@ export function createBasicPhysicsObjects(
 
   // Add sphere to objects
   physicsObjects.bodies.push(sphereBody);
-  physicsObjects.visualMeshes.push(sphereMesh);
+  physicsObjects.visualMeshes.push(pilotMesh);
 
-  return { physicsObjects, platformBody, sphereBody };
+  return { physicsObjects, gliderBody, pilotBody: sphereBody };
 }
 
 /**

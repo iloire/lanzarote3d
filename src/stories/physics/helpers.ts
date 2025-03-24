@@ -7,10 +7,10 @@ export const PUSH_FORCE_MAGNITUDE = 800; // Strength of push when keys are press
 // Key mappings for controls
 export const KEY_MAPPING = {
   RESET_POSITION: ['KeyX'],          // X: Reset positions
-  PLATFORM_LEFT: ['KeyQ'],           // Q: Move platform left
-  PLATFORM_RIGHT: ['KeyE'],          // E: Move platform right
-  PLATFORM_UP: ['KeyW'],            // W: Move platform up
-  PLATFORM_DOWN: ['KeyS'],          // S: Move platform down
+  LEFT: ['KeyQ'],           // Q: Move platform left
+  RIGHT: ['KeyE'],          // E: Move platform right
+  UP: ['KeyW'],            // W: Move platform up
+  DOWN: ['KeyS'],          // S: Move platform down
 };
 
 // Helper function to check if an array contains a value (compatible with older JS)

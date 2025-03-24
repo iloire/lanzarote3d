@@ -8,8 +8,7 @@ import { PhysicsObjects } from "./helpers";
  * Physics control settings
  */
 export interface PhysicsControlSettings {
-  platformForce: number;
-  sphereMass: number;
+  pilotMass: number;
   isAutoRotate: boolean;
   autoRotateSpeed: number;
   resetScene: () => void;
@@ -30,8 +29,7 @@ export function setupPhysicsControls(
 } {
   // Push force control settings
   const pushForceControl: PhysicsControlSettings = {
-    platformForce: 1450,
-    sphereMass: 50,
+    pilotMass: 50,
     isAutoRotate: false,
     autoRotateSpeed: 1,
     showVectors: true,

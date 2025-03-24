@@ -23,7 +23,7 @@ const PhysicsChain = {
     const world = createPhysicsWorld();
 
     // Create basic physics objects (platform and sphere)
-    const { physicsObjects, platformBody, sphereBody } = createBasicPhysicsObjects(scene, world);
+    const { physicsObjects, gliderBody: gliderBody, pilotBody: pilotBody } = createBasicPhysicsObjects(scene, world);
 
     // Setup vector visualizer
     vectorVisualizer = new VectorVisualizater(scene);
@@ -32,10 +32,10 @@ const PhysicsChain = {
 
     // Setup physics controls
     const { controls: pushForceControl } =
-      setupPhysicsControls(gui, physicsObjects, sphereBody, vectorVisualizer);
+      setupPhysicsControls(gui, physicsObjects, pilotBody, vectorVisualizer);
 
     // Define attachment points for ropes - cast shape to Box type to access halfExtents
-    const platformShape = platformBody.shapes[0] as CANNON.Box;
+    const platformShape = gliderBody.shapes[0] as CANNON.Box;
     const attachmentPoints = [
       { x: -platformShape.halfExtents.x, z: -platformShape.halfExtents.z },
       { x: platformShape.halfExtents.x, z: -platformShape.halfExtents.z },
@@ -47,8 +47,8 @@ const PhysicsChain = {
     const ropes = createRopes(
       world,
       scene,
-      platformBody,
-      sphereBody,
+      gliderBody,
+      pilotBody,
       attachmentPoints,
       {
         numSegments: 20,
@@ -71,9 +71,8 @@ const PhysicsChain = {
     storeInitialPositions(physicsObjects);
 
     // Setup keyboard controls
-    keyboardControls = setupKeyboardControls(platformBody, {
+    keyboardControls = setupKeyboardControls(gliderBody, {
       resetSceneCallback: pushForceControl.resetScene,
-      platformForce: pushForceControl.platformForce
     });
 
     // Calculate forces to be applied
@@ -84,21 +83,21 @@ const PhysicsChain = {
 
     function applyForces() {
       // Calculate and apply lift force to platform body
-      liftForce.set(0, 23 * sphereBody.mass, 0);
-      platformBody.applyForce(
+      liftForce.set(0, 23 * pilotBody.mass, 0);
+      gliderBody.applyForce(
         liftForce,
         new CANNON.Vec3(0, 0, 0)
       );
 
       // Apply weight force (gravity) to the sphere
-      weightForce.set(0, -9.82 * sphereBody.mass, 0);
-      sphereBody.applyForce(
+      weightForce.set(0, -9.82 * pilotBody.mass, 0);
+      pilotBody.applyForce(
         weightForce,
         new CANNON.Vec3(0, 0, 0)
       );
 
       // Set drag force (we're not actually applying it, just visualizing)
-      dragForce.set(0, 0, -5 * sphereBody.mass);
+      dragForce.set(0, 0, -5 * pilotBody.mass);
     }
 
     // Physics update function (internal function)
@@ -116,8 +115,8 @@ const PhysicsChain = {
       // Update vector visualization
       if (vectorVisualizer) {
         vectorVisualizer.update(
-          new THREE.Vector3().copy(platformBody.position as any),  // Wing position
-          new THREE.Vector3().copy(sphereBody.position as any),    // Pilot position
+          new THREE.Vector3().copy(gliderBody.position as any),  // Wing position
+          new THREE.Vector3().copy(pilotBody.position as any),    // Pilot position
           liftForce,                                               // Lift force
           dragForce,                                               // Drag force
           weightForce,                                             // Weight force
@@ -133,8 +132,8 @@ const PhysicsChain = {
 
         camera.position.x = Math.cos(angle) * radius;
         camera.position.z = Math.sin(angle) * radius;
-        camera.position.y = platformBody.position.y + 20;
-        camera.lookAt(platformBody.position as any);
+        camera.position.y = gliderBody.position.y + 20;
+        camera.lookAt(gliderBody.position as any);
         controls.update();
       }
 
@@ -156,10 +155,10 @@ const PhysicsChain = {
     animate();
 
     // Set camera position to be above the platform
-    camera.position.y = platformBody.position.y + 20;
+    camera.position.y = gliderBody.position.y + 20;
     camera.position.x = 100;
     camera.position.z = 100;
-    camera.lookAt(platformBody.position as any);
+    camera.lookAt(gliderBody.position as any);
   },
 };
 

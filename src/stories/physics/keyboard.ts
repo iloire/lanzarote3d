@@ -6,14 +6,13 @@ import { KEY_MAPPING, arrayIncludes } from "./helpers";
  */
 export interface KeyboardControlConfig {
   resetSceneCallback: () => void;
-  platformForce: number;
 }
 
 /**
  * Setup keyboard controls for the physics simulation
  */
 export function setupKeyboardControls(
-  platformBody: CANNON.Body,
+  gliderBody: CANNON.Body,
   config: KeyboardControlConfig
 ): {
   keyDownListener: (event: KeyboardEvent) => void;
@@ -47,36 +46,37 @@ export function setupKeyboardControls(
     // Apply platform control forces
     if (keysPressed.size > 0) {
 
+      const force = 1450;
 
       // X-axis movement (left/right)
-      if (keysPressed.has(KEY_MAPPING.PLATFORM_LEFT[0])) {
-        console.log('left', -config.platformForce);
-        platformBody.applyForce(
-          new CANNON.Vec3(-config.platformForce, 0, 0),
+      if (keysPressed.has(KEY_MAPPING.LEFT[0])) {
+        console.log('left', -force);
+        gliderBody.applyForce(
+          new CANNON.Vec3(-force, 0, 0),
           new CANNON.Vec3(0, 0, 0)
         );
       }
 
-      if (keysPressed.has(KEY_MAPPING.PLATFORM_RIGHT[0])) {
-        console.log('right', config.platformForce);
-        platformBody.applyForce(
-          new CANNON.Vec3(config.platformForce, 0, 0),
+      if (keysPressed.has(KEY_MAPPING.RIGHT[0])) {
+        console.log('right', force);
+        gliderBody.applyForce(
+          new CANNON.Vec3(force, 0, 0),
           new CANNON.Vec3(0, 0, 0)
         );
       }
 
-      if (keysPressed.has(KEY_MAPPING.PLATFORM_UP[0])) {
-        console.log('up', config.platformForce);
-        platformBody.applyForce(
-          new CANNON.Vec3(0, config.platformForce, 0),
+      if (keysPressed.has(KEY_MAPPING.UP[0])) {
+        console.log('up', force);
+        gliderBody.applyForce(
+          new CANNON.Vec3(0, force, 0),
           new CANNON.Vec3(0, 0, 0)
         );
       }
 
-      if (keysPressed.has(KEY_MAPPING.PLATFORM_DOWN[0])) {
-        console.log('down', -config.platformForce);
-        platformBody.applyForce(
-          new CANNON.Vec3(0, -config.platformForce, 0),
+      if (keysPressed.has(KEY_MAPPING.DOWN[0])) {
+        console.log('down', -force);
+        gliderBody.applyForce(
+          new CANNON.Vec3(0, -force, 0),
           new CANNON.Vec3(0, 0, 0)
         );
       }
