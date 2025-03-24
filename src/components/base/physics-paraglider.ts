@@ -3,8 +3,8 @@ import GUI from 'lil-gui';
 import * as THREE from "three";
 import { TrajectoryPoint } from "../../elements/trajectory";
 import Weather from "../../elements/weather";
+import { ForceVisualization } from "../../utils/physics-force-visualization";
 import Thermal from "../thermal";
-import { ForceVisualization } from "./physics-force-visualization";
 import { addParagliderGui } from './physics-paraglider-gui';
 
 const TICK_INTERVAL = 40; // 40 Hz update rate

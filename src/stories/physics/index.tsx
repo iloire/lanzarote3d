@@ -11,7 +11,6 @@ import { createRopes } from "./rope";
 
 // Store UI elements and animation ID for cleanup
 let keyboardControls: ReturnType<typeof setupKeyboardControls> | null = null;
-let animationFrameId: number | null = null;
 let forceVisualizer: ReturnType<typeof createForceVisualization> | null = null;
 
 // Store the horizontal force vector
@@ -85,7 +84,7 @@ const PhysicsChain = {
     function applyForces() {
       // Apply lift force to platform body
       platformBody.applyForce(
-        new CANNON.Vec3(0, 10 * sphereBody.mass, 0),
+        new CANNON.Vec3(0, 23 * sphereBody.mass, 0),
         new CANNON.Vec3(0, 0, 0)
       );
 
@@ -154,7 +153,7 @@ const PhysicsChain = {
 
     // Animation loop
     function animate() {
-      animationFrameId = requestAnimationFrame(animate);
+      requestAnimationFrame(animate);
       updatePhysics();
       renderer.render(scene, camera);
     }
@@ -168,26 +167,6 @@ const PhysicsChain = {
     camera.position.z = 100;
     camera.lookAt(platformBody.position as any);
   },
-
-  unload: async () => {
-    // Stop animation loop
-    if (animationFrameId !== null) {
-      cancelAnimationFrame(animationFrameId);
-      animationFrameId = null;
-    }
-
-    // Clean up keyboard controls
-    if (keyboardControls) {
-      keyboardControls.cleanup();
-      keyboardControls = null;
-    }
-
-    // Clean up force visualizer
-    if (forceVisualizer) {
-      forceVisualizer.cleanup();
-      forceVisualizer = null;
-    }
-  }
 };
 
 export default PhysicsChain; 
