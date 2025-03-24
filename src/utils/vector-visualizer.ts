@@ -24,7 +24,7 @@ function colorToHexString(color: number): string {
   return '#' + hexStr;
 }
 
-export class ForceVisualization {
+export class VectorVisualizater {
   // Arrow helpers
   private liftArrow: THREE.ArrowHelper;
   private dragArrow: THREE.ArrowHelper;

@@ -3,7 +3,7 @@ import GUI from 'lil-gui';
 import * as THREE from "three";
 import { TrajectoryPoint } from "../../elements/trajectory";
 import Weather from "../../elements/weather";
-import { ForceVisualization } from "../../utils/physics-force-visualization";
+import { VectorVisualizater } from "../../utils/vector-visualizer";
 import Thermal from "../thermal";
 import { addParagliderGui } from './physics-paraglider-gui';
 
@@ -91,7 +91,7 @@ export default class PhysicsFlier extends THREE.EventDispatcher {
   rearRightLineConstraint: CANNON.PointToPointConstraint;
 
   // Replace force visualization properties with single property
-  public forceVisualization: ForceVisualization;
+  public forceVisualization: VectorVisualizater;
 
   // Turn control properties
   private turnStrength: number = 0.5; // 0 to 1, controls how sharp the turns are
@@ -222,7 +222,7 @@ export default class PhysicsFlier extends THREE.EventDispatcher {
   }
 
   private setupForceVisualization() {
-    this.forceVisualization = new ForceVisualization(this.options.glider.mesh.parent);
+    this.forceVisualization = new VectorVisualizater(this.options.glider.mesh.parent);
 
     // Ensure force visualization is visible by default
     this.forceVisualization.setVisible(true);
