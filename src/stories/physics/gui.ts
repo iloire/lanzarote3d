@@ -54,9 +54,9 @@ export function setupPhysicsControls(
   const forceControls = gui.addFolder("Force Controls");
 
   // Create a sphere control folder
-  const sphereControls = gui.addFolder("Sphere Controls");
-  sphereControls.add(pushForceControl, "sphereMass", 10, 200)
-    .name("Sphere Mass")
+  const sphereControls = gui.addFolder("Pilot Controls");
+  sphereControls.add(pushForceControl, "pilotMass", 10, 200)
+    .name("Pilot Mass")
     .onChange((value: number) => {
       sphereBody.mass = value;
       sphereBody.updateMassProperties();
