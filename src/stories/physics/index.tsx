@@ -1,9 +1,10 @@
 import * as CANNON from "cannon-es";
+import * as THREE from "three";
 import { StoryOptions } from "../types";
 
 // Import our modular components
+import { VectorVisualizater } from "../../utils/vector-visualizer";
 import { createBasicPhysicsObjects, updateVisuals } from "./core";
-import { createForceVisualization } from "./force-visualization";
 import { setupPhysicsControls, storeInitialPositions } from "./gui";
 import { createPhysicsWorld } from "./helpers";
 import { setupKeyboardControls } from "./keyboard";
@@ -11,8 +12,7 @@ import { createRopes } from "./rope";
 
 // Store UI elements and animation ID for cleanup
 let keyboardControls: ReturnType<typeof setupKeyboardControls> | null = null;
-let forceVisualizer: ReturnType<typeof createForceVisualization> | null = null;
-
+let vectorVisualizer: VectorVisualizater | null = null;
 
 const PhysicsChain = {
   load: async (options: StoryOptions) => {
@@ -25,17 +25,14 @@ const PhysicsChain = {
     // Create basic physics objects (platform and sphere)
     const { physicsObjects, platformBody, sphereBody } = createBasicPhysicsObjects(scene, world);
 
+    // Setup vector visualizer
+    vectorVisualizer = new VectorVisualizater(scene);
+    // Set custom scale to make vectors more visible
+    vectorVisualizer.setScale(3.0);
+
     // Setup physics controls
     const { controls: pushForceControl } =
-      setupPhysicsControls(gui, physicsObjects, sphereBody);
-
-    // Setup force visualizer
-    forceVisualizer = createForceVisualization(
-      scene,
-      platformBody,
-      renderer.domElement.parentElement || document.body,
-      camera
-    );
+      setupPhysicsControls(gui, physicsObjects, sphereBody, vectorVisualizer);
 
     // Define attachment points for ropes - cast shape to Box type to access halfExtents
     const platformShape = platformBody.shapes[0] as CANNON.Box;
@@ -79,18 +76,29 @@ const PhysicsChain = {
       platformForce: pushForceControl.platformForce
     });
 
+    // Calculate forces to be applied
+    let liftForce = new CANNON.Vec3(0, 0, 0);
+    let dragForce = new CANNON.Vec3(0, 0, 0);
+    let weightForce = new CANNON.Vec3(0, 0, 0);
+    let glideDirection = new CANNON.Vec3(0, 0, -1);
+
     function applyForces() {
-      // Apply lift force to platform body
+      // Calculate and apply lift force to platform body
+      liftForce.set(0, 23 * sphereBody.mass, 0);
       platformBody.applyForce(
-        new CANNON.Vec3(0, 23 * sphereBody.mass, 0),
+        liftForce,
         new CANNON.Vec3(0, 0, 0)
       );
 
-      // Apply weight force
+      // Apply weight force (gravity) to the sphere
+      weightForce.set(0, -9.82 * sphereBody.mass, 0);
       sphereBody.applyForce(
-        new CANNON.Vec3(0, -9.82 * sphereBody.mass, 0),
+        weightForce,
         new CANNON.Vec3(0, 0, 0)
       );
+
+      // Set drag force (we're not actually applying it, just visualizing)
+      dragForce.set(0, 0, -5 * sphereBody.mass);
     }
 
     // Physics update function (internal function)
@@ -104,6 +112,18 @@ const PhysicsChain = {
       }
 
       applyForces();
+
+      // Update vector visualization
+      if (vectorVisualizer) {
+        vectorVisualizer.update(
+          new THREE.Vector3().copy(platformBody.position as any),  // Wing position
+          new THREE.Vector3().copy(sphereBody.position as any),    // Pilot position
+          liftForce,                                               // Lift force
+          dragForce,                                               // Drag force
+          weightForce,                                             // Weight force
+          glideDirection                                           // Glide direction
+        );
+      }
 
       // Auto-rotate the camera if enabled
       if (pushForceControl.isAutoRotate) {
