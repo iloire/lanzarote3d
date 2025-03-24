@@ -12,8 +12,6 @@ export interface PhysicsControlSettings {
   isAutoRotate: boolean;
   autoRotateSpeed: number;
   resetScene: () => void;
-  horizontalForce: number;
-  horizontalForceDirection: number; // 0-360 degrees
 }
 
 /**
@@ -32,8 +30,6 @@ export function setupPhysicsControls(
     sphereMass: 50,
     isAutoRotate: false,
     autoRotateSpeed: 1,
-    horizontalForce: 30,
-    horizontalForceDirection: 0,
     resetScene: () => {
       // Reset all bodies to their initial positions and velocities
       physicsObjects.bodies?.forEach((body) => {
@@ -52,8 +48,7 @@ export function setupPhysicsControls(
 
   // Create a force control folder
   const forceControls = gui.addFolder("Force Controls");
-  forceControls.add(pushForceControl, "horizontalForce", 0, 400).name("Horizontal Force");
-  forceControls.add(pushForceControl, "horizontalForceDirection", 0, 360).name("Direction (deg)");
+
 
   // Create a sphere control folder
   const sphereControls = gui.addFolder("Sphere Controls");

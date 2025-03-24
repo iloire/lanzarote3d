@@ -13,8 +13,6 @@ import { createRopes } from "./rope";
 let keyboardControls: ReturnType<typeof setupKeyboardControls> | null = null;
 let forceVisualizer: ReturnType<typeof createForceVisualization> | null = null;
 
-// Store the horizontal force vector
-const horizontalForce = new CANNON.Vec3(0, 0, 0);
 
 const PhysicsChain = {
   load: async (options: StoryOptions) => {
@@ -88,35 +86,11 @@ const PhysicsChain = {
         new CANNON.Vec3(0, 0, 0)
       );
 
-      // Apply gravity to sphere body
+      // Apply weight force
       sphereBody.applyForce(
         new CANNON.Vec3(0, -9.82 * sphereBody.mass, 0),
         new CANNON.Vec3(0, 0, 0)
       );
-
-      // Apply horizontal force to platform body
-      // Convert direction from degrees to radians and create the horizontal force
-      const direction = pushForceControl.horizontalForceDirection * (Math.PI / 180);
-      const magnitude = pushForceControl.horizontalForce;
-
-      horizontalForce.set(
-        -Math.sin(direction) * magnitude, // X component (using negative sine for correct direction)
-        0,                               // No vertical component
-        -Math.cos(direction) * magnitude  // Z component (using negative cosine for correct direction)
-      );
-
-      // Apply the horizontal force to the platform
-      if (magnitude > 0) {
-        platformBody.applyForce(horizontalForce, new CANNON.Vec3(0, 0, 0));
-
-        // Update the force visualizer
-        if (forceVisualizer) {
-          forceVisualizer.update(horizontalForce, camera);
-        }
-      } else if (forceVisualizer) {
-        // Hide the visualizer if no force is applied
-        forceVisualizer.update(new CANNON.Vec3(0, 0, 0), camera);
-      }
     }
 
     // Physics update function (internal function)
