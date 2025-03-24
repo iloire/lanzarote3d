@@ -75,29 +75,53 @@ const PhysicsChain = {
       resetSceneCallback: pushForceControl.resetScene,
     });
 
-    // Calculate forces to be applied
-    let liftForce = new CANNON.Vec3(0, 0, 0);
-    let dragForce = new CANNON.Vec3(0, 0, 0);
-    let weightForce = new CANNON.Vec3(0, 0, 0);
-    let glideDirection = new CANNON.Vec3(0, 0, -1);
+    function applyForcesAndDrawVectors() {
+      // the glide direction is in the directio of the speed of the glider  
+      const glideDirection = gliderBody.velocity.clone();
 
-    function applyForces() {
-      // Calculate and apply lift force to platform body
-      liftForce.set(0, 23 * pilotBody.mass, 0);
+      // drag vector is in the opposite direction of the glide direction
+      const dragVector = glideDirection.negate();
+
+      // Calculate forces to be applied
+      const weightVector = new CANNON.Vec3(0, -9.82 * pilotBody.mass, 0);
+
+      // Calculate lift magnitude based on angle of attack
+      // Maximum lift at 15 degrees (0.26 radians), reduces at higher angles
+      // Base lift force proportional to pilot mass
+      const ANGLE_OF_ATTACK = 0.26;
+      const liftMagnitude = 11.82 * pilotBody.mass;
+      const liftVector = new CANNON.Vec3(liftMagnitude * Math.sin(ANGLE_OF_ATTACK),
+        liftMagnitude * Math.cos(ANGLE_OF_ATTACK), liftMagnitude * Math.sin(ANGLE_OF_ATTACK));
       gliderBody.applyForce(
-        liftForce,
+        liftVector,
         new CANNON.Vec3(0, 0, 0)
       );
 
-      // Apply weight force (gravity) to the sphere
-      weightForce.set(0, -9.82 * pilotBody.mass, 0);
+      // Apply weight force (gravity) to the pilot
       pilotBody.applyForce(
-        weightForce,
+        weightVector,
         new CANNON.Vec3(0, 0, 0)
       );
 
-      // Set drag force (we're not actually applying it, just visualizing)
-      dragForce.set(0, 0, -5 * pilotBody.mass);
+      // Set drag force
+      dragVector.set(0, 0, -5 * pilotBody.mass);
+      pilotBody.applyForce(
+        dragVector,
+        new CANNON.Vec3(0, 0, 0)
+      );
+
+      // Update vector visualization
+      if (vectorVisualizer) {
+        vectorVisualizer.update(
+          new THREE.Vector3().copy(gliderBody.position as any),  // Wing position
+          new THREE.Vector3().copy(pilotBody.position as any),    // Pilot position
+          liftVector,                                               // Lift force
+          dragVector,                                               // Drag force
+          weightVector,                                             // Weight force
+          glideDirection                                           // Glide direction
+        );
+      }
+
     }
 
     // Physics update function (internal function)
@@ -110,19 +134,8 @@ const PhysicsChain = {
         keyboardControls.applyInputForces();
       }
 
-      applyForces();
+      applyForcesAndDrawVectors();
 
-      // Update vector visualization
-      if (vectorVisualizer) {
-        vectorVisualizer.update(
-          new THREE.Vector3().copy(gliderBody.position as any),  // Wing position
-          new THREE.Vector3().copy(pilotBody.position as any),    // Pilot position
-          liftForce,                                               // Lift force
-          dragForce,                                               // Drag force
-          weightForce,                                             // Weight force
-          glideDirection                                           // Glide direction
-        );
-      }
 
       // Auto-rotate the camera if enabled
       if (pushForceControl.isAutoRotate) {

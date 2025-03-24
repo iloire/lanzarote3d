@@ -21,7 +21,6 @@ export function arrayIncludes(array: string[], value: string): boolean {
 // Helper function to create a physics world with good defaults
 export function createPhysicsWorld(): CANNON.World {
   const world = new CANNON.World();
-  world.gravity.set(0, -9.82, 0);
 
   // Add stability settings
   // @ts-ignore - CANNON.js typings might not include all solver properties

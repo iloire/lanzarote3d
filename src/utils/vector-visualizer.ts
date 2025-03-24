@@ -188,7 +188,7 @@ export class VectorVisualizater {
     liftVector: CANNON.Vec3,
     dragVector: CANNON.Vec3,
     weightVector: CANNON.Vec3,
-    _glideDirection: CANNON.Vec3
+    glideDirection: CANNON.Vec3
   ) {
     // Position the force groups at their respective objects
     this.gliderForceGroup.position.copy(wingPosition);
@@ -275,6 +275,18 @@ export class VectorVisualizater {
       console.error("Error with weight force visualization:", e);
       this.weightArrow.visible = false;
       this.forceLabels['weight'].visible = false;
+    }
+
+    // Update GLIDE DIRECTION force visualization - apply from pilot center
+    try {
+      const glideDirectionDirection = new THREE.Vector3(glideDirection.x, glideDirection.y, glideDirection.z);
+      this.glideDirectionArrow.setDirection(glideDirectionDirection);
+      this.glideDirectionArrow.setLength(Math.max(0, glideDirection.length() * effectivePilotScale));
+      this.glideDirectionArrow.position.set(0, 0, 0); // Relative to pilot group
+    } catch (e) {
+      console.error("Error with glide direction force visualization:", e);
+      this.glideDirectionArrow.visible = false;
+      this.forceLabels['glideDirection'].visible = false;
     }
 
   }
