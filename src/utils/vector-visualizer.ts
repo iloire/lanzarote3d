@@ -239,13 +239,28 @@ export class VectorVisualizater {
     this.gliderForceGroup.position.copy(wingPosition);
     this.pilotForceGroup.position.copy(pilotPosition);
 
-    // Apply custom scale factor to all force visualizations
+    // Update each vector using the individual update functions
+    this.updateLiftVector(wingPosition, liftVector);
+    this.updateDragVector(wingPosition, dragVector);
+    this.updateWeightVector(pilotPosition, weightVector);
+    this.updateGlideDirectionVector(wingPosition, glideDirection);
+    this.updateLeftBreakVector(wingPosition, leftBreakVector || null);
+    this.updateRightBreakVector(wingPosition, rightBreakVector || null);
+  }
+
+  isVisible(): boolean {
+    return this.forceGroup.visible;
+  }
+
+  /**
+   * Update lift vector independently
+   * @param wingPosition Position where the lift force is applied
+   * @param liftVector The lift force vector
+   */
+  updateLiftVector(wingPosition: THREE.Vector3, liftVector: CANNON.Vec3): void {
+    this.gliderForceGroup.position.copy(wingPosition);
     const effectiveGliderScale = FORCE_SCALE * WING_FORCE_SCALE * this.customScaleFactor;
-    const effectivePilotScale = FORCE_SCALE * PILOT_FORCE_SCALE * this.customScaleFactor;
 
-    // Update forces applied to the WING
-
-    // Safely extract lift force data
     try {
       // Update lift force visualization - apply from wing center
       const liftDirection = new THREE.Vector3(
@@ -266,13 +281,23 @@ export class VectorVisualizater {
       this.liftArrow.setLength(Math.max(0, liftLength)); // Ensure non-negative length
       this.liftArrow.position.set(0, 0, 0); // Relative to wing group
       this.updateLabel('lift', new THREE.Vector3(0, 0, 0), liftDirection, liftLength);
+      this.liftArrow.visible = true;
     } catch (e) {
       console.error("Error with lift force visualization:", e);
       this.liftArrow.visible = false;
       this.forceLabels['lift'].visible = false;
     }
+  }
 
-    // Safely extract drag force data
+  /**
+   * Update drag vector independently
+   * @param wingPosition Position where the drag force is applied
+   * @param dragVector The drag force vector
+   */
+  updateDragVector(wingPosition: THREE.Vector3, dragVector: CANNON.Vec3): void {
+    this.gliderForceGroup.position.copy(wingPosition);
+    const effectiveGliderScale = FORCE_SCALE * WING_FORCE_SCALE * this.customScaleFactor;
+
     try {
       // Update drag force visualization - apply from wing center
       const dragDirection = new THREE.Vector3(
@@ -293,14 +318,23 @@ export class VectorVisualizater {
       this.dragArrow.setLength(Math.max(0, dragLength)); // Ensure non-negative length
       this.dragArrow.position.set(0, 0, 0); // Relative to wing group
       this.updateLabel('drag', new THREE.Vector3(0, 0, 0), dragDirection, dragLength);
+      this.dragArrow.visible = true;
     } catch (e) {
       console.error("Error with drag force visualization:", e);
       this.dragArrow.visible = false;
       this.forceLabels['drag'].visible = false;
     }
+  }
 
+  /**
+   * Update weight vector independently
+   * @param pilotPosition Position where the weight force is applied
+   * @param weightVector The weight force vector
+   */
+  updateWeightVector(pilotPosition: THREE.Vector3, weightVector: CANNON.Vec3): void {
+    this.pilotForceGroup.position.copy(pilotPosition);
+    const effectivePilotScale = FORCE_SCALE * PILOT_FORCE_SCALE * this.customScaleFactor;
 
-    // Update WEIGHT force visualization - apply from pilot center
     try {
       const weightDirection = new THREE.Vector3(weightVector.x, weightVector.y, weightVector.z);
 
@@ -316,90 +350,133 @@ export class VectorVisualizater {
       this.weightArrow.setLength(Math.max(0, weightLength)); // Ensure non-negative length
       this.weightArrow.position.set(0, 0, 0); // Relative to pilot group
       this.updateLabel('weight', new THREE.Vector3(0, 0, 0), weightDirection, weightLength);
+      this.weightArrow.visible = true;
     } catch (e) {
       console.error("Error with weight force visualization:", e);
       this.weightArrow.visible = false;
       this.forceLabels['weight'].visible = false;
     }
+  }
 
-    // Update GLIDE DIRECTION force visualization - apply from pilot center
+  /**
+   * Update glide direction vector independently
+   * @param wingPosition Position where the glide direction is applied
+   * @param glideDirectionVector The glide direction vector
+   */
+  updateGlideDirectionVector(wingPosition: THREE.Vector3, glideDirectionVector: CANNON.Vec3): void {
+    this.gliderForceGroup.position.copy(wingPosition);
+    const effectiveGliderScale = FORCE_SCALE * WING_FORCE_SCALE * this.customScaleFactor;
+
     try {
-      const glideDirectionDirection = new THREE.Vector3(glideDirection.x, glideDirection.y, glideDirection.z);
+      const glideDirectionDirection = new THREE.Vector3(
+        glideDirectionVector.x,
+        glideDirectionVector.y,
+        glideDirectionVector.z
+      );
+
+      // Safely normalize the direction
+      if (glideDirectionDirection.length() > 0.001) {
+        glideDirectionDirection.normalize();
+      } else {
+        glideDirectionDirection.set(0, 0, -1); // Default to forward if invalid
+      }
+
+      const glideLength = glideDirectionVector.length() * effectiveGliderScale;
       this.glideDirectionArrow.setDirection(glideDirectionDirection);
-      this.glideDirectionArrow.setLength(Math.max(0, glideDirection.length() * effectivePilotScale));
-      this.glideDirectionArrow.position.set(0, 0, 0); // Relative to pilot group
+      this.glideDirectionArrow.setLength(Math.max(0, glideLength));
+      this.glideDirectionArrow.position.set(0, 0, 0);
+      this.updateLabel('glideDirection', new THREE.Vector3(0, 0, 0), glideDirectionDirection, glideLength);
+      this.glideDirectionArrow.visible = true;
     } catch (e) {
-      console.error("Error with glide direction force visualization:", e);
+      console.error("Error with glide direction visualization:", e);
       this.glideDirectionArrow.visible = false;
       this.forceLabels['glideDirection'].visible = false;
     }
+  }
 
-    // Update left break arrow if provided
-    if (leftBreakVector) {
-      try {
-        const leftBreakDirection = new THREE.Vector3(
-          isNaN(leftBreakVector.x) ? -1 : leftBreakVector.x,
-          isNaN(leftBreakVector.y) ? 0 : leftBreakVector.y,
-          isNaN(leftBreakVector.z) ? 0 : leftBreakVector.z
-        );
+  /**
+   * Update left break vector independently
+   * @param wingPosition Position where the left break force is applied
+   * @param leftBreakVector The left break force vector, or null to hide
+   */
+  updateLeftBreakVector(wingPosition: THREE.Vector3, leftBreakVector: CANNON.Vec3 | null): void {
+    this.gliderForceGroup.position.copy(wingPosition);
 
-        // Safely normalize the direction
-        if (leftBreakDirection.length() > 0.001) {
-          leftBreakDirection.normalize();
-        } else {
-          leftBreakDirection.set(-1, 0, 0); // Default to left if invalid
-        }
+    if (!leftBreakVector) {
+      this.leftBreakArrow.visible = false;
+      this.forceLabels['leftBreak'].visible = false;
+      return;
+    }
 
-        const leftBreakLength = !isNaN(leftBreakVector.length()) ? leftBreakVector.length() * effectiveGliderScale : 0;
-        this.leftBreakArrow.setDirection(leftBreakDirection);
-        this.leftBreakArrow.setLength(Math.max(0, leftBreakLength));
-        this.leftBreakArrow.position.set(-5, 0, 0); // Position offset to the left side of the wing
-        this.updateLabel('leftBreak', new THREE.Vector3(-5, 0, 0), leftBreakDirection, leftBreakLength);
-        this.leftBreakArrow.visible = true;
-      } catch (e) {
-        console.error("Error with left break force visualization:", e);
-        this.leftBreakArrow.visible = false;
-        this.forceLabels['leftBreak'].visible = false;
+    const effectiveGliderScale = FORCE_SCALE * WING_FORCE_SCALE * this.customScaleFactor;
+
+    try {
+      const leftBreakDirection = new THREE.Vector3(
+        isNaN(leftBreakVector.x) ? -1 : leftBreakVector.x,
+        isNaN(leftBreakVector.y) ? 0 : leftBreakVector.y,
+        isNaN(leftBreakVector.z) ? 0 : leftBreakVector.z
+      );
+
+      // Safely normalize the direction
+      if (leftBreakDirection.length() > 0.001) {
+        leftBreakDirection.normalize();
+      } else {
+        leftBreakDirection.set(-1, 0, 0); // Default to left if invalid
       }
-    } else {
+
+      const leftBreakLength = !isNaN(leftBreakVector.length()) ? leftBreakVector.length() * effectiveGliderScale : 0;
+      this.leftBreakArrow.setDirection(leftBreakDirection);
+      this.leftBreakArrow.setLength(Math.max(0, leftBreakLength));
+      this.leftBreakArrow.position.set(-5, 0, 0); // Position offset to the left side of the wing
+      this.updateLabel('leftBreak', new THREE.Vector3(-5, 0, 0), leftBreakDirection, leftBreakLength);
+      this.leftBreakArrow.visible = true;
+    } catch (e) {
+      console.error("Error with left break force visualization:", e);
       this.leftBreakArrow.visible = false;
       this.forceLabels['leftBreak'].visible = false;
     }
+  }
 
-    // Update right break arrow if provided
-    if (rightBreakVector) {
-      try {
-        const rightBreakDirection = new THREE.Vector3(
-          isNaN(rightBreakVector.x) ? 1 : rightBreakVector.x,
-          isNaN(rightBreakVector.y) ? 0 : rightBreakVector.y,
-          isNaN(rightBreakVector.z) ? 0 : rightBreakVector.z
-        );
+  /**
+   * Update right break vector independently
+   * @param wingPosition Position where the right break force is applied
+   * @param rightBreakVector The right break force vector, or null to hide
+   */
+  updateRightBreakVector(wingPosition: THREE.Vector3, rightBreakVector: CANNON.Vec3 | null): void {
+    this.gliderForceGroup.position.copy(wingPosition);
 
-        // Safely normalize the direction
-        if (rightBreakDirection.length() > 0.001) {
-          rightBreakDirection.normalize();
-        } else {
-          rightBreakDirection.set(1, 0, 0); // Default to right if invalid
-        }
+    if (!rightBreakVector) {
+      this.rightBreakArrow.visible = false;
+      this.forceLabels['rightBreak'].visible = false;
+      return;
+    }
 
-        const rightBreakLength = !isNaN(rightBreakVector.length()) ? rightBreakVector.length() * effectiveGliderScale : 0;
-        this.rightBreakArrow.setDirection(rightBreakDirection);
-        this.rightBreakArrow.setLength(Math.max(0, rightBreakLength));
-        this.rightBreakArrow.position.set(5, 0, 0); // Position offset to the right side of the wing
-        this.updateLabel('rightBreak', new THREE.Vector3(5, 0, 0), rightBreakDirection, rightBreakLength);
-        this.rightBreakArrow.visible = true;
-      } catch (e) {
-        console.error("Error with right break force visualization:", e);
-        this.rightBreakArrow.visible = false;
-        this.forceLabels['rightBreak'].visible = false;
+    const effectiveGliderScale = FORCE_SCALE * WING_FORCE_SCALE * this.customScaleFactor;
+
+    try {
+      const rightBreakDirection = new THREE.Vector3(
+        isNaN(rightBreakVector.x) ? 1 : rightBreakVector.x,
+        isNaN(rightBreakVector.y) ? 0 : rightBreakVector.y,
+        isNaN(rightBreakVector.z) ? 0 : rightBreakVector.z
+      );
+
+      // Safely normalize the direction
+      if (rightBreakDirection.length() > 0.001) {
+        rightBreakDirection.normalize();
+      } else {
+        rightBreakDirection.set(1, 0, 0); // Default to right if invalid
       }
-    } else {
+
+      const rightBreakLength = !isNaN(rightBreakVector.length()) ? rightBreakVector.length() * effectiveGliderScale : 0;
+      this.rightBreakArrow.setDirection(rightBreakDirection);
+      this.rightBreakArrow.setLength(Math.max(0, rightBreakLength));
+      this.rightBreakArrow.position.set(5, 0, 0); // Position offset to the right side of the wing
+      this.updateLabel('rightBreak', new THREE.Vector3(5, 0, 0), rightBreakDirection, rightBreakLength);
+      this.rightBreakArrow.visible = true;
+    } catch (e) {
+      console.error("Error with right break force visualization:", e);
       this.rightBreakArrow.visible = false;
       this.forceLabels['rightBreak'].visible = false;
     }
-  }
-
-  isVisible(): boolean {
-    return this.forceGroup.visible;
   }
 } 
