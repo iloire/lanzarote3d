@@ -57,7 +57,7 @@ const CannonWorkshop = {
     // Create the CANNON.js physics world
     // This is the main container for all physics objects and simulation
     const world = new CANNON.World();
-    world.gravity.set(0, -9.82, 0); // Set gravity (meters/sec²) - Earth's gravity
+    world.gravity.set(0, -1.82, 0); // Set gravity (meters/sec²) - Earth's gravity
 
     // Create vector visualizer for displaying forces
     // This helps understand the physics by showing arrows for each force
@@ -180,7 +180,7 @@ const CannonWorkshop = {
       body.addShape(tailShape, new CANNON.Vec3(-3.5, 0.5, 0)); // Tail at back of fuselage
 
       // Set initial velocity for a moving start - faster speed to generate sufficient lift
-      body.velocity.set(0, 0, -20); // 20 m/s initial forward speed
+      body.velocity.set(0, 0, -2); // 20 m/s initial forward speed
 
       return body;
     }
@@ -253,8 +253,8 @@ const CannonWorkshop = {
       const keyDownHandler = (e: KeyboardEvent) => {
         // Update the corresponding state property based on which key was pressed
         switch (e.code) {
-          case 'ArrowUp': state.up = true; break;
-          case 'ArrowDown': state.down = true; break;
+          case 'ArrowDown': state.up = true; break;
+          case 'ArrowUp': state.down = true; break;
           case 'ArrowLeft': state.left = true; break;
           case 'ArrowRight': state.right = true; break;
           case 'KeyW': state.w = true; break;
@@ -269,8 +269,8 @@ const CannonWorkshop = {
       const keyUpHandler = (e: KeyboardEvent) => {
         // Update the corresponding state property based on which key was released
         switch (e.code) {
-          case 'ArrowUp': state.up = false; break;
-          case 'ArrowDown': state.down = false; break;
+          case 'ArrowDown': state.up = false; break;
+          case 'ArrowUp': state.down = false; break;
           case 'ArrowLeft': state.left = false; break;
           case 'ArrowRight': state.right = false; break;
           case 'KeyW': state.w = false; break;
@@ -387,20 +387,20 @@ const CannonWorkshop = {
      * @param body The airplane physics body
      * @param controls The current control settings
      * @param keyboard The current keyboard input state
-     * @param deltaTime Time since last frame
+     * @param _deltaTime Time since last frame
      * @param vectorVisualizer The vector visualizer for showing forces
      */
     function applyAirplanePhysics(
       body: CANNON.Body,
       controls: AirplaneControlSettings,
       keyboard: KeyboardState,
-      deltaTime: number,
+      _deltaTime: number,
       vectorVisualizer: VectorVisualizater
     ) {
       // Reset all accumulated forces and torques
       // This is important as we'll calculate and apply new ones each frame
-      body.force.set(0, 0, 0);
-      body.torque.set(0, 0, 0);
+      // body.force.set(0, 0, 0);
+      // body.torque.set(0, 0, 0);
 
       // Handle reset key (R) - restores airplane to starting position
       if (keyboard.r) {
@@ -416,12 +416,9 @@ const CannonWorkshop = {
 
       // Transform the local vectors to world space based on airplane orientation
       // This is essential as forces need to be applied in world coordinates
-      body.vectorToWorldFrame(forwardVector, forwardVector);
-      console.log(upVector);
-      body.vectorToWorldFrame(upVector, upVector);
-      console.log(upVector);
-
-      body.vectorToWorldFrame(rightVector, rightVector);
+      // body.vectorToWorldFrame(forwardVector, forwardVector);
+      // body.vectorToWorldFrame(upVector, upVector);
+      // body.vectorToWorldFrame(rightVector, rightVector);
 
       // Calculate velocity magnitude (airspeed)
       const velocityMag = body.velocity.length();
@@ -457,7 +454,9 @@ const CannonWorkshop = {
 
       // Calculate final thrust vector and apply it
       const thrustForce = forwardVector.clone().scale(controls.thrust * thrustMultiplier);
-      body.applyForce(thrustForce, body.position);
+      console.log(thrustForce);
+
+      body.applyLocalForce(thrustForce, new CANNON.Vec3(0, 0, 0));
 
       // Calculate lift direction perpendicular to airflow
       // In simple terms, this is "up" from the airplane's perspective
@@ -479,18 +478,18 @@ const CannonWorkshop = {
       // Use a higher constant multiplier (0.015 instead of 0.01) for better lift
       const liftMagnitude = liftCoefficient * velocityMag * velocityMag * 0.015;
       const liftForce = liftDirection.clone().scale(liftMagnitude);
-      body.applyForce(liftForce, body.position);
+      // body.applyLocalForce(liftForce);
 
       // Add a small constant lift force to help prevent stalling
       // This helps maintain altitude even at lower speeds
       const stabilizingLift = liftDirection.clone().scale(100);
-      body.applyForce(stabilizingLift, body.position);
+      // body.applyLocalForce(stabilizingLift);
 
       // Calculate drag force - opposite to velocity and proportional to velocity squared
       // This simulates air resistance that increases with speed
       const dragMagnitude = controls.dragCoefficient * velocityMag * velocityMag * 0.01;
       const dragForce = relativeWind.clone().scale(dragMagnitude);
-      body.applyForce(dragForce, body.position);
+      // body.applyForce(dragForce, body.position);
 
       // Apply control inputs as torques
       // These rotate the airplane around its different axes
@@ -498,9 +497,13 @@ const CannonWorkshop = {
       // Pitch (elevator) - rotate around right axis (wing axis)
       if (keyboard.up) {
         // Push nose down - positive pitch torque
+        console.log('up');
+        console.log(rightVector.clone().scale(controls.pitchSensitivity * 500));
         body.applyTorque(rightVector.clone().scale(controls.pitchSensitivity * 500));
       } else if (keyboard.down) {
         // Pull nose up - negative pitch torque
+        console.log('down');
+        console.log(rightVector.clone().scale(-controls.pitchSensitivity * 500));
         body.applyTorque(rightVector.clone().scale(-controls.pitchSensitivity * 500));
       }
 
@@ -562,31 +565,38 @@ const CannonWorkshop = {
      * @param controls OrbitControls instance
      */
     function updateCamera(camera: THREE.Camera, body: CANNON.Body, controls: any) {
-      // Only update camera automatically if auto-rotate is enabled
-      // Otherwise, let the user control the camera manually
-      if (controls.autoRotate) {
-        const position = body.position;
-        // Create an offset position behind and above the airplane
-        const offset = new CANNON.Vec3(-15, 5, 0);
+      // Get the airplane's forward direction in world space
+      const forwardVector = new CANNON.Vec3(1, 0, 0);
+      body.vectorToWorldFrame(forwardVector, forwardVector);
 
-        // Transform the offset based on airplane orientation
-        // This helps the camera follow even during turns and maneuvers
-        body.vectorToWorldFrame(offset, offset);
+      // Get the airplane's up direction in world space
+      const upVector = new CANNON.Vec3(0, 1, 0);
+      body.vectorToWorldFrame(upVector, upVector);
 
-        // Set camera position to the transformed offset
-        camera.position.set(
-          position.x + offset.x,
-          position.y + offset.y,
-          position.z + offset.z
-        );
+      // Position the camera slightly above and behind the cockpit
+      const cockpitOffset = new CANNON.Vec3(-0.5, 1, 0); // Slightly behind and above the nose
+      body.vectorToWorldFrame(cockpitOffset, cockpitOffset);
 
-        // Point the camera at the airplane
-        camera.lookAt(
-          position.x,
-          position.y,
-          position.z
-        );
-      }
+      // Set camera position to cockpit position
+      camera.position.set(
+        body.position.x + cockpitOffset.x,
+        body.position.y + cockpitOffset.y,
+        body.position.z + cockpitOffset.z
+      );
+
+      // Calculate look target - point slightly ahead of the airplane
+      const lookAheadDistance = 10;
+      const targetPosition = new THREE.Vector3(
+        body.position.x + forwardVector.x * lookAheadDistance,
+        body.position.y + forwardVector.y * lookAheadDistance,
+        body.position.z + forwardVector.z * lookAheadDistance
+      );
+
+      // Make the camera look at the target point
+      camera.lookAt(targetPosition);
+
+      // Disable orbit controls since we're handling camera movement
+      controls.enabled = false;
     }
 
     // Return cleanup function for when the story is unloaded
