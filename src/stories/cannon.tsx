@@ -1,6 +1,7 @@
 import * as CANNON from "cannon-es";
 import * as THREE from "three";
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
+import { FlightHUD } from "../components/FlightHUD";
 import Helpers from "../utils/helpers";
 import { VectorVisualizater } from "../utils/vector-visualizer";
 import { StoryOptions } from "./types";
@@ -105,6 +106,9 @@ const CannonWorkshop = {
     camera.position.set(0, 15, 30);
     controls.update();
 
+    // Initialize the HUD
+    const hud = new FlightHUD({ scene, camera });
+
     // Animation and physics timestep variables
     let lastTime = 0;
 
@@ -139,8 +143,19 @@ const CannonWorkshop = {
       // Update camera to follow the airplane
       updateCamera(camera, airplaneBody, controls);
 
-      // Render the current frame
-      renderer.render(scene, camera);
+      // Update HUD with current flight data
+      hud.update(
+        new THREE.Vector3(
+          airplaneBody.velocity.x,
+          airplaneBody.velocity.y,
+          airplaneBody.velocity.z
+        ),
+        airplaneBody.position.y,
+        new THREE.Euler().setFromQuaternion(airplaneMesh.quaternion)
+      );
+
+      // Render the scene and HUD
+      hud.render(renderer);
 
       // Schedule the next frame
       requestAnimationFrame(animate);
@@ -603,6 +618,7 @@ const CannonWorkshop = {
     return () => {
       // Clean up event listeners to prevent memory leaks
       if (cleanupKeyboardControls) cleanupKeyboardControls();
+      hud.dispose();
     };
   },
 };
