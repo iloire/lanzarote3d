@@ -82,28 +82,17 @@ const PhysicsChain = {
       // drag vector is in the opposite direction of the glide direction
       const dragVector = glideDirection.negate();
 
-      // Calculate forces to be applied
-      const weightVector = new CANNON.Vec3(0, -9.82 * pilotBody.mass, 0);
 
-      // Calculate lift magnitude based on angle of attack
-      // Maximum lift at 15 degrees (0.26 radians), reduces at higher angles
-      // Base lift force proportional to pilot mass
-      const ANGLE_OF_ATTACK = 0.26;
-      const liftMagnitude = 14.82 * pilotBody.mass;
+      const liftMagnitude = 24.82 * pilotBody.mass;
       const liftVector = new CANNON.Vec3(0, liftMagnitude, 0);
-      // gliderBody.vectorToWorldFrame(liftVector, liftVector);
-
-      const cdgPilot = new CANNON.Vec3(0, -22, 0);
-      gliderBody.vectorToWorldFrame(cdgPilot, cdgPilot);
       gliderBody.applyForce(
-        liftVector,
-        cdgPilot
+        liftVector
       );
 
       // Apply weight force (gravity) to the pilot
+      const weightVector = new CANNON.Vec3(0, -9.82 * pilotBody.mass, 0);
       pilotBody.applyForce(
         weightVector,
-        pilotBody.position
       );
 
       // // Set drag force

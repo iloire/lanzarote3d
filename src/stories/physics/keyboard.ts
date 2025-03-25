@@ -58,6 +58,9 @@ export function setupKeyboardControls(
 
       gliderBody.angularVelocity.z *= 0.95;
 
+      const rollTorqueMagnitude = 1000;
+
+
       if (keysPressed.has(KEY_MAPPING.RIGHT[0])) {
         console.log('right', force);
 
@@ -66,13 +69,13 @@ export function setupKeyboardControls(
         const dragForce = velocity.negate().scale(breakForceMagnitude);
         const wingPosition = new THREE.Vector3(0, 0, 3);
         vectorVisualizer.updateRightBreakVector(wingPosition, dragForce);
-        gliderBody.angularVelocity.z = rollTorque
-        // gliderBody.applyForce(
-        //   dragForce,
-        //   new CANNON.Vec3(0, 0, 3)
-        // );
+        const rollAxis = gliderBody.vectorToWorldFrame(new CANNON.Vec3(0, 1, 0));
+        gliderBody.applyTorque(
+          rollAxis.scale(-rollTorqueMagnitude)
+        );
 
       }
+
 
       // X-axis movement (left/right)
       if (keysPressed.has(KEY_MAPPING.LEFT[0])) {
@@ -80,10 +83,9 @@ export function setupKeyboardControls(
         const dragForce = velocity.negate().scale(breakForceMagnitude);
         const wingPosition = new THREE.Vector3(0, 0, 3);
         vectorVisualizer.updateLeftBreakVector(wingPosition, dragForce);
-        gliderBody.angularVelocity.z = -rollTorque
-        gliderBody.applyForce(
-          dragForce,
-          new CANNON.Vec3(3, 0, 0)
+        const rollAxis = gliderBody.vectorToWorldFrame(new CANNON.Vec3(0, 1, 0));
+        gliderBody.applyTorque(
+          rollAxis.scale(rollTorqueMagnitude)
         );
       }
 
@@ -92,6 +94,7 @@ export function setupKeyboardControls(
         // when the up key is pressed, the glider will experiment a lift force on the top side 
         const liftForceMagnitude = 1200;
         const liftForce = new CANNON.Vec3(0, liftForceMagnitude, 0);
+
         gliderBody.applyForce(
           liftForce,
           new CANNON.Vec3(0, 0, 0)

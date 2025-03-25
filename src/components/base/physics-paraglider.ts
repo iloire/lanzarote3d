@@ -295,7 +295,7 @@ export default class PhysicsFlier extends THREE.EventDispatcher {
     console.log("liftForce", liftForce);
 
     // Apply lift at the center of the wing
-    this.gliderBody.applyForce(liftForce, new CANNON.Vec3(0, 0, 0));
+    this.gliderBody.applyLocalForce(liftForce, new CANNON.Vec3(0, 0, 0));
 
     // Calculate drag force with increased magnitude
     const dragForce = this.calculateDragForce(speed);
@@ -311,11 +311,11 @@ export default class PhysicsFlier extends THREE.EventDispatcher {
 
     // Apply gravity at the pilot's position (center of mass)
     const pilotGravityForce = new CANNON.Vec3(0, -this.options.pilot.weight * 9.81, 0);
-    this.pilotBody.applyForce(pilotGravityForce, new CANNON.Vec3(0, 0, 0));
+    // this.pilotBody.applyLocalForce(pilotGravityForce, new CANNON.Vec3(0, 0, 0));
 
     // Also apply gravity to the glider
     const gliderGravityForce = new CANNON.Vec3(0, -this.options.glider.weight * 9.81, 0);
-    this.gliderBody.applyForce(gliderGravityForce, new CANNON.Vec3(0, 0, 0));
+    this.gliderBody.applyLocalForce(gliderGravityForce, new CANNON.Vec3(0, 0, 0));
   }
 
   public calculateLiftForce(speed: number): CANNON.Vec3 {
