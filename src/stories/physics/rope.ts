@@ -178,6 +178,10 @@ export function createRopes(
   const defaultColors = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00];
   const colors = ropeOptions.colors || defaultColors;
 
+  // Get the sphere radius (assuming bodyB's first shape is a sphere)
+  const sphereShape = bodyB.shapes[0] as CANNON.Sphere;
+  const radius = sphereShape.radius;
+
   // Create a rope for each attachment point
   attachmentPoints.forEach((point, index) => {
     // Create a local attachment point for bodyA (the platform)
@@ -185,13 +189,53 @@ export function createRopes(
     const shape = bodyA.shapes[0] as CANNON.Box;
     const localPointA = new CANNON.Vec3(point.x, -shape.halfExtents.y, point.z);
 
-    // Create attachment point at the top of sphere
-    // Get the sphere radius (assuming bodyB's first shape is a sphere)
-    const sphereShape = bodyB.shapes[0] as CANNON.Sphere;
-    const radius = sphereShape.radius;
+    // Create distributed attachment points on the sphere using a tetrahedral pattern
+    // This provides maximum stability by spreading attachment points in different directions
 
-    // Use a single attachment point at the exact top of the sphere for all ropes
-    const localPointB = new CANNON.Vec3(0, radius, 0);
+    // Phi angle from center to attachment point (0.6 is a good value, about 34 degrees from vertical)
+    const phi = 0.6;
+
+    // Calculate sphere attachment point based on the index (spread points around the sphere)
+    let localPointB: CANNON.Vec3;
+
+    if (attachmentPoints.length <= 1) {
+      // If there's only one attachment point, put it on top
+      localPointB = new CANNON.Vec3(0, radius, 0);
+    } else if (attachmentPoints.length === 2) {
+      // For two points, put them at opposite sides (top and bottom)
+      localPointB = index === 0
+        ? new CANNON.Vec3(0, radius, 0)  // top
+        : new CANNON.Vec3(0, -radius, 0); // bottom
+    } else if (attachmentPoints.length === 3) {
+      // For three points, use a tripod formation (120 degrees apart)
+      const theta = (index * Math.PI * 2 / 3);
+      // Use a slight upward bias for more stability (0.3 keeps points in upper hemisphere)
+      localPointB = new CANNON.Vec3(
+        radius * Math.sin(phi) * Math.cos(theta),
+        radius * 0.3, // Slight upward bias
+        radius * Math.sin(phi) * Math.sin(theta)
+      );
+    } else {
+      // For four or more points, use tetrahedral formation for maximum stability
+      // This places points in a pattern similar to the vertices of a tetrahedron
+      switch (index % 4) {
+        case 0: // Upper point
+          localPointB = new CANNON.Vec3(0, radius * 0.8, 0);
+          break;
+        case 1: // Lower front point
+          localPointB = new CANNON.Vec3(radius * 0.8, -radius * 0.4, 0);
+          break;
+        case 2: // Lower left point
+          localPointB = new CANNON.Vec3(-radius * 0.4, -radius * 0.4, radius * 0.7);
+          break;
+        case 3: // Lower right point
+          localPointB = new CANNON.Vec3(-radius * 0.4, -radius * 0.4, -radius * 0.7);
+          break;
+        default:
+          // Fallback (shouldn't happen)
+          localPointB = new CANNON.Vec3(0, radius, 0);
+      }
+    }
 
     // Create the rope with the color for this index (cycling if needed)
     const color = colors[index % colors.length];
@@ -205,7 +249,7 @@ export function createRopes(
       thickness,
       color,
       localPointA, // Pass the local attachment point for bodyA
-      localPointB  // Attachment point on top of the sphere
+      localPointB  // Distributed attachment point on the sphere
     );
 
     ropes.push(rope);

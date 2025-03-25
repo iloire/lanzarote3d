@@ -1,6 +1,7 @@
 import Animation from "./animation";
 import Animation2 from "./animation2";
 import Animation3 from "./animation3";
+import CannonWorkshop from "./cannon";
 import Clouds from "./clouds";
 import FlierPG from "./flier-pg";
 import FlyZones from "./flyzones/index";
@@ -48,6 +49,7 @@ const Stories: Record<string, StoryFunction> = {
   voxelExample: VoxelExample.load,
   workshop: Workshop.load,
   physics: Physics.load,
+  cannon: CannonWorkshop.load,
 };
 
 export default Stories;

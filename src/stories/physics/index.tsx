@@ -8,7 +8,7 @@ import { createBasicPhysicsObjects, updateVisuals } from "./core";
 import { setupPhysicsControls, storeInitialPositions } from "./gui";
 import { createPhysicsWorld } from "./helpers";
 import { setupKeyboardControls } from "./keyboard";
-import { createRopes } from "./rope";
+import { createLines } from "./lines";
 
 // Store UI elements and animation ID for cleanup
 let keyboardControls: ReturnType<typeof setupKeyboardControls> | null = null;
@@ -43,8 +43,8 @@ const PhysicsChain = {
       { x: platformShape.halfExtents.x, z: platformShape.halfExtents.z }
     ];
 
-    // Create ropes connecting platform and sphere
-    const ropes = createRopes(
+    // Create lines connecting platform and sphere
+    const lines = createLines(
       world,
       scene,
       gliderBody,
@@ -57,13 +57,13 @@ const PhysicsChain = {
       }
     );
 
-    // Add rope segments and constraints to physicsObjects
-    ropes.forEach(rope => {
+    // Add line segments and constraints to physicsObjects
+    lines.forEach(line => {
       physicsObjects.addObjects!(
-        rope.segments,
-        rope.constraints,
-        rope.visualMeshes,
-        rope.constraintLines
+        line.segments,
+        line.constraints,
+        line.visualMeshes,
+        line.constraintLines
       );
     });
 
@@ -89,54 +89,64 @@ const PhysicsChain = {
       // Maximum lift at 15 degrees (0.26 radians), reduces at higher angles
       // Base lift force proportional to pilot mass
       const ANGLE_OF_ATTACK = 0.26;
-      const liftMagnitude = 11.82 * pilotBody.mass;
-      const liftVector = new CANNON.Vec3(liftMagnitude * Math.sin(ANGLE_OF_ATTACK),
-        liftMagnitude * Math.cos(ANGLE_OF_ATTACK), liftMagnitude * Math.sin(ANGLE_OF_ATTACK));
+      const liftMagnitude = 14.82 * pilotBody.mass;
+      const liftVector = new CANNON.Vec3(0, liftMagnitude, 0);
+      // gliderBody.vectorToWorldFrame(liftVector, liftVector);
+
+      const cdgPilot = new CANNON.Vec3(0, -22, 0);
+      gliderBody.vectorToWorldFrame(cdgPilot, cdgPilot);
       gliderBody.applyForce(
         liftVector,
-        new CANNON.Vec3(0, 0, 0)
+        cdgPilot
       );
 
       // Apply weight force (gravity) to the pilot
       pilotBody.applyForce(
         weightVector,
-        new CANNON.Vec3(0, 0, 0)
+        pilotBody.position
       );
 
-      // Set drag force
-      dragVector.set(0, 0, -5 * pilotBody.mass);
-      pilotBody.applyForce(
-        dragVector,
-        new CANNON.Vec3(0, 0, 0)
-      );
+      // // Set drag force
+      // dragVector.set(0, 0, -5 * pilotBody.mass);
+      // pilotBody.applyForce(
+      //   dragVector,
+      //   gliderBody.position
+      // );
 
       // Calculate break forces using GUI control values
       // Left break force - pulls down and to the left
+      const breakMagnitude = pushForceControl.leftBreakForce * pilotBody.mass;
       const leftBreakVector = new CANNON.Vec3(
-        -pushForceControl.leftBreakForce * pilotBody.mass,
-        -pushForceControl.leftBreakForce * 0.5 * pilotBody.mass,
+        -breakMagnitude,
+        0,
         0
       );
+      gliderBody.vectorToWorldFrame(leftBreakVector, leftBreakVector);
 
       // Right break force - pulls down and to the right
       const rightBreakVector = new CANNON.Vec3(
-        pushForceControl.rightBreakForce * pilotBody.mass,
-        -pushForceControl.rightBreakForce * 0.5 * pilotBody.mass,
+        -breakMagnitude,
+        0,
         0
       );
+      gliderBody.vectorToWorldFrame(rightBreakVector, rightBreakVector);
 
       // Apply break forces if they are active (value > 0)
       if (pushForceControl.leftBreakForce > 0) {
+        const leftWingTip = new CANNON.Vec3(-5, 0, 0);
+        gliderBody.vectorToWorldFrame(leftWingTip, leftWingTip);
         gliderBody.applyForce(
           leftBreakVector,
-          new CANNON.Vec3(-5, 0, 0) // Apply on the left side of the wing
+          leftWingTip
         );
       }
 
       if (pushForceControl.rightBreakForce > 0) {
+        const rightWingTip = new CANNON.Vec3(5, 0, 0);
+        gliderBody.vectorToWorldFrame(rightWingTip, rightWingTip);
         gliderBody.applyForce(
           rightBreakVector,
-          new CANNON.Vec3(5, 0, 0) // Apply on the right side of the wing
+          rightWingTip
         );
       }
 

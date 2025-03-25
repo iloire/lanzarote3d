@@ -54,6 +54,10 @@ export function setupKeyboardControls(
       const velocity = gliderBody.velocity;
       const breakForceMagnitude = 1200;
 
+      const rollTorque = 0.4;
+
+      gliderBody.angularVelocity.z *= 0.95;
+
       if (keysPressed.has(KEY_MAPPING.RIGHT[0])) {
         console.log('right', force);
 
@@ -62,10 +66,11 @@ export function setupKeyboardControls(
         const dragForce = velocity.negate().scale(breakForceMagnitude);
         const wingPosition = new THREE.Vector3(0, 0, 3);
         vectorVisualizer.updateRightBreakVector(wingPosition, dragForce);
-        gliderBody.applyForce(
-          dragForce,
-          new CANNON.Vec3(0, 0, 3)
-        );
+        gliderBody.angularVelocity.z = rollTorque
+        // gliderBody.applyForce(
+        //   dragForce,
+        //   new CANNON.Vec3(0, 0, 3)
+        // );
 
       }
 
@@ -75,6 +80,7 @@ export function setupKeyboardControls(
         const dragForce = velocity.negate().scale(breakForceMagnitude);
         const wingPosition = new THREE.Vector3(0, 0, 3);
         vectorVisualizer.updateLeftBreakVector(wingPosition, dragForce);
+        gliderBody.angularVelocity.z = -rollTorque
         gliderBody.applyForce(
           dragForce,
           new CANNON.Vec3(3, 0, 0)

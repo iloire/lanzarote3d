@@ -118,12 +118,56 @@ The rope system works by:
 
 1. **Local Attachment Points**: Ropes are attached to specific local points on the platform and sphere
    - The platform has ropes attached at each of its four corners (bottom face)
-   - All four ropes connect to a single point at the exact top of the sphere
+   - The sphere has attachment points arranged in a tetrahedral pattern for maximum stability
    - Each rope has a unique color for visual distinction (red, green, blue, yellow)
    - The attachment points use local coordinates relative to each body's center
-2. **Segment Chain**: Each rope consists of multiple small physics bodies connected by constraints
-3. **Constraint Visualization**: Visual lines track the positions of constraints, updating in real-time as physics bodies move
-4. **Force Transmission**: Forces applied to the platform or sphere are transmitted through the rope physics
+   
+2. **Tetrahedral Attachment Pattern**: The sphere's attachment points are distributed in a tetrahedral pattern:
+   - For a 4-line configuration (default), the attachments form a tetrahedron:
+     - One point near the top of the sphere
+     - Three points in the lower hemisphere, distributed at 120° intervals
+   - This arrangement maximizes stability by distributing forces evenly around the sphere
+   - The system automatically adapts to different numbers of attachment points:
+     - One line: attaches at the top of the sphere
+     - Two lines: attaches at opposite poles (top and bottom)
+     - Three lines: forms a tripod pattern with a slight upward bias
+     - Four or more: uses the full tetrahedral pattern repeating for additional lines
+
+3. **Segment Chain**: Each rope consists of multiple small physics bodies connected by constraints
+
+4. **Constraint Visualization**: Visual lines track the positions of constraints, updating in real-time as physics bodies move
+
+5. **Force Transmission**: Forces applied to the platform or sphere are transmitted through the rope physics
+
+## Stability Enhancements
+
+The physics simulation has been optimized for maximum stability through several enhancements:
+
+1. **Optimized Tetrahedral Attachment Pattern**
+   - The attachment points on the pilot sphere are distributed in a tetrahedral pattern
+   - This pattern is optimized based on the number of lines (1-4+)
+   - For the standard 4-line setup, points form a balanced upper hemisphere pattern
+   - Even distribution provides stability against forces from any direction
+
+2. **Progressive Line Segment Mass Distribution**
+   - Line segments have a decreasing mass gradient from glider to pilot
+   - Segments near the glider are slightly heavier for better stability
+   - Fixed rotation on line segments prevents unwanted twisting
+   - Higher damping (0.9) reduces oscillation in the line system
+
+3. **Enhanced Physics Parameters**
+   - Reduced gravity (8.0 m/s² instead of 9.82 m/s²) for more gradual movement
+   - Improved solver settings (20 iterations, 0.0001 tolerance) for better constraint solving
+   - Custom contact materials with lower restitution to prevent bouncing
+   - SAPBroadphase for better continuous collision detection
+
+4. **Optimized Body Properties**
+   - Lighter glider (5kg) and realistic pilot mass (70kg)
+   - Higher angular damping on both bodies to reduce wobbling and spinning
+   - Custom materials with appropriate friction and restitution values
+   - Shorter line length (20m vs 24m) for better control
+
+These enhancements work together to create a physically accurate and extremely stable paragliding simulation, suitable for realistic flight behavior without the instability issues that often plague physics-based rope and constraint systems.
 
 ## Usage
 
