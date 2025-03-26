@@ -24,8 +24,14 @@ const PhysicsChain = {
     // Create physics world
     const world = createPhysicsWorld();
 
+    const initialPosition = new THREE.Vector3(100, 190, 0);
+
     // Create basic physics objects (platform and sphere)
-    const { physicsObjects, gliderBody: gliderBody, pilotBody: pilotBody } = createBasicPhysicsObjects(scene, world);
+    const {
+      physicsObjects,
+      gliderBody: gliderBody,
+      pilotBody: pilotBody
+    } = createBasicPhysicsObjects(scene, world, initialPosition);
 
     // Setup vector visualizer
     vectorVisualizer = new VectorVisualizater(scene);
@@ -88,7 +94,7 @@ const PhysicsChain = {
       const dragVector = glideDirection.negate();
 
       // for now let's keep it same as weight
-      const liftMagnitude = 9.82 * pilotBody.mass;
+      const liftMagnitude = 8.82 * pilotBody.mass;
       const liftVector = new CANNON.Vec3(0, liftMagnitude, 0);
       gliderBody.applyForce(
         liftVector
@@ -212,13 +218,6 @@ const PhysicsChain = {
       // Update visual representations to match physics bodies
       updateVisuals(physicsObjects);
     }
-
-    camera.position.set(
-      gliderBody.position.x + 130,
-      gliderBody.position.y + 120,
-      gliderBody.position.z + 130
-    );
-
 
     // Animation loop
     function animate() {

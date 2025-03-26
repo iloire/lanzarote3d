@@ -26,7 +26,8 @@ export interface PhysicsScene {
  */
 export function createBasicPhysicsObjects(
   scene: THREE.Scene,
-  world: CANNON.World
+  world: CANNON.World,
+  initialPosition: THREE.Vector3
 ): {
   physicsObjects: PhysicsObjects;
   gliderBody: CANNON.Body;
@@ -56,7 +57,7 @@ export function createBasicPhysicsObjects(
   const gliderWidth = 12;
   const gliderHeight = 1;
   const gliderDepth = 12;
-  const gliderPos = new THREE.Vector3(14000, 400, 0);
+  const gliderPos = new THREE.Vector3(initialPosition.x, initialPosition.y, initialPosition.z);
 
   const gliderShape = new CANNON.Box(new CANNON.Vec3(
     gliderWidth / 2,
