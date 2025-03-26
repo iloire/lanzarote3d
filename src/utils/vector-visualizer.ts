@@ -26,7 +26,24 @@ function colorToHexString(color: number): string {
   return '#' + hexStr;
 }
 
+interface ForceDefinition {
+  name: string;
+  color: number;
+  position: THREE.Vector3;
+  vector: CANNON.Vec3;
+  scale?: number;
+  offset?: THREE.Vector3;
+}
+
 export class VectorVisualizater {
+  private forces: Map<string, {
+    arrow: THREE.ArrowHelper;
+    label: THREE.Sprite;
+    group: THREE.Group;
+    scale: number;
+    offset: THREE.Vector3;
+  }> = new Map();
+
   // Arrow helpers
   private liftArrow: THREE.ArrowHelper;
   private dragArrow: THREE.ArrowHelper;
@@ -60,6 +77,19 @@ export class VectorVisualizater {
 
     this.setupArrows();
     this.setupLabels();
+  }
+
+  private createArrow(color: number): THREE.ArrowHelper {
+    const arrow = new THREE.ArrowHelper(
+      new THREE.Vector3(0, 1, 0),
+      new THREE.Vector3(0, 0, 0),
+      10,
+      color,
+      3,
+      1.5
+    );
+    arrow.line.material = new THREE.LineBasicMaterial({ color, linewidth: 3 });
+    return arrow;
   }
 
   private createTextSprite(text: string, color: number): THREE.Sprite {
@@ -194,30 +224,17 @@ export class VectorVisualizater {
   }
 
   private updateLabel(
-    labelName: string,
+    label: THREE.Sprite,
+    name: string,
+    color: number,
     position: THREE.Vector3,
     direction: THREE.Vector3,
     length: number
   ) {
-    const label = this.forceLabels[labelName];
-    if (!label) return;
-
-    // Create a new canvas for dynamic text
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
     canvas.width = 512;
     canvas.height = 256;
-
-    // Get the color based on label name
-    const colorMap = {
-      'lift': COLORS.LIFT,
-      'drag': COLORS.DRAG,
-      'weight': COLORS.WEIGHT,
-      'glideDirection': COLORS.GLIDE_DIRECTION,
-      'leftBreak': COLORS.LEFT_BREAK,
-      'rightBreak': COLORS.RIGHT_BREAK
-    };
-    const color = colorMap[labelName] || COLORS.LIFT;
 
     // Format the magnitude to 2 decimal places
     const magnitude = (length / this.customScaleFactor).toFixed(2);
@@ -229,18 +246,8 @@ export class VectorVisualizater {
     context.lineWidth = 3;
     context.textAlign = 'left';
 
-    // Get the label text based on the name
-    const labelText = {
-      'lift': 'LIFT',
-      'drag': 'DRAG',
-      'weight': 'WEIGHT',
-      'glideDirection': 'GLIDE',
-      'leftBreak': 'L-BREAK',
-      'rightBreak': 'R-BREAK'
-    }[labelName] || labelName.toUpperCase();
-
-    context.fillText(labelText, 20, 80);
-    context.strokeText(labelText, 20, 80);
+    context.fillText(name, 20, 80);
+    context.strokeText(name, 20, 80);
 
     // Draw the magnitude below the title
     context.font = "40px Arial";
@@ -255,7 +262,80 @@ export class VectorVisualizater {
     // Position the label at the end of the arrow
     const targetPosition = position.clone().add(direction.clone().multiplyScalar(length + 8));
     label.position.copy(targetPosition);
-    label.visible = length > 0.1; // Show labels for smaller forces
+    label.visible = length > 0.1;
+  }
+
+  /**
+   * Add or update a force vector visualization
+   * @param force Force definition containing name, color, position, and vector
+   */
+  addForce(force: ForceDefinition): void {
+    const {
+      name,
+      color,
+      position,
+      vector,
+      scale = FORCE_SCALE,
+      offset = new THREE.Vector3()
+    } = force;
+
+    let forceData = this.forces.get(name);
+
+    if (!forceData) {
+      // Create new force visualization
+      const group = new THREE.Group();
+      const arrow = this.createArrow(color);
+      const label = this.createTextSprite(name, color);
+
+      group.add(arrow);
+      group.add(label);
+      this.forceGroup.add(group);
+
+      forceData = {
+        arrow,
+        label,
+        group,
+        scale,
+        offset
+      };
+      this.forces.set(name, forceData);
+    }
+
+    // Update force visualization
+    const effectiveScale = scale * this.customScaleFactor;
+    const direction = new THREE.Vector3(vector.x, vector.y, vector.z);
+
+    // Safely normalize the direction
+    if (direction.length() > 0.001) {
+      direction.normalize();
+    }
+
+    const length = vector.length() * effectiveScale;
+    forceData.group.position.copy(position).add(forceData.offset);
+    forceData.arrow.setDirection(direction);
+    forceData.arrow.setLength(Math.max(0, length));
+    this.updateLabel(forceData.label, name, color, new THREE.Vector3(), direction, length);
+  }
+
+  /**
+   * Remove a force vector visualization
+   * @param name Name of the force to remove
+   */
+  removeForce(name: string): void {
+    const force = this.forces.get(name);
+    if (force) {
+      this.forceGroup.remove(force.group);
+      this.forces.delete(name);
+    }
+  }
+
+  /**
+   * Clear all force visualizations
+   */
+  clearForces(): void {
+    this.forces.forEach((force, name) => {
+      this.removeForce(name);
+    });
   }
 
   /**
@@ -264,7 +344,26 @@ export class VectorVisualizater {
    */
   setScale(scale: number): void {
     this.customScaleFactor = scale;
-    console.log(`Force visualization scale set to: ${scale}`);
+    // Update all existing forces with new scale
+    this.forces.forEach((force, name) => {
+      const position = force.group.position.clone().sub(force.offset);
+      // Get the current direction from the arrow's quaternion
+      const direction = new THREE.Vector3(0, 1, 0);
+      direction.applyQuaternion(force.arrow.quaternion);
+
+      this.addForce({
+        name,
+        color: (force.arrow.line.material as THREE.LineBasicMaterial).color.getHex(),
+        position,
+        vector: new CANNON.Vec3(
+          direction.x,
+          direction.y,
+          direction.z
+        ),
+        scale: force.scale,
+        offset: force.offset
+      });
+    });
   }
 
   /**
@@ -275,6 +374,13 @@ export class VectorVisualizater {
     this.forceGroup.visible = visible;
   }
 
+  isVisible(): boolean {
+    return this.forceGroup.visible;
+  }
+
+  /**
+   * Update all predefined forces
+   */
   update(
     wingPosition: THREE.Vector3,
     pilotPosition: THREE.Vector3,
@@ -285,248 +391,67 @@ export class VectorVisualizater {
     leftBreakVector?: CANNON.Vec3,
     rightBreakVector?: CANNON.Vec3
   ) {
-    // Position the force groups at their respective objects
-    this.gliderForceGroup.position.copy(wingPosition);
-    this.pilotForceGroup.position.copy(pilotPosition);
+    // Clear existing forces
+    this.clearForces();
 
-    // Update each vector using the individual update functions
-    this.updateLiftVector(wingPosition, liftVector);
-    this.updateDragVector(wingPosition, dragVector);
-    this.updateWeightVector(pilotPosition, weightVector);
-    this.updateGlideDirectionVector(wingPosition, glideDirection);
-    this.updateLeftBreakVector(wingPosition, leftBreakVector || null);
-    this.updateRightBreakVector(wingPosition, rightBreakVector || null);
-  }
+    // Add lift force
+    this.addForce({
+      name: "LIFT",
+      color: COLORS.LIFT,
+      position: wingPosition,
+      vector: liftVector,
+      scale: FORCE_SCALE * WING_FORCE_SCALE
+    });
 
-  isVisible(): boolean {
-    return this.forceGroup.visible;
-  }
+    // Add drag force
+    this.addForce({
+      name: "DRAG",
+      color: COLORS.DRAG,
+      position: wingPosition,
+      vector: dragVector,
+      scale: FORCE_SCALE * WING_FORCE_SCALE
+    });
 
-  /**
-   * Update lift vector independently
-   * @param wingPosition Position where the lift force is applied
-   * @param liftVector The lift force vector
-   */
-  updateLiftVector(wingPosition: THREE.Vector3, liftVector: CANNON.Vec3): void {
-    this.gliderForceGroup.position.copy(wingPosition);
-    const effectiveGliderScale = FORCE_SCALE * WING_FORCE_SCALE * this.customScaleFactor;
+    // Add weight force
+    this.addForce({
+      name: "WEIGHT",
+      color: COLORS.WEIGHT,
+      position: pilotPosition,
+      vector: weightVector,
+      scale: FORCE_SCALE * PILOT_FORCE_SCALE
+    });
 
-    try {
-      // Update lift force visualization - apply from wing center
-      const liftDirection = new THREE.Vector3(
-        isNaN(liftVector.x) ? 0 : liftVector.x,
-        isNaN(liftVector.y) ? 1 : liftVector.y,
-        isNaN(liftVector.z) ? 0 : liftVector.z
-      );
+    // Add glide direction
+    this.addForce({
+      name: "GLIDE",
+      color: COLORS.GLIDE_DIRECTION,
+      position: wingPosition,
+      vector: glideDirection,
+      scale: FORCE_SCALE * WING_FORCE_SCALE
+    });
 
-      // Safely normalize the direction
-      if (liftDirection.length() > 0.001) {
-        liftDirection.normalize();
-      } else {
-        liftDirection.set(0, 1, 0); // Default to upward if invalid
-      }
-
-      const liftLength = !isNaN(liftVector.length()) ? liftVector.length() * effectiveGliderScale : 0;
-      this.liftArrow.setDirection(liftDirection);
-      this.liftArrow.setLength(Math.max(0, liftLength)); // Ensure non-negative length
-      this.liftArrow.position.set(0, 0, 0); // Relative to wing group
-      this.updateLabel('lift', new THREE.Vector3(0, 0, 0), liftDirection, liftLength);
-      this.liftArrow.visible = true;
-    } catch (e) {
-      console.error("Error with lift force visualization:", e);
-      this.liftArrow.visible = false;
-      this.forceLabels['lift'].visible = false;
-    }
-  }
-
-  /**
-   * Update drag vector independently
-   * @param wingPosition Position where the drag force is applied
-   * @param dragVector The drag force vector
-   */
-  updateDragVector(wingPosition: THREE.Vector3, dragVector: CANNON.Vec3): void {
-    this.gliderForceGroup.position.copy(wingPosition);
-    const effectiveGliderScale = FORCE_SCALE * WING_FORCE_SCALE * this.customScaleFactor;
-
-    try {
-      // Update drag force visualization - apply from wing center
-      const dragDirection = new THREE.Vector3(
-        isNaN(dragVector.x) ? 0 : dragVector.x,
-        isNaN(dragVector.y) ? 0 : dragVector.y,
-        isNaN(dragVector.z) ? -1 : dragVector.z
-      );
-
-      // Safely normalize the direction
-      if (dragDirection.length() > 0.001) {
-        dragDirection.normalize();
-      } else {
-        dragDirection.set(0, 0, -1); // Default to backward if invalid
-      }
-
-      const dragLength = !isNaN(dragVector.length()) ? dragVector.length() * effectiveGliderScale : 0;
-      this.dragArrow.setDirection(dragDirection);
-      this.dragArrow.setLength(Math.max(0, dragLength)); // Ensure non-negative length
-      this.dragArrow.position.set(0, 0, 0); // Relative to wing group
-      this.updateLabel('drag', new THREE.Vector3(0, 0, 0), dragDirection, dragLength);
-      this.dragArrow.visible = true;
-    } catch (e) {
-      console.error("Error with drag force visualization:", e);
-      this.dragArrow.visible = false;
-      this.forceLabels['drag'].visible = false;
-    }
-  }
-
-  /**
-   * Update weight vector independently
-   * @param pilotPosition Position where the weight force is applied
-   * @param weightVector The weight force vector
-   */
-  updateWeightVector(pilotPosition: THREE.Vector3, weightVector: CANNON.Vec3): void {
-    this.pilotForceGroup.position.copy(pilotPosition);
-    const effectivePilotScale = FORCE_SCALE * PILOT_FORCE_SCALE * this.customScaleFactor;
-
-    try {
-      const weightDirection = new THREE.Vector3(weightVector.x, weightVector.y, weightVector.z);
-
-      // Safely normalize the direction
-      if (weightDirection.length() > 0.001) {
-        weightDirection.normalize();
-      } else {
-        weightDirection.set(0, -1, 0); // Default to downward if invalid
-      }
-
-      const weightLength = weightVector.length() * effectivePilotScale;
-      this.weightArrow.setDirection(weightDirection);
-      this.weightArrow.setLength(Math.max(0, weightLength)); // Ensure non-negative length
-      this.weightArrow.position.set(0, 0, 0); // Relative to pilot group
-      this.updateLabel('weight', new THREE.Vector3(0, 0, 0), weightDirection, weightLength);
-      this.weightArrow.visible = true;
-    } catch (e) {
-      console.error("Error with weight force visualization:", e);
-      this.weightArrow.visible = false;
-      this.forceLabels['weight'].visible = false;
-    }
-  }
-
-  /**
-   * Update glide direction vector independently
-   * @param wingPosition Position where the glide direction is applied
-   * @param glideDirectionVector The glide direction vector
-   */
-  updateGlideDirectionVector(wingPosition: THREE.Vector3, glideDirectionVector: CANNON.Vec3): void {
-    this.gliderForceGroup.position.copy(wingPosition);
-    const effectiveGliderScale = FORCE_SCALE * WING_FORCE_SCALE * this.customScaleFactor;
-
-    try {
-      const glideDirectionDirection = new THREE.Vector3(
-        glideDirectionVector.x,
-        glideDirectionVector.y,
-        glideDirectionVector.z
-      );
-
-      // Safely normalize the direction
-      if (glideDirectionDirection.length() > 0.001) {
-        glideDirectionDirection.normalize();
-      } else {
-        glideDirectionDirection.set(0, 0, -1); // Default to forward if invalid
-      }
-
-      const glideLength = glideDirectionVector.length() * effectiveGliderScale;
-      this.glideDirectionArrow.setDirection(glideDirectionDirection);
-      this.glideDirectionArrow.setLength(Math.max(0, glideLength));
-      this.glideDirectionArrow.position.set(0, 0, 0);
-      this.updateLabel('glideDirection', new THREE.Vector3(0, 0, 0), glideDirectionDirection, glideLength);
-      this.glideDirectionArrow.visible = true;
-    } catch (e) {
-      console.error("Error with glide direction visualization:", e);
-      this.glideDirectionArrow.visible = false;
-      this.forceLabels['glideDirection'].visible = false;
-    }
-  }
-
-  /**
-   * Update left break vector independently
-   * @param wingPosition Position where the left break force is applied
-   * @param leftBreakVector The left break force vector, or null to hide
-   */
-  updateLeftBreakVector(wingPosition: THREE.Vector3, leftBreakVector: CANNON.Vec3 | null): void {
-    this.gliderForceGroup.position.copy(wingPosition);
-
-    if (!leftBreakVector) {
-      this.leftBreakArrow.visible = false;
-      this.forceLabels['leftBreak'].visible = false;
-      return;
+    // Add left break force if present
+    if (leftBreakVector) {
+      this.addForce({
+        name: "L-BREAK",
+        color: COLORS.LEFT_BREAK,
+        position: wingPosition,
+        vector: leftBreakVector,
+        scale: FORCE_SCALE * WING_FORCE_SCALE,
+        offset: new THREE.Vector3(-5, 0, 0)
+      });
     }
 
-    const effectiveGliderScale = FORCE_SCALE * WING_FORCE_SCALE * this.customScaleFactor;
-
-    try {
-      const leftBreakDirection = new THREE.Vector3(
-        isNaN(leftBreakVector.x) ? -1 : leftBreakVector.x,
-        isNaN(leftBreakVector.y) ? 0 : leftBreakVector.y,
-        isNaN(leftBreakVector.z) ? 0 : leftBreakVector.z
-      );
-
-      // Safely normalize the direction
-      if (leftBreakDirection.length() > 0.001) {
-        leftBreakDirection.normalize();
-      } else {
-        leftBreakDirection.set(-1, 0, 0); // Default to left if invalid
-      }
-
-      const leftBreakLength = !isNaN(leftBreakVector.length()) ? leftBreakVector.length() * effectiveGliderScale : 0;
-      this.leftBreakArrow.setDirection(leftBreakDirection);
-      this.leftBreakArrow.setLength(Math.max(0, leftBreakLength));
-      this.leftBreakArrow.position.set(-5, 0, 0); // Position offset to the left side of the wing
-      this.updateLabel('leftBreak', new THREE.Vector3(-5, 0, 0), leftBreakDirection, leftBreakLength);
-      this.leftBreakArrow.visible = true;
-    } catch (e) {
-      console.error("Error with left break force visualization:", e);
-      this.leftBreakArrow.visible = false;
-      this.forceLabels['leftBreak'].visible = false;
-    }
-  }
-
-  /**
-   * Update right break vector independently
-   * @param wingPosition Position where the right break force is applied
-   * @param rightBreakVector The right break force vector, or null to hide
-   */
-  updateRightBreakVector(wingPosition: THREE.Vector3, rightBreakVector: CANNON.Vec3 | null): void {
-    this.gliderForceGroup.position.copy(wingPosition);
-
-    if (!rightBreakVector) {
-      this.rightBreakArrow.visible = false;
-      this.forceLabels['rightBreak'].visible = false;
-      return;
-    }
-
-    const effectiveGliderScale = FORCE_SCALE * WING_FORCE_SCALE * this.customScaleFactor;
-
-    try {
-      const rightBreakDirection = new THREE.Vector3(
-        isNaN(rightBreakVector.x) ? 1 : rightBreakVector.x,
-        isNaN(rightBreakVector.y) ? 0 : rightBreakVector.y,
-        isNaN(rightBreakVector.z) ? 0 : rightBreakVector.z
-      );
-
-      // Safely normalize the direction
-      if (rightBreakDirection.length() > 0.001) {
-        rightBreakDirection.normalize();
-      } else {
-        rightBreakDirection.set(1, 0, 0); // Default to right if invalid
-      }
-
-      const rightBreakLength = !isNaN(rightBreakVector.length()) ? rightBreakVector.length() * effectiveGliderScale : 0;
-      this.rightBreakArrow.setDirection(rightBreakDirection);
-      this.rightBreakArrow.setLength(Math.max(0, rightBreakLength));
-      this.rightBreakArrow.position.set(5, 0, 0); // Position offset to the right side of the wing
-      this.updateLabel('rightBreak', new THREE.Vector3(5, 0, 0), rightBreakDirection, rightBreakLength);
-      this.rightBreakArrow.visible = true;
-    } catch (e) {
-      console.error("Error with right break force visualization:", e);
-      this.rightBreakArrow.visible = false;
-      this.forceLabels['rightBreak'].visible = false;
+    // Add right break force if present
+    if (rightBreakVector) {
+      this.addForce({
+        name: "R-BREAK",
+        color: COLORS.RIGHT_BREAK,
+        position: wingPosition,
+        vector: rightBreakVector,
+        scale: FORCE_SCALE * WING_FORCE_SCALE,
+        offset: new THREE.Vector3(5, 0, 0)
+      });
     }
   }
 } 

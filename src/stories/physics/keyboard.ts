@@ -25,7 +25,6 @@ export function setupKeyboardControls(
   // Set to keep track of pressed keys
   const keysPressed = new Set<string>();
 
-
   // Event listeners for keyboard controls
   const keyDownListener = (event: KeyboardEvent) => {
     keysPressed.add(event.code);
@@ -46,67 +45,117 @@ export function setupKeyboardControls(
 
   // Function to apply forces based on keyboard input
   function applyInputForces(vectorVisualizer: VectorVisualizater) {
-    // Apply platform control forces
+    const wingPosition = new THREE.Vector3().copy(gliderBody.position as any);
+    const zeroForce = new CANNON.Vec3(0, 0, 0);
+    const force = 1450;
+    const velocity = gliderBody.velocity;
+    const breakForceMagnitude = 1200;
+    const rollTorqueMagnitude = 1000;
+
+    gliderBody.angularVelocity.z *= 0.95;
+
+    // Always show forces, but with zero magnitude when not active
+    if (!keysPressed.has(KEY_MAPPING.RIGHT[0])) {
+      vectorVisualizer.addForce({
+        name: "R-BREAK",
+        color: 0x00ffff, // Cyan
+        position: wingPosition,
+        vector: zeroForce,
+        scale: 0.01 * 0.2,
+        offset: new THREE.Vector3(5, 0, 0)
+      });
+    }
+
+    if (!keysPressed.has(KEY_MAPPING.LEFT[0])) {
+      // console.log('removing left break force visualizer');
+
+      vectorVisualizer.addForce({
+        name: "L-BREAK",
+        color: 0xff00ff, // Magenta
+        position: wingPosition,
+        vector: zeroForce,
+        scale: 0.01 * 0.2,
+        offset: new THREE.Vector3(-5, 0, 0)
+      });
+    }
+
+    if (!keysPressed.has(KEY_MAPPING.UP[0]) && !keysPressed.has(KEY_MAPPING.DOWN[0])) {
+      vectorVisualizer.addForce({
+        name: "KEYBOARD UP",
+        color: 0x00ff00, // Green
+        position: wingPosition,
+        vector: zeroForce,
+        scale: 0.01 * 0.2,
+        offset: new THREE.Vector3(0, 0, 0)
+      });
+    }
+
+    // Apply active forces when keys are pressed
     if (keysPressed.size > 0) {
-
-      const force = 1450;
-
-      const velocity = gliderBody.velocity;
-      const breakForceMagnitude = 1200;
-
-      const rollTorque = 0.4;
-
-      gliderBody.angularVelocity.z *= 0.95;
-
-      const rollTorqueMagnitude = 1000;
-
-
       if (keysPressed.has(KEY_MAPPING.RIGHT[0])) {
         console.log('right', force);
-
-        // when the right key is pressed, the glider will experiment 
-        // a drag force in the direction opposite to the movement to the right 
         const dragForce = velocity.negate().scale(breakForceMagnitude);
-        const wingPosition = new THREE.Vector3(0, 0, 3);
-        vectorVisualizer.updateRightBreakVector(wingPosition, dragForce);
-        const rollAxis = gliderBody.vectorToWorldFrame(new CANNON.Vec3(0, 1, 0));
-        gliderBody.applyTorque(
-          rollAxis.scale(-rollTorqueMagnitude)
-        );
 
+        vectorVisualizer.addForce({
+          name: "R-BREAK",
+          color: 0x00ffff, // Cyan
+          position: wingPosition,
+          vector: dragForce,
+          scale: 0.01 * 0.2,
+          offset: new THREE.Vector3(5, 0, 0)
+        });
+
+        const rollAxis = gliderBody.vectorToWorldFrame(new CANNON.Vec3(0, 1, 0));
+        gliderBody.applyTorque(rollAxis.scale(-rollTorqueMagnitude));
       }
 
-
-      // X-axis movement (left/right)
       if (keysPressed.has(KEY_MAPPING.LEFT[0])) {
         console.log('left', force);
         const dragForce = velocity.negate().scale(breakForceMagnitude);
-        const wingPosition = new THREE.Vector3(0, 0, 3);
-        vectorVisualizer.updateLeftBreakVector(wingPosition, dragForce);
+
+        vectorVisualizer.addForce({
+          name: "L-BREAK",
+          color: 0xff00ff, // Magenta
+          position: wingPosition,
+          vector: dragForce,
+          scale: 0.01 * 0.2,
+          offset: new THREE.Vector3(-5, 0, 0)
+        });
+
         const rollAxis = gliderBody.vectorToWorldFrame(new CANNON.Vec3(0, 1, 0));
-        gliderBody.applyTorque(
-          rollAxis.scale(rollTorqueMagnitude)
-        );
+        gliderBody.applyTorque(rollAxis.scale(rollTorqueMagnitude));
       }
 
       if (keysPressed.has(KEY_MAPPING.UP[0])) {
         console.log('up', force);
-        // when the up key is pressed, the glider will experiment a lift force on the top side 
-        const liftForceMagnitude = 1200;
-        const liftForce = new CANNON.Vec3(0, liftForceMagnitude, 0);
+        const liftForce = new CANNON.Vec3(0, 1200, 0);
 
-        gliderBody.applyForce(
-          liftForce,
-          new CANNON.Vec3(0, 0, 0)
-        );
+        vectorVisualizer.addForce({
+          name: "KEYBOARD UP",
+          color: 0x00ff00, // Green
+          position: wingPosition,
+          vector: liftForce,
+          scale: 0.01 * 0.2,
+          offset: new THREE.Vector3(0, 0, 0)
+        });
+
+        gliderBody.applyForce(liftForce, new CANNON.Vec3(0, 0, 0));
       }
 
       if (keysPressed.has(KEY_MAPPING.DOWN[0])) {
         console.log('down', -force);
-        gliderBody.applyForce(
-          new CANNON.Vec3(0, -force, 0),
-          new CANNON.Vec3(0, 0, 0)
-        );
+        const liftForce = new CANNON.Vec3(0, -force, 0);
+
+        vectorVisualizer.addForce({
+          name: "KEYBOARD DOWN",
+          color: 0x00ff00, // Green
+          position: wingPosition,
+          vector: liftForce,
+          scale: 0.01 * 0.2,
+          offset: new THREE.Vector3(0, 0, 0)
+        });
+
+        gliderBody.applyForce(liftForce, new CANNON.Vec3(0, 0, 0));
       }
     }
   }
