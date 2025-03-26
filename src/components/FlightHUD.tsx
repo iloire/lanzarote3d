@@ -5,6 +5,15 @@ interface FlightHUDProps {
   camera: THREE.Camera;
 }
 
+interface FlightData {
+  speed: number;
+  altitude: number;
+  verticalSpeed: number;
+  position: THREE.Vector3;
+  lastAltitude?: number;
+  lastUpdateTime?: number;
+}
+
 export class FlightHUD {
   private scene: THREE.Scene;
   private camera: THREE.Camera;
@@ -17,11 +26,18 @@ export class FlightHUD {
   private computerScreen: THREE.Mesh;
   private computerDisplayCanvas: HTMLCanvasElement;
   private computerDisplayTexture: THREE.Texture;
+  private lastFlightData: FlightData;
 
   constructor({ scene, camera }: FlightHUDProps) {
     this.scene = scene;
     this.camera = camera;
     this.horizonLines = [];
+    this.lastFlightData = {
+      speed: 0,
+      altitude: 0,
+      verticalSpeed: 0,
+      position: new THREE.Vector3(),
+    };
 
     // Create a separate scene for HUD elements
     this.hudScene = new THREE.Scene();
@@ -41,10 +57,10 @@ export class FlightHUD {
     this.canvas.width = 256;
     this.canvas.height = 256;
 
-    // Create canvas for computer display
+    // Create canvas for computer display with higher resolution
     this.computerDisplayCanvas = document.createElement('canvas');
-    this.computerDisplayCanvas.width = 512;
-    this.computerDisplayCanvas.height = 256;
+    this.computerDisplayCanvas.width = 800;
+    this.computerDisplayCanvas.height = 400;
     this.computerDisplayTexture = new THREE.Texture(this.computerDisplayCanvas);
 
     // Initialize HUD elements
@@ -58,7 +74,7 @@ export class FlightHUD {
 
   private createComputerScreen(): void {
     // Create a plane geometry for the computer screen
-    const screenGeometry = new THREE.PlaneGeometry(400, 200);
+    const screenGeometry = new THREE.PlaneGeometry(600, 300);
     const screenMaterial = new THREE.MeshBasicMaterial({
       map: this.computerDisplayTexture,
       transparent: true,
@@ -66,11 +82,11 @@ export class FlightHUD {
     });
 
     this.computerScreen = new THREE.Mesh(screenGeometry, screenMaterial);
-    this.computerScreen.position.set(0, -window.innerHeight / 2 + 120, 0);
+    this.computerScreen.position.set(0, -window.innerHeight / 2 + 170, 0);
     this.hudScene.add(this.computerScreen);
   }
 
-  private updateComputerDisplay(speed: number, altitude: number): void {
+  private updateComputerDisplay(flightData: FlightData): void {
     const context = this.computerDisplayCanvas.getContext('2d');
     if (!context) return;
 
@@ -81,42 +97,105 @@ export class FlightHUD {
     context.fillStyle = '#000033';
     context.fillRect(0, 0, this.computerDisplayCanvas.width, this.computerDisplayCanvas.height);
 
-    // Add a border
+    // Add main border
     context.strokeStyle = '#00ff00';
     context.lineWidth = 2;
     context.strokeRect(4, 4, this.computerDisplayCanvas.width - 8, this.computerDisplayCanvas.height - 8);
 
-    // Draw dividing line
-    context.beginPath();
-    context.moveTo(this.computerDisplayCanvas.width / 2, 10);
-    context.lineTo(this.computerDisplayCanvas.width / 2, this.computerDisplayCanvas.height - 10);
-    context.stroke();
+    // Create grid layout
+    this.drawGrid(context);
 
-    // Set text properties
-    context.font = 'bold 36px monospace';
-    context.fillStyle = '#00ff00';
-    context.textAlign = 'center';
+    // Draw flight data
+    this.drawFlightData(context, flightData);
 
-    // Draw labels
-    context.font = 'bold 24px monospace';
-    context.fillText('SPEED', this.computerDisplayCanvas.width * 0.25, 40);
-    context.fillText('ALTITUDE', this.computerDisplayCanvas.width * 0.75, 40);
-
-    // Draw values
-    context.font = 'bold 48px monospace';
-    context.fillText(`${speed}`, this.computerDisplayCanvas.width * 0.25, 120);
-    context.fillText(`${altitude}`, this.computerDisplayCanvas.width * 0.75, 120);
-
-    // Draw units
-    context.font = '20px monospace';
-    context.fillText('km/h', this.computerDisplayCanvas.width * 0.25, 150);
-    context.fillText('meters', this.computerDisplayCanvas.width * 0.75, 150);
-
-    // Add some decorative elements
+    // Add decorative elements
     this.drawDecorations(context);
 
     // Update the texture
     this.computerDisplayTexture.needsUpdate = true;
+  }
+
+  private drawGrid(context: CanvasRenderingContext2D): void {
+    const width = this.computerDisplayCanvas.width;
+    const height = this.computerDisplayCanvas.height;
+
+    // Draw vertical dividers
+    context.beginPath();
+    context.strokeStyle = '#00ff00';
+    context.lineWidth = 1;
+
+    // Three vertical sections
+    for (let i = 1; i < 3; i++) {
+      const x = (width * i) / 3;
+      context.moveTo(x, 10);
+      context.lineTo(x, height - 10);
+    }
+
+    // Horizontal divider
+    context.moveTo(10, height / 2);
+    context.lineTo(width - 10, height / 2);
+    context.stroke();
+  }
+
+  private drawFlightData(context: CanvasRenderingContext2D, data: FlightData): void {
+    const width = this.computerDisplayCanvas.width;
+    const height = this.computerDisplayCanvas.height;
+    const sectionWidth = width / 3;
+
+    // Helper function for section headers
+    const drawHeader = (text: string, x: number, y: number) => {
+      context.font = 'bold 20px monospace';
+      context.fillStyle = '#00ff00';
+      context.textAlign = 'center';
+      context.fillText(text, x, y);
+    };
+
+    // Helper function for values
+    const drawValue = (text: string, x: number, y: number, large = false) => {
+      context.font = large ? 'bold 40px monospace' : 'bold 32px monospace';
+      context.fillStyle = '#00ff00';
+      context.textAlign = 'center';
+      context.fillText(text, x, y);
+    };
+
+    // Helper function for units
+    const drawUnits = (text: string, x: number, y: number) => {
+      context.font = '16px monospace';
+      context.fillStyle = '#00ff00';
+      context.textAlign = 'center';
+      context.fillText(text, x, y);
+    };
+
+    // Speed Section (Top Left)
+    drawHeader('SPEED', sectionWidth * 0.5, 35);
+    drawValue(Math.round(data.speed).toString(), sectionWidth * 0.5, 90, true);
+    drawUnits('km/h', sectionWidth * 0.5, 115);
+
+    // Altitude Section (Top Center)
+    drawHeader('ALTITUDE', sectionWidth * 1.5, 35);
+    drawValue(Math.round(data.altitude).toString(), sectionWidth * 1.5, 90, true);
+    drawUnits('meters', sectionWidth * 1.5, 115);
+
+    // Variometer Section (Top Right)
+    drawHeader('VERTICAL SPEED', sectionWidth * 2.5, 35);
+    const varioValue = data.verticalSpeed >= 0 ? '+' + data.verticalSpeed.toFixed(1) : data.verticalSpeed.toFixed(1);
+    drawValue(varioValue, sectionWidth * 2.5, 90, true);
+    drawUnits('m/s', sectionWidth * 2.5, 115);
+
+    // GPS Coordinates (Bottom)
+    drawHeader('GPS COORDINATES', width * 0.5, height / 2 + 35);
+    const lat = this.convertToGPS(data.position.x);
+    const lon = this.convertToGPS(data.position.z);
+    drawValue(`${lat} N`, width * 0.3, height / 2 + 90);
+    drawValue(`${lon} E`, width * 0.7, height / 2 + 90);
+  }
+
+  private convertToGPS(coordinate: number): string {
+    // Convert world coordinates to fake GPS coordinates
+    // Center around 28.0° (Lanzarote's approximate latitude)
+    const base = 28.0;
+    const converted = base + (coordinate / 10000); // Scale factor for reasonable GPS changes
+    return converted.toFixed(6);
   }
 
   private drawDecorations(context: CanvasRenderingContext2D): void {
@@ -125,33 +204,54 @@ export class FlightHUD {
     context.strokeStyle = '#00ff00';
     context.lineWidth = 2;
 
-    // Top-left brackets
-    context.beginPath();
-    context.moveTo(10, bracketSize + 10);
-    context.lineTo(10, 10);
-    context.lineTo(bracketSize + 10, 10);
-    context.stroke();
+    // Draw brackets in each corner
+    const corners = [
+      [0, 0], // Top-left
+      [this.computerDisplayCanvas.width, 0], // Top-right
+      [0, this.computerDisplayCanvas.height], // Bottom-left
+      [this.computerDisplayCanvas.width, this.computerDisplayCanvas.height] // Bottom-right
+    ];
 
-    // Top-right brackets
-    context.beginPath();
-    context.moveTo(this.computerDisplayCanvas.width - 10, bracketSize + 10);
-    context.lineTo(this.computerDisplayCanvas.width - 10, 10);
-    context.lineTo(this.computerDisplayCanvas.width - bracketSize - 10, 10);
-    context.stroke();
+    corners.forEach(([x, y]) => {
+      const isRight = x > 0;
+      const isBottom = y > 0;
 
-    // Bottom-left brackets
-    context.beginPath();
-    context.moveTo(10, this.computerDisplayCanvas.height - bracketSize - 10);
-    context.lineTo(10, this.computerDisplayCanvas.height - 10);
-    context.lineTo(bracketSize + 10, this.computerDisplayCanvas.height - 10);
-    context.stroke();
+      context.beginPath();
+      // Vertical line
+      context.moveTo(
+        x + (isRight ? -10 : 10),
+        y + (isBottom ? -bracketSize - 10 : bracketSize + 10)
+      );
+      context.lineTo(
+        x + (isRight ? -10 : 10),
+        y + (isBottom ? -10 : 10)
+      );
+      // Horizontal line
+      context.lineTo(
+        x + (isRight ? -bracketSize - 10 : bracketSize + 10),
+        y + (isBottom ? -10 : 10)
+      );
+      context.stroke();
+    });
+  }
 
-    // Bottom-right brackets
-    context.beginPath();
-    context.moveTo(this.computerDisplayCanvas.width - 10, this.computerDisplayCanvas.height - bracketSize - 10);
-    context.lineTo(this.computerDisplayCanvas.width - 10, this.computerDisplayCanvas.height - 10);
-    context.lineTo(this.computerDisplayCanvas.width - bracketSize - 10, this.computerDisplayCanvas.height - 10);
-    context.stroke();
+  private calculateVerticalSpeed(currentAltitude: number, currentTime: number): number {
+    if (this.lastFlightData.lastAltitude === undefined || this.lastFlightData.lastUpdateTime === undefined) {
+      this.lastFlightData.lastAltitude = currentAltitude;
+      this.lastFlightData.lastUpdateTime = currentTime;
+      return 0;
+    }
+
+    const timeDiff = (currentTime - this.lastFlightData.lastUpdateTime) / 1000; // Convert to seconds
+    const altitudeDiff = currentAltitude - this.lastFlightData.lastAltitude;
+    const verticalSpeed = altitudeDiff / timeDiff;
+
+    // Update last values
+    this.lastFlightData.lastAltitude = currentAltitude;
+    this.lastFlightData.lastUpdateTime = currentTime;
+
+    // Apply some smoothing
+    return 0.7 * this.lastFlightData.verticalSpeed + 0.3 * verticalSpeed;
   }
 
   private initializeHUD(): void {
@@ -220,16 +320,32 @@ export class FlightHUD {
     this.hudCamera.updateProjectionMatrix();
 
     // Update computer screen position
-    this.computerScreen.position.set(0, -window.innerHeight / 2 + 120, 0);
+    this.computerScreen.position.set(0, -window.innerHeight / 2 + 170, 0);
   }
 
-  public update(velocity: THREE.Vector3, altitude: number, rotation: THREE.Euler): void {
-    // Calculate speed in km/h
-    const speed = Math.round(velocity.length() * 3.6);
-    const altitudeRounded = Math.round(altitude);
+  public update(velocity: THREE.Vector3, position: THREE.Vector3, rotation: THREE.Euler): void {
+    const currentTime = performance.now();
+    const speed = velocity.length() * 3.6; // m/s to km/h
+    const altitude = position.y;
+
+    // Calculate vertical speed
+    const verticalSpeed = this.calculateVerticalSpeed(altitude, currentTime);
+
+    // Update flight data
+    const flightData: FlightData = {
+      speed,
+      altitude,
+      verticalSpeed,
+      position,
+      lastAltitude: altitude,
+      lastUpdateTime: currentTime
+    };
+
+    // Store for next frame
+    this.lastFlightData = flightData;
 
     // Update computer display
-    this.updateComputerDisplay(speed, altitudeRounded);
+    this.updateComputerDisplay(flightData);
 
     // Update horizon line rotation based on airplane roll and pitch
     this.horizonLines.forEach((line, index) => {

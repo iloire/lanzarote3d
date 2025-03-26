@@ -150,7 +150,11 @@ const CannonWorkshop = {
           airplaneBody.velocity.y,
           airplaneBody.velocity.z
         ),
-        airplaneBody.position.y,
+        new THREE.Vector3(
+          airplaneBody.position.x,
+          airplaneBody.position.y,
+          airplaneBody.position.z
+        ),
         new THREE.Euler().setFromQuaternion(airplaneMesh.quaternion)
       );
 
