@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { StoryOptions } from "../types";
 
 // Import our modular components
+import { FlightHUD } from "../../components/FlightHUD";
 import { VectorVisualizater } from "../../utils/vector-visualizer";
 import { createBasicPhysicsObjects, updateVisuals } from "./core";
 import { setupPhysicsControls, storeInitialPositions } from "./gui";
@@ -13,6 +14,7 @@ import { createLines } from "./lines";
 // Store UI elements and animation ID for cleanup
 let keyboardControls: ReturnType<typeof setupKeyboardControls> | null = null;
 let vectorVisualizer: VectorVisualizater | null = null;
+let hud: FlightHUD | null = null;
 
 const PhysicsChain = {
   load: async (options: StoryOptions) => {
@@ -29,6 +31,9 @@ const PhysicsChain = {
     vectorVisualizer = new VectorVisualizater(scene);
     // Set custom scale to make vectors more visible
     vectorVisualizer.setScale(3.0);
+
+    // Initialize the HUD
+    hud = new FlightHUD({ scene, camera });
 
     // Setup physics controls
     const { controls: pushForceControl } =
@@ -187,7 +192,33 @@ const PhysicsChain = {
     function animate() {
       requestAnimationFrame(animate);
       updatePhysics();
-      renderer.render(scene, camera);
+
+      // Update HUD with current flight data
+      if (hud) {
+        hud.update(
+          new THREE.Vector3(
+            gliderBody.velocity.x,
+            gliderBody.velocity.y,
+            gliderBody.velocity.z
+          ),
+          new THREE.Vector3(
+            gliderBody.position.x,
+            gliderBody.position.y,
+            gliderBody.position.z
+          ),
+          new THREE.Euler().setFromQuaternion(
+            new THREE.Quaternion(
+              gliderBody.quaternion.x,
+              gliderBody.quaternion.y,
+              gliderBody.quaternion.z,
+              gliderBody.quaternion.w
+            )
+          )
+        );
+        hud.render(renderer);
+      } else {
+        renderer.render(scene, camera);
+      }
     }
 
     // Start the animation loop
@@ -198,6 +229,18 @@ const PhysicsChain = {
     camera.position.x = 100;
     camera.position.z = 100;
     camera.lookAt(gliderBody.position as any);
+
+    // Return cleanup function
+    return () => {
+      if (keyboardControls) {
+        keyboardControls.cleanup();
+        keyboardControls = null;
+      }
+      if (hud) {
+        hud.dispose();
+        hud = null;
+      }
+    };
   },
 };
 
