@@ -209,28 +209,6 @@ const PhysicsChain = {
 
       applyForcesAndDrawVectors();
 
-      // Auto-rotate the camera if enabled
-      if (pushForceControl.isAutoRotate) {
-        const rotationSpeed = pushForceControl.autoRotateSpeed;
-        const radius = 30;
-        const angle = Date.now() * 0.0005 * rotationSpeed;
-
-        camera.position.x = Math.cos(angle) * radius;
-        camera.position.z = Math.sin(angle) * radius;
-        camera.position.y = gliderBody.position.y + 20;
-      } else {
-        // Always follow the glider, but from a fixed position when not auto-rotating
-        camera.position.set(
-          gliderBody.position.x + 130,
-          gliderBody.position.y + 120,
-          gliderBody.position.z + 130
-        );
-      }
-
-      // Always look at the glider
-      // camera.lookAt(gliderBody.position as any);
-      controls.update();
-
       // Update visual representations to match physics bodies
       updateVisuals(physicsObjects);
     }
@@ -270,9 +248,31 @@ const PhysicsChain = {
           )
         );
         hud.render(renderer);
-      } else {
-        renderer.render(scene, camera);
       }
+
+      // Auto-rotate the camera if enabled
+      if (pushForceControl.isAutoRotate) {
+        const rotationSpeed = pushForceControl.autoRotateSpeed;
+        const radius = 30;
+        const angle = Date.now() * 0.0005 * rotationSpeed;
+
+        camera.position.x = Math.cos(angle) * radius;
+        camera.position.z = Math.sin(angle) * radius;
+        camera.position.y = gliderBody.position.y + 20;
+      } else {
+        // Always follow the glider, but from a fixed position when not auto-rotating
+        camera.position.set(
+          gliderBody.position.x + 130,
+          gliderBody.position.y + 120,
+          gliderBody.position.z + 130
+        );
+      }
+
+      // Always look at the glider
+      // camera.lookAt(gliderBody.position as any);
+      controls.update();
+
+      renderer.render(scene, camera);
     }
 
     // Start the animation loop
