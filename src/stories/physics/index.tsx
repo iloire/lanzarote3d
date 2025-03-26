@@ -87,8 +87,8 @@ const PhysicsChain = {
       // drag vector is in the opposite direction of the glide direction
       const dragVector = glideDirection.negate();
 
-
-      const liftMagnitude = 14.82 * pilotBody.mass;
+      // for now let's keep it same as weight
+      const liftMagnitude = 9.82 * pilotBody.mass;
       const liftVector = new CANNON.Vec3(0, liftMagnitude, 0);
       gliderBody.applyForce(
         liftVector

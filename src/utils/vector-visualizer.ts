@@ -65,22 +65,23 @@ export class VectorVisualizater {
   private createTextSprite(text: string, color: number): THREE.Sprite {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
-    canvas.width = 512;  // Doubled canvas width
-    canvas.height = 256; // Doubled canvas height
+    canvas.width = 512;
+    canvas.height = 256;
 
     // Draw text with larger font size
-    context.font = "Bold 64px Arial"; // Increased from 36px to 64px
+    context.font = "Bold 48px Arial"; // Slightly smaller for title
     context.fillStyle = colorToHexString(color);
-    context.strokeStyle = '#000000'; // Add black outline for better visibility
+    context.strokeStyle = '#000000';
     context.lineWidth = 3;
-    context.fillText(text, 20, 100); // Adjusted position for larger text
-    context.strokeText(text, 20, 100);
+    context.textAlign = 'left';
+    context.fillText(text, 20, 80);
+    context.strokeText(text, 20, 80);
 
-    // Create sprite with larger scale
+    // Create sprite
     const texture = new THREE.CanvasTexture(canvas);
     const material = new THREE.SpriteMaterial({ map: texture });
     const sprite = new THREE.Sprite(material);
-    sprite.scale.set(25, 12.5, 1); // Increased from 10,5,1 to make labels much bigger
+    sprite.scale.set(25, 12.5, 1);
 
     return sprite;
   }
@@ -90,9 +91,9 @@ export class VectorVisualizater {
     this.forceLabels['lift'] = this.createTextSprite("LIFT", COLORS.LIFT);
     this.forceLabels['drag'] = this.createTextSprite("DRAG", COLORS.DRAG);
     this.forceLabels['weight'] = this.createTextSprite("WEIGHT", COLORS.WEIGHT);
-    this.forceLabels['glideDirection'] = this.createTextSprite("GLIDE DIRECTION", COLORS.GLIDE_DIRECTION);
-    this.forceLabels['leftBreak'] = this.createTextSprite("LEFT BREAK", COLORS.LEFT_BREAK);
-    this.forceLabels['rightBreak'] = this.createTextSprite("RIGHT BREAK", COLORS.RIGHT_BREAK);
+    this.forceLabels['glideDirection'] = this.createTextSprite("GLIDE", COLORS.GLIDE_DIRECTION);
+    this.forceLabels['leftBreak'] = this.createTextSprite("L-BREAK", COLORS.LEFT_BREAK);
+    this.forceLabels['rightBreak'] = this.createTextSprite("R-BREAK", COLORS.RIGHT_BREAK);
 
     // Add labels to their respective groups
     this.gliderForceGroup.add(this.forceLabels['lift']);
@@ -102,8 +103,7 @@ export class VectorVisualizater {
     this.gliderForceGroup.add(this.forceLabels['rightBreak']);
     this.pilotForceGroup.add(this.forceLabels['weight']);
 
-    // Hide labels by default (will be positioned in update)
-    // Compatible alternative to Object.values
+    // Hide labels by default
     Object.keys(this.forceLabels).forEach(key => {
       this.forceLabels[key].visible = false;
     });
@@ -202,10 +202,60 @@ export class VectorVisualizater {
     const label = this.forceLabels[labelName];
     if (!label) return;
 
+    // Create a new canvas for dynamic text
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    canvas.width = 512;
+    canvas.height = 256;
+
+    // Get the color based on label name
+    const colorMap = {
+      'lift': COLORS.LIFT,
+      'drag': COLORS.DRAG,
+      'weight': COLORS.WEIGHT,
+      'glideDirection': COLORS.GLIDE_DIRECTION,
+      'leftBreak': COLORS.LEFT_BREAK,
+      'rightBreak': COLORS.RIGHT_BREAK
+    };
+    const color = colorMap[labelName] || COLORS.LIFT;
+
+    // Format the magnitude to 2 decimal places
+    const magnitude = (length / this.customScaleFactor).toFixed(2);
+
+    // Draw the title
+    context.font = "Bold 48px Arial";
+    context.fillStyle = colorToHexString(color);
+    context.strokeStyle = '#000000';
+    context.lineWidth = 3;
+    context.textAlign = 'left';
+
+    // Get the label text based on the name
+    const labelText = {
+      'lift': 'LIFT',
+      'drag': 'DRAG',
+      'weight': 'WEIGHT',
+      'glideDirection': 'GLIDE',
+      'leftBreak': 'L-BREAK',
+      'rightBreak': 'R-BREAK'
+    }[labelName] || labelName.toUpperCase();
+
+    context.fillText(labelText, 20, 80);
+    context.strokeText(labelText, 20, 80);
+
+    // Draw the magnitude below the title
+    context.font = "40px Arial";
+    context.fillText(`${magnitude}N`, 20, 140);
+    context.strokeText(`${magnitude}N`, 20, 140);
+
+    // Update the sprite's texture
+    const texture = new THREE.CanvasTexture(canvas);
+    (label.material as THREE.SpriteMaterial).map = texture;
+    (label.material as THREE.SpriteMaterial).map.needsUpdate = true;
+
     // Position the label at the end of the arrow
-    const targetPosition = position.clone().add(direction.clone().multiplyScalar(length + 8)); // Increased offset from 5 to 8
+    const targetPosition = position.clone().add(direction.clone().multiplyScalar(length + 8));
     label.position.copy(targetPosition);
-    label.visible = length > 0.5; // Lowered threshold to show more labels
+    label.visible = length > 0.1; // Show labels for smaller forces
   }
 
   /**
