@@ -10,6 +10,7 @@ interface FlightData {
   altitude: number;
   verticalSpeed: number;
   position: THREE.Vector3;
+  heading: number;
   lastAltitude?: number;
   lastUpdateTime?: number;
 }
@@ -37,6 +38,7 @@ export class FlightHUD {
       altitude: 0,
       verticalSpeed: 0,
       position: new THREE.Vector3(),
+      heading: 0,
     };
 
     // Create a separate scene for HUD elements
@@ -73,8 +75,8 @@ export class FlightHUD {
   }
 
   private createComputerScreen(): void {
-    // Create a plane geometry for the computer screen
-    const screenGeometry = new THREE.PlaneGeometry(600, 300);
+    // Create a plane geometry for the computer screen - reduced size
+    const screenGeometry = new THREE.PlaneGeometry(400, 200);
     const screenMaterial = new THREE.MeshBasicMaterial({
       map: this.computerDisplayTexture,
       transparent: true,
@@ -82,7 +84,7 @@ export class FlightHUD {
     });
 
     this.computerScreen = new THREE.Mesh(screenGeometry, screenMaterial);
-    this.computerScreen.position.set(0, -window.innerHeight / 2 + 170, 0);
+    this.computerScreen.position.set(0, -window.innerHeight / 2 + 120, 0);
     this.hudScene.add(this.computerScreen);
   }
 
@@ -140,11 +142,11 @@ export class FlightHUD {
   private drawFlightData(context: CanvasRenderingContext2D, data: FlightData): void {
     const width = this.computerDisplayCanvas.width;
     const height = this.computerDisplayCanvas.height;
-    const sectionWidth = width / 3;
+    const sectionWidth = width / 4; // Changed to 4 sections
 
     // Helper function for section headers
     const drawHeader = (text: string, x: number, y: number) => {
-      context.font = 'bold 20px monospace';
+      context.font = 'bold 16px monospace'; // Reduced font size
       context.fillStyle = '#00ff00';
       context.textAlign = 'center';
       context.fillText(text, x, y);
@@ -152,7 +154,7 @@ export class FlightHUD {
 
     // Helper function for values
     const drawValue = (text: string, x: number, y: number, large = false) => {
-      context.font = large ? 'bold 40px monospace' : 'bold 32px monospace';
+      context.font = large ? 'bold 32px monospace' : 'bold 24px monospace'; // Reduced font sizes
       context.fillStyle = '#00ff00';
       context.textAlign = 'center';
       context.fillText(text, x, y);
@@ -160,34 +162,46 @@ export class FlightHUD {
 
     // Helper function for units
     const drawUnits = (text: string, x: number, y: number) => {
-      context.font = '16px monospace';
+      context.font = '14px monospace'; // Reduced font size
       context.fillStyle = '#00ff00';
       context.textAlign = 'center';
       context.fillText(text, x, y);
     };
 
     // Speed Section (Top Left)
-    drawHeader('SPEED', sectionWidth * 0.5, 35);
-    drawValue(Math.round(data.speed).toString(), sectionWidth * 0.5, 90, true);
-    drawUnits('km/h', sectionWidth * 0.5, 115);
+    drawHeader('SPEED', sectionWidth * 0.5, 30);
+    drawValue(Math.round(data.speed).toString(), sectionWidth * 0.5, 70, true);
+    drawUnits('km/h', sectionWidth * 0.5, 90);
 
-    // Altitude Section (Top Center)
-    drawHeader('ALTITUDE', sectionWidth * 1.5, 35);
-    drawValue(Math.round(data.altitude).toString(), sectionWidth * 1.5, 90, true);
-    drawUnits('meters', sectionWidth * 1.5, 115);
+    // Altitude Section (Top Center-Left)
+    drawHeader('ALTITUDE', sectionWidth * 1.5, 30);
+    drawValue(Math.round(data.altitude).toString(), sectionWidth * 1.5, 70, true);
+    drawUnits('meters', sectionWidth * 1.5, 90);
 
-    // Variometer Section (Top Right)
-    drawHeader('VERTICAL SPEED', sectionWidth * 2.5, 35);
+    // Heading Section (Top Center-Right)
+    drawHeader('HEADING', sectionWidth * 2.5, 30);
+    const heading = Math.round(data.heading);
+    const cardinal = this.getCardinalDirection(heading);
+    drawValue(`${heading}°`, sectionWidth * 2.5, 70, true);
+    drawUnits(cardinal, sectionWidth * 2.5, 90);
+
+    // Vertical Speed (Top Right)
+    drawHeader('VERT SPEED', sectionWidth * 3.5, 30);
     const varioValue = data.verticalSpeed >= 0 ? '+' + data.verticalSpeed.toFixed(1) : data.verticalSpeed.toFixed(1);
-    drawValue(varioValue, sectionWidth * 2.5, 90, true);
-    drawUnits('m/s', sectionWidth * 2.5, 115);
+    drawValue(varioValue, sectionWidth * 3.5, 70, true);
+    drawUnits('m/s', sectionWidth * 3.5, 90);
 
     // GPS Coordinates (Bottom)
-    drawHeader('GPS COORDINATES', width * 0.5, height / 2 + 35);
+    drawHeader('GPS', width * 0.5, height / 2 + 25);
     const lat = this.convertToGPS(data.position.x);
     const lon = this.convertToGPS(data.position.z);
-    drawValue(`${lat} N`, width * 0.3, height / 2 + 90);
-    drawValue(`${lon} E`, width * 0.7, height / 2 + 90);
+    drawValue(`${lat}N ${lon}E`, width * 0.5, height / 2 + 65);
+  }
+
+  private getCardinalDirection(heading: number): string {
+    const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+    const index = Math.round(heading / 45) % 8;
+    return directions[index];
   }
 
   private convertToGPS(coordinate: number): string {
@@ -320,34 +334,42 @@ export class FlightHUD {
     this.hudCamera.updateProjectionMatrix();
 
     // Update computer screen position
-    this.computerScreen.position.set(0, -window.innerHeight / 2 + 170, 0);
+    this.computerScreen.position.set(0, -window.innerHeight / 2 + 120, 0);
   }
 
   public update(velocity: THREE.Vector3, position: THREE.Vector3, rotation: THREE.Euler): void {
-    const currentTime = performance.now();
-    const speed = velocity.length() * 3.6; // m/s to km/h
+    // Calculate speed (km/h)
+    const speed = velocity.length() * 3.6;
+
+    // Get altitude
     const altitude = position.y;
 
     // Calculate vertical speed
+    const currentTime = performance.now();
     const verticalSpeed = this.calculateVerticalSpeed(altitude, currentTime);
 
+    // Calculate heading from rotation
+    const heading = (rotation.y * (180 / Math.PI) + 360) % 360;
+
     // Update flight data
-    const flightData: FlightData = {
+    this.lastFlightData = {
       speed,
       altitude,
       verticalSpeed,
       position,
+      heading,
       lastAltitude: altitude,
       lastUpdateTime: currentTime
     };
 
-    // Store for next frame
-    this.lastFlightData = flightData;
-
     // Update computer display
-    this.updateComputerDisplay(flightData);
+    this.updateComputerDisplay(this.lastFlightData);
 
-    // Update horizon line rotation based on airplane roll and pitch
+    // Update horizon lines based on rotation
+    this.updateHorizonLines(rotation);
+  }
+
+  private updateHorizonLines(rotation: THREE.Euler): void {
     this.horizonLines.forEach((line, index) => {
       line.rotation.z = rotation.z;
       const pitch = rotation.x;
