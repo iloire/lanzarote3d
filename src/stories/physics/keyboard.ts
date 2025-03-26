@@ -51,7 +51,7 @@ export function setupKeyboardControls(
     const breakForceMagnitude = 1200;
     const rollTorqueMagnitude = 1000;
 
-    gliderBody.angularVelocity.z *= 0.95;
+    gliderBody.angularVelocity.z *= 0.95; // dampen the rotation
 
     // Remove break forces when not active
     if (!keysPressed.has(KEY_MAPPING.RIGHT[0])) {
@@ -70,67 +70,56 @@ export function setupKeyboardControls(
 
     // Apply active forces when keys are pressed
     if (keysPressed.size > 0) {
+
+      const rollAxis = gliderBody.vectorToWorldFrame(new CANNON.Vec3(0, 1, 0));
+
       if (keysPressed.has(KEY_MAPPING.RIGHT[0])) {
-        console.log('right', force);
-        const dragForce = velocity.negate().scale(breakForceMagnitude);
+        // const leftBreakDragForce = velocity.negate().scale(breakForceMagnitude);
+        // vectorVisualizer.addForce({
+        //   name: "R-BREAK",
+        //   color: 0x00ffff, // Cyan
+        //   position: wingPosition,
+        //   vector: leftBreakDragForce,
+        //   scale: 0.01 * 0.2,
+        // });
 
-        vectorVisualizer.addForce({
-          name: "R-BREAK",
-          color: 0x00ffff, // Cyan
-          position: wingPosition,
-          vector: dragForce,
-          scale: 0.01 * 0.2,
-          offset: new THREE.Vector3(5, 0, 0)
-        });
-
-        const rollAxis = gliderBody.vectorToWorldFrame(new CANNON.Vec3(0, 1, 0));
         gliderBody.applyTorque(rollAxis.scale(-rollTorqueMagnitude));
       }
 
       if (keysPressed.has(KEY_MAPPING.LEFT[0])) {
-        console.log('left', force);
         const dragForce = velocity.negate().scale(breakForceMagnitude);
-
         vectorVisualizer.addForce({
           name: "L-BREAK",
           color: 0xff00ff, // Magenta
           position: wingPosition,
           vector: dragForce,
           scale: 0.01 * 0.2,
-          offset: new THREE.Vector3(-5, 0, 0)
         });
 
-        const rollAxis = gliderBody.vectorToWorldFrame(new CANNON.Vec3(0, 1, 0));
         gliderBody.applyTorque(rollAxis.scale(rollTorqueMagnitude));
       }
 
       if (keysPressed.has(KEY_MAPPING.UP[0])) {
-        console.log('up', force);
         const liftForce = new CANNON.Vec3(0, 1200, 0);
-
         vectorVisualizer.addForce({
           name: "KEYBOARD UP",
           color: 0x00ff00, // Green
           position: wingPosition,
           vector: liftForce,
           scale: 0.01 * 0.2,
-          offset: new THREE.Vector3(0, 0, 0)
         });
 
         gliderBody.applyForce(liftForce, new CANNON.Vec3(0, 0, 0));
       }
 
       if (keysPressed.has(KEY_MAPPING.DOWN[0])) {
-        console.log('down', -force);
         const liftForce = new CANNON.Vec3(0, -force, 0);
-
         vectorVisualizer.addForce({
           name: "KEYBOARD DOWN",
           color: 0x00ff00, // Green
           position: wingPosition,
           vector: liftForce,
           scale: 0.01 * 0.2,
-          offset: new THREE.Vector3(0, 0, 0)
         });
 
         gliderBody.applyForce(liftForce, new CANNON.Vec3(0, 0, 0));

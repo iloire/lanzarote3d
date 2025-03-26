@@ -161,7 +161,6 @@ const PhysicsChain = {
           position: gliderBody.position as any,
           vector: liftVector,
           scale: 0.01 * 0.2,
-          offset: new THREE.Vector3(0, 0, 0)
         });
       }
 
@@ -171,10 +170,9 @@ const PhysicsChain = {
         vectorVisualizer.addForce({
           name: "WEIGHT",
           color: 0xff00ff, // Magenta 
-          position: gliderBody.position as any,
+          position: pilotBody.position as any,
           vector: weightVector,
           scale: 0.01 * 0.2,
-          offset: new THREE.Vector3(0, 0, 0)
         });
       }
 
@@ -187,7 +185,6 @@ const PhysicsChain = {
           position: gliderBody.position as any,
           vector: dragVector,
           scale: 0.01 * 0.2,
-          offset: new THREE.Vector3(0, 0, 0)
         });
       }
 
@@ -200,7 +197,6 @@ const PhysicsChain = {
           position: gliderBody.position as any,
           vector: glideDirection,
           scale: 0.01 * 0.2,
-          offset: new THREE.Vector3(0, 0, 0)
         });
       }
     }

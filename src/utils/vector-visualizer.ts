@@ -30,7 +30,6 @@ interface ForceDefinition {
   position: THREE.Vector3;
   vector: CANNON.Vec3;
   scale?: number;
-  offset?: THREE.Vector3;
 }
 
 export class VectorVisualizater {
@@ -39,7 +38,6 @@ export class VectorVisualizater {
     label: THREE.Sprite;
     group: THREE.Group;
     scale: number;
-    offset: THREE.Vector3;
   }> = new Map();
 
   // Arrow helpers
@@ -268,14 +266,12 @@ export class VectorVisualizater {
    * @param force Force definition containing name, color, position, and vector
    */
   addForce(force: ForceDefinition): void {
-    console.log("addForce", force.name, force);
     const {
       name,
       color,
       position,
       vector,
-      scale = FORCE_SCALE,
-      offset = new THREE.Vector3()
+      scale = FORCE_SCALE
     } = force;
 
     let forceData = this.forces.get(name);
@@ -294,8 +290,7 @@ export class VectorVisualizater {
         arrow,
         label,
         group,
-        scale,
-        offset
+        scale
       };
       this.forces.set(name, forceData);
     }
@@ -310,7 +305,7 @@ export class VectorVisualizater {
     }
 
     const length = vector.length() * effectiveScale;
-    forceData.group.position.copy(position).add(forceData.offset);
+    forceData.group.position.copy(position);
     forceData.arrow.setDirection(direction);
     forceData.arrow.setLength(Math.max(0, length));
     this.updateLabel(forceData.label, name, color, new THREE.Vector3(), direction, length);
@@ -346,7 +341,7 @@ export class VectorVisualizater {
     this.customScaleFactor = scale;
     // Update all existing forces with new scale
     this.forces.forEach((force, name) => {
-      const position = force.group.position.clone().sub(force.offset);
+      const position = force.group.position.clone();
       // Get the current direction from the arrow's quaternion
       const direction = new THREE.Vector3(0, 1, 0);
       direction.applyQuaternion(force.arrow.quaternion);
@@ -360,8 +355,7 @@ export class VectorVisualizater {
           direction.y,
           direction.z
         ),
-        scale: force.scale,
-        offset: force.offset
+        scale: force.scale
       });
     });
   }
