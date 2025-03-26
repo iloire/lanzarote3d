@@ -3,7 +3,7 @@ import * as THREE from "three";
 import { StoryOptions } from "../types";
 
 // Import our modular components
-import { FlightHUD } from "../../components/FlightHUD";
+import { FlightHUD } from "../../components/flight-hud";
 import { VectorVisualizater } from "../../utils/vector-visualizer";
 import { createBasicPhysicsObjects, updateVisuals } from "./core";
 import { setupPhysicsControls, storeInitialPositions } from "./gui";

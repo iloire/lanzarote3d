@@ -61,8 +61,8 @@ export class FlightHUD {
 
     // Create canvas for computer display with higher resolution
     this.computerDisplayCanvas = document.createElement('canvas');
-    this.computerDisplayCanvas.width = 800;
-    this.computerDisplayCanvas.height = 400;
+    this.computerDisplayCanvas.width = 600;
+    this.computerDisplayCanvas.height = 300;
     this.computerDisplayTexture = new THREE.Texture(this.computerDisplayCanvas);
 
     // Initialize HUD elements
@@ -76,7 +76,7 @@ export class FlightHUD {
 
   private createComputerScreen(): void {
     // Create a plane geometry for the computer screen - reduced size
-    const screenGeometry = new THREE.PlaneGeometry(400, 200);
+    const screenGeometry = new THREE.PlaneGeometry(200, 100);
     const screenMaterial = new THREE.MeshBasicMaterial({
       map: this.computerDisplayTexture,
       transparent: true,
@@ -146,7 +146,7 @@ export class FlightHUD {
 
     // Helper function for section headers
     const drawHeader = (text: string, x: number, y: number) => {
-      context.font = 'bold 16px monospace'; // Reduced font size
+      context.font = 'bold 20px monospace'; // Reduced font size
       context.fillStyle = '#00ff00';
       context.textAlign = 'center';
       context.fillText(text, x, y);
@@ -154,7 +154,7 @@ export class FlightHUD {
 
     // Helper function for values
     const drawValue = (text: string, x: number, y: number, large = false) => {
-      context.font = large ? 'bold 32px monospace' : 'bold 24px monospace'; // Reduced font sizes
+      context.font = large ? 'bold 38px monospace' : 'bold 30px monospace'; // Reduced font sizes
       context.fillStyle = '#00ff00';
       context.textAlign = 'center';
       context.fillText(text, x, y);
@@ -162,34 +162,38 @@ export class FlightHUD {
 
     // Helper function for units
     const drawUnits = (text: string, x: number, y: number) => {
-      context.font = '14px monospace'; // Reduced font size
+      context.font = '22px monospace'; // Reduced font size
       context.fillStyle = '#00ff00';
       context.textAlign = 'center';
       context.fillText(text, x, y);
     };
 
+    const firstRowY = 40;
+    const secondRowY = 100;
+    const thirdRowY = 140;
+
     // Speed Section (Top Left)
-    drawHeader('SPEED', sectionWidth * 0.5, 30);
-    drawValue(Math.round(data.speed).toString(), sectionWidth * 0.5, 70, true);
-    drawUnits('km/h', sectionWidth * 0.5, 90);
+    drawHeader('SPEED', sectionWidth * 0.5, firstRowY);
+    drawValue(Math.round(data.speed).toString(), sectionWidth * 0.5, secondRowY, true);
+    drawUnits('km/h', sectionWidth * 0.5, thirdRowY);
 
     // Altitude Section (Top Center-Left)
-    drawHeader('ALTITUDE', sectionWidth * 1.5, 30);
-    drawValue(Math.round(data.altitude).toString(), sectionWidth * 1.5, 70, true);
-    drawUnits('meters', sectionWidth * 1.5, 90);
+    drawHeader('ALTITUDE', sectionWidth * 1.5, firstRowY);
+    drawValue(Math.round(data.altitude).toString(), sectionWidth * 1.5, secondRowY, true);
+    drawUnits('meters', sectionWidth * 1.5, thirdRowY);
 
     // Heading Section (Top Center-Right)
-    drawHeader('HEADING', sectionWidth * 2.5, 30);
+    drawHeader('HEADING', sectionWidth * 2.5, firstRowY);
     const heading = Math.round(data.heading);
     const cardinal = this.getCardinalDirection(heading);
-    drawValue(`${heading}°`, sectionWidth * 2.5, 70, true);
-    drawUnits(cardinal, sectionWidth * 2.5, 90);
+    drawValue(`${heading}°`, sectionWidth * 2.5, secondRowY, true);
+    drawUnits(cardinal, sectionWidth * 2.5, thirdRowY);
 
     // Vertical Speed (Top Right)
-    drawHeader('VERT SPEED', sectionWidth * 3.5, 30);
+    drawHeader('VERT SPEED', sectionWidth * 3.5, 50);
     const varioValue = data.verticalSpeed >= 0 ? '+' + data.verticalSpeed.toFixed(1) : data.verticalSpeed.toFixed(1);
-    drawValue(varioValue, sectionWidth * 3.5, 70, true);
-    drawUnits('m/s', sectionWidth * 3.5, 90);
+    drawValue(varioValue, sectionWidth * 3.5, secondRowY, true);
+    drawUnits('m/s', sectionWidth * 3.5, thirdRowY);
 
     // GPS Coordinates (Bottom)
     drawHeader('GPS', width * 0.5, height / 2 + 25);

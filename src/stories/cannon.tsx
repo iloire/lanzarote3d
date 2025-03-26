@@ -1,7 +1,7 @@
 import * as CANNON from "cannon-es";
 import * as THREE from "three";
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
-import { FlightHUD } from "../components/FlightHUD";
+import { FlightHUD } from "../components/flight-hud";
 import Helpers from "../utils/helpers";
 import { VectorVisualizater } from "../utils/vector-visualizer";
 import { StoryOptions } from "./types";
