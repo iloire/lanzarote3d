@@ -209,7 +209,6 @@ const PhysicsChain = {
 
       applyForcesAndDrawVectors();
 
-
       // Auto-rotate the camera if enabled
       if (pushForceControl.isAutoRotate) {
         const rotationSpeed = pushForceControl.autoRotateSpeed;
@@ -219,16 +218,29 @@ const PhysicsChain = {
         camera.position.x = Math.cos(angle) * radius;
         camera.position.z = Math.sin(angle) * radius;
         camera.position.y = gliderBody.position.y + 20;
-        camera.lookAt(gliderBody.position as any);
-        controls.update();
+      } else {
+        // Always follow the glider, but from a fixed position when not auto-rotating
+        camera.position.set(
+          gliderBody.position.x + 130,
+          gliderBody.position.y + 120,
+          gliderBody.position.z + 130
+        );
       }
 
-      // Update the controls
+      // Always look at the glider
+      // camera.lookAt(gliderBody.position as any);
       controls.update();
 
       // Update visual representations to match physics bodies
       updateVisuals(physicsObjects);
     }
+
+    camera.position.set(
+      gliderBody.position.x + 130,
+      gliderBody.position.y + 120,
+      gliderBody.position.z + 130
+    );
+
 
     // Animation loop
     function animate() {
@@ -265,24 +277,6 @@ const PhysicsChain = {
 
     // Start the animation loop
     animate();
-
-    // Set camera position to be above the platform
-    camera.position.y = gliderBody.position.y + 20;
-    camera.position.x = 100;
-    camera.position.z = 100;
-    camera.lookAt(gliderBody.position as any);
-
-    // Return cleanup function
-    return () => {
-      if (keyboardControls) {
-        keyboardControls.cleanup();
-        keyboardControls = null;
-      }
-      if (hud) {
-        hud.dispose();
-        hud = null;
-      }
-    };
   },
 };
 

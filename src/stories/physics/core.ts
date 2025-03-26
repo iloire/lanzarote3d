@@ -20,34 +20,6 @@ export interface PhysicsScene {
   cleanup: () => void;
 }
 
-/**
- * Setup lighting for the scene
- */
-function setupLighting(scene: THREE.Scene): void {
-  // Add ambient light
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-  scene.add(ambientLight);
-
-  // Add directional light
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-  directionalLight.position.set(10, 20, 10);
-  directionalLight.castShadow = true;
-
-  // Configure shadow properties
-  directionalLight.shadow.mapSize.width = 2048;
-  directionalLight.shadow.mapSize.height = 2048;
-  directionalLight.shadow.camera.near = 0.5;
-  directionalLight.shadow.camera.far = 50;
-
-  // Expand shadow bounds for large scenes
-  const d = 30;
-  directionalLight.shadow.camera.left = -d;
-  directionalLight.shadow.camera.right = d;
-  directionalLight.shadow.camera.top = d;
-  directionalLight.shadow.camera.bottom = -d;
-
-  scene.add(directionalLight);
-}
 
 /**
  * Create platform and sphere bodies for the basic simulation
@@ -200,56 +172,3 @@ export function updateVisuals(physicsObjects: PhysicsObjects): void {
     }
   });
 }
-
-// Export the setupScene function so it can be used in index.tsx
-export function setupScene(container: HTMLElement): {
-  scene: THREE.Scene;
-  camera: THREE.PerspectiveCamera;
-  renderer: THREE.WebGLRenderer;
-  controls: OrbitControls;
-} {
-  // Create a scene
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x87ceeb); // Sky blue background
-
-  // Create a camera
-  const camera = new THREE.PerspectiveCamera(
-    75, // Field of view
-    window.innerWidth / window.innerHeight, // Aspect ratio
-    0.1, // Near plane
-    1000 // Far plane
-  );
-
-  // Set initial camera position
-  camera.position.set(10, 20, 30);
-  camera.lookAt(0, 0, 0);
-
-  // Create a renderer
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setPixelRatio(window.devicePixelRatio);
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-  // Add renderer to container
-  container.appendChild(renderer.domElement);
-
-  // Create camera controls
-  const controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
-  controls.dampingFactor = 0.05;
-
-  // Add window resize handler
-  const handleResize = () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-  };
-
-  window.addEventListener('resize', handleResize);
-
-  // Add basic lighting to the scene
-  setupLighting(scene);
-
-  return { scene, camera, renderer, controls };
-} 

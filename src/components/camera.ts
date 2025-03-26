@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import Paraglider from "../components/base/flier";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import Paraglider from "../components/base/flier";
 import Animations from "../utils/animations";
 import GuiHelper from "../utils/gui";
 
@@ -20,8 +20,8 @@ let isDownViewing = false;
 let isZoomInViewing = false;
 let isZoomOutViewing = false;
 
-document.addEventListener("keydown", onDocumentKeyDown, false);
-document.addEventListener("keyup", onDocumentKeyUp, false);
+// document.addEventListener("keydown", onDocumentKeyDown, false);
+// document.addEventListener("keyup", onDocumentKeyUp, false);
 
 enum KeyCodes {
   left = 37, // left arrow
@@ -32,39 +32,39 @@ enum KeyCodes {
   out = 34, // page down
 }
 
-function onDocumentKeyDown(event) {
-  const keyCode = event.which;
-  if (keyCode === KeyCodes.left) {
-    isLeftViewing = true;
-  } else if (keyCode === KeyCodes.right) {
-    isRightViewing = true;
-  } else if (keyCode === KeyCodes.out) {
-    isZoomOutViewing = true;
-  } else if (keyCode === KeyCodes.in) {
-    isZoomInViewing = true;
-  } else if (keyCode === KeyCodes.up) {
-    isUpViewing = true;
-  } else if (keyCode === KeyCodes.down) {
-    isDownViewing = true;
-  }
-}
+// function onDocumentKeyDown(event) {
+//   const keyCode = event.which;
+//   if (keyCode === KeyCodes.left) {
+//     isLeftViewing = true;
+//   } else if (keyCode === KeyCodes.right) {
+//     isRightViewing = true;
+//   } else if (keyCode === KeyCodes.out) {
+//     isZoomOutViewing = true;
+//   } else if (keyCode === KeyCodes.in) {
+//     isZoomInViewing = true;
+//   } else if (keyCode === KeyCodes.up) {
+//     isUpViewing = true;
+//   } else if (keyCode === KeyCodes.down) {
+//     isDownViewing = true;
+//   }
+// }
 
-function onDocumentKeyUp(event) {
-  const keyCode = event.which;
-  if (keyCode === KeyCodes.left) {
-    isLeftViewing = false;
-  } else if (keyCode === KeyCodes.right) {
-    isRightViewing = false;
-  } else if (keyCode === KeyCodes.out) {
-    isZoomOutViewing = false;
-  } else if (keyCode === KeyCodes.in) {
-    isZoomInViewing = false;
-  } else if (keyCode === KeyCodes.up) {
-    isUpViewing = false;
-  } else if (keyCode === KeyCodes.down) {
-    isDownViewing = false;
-  }
-}
+// function onDocumentKeyUp(event) {
+//   const keyCode = event.which;
+//   if (keyCode === KeyCodes.left) {
+//     isLeftViewing = false;
+//   } else if (keyCode === KeyCodes.right) {
+//     isRightViewing = false;
+//   } else if (keyCode === KeyCodes.out) {
+//     isZoomOutViewing = false;
+//   } else if (keyCode === KeyCodes.in) {
+//     isZoomInViewing = false;
+//   } else if (keyCode === KeyCodes.up) {
+//     isUpViewing = false;
+//   } else if (keyCode === KeyCodes.down) {
+//     isDownViewing = false;
+//   }
+// }
 
 class Camera extends THREE.PerspectiveCamera {
   mode: CameraMode;
@@ -112,9 +112,9 @@ class Camera extends THREE.PerspectiveCamera {
       return;
     }
     if (this.mode === CameraMode.FollowTarget) {
-      this.followTarget();
+      // this.followTarget();
     } else if (this.mode === CameraMode.FirstPersonView) {
-      this.firstPersonView();
+      // this.firstPersonView();
     } else {
       throw new Error("invalid camera mode");
     }
@@ -180,38 +180,38 @@ class Camera extends THREE.PerspectiveCamera {
     );
   }
 
-  followTarget() {
-    const x = Math.sin(this.angle) * this.distance;
-    const z = Math.cos(this.angle) * this.distance;
-    const y = Math.cos(this.angleY) * this.distance;
+  // followTarget() {
+  //   const x = Math.sin(this.angle) * this.distance;
+  //   const z = Math.cos(this.angle) * this.distance;
+  //   const y = Math.cos(this.angleY) * this.distance;
 
-    const pg = this.target;
-    const cameraOffset = new THREE.Vector3(x, y, z);
-    this.position.copy(pg.position().add(pg.direction().add(cameraOffset)));
+  //   const pg = this.target;
+  //   const cameraOffset = new THREE.Vector3(x, y, z);
+  //   this.position.copy(pg.position().add(pg.direction().add(cameraOffset)));
 
-    const lookOffset = new THREE.Vector3(0, 0, 0);
-    const lookAt = pg.position().add(pg.direction().add(lookOffset));
-    this.lookAt(lookAt);
-  }
+  //   const lookOffset = new THREE.Vector3(0, 0, 0);
+  //   const lookAt = pg.position().add(pg.direction().add(lookOffset));
+  //   this.lookAt(lookAt);
+  // }
 
-  firstPersonView() {
-    const cam = this;
-    const pg = this.target;
+  // firstPersonView() {
+  //   const cam = this;
+  //   const pg = this.target;
 
-    cam.position.copy(pg.position()).add(this.firstPersonViewOffset);
+  //   cam.position.copy(pg.position()).add(this.firstPersonViewOffset);
 
-    const lookAt = pg.position().add(pg.direction().multiplyScalar(20000));
-    this.lookAt(lookAt);
+  //   const lookAt = pg.position().add(pg.direction().multiplyScalar(20000));
+  //   this.lookAt(lookAt);
 
-    // adjust for roll
-    this.rotateZ(
-      -1 * (this.viewRotationHorizontal / 4 + pg.getMesh().rotation.z)
-    );
+  //   // adjust for roll
+  //   this.rotateZ(
+  //     -1 * (this.viewRotationHorizontal / 4 + pg.getMesh().rotation.z)
+  //   );
 
-    // view rotation
-    this.rotateY(-1 * this.viewRotationHorizontal * 1.5);
-    this.rotateX(-1 * this.viewRotationVertical * 1.5);
-  }
+  //   // view rotation
+  //   this.rotateY(-1 * this.viewRotationHorizontal * 1.5);
+  //   this.rotateX(-1 * this.viewRotationVertical * 1.5);
+  // }
 }
 
 export default Camera;
