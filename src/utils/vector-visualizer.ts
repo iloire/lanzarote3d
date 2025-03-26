@@ -3,8 +3,6 @@ import * as THREE from "three";
 
 // Force visualization constants with better scaling
 const FORCE_SCALE = 0.01; // Base scale factor for force visualization
-const WING_FORCE_SCALE = 0.2; // Wing forces need more visibility
-const PILOT_FORCE_SCALE = 1; // Pilot forces scale
 
 // Vector colors with better distinction
 const COLORS = {
@@ -270,6 +268,7 @@ export class VectorVisualizater {
    * @param force Force definition containing name, color, position, and vector
    */
   addForce(force: ForceDefinition): void {
+    console.log("addForce", force.name, force);
     const {
       name,
       color,
@@ -333,6 +332,7 @@ export class VectorVisualizater {
    * Clear all force visualizations
    */
   clearForces(): void {
+    console.log("clearForces");
     this.forces.forEach((force, name) => {
       this.removeForce(name);
     });
@@ -376,82 +376,5 @@ export class VectorVisualizater {
 
   isVisible(): boolean {
     return this.forceGroup.visible;
-  }
-
-  /**
-   * Update all predefined forces
-   */
-  update(
-    wingPosition: THREE.Vector3,
-    pilotPosition: THREE.Vector3,
-    liftVector: CANNON.Vec3,
-    dragVector: CANNON.Vec3,
-    weightVector: CANNON.Vec3,
-    glideDirection: CANNON.Vec3,
-    leftBreakVector?: CANNON.Vec3,
-    rightBreakVector?: CANNON.Vec3
-  ) {
-    // Clear existing forces
-    this.clearForces();
-
-    // Add lift force
-    this.addForce({
-      name: "LIFT",
-      color: COLORS.LIFT,
-      position: wingPosition,
-      vector: liftVector,
-      scale: FORCE_SCALE * WING_FORCE_SCALE
-    });
-
-    // Add drag force
-    this.addForce({
-      name: "DRAG",
-      color: COLORS.DRAG,
-      position: wingPosition,
-      vector: dragVector,
-      scale: FORCE_SCALE * WING_FORCE_SCALE
-    });
-
-    // Add weight force
-    this.addForce({
-      name: "WEIGHT",
-      color: COLORS.WEIGHT,
-      position: pilotPosition,
-      vector: weightVector,
-      scale: FORCE_SCALE * PILOT_FORCE_SCALE
-    });
-
-    // Add glide direction
-    this.addForce({
-      name: "GLIDE",
-      color: COLORS.GLIDE_DIRECTION,
-      position: wingPosition,
-      vector: glideDirection,
-      scale: FORCE_SCALE * WING_FORCE_SCALE
-    });
-
-    // Add left break force if present
-    if (leftBreakVector) {
-      this.addForce({
-        name: "L-BREAK",
-        color: COLORS.LEFT_BREAK,
-        position: wingPosition,
-        vector: leftBreakVector,
-        scale: FORCE_SCALE * WING_FORCE_SCALE,
-        offset: new THREE.Vector3(-5, 0, 0)
-      });
-    }
-
-    // Add right break force if present
-    if (rightBreakVector) {
-      this.addForce({
-        name: "R-BREAK",
-        color: COLORS.RIGHT_BREAK,
-        position: wingPosition,
-        vector: rightBreakVector,
-        scale: FORCE_SCALE * WING_FORCE_SCALE,
-        offset: new THREE.Vector3(5, 0, 0)
-      });
-    }
   }
 } 

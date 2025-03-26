@@ -270,16 +270,31 @@ export default class PhysicsFlier extends THREE.EventDispatcher {
     // Create gravity force
     const gravityForce = new CANNON.Vec3(0, -this.options.pilot.weight * 9.81, 0);
 
+    // instead of vectorVisualizer.update, we can manually add and remove forces
+    // this is useful for debugging
+    if (!liftForce.isZero()) {
+      this.forceVisualization.removeForce("LIFT");
+    } else {
+      this.forceVisualization.addForce({ name: "LIFT", color: 0xff00ff, position: wingPos, vector: liftForce });
+    }
 
-    // Update visualization with current positions and forces
-    this.forceVisualization.update(
-      wingPos,
-      pilotPos,
-      liftForce,
-      dragForce,
-      windForce,
-      gravityForce
-    );
+    if (!dragForce.isZero()) {
+      this.forceVisualization.removeForce("DRAG");
+    } else {
+      this.forceVisualization.addForce({ name: "DRAG", color: 0xff00ff, position: wingPos, vector: dragForce });
+    }
+
+    if (!windForce.isZero()) {
+      this.forceVisualization.removeForce("WIND");
+    } else {
+      this.forceVisualization.addForce({ name: "WIND", color: 0xff00ff, position: wingPos, vector: windForce });
+    }
+
+    if (!gravityForce.isZero()) {
+      this.forceVisualization.removeForce("GRAVITY");
+    } else {
+      this.forceVisualization.addForce({ name: "GRAVITY", color: 0xff00ff, position: wingPos, vector: gravityForce });
+    }
   }
 
   private applyForces() {

@@ -46,7 +46,6 @@ export function setupKeyboardControls(
   // Function to apply forces based on keyboard input
   function applyInputForces(vectorVisualizer: VectorVisualizater) {
     const wingPosition = new THREE.Vector3().copy(gliderBody.position as any);
-    const zeroForce = new CANNON.Vec3(0, 0, 0);
     const force = 1450;
     const velocity = gliderBody.velocity;
     const breakForceMagnitude = 1200;
@@ -54,40 +53,19 @@ export function setupKeyboardControls(
 
     gliderBody.angularVelocity.z *= 0.95;
 
-    // Always show forces, but with zero magnitude when not active
+    // Remove break forces when not active
     if (!keysPressed.has(KEY_MAPPING.RIGHT[0])) {
-      vectorVisualizer.addForce({
-        name: "R-BREAK",
-        color: 0x00ffff, // Cyan
-        position: wingPosition,
-        vector: zeroForce,
-        scale: 0.01 * 0.2,
-        offset: new THREE.Vector3(5, 0, 0)
-      });
+      vectorVisualizer.removeForce("R-BREAK");
     }
 
     if (!keysPressed.has(KEY_MAPPING.LEFT[0])) {
-      // console.log('removing left break force visualizer');
-
-      vectorVisualizer.addForce({
-        name: "L-BREAK",
-        color: 0xff00ff, // Magenta
-        position: wingPosition,
-        vector: zeroForce,
-        scale: 0.01 * 0.2,
-        offset: new THREE.Vector3(-5, 0, 0)
-      });
+      vectorVisualizer.removeForce("L-BREAK");
     }
 
+    // Show keyboard forces
     if (!keysPressed.has(KEY_MAPPING.UP[0]) && !keysPressed.has(KEY_MAPPING.DOWN[0])) {
-      vectorVisualizer.addForce({
-        name: "KEYBOARD UP",
-        color: 0x00ff00, // Green
-        position: wingPosition,
-        vector: zeroForce,
-        scale: 0.01 * 0.2,
-        offset: new THREE.Vector3(0, 0, 0)
-      });
+      vectorVisualizer.removeForce("KEYBOARD UP");
+      vectorVisualizer.removeForce("KEYBOARD DOWN");
     }
 
     // Apply active forces when keys are pressed

@@ -563,17 +563,25 @@ const CannonWorkshop = {
         const weightVecCannon = new CANNON.Vec3(0, -9.82 * body.mass, 0);
         const glideDirectionCannon = new CANNON.Vec3(forwardVector.x, forwardVector.y, forwardVector.z);
 
-        // Update the vector visualizer with all current forces
-        vectorVisualizer.update(
-          position,                 // Wing position for drawing vectors from
-          position.clone().add(new THREE.Vector3(0, 5, 0)), // Offset position for clarity
-          liftVecCannon,            // Lift force (green arrow)
-          dragVecCannon,            // Drag force (red arrow)
-          weightVecCannon,          // Weight force (yellow arrow)
-          glideDirectionCannon,     // Direction of travel (blue arrow)
-          null,                     // No left break force in this model
-          null                      // No right break force in this model
-        );
+        // insgtead of vectorVisualizer.update2, we can manually add and remove forces
+        // this is useful for debugging
+        if (liftVecCannon.isZero()) {
+          vectorVisualizer.removeForce("LIFT");
+        } else {
+          vectorVisualizer.addForce({ name: "LIFT", color: 0xff00ff, position, vector: liftVecCannon });
+        }
+
+        if (dragVecCannon.isZero()) {
+          vectorVisualizer.removeForce("DRAG");
+        } else {
+          vectorVisualizer.addForce({ name: "DRAG", color: 0xff00ff, position, vector: dragVecCannon });
+        }
+
+        if (weightVecCannon.isZero()) {
+          vectorVisualizer.removeForce("WEIGHT");
+        } else {
+          vectorVisualizer.addForce({ name: "WEIGHT", color: 0xff00ff, position, vector: weightVecCannon });
+        }
       }
     }
 

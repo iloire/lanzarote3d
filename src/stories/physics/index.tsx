@@ -144,17 +144,59 @@ const PhysicsChain = {
         );
       }
 
-      // Update vector visualization
-      vectorVisualizer.update(
-        new THREE.Vector3().copy(gliderBody.position as any),  // Wing position
-        new THREE.Vector3().copy(pilotBody.position as any),    // Pilot position
-        liftVector,                                               // Lift force
-        dragVector,                                               // Drag force
-        weightVector,                                             // Weight force
-        glideDirection,                                           // Glide direction
-        pushForceControl.leftBreakForce > 0 ? leftBreakVector : null,  // Left break force if active
-        pushForceControl.rightBreakForce > 0 ? rightBreakVector : null  // Right break force if active
-      );
+      // instead of using the vector visualizer update method, we can manually add and remove forces
+      // this is useful for debugging
+      if (liftVector.isZero()) {
+        vectorVisualizer.removeForce("LIFT");
+      } else {
+        vectorVisualizer.addForce({
+          name: "LIFT",
+          color: 0xff00ff, // Magenta 
+          position: gliderBody.position as any,
+          vector: liftVector,
+          scale: 0.01 * 0.2,
+          offset: new THREE.Vector3(0, 0, 0)
+        });
+      }
+
+      if (weightVector.isZero()) {
+        vectorVisualizer.removeForce("WEIGHT");
+      } else {
+        vectorVisualizer.addForce({
+          name: "WEIGHT",
+          color: 0xff00ff, // Magenta 
+          position: gliderBody.position as any,
+          vector: weightVector,
+          scale: 0.01 * 0.2,
+          offset: new THREE.Vector3(0, 0, 0)
+        });
+      }
+
+      if (dragVector.isZero()) {
+        vectorVisualizer.removeForce("DRAG");
+      } else {
+        vectorVisualizer.addForce({
+          name: "DRAG",
+          color: 0xff00ff, // Magenta   
+          position: gliderBody.position as any,
+          vector: dragVector,
+          scale: 0.01 * 0.2,
+          offset: new THREE.Vector3(0, 0, 0)
+        });
+      }
+
+      if (glideDirection.isZero()) {
+        vectorVisualizer.removeForce("GLIDE");
+      } else {
+        vectorVisualizer.addForce({
+          name: "GLIDE",
+          color: 0xff00ff, // Magenta   
+          position: gliderBody.position as any,
+          vector: glideDirection,
+          scale: 0.01 * 0.2,
+          offset: new THREE.Vector3(0, 0, 0)
+        });
+      }
     }
 
     // Physics update function (internal function)
