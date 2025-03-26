@@ -84,7 +84,7 @@ export function createBasicPhysicsObjects(
   const gliderWidth = 12;
   const gliderHeight = 1;
   const gliderDepth = 12;
-  const gliderPos = new THREE.Vector3(0, 10, 0);
+  const gliderPos = new THREE.Vector3(14000, 400, 0);
 
   const gliderShape = new CANNON.Box(new CANNON.Vec3(
     gliderWidth / 2,
@@ -125,13 +125,13 @@ export function createBasicPhysicsObjects(
   // Create a single sphere below the platform
   const sphereRadius = 1.5;
   const ropeLength = 20; // Shorter lines for better stability
-  const spherePos = new THREE.Vector3(gliderPos.x, gliderPos.y - ropeLength, gliderPos.z);
-  const sphereShape = new CANNON.Sphere(sphereRadius);
+  const spherePilotPos = new THREE.Vector3(gliderPos.x, gliderPos.y - ropeLength, gliderPos.z);
+  const spherePilotShape = new CANNON.Sphere(sphereRadius);
 
   const pilotBody = new CANNON.Body({
     mass: 70, // Slightly lighter mass (realistic human weight)
-    position: new CANNON.Vec3(spherePos.x, spherePos.y, spherePos.z),
-    shape: sphereShape,
+    position: new CANNON.Vec3(spherePilotPos.x, spherePilotPos.y, spherePilotPos.z),
+    shape: spherePilotShape,
     linearDamping: 0.8, // Higher damping to reduce swinging
     angularDamping: 0.9, // Higher damping to reduce spinning
     allowSleep: true, // Allow sleep for optimization
@@ -148,7 +148,7 @@ export function createBasicPhysicsObjects(
   const pilotMesh = createSphereVisualization(
     scene,
     sphereRadius,
-    spherePos,
+    spherePilotPos,
     0x0088ff, // Blue for the main sphere
     "Sphere"
   );

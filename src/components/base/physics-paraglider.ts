@@ -272,25 +272,25 @@ export default class PhysicsFlier extends THREE.EventDispatcher {
 
     // instead of vectorVisualizer.update, we can manually add and remove forces
     // this is useful for debugging
-    if (!liftForce.isZero()) {
+    if (liftForce.isZero()) {
       this.forceVisualization.removeForce("LIFT");
     } else {
       this.forceVisualization.addForce({ name: "LIFT", color: 0xff00ff, position: wingPos, vector: liftForce });
     }
 
-    if (!dragForce.isZero()) {
+    if (dragForce.isZero()) {
       this.forceVisualization.removeForce("DRAG");
     } else {
       this.forceVisualization.addForce({ name: "DRAG", color: 0xff00ff, position: wingPos, vector: dragForce });
     }
 
-    if (!windForce.isZero()) {
+    if (windForce.isZero()) {
       this.forceVisualization.removeForce("WIND");
     } else {
       this.forceVisualization.addForce({ name: "WIND", color: 0xff00ff, position: wingPos, vector: windForce });
     }
 
-    if (!gravityForce.isZero()) {
+    if (gravityForce.isZero()) {
       this.forceVisualization.removeForce("GRAVITY");
     } else {
       this.forceVisualization.addForce({ name: "GRAVITY", color: 0xff00ff, position: wingPos, vector: gravityForce });
