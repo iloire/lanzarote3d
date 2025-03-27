@@ -36,7 +36,7 @@ const PhysicsChain = {
     // Setup vector visualizer
     vectorVisualizer = new VectorVisualizater(scene);
     // Set custom scale to make vectors more visible
-    vectorVisualizer.setScale(3.0);
+    vectorVisualizer.setScale(13.0);
 
     // Initialize the HUD
     hud = new FlightHUD({ scene, camera });
@@ -113,6 +113,13 @@ const PhysicsChain = {
       //   gliderBody.position
       // );
 
+      // apply forward force in the direction of the glider
+      const forwardForce = gliderBody.velocity.negate().scale(1);
+      gliderBody.applyForce(
+        forwardForce,
+        gliderBody.position
+      );
+
       // Calculate break forces using GUI control values
       // Left break force - pulls down and to the left
       const breakMagnitude = pushForceControl.leftBreakForce * pilotBody.mass;
@@ -148,6 +155,17 @@ const PhysicsChain = {
           rightBreakVector,
           rightWingTip
         );
+      }
+
+      if (forwardForce.isZero()) {
+        vectorVisualizer.removeForce("FORWARD");
+      } else {
+        vectorVisualizer.addForce({
+          name: "FORWARD",
+          color: 0x0000ff, // Blue
+          position: gliderBody.position as any,
+          vector: forwardForce,
+        });
       }
 
       // instead of using the vector visualizer update method, we can manually add and remove forces
@@ -220,7 +238,36 @@ const PhysicsChain = {
       requestAnimationFrame(animate);
       updatePhysics();
 
-      // Update HUD with current flight data
+      // Auto-rotate the camera if enabled
+      if (pushForceControl.isAutoRotate) {
+        const rotationSpeed = pushForceControl.autoRotateSpeed;
+        const radius = 30;
+        const angle = Date.now() * 0.0005 * rotationSpeed;
+
+        camera.position.x = gliderBody.position.x + Math.cos(angle) * radius;
+        camera.position.z = gliderBody.position.z + Math.sin(angle) * radius;
+        camera.position.y = gliderBody.position.y + 20;
+      } else {
+        // Always follow the glider, but from a fixed position when not auto-rotating
+        camera.position.set(
+          gliderBody.position.x + 50,
+          gliderBody.position.y + 50,
+          gliderBody.position.z + 50
+        );
+      }
+
+      // Always look at the glider
+      camera.lookAt(new THREE.Vector3(
+        gliderBody.position.x,
+        gliderBody.position.y,
+        gliderBody.position.z
+      ));
+      controls.update();
+
+      // First render the scene
+      renderer.render(scene, camera);
+
+      // Then update and render the HUD on top
       if (hud) {
         hud.update(
           new THREE.Vector3(
@@ -244,30 +291,6 @@ const PhysicsChain = {
         );
         hud.render(renderer);
       }
-
-      // Auto-rotate the camera if enabled
-      if (pushForceControl.isAutoRotate) {
-        const rotationSpeed = pushForceControl.autoRotateSpeed;
-        const radius = 30;
-        const angle = Date.now() * 0.0005 * rotationSpeed;
-
-        camera.position.x = Math.cos(angle) * radius;
-        camera.position.z = Math.sin(angle) * radius;
-        camera.position.y = gliderBody.position.y + 20;
-      } else {
-        // Always follow the glider, but from a fixed position when not auto-rotating
-        camera.position.set(
-          gliderBody.position.x + 130,
-          gliderBody.position.y + 120,
-          gliderBody.position.z + 130
-        );
-      }
-
-      // Always look at the glider
-      // camera.lookAt(gliderBody.position as any);
-      controls.update();
-
-      renderer.render(scene, camera);
     }
 
     // Start the animation loop

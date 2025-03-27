@@ -55,11 +55,11 @@ export function setupKeyboardControls(
 
     // Remove break forces when not active
     if (!keysPressed.has(KEY_MAPPING.RIGHT[0])) {
-      vectorVisualizer.removeForce("R-BREAK");
+      vectorVisualizer.removeTorque("R-BREAK-ROLL");
     }
 
     if (!keysPressed.has(KEY_MAPPING.LEFT[0])) {
-      vectorVisualizer.removeForce("L-BREAK");
+      vectorVisualizer.removeTorque("L-BREAK-ROLL");
     }
 
     // Show keyboard forces
@@ -74,33 +74,31 @@ export function setupKeyboardControls(
       const rollAxis = gliderBody.vectorToWorldFrame(new CANNON.Vec3(0, 1, 0));
 
       if (keysPressed.has(KEY_MAPPING.RIGHT[0])) {
-        // const leftBreakDragForce = velocity.negate().scale(breakForceMagnitude);
-        // vectorVisualizer.addForce({
-        //   name: "R-BREAK",
-        //   color: 0x00ffff, // Cyan
-        //   position: wingPosition,
-        //   vector: leftBreakDragForce,
-        //   scale: 0.01 * 0.2,
-        // });
-
+        vectorVisualizer.addTorque({
+          name: "R-BREAK-ROLL",
+          color: 0x00ffff, // Cyan
+          position: wingPosition,
+          axis: rollAxis,
+          magnitude: rollTorqueMagnitude,
+          scale: 0.01 * 0.2,
+        });
         gliderBody.applyTorque(rollAxis.scale(-rollTorqueMagnitude));
       }
 
       if (keysPressed.has(KEY_MAPPING.LEFT[0])) {
-        const dragForce = velocity.negate().scale(breakForceMagnitude);
-        vectorVisualizer.addForce({
-          name: "L-BREAK",
-          color: 0xff00ff, // Magenta
+        vectorVisualizer.addTorque({
+          name: "L-BREAK-ROLL",
+          color: 0x00ffff, // Cyan
           position: wingPosition,
-          vector: dragForce,
+          axis: rollAxis,
+          magnitude: -rollTorqueMagnitude,
           scale: 0.01 * 0.2,
         });
-
         gliderBody.applyTorque(rollAxis.scale(rollTorqueMagnitude));
       }
 
       if (keysPressed.has(KEY_MAPPING.UP[0])) {
-        const liftForce = new CANNON.Vec3(0, 1200, 0);
+        const liftForce = new CANNON.Vec3(0, 2200, 0);
         vectorVisualizer.addForce({
           name: "KEYBOARD UP",
           color: 0x00ff00, // Green

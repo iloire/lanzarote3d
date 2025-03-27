@@ -3,6 +3,7 @@ import * as THREE from "three";
 
 // Force visualization constants with better scaling
 const FORCE_SCALE = 0.01; // Base scale factor for force visualization
+const TORQUE_SCALE = 0.05; // Base scale factor for torque visualization
 
 // Vector colors with better distinction
 const COLORS = {
@@ -12,6 +13,9 @@ const COLORS = {
   GLIDE_DIRECTION: 0x0000ff,    // Blue
   LEFT_BREAK: 0xff00ff,   // Magenta
   RIGHT_BREAK: 0x00ffff,  // Cyan
+  ROLL_TORQUE: 0xff8800,  // Orange
+  PITCH_TORQUE: 0x8800ff, // Purple
+  YAW_TORQUE: 0x00ff88,   // Turquoise
 };
 
 // Helper function to convert color number to CSS color string
@@ -32,9 +36,27 @@ interface ForceDefinition {
   scale?: number;
 }
 
+interface TorqueDefinition {
+  name: string;
+  color: number;
+  position: THREE.Vector3;
+  axis: CANNON.Vec3;
+  magnitude: number;
+  scale?: number;
+  radius?: number;
+}
+
 export class VectorVisualizater {
   private forces: Map<string, {
     arrow: THREE.ArrowHelper;
+    label: THREE.Sprite;
+    group: THREE.Group;
+    scale: number;
+  }> = new Map();
+
+  private torques: Map<string, {
+    curve: THREE.Line;
+    arrowHead: THREE.Mesh;
     label: THREE.Sprite;
     group: THREE.Group;
     scale: number;
@@ -324,25 +346,118 @@ export class VectorVisualizater {
   }
 
   /**
-   * Clear all force visualizations
+   * Add or update a torque vector visualization
+   * @param torque Torque definition containing name, color, position, axis, and magnitude
+   */
+  addTorque(torque: TorqueDefinition): void {
+    const {
+      name,
+      color,
+      position,
+      axis,
+      magnitude,
+      scale = TORQUE_SCALE,
+      radius = 5
+    } = torque;
+
+    let torqueData = this.torques.get(name);
+
+    if (!torqueData) {
+      // Create new torque visualization
+      const group = new THREE.Group();
+      const curve = this.createTorqueArrow(radius);
+      const arrowHead = this.createArrowHead();
+      const label = this.createTextSprite(name, color);
+
+      group.add(curve);
+      group.add(arrowHead);
+      group.add(label);
+      this.forceGroup.add(group);
+
+      torqueData = {
+        curve,
+        arrowHead,
+        label,
+        group,
+        scale
+      };
+      this.torques.set(name, torqueData);
+    }
+
+    // Update torque visualization
+    const effectiveScale = scale * this.customScaleFactor;
+    const direction = new THREE.Vector3(axis.x, axis.y, axis.z);
+
+    // Safely normalize the direction
+    if (direction.length() > 0.001) {
+      direction.normalize();
+    }
+
+    // Scale the radius by the magnitude
+    const scaledRadius = radius * Math.abs(magnitude) * effectiveScale;
+
+    // Update curve size and color
+    const curve = torqueData.curve;
+    (curve.material as THREE.LineBasicMaterial).color.setHex(color);
+    curve.scale.setScalar(scaledRadius / radius);
+
+    // Position and orient the group based on the axis
+    torqueData.group.position.copy(position);
+
+    // Align the torque visualization with the axis
+    const up = new THREE.Vector3(0, 1, 0);
+    const quaternion = new THREE.Quaternion();
+    quaternion.setFromUnitVectors(up, direction);
+    torqueData.group.setRotationFromQuaternion(quaternion);
+
+    // Position the arrow head at the end of the curve
+    const endAngle = 1.5 * Math.PI;
+    torqueData.arrowHead.position.set(
+      scaledRadius * Math.cos(endAngle),
+      scaledRadius * Math.sin(endAngle),
+      0
+    );
+    // torqueData.arrowHead.material.color.setHex(color);
+
+    // Update the label
+    const length = Math.abs(magnitude) * effectiveScale;
+    this.updateLabel(torqueData.label, name, color, new THREE.Vector3(0, scaledRadius, 0), direction, length);
+  }
+
+  /**
+   * Remove a torque vector visualization
+   * @param name Name of the torque to remove
+   */
+  removeTorque(name: string): void {
+    const torque = this.torques.get(name);
+    if (torque) {
+      this.forceGroup.remove(torque.group);
+      this.torques.delete(name);
+    }
+  }
+
+  /**
+   * Clear all force and torque visualizations
    */
   clearForces(): void {
     console.log("clearForces");
     this.forces.forEach((force, name) => {
       this.removeForce(name);
     });
+    this.torques.forEach((torque, name) => {
+      this.removeTorque(name);
+    });
   }
 
   /**
-   * Set the scale factor for all force visualizations
-   * @param scale Scale factor to apply to all forces (default: 1.0)
+   * Set the scale factor for all force and torque visualizations
    */
   setScale(scale: number): void {
     this.customScaleFactor = scale;
-    // Update all existing forces with new scale
+
+    // Update forces
     this.forces.forEach((force, name) => {
       const position = force.group.position.clone();
-      // Get the current direction from the arrow's quaternion
       const direction = new THREE.Vector3(0, 1, 0);
       direction.applyQuaternion(force.arrow.quaternion);
 
@@ -350,12 +465,28 @@ export class VectorVisualizater {
         name,
         color: (force.arrow.line.material as THREE.LineBasicMaterial).color.getHex(),
         position,
-        vector: new CANNON.Vec3(
-          direction.x,
-          direction.y,
-          direction.z
-        ),
+        vector: new CANNON.Vec3(direction.x, direction.y, direction.z),
         scale: force.scale
+      });
+    });
+
+    // Update torques
+    this.torques.forEach((torque, name) => {
+      const position = torque.group.position.clone();
+      const direction = new THREE.Vector3(0, 1, 0);
+      direction.applyQuaternion(torque.group.quaternion);
+
+      // Get the current scale to determine the magnitude
+      const currentScale = torque.curve.scale.x;
+      const magnitude = currentScale / (torque.scale * this.customScaleFactor);
+
+      this.addTorque({
+        name,
+        color: (torque.curve.material as THREE.LineBasicMaterial).color.getHex(),
+        position,
+        axis: new CANNON.Vec3(direction.x, direction.y, direction.z),
+        magnitude,
+        scale: torque.scale
       });
     });
   }
@@ -370,5 +501,29 @@ export class VectorVisualizater {
 
   isVisible(): boolean {
     return this.forceGroup.visible;
+  }
+
+  private createTorqueArrow(radius: number = 5, segments: number = 32): THREE.Line {
+    const curve = new THREE.EllipseCurve(
+      0, 0,            // Center x, y
+      radius, radius,  // xRadius, yRadius
+      0, 1.5 * Math.PI,  // Start angle, end angle
+      false,           // Clockwise
+      0               // Rotation
+    );
+
+    const points = curve.getPoints(segments);
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    const material = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 3 });
+
+    return new THREE.Line(geometry, material);
+  }
+
+  private createArrowHead(): THREE.Mesh {
+    const geometry = new THREE.ConeGeometry(0.5, 2, 8);
+    const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const arrowHead = new THREE.Mesh(geometry, material);
+    arrowHead.rotateX(Math.PI / 2);
+    return arrowHead;
   }
 } 
