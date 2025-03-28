@@ -88,131 +88,174 @@ const PhysicsChain = {
     });
 
     function applyForcesAndDrawVectors() {
-      // the glide direction is in the directio of the speed of the glider  
+      // Get the glider's velocity and normalize it for direction calculations
       const glideDirection = gliderBody.velocity.clone();
+      const speed = glideDirection.length();
 
-      // drag vector is in the opposite direction of the glide direction
+      if (speed > 0.001) {
+        glideDirection.normalize();
+      }
+
+      // Calculate the relative wind direction (opposite to glide direction)
       const dragVector = glideDirection.negate();
 
-      // for now let's keep it same as weight
-      const liftMagnitude = 9.82 * pilotBody.mass;
-      const liftVector = new CANNON.Vec3(0, liftMagnitude, 0);
-      gliderBody.applyForce(
-        liftVector
-      );
+      // Define lift distribution points along the glider's surface
+      const liftPoints = [
+        // Left wing points (from center to tip)
+        { x: -4, z: 0, weight: 0.2 },
+        { x: -8, z: 0, weight: 0.15 },
+        { x: -12, z: 0, weight: 0.1 },
+        // Center points
+        { x: 0, z: -2, weight: 0.1 },
+        { x: 0, z: 0, weight: 0.1 },
+        { x: 0, z: 2, weight: 0.1 },
+        // Right wing points (from center to tip)
+        { x: 4, z: 0, weight: 0.2 },
+        { x: 8, z: 0, weight: 0.15 },
+        { x: 12, z: 0, weight: 0.1 }
+      ];
+
+      // Base lift magnitude calculation
+      const baseLiftMagnitude = 9.82 * pilotBody.mass;
+
+      // Apply distributed lift forces
+      liftPoints.forEach((point, index) => {
+        // Create local lift vector in glider's local space
+        const localLiftVector = new CANNON.Vec3(0, baseLiftMagnitude * point.weight, 0);
+
+        // Create application point in glider's local space
+        const localPoint = new CANNON.Vec3(point.x, 0, point.z);
+
+        // Transform vectors to world space
+        const worldLiftVector = new CANNON.Vec3();
+        const worldPoint = new CANNON.Vec3();
+        gliderBody.vectorToWorldFrame(localLiftVector, worldLiftVector);
+        gliderBody.vectorToWorldFrame(localPoint, worldPoint);
+
+        // Apply the lift force at this point
+        gliderBody.applyForce(worldLiftVector, worldPoint);
+
+        // Visualize each lift force point
+        if (vectorVisualizer) {
+          vectorVisualizer.addForce({
+            name: `LIFT_${index}`,
+            color: 0x00ff00, // Green
+            position: new THREE.Vector3(worldPoint.x, worldPoint.y, worldPoint.z),
+            vector: worldLiftVector,
+            scale: 0.01 * 0.2,
+          });
+        }
+      });
 
       // Apply weight force (gravity) to the pilot
       const weightVector = new CANNON.Vec3(0, -9.82 * pilotBody.mass, 0);
-      pilotBody.applyForce(
-        weightVector,
-      );
+      pilotBody.applyForce(weightVector);
 
-      // // Set drag force
-      dragVector.set(0, 0, -5 * pilotBody.mass);
-      pilotBody.applyForce(
-        dragVector,
-        gliderBody.position
-      );
+      // Apply drag force distributed across the glider
+      const dragPoints = [
+        { x: 0, z: -6 },  // Front
+        { x: 0, z: 6 },   // Back
+        { x: -6, z: 0 },  // Left
+        { x: 6, z: 0 }    // Right
+      ];
 
-      // apply forward force in the direction of the glider
-      const forwardForce = gliderBody.velocity.negate().scale(1);
-      gliderBody.applyForce(
-        forwardForce,
-        gliderBody.position
-      );
+      const baseDragMagnitude = 5 * pilotBody.mass * (speed * speed * 0.01); // Quadratic drag
 
-      // Calculate break forces using GUI control values
-      // Left break force - pulls down and to the left
+      dragPoints.forEach((point, index) => {
+        const localDragVector = dragVector.scale(baseDragMagnitude * 0.25); // Distribute drag force
+        const localPoint = new CANNON.Vec3(point.x, 0, point.z);
+
+        const worldDragVector = new CANNON.Vec3();
+        const worldPoint = new CANNON.Vec3();
+        gliderBody.vectorToWorldFrame(localDragVector, worldDragVector);
+        gliderBody.vectorToWorldFrame(localPoint, worldPoint);
+
+        gliderBody.applyForce(worldDragVector, worldPoint);
+
+        if (vectorVisualizer) {
+          vectorVisualizer.addForce({
+            name: `DRAG_${index}`,
+            color: 0xff0000, // Red
+            position: new THREE.Vector3(worldPoint.x, worldPoint.y, worldPoint.z),
+            vector: worldDragVector,
+            scale: 0.01 * 0.2,
+          });
+        }
+      });
+
+      // Calculate and apply break forces
       const breakMagnitude = pushForceControl.leftBreakForce * pilotBody.mass;
-      const leftBreakVector = new CANNON.Vec3(
-        -breakMagnitude,
-        0,
-        0
-      );
-      gliderBody.vectorToWorldFrame(leftBreakVector, leftBreakVector);
 
-      // Right break force - pulls down and to the right
-      const rightBreakVector = new CANNON.Vec3(
-        -breakMagnitude,
-        0,
-        0
-      );
-      gliderBody.vectorToWorldFrame(rightBreakVector, rightBreakVector);
-
-      // Apply break forces if they are active (value > 0)
       if (pushForceControl.leftBreakForce > 0) {
-        const leftWingTip = new CANNON.Vec3(-5, 0, 0);
-        gliderBody.vectorToWorldFrame(leftWingTip, leftWingTip);
-        gliderBody.applyForce(
-          leftBreakVector,
-          leftWingTip
-        );
+        const leftBreakPoints = [
+          { x: -8, z: 0, weight: 0.5 },
+          { x: -12, z: 0, weight: 0.5 }
+        ];
+
+        leftBreakPoints.forEach((point, index) => {
+          const localBreakVector = new CANNON.Vec3(-breakMagnitude * point.weight, 0, 0);
+          const localPoint = new CANNON.Vec3(point.x, 0, point.z);
+
+          const worldBreakVector = new CANNON.Vec3();
+          const worldPoint = new CANNON.Vec3();
+          gliderBody.vectorToWorldFrame(localBreakVector, worldBreakVector);
+          gliderBody.vectorToWorldFrame(localPoint, worldPoint);
+
+          gliderBody.applyForce(worldBreakVector, worldPoint);
+
+          vectorVisualizer.addForce({
+            name: `L_BREAK_${index}`,
+            color: 0xff00ff, // Magenta
+            position: new THREE.Vector3(worldPoint.x, worldPoint.y, worldPoint.z),
+            vector: worldBreakVector,
+            scale: 0.01 * 0.2,
+          });
+        });
       }
 
       if (pushForceControl.rightBreakForce > 0) {
-        const rightWingTip = new CANNON.Vec3(5, 0, 0);
-        gliderBody.vectorToWorldFrame(rightWingTip, rightWingTip);
-        gliderBody.applyForce(
-          rightBreakVector,
-          rightWingTip
-        );
-      }
+        const rightBreakPoints = [
+          { x: 8, z: 0, weight: 0.5 },
+          { x: 12, z: 0, weight: 0.5 }
+        ];
 
-      if (forwardForce.isZero()) {
-        vectorVisualizer.removeForce("FORWARD");
-      } else {
-        vectorVisualizer.addForce({
-          name: "FORWARD",
-          color: 0x0000ff, // Blue
-          position: gliderBody.position as any,
-          vector: forwardForce,
+        rightBreakPoints.forEach((point, index) => {
+          const localBreakVector = new CANNON.Vec3(breakMagnitude * point.weight, 0, 0);
+          const localPoint = new CANNON.Vec3(point.x, 0, point.z);
+
+          const worldBreakVector = new CANNON.Vec3();
+          const worldPoint = new CANNON.Vec3();
+          gliderBody.vectorToWorldFrame(localBreakVector, worldBreakVector);
+          gliderBody.vectorToWorldFrame(localPoint, worldPoint);
+
+          gliderBody.applyForce(worldBreakVector, worldPoint);
+
+          vectorVisualizer.addForce({
+            name: `R_BREAK_${index}`,
+            color: 0x00ffff, // Cyan
+            position: new THREE.Vector3(worldPoint.x, worldPoint.y, worldPoint.z),
+            vector: worldBreakVector,
+            scale: 0.01 * 0.2,
+          });
         });
       }
 
-      // instead of using the vector visualizer update method, we can manually add and remove forces
-      // this is useful for debugging
-      if (liftVector.isZero()) {
-        vectorVisualizer.removeForce("LIFT");
-      } else {
-        vectorVisualizer.addForce({
-          name: "LIFT",
-          color: 0xff00ff, // Magenta 
-          position: gliderBody.position as any,
-          vector: liftVector,
-          scale: 0.01 * 0.2,
-        });
-      }
-
-      if (weightVector.isZero()) {
-        vectorVisualizer.removeForce("WEIGHT");
-      } else {
+      // Visualize weight force
+      if (!weightVector.isZero()) {
         vectorVisualizer.addForce({
           name: "WEIGHT",
-          color: 0xff00ff, // Magenta 
+          color: 0xffff00, // Yellow
           position: pilotBody.position as any,
           vector: weightVector,
           scale: 0.01 * 0.2,
         });
       }
 
-      if (dragVector.isZero()) {
-        vectorVisualizer.removeForce("DRAG");
-      } else {
-        vectorVisualizer.addForce({
-          name: "DRAG",
-          color: 0xff00ff, // Magenta   
-          position: gliderBody.position as any,
-          vector: dragVector,
-          scale: 0.01 * 0.2,
-        });
-      }
-
-      if (glideDirection.isZero()) {
-        vectorVisualizer.removeForce("GLIDE");
-      } else {
+      // Visualize glide direction
+      if (!glideDirection.isZero()) {
         vectorVisualizer.addForce({
           name: "GLIDE",
-          color: 0xff00ff, // Magenta   
+          color: 0x0000ff, // Blue
           position: gliderBody.position as any,
           vector: glideDirection,
           scale: 0.01 * 0.2,
