@@ -33,6 +33,7 @@ const PhysicsChain = {
       pilotBody: pilotBody
     } = createBasicPhysicsObjects(scene, world, initialPosition);
 
+
     // Setup vector visualizer
     vectorVisualizer = new VectorVisualizater(scene);
     // Set custom scale to make vectors more visible
@@ -62,8 +63,8 @@ const PhysicsChain = {
       pilotBody,
       attachmentPoints,
       {
-        numSegments: 20,
-        thickness: 0.25,
+        numSegments: 40,
+        thickness: 0.05,
         colors: [0xff0000, 0x00ff00, 0x0000ff, 0xffff00]
       }
     );
@@ -94,7 +95,7 @@ const PhysicsChain = {
       const dragVector = glideDirection.negate();
 
       // for now let's keep it same as weight
-      const liftMagnitude = 8.82 * pilotBody.mass;
+      const liftMagnitude = 9.82 * pilotBody.mass;
       const liftVector = new CANNON.Vec3(0, liftMagnitude, 0);
       gliderBody.applyForce(
         liftVector
@@ -107,11 +108,11 @@ const PhysicsChain = {
       );
 
       // // Set drag force
-      // dragVector.set(0, 0, -5 * pilotBody.mass);
-      // pilotBody.applyForce(
-      //   dragVector,
-      //   gliderBody.position
-      // );
+      dragVector.set(0, 0, -5 * pilotBody.mass);
+      pilotBody.applyForce(
+        dragVector,
+        gliderBody.position
+      );
 
       // apply forward force in the direction of the glider
       const forwardForce = gliderBody.velocity.negate().scale(1);
@@ -246,22 +247,11 @@ const PhysicsChain = {
 
         camera.position.x = gliderBody.position.x + Math.cos(angle) * radius;
         camera.position.z = gliderBody.position.z + Math.sin(angle) * radius;
-        camera.position.y = gliderBody.position.y + 20;
-      } else {
-        // Always follow the glider, but from a fixed position when not auto-rotating
-        camera.position.set(
-          gliderBody.position.x + 50,
-          gliderBody.position.y + 50,
-          gliderBody.position.z + 50
-        );
+        camera.position.y = gliderBody.position.y - 2;
       }
 
-      // Always look at the glider
-      camera.lookAt(new THREE.Vector3(
-        gliderBody.position.x,
-        gliderBody.position.y,
-        gliderBody.position.z
-      ));
+      // Update the orbit controls target to follow the glider
+      controls.target.copy(gliderBody.position as any);
       controls.update();
 
       // First render the scene

@@ -49,7 +49,7 @@ export function setupKeyboardControls(
     const force = 1450;
     const velocity = gliderBody.velocity;
     const breakForceMagnitude = 1200;
-    const rollTorqueMagnitude = 1000;
+    const rollTorqueMagnitude = 1200;
 
     gliderBody.angularVelocity.z *= 0.95; // dampen the rotation
 
@@ -72,6 +72,7 @@ export function setupKeyboardControls(
     if (keysPressed.size > 0) {
 
       const rollAxis = gliderBody.vectorToWorldFrame(new CANNON.Vec3(0, 1, 0));
+      const localAxis = gliderBody.quaternion.vmult(rollAxis);
 
       if (keysPressed.has(KEY_MAPPING.RIGHT[0])) {
         vectorVisualizer.addTorque({
@@ -82,7 +83,8 @@ export function setupKeyboardControls(
           magnitude: rollTorqueMagnitude,
           scale: 0.01 * 0.2,
         });
-        gliderBody.applyTorque(rollAxis.scale(-rollTorqueMagnitude));
+
+        gliderBody.applyTorque(localAxis.scale(-rollTorqueMagnitude));
       }
 
       if (keysPressed.has(KEY_MAPPING.LEFT[0])) {
@@ -94,11 +96,11 @@ export function setupKeyboardControls(
           magnitude: -rollTorqueMagnitude,
           scale: 0.01 * 0.2,
         });
-        gliderBody.applyTorque(rollAxis.scale(rollTorqueMagnitude));
+        gliderBody.applyTorque(localAxis.scale(rollTorqueMagnitude));
       }
 
       if (keysPressed.has(KEY_MAPPING.UP[0])) {
-        const liftForce = new CANNON.Vec3(0, 2200, 0);
+        const liftForce = new CANNON.Vec3(0, 1000, 0);
         vectorVisualizer.addForce({
           name: "KEYBOARD UP",
           color: 0x00ff00, // Green

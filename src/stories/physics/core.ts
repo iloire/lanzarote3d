@@ -54,9 +54,9 @@ export function createBasicPhysicsObjects(
   };
 
   // Create rectangular platform (anchor)
-  const gliderWidth = 12;
+  const gliderWidth = 20;
   const gliderHeight = 1;
-  const gliderDepth = 12;
+  const gliderDepth = 14;
   const gliderPos = new THREE.Vector3(initialPosition.x, initialPosition.y, initialPosition.z);
 
   const gliderShape = new CANNON.Box(new CANNON.Vec3(
