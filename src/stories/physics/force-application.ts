@@ -11,18 +11,29 @@ interface ForceApplicationParams {
 }
 
 const LIFT_POINTS = [
-  // Left wing points (from center to tip)
-  { x: -4, z: 0, weight: 0.2 },
-  { x: -8, z: 0, weight: 0.15 },
-  { x: -12, z: 0, weight: 0.1 },
-  // Center points
-  { x: 0, z: -2, weight: 0.1 },
-  { x: 0, z: 0, weight: 0.1 },
-  { x: 0, z: 2, weight: 0.1 },
+  // First row of left wing points (from center to tip)
+  { x: -2, z: -2, weight: 0.22 },
+  { x: -4, z: -2, weight: 0.2 },
+  { x: -8, z: -2, weight: 0.15 },
+  { x: -12, z: -2, weight: 0.1 },
+
+  // Second row of left wing points (from center to tip)
+  { x: -2, z: 2, weight: 0.22 },
+  { x: -4, z: 2, weight: 0.2 },
+  { x: -8, z: 2, weight: 0.15 },
+  { x: -12, z: 2, weight: 0.1 },
+
   // Right wing points (from center to tip)
-  { x: 4, z: 0, weight: 0.2 },
-  { x: 8, z: 0, weight: 0.15 },
-  { x: 12, z: 0, weight: 0.1 }
+  { x: 2, z: -2, weight: 0.22 },
+  { x: 4, z: -2, weight: 0.2 },
+  { x: 8, z: -2, weight: 0.15 },
+  { x: 12, z: -2, weight: 0.1 },
+
+  // Second row of right wing points (from center to tip)
+  { x: 2, z: 2, weight: 0.22 },
+  { x: 4, z: 2, weight: 0.2 },
+  { x: 8, z: 2, weight: 0.15 },
+  { x: 12, z: 2, weight: 0.1 }
 ];
 
 const DRAG_POINTS = [
@@ -189,22 +200,10 @@ export function applyForcesAndDrawVectors(params: ForceApplicationParams): void 
   // Calculate lift scale based on glider's angle of attack
   const velocity = gliderBody.velocity;
   const speed = velocity.length();
-  let liftScale = 12;
-
-  if (speed > 0.001) {
-    // Get the glider's up vector in world space
-    const gliderUp = gliderBody.vectorToWorldFrame(new CANNON.Vec3(0, 1, 0));
-    // Normalize velocity for direction
-    const normalizedVelocity = velocity.clone();
-    normalizedVelocity.normalize();
-    // Calculate angle between velocity and glider's up vector
-    const angle = Math.acos(gliderUp.dot(normalizedVelocity));
-    // Scale lift based on angle of attack (maximum at 45 degrees)
-    liftScale = Math.sin(2 * angle); // This gives maximum lift at 45 degrees
-  }
+  let liftScale = 1;
 
   applyLiftForce(gliderBody, pilotBody, vectorVisualizer, liftScale);
   // applyDragForce(gliderBody, pilotBody, vectorVisualizer);
   // applyBreakForces(gliderBody, pilotBody, vectorVisualizer, leftBreakForce, rightBreakForce);
-  // applyWeightForce(pilotBody, vectorVisualizer);
+  applyWeightForce(pilotBody, vectorVisualizer);
 } 

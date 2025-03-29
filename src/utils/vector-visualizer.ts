@@ -70,9 +70,6 @@ export class VectorVisualizater {
   private leftBreakArrow: THREE.ArrowHelper;
   private rightBreakArrow: THREE.ArrowHelper;
 
-  // Text labels for forces
-  private forceLabels: { [key: string]: THREE.Sprite } = {};
-
   // Groups to organize forces by where they're applied
   private gliderForceGroup: THREE.Group;
   private pilotForceGroup: THREE.Group;
@@ -94,7 +91,6 @@ export class VectorVisualizater {
     this.forceGroup.add(this.pilotForceGroup);
 
     this.setupArrows();
-    this.setupLabels();
   }
 
   private createArrow(color: number): THREE.ArrowHelper {
@@ -132,29 +128,6 @@ export class VectorVisualizater {
     sprite.scale.set(25, 12.5, 1);
 
     return sprite;
-  }
-
-  private setupLabels() {
-    // Create text labels for each force
-    this.forceLabels['lift'] = this.createTextSprite("LIFT", COLORS.LIFT);
-    this.forceLabels['drag'] = this.createTextSprite("DRAG", COLORS.DRAG);
-    this.forceLabels['weight'] = this.createTextSprite("WEIGHT", COLORS.WEIGHT);
-    this.forceLabels['glideDirection'] = this.createTextSprite("GLIDE", COLORS.GLIDE_DIRECTION);
-    this.forceLabels['leftBreak'] = this.createTextSprite("L-BREAK", COLORS.LEFT_BREAK);
-    this.forceLabels['rightBreak'] = this.createTextSprite("R-BREAK", COLORS.RIGHT_BREAK);
-
-    // Add labels to their respective groups
-    this.gliderForceGroup.add(this.forceLabels['lift']);
-    this.gliderForceGroup.add(this.forceLabels['drag']);
-    this.gliderForceGroup.add(this.forceLabels['glideDirection']);
-    this.gliderForceGroup.add(this.forceLabels['leftBreak']);
-    this.gliderForceGroup.add(this.forceLabels['rightBreak']);
-    this.pilotForceGroup.add(this.forceLabels['weight']);
-
-    // Hide labels by default
-    Object.keys(this.forceLabels).forEach(key => {
-      this.forceLabels[key].visible = false;
-    });
   }
 
   private setupArrows() {
