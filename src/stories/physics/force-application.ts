@@ -182,36 +182,12 @@ export function applyWeightForce(
   }
 }
 
-export function visualizeGlideDirection(
-  gliderBody: CANNON.Body,
-  vectorVisualizer: VectorVisualizater
-): void {
-  const glideDirection = gliderBody.velocity.clone();
-  const speed = glideDirection.length();
-
-  if (speed > 0.001) {
-    glideDirection.normalize();
-
-    vectorVisualizer.addForce({
-      name: "GLIDE",
-      color: 0x0000ff, // Blue
-      position: new THREE.Vector3(
-        gliderBody.position.x,
-        gliderBody.position.y,
-        gliderBody.position.z
-      ),
-      vector: glideDirection,
-      scale: 0.01 * 0.2,
-    });
-  }
-}
 
 export function applyForcesAndDrawVectors(params: ForceApplicationParams): void {
   const { gliderBody, pilotBody, vectorVisualizer, leftBreakForce, rightBreakForce } = params;
 
   applyLiftForce(gliderBody, pilotBody, vectorVisualizer);
   // applyDragForce(gliderBody, pilotBody, vectorVisualizer);
-  applyBreakForces(gliderBody, pilotBody, vectorVisualizer, leftBreakForce, rightBreakForce);
+  // applyBreakForces(gliderBody, pilotBody, vectorVisualizer, leftBreakForce, rightBreakForce);
   applyWeightForce(pilotBody, vectorVisualizer);
-  visualizeGlideDirection(gliderBody, vectorVisualizer);
 } 

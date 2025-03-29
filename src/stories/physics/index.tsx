@@ -122,13 +122,6 @@ const PhysicsChain = {
         camera.position.x = gliderBody.position.x + Math.cos(angle) * radius;
         camera.position.z = gliderBody.position.z + Math.sin(angle) * radius;
         camera.position.y = gliderBody.position.y + 20;
-      } else {
-        // Always follow the glider, but from a fixed position when not auto-rotating
-        camera.position.set(
-          gliderBody.position.x + 30,
-          gliderBody.position.y + 20,
-          gliderBody.position.z + 30
-        );
       }
 
       // Update the orbit controls target to follow the glider

@@ -97,7 +97,7 @@ export function createBasicPhysicsObjects(
 
   // Create a single sphere below the platform
   const sphereRadius = 1.5;
-  const ropeLength = 20; // Shorter lines for better stability
+  const ropeLength = 200; // Shorter lines for better stability
   const spherePilotPos = new THREE.Vector3(gliderPos.x, gliderPos.y - ropeLength, gliderPos.z);
   const spherePilotShape = new CANNON.Sphere(sphereRadius);
 
