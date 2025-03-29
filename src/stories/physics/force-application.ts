@@ -45,9 +45,10 @@ const RIGHT_BREAK_POINTS = [
 export function applyLiftForce(
   gliderBody: CANNON.Body,
   pilotBody: CANNON.Body,
-  vectorVisualizer: VectorVisualizater
+  vectorVisualizer: VectorVisualizater,
+  scale: number = 1.0 // Default scale is 1.0
 ): void {
-  const baseLiftMagnitude = 9.82 * pilotBody.mass;
+  const baseLiftMagnitude = 9.82 * pilotBody.mass * scale;
 
   LIFT_POINTS.forEach((point, index) => {
     const localLiftVector = new CANNON.Vec3(0, baseLiftMagnitude * point.weight, 0);
@@ -58,7 +59,7 @@ export function applyLiftForce(
     gliderBody.vectorToWorldFrame(localLiftVector, worldLiftVector);
     gliderBody.pointToWorldFrame(localPoint, worldPoint);
 
-    gliderBody.applyForce(worldLiftVector, worldPoint);
+    gliderBody.applyLocalForce(localLiftVector, localPoint);
 
     vectorVisualizer.addForce({
       name: `LIFT_${index}`,
@@ -182,12 +183,28 @@ export function applyWeightForce(
   }
 }
 
-
 export function applyForcesAndDrawVectors(params: ForceApplicationParams): void {
   const { gliderBody, pilotBody, vectorVisualizer, leftBreakForce, rightBreakForce } = params;
 
-  applyLiftForce(gliderBody, pilotBody, vectorVisualizer);
+  // Calculate lift scale based on glider's angle of attack
+  const velocity = gliderBody.velocity;
+  const speed = velocity.length();
+  let liftScale = 12;
+
+  if (speed > 0.001) {
+    // Get the glider's up vector in world space
+    const gliderUp = gliderBody.vectorToWorldFrame(new CANNON.Vec3(0, 1, 0));
+    // Normalize velocity for direction
+    const normalizedVelocity = velocity.clone();
+    normalizedVelocity.normalize();
+    // Calculate angle between velocity and glider's up vector
+    const angle = Math.acos(gliderUp.dot(normalizedVelocity));
+    // Scale lift based on angle of attack (maximum at 45 degrees)
+    liftScale = Math.sin(2 * angle); // This gives maximum lift at 45 degrees
+  }
+
+  applyLiftForce(gliderBody, pilotBody, vectorVisualizer, liftScale);
   // applyDragForce(gliderBody, pilotBody, vectorVisualizer);
   // applyBreakForces(gliderBody, pilotBody, vectorVisualizer, leftBreakForce, rightBreakForce);
-  applyWeightForce(pilotBody, vectorVisualizer);
+  // applyWeightForce(pilotBody, vectorVisualizer);
 } 
