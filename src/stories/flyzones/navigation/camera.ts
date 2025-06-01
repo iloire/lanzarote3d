@@ -10,5 +10,5 @@ export const navigateTo = (
   controls: OrbitControls,
   location: Location
 ): void => {  
-  camera.animateTo(position, location.position, 2000, controls);
+  camera.animateTo(position, location.cameraView.position, 2000, controls);
 }; 

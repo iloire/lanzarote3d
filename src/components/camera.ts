@@ -180,38 +180,6 @@ class Camera extends THREE.PerspectiveCamera {
     );
   }
 
-  // followTarget() {
-  //   const x = Math.sin(this.angle) * this.distance;
-  //   const z = Math.cos(this.angle) * this.distance;
-  //   const y = Math.cos(this.angleY) * this.distance;
-
-  //   const pg = this.target;
-  //   const cameraOffset = new THREE.Vector3(x, y, z);
-  //   this.position.copy(pg.position().add(pg.direction().add(cameraOffset)));
-
-  //   const lookOffset = new THREE.Vector3(0, 0, 0);
-  //   const lookAt = pg.position().add(pg.direction().add(lookOffset));
-  //   this.lookAt(lookAt);
-  // }
-
-  // firstPersonView() {
-  //   const cam = this;
-  //   const pg = this.target;
-
-  //   cam.position.copy(pg.position()).add(this.firstPersonViewOffset);
-
-  //   const lookAt = pg.position().add(pg.direction().multiplyScalar(20000));
-  //   this.lookAt(lookAt);
-
-  //   // adjust for roll
-  //   this.rotateZ(
-  //     -1 * (this.viewRotationHorizontal / 4 + pg.getMesh().rotation.z)
-  //   );
-
-  //   // view rotation
-  //   this.rotateY(-1 * this.viewRotationHorizontal * 1.5);
-  //   this.rotateX(-1 * this.viewRotationVertical * 1.5);
-  // }
 }
 
 export default Camera;
