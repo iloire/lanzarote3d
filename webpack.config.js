@@ -1,8 +1,8 @@
 //webpack.config.js
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-
 module.exports = {
+  devtool: 'source-map', // "inline-source-map" is also a good choice for development
   entry: {
     main: "./src/apps/main/index.tsx",
     animation1: "./src/apps/animation1/index.tsx",
@@ -12,10 +12,9 @@ module.exports = {
   },
   output: {
     path: path.join(__dirname, "/dist"),
-    filename: "[name].bundle.js",
+    filename: "[name].[contenthash].bundle.js",
   },
   externals: {
-    rStats: "rStats",
     glStats: "glStats",
     threeStats: "threeStats",
   },

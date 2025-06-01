@@ -1,7 +1,7 @@
 import GUI from "lil-gui";
 import React, { useEffect, useState } from "react";
 import * as THREE from "three";
-import Stats from "three/examples/jsm/libs/stats.module";
+import Stats from 'stats.js'
 import Camera from "./components/camera";
 import Island from "./components/island";
 import Sky from "./components/sky";
