@@ -7,7 +7,7 @@ const Night = {
   load: async (options: StoryOptions) => {
     const { camera, scene, renderer,  sky,  controls } = options;
     
-    sky.updateSunPosition(2);
+    // sky.updateSunPosition(2);
 
     const animate = () => {
       requestAnimationFrame(animate);

@@ -123,8 +123,13 @@ const Animation3 = {
       controls.update();
     };
 
+    controls.enabled=false;
+    
     new TWEEN.Tween(camera.position)
-    .to({ x: paraglidersVoxel[0].position.x - 200, y: paraglidersVoxel[0].position.y + 90, z: paraglidersVoxel[0].position.z + 450 }, 8000)
+    .to({ 
+      x: paraglidersVoxel[0].position.x - 200, 
+      y: paraglidersVoxel[0].position.y + 90, 
+      z: paraglidersVoxel[0].position.z + 450 }, 3000)
     .easing(TWEEN.Easing.Quadratic.InOut)
     .start();
 

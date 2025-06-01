@@ -2,13 +2,19 @@ import * as THREE from 'three';
 import { TWEEN } from 'three/examples/jsm/libs/tween.module.min.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { Location } from '../locations';
+import Camera from '../../../components/camera';
 
 export const navigateTo = (
   position: THREE.Vector3, 
-  camera: THREE.Camera,
+  camera: Camera,
   controls: OrbitControls,
   location?: Location
 ): void => {
+  
+  camera.animateTo(position, location.position, 2000, controls);
+  controls.enabled=true;
+  return;
+
   // Calculate target position for camera
   const cameraTarget = new THREE.Vector3().copy(position);
   

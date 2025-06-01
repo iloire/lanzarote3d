@@ -40,7 +40,6 @@ const Animations = {
       controls.update();
     });
     tween.onComplete(function() {
-      controls.enabled = true;
       callBack && callBack();
     });
     tween.easing(TWEEN.Easing.Cubic.InOut);
