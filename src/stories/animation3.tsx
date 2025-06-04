@@ -84,12 +84,10 @@ type ParagliderConfig = {
   position: any
 }
 
-
-
 const Animation3 = {
   load: async (options: StoryOptions) => {
     const { camera, scene, renderer, terrain, water, controls } = options;
-    
+
     const initialPos = new THREE.Vector3(6714, 949, -525);
     camera.animateTo(initialPos, paraglidersVoxel[0].position, 0, controls);
 
@@ -123,15 +121,16 @@ const Animation3 = {
       controls.update();
     };
 
-    controls.enabled=false;
-    
+    controls.enabled = false;
+
     new TWEEN.Tween(camera.position)
-    .to({ 
-      x: paraglidersVoxel[0].position.x - 200, 
-      y: paraglidersVoxel[0].position.y + 90, 
-      z: paraglidersVoxel[0].position.z + 450 }, 3000)
-    .easing(TWEEN.Easing.Quadratic.InOut)
-    .start();
+      .to({
+        x: paraglidersVoxel[0].position.x - 200,
+        y: paraglidersVoxel[0].position.y + 90,
+        z: paraglidersVoxel[0].position.z + 450
+      }, 3000)
+      .easing(TWEEN.Easing.Quadratic.InOut)
+      .start();
 
     animate();
   },

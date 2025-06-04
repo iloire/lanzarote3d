@@ -5,117 +5,14 @@ import Tandem from "../components/tandem";
 import Camera from "../components/camera";
 import Environment from "./env/environment";
 import Weather, { WeatherOptions } from "../elements/weather";
-import { PilotHeadType } from "../components/parts/pilot-head";
 import { StoryOptions } from "./types";
+import { paragliders, tandems } from "../stories-data/paragliders";
 
 const WEATHER_SETTINGS: WeatherOptions = {
   windDirectionDegreesFromNorth: 310,
   speedMetresPerSecond: 18 / 3.6,
   lclLevel: 1800,
 };
-
-
-const defaultGlider = {
-  wingColor1: 'orange',
-  wingColor2: 'green',
-  breakColor: '#ffffff',
-  lineFrontColor: '#ffffff',
-  lineBackColor: '#ffffff',
-  inletsColor: '#333333',
-  numeroCajones: 35
-}
-
-const defaultHead = {
-  helmetColor: '#ffff00',
-  headType: PilotHeadType.Default
-}
-
-const defaultPilot = {
-  head: {
-    ...defaultHead
-  }
-}
-
-
-const tandems = [
-  {
-    pg: {
-      glider: {
-        ...defaultGlider
-      },
-      pilot: {
-        pilot: {
-          ...defaultPilot
-        },
-        passenger: {
-          head: { ...defaultHead },
-          suitColor: 'red', suitColor2: 'green'
-        }
-      },
-    },
-    position: new THREE.Vector3(6837, 850, -535)
-  }
-];
-
-const paragliders = [
-  {
-    pg: {
-      glider: {
-        wingColor1: 'red',
-        wingColor2: '#b100cd',
-        inletsColor: '#333333',
-        numeroCajones: 35
-      },
-      pilot: {
-        ...defaultPilot
-      }
-    },
-    position: new THREE.Vector3(6827, 860, -555)
-  },
-  {
-    pg: {
-      glider: {
-        wingColor1: 'yellow',
-        wingColor2: '#b100cd',
-        inletsColor: '#333333',
-        numeroCajones: 50
-      },
-      pilot: {
-        ...defaultPilot
-      }
-    },
-    position: new THREE.Vector3(6727, 780, -555)
-  },
-  {
-    pg: {
-      glider: {
-        wingColor1: 'black',
-        wingColor2: 'white',
-        inletsColor: '#333333',
-        numeroCajones: 40
-      },
-      pilot: {
-        ...defaultPilot
-      }
-    },
-    position: new THREE.Vector3(6777, 920, -535)
-  },
-  {
-    // fabio
-    pg: {
-      glider: {
-        wingColor1: 'purple',
-        wingColor2: '#b100cd',
-        inletsColor: '#333333',
-        numeroCajones: 40
-      },
-      pilot: {
-        ...defaultPilot
-      }
-    },
-    position: new THREE.Vector3(6777, 920, -535)
-  }
-];
 
 function getOffsetPosition(camera: Camera, target: THREE.Vector3, offsetDistance: number): THREE.Vector3 {
   const direction = target.clone().sub(camera.position).normalize();
@@ -134,8 +31,8 @@ function flyThroughTargets(camera: Camera, targets: THREE.Vector3[], offsetDista
 
 const Animation = {
   load: async (options: StoryOptions) => {
-    const { camera, scene, renderer, terrain, water,  controls } = options;
-    
+    const { camera, scene, renderer, terrain, water, controls } = options;
+
     const initialPos = new THREE.Vector3(6740, 892, -296);
     camera.animateTo(initialPos, paragliders[0].position, 0, controls);
 
@@ -188,13 +85,10 @@ const Animation = {
       new TWEEN.Tween(camera.position)
         .to({ x: target.x, y: target.y, z: target.z + radius }, duration)
         .easing(TWEEN.Easing.Quadratic.InOut)
-        .onComplete(() => {
-        })
         .start();
 
       pointIndex++;
     }
-
 
     const animate = () => {
       TWEEN.update();
@@ -202,8 +96,8 @@ const Animation = {
       requestAnimationFrame(animate);
       controls.update();
     };
-    // flyThroughTargets(camera, paragliders.map(p => p.position), 10, 2000);
-    animateCamera();
+    flyThroughTargets(camera, paragliders.map(p => p.position), 10, 2000);
+    // animateCamera();
     animate();
   },
 };
