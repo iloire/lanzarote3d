@@ -1,7 +1,7 @@
 import * as THREE from "three";
-import Weather from "../../elements/weather";
-import Thermal, { ThermalDimensions } from "../../components/thermal";
-import { rndIntBetween } from "../../utils/math";
+import Weather from "../elements/weather";
+import Thermal, { ThermalDimensions } from "../components/thermal";
+import { rndIntBetween } from "../utils/math";
 
 
 const generateRandomLcl = (lclLevel: number): number => {

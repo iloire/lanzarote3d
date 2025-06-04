@@ -1,16 +1,16 @@
 import * as THREE from "three";
-import Birds from "../../components/birds";
-import Boat from "../../components/boat";
-import { CloudOptions } from "../../components/cloud";
-import Clouds from "../../components/clouds";
-import HangGlider from "../../components/hangglider";
-import House, { HouseType } from "../../components/house";
-import PineTree from "../../components/pinetree";
-import Stone from "../../components/stone";
-import Thermal from "../../components/thermal";
-import Tree from "../../components/tree";
-import Weather from "../../elements/weather";
-import { rndIntBetween } from "../../utils/math";
+import Birds from "../components/birds";
+import Boat from "../components/boat";
+import { CloudOptions } from "../components/cloud";
+import Clouds from "../components/clouds";
+import HangGlider from "../components/hangglider";
+import House, { HouseType } from "../components/house";
+import PineTree from "../components/pinetree";
+import Stone from "../components/stone";
+import Thermal from "../components/thermal";
+import Tree from "../components/tree";
+import Weather from "../elements/weather";
+import { rndIntBetween } from "../utils/math";
 import { addMeshAroundArea } from "./mesh-utils";
 import { generateThermalPair, ThermalGenerationOptions } from "./thermal-utils";
 

@@ -3,7 +3,7 @@ import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 import Paraglider from "../components/paraglider";
 import Tandem from "../components/tandem";
 import Camera from "../components/camera";
-import Environment from "./env/environment";
+import Environment from "../stories-env/environment";
 import Weather, { WeatherOptions } from "../elements/weather";
 import { StoryOptions } from "./types";
 import { paragliders, tandems } from "../stories-data/paragliders";

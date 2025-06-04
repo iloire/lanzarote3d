@@ -5,7 +5,7 @@ import ParagliderVoxel, { ParagliderVoxelOptions } from "../components/paraglide
 import Tandem from "../components/tandem";
 import Camera from "../components/camera";
 import { PilotHeadType } from "../components/parts/pilot-head";
-import Environment from "./env/environment";
+import Environment from "../stories-env/environment";
 import Weather, { WeatherOptions } from "../elements/weather";
 import adriModel from '../models/adri.obj';
 import adriTextureImage from '../models/adri.png';
@@ -178,7 +178,7 @@ const paragliders: ParagliderConfig[] = [
 const PhotoBooth = {
   load: async (options: StoryOptions) => {
     const { camera, scene, renderer, terrain, water, controls } = options;
-    
+
     const initialPos = new THREE.Vector3(6800, 870, -475);
     camera.animateTo(initialPos, paraglidersVoxel[0].position, 0, controls);
 

@@ -3,7 +3,7 @@ import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 import Paraglider, { ParagliderOptions } from "../components/paraglider";
 import ParagliderVoxel, { ParagliderVoxelOptions } from "../components/paraglider-voxel";
 import { PilotHeadType } from "../components/parts/pilot-head";
-import Environment from "./env/environment";
+import Environment from "../stories-env/environment";
 import Weather, { WeatherOptions } from "../elements/weather";
 import adriModel from '../models/adri.obj';
 import adriTextureImage from '../models/adri.png';
