@@ -29,7 +29,7 @@ function flyThroughTargets(camera: Camera, targets: THREE.Vector3[], offsetDista
   tweenChain.start();
 }
 
-const Animation = {
+const AnimationFlyThrough = {
   load: async (options: StoryOptions) => {
     const { camera, scene, renderer, terrain, water, controls } = options;
 
@@ -102,4 +102,4 @@ const Animation = {
   },
 };
 
-export default Animation;
+export default AnimationFlyThrough;

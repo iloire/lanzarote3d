@@ -84,7 +84,7 @@ type ParagliderConfig = {
   position: any
 }
 
-const Animation3 = {
+const AnimationVoxel = {
   load: async (options: StoryOptions) => {
     const { camera, scene, renderer, terrain, water, controls } = options;
 
@@ -136,4 +136,4 @@ const Animation3 = {
   },
 };
 
-export default Animation3;
+export default AnimationVoxel;

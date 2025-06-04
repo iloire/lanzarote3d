@@ -1,6 +1,6 @@
-import Animation from "./animation";
-import Animation2 from "./animation2";
-import Animation3 from "./animation3";
+import AnimationFlyThrough from "./animation-flythrough";
+import Animation from "./animation2";
+import AnimationVoxel from "./animation-voxel";
 import CannonWorkshop from "./cannon";
 import Clouds from "./clouds";
 import FlierPG from "./flier-pg";
@@ -23,13 +23,12 @@ import Voxel from "./voxel";
 import VoxelExample from "./voxel/index";
 import Workshop from "./workshop";
 
-
 export type StoryFunction = (options: StoryOptions) => Promise<any>;
 
 const Stories: Record<string, StoryFunction> = {
+  animationFlyThrough: AnimationFlyThrough.load,
   animation: Animation.load,
-  animation2: Animation2.load,
-  animation3: Animation3.load,
+  animationVoxel: AnimationVoxel.load,
   clouds: Clouds.load,
   flier: FlierPG.load,
   flyzones: FlyZones.load,

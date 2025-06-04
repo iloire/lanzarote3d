@@ -2,12 +2,8 @@ import * as THREE from "three";
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 import Paraglider from "../components/paraglider";
 import Tandem from "../components/tandem";
-import Camera from "../components/camera";
 import Environment from "./env/environment";
 import Weather, { WeatherOptions } from "../elements/weather";
-import { PilotHeadType } from "../components/parts/pilot-head";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import Sky from "../components/sky";
 import { StoryOptions } from "./types";
 import { paragliders, tandems } from "../stories-data/paragliders";
 
@@ -17,7 +13,7 @@ const WEATHER_SETTINGS: WeatherOptions = {
   lclLevel: 1800,
 };
 
-const Animation2 = {
+const Animation = {
   load: async (options: StoryOptions) => {
     const { camera, scene, renderer, terrain, water, controls } = options;
 
@@ -91,4 +87,4 @@ const Animation2 = {
   },
 };
 
-export default Animation2;
+export default Animation;
