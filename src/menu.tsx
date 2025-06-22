@@ -28,7 +28,6 @@ class Menu extends React.Component {
       { story: "flier" },
       { story: "flyzones" },
       { story: "locationEditor" },
-      { story: "glider" },
       { story: "paragliderVoxel" },
       { story: "night", description: "Night mode" },
       { story: "photobooth" },
@@ -42,6 +41,7 @@ class Menu extends React.Component {
       { story: "hangglider", description: "Hangglider" },
       { story: "terrain", description: "Terrain" },
       { story: "clouds", description: "Clouds" },
+      { story: "glider" },
       { story: "pilot" },
       { story: "workshop", description: "Workshop" },
     ];
