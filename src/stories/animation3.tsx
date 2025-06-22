@@ -92,7 +92,7 @@ const Animation3 = {
     
     const initialPos = new THREE.Vector3(6714, 949, -525);
     camera.animateTo(initialPos, paraglidersVoxel[0].position, 0, controls, () => {
-          camera.baseY = camera.position.y;
+        camera.baseY = camera.position.y;
     });
 
     // Add voxel paragliders

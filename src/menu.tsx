@@ -46,10 +46,17 @@ class Menu extends React.Component {
       { story: "workshop", description: "Workshop" },
     ];
 
+    // Get selected story from URL
+    const params = new URLSearchParams(window.location.search);
+    const selectedStory = params.get("story");
+
     const renderButtons = (stories) =>
       stories.map((story) => (
         <div className="button" key={story.story}>
-          <button onClick={() => this.navigateTo(story.story)}>
+          <button
+            className={selectedStory === story.story ? "selected" : ""}
+            onClick={() => this.navigateTo(story.story)}
+          >
             {story.story}
           </button>
           <span>{story.description || story.story}</span>
