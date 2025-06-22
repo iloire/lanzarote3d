@@ -61,7 +61,7 @@ const Animation = {
       const paraglider = new Paraglider(p.pg);
       const mesh = await paraglider.load();
       mesh.position.copy(p.position);
-      const scale = 0.001; // mm to m
+      const scale = 0.01; // mm to m
       mesh.scale.set(scale, scale, scale);
       scene.add(mesh);
     });

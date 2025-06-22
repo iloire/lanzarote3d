@@ -161,10 +161,6 @@ const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAp
     };
   }, []);
 
-  const navigateTo = (story: string) => {
-    window.location.href = `?story=${story}`;
-  };
-
   return (
     <div className="lanzarote">
       {loadingProcess !== 100 && (

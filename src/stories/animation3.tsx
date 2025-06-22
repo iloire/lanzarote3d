@@ -43,13 +43,10 @@ type ParagliderConfig = {
   position: any
 }
 
-
-
 const Animation3 = {
   load: async (options: StoryOptions) => {
     const { camera, scene, renderer, terrain, water, controls } = options;
     
-
     // Add voxel paragliders
     paraglidersVoxel.forEach(async (p) => {
       const paraglider = new ParagliderVoxel(p.pg);
