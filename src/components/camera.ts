@@ -92,7 +92,6 @@ class Camera extends THREE.PerspectiveCamera {
   ) {
     super(fov, aspect, near, far);
     this.terrain = terrain;
-    this.baseY = this.position.y
   }
 
   addGui(gui) {
@@ -115,8 +114,16 @@ class Camera extends THREE.PerspectiveCamera {
       return;
     }
     if (this.mode === CameraMode.FollowTarget) {
+      console.log("Camera follow target");
+      if (!this.target) {
+        throw new Error("Camera target is not set");
+      }
       this.followTarget();
     } else if (this.mode === CameraMode.FirstPersonView) {
+      console.log("Camera first person view");
+      if (!this.target) {
+        throw new Error("Camera target is not set");
+      }
       this.firstPersonView();
     } else {
       throw new Error("invalid camera mode");
@@ -160,6 +167,7 @@ class Camera extends THREE.PerspectiveCamera {
   }
 
   lookDirection(xDegrees: number, yDegrees: number) {
+    console.log("Camera look direction", xDegrees, yDegrees);
     const angleRadiansX = THREE.MathUtils.degToRad(xDegrees);
     const angleRadiansY = THREE.MathUtils.degToRad(yDegrees);
     this.viewRotationHorizontal = angleRadiansX;

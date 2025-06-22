@@ -15,33 +15,33 @@ class Menu extends React.Component {
   render() {
     // Public/finished features
     const publicStories = [
-      { story: "animation" },
-      { story: "animation3", description: "Voxel animation" },
-      { story: "game", description: "The game!" },
+      { story: "animation", name: "famara" },
+      { story: "animation3", name: "famara voxel", description: "Voxel animation" },
+      { story: "game", name: "game (WIP)", description: "The game!" },
     ];
 
     // Dev/testing features
     const experimentStories = [
-      { story: "flier" },
-      { story: "flyzones" },
-      { story: "locationEditor" },
-      { story: "paragliderVoxel" },
-      { story: "photobooth" },
+      { story: "flier", name: "Flier" },
+      { story: "flyzones", name: "Fly Zones" },
+      { story: "locationEditor", name: "Location Editor" },
+      { story: "paragliderVoxel", name: "Paraglider Voxel" },
+      { story: "photobooth", name: "Photo Booth" },
     ];
 
     // Dev-only features
     const devOnlyStories = [
-      { story: "night", description: "Night mode" },
-      { story: "voxel", description: "Voxel example" },
-      { story: "head" },
-      { story: "helmet" },
-      { story: "paraglider", description: "Paraglider" },
-      { story: "hangglider", description: "Hangglider" },
-      { story: "terrain", description: "Terrain" },
-      { story: "clouds", description: "Clouds" },
-      { story: "glider" },
-      { story: "pilot" },
-      { story: "workshop", description: "Workshop" },
+      { story: "night", name: "Night", description: "Night mode" },
+      { story: "voxel", name: "Voxel Example", description: "Voxel example" },
+      { story: "head", name: "Head" },
+      { story: "helmet", name: "Helmet" },
+      { story: "paraglider", name: "Paraglider", description: "Paraglider" },
+      { story: "hangglider", name: "Hangglider", description: "Hangglider" },
+      { story: "terrain", name: "Terrain", description: "Terrain" },
+      { story: "clouds", name: "Clouds", description: "Clouds" },
+      { story: "glider", name: "Glider" },
+      { story: "pilot", name: "Pilot" },
+      { story: "workshop", name: "Workshop", description: "Workshop" },
     ];
 
     // Get selected story from URL
@@ -55,7 +55,7 @@ class Menu extends React.Component {
             className={selectedStory === story.story ? "selected" : ""}
             onClick={() => this.navigateTo(story.story)}
           >
-            {story.story}
+            {story.name || story.story}
           </button>
           <span>{story.description || story.story}</span>
         </div>

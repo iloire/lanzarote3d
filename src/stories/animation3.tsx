@@ -90,10 +90,6 @@ const Animation3 = {
   load: async (options: StoryOptions) => {
     const { camera, scene, renderer, terrain, water, controls } = options;
     
-    const initialPos = new THREE.Vector3(6714, 949, -525);
-    camera.animateTo(initialPos, paraglidersVoxel[0].position, 0, controls, () => {
-        camera.baseY = camera.position.y;
-    });
 
     // Add voxel paragliders
     paraglidersVoxel.forEach(async (p) => {
@@ -118,12 +114,24 @@ const Animation3 = {
     env.addHouses(terrain);
     env.addBoats(water);
 
-    const animate = () => {
+    const initialCameraPosition = new THREE.Vector3(6760, 949, -461);
+    const finalCameraPosition = new THREE.Vector3(
+      paraglidersVoxel[0].position.x - 200, 
+      paraglidersVoxel[0].position.y + 90, paraglidersVoxel[0].position.z + 450);
 
+    camera.position.copy(initialCameraPosition);
+    // camera.lookAt(paraglidersVoxel[0].position);
+
+    camera.animateTo(finalCameraPosition, 
+      paraglidersVoxel[0].position, 6000, controls, () => {
+        camera.baseY = camera.position.y;
+    });
+
+    const animate = () => {
       if (camera.baseY) {
         // Floating camera effect
-        const floatSpeed = 0.15; // oscillations per second
-        const floatAmplitude = 0.5; // units up/down
+        const floatSpeed = 0.20; // oscillations per second
+        const floatAmplitude = 1.2; // units up/down
         const time = performance.now() * 0.001;
         camera.position.y = camera.baseY + Math.sin(time * floatSpeed * Math.PI * 2) * floatAmplitude;
       }
@@ -133,10 +141,7 @@ const Animation3 = {
       controls.update();
     };
 
-    new TWEEN.Tween(camera.position)
-    .to({ x: paraglidersVoxel[0].position.x - 200, y: paraglidersVoxel[0].position.y + 90, z: paraglidersVoxel[0].position.z + 450 }, 8000)
-    .easing(TWEEN.Easing.Quadratic.InOut)
-    .start();
+
 
     animate();
   },
