@@ -16,25 +16,23 @@ class Menu extends React.Component {
     // Public/finished features
     const publicStories = [
       { story: "animation" },
-      { story: "animation2" },
-      { story: "animation3" },
+      { story: "animation3", description: "Voxel animation" },
       { story: "game", description: "The game!" },
     ];
 
     // Dev/testing features
     const experimentStories = [
-      { story: "voxel" },
-      { story: "voxelExample" },
       { story: "flier" },
       { story: "flyzones" },
       { story: "locationEditor" },
       { story: "paragliderVoxel" },
-      { story: "night", description: "Night mode" },
       { story: "photobooth" },
     ];
 
     // Dev-only features
     const devOnlyStories = [
+      { story: "night", description: "Night mode" },
+      { story: "voxel", description: "Voxel example" },
       { story: "head" },
       { story: "helmet" },
       { story: "paraglider", description: "Paraglider" },

@@ -1,6 +1,5 @@
 import { StoryOptions } from "./types";
 import Animation from "./animation";
-import Animation2 from "./animation2";
 import Animation3 from "./animation3";
 import Clouds from "./clouds";
 import FlierPG from "./flier-pg";
@@ -15,7 +14,6 @@ import ParagliderVoxel from "./paraglider-voxel";
 import PhotoBooth from "./photobooth";
 import Pilot from "./pilot";
 import Terrain from "./terrain";
-import Voxel from "./voxel";
 import Workshop from "./workshop";
 import Helmet from "./helmet";
 import VoxelExample from "./voxel/index";
@@ -24,7 +22,6 @@ export type StoryFunction = (options: StoryOptions) => Promise<any>;
 
 const Stories: Record<string, StoryFunction> = {
   animation: Animation.load,
-  animation2: Animation2.load,
   animation3: Animation3.load,
   clouds: Clouds.load,
   flier: FlierPG.load,
@@ -41,8 +38,7 @@ const Stories: Record<string, StoryFunction> = {
   photobooth: PhotoBooth.load,
   pilot: Pilot.load,
   terrain: Terrain.load,
-  voxel: Voxel.load,
-  voxelExample: VoxelExample.load,  
+  voxel: VoxelExample.load,  
   workshop: Workshop.load,
 };
 
