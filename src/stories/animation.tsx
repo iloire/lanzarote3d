@@ -117,20 +117,6 @@ const paragliders = [
   }
 ];
 
-function getOffsetPosition(camera: Camera, target: THREE.Vector3, offsetDistance: number): THREE.Vector3 {
-  const direction = target.clone().sub(camera.position).normalize();
-  return target.clone().sub(direction.multiplyScalar(offsetDistance));
-}
-
-function flyThroughTargets(camera: Camera, targets: THREE.Vector3[], offsetDistance: number, duration: number) {
-  let tweenChain = new TWEEN.Tween(camera.position)
-    .to(getOffsetPosition(camera, targets[0], offsetDistance), duration)
-    .easing(TWEEN.Easing.Quadratic.InOut)
-    .onUpdate(() => {
-      camera.lookAt(targets[0]);
-    });
-  tweenChain.start();
-}
 
 const Animation = {
   load: async (options: StoryOptions) => {
@@ -189,6 +175,7 @@ const Animation = {
         .to({ x: target.x, y: target.y, z: target.z + radius }, duration)
         .easing(TWEEN.Easing.Quadratic.InOut)
         .onComplete(() => {
+          camera.baseY = camera.position.y;
         })
         .start();
 
@@ -196,8 +183,20 @@ const Animation = {
     }
 
 
+    // const fogColor = 0x000000;
+    // // const fog = new THREE.FogExp2(fogColor, 0.0002);
+    // const fog = new THREE.Fog(fogColor, 100, 300);
+    // scene.fog = fog;
+
     const animate = () => {
       TWEEN.update();
+      if (camera.baseY) {
+        // Floating camera effect
+        const floatSpeed = 0.15; // oscillations per second
+        const floatAmplitude = 0.5; // units up/down
+        const time = performance.now() * 0.001;
+        camera.position.y = camera.baseY + Math.sin(time * floatSpeed * Math.PI * 2) * floatAmplitude;
+      }
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
       controls.update();

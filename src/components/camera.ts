@@ -79,6 +79,8 @@ class Camera extends THREE.PerspectiveCamera {
   directionToLook: THREE.Vector3;
   viewRotationHorizontal: number = 0;
   viewRotationVertical: number = 0;
+  floatStartTime = performance.now();
+  baseY: number = 0;
 
   constructor(
     fov: number,
@@ -90,6 +92,7 @@ class Camera extends THREE.PerspectiveCamera {
   ) {
     super(fov, aspect, near, far);
     this.terrain = terrain;
+    this.baseY = this.position.y
   }
 
   addGui(gui) {
