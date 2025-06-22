@@ -91,7 +91,9 @@ const Animation3 = {
     const { camera, scene, renderer, terrain, water, controls } = options;
     
     const initialPos = new THREE.Vector3(6714, 949, -525);
-    camera.animateTo(initialPos, paraglidersVoxel[0].position, 0, controls);
+    camera.animateTo(initialPos, paraglidersVoxel[0].position, 0, controls, () => {
+          camera.baseY = camera.position.y;
+    });
 
     // Add voxel paragliders
     paraglidersVoxel.forEach(async (p) => {
@@ -117,6 +119,14 @@ const Animation3 = {
     env.addBoats(water);
 
     const animate = () => {
+
+      if (camera.baseY) {
+        // Floating camera effect
+        const floatSpeed = 0.15; // oscillations per second
+        const floatAmplitude = 0.5; // units up/down
+        const time = performance.now() * 0.001;
+        camera.position.y = camera.baseY + Math.sin(time * floatSpeed * Math.PI * 2) * floatAmplitude;
+      }
       TWEEN.update();
       renderer.render(scene, camera);
       requestAnimationFrame(animate);

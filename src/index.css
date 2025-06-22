@@ -42,6 +42,11 @@ body {
   margin-left: 1em;
 }
 
+.appOptions h2 {
+  text-transform: uppercase;
+  color: #fff;
+}
+
 .loading {
   position: absolute;
   top: 40%;
