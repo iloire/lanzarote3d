@@ -15,47 +15,6 @@ const WEATHER_SETTINGS: WeatherOptions = {
   lclLevel: 1800,
 };
 
-const tandems = [
-  {
-    pg: {
-      glider: {
-        wingColor1: '#c30010',
-        wingColor2: '#b100cd',
-        breakColor: '#ffffff',
-        lineFrontColor: '#ffffff',
-        lineBackColor: '#ffffff',
-        inletsColor: '#333333',
-        numeroCajones: 35
-      },
-      pilot: {
-        pilot: {
-          head: {
-            headType: PilotHeadType.Default,
-            helmetOptions: {
-              color: '#ffff00',
-              color2: '#cccccc',
-              color3: '#999999'
-            }
-          }
-        },
-        passenger: {
-          head: {
-            headType: PilotHeadType.Default,
-            helmetOptions: {
-              color: '#ffffff',
-              color2: '#cccccc',
-              color3: '#999999'
-            }
-          },
-          suitColor: 'red',
-          suitColor2: 'green'
-        },
-      },
-    },
-    position: new THREE.Vector3(6837, 850, -535)
-  }
-];
-
 type ParagliderVoxelConfig = {
   pg: ParagliderVoxelOptions,
   position: any
@@ -114,16 +73,18 @@ const Animation3 = {
     env.addHouses(terrain);
     env.addBoats(water);
 
+    const pgPos = paraglidersVoxel[0].position.clone();
+
     const initialCameraPosition = new THREE.Vector3(6760, 949, -461);
     const finalCameraPosition = new THREE.Vector3(
-      paraglidersVoxel[0].position.x - 200, 
-      paraglidersVoxel[0].position.y + 90, paraglidersVoxel[0].position.z + 450);
+      pgPos.x - 200, 
+      pgPos.y + 90, pgPos.z + 450);
 
     camera.position.copy(initialCameraPosition);
-    // camera.lookAt(paraglidersVoxel[0].position);
+    camera.lookAt(pgPos);
 
     camera.animateTo(finalCameraPosition, 
-      paraglidersVoxel[0].position, 6000, controls, () => {
+      pgPos, 2000, controls, () => {
         camera.baseY = camera.position.y;
     });
 
@@ -140,8 +101,6 @@ const Animation3 = {
       requestAnimationFrame(animate);
       controls.update();
     };
-
-
 
     animate();
   },

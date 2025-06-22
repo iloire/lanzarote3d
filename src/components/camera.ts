@@ -192,6 +192,7 @@ class Camera extends THREE.PerspectiveCamera {
   }
 
   followTarget() {
+    console.log("Camera follow target", this.target);
     const x = Math.sin(this.angle) * this.distance;
     const z = Math.cos(this.angle) * this.distance;
     const y = Math.cos(this.angleY) * this.distance;
@@ -206,6 +207,7 @@ class Camera extends THREE.PerspectiveCamera {
   }
 
   firstPersonView() {
+    console.log("Camera first person view", this.target);
     const cam = this;
     const pg = this.target;
 

@@ -56,9 +56,6 @@ const paragliders = [
 const Animation = {
   load: async (options: StoryOptions) => {
     const { camera, scene, renderer, terrain, water,  controls } = options;
-    
-    const initialPos = new THREE.Vector3(6714, 949, -525);  
-    camera.animateTo(initialPos, paragliders[0].position, 0, controls);
 
     paragliders.forEach(async p => {
       const paraglider = new Paraglider(p.pg);
@@ -82,19 +79,25 @@ const Animation = {
     env.addHouses(terrain);
     env.addBoats(water);
 
-    const points: THREE.Vector3[] = paragliders.map(p => p.position);
+    const pgPos = paragliders[0].position;
 
-    let pointIndex = 0;
-    const radius = 30;
+    const initialCameraPosition = new THREE.Vector3(6760, 949, -461);
+    const finalCameraPosition = new THREE.Vector3(
+      pgPos.x - 200, 
+      pgPos.y + 90, pgPos.z + 450);
 
-    camera.animateTo(initialPos, paragliders[0].position, 1000, controls, () => {
-       camera.baseY = camera.position.y;
+    camera.position.copy(initialCameraPosition);
+    camera.lookAt(pgPos);
+
+    camera.animateTo(finalCameraPosition, 
+      pgPos, 2000, controls, () => {
+        camera.baseY = camera.position.y;
     });
 
     const animate = () => {
       if (camera.baseY) {
         const floatSpeed = 0.15; // oscillations per second
-        const floatAmplitude = 0.5; // units up/down
+        const floatAmplitude = 1.2; // units up/down
         const time = performance.now() * 0.001;
         camera.position.y = camera.baseY + Math.sin(time * floatSpeed * Math.PI * 2) * floatAmplitude;
       }
