@@ -1,6 +1,12 @@
 import React from "react";
 
-class Menu extends React.Component {
+interface MenuProps {
+  showPublic?: boolean;
+  showExperiments?: boolean;
+  showDev?: boolean;
+}
+
+class Menu extends React.Component<MenuProps> {
   renderer: any;
 
   state = {
@@ -15,30 +21,30 @@ class Menu extends React.Component {
   render() {
     // Public/finished features
     const publicStories = [
-      { story: "animation", name: "famara" },
       { story: "animation3", name: "famara voxel", description: "Voxel animation" },
-      { story: "game", name: "game (WIP)", description: "The game!" },
     ];
 
     // Dev/testing features
     const experimentStories = [
-      { story: "flier", name: "Flier" },
-      { story: "flyzones", name: "Fly Zones" },
-      { story: "locationEditor", name: "Location Editor" },
-      { story: "paragliderVoxel", name: "Paraglider Voxel" },
+      { story: "animation", name: "famara" },
+      { story: "night", name: "Night", description: "Night mode" },
+      { story: "clouds", name: "Clouds", description: "Clouds" },
+      { story: "game", name: "game (WIP)", description: "The game!" },
       { story: "photobooth", name: "Photo Booth" },
     ];
 
     // Dev-only features
     const devOnlyStories = [
-      { story: "night", name: "Night", description: "Night mode" },
+      { story: "flier", name: "Flier" },
+      { story: "locationEditor", name: "Location Editor" },
+      { story: "flyzones", name: "Fly Zones" },
+      { story: "paragliderVoxel", name: "Paraglider Voxel" },
       { story: "voxel", name: "Voxel Example", description: "Voxel example" },
       { story: "head", name: "Head" },
       { story: "helmet", name: "Helmet" },
       { story: "paraglider", name: "Paraglider", description: "Paraglider" },
       { story: "hangglider", name: "Hangglider", description: "Hangglider" },
       { story: "terrain", name: "Terrain", description: "Terrain" },
-      { story: "clouds", name: "Clouds", description: "Clouds" },
       { story: "glider", name: "Glider" },
       { story: "pilot", name: "Pilot" },
       { story: "workshop", name: "Workshop", description: "Workshop" },
@@ -61,14 +67,28 @@ class Menu extends React.Component {
         </div>
       ));
 
+    const { showPublic = true, showExperiments: showExperiments = true, showDev: showDev = true } = this.props;
+
     return (
       <div className="appOptions">
-        <h2>Public Features</h2>
-        {renderButtons(publicStories)}
-        <h2>Experiments</h2>
-        {renderButtons(experimentStories)}
-        <h2>Dev Only</h2>
-        {renderButtons(devOnlyStories)}
+        {showPublic && (
+          <>
+            <h2>Public Features</h2>
+            {renderButtons(publicStories)}
+          </>
+        )}
+        {showExperiments && (
+          <>
+            <h2>Experiments</h2>
+            {renderButtons(experimentStories)}
+          </>
+        )}
+        {showDev && (
+          <>
+            <h2>Dev Only</h2>
+            {renderButtons(devOnlyStories)}
+          </>
+        )}
       </div>
     );
   }
