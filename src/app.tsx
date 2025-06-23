@@ -23,6 +23,9 @@ gui.hide();
 interface AppProps {
   initialStory?: string;
   showAppSelection?: boolean;
+  showPublic?: boolean;
+  showExperiments?: boolean;
+  showDev?: boolean;
 }
 
 interface SceneConfig {
@@ -68,7 +71,7 @@ const createRenderer = (sizes: { width: number; height: number }) => {
   return renderer;
 };
 
-const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAppSelection = false }) => {
+const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAppSelection = false, showPublic, showExperiments, showDev }) => {
   const [loadingProcess, setLoadingProcess] = useState(0);
   const [showAppSelection, setShowAppSelection] = useState(initialShowAppSelection);
   const [renderer, setRenderer] = useState<THREE.WebGLRenderer | null>(null);
@@ -168,7 +171,13 @@ const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAp
           <span className="progress">LOADING {loadingProcess} %</span>
         </div>
       )}
-      {showAppSelection && <Menu />}
+      {showAppSelection && (
+        <Menu
+          showPublic={typeof showPublic === 'undefined' ? true : showPublic}
+          showDev={typeof showDev === 'undefined' ? true : showDev}
+          showExperiments={typeof showExperiments === 'undefined' ? true : showExperiments}
+        />
+      )}
       <canvas className="webgl" />
     </div>
   );
