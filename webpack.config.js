@@ -5,8 +5,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 module.exports = {
   entry: {
     main: "./src/apps/main/index.tsx",
-    animation1: "./src/apps/animation1/index.tsx",
-    animation2: "./src/apps/animation2/index.tsx",
+    animation: "./src/apps/animation/index.tsx",
     game: "./src/apps/game/index.tsx",
     flyzones: "./src/apps/flyzones/index.tsx"
   },
@@ -88,9 +87,9 @@ module.exports = {
       filename: 'index.html'
     }),
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, "./src/apps/animation1/index.html"),
-      chunks: ['animation1'],
-      filename: 'animation1.html'
+      template: path.join(__dirname, "./src/apps/animation/index.html"),
+      chunks: ['animation'],
+      filename: 'animation.html'
     }),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "./src/apps/game/index.html"),
@@ -101,11 +100,6 @@ module.exports = {
       template: path.join(__dirname, "./src/apps/flyzones/index.html"),
       chunks: ['flyzones'],
       filename: 'flyzones.html'
-    }),
-    new HtmlWebpackPlugin({
-      template: path.join(__dirname, "./src/apps/animation2/index.html"),
-      chunks: ['animation2'],
-      filename: 'animation2.html'
     }),
   ],
 };
