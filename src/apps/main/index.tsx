@@ -10,12 +10,12 @@ THREE.Cache.enabled = true;
 
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
-const storyParam = urlParams.get("story") || "animation";
+const storyParam = urlParams.get("story") || "animation2";
 
 const rootElement = document.getElementById("root");
 if (WebGL.isWebGLAvailable()) {
   const root = createRoot(rootElement);
-  root.render(<App initialStory={storyParam}  showAppSelection={true}/>);
+  root.render(<App initialStory={storyParam} showDev={false} showAppSelection={true}/>);
 } else {
   const warning = WebGL.getWebGLErrorMessage();
   rootElement.appendChild(warning);

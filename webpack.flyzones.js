@@ -10,7 +10,6 @@ module.exports = {
     filename: "[name].bundle.js",
   },
   externals: {
-    rStats: "rStats",
     glStats: "glStats",
     threeStats: "threeStats",
   },

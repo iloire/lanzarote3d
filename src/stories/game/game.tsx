@@ -15,9 +15,6 @@ import { GameStartOptions, GameStatus } from "./types";
 import { addGameEnvironment } from "./env";
 import locations from "./lanzarote";
 import WindIndicator from "../../components/wind-indicator";
-import Sky from "../../components/sky";
-import PerfStats from "../../utils/stats";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { StoryOptions } from "../types";
 const KMH_TO_MS = 3.6;
 
@@ -66,7 +63,6 @@ const Game = {
   load: async (options: StoryOptions) => {
     const { camera, scene, renderer, terrain, water, sky, gui, controls } = options;
     
-    const perfStats = new PerfStats(renderer, "rs-base");
 
     sky.updateSunPosition(TIME_OF_DAY);
 
@@ -85,7 +81,6 @@ const Game = {
       terrain,
       water,
       thermals,
-      perfStats,
     };
 
     const gliderOptions = {
@@ -125,11 +120,7 @@ const Game = {
       const keyCode = event.which;
       if (keyCode == 90) {
         //z
-        if (perfStats.isVisible()) {
-          perfStats.hide();
-        } else {
-          perfStats.show();
-        }
+        
       } else if (keyCode == 77) {
         //m
         bgMusic.toggle();
@@ -315,19 +306,9 @@ const Game = {
       }
 
       vario.updateReading(pg.altitude());
-      perfStats.frameStart();
-      perfStats.wrapFunction("tween", () => {
-        TWEEN.update();
-      });
-      perfStats.wrapFunction("camera", () => {
-        camera.update();
-      });
-      perfStats.wrapFunction("render", () => {
-        renderer.render(scene, camera);
-      });
-      perfStats.frameEnd();
-      perfStats.update();
-
+      TWEEN.update();
+      camera.update();
+      renderer.render(scene, camera);
       requestAnimationFrame(animate);
     };
 

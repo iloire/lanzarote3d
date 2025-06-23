@@ -21,20 +21,20 @@ class Menu extends React.Component<MenuProps> {
   render() {
     // Public/finished features
     const publicStories = [
-      { story: "animation3", name: "famara voxel", description: "Voxel animation" },
+      { story: "animation2", name: "famara voxel", description: "Voxel animation" },
     ];
 
     // Dev/testing features
     const experimentStories = [
-      { story: "animation", name: "famara" },
-      { story: "night", name: "Night", description: "Night mode" },
-      { story: "clouds", name: "Clouds", description: "Clouds" },
-      { story: "game", name: "game (WIP)", description: "The game!" },
-      { story: "photobooth", name: "Photo Booth" },
+      { story: "night", name: "night", description: "night mode" },
+      { story: "clouds", name: "clouds", description: "clouds" },
+      { story: "game", name: "game (WIP)", description: "The game, work in progress!" },
+      { story: "photobooth", name: "photo booth" },
     ];
 
     // Dev-only features
     const devOnlyStories = [
+      { story: "animation", name: "famara" },
       { story: "flier", name: "Flier" },
       { story: "locationEditor", name: "Location Editor" },
       { story: "flyzones", name: "Fly Zones" },

@@ -6,16 +6,15 @@ module.exports = {
   entry: {
     main: "./src/apps/main/index.tsx",
     animation1: "./src/apps/animation1/index.tsx",
+    animation2: "./src/apps/animation2/index.tsx",
     game: "./src/apps/game/index.tsx",
-    flyzones: "./src/apps/flyzones/index.tsx",
-    animation2: "./src/apps/animation2/index.tsx"
+    flyzones: "./src/apps/flyzones/index.tsx"
   },
   output: {
     path: path.join(__dirname, "/dist"),
     filename: "[name].bundle.js",
   },
   externals: {
-    rStats: "rStats",
     glStats: "glStats",
     threeStats: "threeStats",
   },
