@@ -10,7 +10,7 @@ THREE.Cache.enabled = true;
 
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
-const storyParam = urlParams.get("story") || "animation2";
+const storyParam = urlParams.get("story") || "animation";
 
 const rootElement = document.getElementById("root");
 if (WebGL.isWebGLAvailable()) {

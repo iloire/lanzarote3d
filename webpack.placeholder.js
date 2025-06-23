@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
   entry: {
-    animation: "./src/apps/animation2/index.tsx"
+    animation: "./src/apps/animation/index.tsx"
   },
   output: {
     path: path.join(__dirname, "/dist"),
@@ -78,7 +78,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, "./src/apps/animation2/index.html"),
+      template: path.join(__dirname, "./src/apps/animation/index.html"),
       chunks: ['animation'],
       filename: 'index.html'
     }),

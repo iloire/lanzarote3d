@@ -21,7 +21,7 @@ class Menu extends React.Component<MenuProps> {
   render() {
     // Public/finished features
     const publicStories = [
-      { story: "animation2", name: "famara voxel", description: "Voxel animation" },
+      { story: "animation", name: "famara voxel", description: "Famara voxel animation" },
     ];
 
     // Dev/testing features
@@ -34,7 +34,6 @@ class Menu extends React.Component<MenuProps> {
 
     // Dev-only features
     const devOnlyStories = [
-      { story: "animation", name: "famara" },
       { story: "flier", name: "Flier" },
       { story: "locationEditor", name: "Location Editor" },
       { story: "flyzones", name: "Fly Zones" },
@@ -73,7 +72,7 @@ class Menu extends React.Component<MenuProps> {
       <div className="appOptions">
         {showPublic && (
           <>
-            <h2>Public Features</h2>
+            <h2>Lanzarote 3D</h2>
             {renderButtons(publicStories)}
           </>
         )}

@@ -1,10 +1,12 @@
 import * as THREE from "three";
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
-import Paraglider from "../components/paraglider";
-import Tandem from "../components/tandem";
+import Paraglider, { ParagliderOptions } from "../components/paraglider";
+import ParagliderVoxel, { ParagliderVoxelOptions } from "../components/paraglider-voxel";
+import { PilotHeadType } from "../components/parts/pilot-head";
 import Environment from "./env/environment";
 import Weather, { WeatherOptions } from "../elements/weather";
-import { PilotHeadType } from "../components/parts/pilot-head";
+import adriModel from '../models/adri.obj';
+import adriTextureImage from '../models/adri.png';
 import { StoryOptions } from "./types";
 
 const WEATHER_SETTINGS: WeatherOptions = {
@@ -13,55 +15,44 @@ const WEATHER_SETTINGS: WeatherOptions = {
   lclLevel: 1800,
 };
 
-
-const defaultGlider = {
-  wingColor1: 'orange',
-  wingColor2: 'green',
-  breakColor: '#ffffff',
-  lineFrontColor: '#ffffff',
-  lineBackColor: '#ffffff',
-  inletsColor: '#333333',
-  numeroCajones: 35
+type ParagliderVoxelConfig = {
+  pg: ParagliderVoxelOptions,
+  position: any
 }
 
-const defaultHead = {
-  helmetColor: '#ffff00',
-  headType: PilotHeadType.Default
-}
-
-const defaultPilot = {
-  head: {
-    ...defaultHead
-  }
-}
-
-const paragliders = [
+const paraglidersVoxel: ParagliderVoxelConfig[] = [
   {
     pg: {
       glider: {
-        wingColor1: 'red',
+        wingColor1: '#c30010',
         wingColor2: '#b100cd',
-        inletsColor: '#333333',
+        inletsColor: 'pink',
         numeroCajones: 35
       },
       pilot: {
-        ...defaultPilot
-      }
-    },    
-    position: new THREE.Vector3(6897, 920, -705) 
-  }
-];
+        objFile: adriModel,
+        textureFile: adriTextureImage
+      },
+    },
+    position: new THREE.Vector3(6897, 920, -705)
+  }];
 
 
-const Animation = {
+type ParagliderConfig = {
+  pg: ParagliderOptions,
+  position: any
+}
+
+const Animation3 = {
   load: async (options: StoryOptions) => {
-    const { camera, scene, renderer, terrain, water,  controls } = options;
-
-    paragliders.forEach(async p => {
-      const paraglider = new Paraglider(p.pg);
+    const { camera, scene, renderer, terrain, water, controls } = options;
+    
+    // Add voxel paragliders
+    paraglidersVoxel.forEach(async (p) => {
+      const paraglider = new ParagliderVoxel(p.pg);
       const mesh = await paraglider.load();
       mesh.position.copy(p.position);
-      const scale = 0.01; // mm to m
+      const scale = 0.01;
       mesh.scale.set(scale, scale, scale);
       scene.add(mesh);
     });
@@ -73,13 +64,13 @@ const Animation = {
     const weather = new Weather(WEATHER_SETTINGS);
     const thermals = env.generateThermals(weather, 0);
     const cloudOptions = { colors: ['#F64A8A', '#F987C5', '#DE3163'] }
+
     env.addClouds(weather, thermals, cloudOptions);
     env.addTrees(terrain);
-    env.addStones(terrain);
     env.addHouses(terrain);
     env.addBoats(water);
 
-    const pgPos = paragliders[0].position;
+    const pgPos = paraglidersVoxel[0].position.clone();
 
     const initialCameraPosition = new THREE.Vector3(6760, 949, -461);
     const finalCameraPosition = new THREE.Vector3(
@@ -96,7 +87,8 @@ const Animation = {
 
     const animate = () => {
       if (camera.baseY) {
-        const floatSpeed = 0.15; // oscillations per second
+        // Floating camera effect
+        const floatSpeed = 0.20; // oscillations per second
         const floatAmplitude = 1.2; // units up/down
         const time = performance.now() * 0.001;
         camera.position.y = camera.baseY + Math.sin(time * floatSpeed * Math.PI * 2) * floatAmplitude;
@@ -106,8 +98,9 @@ const Animation = {
       requestAnimationFrame(animate);
       controls.update();
     };
+
     animate();
   },
 };
 
-export default Animation;
+export default Animation3;

@@ -1,6 +1,5 @@
 import { StoryOptions } from "./types";
 import Animation from "./animation";
-import Animation2 from "./animation2";
 import Clouds from "./clouds";
 import FlierPG from "./flier-pg";
 import FlyZones from "./flyzones/index";
@@ -22,7 +21,6 @@ export type StoryFunction = (options: StoryOptions) => Promise<any>;
 
 const Stories: Record<string, StoryFunction> = {
   animation: Animation.load,
-  animation2: Animation2.load,
   clouds: Clouds.load,
   flier: FlierPG.load,
   flyzones: FlyZones.load,
