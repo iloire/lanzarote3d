@@ -6,8 +6,10 @@ import { StoryOptions } from "./types";
 
 const ParagliderWorkshop = {
   load: async (options: StoryOptions) => {
-    const { camera, scene, renderer, terrain, water, sky, gui } = options;
-    
+    const { camera, scene, renderer, terrain, water, sky, gui, controls } =
+      options;
+    controls.enabled = true;
+
     terrain.visible = false;
     water.visible = false;
 
@@ -16,37 +18,36 @@ const ParagliderWorkshop = {
     sky.updateSunPosition(12);
 
     const gliderOptions = {
-      wingColor1: '#c30010',
-      wingColor2: '#b100cd',
-      breakColor: '#ffffff',
-      lineFrontColor: '#ffffff',
-      lineBackColor: '#ffffff',
-      inletsColor: '#333333',
+      wingColor1: "#c30010",
+      wingColor2: "#b100cd",
+      breakColor: "#ffffff",
+      lineFrontColor: "#ffffff",
+      lineBackColor: "#ffffff",
+      inletsColor: "#333333",
       numeroCajones: 40,
       bandLength: 500,
-      carabinersSeparationMM: 300
+      carabinersSeparationMM: 300,
     };
     const pilotOptions = {
       head: {
         headType: PilotHeadType.Default,
         helmetOptions: {
-          color: '#ffffff',
-          color2: '#cccccc',
-          color3: '#999999'
-        }
+          color: "#ffffff",
+          color2: "#cccccc",
+          color3: "#999999",
+        },
       },
-      carabinerColor: '#333',
+      carabinerColor: "#333",
     };
 
     const paragliderOptions = {
       glider: gliderOptions,
-      pilot: pilotOptions
-    }
+      pilot: pilotOptions,
+    };
 
     const paraglider = new Paraglider(paragliderOptions);
     const mesh = await paraglider.load(gui);
     scene.add(mesh);
-
 
     const animate = () => {
       requestAnimationFrame(animate);

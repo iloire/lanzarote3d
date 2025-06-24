@@ -61,7 +61,9 @@ const waterGenerator = () => {
 const TerrainWorkshop = {
   load: async (options: StoryOptions) => {
     const { camera, scene, renderer, terrain, water, sky, controls } = options;
-    
+
+    controls.enabled = true;
+
     water.visible = false;
     terrain.visible = false;
 

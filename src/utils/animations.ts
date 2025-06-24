@@ -9,7 +9,7 @@ const Animations = {
     newPosition: THREE.Vector3,
     newTarget: THREE.Vector3,
     time: number = 2000,
-    callBack?: () => void
+    callBack?: () => void,
   ) => {
     const tween = new TWEEN.Tween({
       x1: camera.position.x,
@@ -28,9 +28,9 @@ const Animations = {
         y2: newTarget.y,
         z2: newTarget.z,
       },
-      time
+      time,
     );
-    tween.onUpdate(function(object) {
+    tween.onUpdate(function (object) {
       camera.position.x = object.x1;
       camera.position.y = object.y1;
       camera.position.z = object.z1;
@@ -39,8 +39,7 @@ const Animations = {
       controls.target.z = object.z2;
       controls.update();
     });
-    tween.onComplete(function() {
-      controls.enabled = true;
+    tween.onComplete(function () {
       callBack && callBack();
     });
     tween.easing(TWEEN.Easing.Cubic.InOut);

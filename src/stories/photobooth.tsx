@@ -1,14 +1,16 @@
 import * as THREE from "three";
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 import Paraglider, { ParagliderOptions } from "../components/paraglider";
-import ParagliderVoxel, { ParagliderVoxelOptions } from "../components/paraglider-voxel";
+import ParagliderVoxel, {
+  ParagliderVoxelOptions,
+} from "../components/paraglider-voxel";
 import Tandem from "../components/tandem";
 import Camera from "../components/camera";
 import { PilotHeadType } from "../components/parts/pilot-head";
 import Environment from "./env/environment";
 import Weather, { WeatherOptions } from "../elements/weather";
-import adriModel from '../models/adri.obj';
-import adriTextureImage from '../models/adri.png';
+import adriModel from "../models/adri.obj";
+import adriTextureImage from "../models/adri.png";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import Sky from "../components/sky";
 import { StoryOptions } from "./types";
@@ -23,162 +25,164 @@ const tandems = [
   {
     pg: {
       glider: {
-        wingColor1: '#c30010',
-        wingColor2: '#b100cd',
-        breakColor: '#ffffff',
-        lineFrontColor: '#ffffff',
-        lineBackColor: '#ffffff',
-        inletsColor: '#333333',
-        numeroCajones: 35
+        wingColor1: "#c30010",
+        wingColor2: "#b100cd",
+        breakColor: "#ffffff",
+        lineFrontColor: "#ffffff",
+        lineBackColor: "#ffffff",
+        inletsColor: "#333333",
+        numeroCajones: 35,
       },
       pilot: {
         pilot: {
           head: {
             headType: PilotHeadType.Default,
             helmetOptions: {
-              color: '#ffff00',
-              color2: '#cccccc',
-              color3: '#999999'
-            }
-          }
+              color: "#ffff00",
+              color2: "#cccccc",
+              color3: "#999999",
+            },
+          },
         },
         passenger: {
           head: {
             headType: PilotHeadType.Default,
             helmetOptions: {
-              color: '#ffffff',
-              color2: '#cccccc',
-              color3: '#999999'
-            }
+              color: "#ffffff",
+              color2: "#cccccc",
+              color3: "#999999",
+            },
           },
-          suitColor: 'red',
-          suitColor2: 'green'
+          suitColor: "red",
+          suitColor2: "green",
         },
       },
     },
-    position: new THREE.Vector3(6837, 850, -535)
-  }
+    position: new THREE.Vector3(6837, 850, -535),
+  },
 ];
 
 type ParagliderVoxelConfig = {
-  pg: ParagliderVoxelOptions,
-  position: any
-}
+  pg: ParagliderVoxelOptions;
+  position: any;
+};
 
 const paraglidersVoxel: ParagliderVoxelConfig[] = [
   {
     pg: {
       glider: {
-        wingColor1: '#c30010',
-        wingColor2: '#b100cd',
-        inletsColor: 'pink',
-        numeroCajones: 35
+        wingColor1: "#c30010",
+        wingColor2: "#b100cd",
+        inletsColor: "pink",
+        numeroCajones: 35,
       },
       pilot: {
         objFile: adriModel,
-        textureFile: adriTextureImage
+        textureFile: adriTextureImage,
       },
     },
-    position: new THREE.Vector3(6897, 920, -705)
-  }];
-
+    position: new THREE.Vector3(6897, 920, -705),
+  },
+];
 
 type ParagliderConfig = {
-  pg: ParagliderOptions,
-  position: any
-}
+  pg: ParagliderOptions;
+  position: any;
+};
 
 const paragliders: ParagliderConfig[] = [
   {
     pg: {
       glider: {
-        wingColor1: '#c30010',
-        wingColor2: '#b100cd',
-        inletsColor: 'pink',
-        numeroCajones: 35
+        wingColor1: "#c30010",
+        wingColor2: "#b100cd",
+        inletsColor: "pink",
+        numeroCajones: 35,
       },
       pilot: {
         head: {
           headType: PilotHeadType.Default,
           helmetOptions: {
-            color: '#ffff00',
-            color2: '#cccccc',
-            color3: '#999999'
-          }
-        }
+            color: "#ffff00",
+            color2: "#cccccc",
+            color3: "#999999",
+          },
+        },
       },
     },
-    position: new THREE.Vector3(6827, 860, -555)
+    position: new THREE.Vector3(6827, 860, -555),
   },
   {
     pg: {
       glider: {
-        wingColor1: '#FFA500',
-        wingColor2: '#b100cd',
-        inletsColor: 'white',
-        numeroCajones: 50
+        wingColor1: "#FFA500",
+        wingColor2: "#b100cd",
+        inletsColor: "white",
+        numeroCajones: 50,
       },
       pilot: {
         head: {
           headType: PilotHeadType.Default,
           helmetOptions: {
-            color: '#ffff00',
-            color2: '#cccccc',
-            color3: '#999999'
-          }
-        }
-      }
+            color: "#ffff00",
+            color2: "#cccccc",
+            color3: "#999999",
+          },
+        },
+      },
     },
-    position: new THREE.Vector3(6727, 780, -555)
+    position: new THREE.Vector3(6727, 780, -555),
   },
   {
     pg: {
       glider: {
-        wingColor1: '#FFA500',
-        wingColor2: '#b100cd',
-        inletsColor: '#333333',
-        numeroCajones: 40
+        wingColor1: "#FFA500",
+        wingColor2: "#b100cd",
+        inletsColor: "#333333",
+        numeroCajones: 40,
       },
       pilot: {
         head: {
           headType: PilotHeadType.Default,
           helmetOptions: {
-            color: '#ffff00',
-            color2: '#cccccc',
-            color3: '#999999'
-          }
-        }
-      }
+            color: "#ffff00",
+            color2: "#cccccc",
+            color3: "#999999",
+          },
+        },
+      },
     },
-    position: new THREE.Vector3(6777, 920, -535)
+    position: new THREE.Vector3(6777, 920, -535),
   },
   {
     pg: {
       glider: {
-        wingColor1: '#FFA500',
-        wingColor2: '#b100cd',
-        inletsColor: 'pink',
-        numeroCajones: 40
+        wingColor1: "#FFA500",
+        wingColor2: "#b100cd",
+        inletsColor: "pink",
+        numeroCajones: 40,
       },
       pilot: {
         head: {
           headType: PilotHeadType.Default,
           helmetOptions: {
-            color: '#ffff00',
-            color2: '#cccccc',
-            color3: '#999999'
-          }
-        }
-      }
+            color: "#ffff00",
+            color2: "#cccccc",
+            color3: "#999999",
+          },
+        },
+      },
     },
-    position: new THREE.Vector3(6777, 920, -535)
-  }
+    position: new THREE.Vector3(6777, 920, -535),
+  },
 ];
 
 const PhotoBooth = {
   load: async (options: StoryOptions) => {
     const { camera, scene, renderer, terrain, water, controls } = options;
-    
+
+    controls.enabled = true;
+
     const initialPos = new THREE.Vector3(6800, 870, -475);
     camera.animateTo(initialPos, paraglidersVoxel[0].position, 0, controls);
 
@@ -218,7 +222,7 @@ const PhotoBooth = {
     const env = new Environment(scene);
     const weather = new Weather(WEATHER_SETTINGS);
     const thermals = env.generateThermals(weather, 0);
-    const cloudOptions = { colors: ['#F64A8A', '#F987C5', '#DE3163'] }
+    const cloudOptions = { colors: ["#F64A8A", "#F987C5", "#DE3163"] };
 
     env.addClouds(weather, thermals, cloudOptions);
     env.addTrees(terrain);

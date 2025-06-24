@@ -9,14 +9,13 @@ import { StoryOptions } from "./types";
 const HangGliderWorkshop = {
   load: async (options: StoryOptions) => {
     const { camera, scene, renderer, terrain, water, sky, gui } = options;
-    
+
     terrain.visible = false;
     water.visible = false;
 
     Helpers.createHelpers(scene);
 
     sky.updateSunPosition(12);
-    //
 
     const hg = new HangGlider();
     const mesh = await hg.load([], gui);

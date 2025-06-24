@@ -8,17 +8,17 @@ import { PilotHeadType } from "../components/parts/pilot-head";
 import { StoryOptions } from "./types";
 
 const createLabel = (text: string, position: THREE.Vector3) => {
-  const canvas = document.createElement('canvas');
-  const context = canvas.getContext('2d');
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
   canvas.width = 256;
   canvas.height = 64;
 
   if (context) {
-    context.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    context.fillStyle = "rgba(0, 0, 0, 0.7)";
     context.fillRect(0, 0, canvas.width, canvas.height);
-    context.font = 'bold 32px Arial';
-    context.fillStyle = '#ffffff';
-    context.textAlign = 'center';
+    context.font = "bold 32px Arial";
+    context.fillStyle = "#ffffff";
+    context.textAlign = "center";
     context.fillText(text, canvas.width / 2, canvas.height / 2 + 8);
   }
 
@@ -27,7 +27,7 @@ const createLabel = (text: string, position: THREE.Vector3) => {
     map: texture,
     transparent: true,
     side: THREE.DoubleSide,
-    depthTest: false
+    depthTest: false,
   });
   const geometry = new THREE.PlaneGeometry(12, 3);
   const mesh = new THREE.Mesh(geometry, material);
@@ -38,34 +38,39 @@ const createLabel = (text: string, position: THREE.Vector3) => {
 
 const Workshop = {
   load: async (options: StoryOptions) => {
-    const { camera, scene, renderer, terrain, water, sky, gui, controls } = options;
-    
+    const { camera, scene, renderer, terrain, water, sky, gui, controls } =
+      options;
+
+    controls.enabled = true;
+
     terrain.visible = false;
     water.visible = false;
 
     Helpers.createHelpers(scene);
 
     sky.updateSunPosition(12);
-    //
 
     const gliderOptions = {
-      wingColor1: '#c30010',
-      wingColor2: '#b100cd',
-      inletsColor: '#333333',
-      numeroCajones: 40
+      wingColor1: "#c30010",
+      wingColor2: "#b100cd",
+      inletsColor: "#333333",
+      numeroCajones: 40,
     };
 
     const pilotOptions = {
       head: {
         headType: PilotHeadType.Default,
         helmetOptions: {
-          color: '#ffffff',
-          color2: '#cccccc',
-          color3: '#999999'
-        }
-      }
+          color: "#ffffff",
+          color2: "#cccccc",
+          color3: "#999999",
+        },
+      },
     };
-    const paraglider = new Paraglider({ glider: gliderOptions, pilot: pilotOptions });
+    const paraglider = new Paraglider({
+      glider: gliderOptions,
+      pilot: pilotOptions,
+    });
     const mesh = await paraglider.load(gui);
     mesh.position.set(0, 0, 0);
     mesh.scale.set(0.01, 0.01, 0.01);
@@ -82,28 +87,28 @@ const Workshop = {
     const houseSmallMesh = houseSmall.load(gui);
     houseSmallMesh.position.set(0, 0, 0);
     scene.add(houseSmallMesh);
-    labels.push(createLabel('Small House', new THREE.Vector3(0, -10, 0)));
+    labels.push(createLabel("Small House", new THREE.Vector3(0, -10, 0)));
     scene.add(labels[labels.length - 1]);
 
     const houseMedium = new House(HouseType.Medium);
     const houseMediumMesh = houseMedium.load(gui);
     houseMediumMesh.position.set(0, 0, 30);
     scene.add(houseMediumMesh);
-    labels.push(createLabel('Medium House', new THREE.Vector3(0, -10, 30)));
+    labels.push(createLabel("Medium House", new THREE.Vector3(0, -10, 30)));
     scene.add(labels[labels.length - 1]);
 
     const houseLarge = new House(HouseType.Large);
     const houseLargeMesh = houseLarge.load(gui);
     houseLargeMesh.position.set(0, 0, 60);
     scene.add(houseLargeMesh);
-    labels.push(createLabel('Large House', new THREE.Vector3(0, -10, 60)));
+    labels.push(createLabel("Large House", new THREE.Vector3(0, -10, 60)));
     scene.add(labels[labels.length - 1]);
 
     const houseModern = new House(HouseType.Modern);
     const houseModernMesh = houseModern.load(gui);
     houseModernMesh.position.set(0, 0, 90);
     scene.add(houseModernMesh);
-    labels.push(createLabel('Modern House', new THREE.Vector3(0, -10, 90)));
+    labels.push(createLabel("Modern House", new THREE.Vector3(0, -10, 90)));
     scene.add(labels[labels.length - 1]);
 
     const pineTree = new PineTree();
@@ -114,17 +119,17 @@ const Workshop = {
 
     const animate = () => {
       requestAnimationFrame(animate);
-      
-      labels.forEach(label => {
+
+      labels.forEach((label) => {
         label.quaternion.copy(camera.quaternion);
       });
-      
+
       renderer.render(scene, camera);
       controls.update();
     };
 
-    const lookAt = new THREE.Vector3(0, 0, 45);  // Center point between all houses
-    camera.position.set(200, 100, -100);  // Further away and better angle
+    const lookAt = new THREE.Vector3(0, 0, 45); // Center point between all houses
+    camera.position.set(200, 100, -100); // Further away and better angle
     camera.lookAt(lookAt);
     animate();
   },

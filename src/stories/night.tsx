@@ -5,8 +5,10 @@ import { StoryOptions } from "./types";
 
 const Night = {
   load: async (options: StoryOptions) => {
-    const { camera, scene, renderer,  sky,  controls } = options;
-    
+    const { camera, scene, renderer, sky, controls } = options;
+
+    controls.enabled = true;
+
     sky.updateSunPosition(2);
 
     const animate = () => {
