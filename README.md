@@ -1,5 +1,63 @@
 # lanzarote 3d
 
+## Setup
+
+### AWS Configuration
+
+This project uses AWS S3 for deployment. You need to configure AWS CLI with the `lanzaroteparagliding` profile:
+
+1. Install AWS CLI if you haven't already:
+   ```bash
+   # On macOS
+   brew install awscli
+
+   # On Linux/Windows
+   # Follow instructions at https://aws.amazon.com/cli/
+   ```
+
+2. Configure the AWS profile:
+   ```bash
+   aws configure --profile lanzaroteparagliding
+   ```
+
+   You'll be prompted to enter:
+   - AWS Access Key ID
+   - AWS Secret Access Key
+   - Default region (e.g., `eu-west-1`)
+   - Default output format (e.g., `json`)
+
+3. Verify the profile is set up correctly:
+   ```bash
+   aws s3 ls --profile lanzaroteparagliding
+   ```
+
+### Development
+
+```bash
+# Install dependencies
+yarn install
+
+# Start development server
+yarn dev
+```
+
+### Deployment
+
+The project can be deployed to different S3 buckets:
+
+```bash
+# Deploy to staging environment
+yarn deploy-staging
+
+# Deploy to flyzones environment
+yarn deploy-flyzones
+
+# Deploy to placeholder environment
+yarn deploy-placeholder
+```
+
+All deployment scripts automatically use the `lanzaroteparagliding` AWS profile.
+
 ## TODO
 
 - wing selection
