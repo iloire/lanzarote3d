@@ -11,7 +11,8 @@ THREE.Cache.enabled = true;
 const rootElement = document.getElementById("root");
 if (WebGL.isWebGLAvailable()) {
   const root = createRoot(rootElement);
-  root.render(<App showDev={false} initialStory="animation" />);
+  root.render(<App showAppSelection={true} showPublic={true} showDev={false} showExperiments={false} initialStory="animation" />);
+  console.log('animation started');
 } else {
   const warning = WebGL.getWebGLErrorMessage();
   rootElement.appendChild(warning);

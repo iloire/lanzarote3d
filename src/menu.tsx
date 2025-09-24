@@ -21,15 +21,17 @@ class Menu extends React.Component<MenuProps> {
   render() {
     // Public/finished features
     const publicStories = [
-      { story: "animation", name: "famara voxel", description: "Famara voxel animation" },
+      { story: "animation", name: "voxel", description: "famara voxel animation" },
+      { story: "photobooth", name: "photo booth" },
+      { story: "workshop", name: "workshop", description: "workshop" },
+      { story: "clouds", name: "clouds", description: "clouds" },
+      { story: "night", name: "night", description: "night mode" },
     ];
 
     // Dev/testing features
     const experimentStories = [
-      { story: "night", name: "night", description: "night mode" },
-      { story: "clouds", name: "clouds", description: "clouds" },
       { story: "game", name: "game (WIP)", description: "The game, work in progress!" },
-      { story: "photobooth", name: "photo booth" },
+      { story: "paragliderVoxel", name: "Paraglider Voxel" },
     ];
 
     // Dev-only features
@@ -37,7 +39,6 @@ class Menu extends React.Component<MenuProps> {
       { story: "flier", name: "Flier" },
       { story: "locationEditor", name: "Location Editor" },
       { story: "flyzones", name: "Fly Zones" },
-      { story: "paragliderVoxel", name: "Paraglider Voxel" },
       { story: "voxel", name: "Voxel Example", description: "Voxel example" },
       { story: "head", name: "Head" },
       { story: "helmet", name: "Helmet" },
@@ -45,8 +46,7 @@ class Menu extends React.Component<MenuProps> {
       { story: "hangglider", name: "Hangglider", description: "Hangglider" },
       { story: "terrain", name: "Terrain", description: "Terrain" },
       { story: "glider", name: "Glider" },
-      { story: "pilot", name: "Pilot" },
-      { story: "workshop", name: "Workshop", description: "Workshop" },
+      { story: "pilot", name: "Pilot" }
     ];
 
     // Get selected story from URL
@@ -62,7 +62,7 @@ class Menu extends React.Component<MenuProps> {
           >
             {story.name || story.story}
           </button>
-          <span>{story.description || story.story}</span>
+          <span>{story.description || ''}</span>
         </div>
       ));
 
