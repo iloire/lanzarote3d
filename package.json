@@ -57,7 +57,7 @@
     "delete-placeholder": "aws s3 rm s3://lanzaroteparagliding-placeholder --recursive --profile lanzaroteparagliding",
     "upload-placeholder": "aws s3 cp dist s3://lanzaroteparagliding-placeholder --recursive --profile lanzaroteparagliding",
     "build-placeholder": "yarn clean && webpack --config webpack.placeholder.js --mode production",
-    "deploy-placeholder": "yarn build-placeholder && yarn tag-placeholder && yarn delete-placeholder && yarn upload-placeholder && && yarn invalidate-prod-cache",
+    "deploy-placeholder": "yarn build-placeholder && yarn tag-placeholder && yarn delete-placeholder && yarn upload-placeholder && yarn invalidate-prod-cache",
     "tag-placeholder": "git tag PLACEHOLDER-$(date '+%F_%H%M')",
     "invalidate-prod-cache": "aws cloudfront create-invalidation --distribution-id E8276RQ1W5RSC --paths '/*' --profile lanzaroteparagliding"
   },
