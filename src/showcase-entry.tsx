@@ -14,12 +14,14 @@ const scriptTag = document.currentScript as HTMLScriptElement;
 const bundleName = scriptTag?.src.match(/([^\/]+)\.bundle\.js$/)?.[1] || 'animation';
 
 const rootElement = document.getElementById("root");
-if (WebGL.isWebGLAvailable()) {
+if (rootElement && WebGL.isWebGLAvailable()) {
   const root = createRoot(rootElement);
   root.render(<App showAppSelection={true} showPublic={true} showDev={false} showExperiments={false} initialStory={bundleName} />);
   logger.info(`${bundleName} story started`);
-} else {
+} else if (rootElement) {
   const warning = WebGL.getWebGLErrorMessage();
-  rootElement?.appendChild(warning);
+  rootElement.appendChild(warning);
   logger.error('WebGL not available, falling back to error message');
+} else {
+  logger.error('Root element not found');
 }

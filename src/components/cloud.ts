@@ -89,7 +89,7 @@ class Cloud {
     this.options = options;
   }
 
-  interval: number;
+  interval: number | null;
 
   async load(): Promise<THREE.Object3D> {
     const mesh = await generateCloud(this.options);
@@ -99,7 +99,7 @@ class Cloud {
         tweakSize(m, interval);
         tweakPos(m, interval);
       });
-    }, interval);
+    }, interval) as unknown as number;
 
     const animate = (mesh: THREE.Object3D) => {
       const timer = (Date.now() + Math.random() * 1000) * 0.0001;

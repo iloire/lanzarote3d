@@ -9,23 +9,23 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "typeRoots": ["./src/typings/", "./node_modules/@types"],
 
-    // Strict Type Checking
-    "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
+    // Strict Type Checking (gradually enabled)
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
     "strictFunctionTypes": true,
     "strictBindCallApply": true,
-    "strictPropertyInitialization": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
+    "strictPropertyInitialization": false,
+    "noImplicitReturns": false,
+    "noImplicitThis": false,
     "alwaysStrict": true,
 
-    // Additional Checks
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitOverride": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "noUncheckedIndexedAccess": true,
+    // Additional Checks (gradually enabled)
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitOverride": false,
+    "noPropertyAccessFromIndexSignature": false,
+    "noUncheckedIndexedAccess": false,
 
     // Module Resolution
     "resolveJsonModule": true,

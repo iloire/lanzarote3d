@@ -44,7 +44,7 @@ class Flier extends THREE.EventDispatcher {
   thermals: Thermal[];
   speedBar: boolean;
   ears: boolean;
-  interval: number = null;
+  interval: number | null = null;
   mesh: THREE.Object3D;
   flyable: IFlyable;
   wrapSpeed: number = 1;
@@ -106,7 +106,7 @@ class Flier extends THREE.EventDispatcher {
       this.interval = setInterval(
         () => this.tick((TICK_INTERVAL / 1000) * this.wrapSpeed),
         TICK_INTERVAL
-      );
+      ) as unknown as number;
     }
   }
 

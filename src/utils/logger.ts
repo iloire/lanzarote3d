@@ -16,7 +16,9 @@ class Logger {
 
   constructor() {
     // Set log level based on environment
-    this.level = process.env.NODE_ENV === 'production' ? LogLevel.WARN : LogLevel.DEBUG;
+    this.level = (typeof process !== 'undefined' && process.env?.['NODE_ENV']) === 'production'
+      ? LogLevel.WARN
+      : LogLevel.DEBUG;
   }
 
   debug(message: string, ...args: any[]): void {
