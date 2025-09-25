@@ -30,7 +30,8 @@
       "Bash(touch:*)",
       "Bash(tree:*)",
       "Bash(rm:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(rmdir:*)"
     ],
     "deny": [],
     "ask": []

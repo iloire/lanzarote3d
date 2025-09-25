@@ -33,7 +33,7 @@ class Menu extends React.Component<MenuProps> {
   override render() {
     // Public/finished features
     const publicStories = [
-      { story: "animation", name: "voxel", description: "famara voxel animation" },
+      { story: "animation", name: "main", description: "famara voxel animation" },
       { story: "photobooth", name: "photo booth" },
       { story: "workshop", name: "workshop", description: "workshop" },
       { story: "clouds", name: "clouds", description: "clouds" },
