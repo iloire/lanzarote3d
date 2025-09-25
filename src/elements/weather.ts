@@ -12,7 +12,14 @@ export type WeatherOptions = {
   lclLevel: number;
 };
 
-class Weather extends THREE.EventDispatcher {
+// Define event types for Weather
+export interface WeatherEventMap {
+  "wind-speedChange": { value: number };
+  "wind-directionChange": { value: number };
+  "lclChange": { value: number };
+}
+
+class Weather extends THREE.EventDispatcher<WeatherEventMap> {
   options: WeatherOptions;
 
   constructor(options: WeatherOptions) {

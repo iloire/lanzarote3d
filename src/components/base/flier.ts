@@ -36,7 +36,21 @@ export interface EnvOptions {
   perfStats?: any; //stats
 }
 
-class Flier extends THREE.EventDispatcher {
+// Define event types for Flier
+export interface FlierEventMap {
+  touchedGround: { groundTouches: number };
+  crashed: {};
+  drop: { drop: number };
+  dynamicLift: { lift: number };
+  thermalLift: { lift: number };
+  position: { position: THREE.Vector3 };
+  delta: { delta: number };
+  heightAboveGround: { height: number };
+  gradient: { gradient: number };
+  lift: { lift: number };
+}
+
+class Flier extends THREE.EventDispatcher<FlierEventMap> {
   options: FlierConstructor;
   weather: Weather;
   terrain: THREE.Mesh;
