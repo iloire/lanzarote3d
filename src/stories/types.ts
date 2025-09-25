@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import Camera from "../components/camera";
+import Camera from '../foundation/systems/scene/CameraController';
 import Sky from "../foundation/components/environment/Sky";
 import { GUI } from "lil-gui";
 

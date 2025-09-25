@@ -9,6 +9,10 @@ export * from './components/ui';          // Trajectories, 3D UI elements
 
 // Core systems
 export * from './systems/assets/AssetManager'; // Asset loading & caching
+export * from './systems/scene';      // Scene management, camera controls
+export * from './systems/controls';   // Flight controls, input handling
+export * from './systems/audio';      // Sound management, positional audio
+export * from './systems/analytics';  // Performance monitoring, user analytics
 
 // Utilities
 export * from './utils';
@@ -17,8 +21,9 @@ export * from './utils';
 export * from './types';
 
 // Foundation metadata
-export const FOUNDATION_VERSION = '2.0.0';
+export const FOUNDATION_VERSION = '3.0.0';
 export const FOUNDATION_NAME = 'Lanzarote3D Foundation';
 
-// Phase 2 completion marker
+// Phase completion markers
 export const PHASE_2_COMPLETE = true;
+export const PHASE_3_COMPLETE = true;

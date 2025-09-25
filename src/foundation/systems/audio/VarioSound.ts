@@ -1,11 +1,11 @@
-import beep200 from "../../assets/foundation/audio/vario/audiocheck.net_sin_200Hz_-3dBFS_0.3s.wav";
-import beep400 from "../../assets/foundation/audio/vario/audiocheck.net_sin_400Hz_-3dBFS_0.3s.wav";
-import beep600 from "../../assets/foundation/audio/vario/audiocheck.net_sin_600Hz_-3dBFS_0.3s.wav";
-import beep800 from "../../assets/foundation/audio/vario/audiocheck.net_sin_800Hz_-3dBFS_0.3s.wav";
-import beep1000 from "../../assets/foundation/audio/vario/audiocheck.net_sin_1000Hz_-3dBFS_0.3s.wav";
-import beep1200 from "../../assets/foundation/audio/vario/audiocheck.net_sin_1200Hz_-3dBFS_0.3s.wav";
+import beep200 from "../../../../assets/foundation/audio/vario/audiocheck.net_sin_200Hz_-3dBFS_0.3s.wav";
+import beep400 from "../../../../assets/foundation/audio/vario/audiocheck.net_sin_400Hz_-3dBFS_0.3s.wav";
+import beep600 from "../../../../assets/foundation/audio/vario/audiocheck.net_sin_600Hz_-3dBFS_0.3s.wav";
+import beep800 from "../../../../assets/foundation/audio/vario/audiocheck.net_sin_800Hz_-3dBFS_0.3s.wav";
+import beep1000 from "../../../../assets/foundation/audio/vario/audiocheck.net_sin_1000Hz_-3dBFS_0.3s.wav";
+import beep1200 from "../../../../assets/foundation/audio/vario/audiocheck.net_sin_1200Hz_-3dBFS_0.3s.wav";
 import * as THREE from "three";
-import Paraglider from "../foundation/types/flier";
+import Flier from "../../types/flier";
 
 // Define event types for Vario
 export interface VarioEventMap {
@@ -15,7 +15,7 @@ export interface VarioEventMap {
 
 class Vario extends THREE.EventDispatcher<VarioEventMap> {
   sound: any;
-  pg: Paraglider;
+  pg: Flier;
   status: string = "off";
   paused: boolean;
   lastRecord: number;
@@ -23,7 +23,7 @@ class Vario extends THREE.EventDispatcher<VarioEventMap> {
   volume: number = 0.3;
   wrapSpeed: number = 1;
 
-  constructor(pg: Paraglider) {
+  constructor(pg: Flier) {
     super();
     const listener = new THREE.AudioListener();
     this.sound = new THREE.Audio(listener);

@@ -6,7 +6,7 @@ import Sky from "./foundation/components/environment/Sky";
 import Water from "./foundation/components/environment/Water";
 import Island from "./components/island";
 import Stories from "./stories/index";
-import Camera from "./components/camera";
+import { CameraController as Camera, CameraMode } from './foundation/systems/scene/CameraController';
 import Menu from './menu';
 import Controls from "./foundation/utils/controls";
 import { StoryOptions } from "./stories/types";

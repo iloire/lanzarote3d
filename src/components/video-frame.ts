@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import Camera from "../components/camera";
+import Camera from '../foundation/systems/scene/CameraController';
 
 const createVideo = (url) => {
   const video = document.createElement('video');

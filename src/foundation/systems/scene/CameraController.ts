@@ -1,8 +1,8 @@
 import * as THREE from "three";
-import Paraglider from "../foundation/types/flier";
+import Flier from "../../types/flier";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import Animations from "../foundation/utils/animations";
-import GuiHelper from "../foundation/utils/gui";
+import Animations from "../../utils/animations";
+import GuiHelper from "../../utils/gui";
 
 const DEFAULT_FOLLOW_DISTANCE = 180;
 const DEFAULT_ANGLE = -Math.PI / 5.8;
@@ -66,9 +66,9 @@ function onDocumentKeyUp(event) {
   }
 }
 
-class Camera extends THREE.PerspectiveCamera {
+export class CameraController extends THREE.PerspectiveCamera {
   mode: CameraMode;
-  target: Paraglider;
+  target: Flier;
   terrain: THREE.Mesh;
   angle: number = DEFAULT_ANGLE;
   angleY: number = DEFAULT_ANGLE_Y;
@@ -136,7 +136,7 @@ class Camera extends THREE.PerspectiveCamera {
     isZoomOutViewing && this.zoomOut();
   }
 
-  setCameraMode(mode: CameraMode, target: Paraglider) {
+  setCameraMode(mode: CameraMode, target: Flier) {
     this.target = target;
     this.mode = mode;
   }
@@ -226,4 +226,8 @@ class Camera extends THREE.PerspectiveCamera {
   }
 }
 
-export default Camera;
+// Backward compatibility export
+export default CameraController;
+
+// Re-export for foundation API
+export { CameraController as Camera };

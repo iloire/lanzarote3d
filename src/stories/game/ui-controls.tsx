@@ -1,5 +1,5 @@
 import React from "react";
-import { CameraMode } from "../../components/camera";
+import { CameraMode } from "../../foundation/systems/scene/CameraController";
 import Paraglider from "../../foundation/types/flier";
 import Vario from "../../audio/vario";
 import { Weather } from "../../foundation/components/physics";

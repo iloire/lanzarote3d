@@ -1,10 +1,5 @@
-// Controls system exports
-// These will be populated as we extract existing systems in Phase 3
+// Flight Control System
+export { FlightControls, DEFAULT_FLIGHT_KEYBINDINGS } from './FlightControls';
 
-// Placeholder exports for clean API structure
-export type { ControlsConfig } from '../../types';
-
-// TODO: Add actual exports when systems are extracted:
-// export { FlightControls } from './FlightControls';
-// export { InputHandler } from './InputHandler';
-// export { KeyBindings } from './KeyBindings';
+// Input Handling System
+export { InputHandler, KeyBinding, InputConfig } from './InputHandler';
