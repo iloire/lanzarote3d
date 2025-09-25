@@ -1,15 +1,29 @@
 {
   "compilerOptions": {
-    "esModuleInterop": true,
-    "jsx": "react",
-    "moduleResolution": "node",
-    "outDir": "./built",
-    "allowJs": true,
+    // Language and Environment
     "target": "ES2020",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "typeRoots": ["./src/typings/", "./node_modules/@types"],
+    "lib": ["ES2020", "DOM", "DOM.Iterable", "WebWorker"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "allowJs": true,
+    "checkJs": false,
 
-    // Strict Type Checking (gradually enabled)
+    // Module Resolution Enhancement
+    "baseUrl": "./src",
+    "paths": {
+      "foundation": ["./foundation"],
+      "foundation/*": ["./foundation/*"],
+      "apps/*": ["./apps/*"],
+      "assets/*": ["../assets/*"]
+    },
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "verbatimModuleSyntax": false,
+
+    // Type Checking (Progressive Strictness)
     "strict": false,
     "noImplicitAny": false,
     "strictNullChecks": false,
@@ -18,27 +32,55 @@
     "strictPropertyInitialization": false,
     "noImplicitReturns": true,
     "noImplicitThis": true,
+    "useUnknownInCatchVariables": false,
     "alwaysStrict": true,
-
-    // Additional Checks (gradually enabled)
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "exactOptionalPropertyTypes": false,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": false,
     "noUncheckedIndexedAccess": false,
 
-    // Module Resolution
-    "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
+    // Linting (Enhanced for Foundation)
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": false,
 
-    // Emit
+    // Emit Configuration (NPM Package Ready)
+    "outDir": "./built",
+    "rootDir": "./",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "removeComments": true,
-    "skipLibCheck": true
+    "inlineSources": false,
+    "removeComments": false,
+    "importHelpers": true,
+    "downlevelIteration": true,
+    "preserveConstEnums": true,
+    "isolatedModules": true,
+
+    // Interop and Compatibility
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+
+    // Type Roots
+    "typeRoots": ["./src/typings/", "./node_modules/@types"]
   },
-  "include": ["./src/**/*", "./tests/**/*"],
-  "exclude": ["node_modules", "dist", "built"]
+  "include": [
+    "./src/**/*",
+    "./tests/**/*",
+    "./assets/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "built",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "./src/**/__tests__/**/*",
+    "./assets/**/*.{png,jpg,jpeg,gif,webp,svg,glb,obj,mp3,wav}"
+  ],
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  }
 }
