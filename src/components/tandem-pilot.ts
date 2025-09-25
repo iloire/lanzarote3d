@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import PilotHead, { PilotHeadOptions } from './parts/pilot-head';
-import Pilot, { PilotOptions } from './pilot';
+import { PilotOptions } from './pilot';
 
 const getColoredMaterial = (color: string) => {
   return new THREE.MeshStandardMaterial({

@@ -2,11 +2,9 @@ import * as THREE from "three";
 import Pilot from "./pilot";
 import Wing from "./parts/wing";
 import GuiHelper from "../utils/gui";
-import Models from "../utils/models";
 import AutoFlier from "./base/auto-flier";
 import { PilotHeadType } from "./parts/pilot-head";
 
-const BREAK_ROTATION = 0.05;
 
 const DEFAULT_OPTIONS = {
   head: {
