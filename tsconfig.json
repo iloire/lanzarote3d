@@ -17,7 +17,7 @@
     "strictBindCallApply": false,
     "strictPropertyInitialization": false,
     "noImplicitReturns": true,
-    "noImplicitThis": false,
+    "noImplicitThis": true,
     "alwaysStrict": true,
 
     // Additional Checks (gradually enabled)
