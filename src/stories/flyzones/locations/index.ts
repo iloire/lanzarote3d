@@ -1,4 +1,3 @@
-import * as THREE from "three";
 // Re-export all types from helpers/types
 export * from '../helpers/types';
 

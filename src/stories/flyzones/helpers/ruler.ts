@@ -16,7 +16,7 @@ export interface Ruler {
 }
 
 export const createRuler = (options: RulerOptions): Ruler => {
-  const { scene, camera, renderer, labelRenderer } = options;
+  const { scene, camera, renderer } = options;
   
   let active = false;
   let startPoint: THREE.Vector3 | null = null;

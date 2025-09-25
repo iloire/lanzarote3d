@@ -1,11 +1,10 @@
 import * as THREE from 'three';
-import { Tween, Easing, update } from '@tweenjs/tween.js';
-const TWEEN = { Tween, Easing, update };
+import { Tween } from '@tweenjs/tween.js';
 import { MarkerType } from '../helpers/types';
 import { PIN_COLORS, PIN_SIZES, PIN_FADE_DURATION } from '../config/marker-config';
 import Paraglider from '../../../components/paraglider';
 import { PilotHeadType } from '../../../components/parts/pilot-head';
-import { createLabel, createPopupContent, createPopupHandler } from '../helpers/popup';
+import { createLabel } from '../helpers/popup';
 import { CSS2DObject, CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { Location, Media } from '../locations';
 import { createWindArrow } from '../helpers/flyzone';

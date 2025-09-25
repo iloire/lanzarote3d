@@ -1,9 +1,6 @@
 import * as THREE from "three";
 import { BaseHead } from "./BaseHead";
-import { DefaultHelmet } from "../helmets/DefaultHelmet";
 import { HelmetOptions, HelmetType } from "../helmets/types";
-import { FullFaceHelmet } from "../helmets/FullFaceHelmet";
-import { HelmetWithHorns } from "../helmets/HelmetWithHorns";
 
 export class WarriorHead extends BaseHead {
   private addBeard(): THREE.Group {

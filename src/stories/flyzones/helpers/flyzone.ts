@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import { FlyZoneShape } from '../locations';
 import { FLYZONE_COLORS } from '../config/flyzone-config';
 import { WIND_ARROW } from '../config/wind-config';
-import { getConfig } from '../config';
 
 export const createCustomFlyZone = (shape: FlyZoneShape) => {
   const group = new THREE.Group();

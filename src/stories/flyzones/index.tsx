@@ -1,15 +1,10 @@
 import * as THREE from "three";
-import { Tween, Easing, update } from "@tweenjs/tween.js";
-const TWEEN = { Tween, Easing, update };
-import React from "react";
-import { createRoot } from "react-dom/client";
 import locations from "./locations";
 // import VideoFrame from "../components/video-frame";
 import { StoryOptions } from "../types";
-import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
-import { Takeoff, Media, Location } from "./locations";
+import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
+import { Location } from "./locations";
 import {
-  TAKEOFF_VISIBILITY_THRESHOLD, 
   type Marker,
   setupPopupContainer,
   VISIBILITY_THRESHOLDS,
@@ -19,25 +14,22 @@ import {
   setupLabelRenderer,
 } from './helpers';
 import { createSimpleMarker } from './markers/marker-creator';
-import { worldToGPS } from './helpers/gps';
 
 
-import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 
-import { 
-  getConfig, 
-  updateConfig, 
-  defaultConfig
+import {
+  getConfig,
+  updateConfig
 } from './config/flyzone-config';
 
-import { createRuler, Ruler } from './helpers/ruler';
+import { createRuler } from './helpers/ruler';
 import { createUI } from './ui/UI';
 import { navigateTo } from './navigation/camera';
 import { setupMouseClickHandler } from './events/mouse';
 import { setupAnimationLoop } from './animation/loop';
 import { toggleLandingMarkers } from './markers/toggle';
 import './styles/ruler.css';
-import { Marker as MarkerHelper, MarkerObject } from './markers/markers';
+import { Marker as MarkerHelper } from './markers/markers';
 import { createWindArrowsForTakeoff } from './helpers/wind';
 import './styles/popup.css';
 
@@ -82,7 +74,7 @@ const FlyZones = {
           position: location.position,
           color: 0x00ff00,
           size: 300
-        }, scene);
+        });
         
         // Add the marker to the scene
         scene.add(locationMarker);
