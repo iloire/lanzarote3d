@@ -21,8 +21,8 @@ export const createSimpleMarker = async (
   mesh.position.copy(options.position);
 
   // Add marker metadata
-  mesh.userData.isMarker = true;
-  mesh.userData.markerType = 'location';
+  mesh.userData['isMarker'] = true;
+  mesh.userData['markerType'] = 'location';
 
   return mesh;
 }; 

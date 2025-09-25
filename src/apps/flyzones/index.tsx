@@ -373,10 +373,10 @@ const FlyZones = {
         
         // Traverse up to find the root object with userData
         while (current && current.parent) {
-          if (current.userData && current.userData.isInteractive) {
+          if (current.userData && current.userData['isInteractive']) {
             console.log("Clicked on interactive object:", current);
-            if (current.userData.onClick) {
-              current.userData.onClick();
+            if (current.userData['onClick']) {
+              current.userData['onClick']();
             }
             return;
           }

@@ -9,13 +9,13 @@ export const toggleLandingMarkers = (
     marker.visible = visible;
     
     // Also update the clickable property to prevent invisible markers from being clickable
-    marker.userData.clickable = visible;
+    marker.userData['clickable'] = visible;
     
     // Update all children as well
     marker.traverse(child => {
       if (child !== marker) {
         child.visible = visible;
-        child.userData.clickable = visible;
+        child.userData['clickable'] = visible;
       }
     });
   });

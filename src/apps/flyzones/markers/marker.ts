@@ -167,10 +167,10 @@ export const createMarker = async (
   };
 
   // Add click event handler to the pin
-  pin.userData.onClick = showPopup;
+  pin.userData['onClick'] = showPopup;
 
   // Make the pin interactive
-  pin.userData.isInteractive = true;
+  pin.userData['isInteractive'] = true;
 
   const marker = new MarkerObject(pin, type);
   marker.hoverAnimation = hover;
@@ -242,15 +242,15 @@ export const createPinMesh = async (type: MarkerType) => {
 
 export const setupPinBasics = (pin: THREE.Object3D, position: THREE.Vector3, type: MarkerType) => {
   pin.position.copy(position);
-  pin.userData.type = type;
-  pin.userData.hoverable = true;
-  pin.userData.clickable = true;
+  pin.userData['type'] = type;
+  pin.userData['hoverable'] = true;
+  pin.userData['clickable'] = true;
   
   // Make sure all children inherit the clickable property
   pin.traverse(child => {
     if (child !== pin) {
-      child.userData.type = type;
-      child.userData.clickable = true;
+      child.userData['type'] = type;
+      child.userData['clickable'] = true;
       // We don't set hoverable on children to avoid multiple hover events
     }
   });
