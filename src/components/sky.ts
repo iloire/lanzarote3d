@@ -13,31 +13,32 @@ const calculateLightIntensity = (
   timeOfDayInHours: number,
   monthOfTheYear: number
 ) => {
+  // Increased all values to make colors more vibrant
   if (timeOfDayInHours < 6) {
-    return 0.2;
+    return 1.8;
   }
   if (timeOfDayInHours < 10) {
-    return 0.3;
+    return 2.0;
   }
   if (timeOfDayInHours < 12) {
-    return 0.4;
+    return 2.2;
   }
   if (timeOfDayInHours < 14) {
-    return 0.7;
+    return 2.5;
   }
   if (timeOfDayInHours < 16) {
-    return 0.6;
+    return 2.4;
   }
   if (timeOfDayInHours < 18) {
-    return 0.5;
+    return 2.2;
   }
   if (timeOfDayInHours <= 20) {
-    return 0.4;
+    return 2.3; // This matches your perfect setting for 8 PM
   }
   if (timeOfDayInHours < 21) {
-    return 0.35;
+    return 2.1;
   }
-  return 0.2;
+  return 1.8;
 };
 
 const calculateSunPosition = (
@@ -108,7 +109,7 @@ export default class Sky extends THREE.Object3D {
     }
 
     const distance = 0; // max range of the light
-    const intensity = 0.9;
+    const intensity = 2.1;
     this.pointLight = new THREE.PointLight(0xffffff, intensity, distance);
     this.pointLight.castShadow = true;
     this.pointLight.color.setHSL(0.995, 0.5, 0.9);

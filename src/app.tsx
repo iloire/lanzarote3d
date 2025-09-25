@@ -66,12 +66,12 @@ const createRenderer = (sizes: { width: number; height: number }) => {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(sizes.width, sizes.height);
 
-  // Configure renderer to match original darker appearance
-  renderer.toneMapping = THREE.NoToneMapping; // Try no tone mapping for darker look
-  renderer.toneMappingExposure = 1.0;
+  // Configure renderer for vibrant colors like original Three.js
+  renderer.toneMapping = THREE.LinearToneMapping;
+  renderer.toneMappingExposure = 1.2;
 
-  // Keep the old Three.js color behavior for consistency
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  // Use Linear color space for more vibrant colors (like older Three.js)
+  renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
   THREE.ColorManagement.enabled = false;
 
   // Shadow settings for consistency
@@ -89,9 +89,9 @@ const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAp
   const initThree = async () => {
     const renderer = createRenderer(SCENE_CONFIG.sizes);
     setRenderer(renderer);
-    
+
     const scene = new THREE.Scene();
-    
+
     // Sky setup
     const sky = new Sky(20, 3);
     sky.addToScene(scene);
@@ -162,7 +162,7 @@ const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAp
       stats.update();
     };
     animate();
-    
+
     console.log("triangles:", renderer.info.render.triangles);
   };
 
@@ -170,7 +170,7 @@ const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAp
     if (!renderer) {
       initThree();
     }
-    
+
     return () => {
       // Cleanup
       renderer?.dispose();
