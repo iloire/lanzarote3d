@@ -81,8 +81,10 @@ const Animation3 = {
     camera.position.copy(initialCameraPosition);
     camera.lookAt(pgPos);
 
-    camera.animateTo(finalCameraPosition, 
+    console.log('Starting camera animation from', initialCameraPosition, 'to', finalCameraPosition);
+    camera.animateTo(finalCameraPosition,
       pgPos, 2000, controls, () => {
+        console.log('Camera animation completed');
         camera.baseY = camera.position.y;
     });
 

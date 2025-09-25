@@ -11,6 +11,7 @@ const Animations = {
     time: number = 2000,
     callBack?: () => void,
   ) => {
+    console.log('animateCamera called with:', { newPosition, newTarget, time });
     const tween = new Tween({
       x1: camera.position.x,
       y1: camera.position.y,
@@ -40,6 +41,7 @@ const Animations = {
       controls.update();
     });
     tween.onComplete(function () {
+      console.log('Camera tween completed');
       callBack && callBack();
     });
     tween.easing(Easing.Cubic.InOut);
