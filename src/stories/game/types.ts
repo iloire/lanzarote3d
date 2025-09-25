@@ -1,4 +1,3 @@
-import * as THREE from "three";
 import { Location } from "../flyzones/locations/index";
 
 export type GameStartOptions = {

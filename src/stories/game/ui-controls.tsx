@@ -447,7 +447,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       showHelp,
     } = this.state;
 
-    const { showDebugInfo, defaultGameSpeed } = this.props;
+    const { showDebugInfo } = this.props;
     const distanceFlown =
       metersFlown < 1000
         ? Math.round(metersFlown) + " m."

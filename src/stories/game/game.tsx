@@ -7,7 +7,7 @@ import Flier, { FlierConstructor } from "../../components/base/flier";
 import Paraglider from "../../components/paraglider";
 import Vario from "../../audio/vario";
 import Weather, { WeatherOptions } from "../../elements/weather";
-import Camera, { CameraMode } from "../../components/camera";
+import { CameraMode } from "../../components/camera";
 import UIControls, { FirstPersonViewLook } from "./ui-controls";
 import Trajectory from "../../elements/trajectory";
 import Analytics from "../../elements/analytics";

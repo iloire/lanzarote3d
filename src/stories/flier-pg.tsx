@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { update } from "@tweenjs/tween.js";
 import Paraglider from "../components/paraglider";
 import Flier, { FlierConstructor } from "../components/base/flier";
 import Helpers from "../utils/helpers";

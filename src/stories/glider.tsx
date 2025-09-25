@@ -1,6 +1,3 @@
-import * as THREE from "three";
-import Controls from "../utils/controls";
-import Sky from "../components/sky";
 import Glider from "../components/parts/glider";
 import Helpers from "../utils/helpers";
 import { StoryOptions } from "./types";

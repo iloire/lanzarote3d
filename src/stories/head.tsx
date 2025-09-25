@@ -15,7 +15,7 @@ const toHexColor = (num: number): string => {
 
 const Head = {
   load: async (options: StoryOptions) => {
-    const { camera, scene, renderer, terrain, water, sky, gui, controls } =
+    const { camera, scene, renderer, terrain, water, sky, controls } =
       options;
 
     controls.enabled = true;

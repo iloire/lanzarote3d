@@ -1,8 +1,4 @@
 import * as THREE from "three";
-import { Tween, Easing, update } from "@tweenjs/tween.js";
-const TWEEN = { Tween, Easing, update };
-import React from "react";
-import { createRoot } from "react-dom/client";
 import { StoryOptions } from "../types";
 import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
