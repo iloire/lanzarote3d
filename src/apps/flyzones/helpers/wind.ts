@@ -41,8 +41,8 @@ export const createWindArrow = (
   group.scale.set(scale, scale, scale);
   
   // Add metadata
-  group.userData.windDirection = direction;
-  group.userData.windSpeed = speed;
+  group.userData['windDirection'] = direction;
+  group.userData['windSpeed'] = speed;
   
   return group;
 };

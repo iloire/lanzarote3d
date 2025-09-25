@@ -52,7 +52,7 @@ export const createRuler = (options: RulerOptions): Ruler => {
         const markerMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
         const marker = new THREE.Mesh(markerGeometry, markerMaterial);
         marker.position.copy(startPoint);
-        marker.userData.isRulerMarker = true;
+        marker.userData['isRulerMarker'] = true;
         scene.add(marker);
         
       } else if (!endPoint) {
@@ -64,14 +64,14 @@ export const createRuler = (options: RulerOptions): Ruler => {
         const markerMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
         const marker = new THREE.Mesh(markerGeometry, markerMaterial);
         marker.position.copy(endPoint);
-        marker.userData.isRulerMarker = true;
+        marker.userData['isRulerMarker'] = true;
         scene.add(marker);
         
         // Create line between points
         const lineGeometry = new THREE.BufferGeometry().setFromPoints([startPoint, endPoint]);
         const lineMaterial = new THREE.LineBasicMaterial({ color: 0xff0000, linewidth: 2 });
         rulerLine = new THREE.Line(lineGeometry, lineMaterial);
-        rulerLine.userData.isRulerLine = true;
+        rulerLine.userData['isRulerLine'] = true;
         scene.add(rulerLine);
         
         // Calculate distance
@@ -85,7 +85,7 @@ export const createRuler = (options: RulerOptions): Ruler => {
         distanceLabel = new CSS2DObject(labelDiv);
         distanceLabel.position.copy(endPoint);
         distanceLabel.position.y += 100; // Offset above the end point
-        distanceLabel.userData.isRulerLabel = true;
+        distanceLabel.userData['isRulerLabel'] = true;
         scene.add(distanceLabel);
         
         // Log the measurement
@@ -132,9 +132,9 @@ export const createRuler = (options: RulerOptions): Ruler => {
     // Remove ruler objects from scene
     scene.children.forEach(child => {
       if (
-        child.userData.isRulerMarker || 
-        child.userData.isRulerLine || 
-        child.userData.isRulerLabel
+        child.userData['isRulerMarker'] ||
+        child.userData['isRulerLine'] ||
+        child.userData['isRulerLabel']
       ) {
         scene.remove(child);
       }
