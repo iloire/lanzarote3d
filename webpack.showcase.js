@@ -3,7 +3,11 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
   entry: {
-    animation: "./src/apps/animation/index.tsx"
+    animation: "./src/apps/animation/index.tsx",
+    photobooth: "./src/apps/photobooth/index.tsx",
+    workshop: "./src/apps/workshop/index.tsx",
+    clouds: "./src/apps/clouds/index.tsx",
+    night: "./src/apps/night/index.tsx"
   },
   output: {
     path: path.join(__dirname, "/dist"),
@@ -81,6 +85,26 @@ module.exports = {
       template: path.join(__dirname, "./src/apps/animation/index.html"),
       chunks: ['animation'],
       filename: 'index.html'
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(__dirname, "./src/apps/animation/index.html"),
+      chunks: ['photobooth'],
+      filename: 'photobooth.html'
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(__dirname, "./src/apps/animation/index.html"),
+      chunks: ['workshop'],
+      filename: 'workshop.html'
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(__dirname, "./src/apps/animation/index.html"),
+      chunks: ['clouds'],
+      filename: 'clouds.html'
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(__dirname, "./src/apps/animation/index.html"),
+      chunks: ['night'],
+      filename: 'night.html'
     }),
   ],
 }; 

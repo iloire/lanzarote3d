@@ -56,7 +56,7 @@
     "tag-flyzones": "git tag FLYZONES-$(date '+%F_%H%M')",
     "delete-animation": "aws s3 rm s3://lanzaroteparagliding-placeholder --recursive --profile lanzaroteparagliding",
     "upload-animation": "aws s3 cp dist s3://lanzaroteparagliding-placeholder --recursive --profile lanzaroteparagliding",
-    "build-animation": "yarn clean && webpack --config webpack.animation.js --mode production",
+    "build-animation": "yarn clean && webpack --config webpack.showcase.js --mode production",
     "deploy-animation": "yarn build-animation && yarn tag-animation && yarn delete-animation && yarn upload-animation && yarn invalidate-prod-cache",
     "tag-animation": "git tag PLACEHOLDER-$(date '+%F_%H%M')",
     "invalidate-prod-cache": "aws cloudfront create-invalidation --distribution-id E8276RQ1W5RSC --paths '/*' --profile lanzaroteparagliding"

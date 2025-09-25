@@ -15,7 +15,19 @@ class Menu extends React.Component<MenuProps> {
   };
 
   navigateTo(story: string) {
-    window.location.href = "?story=" + story;
+    // In development, use query parameters
+    // In production, use separate HTML files
+    const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+    if (isDevelopment) {
+      window.location.href = "?story=" + story;
+    } else {
+      if (story === "animation") {
+        window.location.href = "index.html";
+      } else {
+        window.location.href = story + ".html";
+      }
+    }
   }
 
   render() {
