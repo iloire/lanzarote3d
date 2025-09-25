@@ -9,7 +9,10 @@
       "Bash(npm test)",
       "Bash(npm install:*)",
       "Bash(npm test:*)",
-      "Bash(xargs sed:*)"
+      "Bash(xargs sed:*)",
+      "Bash(npm start:*)",
+      "Bash(npx webpack serve:*)",
+      "Bash(npx tsc:*)"
     ],
     "deny": [],
     "ask": []
