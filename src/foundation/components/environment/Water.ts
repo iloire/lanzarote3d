@@ -27,7 +27,9 @@ export default class Water {
       return meshWater;
     } else {
       function animate() {
-        water.material.uniforms["time"].value += 1.0 / 60.0;
+        if (water.material.uniforms["time"]?.value !== undefined) {
+          water.material.uniforms["time"].value += 1.0 / 60.0;
+        }
         requestAnimationFrame(animate);
       }
       const water = new WaterEffect(waterGeometry, {
@@ -45,9 +47,9 @@ export default class Water {
         distortionScale: 4,
       });
       water.rotation.x = -Math.PI / 2;
-      water.material.uniforms["sunDirection"].value
-        .copy(sunPosition)
-        .normalize();
+      water.material.uniforms["sunDirection"]?.value
+        ?.copy(sunPosition)
+        ?.normalize();
       water.receiveShadow = true;
       animate();
       return water;

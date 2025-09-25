@@ -181,7 +181,7 @@ const PhotoBooth = {
     controls.enabled = true;
 
     const initialPos = new THREE.Vector3(6800, 870, -475);
-    const lookAtPos = paraglidersVoxel[0].position;
+    const lookAtPos = paraglidersVoxel[0]?.position || new THREE.Vector3();
 
     console.log('PhotoBooth: Setting camera position to', initialPos, 'looking at', lookAtPos);
 

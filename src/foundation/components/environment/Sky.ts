@@ -94,7 +94,7 @@ export default class Sky extends THREE.Object3D {
     };
 
     this.sky = new SkyExample();
-    this.sky.material.uniforms["sunPosition"].value.copy(this.sunPosition);
+    this.sky.material.uniforms["sunPosition"]?.value?.copy(this.sunPosition);
     this.sky.scale.setScalar(10000000);
 
     const skyUniforms = this.sky.material.uniforms;
@@ -148,7 +148,7 @@ export default class Sky extends THREE.Object3D {
     GuiHelper.addPositionGui(
       gui,
       "sun",
-      this.sky.material.uniforms["sunPosition"].value
+      this.sky.material.uniforms["sunPosition"]?.value
     );
   }
 
@@ -186,7 +186,7 @@ export default class Sky extends THREE.Object3D {
 
   updateSunPosition(timeOfDayInHours: number) {
     this.sunPosition = calculateSunPosition(timeOfDayInHours);
-    this.sky.material.uniforms["sunPosition"].value.copy(this.sunPosition);
+    this.sky.material.uniforms["sunPosition"]?.value?.copy(this.sunPosition);
     this.pointLight.position.copy(
       this.sunPosition.clone().multiplyScalar(10000)
     );

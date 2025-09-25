@@ -11,7 +11,7 @@ const getTerrainHeight = (x: number, z: number, terrain: THREE.Mesh) => {
     new THREE.Vector3(0, -1, 0) // vertical
   );
   const intersects = rayVertical.intersectObject(terrain);
-  if (intersects.length > 0) {
+  if (intersects.length > 0 && intersects[0]) {
     return intersects[0].point.y;
   } else {
     return NaN;

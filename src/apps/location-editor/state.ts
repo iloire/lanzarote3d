@@ -229,8 +229,9 @@ export const addFlyZonePhase = (
   
   scene.add(phase.object);
   state.flyZones.push(phase.object);
-  if (state.locations[state.currentLocationIndex]?.flyzone) {
-    state.locations[state.currentLocationIndex].flyzone.phases[phaseId] = phase;
+  const currentLocation = state.locations[state.currentLocationIndex];
+  if (currentLocation?.flyzone) {
+    currentLocation.flyzone.phases[phaseId] = phase;
   }
   state.selectedItem = phase;
   
@@ -735,8 +736,9 @@ export const undoLastAction = (state: EditorState, scene: THREE.Scene): void => 
     case 'add_flyzone':
       if (state.currentLocationIndex !== null && lastAction.data) {
         const { phaseId } = lastAction.data;
-        if (phaseId && state.locations[state.currentLocationIndex].flyzone.phases[phaseId]) {
-          delete state.locations[state.currentLocationIndex].flyzone.phases[phaseId];
+        const currentLocation = state.locations[state.currentLocationIndex];
+        if (phaseId && currentLocation?.flyzone?.phases[phaseId]) {
+          delete currentLocation.flyzone.phases[phaseId];
         }
         state.flyZones = state.flyZones.filter(f => f !== lastAction.object);
       }

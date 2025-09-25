@@ -48,15 +48,15 @@ class Tree {
     const subStems = [];
     for (var i = 0; i < 8; i++) {
       subStems[i] = mainStem.clone();
-      subStems[i].scale.set(0.0055, 0.0055, 0.01);
-      subStems[i].castShadow = true;
+      subStems[i]?.scale.set(0.0055, 0.0055, 0.01);
+      if (subStems[i]) subStems[i].castShadow = true;
       leaf.add(subStems[i]);
     }
-    subStems[0].rotation.x = -pi / 4;
-    subStems[0].scale.z = 0.04;
-    subStems[0].position.set(0, 0.8, 0.2);
+    if (subStems[0]) subStems[0].rotation.x = -pi / 4;
+    if (subStems[0]) subStems[0].scale.z = 0.04;
+    if (subStems[0]) subStems[0].position.set(0, 0.8, 0.2);
 
-    subStems[2].rotation.x = -pi / 6;
+    if (subStems[2]) subStems[2].rotation.x = -pi / 6;
     subStems[2].scale.z = 0.05;
     subStems[2].position.set(0, 0.5, 0.25);
 
