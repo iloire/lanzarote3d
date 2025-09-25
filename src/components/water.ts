@@ -19,9 +19,9 @@ export default class Water {
   load(sunPosition: THREE.Vector3) {
     const waterGeometry = new THREE.PlaneGeometry(this.options.size, this.options.size);
     if (USE_PLAIN_WATER) {
-      const mat = new THREE.MeshLambertMaterial({ color: 0x333 });
+      const mat = new THREE.MeshLambertMaterial({ color: 0x001122 });
       mat.transparent = true;
-      mat.opacity = 0.2;
+      mat.opacity = 0.3;
       const meshWater = new THREE.Mesh(waterGeometry, mat);
       meshWater.rotation.x = -Math.PI / 2;
       return meshWater;
