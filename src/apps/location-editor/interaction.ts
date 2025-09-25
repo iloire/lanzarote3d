@@ -70,7 +70,7 @@ export const setupInteraction = (
     });
     
     // Find the first terrain intersection
-    const terrainIntersect = intersects.find(i => i.object.userData.type === 'terrain');
+    const terrainIntersect = intersects.find(i => i.object.userData['type'] === 'terrain');
     
     if (terrainIntersect) {
       console.log("Terrain intersection found at:", terrainIntersect.point);
@@ -159,10 +159,10 @@ export const setupInteraction = (
       
       // Check if we clicked on an existing marker
       const markerIntersect = intersects.find(i => 
-        i.object.userData.type === 'location' || 
-        i.object.userData.type === 'takeoff' || 
-        i.object.userData.type === 'landing' ||
-        i.object.userData.type === 'flyzone'
+        i.object.userData['type'] === 'location' || 
+        i.object.userData['type'] === 'takeoff' || 
+        i.object.userData['type'] === 'landing' ||
+        i.object.userData['type'] === 'flyzone'
       );
       
       if (markerIntersect) {

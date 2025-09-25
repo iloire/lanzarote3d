@@ -145,7 +145,7 @@ export const addTakeoff = (state: EditorState, position: THREE.Vector3, scene: T
   
   const takeoff: EditorTakeoff = {
     id: `takeoff-${Date.now()}`,
-    title: `Takeoff ${state.locations[state.currentLocationIndex].takeoffs.length + 1}`,
+    title: `Takeoff ${state.locations[state.currentLocationIndex]?.takeoffs.length + 1 || 1}`,
     description: "Description of the takeoff",
     position: position.clone(),
     gps: gps,
@@ -155,7 +155,7 @@ export const addTakeoff = (state: EditorState, position: THREE.Vector3, scene: T
   
   scene.add(takeoff.marker);
   state.markers.push(takeoff.marker);
-  state.locations[state.currentLocationIndex].takeoffs.push(takeoff);
+  state.locations[state.currentLocationIndex]?.takeoffs.push(takeoff);
   state.selectedItem = takeoff;
   
   // Add to history
@@ -177,7 +177,7 @@ export const addLandingSpot = (state: EditorState, position: THREE.Vector3, scen
   
   const landingSpot: EditorLandingSpot = {
     id: `landing-${Date.now()}`,
-    title: `Landing ${state.locations[state.currentLocationIndex].landingSpots.length + 1}`,
+    title: `Landing ${state.locations[state.currentLocationIndex]?.landingSpots.length + 1 || 1}`,
     description: "Description of the landing spot",
     position: position.clone(),
     gps: gps,

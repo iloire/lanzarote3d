@@ -102,10 +102,10 @@ const LocationEditor = {
 
     // Make sure terrain is clickable
     if (terrain) {
-      terrain.traverse((child) => {
+      terrain.traverse((child: any) => {
         if (child instanceof THREE.Mesh) {
-          child.userData.type = 'terrain';
-          child.userData.clickable = true;
+          child.userData['type'] = 'terrain';
+          child.userData['clickable'] = true;
         }
       });
     }

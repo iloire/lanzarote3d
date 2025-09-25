@@ -79,7 +79,7 @@ export enum View {
 }
 
 class UIControls extends React.Component<UIControlsProps, UIControlsState> {
-  constructor(props) {
+  constructor(props: UIControlsProps) {
     super(props);
     this.state = {
       showStartButton: true,
@@ -112,12 +112,12 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     document.addEventListener("keyup", this.onDocumentKeyUp, false);
 
     const vario = props.vario;
-    vario.addEventListener("altitude", (event) => {
+    vario.addEventListener("altitude", (event: any) => {
       this.setState({ altitude: Math.round(event.altitude) });
     });
 
     const pg = props.pg;
-    pg.addEventListener("position", (_event) => {
+    pg.addEventListener("position", (_event: any) => {
       const pos = pg.position();
       this.setState({
         groundSpeed: Math.round(pg.getGroundSpeed() * KMH_TO_MS * 100) / 100,
@@ -131,25 +131,25 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         metersFlown: Math.round(pg.getMetersFlown() * 100) / 100,
       });
     });
-    pg.addEventListener("heightAboveGround", (event) => {
+    pg.addEventListener("heightAboveGround", (event: any) => {
       this.setState({ heightAboveGround: Math.round(event.height) });
     });
-    pg.addEventListener("thermalLift", (event) => {
+    pg.addEventListener("thermalLift", (event: any) => {
       this.setState({ thermalLift: Math.round(event.lift * 100) / 100 });
     });
-    pg.addEventListener("dynamicLift", (event) => {
+    pg.addEventListener("dynamicLift", (event: any) => {
       this.setState({ dynamicLift: Math.round(event.lift * 100) / 100 });
     });
-    pg.addEventListener("drop", (event) => {
+    pg.addEventListener("drop", (event: any) => {
       this.setState({ drop: (-1 * Math.round(event.drop * 100)) / 100 });
     });
-    pg.addEventListener("delta", (event) => {
+    pg.addEventListener("delta", (event: any) => {
       this.setState({ delta: Math.round(event.delta * 100) / 100 });
     });
-    pg.addEventListener("gradient", (event) => {
+    pg.addEventListener("gradient", (event: any) => {
       this.setState({ gradient: Math.round(event.gradient * 100) / 100 });
     });
-    pg.addEventListener("touchedGround", (event) => {
+    pg.addEventListener("touchedGround", (event: any) => {
       this.setState({ groundTouches: event.groundTouches });
     });
 

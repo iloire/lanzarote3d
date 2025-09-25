@@ -2,7 +2,7 @@ import * as THREE from "three";
 import textureImg from "../../../../assets/foundation/textures/environment/h-map-lanzarote.png";
 import { StoryOptions } from "../../shared/types";
 
-const terrainGenerator1 = (groundGeo, displacement) => {
+const terrainGenerator1 = (groundGeo: any, displacement: any) => {
   const groundMaterial = new THREE.MeshPhongMaterial({
     wireframe: true,
     color: "red",
@@ -17,7 +17,7 @@ const terrainGenerator1 = (groundGeo, displacement) => {
   return mesh;
 };
 
-const terrainGenerator2 = (groundGeo, displacement) => {
+const terrainGenerator2 = (groundGeo: any, displacement: any) => {
   const groundMaterial2 = new THREE.MeshPhongMaterial({
     color: "yellow",
     reflectivity: 0.4,

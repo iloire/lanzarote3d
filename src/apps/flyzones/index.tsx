@@ -342,8 +342,8 @@ const FlyZones = {
     });
     
     // Set initial position
-    const initialPosition = locations.length > 0 
-      ? locations[0].position.clone() 
+    const initialPosition = locations.length > 0 && locations[0]?.position
+      ? locations[0].position.clone()
       : new THREE.Vector3(14000, 8000, 14000);
     
     navigateTo(initialPosition, camera, controls, locations.length > 0 ? locations[0] : undefined);
