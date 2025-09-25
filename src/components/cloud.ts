@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { rndBetween, rndIntBetween } from "../utils/math";
-import { Tween } from "@tweenjs/tween.js";
-const TWEEN = { Tween };
+import { Tween, Easing, update } from "@tweenjs/tween.js";
+const TWEEN = { Tween, Easing, update };
 
 
 

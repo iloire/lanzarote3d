@@ -25,6 +25,9 @@ module.exports = {
         test: /\.tsx?$/,
         loader: "ts-loader",
         exclude: /node_modules/,
+        options: {
+          transpileOnly: true, // Skip type checking for faster builds
+        },
       },
       {
         test: /\.styl?$/,

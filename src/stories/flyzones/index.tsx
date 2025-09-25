@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import { Tween } from "@tweenjs/tween.js";
-const TWEEN = { Tween };
+import { Tween, Easing, update } from "@tweenjs/tween.js";
+const TWEEN = { Tween, Easing, update };
 import React from "react";
 import { createRoot } from "react-dom/client";
 import locations from "./locations";

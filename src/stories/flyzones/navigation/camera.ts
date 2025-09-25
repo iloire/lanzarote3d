@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import { TWEEN } from '@tweenjs/tween.js';
+import { Tween, Easing, update } from '@tweenjs/tween.js';
+const TWEEN = { Tween, Easing, update };
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { Location } from '../locations';
 
