@@ -83,7 +83,7 @@ const createRenderer = (sizes: { width: number; height: number }) => {
 
 const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAppSelection = false, showPublic, showExperiments, showDev }) => {
   const [loadingProcess, setLoadingProcess] = useState(0);
-  const [showAppSelection, setShowAppSelection] = useState(initialShowAppSelection);
+  const [showAppSelection] = useState(initialShowAppSelection);
   const [renderer, setRenderer] = useState<THREE.WebGLRenderer | null>(null);
 
   const initThree = async () => {
@@ -196,7 +196,7 @@ const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAp
   );
 };
 
-const stats = Stats();
+const stats = new Stats();
 stats.showPanel(0);
 document.getElementById("stats")?.appendChild(stats.dom);
 

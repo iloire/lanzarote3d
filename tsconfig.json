@@ -21,7 +21,7 @@
     "alwaysStrict": true,
 
     // Additional Checks (gradually enabled)
-    "noUnusedLocals": false,
+    "noUnusedLocals": true,
     "noUnusedParameters": false,
     "noImplicitOverride": false,
     "noPropertyAccessFromIndexSignature": false,

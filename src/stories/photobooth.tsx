@@ -1,19 +1,10 @@
 import * as THREE from "three";
-import { Tween, Easing, update } from "@tweenjs/tween.js";
-const TWEEN = { Tween, Easing, update };
-import Paraglider, { ParagliderOptions } from "../components/paraglider";
-import ParagliderVoxel, {
-  ParagliderVoxelOptions,
-} from "../components/paraglider-voxel";
+import { update } from "@tweenjs/tween.js";
 import Tandem from "../components/tandem";
-import Camera from "../components/camera";
-import { PilotHeadType } from "../components/parts/pilot-head";
 import Environment from "./env/environment";
 import Weather, { WeatherOptions } from "../elements/weather";
 import adriModel from "../models/adri.obj";
 import adriTextureImage from "../models/adri.png";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import Sky from "../components/sky";
 import { StoryOptions } from "./types";
 
 const WEATHER_SETTINGS: WeatherOptions = {

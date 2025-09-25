@@ -1,6 +1,5 @@
 import * as THREE from "three";
-import { Tween, Easing, update } from "@tweenjs/tween.js";
-const TWEEN = { Tween, Easing, update };
+import { Tween } from "@tweenjs/tween.js";
 import Weather from "../../elements/weather";
 import Thermal from "../../components/thermal";
 import GuiHelper from "../../utils/gui";
@@ -281,7 +280,7 @@ class Flier extends THREE.EventDispatcher {
 
     const startPosition = this.position();
     const nextPosition = this.position().add(combinedMoveVector);
-    const tween = new Tween(startPosition)
+    new Tween(startPosition)
       .to(nextPosition, TICK_INTERVAL) // Set the duration of the animation to 1000 milliseconds (1 second)
       // .easing(Easing.Quadratic.InOut) // Set the easing function for the animation
       .onUpdate(() => {

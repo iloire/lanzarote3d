@@ -1,9 +1,6 @@
 import * as THREE from "three";
-import { Tween, Easing, update } from "@tweenjs/tween.js";
-const TWEEN = { Tween, Easing, update };
-import Paraglider, { ParagliderOptions } from "../components/paraglider";
+import { update } from "@tweenjs/tween.js";
 import ParagliderVoxel, { ParagliderVoxelOptions } from "../components/paraglider-voxel";
-import { PilotHeadType } from "../components/parts/pilot-head";
 import Environment from "./env/environment";
 import Weather, { WeatherOptions } from "../elements/weather";
 import adriModel from '../models/adri.obj';
@@ -39,10 +36,6 @@ const paraglidersVoxel: ParagliderVoxelConfig[] = [
   }];
 
 
-type ParagliderConfig = {
-  pg: ParagliderOptions,
-  position: any
-}
 
 const Animation3 = {
   load: async (options: StoryOptions) => {

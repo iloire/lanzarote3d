@@ -1,8 +1,6 @@
 import * as THREE from 'three';
-import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { MarkerType } from '../helpers/types';
-import { Tween, Easing, update } from '@tweenjs/tween.js';
-const TWEEN = { Tween, Easing, update };
+import { Tween } from '@tweenjs/tween.js';
 
 // Define the MarkerObject class that properly extends THREE.Object3D
 export class MarkerObject extends THREE.Object3D {

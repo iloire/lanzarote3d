@@ -1,7 +1,5 @@
 import * as THREE from "three";
 
-const FORWARD_DIRECTION = new THREE.Vector3(1, 0, 0);
-
 class AutoFlier {
   currentPointIndex: number = 0;
   path: THREE.Vector3[];
