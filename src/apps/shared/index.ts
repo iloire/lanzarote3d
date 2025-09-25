@@ -24,32 +24,42 @@ import Workshop from "../tools/workshop/index";
 
 export type StoryFunction = (options: StoryOptions) => Promise<any>;
 
-const Stories: Record<string, any> = {
-  // Core Independent Applications
+// Story mappings organized by app registry structure
+const storyModules = {
+  // Experiences
   animation: Animation,
   game: Game,
   flyzones: FlyZones,
   photobooth: PhotoBooth,
-  'location-editor': LocationEditor,
-  locationEditor: LocationEditor, // camelCase alias
 
-  // Workshop Demos
+  // Tools
+  'location-editor': LocationEditor,
+  workshop: Workshop,
+
+  // Demos
   clouds: Clouds,
   'flier-pg': FlierPg,
-  flierPg: FlierPg, // camelCase alias
-  flier: FlierPg, // short alias
   glider: Glider,
   hangglider: HangGlider,
   head: Head,
   helmet: Helmet,
   night: Night,
   'paraglider-voxel': ParagliderVoxelDemo,
-  paragliderVoxel: ParagliderVoxelDemo, // camelCase alias
   paraglider: ParagliderDemo,
   pilot: Pilot,
   terrain: Terrain,
-  voxel: Voxel,
-  workshop: Workshop
+  voxel: Voxel
+};
+
+// Generate Stories with aliases for backward compatibility
+const Stories: Record<string, any> = {
+  ...storyModules,
+
+  // Backward compatibility aliases
+  locationEditor: LocationEditor,
+  flierPg: FlierPg,
+  flier: FlierPg,
+  paragliderVoxel: ParagliderVoxelDemo
 };
 
 export default Stories;

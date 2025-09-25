@@ -1,4 +1,5 @@
 import React from "react";
+import { getAppsByStatus, type AppMetadata } from "./apps/config/app-registry";
 
 interface MenuProps {
   showPublic?: boolean;
@@ -14,90 +15,71 @@ class Menu extends React.Component<MenuProps> {
     showAppSelection: false,
   };
 
-  navigateTo(story: string) {
+  navigateTo(route: string) {
     // In development, use query parameters
     // In production, use separate HTML files
     const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
+    // Remove leading slash if present
+    const cleanRoute = route.replace(/^\//, '');
+
     if (isDevelopment) {
-      window.location.href = "?story=" + story;
+      window.location.href = "?story=" + cleanRoute;
     } else {
-      if (story === "animation") {
+      if (cleanRoute === "animation") {
         window.location.href = "index.html";
       } else {
-        window.location.href = story + ".html";
+        window.location.href = cleanRoute + ".html";
       }
     }
   }
 
   override render() {
-    // Public/finished features
-    const publicStories = [
-      { story: "animation", name: "main", description: "famara voxel animation" },
-      { story: "photobooth", name: "photo booth" },
-      { story: "workshop", name: "workshop", description: "workshop" },
-      { story: "clouds", name: "clouds", description: "clouds" },
-      { story: "night", name: "night", description: "night mode" },
-      { story: "paragliderVoxel", name: "Paraglider Voxel" },
-    ];
-
-    // Dev/testing features
-    const experimentStories = [
-      { story: "game", name: "game (WIP)", description: "The game, work in progress!" },
-    ];
-
-    // Dev-only features
-    const devOnlyStories = [
-      { story: "flier", name: "Flier" },
-      { story: "locationEditor", name: "Location Editor" },
-      { story: "flyzones", name: "Fly Zones" },
-      { story: "voxel", name: "Voxel Example", description: "Voxel example" },
-      { story: "head", name: "Head" },
-      { story: "helmet", name: "Helmet" },
-      { story: "paraglider", name: "Paraglider", description: "Paraglider" },
-      { story: "hangglider", name: "Hangglider", description: "Hangglider" },
-      { story: "terrain", name: "Terrain", description: "Terrain" },
-      { story: "glider", name: "Glider" },
-      { story: "pilot", name: "Pilot" }
-    ];
+    // Get apps from registry by status
+    const publicApps = getAppsByStatus('public');
+    const experimentalApps = getAppsByStatus('experimental');
+    const devApps = getAppsByStatus('dev');
 
     // Get selected story from URL
     const params = new URLSearchParams(window.location.search);
     const selectedStory = params.get("story");
 
-    const renderButtons = (stories: any[]) =>
-      stories.map((story: any) => (
-        <div className="button" key={story.story}>
-          <button
-            className={selectedStory === story.story ? "selected" : ""}
-            onClick={() => this.navigateTo(story.story)}
-          >
-            {story.name || story.story}
-          </button>
-          <span>{story.description || ''}</span>
-        </div>
-      ));
+    const renderButtons = (apps: AppMetadata[]) =>
+      apps.map((app) => {
+        const routeKey = app.route.replace('/', '');
+        return (
+          <div className="button" key={routeKey}>
+            <button
+              className={selectedStory === routeKey ? "selected" : ""}
+              onClick={() => this.navigateTo(app.route)}
+            >
+              {app.name}
+            </button>
+            <span>{app.description}</span>
+          </div>
+        );
+      });
 
     const { showPublic = true, showExperiments: showExperiments = true, showDev: showDev = true } = this.props;
 
     return (
       <div className="appOptions">
-        {showPublic && (
+        {showPublic && publicApps.length > 0 && (
           <>
             <h2>Lanzarote 3D</h2>
-            {renderButtons(publicStories)}
+            {renderButtons(publicApps)}
           </>
         )}
-        {showExperiments && (
+        {showExperiments && experimentalApps.length > 0 && (
           <>
             <h2>Experiments</h2>
-            {renderButtons(experimentStories)}
+            {renderButtons(experimentalApps)}
           </>
         )}
-        {showDev && (
+        {showDev && devApps.length > 0 && (
           <>
-            <h2>Dev Only</h2>
-            {renderButtons(devOnlyStories)}
+            <h2>Development</h2>
+            {renderButtons(devApps)}
           </>
         )}
       </div>
