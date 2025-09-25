@@ -1,7 +1,8 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import * as THREE from "three";
-import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
+import { Tween } from "@tweenjs/tween.js";
+const TWEEN = { Tween };
 import BackgroundSound from "../../audio/background";
 import Flier, { FlierConstructor } from "../../components/base/flier";
 import Paraglider from "../../components/paraglider";

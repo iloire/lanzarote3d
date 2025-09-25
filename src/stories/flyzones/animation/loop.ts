@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { TWEEN } from 'three/examples/jsm/libs/tween.module.min.js';
+import { TWEEN } from '@tweenjs/tween.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { Marker } from '../helpers/index';

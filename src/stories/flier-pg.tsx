@@ -1,5 +1,6 @@
 import * as THREE from "three";
-import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
+import { Tween } from "@tweenjs/tween.js";
+const TWEEN = { Tween };
 import Paraglider from "../components/paraglider";
 import Flier, { FlierConstructor } from "../components/base/flier";
 import Helpers from "../utils/helpers";

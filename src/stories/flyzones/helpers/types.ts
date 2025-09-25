@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { TWEEN } from 'three/examples/jsm/libs/tween.module.min.js';
+import { TWEEN } from '@tweenjs/tween.js';
 import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer';
 import { MarkerObject } from '../markers/markers';
 

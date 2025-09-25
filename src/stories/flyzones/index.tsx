@@ -1,5 +1,6 @@
 import * as THREE from "three";
-import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
+import { Tween } from "@tweenjs/tween.js";
+const TWEEN = { Tween };
 import React from "react";
 import { createRoot } from "react-dom/client";
 import locations from "./locations";

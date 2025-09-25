@@ -1,5 +1,6 @@
 import * as THREE from "three";
-import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
+import { Tween } from "@tweenjs/tween.js";
+const TWEEN = { Tween };
 import Weather from "../../elements/weather";
 import Thermal from "../../components/thermal";
 import GuiHelper from "../../utils/gui";
