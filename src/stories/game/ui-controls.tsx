@@ -117,7 +117,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     });
 
     const pg = props.pg;
-    pg.addEventListener("position", (event) => {
+    pg.addEventListener("position", (_event) => {
       const pos = pg.position();
       this.setState({
         groundSpeed: Math.round(pg.getGroundSpeed() * KMH_TO_MS * 100) / 100,

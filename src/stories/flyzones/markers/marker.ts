@@ -63,8 +63,8 @@ export const createMarker = async (
   type: MarkerType,
   scene: THREE.Scene,
   popupContainer: HTMLDivElement,
-  navigateTo: (position: THREE.Vector3, location?: Location) => void,
-  location: Location | undefined,
+  _navigateTo: (position: THREE.Vector3, location?: Location) => void,
+  _location: Location | undefined,
   camera: THREE.Camera,
   conditions?: any[]
 ): Promise<MarkerObject> => {

@@ -3,7 +3,7 @@ import * as THREE from "three";
 export const getTerrainHeightBelowPosition = (
   pos: THREE.Vector3,
   terrain: THREE.Mesh,
-  water: THREE.Mesh
+  _water: THREE.Mesh
 ): number => {
   const rayVertical = new THREE.Raycaster(
     new THREE.Vector3(pos.x, 100000, pos.z), // big enough value for Y

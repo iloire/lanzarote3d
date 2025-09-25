@@ -60,9 +60,9 @@ const createCentripetalArrow = (
 export const addDebugArrowsToParaglider = (pg: Paraglider) => {
   const arrowLen = 50;
   const mesh = pg.mesh;
-  mesh.add(createCentripetalArrow(mesh, arrowLen, 0x0000ff));
+  mesh.add(createCentripetalArrow(arrowLen, 0x0000ff));
   mesh.add(createDirectionArrow(pg.direction(), arrowLen, 0x0000ff));
   mesh.add(createTrajectoryArrow(pg.glidingRatio(), arrowLen, 0xff00ff));
   mesh.add(createLiftArrow(pg.glidingRatio(), arrowLen, 0xffffff));
-  mesh.add(createGravityArrow(pg.mesh, arrowLen));
+  mesh.add(createGravityArrow(arrowLen));
 };

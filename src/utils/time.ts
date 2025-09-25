@@ -18,7 +18,7 @@ const Time = {
     return degrees;
   },
 
-  getSunAzimuthDegreesAccordingToTimeOfDay: (timeOfDayInHours) => {
+  getSunAzimuthDegreesAccordingToTimeOfDay: (_timeOfDayInHours) => {
     return 90;
   },
 };

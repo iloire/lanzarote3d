@@ -125,7 +125,7 @@ class TandemPilot {
     group.add(carabinerRight);
 
     group.add(getPilotArms(options, armRotation));
-    group.add(getPilotLegs(options, 0));
+    group.add(getPilotLegs(options));
 
     return group;
   }
