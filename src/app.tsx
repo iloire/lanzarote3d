@@ -66,15 +66,12 @@ const createRenderer = (sizes: { width: number; height: number }) => {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(sizes.width, sizes.height);
 
-  // Configure renderer for visual consistency with Three.js 0.149
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.25; // Increase exposure to reduce grayness
+  // Configure renderer to match original darker appearance
+  renderer.toneMapping = THREE.NoToneMapping; // Try no tone mapping for darker look
+  renderer.toneMappingExposure = 1.0;
 
-  // Use sRGB color space (replaces outputEncoding from older versions)
+  // Keep the old Three.js color behavior for consistency
   renderer.outputColorSpace = THREE.SRGBColorSpace;
-
-  // Disable color management for more vibrant colors (like older Three.js)
-  // This maintains the lighting behavior from Three.js < 0.155
   THREE.ColorManagement.enabled = false;
 
   // Shadow settings for consistency
