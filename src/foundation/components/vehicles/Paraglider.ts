@@ -10,11 +10,11 @@ export type ParagliderOptions = {
 }
 
 class Paraglider implements IFlyable {
-  mesh: THREE.Object3D;
-  glider: Glider;
-  pilot: Pilot;
-  pilotMesh: THREE.Object3D;
-  axesHelper: THREE.AxesHelper;
+  mesh!: THREE.Object3D;
+  glider!: Glider;
+  pilot!: Pilot;
+  pilotMesh!: THREE.Object3D;
+  axesHelper!: THREE.AxesHelper;
   options: ParagliderOptions;
 
   constructor(options: ParagliderOptions) {

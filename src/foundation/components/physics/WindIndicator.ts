@@ -30,7 +30,7 @@ class WindIndicator {
   constructor(length: number) {
     this.length = length;
   }
-  arrow: THREE.ArrowHelper;
+  arrow!: THREE.ArrowHelper;
   load(directionDegrees: number, origin: THREE.Vector3): THREE.ArrowHelper {
     this.arrow = createWindArrow(
       directionDegrees,

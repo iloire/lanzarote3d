@@ -77,7 +77,7 @@ export default class Sky extends THREE.Object3D {
   ambientLight: THREE.AmbientLight;
   pointLight: THREE.PointLight;
   directionalLight: THREE.DirectionalLight;
-  directionalLightHelper: THREE.DirectionalLightHelper;
+  directionalLightHelper!: THREE.DirectionalLightHelper;
   skyOptions: SkyOptions;
 
   constructor(

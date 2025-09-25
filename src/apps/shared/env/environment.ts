@@ -15,8 +15,8 @@ import { generateThermalPair, ThermalGenerationOptions } from "./thermal-utils";
 import { CloudOptions } from "../../../foundation/components/environment";
 
 class Environment {
-  birds: Birds;
-  hg: HangGlider;
+  birds!: Birds;
+  hg!: HangGlider;
   thermals: Thermal[] = [];
   scene: THREE.Scene;
 

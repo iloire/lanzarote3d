@@ -165,9 +165,9 @@ const createBand = (options: BandOptions) => {
 
 
 class Glider {
-  leftWing: HalfWing;
-  rightWing: HalfWing;
-  fullWing: THREE.Mesh;
+  leftWing!: HalfWing;
+  rightWing!: HalfWing;
+  fullWing!: THREE.Mesh;
 
   options: GliderOptions
 

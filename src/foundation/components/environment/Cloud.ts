@@ -88,7 +88,7 @@ class Cloud {
     this.options = options;
   }
 
-  interval: number | null;
+  interval: number | null = null;
 
   async load(): Promise<THREE.Object3D> {
     const mesh = await generateCloud(this.options);

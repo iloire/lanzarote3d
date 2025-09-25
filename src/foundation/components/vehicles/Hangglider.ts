@@ -19,8 +19,8 @@ const DEFAULT_OPTIONS = {
 };
 
 class HangGliderModel extends AutoFlier {
-  wing: Wing;
-  pilot: Pilot;
+  wing!: Wing;
+  pilot!: Pilot;
 
   async load(path: THREE.Vector3[], gui?: any): Promise<THREE.Mesh> {
     this.path = path;
