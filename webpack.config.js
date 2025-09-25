@@ -5,8 +5,8 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 module.exports = {
   entry: {
     main: "./src/showcase-entry.tsx",
-    game: "./src/apps/game/index.tsx",
-    flyzones: "./src/apps/flyzones/index.tsx"
+    game: "./src/apps/experiences/game/index.tsx",
+    flyzones: "./src/apps/experiences/flyzones/index.tsx"
   },
   output: {
     path: path.join(__dirname, "/dist"),
@@ -90,12 +90,12 @@ module.exports = {
       title: 'Lanzarote 3D'
     }),
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, "./src/apps/game/index.html"),
+      template: path.join(__dirname, "./src/apps/experiences/game/index.html"),
       chunks: ['game'],
       filename: 'game.html'
     }),
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, "./src/apps/flyzones/index.html"),
+      template: path.join(__dirname, "./src/apps/experiences/flyzones/index.html"),
       chunks: ['flyzones'],
       filename: 'flyzones.html'
     }),

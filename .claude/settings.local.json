@@ -33,7 +33,8 @@
       "Bash(curl:*)",
       "Bash(rmdir:*)",
       "Bash(cut:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Read(//Users/**)"
     ],
     "deny": [],
     "ask": []
