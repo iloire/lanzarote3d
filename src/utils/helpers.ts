@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { logger } from "./logger";
 
 const Helpers = {
   drawSphericalPosition: (
@@ -23,7 +24,7 @@ const Helpers = {
 
     const cube = new THREE.Mesh(geometry, material);
     cube.position.copy(position);
-    console.log(cube);
+    logger.debug('Added debug cube at position:', position);
     scene.add(cube);
   },
 

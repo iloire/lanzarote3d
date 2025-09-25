@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import * as THREE from "three";
 import WebGL from "./WebGL";
 import App from "./app";
+import { logger } from "./utils/logger";
 
 import "./index.css";
 
@@ -16,8 +17,9 @@ const rootElement = document.getElementById("root");
 if (WebGL.isWebGLAvailable()) {
   const root = createRoot(rootElement);
   root.render(<App showAppSelection={true} showPublic={true} showDev={false} showExperiments={false} initialStory={bundleName} />);
-  console.log(`${bundleName} started`);
+  logger.info(`${bundleName} story started`);
 } else {
   const warning = WebGL.getWebGLErrorMessage();
-  rootElement.appendChild(warning);
+  rootElement?.appendChild(warning);
+  logger.error('WebGL not available, falling back to error message');
 }
