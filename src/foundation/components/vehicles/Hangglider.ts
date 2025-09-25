@@ -1,9 +1,9 @@
 import * as THREE from "three";
 import { Pilot } from "./";
-import Wing from "../../../components/parts/wing";
+import Wing from "./Wing";
 import GuiHelper from "../../utils/gui";
 import AutoFlier from "../../types/auto-flier";
-import { PilotHeadType } from "../../../components/parts/pilot-head";
+import { PilotHeadType } from "../characters/PilotHead";
 
 
 const DEFAULT_OPTIONS = {

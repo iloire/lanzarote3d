@@ -1,23 +1,23 @@
 import * as THREE from "three";
-import Pilot, { PilotOptions } from "./Pilot";
+import PilotVoxel, { PilotVoxelOptions } from "../characters/PilotVoxel";
 import Glider, { GliderOptions } from "./Glider";
 import GuiHelper from "../../utils/gui";
-import IFlyable from "../../types/IFlyable";
+import IFlyable from './base/IFlyable';
 
-export type ParagliderOptions = {
+export type ParagliderVoxelOptions = {
   glider: GliderOptions;
-  pilot: PilotOptions;
+  pilot: PilotVoxelOptions;
 }
 
-class Paraglider implements IFlyable {
+class ParagliderVoxel implements IFlyable {
   mesh: THREE.Object3D;
   glider: Glider;
-  pilot: Pilot;
+  pilot: PilotVoxel;
   pilotMesh: THREE.Object3D;
   axesHelper: THREE.AxesHelper;
-  options: ParagliderOptions;
+  options: ParagliderVoxelOptions;
 
-  constructor(options: ParagliderOptions) {
+  constructor(options: ParagliderVoxelOptions) {
     this.options = options;
   }
 
@@ -31,30 +31,24 @@ class Paraglider implements IFlyable {
 
   left() {
     this.glider.breakLeft();
-    this.pilot.breakLeft();
     console.log('paraglider model left');
   }
 
   leftRelease() {
-    this.pilot.breakLeftRelease();
   }
 
   right() {
     this.glider.breakRight();
-    this.pilot.breakRight();
     console.log('paraglider model right');
   }
 
   rightRelease() {
-    this.pilot.breakRightRelease();
   }
 
   speedBar() {
-    this.pilot.speedBar();
   }
 
   releaseSpeedBar() {
-    this.pilot.releaseSpeedBar();
   }
 
 
@@ -76,11 +70,14 @@ class Paraglider implements IFlyable {
     this.mesh.add(wing);
 
 
-    this.pilot = new Pilot(this.options.pilot);
-    this.pilotMesh = this.pilot.load();
+    this.pilot = new PilotVoxel(this.options.pilot);
+    this.pilotMesh = await this.pilot.load();
 
-    this.pilotMesh.position.x = 17;
-    this.pilotMesh.position.z = -0.4;
+    this.pilotMesh.position.x = 350;
+    this.pilotMesh.position.y = -600;
+    this.pilotMesh.position.z = 0;
+    const scale = 150;
+    this.pilotMesh.scale.set(scale, scale, scale);
     this.pilotMesh.rotateY(Math.PI / 2);
 
     this.mesh.add(this.pilotMesh);
@@ -98,4 +95,4 @@ class Paraglider implements IFlyable {
 
 }
 
-export default Paraglider;
+export default ParagliderVoxel;

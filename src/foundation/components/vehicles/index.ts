@@ -2,6 +2,10 @@
 import Paraglider from './Paraglider';
 import Pilot from './Pilot';
 import Hangglider from './Hangglider';
+import ParagliderVoxel from './ParagliderVoxel';
+import Tandem from './Tandem';
+import Glider from './Glider';
+import Wing from './Wing';
 
 // Type exports
 export type { VehicleConfig } from '../../types';
@@ -9,4 +13,4 @@ export type { ParagliderOptions } from './Paraglider';
 export type { PilotOptions } from './Pilot';
 
 // Component exports
-export { Paraglider, Pilot, Hangglider };
+export { Paraglider, Pilot, Hangglider, ParagliderVoxel, Tandem, Glider, Wing };
