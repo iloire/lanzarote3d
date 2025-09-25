@@ -188,7 +188,7 @@ export const addLandingSpot = (state: EditorState, position: THREE.Vector3, scen
   
   scene.add(landingSpot.marker);
   state.markers.push(landingSpot.marker);
-  state.locations[state.currentLocationIndex].landingSpots.push(landingSpot);
+  state.locations[state.currentLocationIndex]?.landingSpots.push(landingSpot);
   state.selectedItem = landingSpot;
   
   // Add to history
@@ -212,7 +212,7 @@ export const addFlyZonePhase = (
   // Calculate GPS coordinates from the position
   const gps = worldToGPS(position);
   
-  const phaseId = `${state.flyZonePhaseType}-${Object.keys(state.locations[state.currentLocationIndex].flyzone.phases).length + 1}`;
+  const phaseId = `${state.flyZonePhaseType}-${Object.keys(state.locations[state.currentLocationIndex]?.flyzone?.phases || {}).length + 1}`;
   
   const phase: EditorFlightPhase = {
     type: state.flyZonePhaseType,
@@ -229,7 +229,9 @@ export const addFlyZonePhase = (
   
   scene.add(phase.object);
   state.flyZones.push(phase.object);
-  state.locations[state.currentLocationIndex].flyzone.phases[phaseId] = phase;
+  if (state.locations[state.currentLocationIndex]?.flyzone) {
+    state.locations[state.currentLocationIndex].flyzone.phases[phaseId] = phase;
+  }
   state.selectedItem = phase;
   
   // Add to history
@@ -396,6 +398,7 @@ import { gpsToWorld } from '../../helpers/gps';
 const phases: Record<string, FlightPhase> = {
 ${Object.keys(currentLocation.flyzone.phases).map(id => {
   const phase = currentLocation.flyzone.phases[id];
+  if (!phase) return '';
   return `  '${id}': {
     type: '${phase.type}',
     gps: {
@@ -707,19 +710,25 @@ export const undoLastAction = (state: EditorState, scene: THREE.Scene): void => 
       
     case 'add_takeoff':
       if (state.currentLocationIndex !== null) {
-        state.locations[state.currentLocationIndex].takeoffs = state.locations[state.currentLocationIndex].takeoffs.filter(
-          t => t.marker !== lastAction.object
-        );
-        state.markers = state.markers.filter(m => m !== lastAction.object);
+        const currentLocation = state.locations[state.currentLocationIndex];
+        if (currentLocation) {
+          currentLocation.takeoffs = currentLocation.takeoffs.filter(
+            t => t.marker !== lastAction.object
+          );
+          state.markers = state.markers.filter(m => m !== lastAction.object);
+        }
       }
       break;
       
     case 'add_landing':
       if (state.currentLocationIndex !== null) {
-        state.locations[state.currentLocationIndex].landingSpots = state.locations[state.currentLocationIndex].landingSpots.filter(
-          l => l.marker !== lastAction.object
-        );
-        state.markers = state.markers.filter(m => m !== lastAction.object);
+        const currentLocation = state.locations[state.currentLocationIndex];
+        if (currentLocation) {
+          currentLocation.landingSpots = currentLocation.landingSpots.filter(
+            l => l.marker !== lastAction.object
+          );
+          state.markers = state.markers.filter(m => m !== lastAction.object);
+        }
       }
       break;
       
