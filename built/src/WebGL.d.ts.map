@@ -1,1 +1,0 @@
-{"version":3,"file":"WebGL.d.ts","sourceRoot":"","sources":["../../src/WebGL.ts"],"names":[],"mappings":"AAAA,cAAM,KAAK;IACT,MAAM,CAAC,gBAAgB;IAYvB,MAAM,CAAC,iBAAiB;IASxB,MAAM,CAAC,oBAAoB;IAI3B,MAAM,CAAC,qBAAqB;IAI5B,MAAM,CAAC,eAAe,CAAC,OAAO,KAAA;CAsC/B;AAED,eAAe,KAAK,CAAC"}

@@ -29,7 +29,7 @@ const Helpers = {
   },
 
   createHelpers: function (scene: THREE.Scene) {
-    const grid = this.getGrid({ x: 0, y: 0 });
+    const grid = this.getGrid(new THREE.Vector3(0, 0, 0));
     scene.add(grid);
     scene.add(this.getAxisHelper(100));
   },

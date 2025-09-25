@@ -18,7 +18,9 @@
       "Bash(lsof:*)",
       "Bash(kill:*)",
       "Bash(npx serve:*)",
-      "Bash(xargs:*)"
+      "Bash(xargs:*)",
+      "Bash(npm ls:*)",
+      "Bash(npx npm-check-updates:*)"
     ],
     "deny": [],
     "ask": []

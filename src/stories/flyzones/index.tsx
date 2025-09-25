@@ -3,7 +3,7 @@ import locations from "./locations";
 // import VideoFrame from "../components/video-frame";
 import { StoryOptions } from "../types";
 import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
-import { Location } from "./locations";
+import { Location as FlyLocation } from "./locations";
 import {
   type Marker,
   setupPopupContainer,
@@ -41,7 +41,7 @@ const FlyZones = {
     const markers: MarkerHelper[] = [];
     const landingMarkers: THREE.Object3D[] = [];
     let landingMarkersVisible = true;
-    let currentLocation: Location | undefined;
+    let currentLocation: FlyLocation | undefined;
     const popupContainer = setupPopupContainer();
     const labelRenderer = setupLabelRenderer();
     
@@ -105,7 +105,7 @@ const FlyZones = {
             console.log("Creating marker for takeoff:", takeoff.title);
             
             // Create a takeoff marker
-            const navigateToWrapper = (position: THREE.Vector3, location?: Location) => {
+            const navigateToWrapper = (position: THREE.Vector3, location?: FlyLocation) => {
               navigateTo(position, camera, controls, location);
             };
             
