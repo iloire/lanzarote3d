@@ -9,7 +9,7 @@ interface MenuProps {
 class Menu extends React.Component<MenuProps> {
   renderer: any;
 
-  state = {
+  override state = {
     loadingProcess: 0,
     showAppSelection: false,
   };
@@ -30,7 +30,7 @@ class Menu extends React.Component<MenuProps> {
     }
   }
 
-  render() {
+  override render() {
     // Public/finished features
     const publicStories = [
       { story: "animation", name: "voxel", description: "famara voxel animation" },

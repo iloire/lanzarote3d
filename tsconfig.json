@@ -13,8 +13,8 @@
     "strict": false,
     "noImplicitAny": false,
     "strictNullChecks": false,
-    "strictFunctionTypes": false,
-    "strictBindCallApply": false,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
     "strictPropertyInitialization": false,
     "noImplicitReturns": true,
     "noImplicitThis": true,
@@ -23,7 +23,7 @@
     // Additional Checks (gradually enabled)
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noImplicitOverride": false,
+    "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": false,
     "noUncheckedIndexedAccess": false,
 

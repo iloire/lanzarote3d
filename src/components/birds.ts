@@ -41,7 +41,7 @@ class Birds extends AutoFlier {
     requestAnimationFrame(() => this.animate());
   }
 
-  position(): THREE.Vector3 {
+  override position(): THREE.Vector3 {
     return this.mesh.position.clone();
   }
 }

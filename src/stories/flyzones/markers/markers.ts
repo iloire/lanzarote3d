@@ -4,7 +4,7 @@ import { Tween } from '@tweenjs/tween.js';
 
 // Define the MarkerObject class that properly extends THREE.Object3D
 export class MarkerObject extends THREE.Object3D {
-  type: MarkerType;
+  override type: MarkerType;
   hoverAnimation: Tween<any>;
   unhoverAnimation: Tween<any>;
   showPopup: () => void;

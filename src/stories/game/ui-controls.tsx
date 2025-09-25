@@ -167,7 +167,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     });
   }
 
-  componentDidMount() {
+  override componentDidMount() {
     this.props.onWrapSpeedChange(this.props.defaultGameSpeed);
     this.setUpViewUI();
   }
@@ -351,7 +351,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     this.props.onViewUIChange(direction);
   };
 
-  render() {
+  override render() {
     const availableForPlaying = (location) => location.availableForPlaying;
     const isGameStarted = !this.state.showStartButton;
     const buttons = this.props.locations
