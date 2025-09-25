@@ -234,7 +234,6 @@ export default class Sky extends THREE.Object3D {
     const textureFlare1 = textureLoader.load(lensflareTexture1);
     const lensflare = new Lensflare();
     const size = 600;
-    const distance = 0; //(optional) (0-1) from light source (0 = at light source)
     lensflare.addElement(
       new LensflareElement(textureFlare0, size, 0, light.color)
     );

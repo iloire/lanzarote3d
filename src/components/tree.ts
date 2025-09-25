@@ -12,7 +12,6 @@ class Tree {
     //trunk
     const geo_trunk = new THREE.IcosahedronGeometry(9, 0);
     const trunk = new THREE.Mesh(geo_trunk, mat_grey);
-    const a = new THREE.Vector3(1, 0, 10);
     trunk.rotation.x = pi / 2;
     trunk.position.y = 5;
     trunk.scale.set(0.03, 0.03, 1);
