@@ -119,7 +119,6 @@ const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAp
       SCENE_CONFIG.sizes.width / SCENE_CONFIG.sizes.height,
       SCENE_CONFIG.cameraSettings.near,
       SCENE_CONFIG.cameraSettings.far,
-      renderer,
       island
     );
     camera.addGui(gui);

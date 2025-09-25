@@ -5,7 +5,6 @@ import { Tween, Easing } from "@tweenjs/tween.js";
 
 
 const generateCloudPart = (
-  options: CloudOptions,
   radius: number,
   scale: number,
   material: THREE.Material
@@ -40,7 +39,7 @@ const generateCloud = async (options: CloudOptions): Promise<THREE.Object3D> => 
     const posX = 1.7 * radius * r(-1 * i, i);
     const posY = 0.3 * radius * r(-1 * i, i);
     const posZ = 1.2 * radius * r(-1 * i, i);
-    const p = generateCloudPart(options, radius, scale, material);
+    const p = generateCloudPart(radius, scale, material);
     p.position.set(posX, posY, posZ);
     group.add(p);
   }

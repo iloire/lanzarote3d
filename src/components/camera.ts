@@ -87,7 +87,6 @@ class Camera extends THREE.PerspectiveCamera {
     aspect: number,
     near: number,
     far: number,
-    renderer: THREE.WebGLRenderer,
     terrain: THREE.Mesh
   ) {
     super(fov, aspect, near, far);

@@ -22,7 +22,7 @@
 
     // Additional Checks (gradually enabled)
     "noUnusedLocals": true,
-    "noUnusedParameters": false,
+    "noUnusedParameters": true,
     "noImplicitOverride": false,
     "noPropertyAccessFromIndexSignature": false,
     "noUncheckedIndexedAccess": false,
