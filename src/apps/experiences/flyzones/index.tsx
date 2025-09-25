@@ -1,11 +1,10 @@
 import * as THREE from "three";
 import locations from "./locations";
 // import VideoFrame from "../components/video-frame";
-import { StoryOptions } from "../types";
+import { StoryOptions } from "../../shared/types";
 import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
-import { Location as FlyLocation } from "./locations";
+import { Location as FlyLocation } from "./helpers/types";
 import {
-  type Marker,
   setupPopupContainer,
   VISIBILITY_THRESHOLDS,
   MarkerType,
@@ -66,7 +65,7 @@ const FlyZones = {
       // Processing locations
       
       // Create location markers
-      for (const location of locations) {
+      for (const location of locations as FlyLocation[]) {
         // Creating location marker
         
         // Create a simple sphere to represent the location
@@ -127,15 +126,15 @@ const FlyZones = {
             markers.push({
               type: MarkerType.TAKEOFF,
               position: takeoff.position,
-              object: takeoffMarker,
+              object: takeoffMarker as unknown as THREE.Object3D,
               data: takeoff,
-              pin: takeoffMarker,
+              pin: takeoffMarker as unknown as THREE.Object3D,
               setVisibility: (visible: boolean) => {
                 if (takeoffMarker) {
                   takeoffMarker.visible = visible;
                 }
               }
-            } as Marker);
+            });
             
             // Create wind arrows for this takeoff
             const windArrows = createWindArrowsForTakeoff(takeoff.position, takeoff.conditions);
@@ -320,12 +319,9 @@ const FlyZones = {
       landingMarkersVisible = visible;
     };
     
-    // Setup mouse click handler
-    const cleanupMouseHandler = setupMouseClickHandler(renderer, camera, scene);
-    
     // Create UI
     createUI({
-      locations,
+      locations: locations as FlyLocation[],
       landingMarkersVisible,
       onNavigate: (position, location) => {
         currentLocation = location;
@@ -335,65 +331,31 @@ const FlyZones = {
       onToggleRuler: toggleRuler,
       showRulerButton: true
     });
-    
+
     // Setup window resize handler
     window.addEventListener('resize', () => {
       labelRenderer.setSize(window.innerWidth, window.innerHeight);
     });
-    
+
     // Set initial position
-    const initialPosition = locations.length > 0 && locations[0]?.position
-      ? locations[0].position.clone()
+    const flyLocations = locations as FlyLocation[];
+    const initialPosition = flyLocations.length > 0 && flyLocations[0]?.position
+      ? flyLocations[0].position.clone()
       : new THREE.Vector3(14000, 8000, 14000);
-    
-    navigateTo(initialPosition, camera, controls, locations.length > 0 ? locations[0] : undefined);
-    
+
+    navigateTo(initialPosition, camera, controls, flyLocations.length > 0 ? flyLocations[0] : undefined);
+
+    // Setup mouse click handler
+    const cleanupMouseHandler = setupMouseClickHandler(renderer, camera, scene);
+
     // Start animation loop
     setupAnimationLoop(renderer, scene, camera, controls, labelRenderer, markers, landingMarkersVisible);
-    
-    // Setup mouse click handler
-    const handleMouseClick = (event: MouseEvent) => {
-      // Create raycaster and mouse vector
-      const raycaster = new THREE.Raycaster();
-      const mouse = new THREE.Vector2();
-      
-      // Calculate mouse position in normalized device coordinates
-      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-      
-      // Update the picking ray with the camera and mouse position
-      raycaster.setFromCamera(mouse, camera);
-      
-      // Find intersections with all objects in the scene
-      const intersects = raycaster.intersectObjects(scene.children, true);
-      
-      // Check if we hit any markers
-      for (const intersect of intersects) {
-        let current = intersect.object;
-        
-        // Traverse up to find the root object with userData
-        while (current && current.parent) {
-          if (current.userData && current.userData['isInteractive']) {
-            // Clicked on interactive object
-            if (current.userData['onClick']) {
-              current.userData['onClick']();
-            }
-            return;
-          }
-          current = current.parent;
-        }
-      }
-    };
 
-    // Add event listener
-    window.addEventListener('click', handleMouseClick);
-    
     // Return cleanup function
     return () => {
       cleanupMouseHandler();
       ruler.deactivate();
       document.body.removeChild(labelRenderer.domElement);
-      window.removeEventListener('click', handleMouseClick);
     };
   },
 };

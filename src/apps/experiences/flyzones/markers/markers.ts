@@ -30,6 +30,6 @@ export class MarkerObject extends THREE.Object3D {
 }
 
 // Re-export Marker interface from types.ts to maintain API compatibility
-export { Marker } from '../helpers/types';
+export type { Marker } from '../helpers/types';
 
 // Add any other marker-related functions here 

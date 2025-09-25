@@ -23,8 +23,8 @@ export const setupLabelRenderer = () => {
 export class MarkerObject {
   pin: THREE.Object3D;
   type: MarkerType;
-  hoverAnimation: () => void;
-  unhoverAnimation: () => void;
+  hoverAnimation: (() => void) | Tween<any>;
+  unhoverAnimation: (() => void) | Tween<any>;
   showPopup: () => void;
   setVisibility: (visible: boolean) => void;
   flyzone?: THREE.Object3D;
@@ -177,7 +177,7 @@ export const createMarker = async (
   marker.unhoverAnimation = unhover;
   marker.showPopup = showPopup;
   marker.setVisibility = setVisibility;
-  marker.flyzone = undefined;  // Will be set by caller if needed
+  // flyzone will be set by caller if needed
 
   return marker;
 };

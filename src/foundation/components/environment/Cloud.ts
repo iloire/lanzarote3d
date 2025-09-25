@@ -30,7 +30,8 @@ const generateCloud = async (options: CloudOptions): Promise<THREE.Object3D> => 
   const n = rndIntBetween(3, 8);
   const group = new THREE.Group();
 
-  const material = materials[rndIntBetween(0, materials.length)];
+  const materialIndex = rndIntBetween(0, materials.length - 1);
+  const material = materials[materialIndex] || materials[0]!; // Fallback to first material, non-null assertion
 
   for (let i = 0; i < n; i++) {
     const scale = r(i * 0.9, i * 1.1);

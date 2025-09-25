@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { CSS2DObject, CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
-import { worldToGPS } from './gps';
 
 interface RulerOptions {
   scene: THREE.Scene;
@@ -88,11 +87,8 @@ export const createRuler = (options: RulerOptions): Ruler => {
         distanceLabel.userData['isRulerLabel'] = true;
         scene.add(distanceLabel);
         
-        // Log the measurement
-        const startGPS = worldToGPS(startPoint);
-        const endGPS = worldToGPS(endPoint);
-        
         // Ruler measurement completed
+        // GPS coordinates available via: worldToGPS(startPoint), worldToGPS(endPoint)
         
         // Reset for next measurement
         startPoint = null;

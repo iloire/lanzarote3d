@@ -13,9 +13,9 @@ export const navigateTo = (
   const cameraTarget = new THREE.Vector3().copy(position);
   
   // If we have a location with a camera view, use it
-  if (location && location.cameraView) {
+  if (location && location.cameraView && location.cameraView.distance !== undefined) {
     const { position: relativePos, distance } = location.cameraView;
-    
+
     // Calculate camera position based on relative position and distance
     const cameraPosition = new THREE.Vector3()
       .copy(cameraTarget)

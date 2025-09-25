@@ -82,10 +82,10 @@ export const createCustomFlyZone = (shape: FlyZoneShape) => {
     if (phase.nextPhases) {
       phase.nextPhases.forEach(nextPhaseId => {
         const nextPhase = shape.phases[nextPhaseId];
-        if (nextPhase && nextPhase.position) {
+        if (nextPhase && nextPhase.position && phase.position) {
           const connectionGeometry = new THREE.BufferGeometry().setFromPoints([
             phase.position,
-            nextPhase.position!
+            nextPhase.position
           ]);
           
           const connectionLine = new THREE.Line(

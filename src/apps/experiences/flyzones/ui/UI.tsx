@@ -1,4 +1,3 @@
-import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Location } from '../locations';
 import { Vector3 } from 'three';
@@ -36,10 +35,10 @@ export const createUI = ({
         locations={locations} 
         onNavigate={onNavigate} 
       />
-      <ToggleButtons 
+      <ToggleButtons
         landingMarkersVisible={landingMarkersVisible}
         onToggleLandings={onToggleLandings}
-        onToggleRuler={onToggleRuler}
+        {...(onToggleRuler && { onToggleRuler })}
         showRulerButton={showRulerButton}
       />
     </div>

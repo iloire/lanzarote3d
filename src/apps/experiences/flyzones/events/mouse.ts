@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { worldToGPS } from '../helpers/gps';
 
 export const setupMouseClickHandler = (
   renderer: THREE.WebGLRenderer,
@@ -25,12 +24,10 @@ export const setupMouseClickHandler = (
     // Find intersections with the terrain
     const intersects = raycaster.intersectObjects(scene.children, true);
     
-    // If we hit something, log the coordinates
+    // If we hit something, coordinates are available for future use
     if (intersects.length > 0 && intersects[0]) {
-      const point = intersects[0].point;
-      const gpsCoords = worldToGPS(point);
-      
-      // Click detected - coordinates available in point and gpsCoords
+      // Click detected - coordinates available in intersects[0].point
+      // GPS coordinates can be calculated with: worldToGPS(intersects[0].point)
     }
   };
 

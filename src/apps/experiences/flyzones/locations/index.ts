@@ -4,15 +4,14 @@ export * from '../helpers/types';
 // Import locations
 import famara from './famara';
 import teguise from './teguise';
-
-// Types are exported above with export *
+import { Location as FlyLocation } from '../helpers/types';
 
 // Export individual locations
 export { default as famara } from './famara';
 export { default as teguise } from './teguise';
 
 // Create a default export with all locations
-const locations: Location[] = [
+const locations: FlyLocation[] = [
   famara,
   teguise
 ];
