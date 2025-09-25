@@ -7,7 +7,7 @@ export type GuiHelperOptions = {
 
 const GuiHelper = {
   addRotationGui: (
-    gui,
+    gui: any,
     name: string,
     rotation: THREE.Euler,
     options: GuiHelperOptions = { min: -2 * Math.PI, max: 2 * Math.PI }
@@ -27,7 +27,7 @@ const GuiHelper = {
   },
 
   addPositionGui: (
-    gui,
+    gui: any,
     name: string,
     pos: THREE.Vector3,
     options: GuiHelperOptions = { min: -100, max: 100 }
@@ -47,7 +47,7 @@ const GuiHelper = {
   },
 
   addLocationGui: (
-    gui,
+    gui: any,
     name: string,
     obj: THREE.Object3D,
     options?: GuiHelperOptions

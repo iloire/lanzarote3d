@@ -55,8 +55,8 @@ export const createWindArrowsForTakeoff = (
   const arrows: THREE.Object3D[] = [];
   
   // Find the best condition (highest rating)
-  const bestCondition = conditions.reduce((best, current) => 
-    current.rating > best.rating ? current : best, conditions[0]);
+  const bestCondition = conditions.length > 0 ? conditions.reduce((best, current) =>
+    current.rating > best.rating ? current : best, conditions[0]!) : null;
   
   if (bestCondition) {
     // Create an arrow for the ideal direction

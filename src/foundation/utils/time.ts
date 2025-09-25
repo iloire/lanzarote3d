@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 const Time = {
-  getSunAltitudeDegreesAccordingToTimeOfDay: (timeOfDayInHours) => {
+  getSunAltitudeDegreesAccordingToTimeOfDay: (timeOfDayInHours: number) => {
     const minSun = 5,
       maxSun = 20;
     if (timeOfDayInHours < minSun || timeOfDayInHours > maxSun) {
@@ -18,7 +18,7 @@ const Time = {
     return degrees;
   },
 
-  getSunAzimuthDegreesAccordingToTimeOfDay: (_timeOfDayInHours) => {
+  getSunAzimuthDegreesAccordingToTimeOfDay: (_timeOfDayInHours: number) => {
     return 90;
   },
 };

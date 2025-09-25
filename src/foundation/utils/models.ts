@@ -5,7 +5,7 @@ import * as THREE from "three";
 
 const defaultManager = new THREE.LoadingManager();
 
-function modelLoader(url, draco: boolean, manager?: THREE.LoadingManager) {
+function modelLoader(url: string, draco: boolean, manager?: THREE.LoadingManager) {
   const man = manager || defaultManager;
   const loader = draco ? new DRACOLoader(man) : new GLTFLoader(man);
   if (draco) {
@@ -13,15 +13,15 @@ function modelLoader(url, draco: boolean, manager?: THREE.LoadingManager) {
     // loader.preload();
   }
   return new Promise((resolve, reject) => {
-    loader.load(url, (data) => resolve(data), null, reject);
+    loader.load(url, (data) => resolve(data), undefined, reject);
   });
 }
 
-function objLoader(url, manager?: THREE.LoadingManager) {
+function objLoader(url: string, manager?: THREE.LoadingManager) {
   const man = manager || defaultManager;
   const loader = new OBJLoader(man);
   return new Promise((resolve, reject) => {
-    loader.load(url, (data) => resolve(data), null, reject);
+    loader.load(url, (data) => resolve(data), undefined, reject);
   });
 }
 

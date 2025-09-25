@@ -125,8 +125,10 @@ class Flier extends THREE.EventDispatcher<FlierEventMap> {
   }
 
   stop() {
-    clearInterval(this.interval);
-    this.interval = null;
+    if (this.interval !== null) {
+      clearInterval(this.interval);
+      this.interval = null;
+    }
   }
 
   isRunning() {
@@ -312,7 +314,7 @@ class Flier extends THREE.EventDispatcher<FlierEventMap> {
     });
   }
 
-  addGui(gui) {
+  addGui(gui: any) {
     const pg = this.mesh;
     GuiHelper.addLocationGui(gui, "Paraglider", pg, {
       min: -20000,

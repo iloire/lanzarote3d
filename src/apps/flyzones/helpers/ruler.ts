@@ -40,7 +40,7 @@ export const createRuler = (options: RulerOptions): Ruler => {
     // Find intersections with the terrain
     const intersects = raycaster.intersectObjects(scene.children, true);
     
-    if (intersects.length > 0) {
+    if (intersects.length > 0 && intersects[0]) {
       const point = intersects[0].point;
       
       if (!startPoint) {

@@ -65,8 +65,8 @@ class Menu extends React.Component<MenuProps> {
     const params = new URLSearchParams(window.location.search);
     const selectedStory = params.get("story");
 
-    const renderButtons = (stories) =>
-      stories.map((story) => (
+    const renderButtons = (stories: any[]) =>
+      stories.map((story: any) => (
         <div className="button" key={story.story}>
           <button
             className={selectedStory === story.story ? "selected" : ""}

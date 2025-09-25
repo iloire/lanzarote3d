@@ -116,7 +116,7 @@ const Game = {
 
     document.addEventListener("keydown", onDocumentKeyDown, false);
 
-    function onDocumentKeyDown(event) {
+    function onDocumentKeyDown(event: KeyboardEvent) {
       const keyCode = event.which;
       if (keyCode == 90) {
         //z
@@ -152,7 +152,7 @@ const Game = {
     let gameStatus = GameStatus.NonStarted;
 
 
-    function setCameraMode(mode) {
+    function setCameraMode(mode: CameraMode) {
       camera.setCameraMode(mode, pg);
       const mesh = pg.getMesh();
       if (mode === CameraMode.FirstPersonView) {

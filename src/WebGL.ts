@@ -28,7 +28,7 @@ class WebGL {
     return this.getErrorMessage(2);
   }
 
-  static getErrorMessage(version) {
+  static getErrorMessage(version: 1 | 2) {
     const names = {
       1: "WebGL",
       2: "WebGL 2",
@@ -54,13 +54,13 @@ class WebGL {
     element.style.width = "400px";
     element.style.margin = "5em auto 0";
 
-    if (contexts[version]) {
+    if (contexts[version as keyof typeof contexts]) {
       message = message.replace("$0", "graphics card");
     } else {
       message = message.replace("$0", "browser");
     }
 
-    message = message.replace("$1", names[version]);
+    message = message.replace("$1", names[version as keyof typeof names]);
 
     element.innerHTML = message;
 
