@@ -2,7 +2,6 @@ import * as THREE from "three";
 import Paraglider from "./base/flier";
 import {
   ORIGIN,
-  FORWARD_DIRECTION,
   UP_DIRECTION,
   DOWN_DIRECTION,
 } from "./common";

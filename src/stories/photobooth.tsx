@@ -1,6 +1,11 @@
 import * as THREE from "three";
 import { update } from "@tweenjs/tween.js";
+import Paraglider, { ParagliderOptions } from "../components/paraglider";
+import ParagliderVoxel, {
+  ParagliderVoxelOptions,
+} from "../components/paraglider-voxel";
 import Tandem from "../components/tandem";
+import { PilotHeadType } from "../components/parts/pilot-head";
 import Environment from "./env/environment";
 import Weather, { WeatherOptions } from "../elements/weather";
 import adriModel from "../models/adri.obj";
