@@ -4,7 +4,7 @@ import PilotHead, {
   PilotHeadType,
   PilotHeadOptions,
 } from "../components/parts/pilot-head";
-import Helpers from "../utils/helpers";
+import Helpers from "../foundation/utils/helpers";
 import { HelmetOptions, HelmetType } from "../components/parts/helmets/types";
 import { StoryOptions } from "./types";
 

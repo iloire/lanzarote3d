@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import model from "../models/lanzarote.glb";
-import Models from "../utils/models";
+import model from "../../assets/foundation/models/environment/lanzarote.glb";
+import Models from "../foundation/utils/models";
 import { MeshBVH, acceleratedRaycast } from "three-mesh-bvh";
 
 THREE.Mesh.prototype.raycast = acceleratedRaycast;

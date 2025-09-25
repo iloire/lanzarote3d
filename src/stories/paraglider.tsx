@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import Paraglider from "../components/paraglider";
-import Helpers from "../utils/helpers";
+import { Paraglider } from "../foundation/components/vehicles";
+import Helpers from "../foundation/utils/helpers";
 import { PilotHeadType } from "../components/parts/pilot-head";
 import { StoryOptions } from "./types";
 

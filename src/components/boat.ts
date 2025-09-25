@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import GuiHelper from "../utils/gui";
+import GuiHelper from "../foundation/utils/gui";
 
 const mat = new THREE.MeshLambertMaterial({ color: 0xffffff });
 const sail_mat = new THREE.MeshLambertMaterial({ color: 0x666666 });

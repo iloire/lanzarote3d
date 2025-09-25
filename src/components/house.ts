@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import GuiHelper from "../utils/gui";
+import GuiHelper from "../foundation/utils/gui";
 
 const getColorMaterial = (color: number) => {
   return new THREE.MeshPhongMaterial({ color });

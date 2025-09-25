@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { Water as WaterEffect } from "three/examples/jsm/objects/Water";
-import waterTexture from "../textures/waternormals.jpg";
-import Models from "../utils/models";
+import waterTexture from "../../../../assets/foundation/textures/environment/waternormals.jpg";
+import Models from "../../utils/models";
 
 const USE_PLAIN_WATER = true;
 

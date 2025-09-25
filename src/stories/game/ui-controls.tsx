@@ -1,10 +1,10 @@
 import React from "react";
 import { CameraMode } from "../../components/camera";
-import Paraglider from "../../components/base/flier";
+import Paraglider from "../../foundation/types/flier";
 import Vario from "../../audio/vario";
-import Weather from "../../elements/weather";
-import arrowLeftImg from "../../img/left-chevron.png";
-import arrowRightImg from "../../img/right-chevron.png";
+import { Weather } from "../../foundation/components/physics";
+import arrowLeftImg from "../../../assets/apps/shared/icons/left-chevron.png";
+import arrowRightImg from "../../../assets/apps/shared/icons/right-chevron.png";
 import { GameStartOptions } from "./types";
 import { Location } from "../flyzones/locations/index";
 

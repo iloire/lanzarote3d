@@ -1,4 +1,4 @@
-import { logger, LogLevel } from '../../src/utils/logger';
+import { logger, LogLevel } from '../../src/foundation/utils/logger';
 
 describe('Logger', () => {
   // Mock console methods

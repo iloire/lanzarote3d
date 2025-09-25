@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import textureImg from "../textures/h-map-lanzarote.png";
+import textureImg from "../../assets/foundation/textures/environment/h-map-lanzarote.png";
 import { StoryOptions } from "./types";
 
 const terrainGenerator1 = (groundGeo, displacement) => {

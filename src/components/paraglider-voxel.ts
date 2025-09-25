@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import PilotVoxel, { PilotVoxelOptions } from "./pilot-voxel";
 import Glider, { GliderOptions } from "./parts/glider";
-import GuiHelper from "../utils/gui";
+import GuiHelper from "../foundation/utils/gui";
 import IFlyable from './base/IFlyable';
 
 export type ParagliderVoxelOptions = {

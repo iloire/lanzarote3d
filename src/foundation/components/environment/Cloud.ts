@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { rndBetween, rndIntBetween } from "../utils/math";
+import { rndBetween, rndIntBetween } from "../../utils/math";
 import { Tween, Easing } from "@tweenjs/tween.js";
 
 

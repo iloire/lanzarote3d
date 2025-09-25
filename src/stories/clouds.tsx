@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import Clouds from "../components/clouds";
-import Helpers from "../utils/helpers";
+import Clouds from "../foundation/components/environment/Clouds";
+import Helpers from "../foundation/utils/helpers";
 import { StoryOptions } from "./types";
 
 const CloudsWorkshop = {

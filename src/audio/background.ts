@@ -1,7 +1,7 @@
 import * as THREE from "three";
-import wind1 from "./wind/wind-howl-01.mp3";
-import wind2 from "./wind/hurricane-01.mp3";
-import music from "./music/the-beat-of-nature-122841.mp3";
+import wind1 from "../../assets/foundation/audio/environment/wind-howl-01.mp3";
+import wind2 from "../../assets/foundation/audio/environment/hurricane-01.mp3";
+import music from "../../assets/foundation/audio/environment/the-beat-of-nature-122841.mp3";
 
 class BackgroundSound {
   wind1: THREE.Audio;

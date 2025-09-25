@@ -1,9 +1,9 @@
 import * as THREE from "three";
-import Paraglider from "../components/paraglider";
+import { Paraglider } from "../foundation/components/vehicles";
 import Boat from "../components/boat";
 import House, { HouseType } from "../components/house";
 import PineTree from "../components/pinetree";
-import Helpers from "../utils/helpers";
+import Helpers from "../foundation/utils/helpers";
 import { PilotHeadType } from "../components/parts/pilot-head";
 import { StoryOptions } from "./types";
 

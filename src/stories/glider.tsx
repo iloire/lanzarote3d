@@ -1,5 +1,5 @@
 import Glider from "../components/parts/glider";
-import Helpers from "../utils/helpers";
+import Helpers from "../foundation/utils/helpers";
 import { StoryOptions } from "./types";
 
 const GliderWorkshop = {

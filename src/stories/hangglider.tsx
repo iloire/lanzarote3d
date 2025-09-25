@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import HangGlider from "../components/hangglider";
-import Helpers from "../utils/helpers";
+import HangGlider from "../foundation/components/vehicles/Hangglider";
+import Helpers from "../foundation/utils/helpers";
 import { StoryOptions } from "./types";
 
 const HangGliderWorkshop = {

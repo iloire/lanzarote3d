@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { rndIntBetween } from "../utils/math";
+import { rndIntBetween } from "../foundation/utils/math";
 
 const pineMaterials = [
   new THREE.MeshBasicMaterial({ color: 0x0d5b28 }),

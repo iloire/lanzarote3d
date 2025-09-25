@@ -2,9 +2,9 @@ import * as THREE from "three";
 import { update } from "@tweenjs/tween.js";
 import ParagliderVoxel, { ParagliderVoxelOptions } from "../components/paraglider-voxel";
 import Environment from "./env/environment";
-import Weather, { WeatherOptions } from "../elements/weather";
-import adriModel from '../models/adri.obj';
-import adriTextureImage from '../models/adri.png';
+import Weather, { WeatherOptions } from "../foundation/components/physics/Weather";
+import adriModel from '../../assets/foundation/models/characters/adri.obj';
+import adriTextureImage from '../../assets/foundation/models/characters/adri.png';
 import { StoryOptions } from "./types";
 
 const WEATHER_SETTINGS: WeatherOptions = {

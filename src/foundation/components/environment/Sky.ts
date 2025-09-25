@@ -4,10 +4,10 @@ import {
   Lensflare,
   LensflareElement,
 } from "three/examples/jsm/objects/Lensflare.js";
-import lensflareTexture0 from "../textures/lensflare0.png";
-import lensflareTexture1 from "../textures/lensflare1.png";
-import Time from "../utils/time";
-import GuiHelper from "../utils/gui";
+import lensflareTexture0 from "../../../../assets/foundation/textures/effects/lensflare0.png";
+import lensflareTexture1 from "../../../../assets/foundation/textures/effects/lensflare1.png";
+import Time from "../../utils/time";
+import GuiHelper from "../../utils/gui";
 
 const calculateLightIntensity = (
   timeOfDayInHours: number

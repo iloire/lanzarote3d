@@ -1,4 +1,4 @@
-import Time from "../../src/utils/time";
+import Time from "../../src/foundation/utils/time";
 
 test("time", () => {
   expect(Time.getSunAltitudeDegreesAccordingToTimeOfDay(4)).toBe(0);

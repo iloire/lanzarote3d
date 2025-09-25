@@ -1,10 +1,10 @@
 import * as THREE from "three";
-import Paraglider from "./base/flier";
+import Paraglider from "../foundation/types/flier";
 import {
   ORIGIN,
   UP_DIRECTION,
   DOWN_DIRECTION,
-} from "./common";
+} from "../foundation/types/common";
 
 function getAttackAngleRadians(glidingRatio: number) {
   return Math.atan(1 / glidingRatio);

@@ -23,7 +23,11 @@
       "Bash(npx npm-check-updates:*)",
       "Bash(timeout 10 npm start:*)",
       "Bash(npm info eslint versions:*)",
-      "Bash(npm info:*)"
+      "Bash(npm info:*)",
+      "Bash(mkdir:*)",
+      "Bash(mv:*)",
+      "Bash(sed:*)",
+      "Bash(touch:*)"
     ],
     "deny": [],
     "ask": []

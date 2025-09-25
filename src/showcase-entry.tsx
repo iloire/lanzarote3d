@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import * as THREE from "three";
 import WebGL from "./WebGL";
 import App from "./app";
-import { logger } from "./utils/logger";
+import { logger } from "./foundation/utils/logger";
 
 import "./index.css";
 

@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import GuiHelper from "../../utils/gui";
+import GuiHelper from "../../foundation/utils/gui";
 
 const halfWingLength = 4000; // mm
 const DEFAULT_BAND_LENGTH = 400; //mm

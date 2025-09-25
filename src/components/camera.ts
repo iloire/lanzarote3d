@@ -1,8 +1,8 @@
 import * as THREE from "three";
-import Paraglider from "../components/base/flier";
+import Paraglider from "../foundation/types/flier";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import Animations from "../utils/animations";
-import GuiHelper from "../utils/gui";
+import Animations from "../foundation/utils/animations";
+import GuiHelper from "../foundation/utils/gui";
 
 const DEFAULT_FOLLOW_DISTANCE = 180;
 const DEFAULT_ANGLE = -Math.PI / 5.8;

@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import GUI from "lil-gui";
 import Stats from "three/examples/jsm/libs/stats.module";
 import * as THREE from "three";
-import Sky from "./components/sky";
-import Water from "./components/water";
+import Sky from "./foundation/components/environment/Sky";
+import Water from "./foundation/components/environment/Water";
 import Island from "./components/island";
 import Stories from "./stories/index";
 import Camera from "./components/camera";
 import Menu from './menu';
-import Controls from "./utils/controls";
+import Controls from "./foundation/utils/controls";
 import { StoryOptions } from "./stories/types";
 
 import "./index.css";

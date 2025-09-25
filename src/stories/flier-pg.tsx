@@ -1,9 +1,9 @@
 import * as THREE from "three";
 import { update } from "@tweenjs/tween.js";
-import Paraglider from "../components/paraglider";
-import Flier, { FlierConstructor } from "../components/base/flier";
-import Helpers from "../utils/helpers";
-import Weather, { WeatherOptions } from "../elements/weather";
+import { Paraglider } from "../foundation/components/vehicles";
+import Flier, { FlierConstructor } from "../foundation/types/flier";
+import Helpers from "../foundation/utils/helpers";
+import Weather, { WeatherOptions } from "../foundation/components/physics/Weather";
 import { StoryOptions } from "./types";
     
 const KMH_TO_MS = 3.6;

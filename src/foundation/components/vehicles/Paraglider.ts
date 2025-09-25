@@ -1,8 +1,8 @@
 import * as THREE from "three";
-import Pilot, { PilotOptions } from "./pilot";
-import Glider, { GliderOptions } from "./parts/glider";
-import GuiHelper from "../utils/gui";
-import IFlyable from './base/IFlyable';
+import Pilot, { PilotOptions } from "./Pilot";
+import Glider, { GliderOptions } from "../../../components/parts/glider";
+import GuiHelper from "../../utils/gui";
+import IFlyable from "../../types/IFlyable";
 
 export type ParagliderOptions = {
   glider: GliderOptions;

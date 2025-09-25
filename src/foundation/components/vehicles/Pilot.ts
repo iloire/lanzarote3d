@@ -1,7 +1,7 @@
 import * as THREE from "three";
-import PilotHead, { PilotHeadOptions, PilotHeadType } from './parts/pilot-head';
-import CocoonHarness from "./parts/cocoon-harness";
-import { HelmetType } from './parts/helmets/types';
+import PilotHead, { PilotHeadOptions, PilotHeadType } from '../../../components/parts/pilot-head';
+import CocoonHarness from "../../../components/parts/cocoon-harness";
+import { HelmetType } from '../../../components/parts/helmets/types';
 
 const DEFAULT_OPTIONS = {
   head: {

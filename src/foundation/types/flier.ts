@@ -1,15 +1,15 @@
 import * as THREE from "three";
 import { Tween } from "@tweenjs/tween.js";
-import Weather from "../../elements/weather";
-import Thermal from "../../components/thermal";
-import GuiHelper from "../../utils/gui";
-import { TrajectoryPoint, TrajectoryPointType } from "../../elements/trajectory";
-import { getTerrainHeightBelowPosition } from "../../utils/collision";
+import Weather from "../components/physics/Weather";
+import Thermal from "../components/physics/Thermal";
+import GuiHelper from "../utils/gui";
+import { TrajectoryPoint, TrajectoryPointType } from "../components/ui/Trajectory";
+import { getTerrainHeightBelowPosition } from "../utils/collision";
 import {
   FORWARD_DIRECTION,
   UP_DIRECTION,
   DOWN_DIRECTION,
-} from "./../common";
+} from "./common";
 import IFlyable from './IFlyable';
 
 const ANTI_CRASH_ENABLED = false;

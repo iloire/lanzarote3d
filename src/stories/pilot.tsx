@@ -1,6 +1,6 @@
-import Pilot from "../components/pilot";
+import Pilot from "../foundation/components/vehicles/Pilot";
 import TandemPilot from "../components/tandem-pilot";
-import Helpers from "../utils/helpers";
+import Helpers from "../foundation/utils/helpers";
 import { GlassesType, PilotHeadType } from "../components/parts/pilot-head";
 import { StoryOptions } from "./types";
 

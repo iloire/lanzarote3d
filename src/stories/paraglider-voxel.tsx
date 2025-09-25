@@ -1,8 +1,8 @@
 import * as THREE from "three";
 import ParagliderVoxel from "../components/paraglider-voxel";
-import Helpers from "../utils/helpers";
-import adriModel from "../models/adri.obj";
-import adriTextureImage from "../models/adri.png";
+import Helpers from "../foundation/utils/helpers";
+import adriModel from "../../assets/foundation/models/characters/adri.obj";
+import adriTextureImage from "../../assets/foundation/models/characters/adri.png";
 import { StoryOptions } from "./types";
 
 const ParagliderVoxelWorkshop = {

@@ -1,8 +1,8 @@
 import * as THREE from "three";
-import GuiHelper from "../utils/gui";
-import Models from "../utils/models";
-import model from "../models/birds.glb";
-import AutoFlier from "./base/auto-flier";
+import GuiHelper from "../foundation/utils/gui";
+import Models from "../foundation/utils/models";
+import model from "../../assets/foundation/models/environment/birds.glb";
+import AutoFlier from "../foundation/types/auto-flier";
 
 const clock = new THREE.Clock();
 

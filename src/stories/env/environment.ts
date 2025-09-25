@@ -1,18 +1,18 @@
 import * as THREE from "three";
-import Clouds from "../../components/clouds";
-import Weather from "../../elements/weather";
-import Thermal from "../../components/thermal";
-import { rndIntBetween } from "../../utils/math";
+import { Clouds } from "../../foundation/components/environment";
+import { Weather } from "../../foundation/components/physics";
+import { Thermal } from "../../foundation/components/physics";
+import { rndIntBetween } from "../../foundation/utils/math";
 import Tree from "../../components/tree";
 import PineTree from "../../components/pinetree";
 import Stone from "../../components/stone";
 import House, { HouseType } from "../../components/house";
 import Boat from "../../components/boat";
 import Birds from "../../components/birds";
-import HangGlider from "../../components/hangglider";
+import { Hangglider as HangGlider } from "../../foundation/components/vehicles";
 import { addMeshAroundArea } from "./mesh-utils";
 import { generateThermalPair, ThermalGenerationOptions } from "./thermal-utils";
-import { CloudOptions } from "../../components/cloud";
+import { CloudOptions } from "../../foundation/components/environment";
 
 class Environment {
   birds: Birds;

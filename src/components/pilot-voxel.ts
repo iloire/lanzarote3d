@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import Models from "../utils/models";
+import Models from "../foundation/utils/models";
 
 export type PilotVoxelOptions = {
   objFile: string;

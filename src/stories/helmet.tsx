@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import Helpers from "../utils/helpers";
+import Helpers from "../foundation/utils/helpers";
 import { HelmetOptions, HelmetType } from "../components/parts/helmets/types";
 import { DefaultHelmet } from "../components/parts/helmets/DefaultHelmet";
 import { FullFaceHelmet } from "../components/parts/helmets/FullFaceHelmet";

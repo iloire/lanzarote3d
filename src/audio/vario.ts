@@ -1,11 +1,11 @@
-import beep200 from "./beep/audiocheck.net_sin_200Hz_-3dBFS_0.3s.wav";
-import beep400 from "./beep/audiocheck.net_sin_400Hz_-3dBFS_0.3s.wav";
-import beep600 from "./beep/audiocheck.net_sin_600Hz_-3dBFS_0.3s.wav";
-import beep800 from "./beep/audiocheck.net_sin_800Hz_-3dBFS_0.3s.wav";
-import beep1000 from "./beep/audiocheck.net_sin_1000Hz_-3dBFS_0.3s.wav";
-import beep1200 from "./beep/audiocheck.net_sin_1200Hz_-3dBFS_0.3s.wav";
+import beep200 from "../../assets/foundation/audio/vario/audiocheck.net_sin_200Hz_-3dBFS_0.3s.wav";
+import beep400 from "../../assets/foundation/audio/vario/audiocheck.net_sin_400Hz_-3dBFS_0.3s.wav";
+import beep600 from "../../assets/foundation/audio/vario/audiocheck.net_sin_600Hz_-3dBFS_0.3s.wav";
+import beep800 from "../../assets/foundation/audio/vario/audiocheck.net_sin_800Hz_-3dBFS_0.3s.wav";
+import beep1000 from "../../assets/foundation/audio/vario/audiocheck.net_sin_1000Hz_-3dBFS_0.3s.wav";
+import beep1200 from "../../assets/foundation/audio/vario/audiocheck.net_sin_1200Hz_-3dBFS_0.3s.wav";
 import * as THREE from "three";
-import Paraglider from "../components/base/flier";
+import Paraglider from "../foundation/types/flier";
 
 // Define event types for Vario
 export interface VarioEventMap {
