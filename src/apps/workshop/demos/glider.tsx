@@ -1,6 +1,6 @@
-import Glider from "../components/parts/glider";
-import Helpers from "../foundation/utils/helpers";
-import { StoryOptions } from "./types";
+import Glider from "../../../components/parts/glider";
+import Helpers from "../../../foundation/utils/helpers";
+import { StoryOptions } from "../../shared/types";
 
 const GliderWorkshop = {
   load: async (options: StoryOptions) => {

@@ -1,10 +1,10 @@
 import * as THREE from "three";
-import Helpers from "../foundation/utils/helpers";
-import { HelmetOptions, HelmetType } from "../components/parts/helmets/types";
-import { DefaultHelmet } from "../components/parts/helmets/DefaultHelmet";
-import { FullFaceHelmet } from "../components/parts/helmets/FullFaceHelmet";
-import { HelmetWithHorns } from "../components/parts/helmets/HelmetWithHorns";
-import { StoryOptions } from "./types";
+import Helpers from "../../../foundation/utils/helpers";
+import { HelmetOptions, HelmetType } from "../../../components/parts/helmets/types";
+import { DefaultHelmet } from "../../../components/parts/helmets/DefaultHelmet";
+import { FullFaceHelmet } from "../../../components/parts/helmets/FullFaceHelmet";
+import { HelmetWithHorns } from "../../../components/parts/helmets/HelmetWithHorns";
+import { StoryOptions } from "../../shared/types";
 
 const toHexColor = (num: number): string => {
   const hex = num.toString(16);

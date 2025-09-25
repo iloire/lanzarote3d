@@ -1,7 +1,7 @@
 import * as THREE from "three";
-import HangGlider from "../foundation/components/vehicles/Hangglider";
-import Helpers from "../foundation/utils/helpers";
-import { StoryOptions } from "./types";
+import HangGlider from "../../../foundation/components/vehicles/Hangglider";
+import Helpers from "../../../foundation/utils/helpers";
+import { StoryOptions } from "../../shared/types";
 
 const HangGliderWorkshop = {
   load: async (options: StoryOptions) => {

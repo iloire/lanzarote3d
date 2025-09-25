@@ -1,8 +1,8 @@
 import * as THREE from "three";
-import { Paraglider } from "../foundation/components/vehicles";
-import Helpers from "../foundation/utils/helpers";
-import { PilotHeadType } from "../components/parts/pilot-head";
-import { StoryOptions } from "./types";
+import { Paraglider } from "../../../foundation/components/vehicles";
+import Helpers from "../../../foundation/utils/helpers";
+import { PilotHeadType } from "../../../components/parts/pilot-head";
+import { StoryOptions } from "../../shared/types";
 
 const ParagliderWorkshop = {
   load: async (options: StoryOptions) => {

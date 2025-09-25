@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import textureImg from "../../assets/foundation/textures/environment/h-map-lanzarote.png";
-import { StoryOptions } from "./types";
+import textureImg from "../../../../assets/foundation/textures/environment/h-map-lanzarote.png";
+import { StoryOptions } from "../../shared/types";
 
 const terrainGenerator1 = (groundGeo, displacement) => {
   const groundMaterial = new THREE.MeshPhongMaterial({

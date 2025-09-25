@@ -1,7 +1,7 @@
 import * as THREE from "three";
-import Clouds from "../foundation/components/environment/Clouds";
-import Helpers from "../foundation/utils/helpers";
-import { StoryOptions } from "./types";
+import Clouds from "../../../foundation/components/environment/Clouds";
+import Helpers from "../../../foundation/utils/helpers";
+import { StoryOptions } from "../../shared/types";
 
 const CloudsWorkshop = {
   load: async (options: StoryOptions) => {

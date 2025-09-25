@@ -1,7 +1,7 @@
 import * as THREE from "three";
-import { Weather } from "../../foundation/components/physics";
-import { Thermal, ThermalDimensions } from "../../foundation/components/physics";
-import { rndIntBetween } from "../../foundation/utils/math";
+import { Weather } from "../../../foundation/components/physics";
+import { Thermal, ThermalDimensions } from "../../../foundation/components/physics";
+import { rndIntBetween } from "../../../foundation/utils/math";
 
 
 const generateRandomLcl = (lclLevel: number): number => {

@@ -1,9 +1,9 @@
 import * as THREE from "three";
-import ParagliderVoxel from "../components/paraglider-voxel";
-import Helpers from "../foundation/utils/helpers";
-import adriModel from "../../assets/foundation/models/characters/adri.obj";
-import adriTextureImage from "../../assets/foundation/models/characters/adri.png";
-import { StoryOptions } from "./types";
+import ParagliderVoxel from "../../../components/paraglider-voxel";
+import Helpers from "../../../foundation/utils/helpers";
+import adriModel from "../../../../assets/foundation/models/characters/adri.obj";
+import adriTextureImage from "../../../../assets/foundation/models/characters/adri.png";
+import { StoryOptions } from "../../shared/types";
 
 const ParagliderVoxelWorkshop = {
   load: async (options: StoryOptions) => {

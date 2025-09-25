@@ -3,10 +3,10 @@ import PilotHead, {
   GlassesType,
   PilotHeadType,
   PilotHeadOptions,
-} from "../components/parts/pilot-head";
-import Helpers from "../foundation/utils/helpers";
-import { HelmetOptions, HelmetType } from "../components/parts/helmets/types";
-import { StoryOptions } from "./types";
+} from "../../../components/parts/pilot-head";
+import Helpers from "../../../foundation/utils/helpers";
+import { HelmetOptions, HelmetType } from "../../../components/parts/helmets/types";
+import { StoryOptions } from "../../shared/types";
 
 const toHexColor = (num: number): string => {
   const hex = num.toString(16);

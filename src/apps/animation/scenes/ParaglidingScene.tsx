@@ -1,7 +1,6 @@
 import * as THREE from "three";
 import { update } from "@tweenjs/tween.js";
 import {
-  SceneManager,
   Paraglider,
   Sky,
   Weather,
@@ -17,19 +16,12 @@ export interface ParaglidingSceneConfig {
 }
 
 export class ParaglidingScene {
-  private sceneManager: SceneManager;
   private soundManager: SoundManager;
   private weather: Weather;
   private paragliders: Paraglider[] = [];
+  private scene: THREE.Scene | null = null;
 
   constructor(config: ParaglidingSceneConfig) {
-    // Initialize scene with optimized foundation systems
-    this.sceneManager = new SceneManager({
-      environment: 'lanzarote',
-      lighting: 'dynamic',
-      physics: true,
-      fog: { enabled: true, color: 0x87CEEB, near: 1000, far: 20000 }
-    });
 
     // Weather system
     this.weather = new Weather({
@@ -81,18 +73,24 @@ export class ParaglidingScene {
       const mesh = await paraglider.load();
       mesh.position.copy(config.position);
 
-      this.sceneManager.add(mesh);
+      if (this.scene) {
+        this.scene.add(mesh);
+      }
       this.paragliders.push(paraglider);
     }
   }
 
   load(options: StoryOptions): void {
-    const { camera, renderer, gui } = options;
+    const { camera, renderer, gui, scene } = options;
+    this.scene = scene;
+
+    // Setup fog for atmosphere
+    scene.fog = new THREE.Fog(0x87CEEB, 1000, 20000);
 
     // Setup sky
     const sky = new Sky();
     sky.updateSunPosition(14); // Afternoon lighting
-    this.sceneManager.add(sky.getMesh());
+    scene.add(sky); // Sky extends THREE.Object3D, so add it directly
 
     // Add weather controls to GUI
     this.weather.addGui(gui);
@@ -108,7 +106,7 @@ export class ParaglidingScene {
       this.animateParagliders();
 
       // Render the scene
-      renderer.render(this.sceneManager.getScene(), camera);
+      renderer.render(scene, camera);
     };
 
     // Set dramatic camera position

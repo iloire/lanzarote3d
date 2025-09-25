@@ -1,4 +1,4 @@
-import { StoryOptions } from "./types";
+import { StoryOptions } from "../../shared/types";
 
 const Night = {
   load: async (options: StoryOptions) => {

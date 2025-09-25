@@ -1,8 +1,8 @@
-import Pilot from "../foundation/components/vehicles/Pilot";
-import TandemPilot from "../components/tandem-pilot";
-import Helpers from "../foundation/utils/helpers";
-import { GlassesType, PilotHeadType } from "../components/parts/pilot-head";
-import { StoryOptions } from "./types";
+import Pilot from "../../../foundation/components/vehicles/Pilot";
+import TandemPilot from "../../../components/tandem-pilot";
+import Helpers from "../../../foundation/utils/helpers";
+import { GlassesType, PilotHeadType } from "../../../components/parts/pilot-head";
+import { StoryOptions } from "../../shared/types";
 
 const PilotWorkshop = {
   load: async (options: StoryOptions) => {

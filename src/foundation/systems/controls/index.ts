@@ -2,4 +2,5 @@
 export { FlightControls, DEFAULT_FLIGHT_KEYBINDINGS } from './FlightControls';
 
 // Input Handling System
-export { InputHandler, KeyBinding, InputConfig } from './InputHandler';
+export { InputHandler } from './InputHandler';
+export type { KeyBinding, InputConfig } from './InputHandler';

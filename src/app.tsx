@@ -153,7 +153,12 @@ const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAp
       controls
     };
 
-    await Stories[initialStory](storyOptions);
+    // Call the load method on the selected story
+    if (Stories[initialStory] && Stories[initialStory].load) {
+      await Stories[initialStory].load(storyOptions);
+    } else {
+      console.error(`Story "${initialStory}" not found or doesn't have a load method`);
+    }
 
     // Animation loop
     const animate = () => {
