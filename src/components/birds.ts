@@ -4,7 +4,6 @@ import Models from "../utils/models";
 import model from "../models/birds.glb";
 import AutoFlier from "./base/auto-flier";
 
-const mat = new THREE.MeshLambertMaterial({ color: 0xffffff });
 const clock = new THREE.Clock();
 
 class Birds extends AutoFlier {
@@ -34,7 +33,6 @@ class Birds extends AutoFlier {
   }
 
   animate() {
-    const timer = (Date.now() + Math.random() * 1000) * 0.001;
     const delta = clock.getDelta();
     this.mixer.update(delta);
     if (this.path.length) {

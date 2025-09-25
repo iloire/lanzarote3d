@@ -13,7 +13,6 @@ const mat_roof = getColorMaterial(0x8B4513);  // Brown color for roof
 const mat_frame = getColorMaterial(0x4a4a4a);  // Dark gray for window frames
 const mat_modern = getColorMaterial(0xCCCCCC); // Light gray for modern houses
 const mat_modern_window = getColorMaterial(0x000080); // Navy blue for modern windows
-const mat_balcony = getColorMaterial(0x808080); // Gray for balcony
 
 export enum HouseType {
   Small,
