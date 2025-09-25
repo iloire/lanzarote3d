@@ -185,50 +185,70 @@ const PhotoBooth = {
     controls.enabled = true;
 
     const initialPos = new THREE.Vector3(6800, 870, -475);
-    camera.animateTo(initialPos, paraglidersVoxel[0].position, 0, controls);
+    const lookAtPos = paraglidersVoxel[0].position;
+
+    console.log('PhotoBooth: Setting camera position to', initialPos, 'looking at', lookAtPos);
+
+    // Set camera position directly since duration is 0
+    camera.position.copy(initialPos);
+    camera.lookAt(lookAtPos);
+    controls.target.copy(lookAtPos);
+    controls.update();
 
     // Add paragliders
-    paragliders.forEach(async (p) => {
+    console.log('PhotoBooth: Adding', paragliders.length, 'regular paragliders');
+    paragliders.forEach(async (p, index) => {
       const paraglider = new Paraglider(p.pg);
       const mesh = await paraglider.load();
       mesh.position.copy(p.position);
       const scale = 0.001;
       mesh.scale.set(scale, scale, scale);
       scene.add(mesh);
+      console.log(`PhotoBooth: Added regular paraglider ${index} at`, p.position);
     });
 
     // Add voxel paragliders
-    paraglidersVoxel.forEach(async (p) => {
+    console.log('PhotoBooth: Adding', paraglidersVoxel.length, 'voxel paragliders');
+    paraglidersVoxel.forEach(async (p, index) => {
       const paraglider = new ParagliderVoxel(p.pg);
       const mesh = await paraglider.load();
       mesh.position.copy(p.position);
       const scale = 0.01;
       mesh.scale.set(scale, scale, scale);
       scene.add(mesh);
+      console.log(`PhotoBooth: Added voxel paraglider ${index} at`, p.position);
     });
 
     // Add tandems
-    tandems.forEach(async (p) => {
+    console.log('PhotoBooth: Adding', tandems.length, 'tandems');
+    tandems.forEach(async (p, index) => {
       const tandem = new Tandem(p.pg);
       const mesh = await tandem.load();
       mesh.position.copy(p.position);
       const scale = 0.001;
       mesh.scale.set(scale, scale, scale);
       scene.add(mesh);
+      console.log(`PhotoBooth: Added tandem ${index} at`, p.position);
     });
 
     // must render before adding env
     renderer.render(scene, camera);
 
+    console.log('PhotoBooth: Setting up environment');
     const env = new Environment(scene);
     const weather = new Weather(WEATHER_SETTINGS);
     const thermals = env.generateThermals(weather, 0);
     const cloudOptions = { colors: ["#F64A8A", "#F987C5", "#DE3163"] };
 
+    console.log('PhotoBooth: Adding clouds, thermals count:', thermals.length);
     env.addClouds(weather, thermals, cloudOptions);
+    console.log('PhotoBooth: Adding trees');
     env.addTrees(terrain);
+    console.log('PhotoBooth: Adding houses');
     env.addHouses(terrain);
+    console.log('PhotoBooth: Adding boats');
     env.addBoats(water);
+    console.log('PhotoBooth: Environment setup complete');
 
     const animate = () => {
       update();
