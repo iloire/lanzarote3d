@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { Paraglider } from "../../../foundation/components/vehicles";
 import Helpers from "../../../foundation/utils/helpers";
-import { PilotHeadType } from "../../../components/parts/pilot-head";
+import { PilotHeadType } from "../../../foundation/components/characters/PilotHead";
 import { StoryOptions } from "../../shared/types";
 
 const ParagliderWorkshop = {

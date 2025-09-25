@@ -1,4 +1,4 @@
-import Glider from "../../../components/parts/glider";
+import Glider from "../../../foundation/components/vehicles/Glider";
 import Helpers from "../../../foundation/utils/helpers";
 import { StoryOptions } from "../../shared/types";
 

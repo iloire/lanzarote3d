@@ -4,7 +4,7 @@ import Stats from "three/examples/jsm/libs/stats.module";
 import * as THREE from "three";
 import Sky from "./foundation/components/environment/Sky";
 import Water from "./foundation/components/environment/Water";
-import Island from "./components/island";
+import Island from "./foundation/components/scenery/Island";
 import Stories from "./apps/shared/index";
 import { CameraController as Camera, CameraMode } from './foundation/systems/scene/CameraController';
 import Menu from './menu';

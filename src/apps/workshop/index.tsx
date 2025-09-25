@@ -1,10 +1,10 @@
 import * as THREE from "three";
 import { Paraglider } from "../../foundation/components/vehicles";
-import Boat from "../../components/boat";
-import House, { HouseType } from "../../components/house";
-import PineTree from "../../components/pinetree";
+import { Boat } from "../../foundation/components/scenery";
+import { House, HouseType } from "../../foundation/components/scenery";
+import { PineTree } from "../../foundation/components/scenery";
 import Helpers from "../../foundation/utils/helpers";
-import { PilotHeadType } from "../../components/parts/pilot-head";
+import { PilotHeadType } from "../../foundation/components/characters";
 import { StoryOptions } from "../shared/types";
 
 const createLabel = (text: string, position: THREE.Vector3) => {

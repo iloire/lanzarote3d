@@ -1,7 +1,7 @@
 import Pilot from "../../../foundation/components/vehicles/Pilot";
-import TandemPilot from "../../../components/tandem-pilot";
+import TandemPilot from "../../../foundation/components/characters/TandemPilot";
 import Helpers from "../../../foundation/utils/helpers";
-import { GlassesType, PilotHeadType } from "../../../components/parts/pilot-head";
+import { GlassesType, PilotHeadType } from "../../../foundation/components/characters/PilotHead";
 import { StoryOptions } from "../../shared/types";
 
 const PilotWorkshop = {

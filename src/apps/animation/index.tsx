@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { update } from "@tweenjs/tween.js";
-import ParagliderVoxel, { ParagliderVoxelOptions } from "../../components/paraglider-voxel";
+import { ParagliderVoxel } from "../../foundation/components/vehicles";
+import type { ParagliderVoxelOptions } from "../../foundation/components/vehicles";
 import Environment from "../shared/env/environment";
 import Weather, { WeatherOptions } from "../../foundation/components/physics/Weather";
 import adriModel from '../../../assets/foundation/models/characters/adri.obj';

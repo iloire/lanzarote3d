@@ -3,9 +3,9 @@ import PilotHead, {
   GlassesType,
   PilotHeadType,
   PilotHeadOptions,
-} from "../../../components/parts/pilot-head";
+} from "../../../foundation/components/characters/PilotHead";
 import Helpers from "../../../foundation/utils/helpers";
-import { HelmetOptions, HelmetType } from "../../../components/parts/helmets/types";
+import { HelmetOptions, HelmetType } from "../../../foundation/components/characters/helmets/types";
 import { StoryOptions } from "../../shared/types";
 
 const toHexColor = (num: number): string => {

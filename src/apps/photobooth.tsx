@@ -3,9 +3,9 @@ import { update } from "@tweenjs/tween.js";
 import { Paraglider, ParagliderOptions } from "../foundation/components/vehicles";
 import ParagliderVoxel, {
   ParagliderVoxelOptions,
-} from "../components/paraglider-voxel";
-import Tandem from "../components/tandem";
-import { PilotHeadType } from "../components/parts/pilot-head";
+} from "../foundation/components/vehicles/ParagliderVoxel";
+import Tandem from "../foundation/components/vehicles/Tandem";
+import { PilotHeadType } from "../foundation/components/characters/PilotHead";
 import Environment from "./shared/env/environment";
 import Weather, { WeatherOptions } from "../foundation/components/physics/Weather";
 import adriModel from "../../assets/foundation/models/characters/adri.obj";
