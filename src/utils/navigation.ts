@@ -84,7 +84,6 @@ const Navigation = (camera: THREE.PerspectiveCamera, controls: OrbitControls) =>
   }
 
   const xSpeed = 0.1;
-  const ySpeed = 0.1;
   document.addEventListener("keydown", onDocumentKeyDown, false);
 
   function onDocumentKeyDown(event) {

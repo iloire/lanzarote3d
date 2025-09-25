@@ -2,7 +2,6 @@ import { logger, LogLevel } from '../../src/utils/logger';
 
 describe('Logger', () => {
   // Mock console methods
-  const originalConsole = console;
   let mockDebug: jest.SpyInstance;
   let mockInfo: jest.SpyInstance;
   let mockWarn: jest.SpyInstance;

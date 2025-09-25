@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { Location, Takeoff, LandingSpot, FlightPhase, FlyZoneShape } from "../flyzones/locations";
-import { gpsToWorld, worldToGPS } from "../flyzones/helpers/gps";
+import { worldToGPS } from "../flyzones/helpers/gps";
 
 export interface EditorState {
   locations: EditorLocation[];

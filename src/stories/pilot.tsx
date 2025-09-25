@@ -1,6 +1,3 @@
-import * as THREE from "three";
-import Controls from "../utils/controls";
-import Sky from "../components/sky";
 import Pilot from "../components/pilot";
 import TandemPilot from "../components/tandem-pilot";
 import Helpers from "../utils/helpers";

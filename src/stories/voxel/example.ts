@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { STLExporter } from 'three/examples/jsm/exporters/STLExporter';
 
 const createVoxelElephant = () => {
   const group = new THREE.Group();

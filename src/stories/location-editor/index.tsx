@@ -1,9 +1,8 @@
 import * as THREE from "three";
+import { update } from "@tweenjs/tween.js";
 import { StoryOptions } from "../types";
-import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
-import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import { setupLabelRenderer } from "../flyzones/markers/marker";
-import { EditorState, createNewLocation, addTakeoff, addLandingSpot, addFlyZonePhase, exportLocationData, resetLocation, undoLastAction, saveToLocalStorage, loadFromLocalStorage, clearLocalStorage } from "./state";
+import { EditorState, exportLocationData, resetLocation, undoLastAction, saveToLocalStorage, loadFromLocalStorage, clearLocalStorage } from "./state";
 import { createEditorUI } from "./ui";
 import { setupInteraction } from "./interaction";
 import "./styles.css"; // Import the CSS
