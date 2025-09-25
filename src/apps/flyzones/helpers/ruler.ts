@@ -92,16 +92,7 @@ export const createRuler = (options: RulerOptions): Ruler => {
         const startGPS = worldToGPS(startPoint);
         const endGPS = worldToGPS(endPoint);
         
-        console.log('Ruler Measurement:');
-        console.log('Start:', {
-          world: startPoint,
-          gps: startGPS
-        });
-        console.log('End:', {
-          world: endPoint,
-          gps: endGPS
-        });
-        console.log('Distance:', distance.toFixed(1), 'meters');
+        // Ruler measurement completed
         
         // Reset for next measurement
         startPoint = null;

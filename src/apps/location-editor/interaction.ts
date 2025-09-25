@@ -62,18 +62,13 @@ export const setupInteraction = (
     raycaster.setFromCamera(mouse, camera);
     const intersects = raycaster.intersectObjects(scene.children, true);
     
-    console.log("Click detected, intersects:", intersects.length);
-    
-    // Log all intersected objects for debugging
-    intersects.forEach((intersect, index) => {
-      console.log(`Intersect ${index}:`, intersect.object.type, intersect.object.userData);
-    });
+    // Process raycaster intersections
     
     // Find the first terrain intersection
     const terrainIntersect = intersects.find(i => i.object.userData['type'] === 'terrain');
     
     if (terrainIntersect) {
-      console.log("Terrain intersection found at:", terrainIntersect.point);
+      // Terrain intersection found
       const position = terrainIntersect.point;
       const currentLocation = getCurrentLocation(state);
       
@@ -82,7 +77,7 @@ export const setupInteraction = (
         case 'location':
           if (state.currentLocationIndex === null) {
             createNewLocation(state, position, scene);
-            console.log("Created new location at", position);
+            // New location created
             saveToLocalStorage(state);
           } else {
             alert("You already have a location selected. To create a new one, deselect the current location first.");
@@ -92,7 +87,7 @@ export const setupInteraction = (
         case 'takeoff':
           if (currentLocation) {
             addTakeoff(state, position, scene);
-            console.log("Added takeoff at", position);
+            // Takeoff added
             saveToLocalStorage(state);
           } else {
             alert("Please create or select a location first.");
@@ -102,7 +97,7 @@ export const setupInteraction = (
         case 'landing':
           if (currentLocation) {
             addLandingSpot(state, position, scene);
-            console.log("Added landing spot at", position);
+            // Landing spot added
             saveToLocalStorage(state);
           } else {
             alert("Please create or select a location first.");
@@ -112,7 +107,7 @@ export const setupInteraction = (
         case 'flyzone':
           if (currentLocation) {
             addFlyZonePhase(state, position, scene);
-            console.log(`Added ${state.flyZonePhaseType} flyzone phase at`, position);
+            // Flyzone phase added
             saveToLocalStorage(state);
           } else {
             alert("Please create or select a location first.");
@@ -120,19 +115,19 @@ export const setupInteraction = (
           break;
       }
     } else {
-      console.log("No terrain intersection found");
+      // No terrain intersection found
       const currentLocation = getCurrentLocation(state);
       
       // As a fallback, use a point at the camera's target position
       if (event.shiftKey) {
-        console.log("Using fallback position (shift+click)");
+        // Using fallback position (shift+click)
         const fallbackPosition = new THREE.Vector3(0, 0, 0);
         
         switch(state.mode) {
           case 'location':
             if (state.currentLocationIndex === null) {
               createNewLocation(state, fallbackPosition, scene);
-              console.log("Created new location at fallback position");
+              // New location created at fallback position
               saveToLocalStorage(state);
             }
             break;
@@ -166,7 +161,7 @@ export const setupInteraction = (
       );
       
       if (markerIntersect) {
-        console.log("Selected marker:", markerIntersect.object.userData);
+        // Marker selected
       }
     }
   };

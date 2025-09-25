@@ -32,7 +32,7 @@ class Paraglider implements IFlyable {
   left() {
     this.glider.breakLeft();
     this.pilot.breakLeft();
-    console.log('paraglider model left');
+    // Loading left wing model
   }
 
   leftRelease() {
@@ -42,7 +42,7 @@ class Paraglider implements IFlyable {
   right() {
     this.glider.breakRight();
     this.pilot.breakRight();
-    console.log('paraglider model right');
+    // Loading right wing model
   }
 
   rightRelease() {

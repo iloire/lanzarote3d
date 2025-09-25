@@ -113,13 +113,13 @@ export class CameraController extends THREE.PerspectiveCamera {
       return;
     }
     if (this.mode === CameraMode.FollowTarget) {
-      console.log("Camera follow target");
+      // Camera switching to follow target mode
       if (!this.target) {
         throw new Error("Camera target is not set");
       }
       this.followTarget();
     } else if (this.mode === CameraMode.FirstPersonView) {
-      console.log("Camera first person view");
+      // Camera switching to first person mode
       if (!this.target) {
         throw new Error("Camera target is not set");
       }
@@ -166,7 +166,7 @@ export class CameraController extends THREE.PerspectiveCamera {
   }
 
   lookDirection(xDegrees: number, yDegrees: number) {
-    console.log("Camera look direction", xDegrees, yDegrees);
+    // Camera look direction updated
     const angleRadiansX = THREE.MathUtils.degToRad(xDegrees);
     const angleRadiansY = THREE.MathUtils.degToRad(yDegrees);
     this.viewRotationHorizontal = angleRadiansX;
@@ -191,7 +191,7 @@ export class CameraController extends THREE.PerspectiveCamera {
   }
 
   followTarget() {
-    console.log("Camera follow target", this.target);
+    // Camera following target
     const x = Math.sin(this.angle) * this.distance;
     const z = Math.cos(this.angle) * this.distance;
     const y = Math.cos(this.angleY) * this.distance;
@@ -206,7 +206,7 @@ export class CameraController extends THREE.PerspectiveCamera {
   }
 
   firstPersonView() {
-    console.log("Camera first person view", this.target);
+    // Camera in first person view
     const cam = this;
     const pg = this.target;
 

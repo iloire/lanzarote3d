@@ -32,7 +32,8 @@
       "Bash(rm:*)",
       "Bash(curl:*)",
       "Bash(rmdir:*)",
-      "Bash(cut:*)"
+      "Bash(cut:*)",
+      "Bash(grep:*)"
     ],
     "deny": [],
     "ask": []

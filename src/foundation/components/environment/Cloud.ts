@@ -2,8 +2,6 @@ import * as THREE from "three";
 import { rndBetween, rndIntBetween } from "../../utils/math";
 import { Tween, Easing } from "@tweenjs/tween.js";
 
-
-
 const generateCloudPart = (
   radius: number,
   scale: number,

@@ -44,9 +44,9 @@ export const addMeshAroundArea = (
 
     const terrainHeight = getTerrainHeight(newX, newZ, terrain);
     if (isNaN(terrainHeight)) {
-      console.log(meshTypes);
-      console.log(centerPosition);
-      console.log(terrain);
+      // Mesh types available
+      // Center position calculated
+      // Terrain mesh available
       throw new Error("can not calculate terrain height. Perphaps you need to render the scene first");
       break;
     }

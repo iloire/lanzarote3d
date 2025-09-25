@@ -314,7 +314,7 @@ const Game = {
 
     animate();
 
-    console.log("triangles:", renderer.info.render.triangles);
+    // Game rendering complete
   },
 };
 

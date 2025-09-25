@@ -66,7 +66,7 @@ class Weather extends THREE.EventDispatcher<WeatherEventMap> {
 
   changeWindSpeed(windSpeedMetresPerSecond: number) {
     this.options.speedMetresPerSecond = windSpeedMetresPerSecond;
-    console.log(this.options.speedMetresPerSecond);
+    // Wind speed updated
   }
 
   changeWindDirection(degreesFromNorth: number) {

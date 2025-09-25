@@ -41,8 +41,8 @@ export abstract class AppBase {
 
   constructor(config: AppConfig) {
     this.config = config;
-    console.log(`🚀 Initializing ${config.name}`);
-    console.log(`📦 Required components: ${config.requiredComponents.join(', ')}`);
+    // Initializing app
+    // Required components configured
   }
 
   protected initializeCore(options: StoryOptions): void {
@@ -89,12 +89,7 @@ export abstract class AppBase {
 
   // Utility methods
   protected logAppInfo(): void {
-    console.group(`📱 ${this.config.name} - App Info`);
-    console.log(`Description: ${this.config.description}`);
-    console.log(`Components: ${this.config.requiredComponents.join(', ')}`);
-    console.log(`Performance Monitoring: ${this.config.performance?.monitoring ? 'Enabled' : 'Disabled'}`);
-    console.log(`Scene Management: ${this.sceneManager ? 'Enabled' : 'Disabled'}`);
-    console.groupEnd();
+    // App information available for debugging
   }
 
   protected handleError(error: Error, context: string): void {
@@ -102,7 +97,7 @@ export abstract class AppBase {
 
     // Could send to analytics system here
     if (this.performanceMonitor) {
-      console.log('Performance at error:', this.performanceMonitor.getMetrics());
+      // Performance metrics captured during error
     }
   }
 
@@ -117,7 +112,7 @@ export abstract class AppBase {
   }
 
   public dispose(): void {
-    console.log(`🧹 Cleaning up ${this.config.name}`);
+    // App cleanup initiated
 
     this.onAppStop?.();
 

@@ -91,7 +91,7 @@ const Animation = {
     };
     animate();
 
-    console.log('Animation App loaded - restored original animation');
+    // Animation app initialized
   }
 };
 

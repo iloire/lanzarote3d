@@ -13,9 +13,7 @@ const LocationEditor = {
 
     camera.position.set(1000,5000,1000);
 
-    console.log("Location Editor loading...");
-    console.log("Scene:", scene);
-    console.log("Terrain:", terrain);
+    // Location Editor loading...
 
     // Store scene in window for UI access
     (window as any).__editorScene = scene;
@@ -26,7 +24,7 @@ const LocationEditor = {
 
     if (savedState) {
       editorState = savedState;
-      console.log("Loaded state from localStorage:", editorState);
+      // Loaded state from localStorage
     } else {
       editorState = {
         locations: [],
@@ -53,7 +51,7 @@ const LocationEditor = {
     modeFolder.add(editorState, 'mode', ['location', 'takeoff', 'landing', 'flyzone'])
       .name('Edit Mode')
       .onChange((value: string) => {
-        console.log(`Switched to ${value} mode`);
+        // Switched mode
         updateCursorStyle(value);
         saveState(); // Save after mode change
       });
@@ -163,7 +161,7 @@ const LocationEditor = {
     );
     debugSphere.position.set(0, 1000, 0);
     scene.add(debugSphere);
-    console.log("Added debug sphere at position:", debugSphere.position);
+    // Debug sphere added
   },
 };
 

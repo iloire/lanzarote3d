@@ -5,7 +5,7 @@ const createVoxelElephant = () => {
   const voxelSize = 50; // Smaller voxels for better detail
 
   let voxelCount = 0;
-  console.log('Starting elephant creation');
+  // Starting elephant creation
 
   // Define elephant voxels - each array is a layer from bottom to top
   const elephantLayers = [
@@ -113,13 +113,13 @@ const createVoxelElephant = () => {
           cube.rotation.z = Math.random() * 0.1;
           group.add(cube);
           
-          console.log(`Added voxel at position:`, cube.position);
+          // Voxel added
         }
       });
     });
   });
 
-  console.log(`Created elephant with ${voxelCount} voxels`);
+  // Elephant creation completed
   
   // Center the group
   const box = new THREE.Box3().setFromObject(group);
@@ -127,12 +127,7 @@ const createVoxelElephant = () => {
   group.position.sub(center);
   group.position.y += box.max.y / 2; // Move up by half height to sit on ground
 
-  console.log('Elephant bounds:', {
-    min: box.min,
-    max: box.max,
-    center: center,
-    finalPosition: group.position
-  });
+  // Elephant positioned and centered
 
   return group;
 };

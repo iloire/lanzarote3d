@@ -31,7 +31,7 @@ class ParagliderVoxel implements IFlyable {
 
   left() {
     this.glider.breakLeft();
-    console.log('paraglider model left');
+    // Loading left wing model
   }
 
   leftRelease() {
@@ -39,7 +39,7 @@ class ParagliderVoxel implements IFlyable {
 
   right() {
     this.glider.breakRight();
-    console.log('paraglider model right');
+    // Loading right wing model
   }
 
   rightRelease() {

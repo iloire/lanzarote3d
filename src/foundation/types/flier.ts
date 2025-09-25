@@ -158,7 +158,7 @@ class Flier extends THREE.EventDispatcher<FlierEventMap> {
           vector: this.position(),
         }); // last point saved
         if (ANTI_CRASH_ENABLED) {
-          console.log("touched ground");
+          // Anti-crash mode enabled
         } else {
           this.dispatchEvent({
             type: "crashed",
@@ -271,7 +271,7 @@ class Flier extends THREE.EventDispatcher<FlierEventMap> {
 
     const inHowManyThermals = this.countInsideHowManyThermals();
     if (inHowManyThermals > 0) {
-      console.log(inHowManyThermals, 'thermals')
+      // Thermal detection logic
     }
     const liftThermal = 2 * inHowManyThermals;
     const liftThermalVector = UP_DIRECTION.clone().multiplyScalar(
@@ -361,25 +361,25 @@ class Flier extends THREE.EventDispatcher<FlierEventMap> {
   }
 
   leftInput() {
-    console.log('left input');
+    // Left input
     this.isLeftInput = true;
     this.flyable.left();
   }
 
   leftRelease() {
-    console.log('leftrelease');
+    // Left release
     this.isLeftInput = false;
     this.flyable.leftRelease();
   }
 
   rightInput() {
-    console.log('right');
+    // Right input
     this.isRightInput = true;
     this.flyable.right();
   }
 
   rightRelease() {
-    console.log('rightrelease');
+    // Right release
     this.isRightInput = false;
     this.flyable.rightRelease();
   }
@@ -471,20 +471,20 @@ class Flier extends THREE.EventDispatcher<FlierEventMap> {
   toggleEars() {
     if (this.ears) {
       this.ears = false;
-      console.log("ears off");
+      // Ears off
     } else {
       this.ears = true;
-      console.log("ears on");
+      // Ears on
     }
   }
 
   toggleSpeedBar() {
     if (this.speedBar) {
       this.speedBar = false;
-      console.log("speed bar off");
+      // Speed bar off
     } else {
       this.speedBar = true;
-      console.log("speed bar on");
+      // Speed bar on
     }
   }
 

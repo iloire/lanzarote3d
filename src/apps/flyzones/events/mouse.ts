@@ -30,17 +30,7 @@ export const setupMouseClickHandler = (
       const point = intersects[0].point;
       const gpsCoords = worldToGPS(point);
       
-      console.log('Click detected:');
-      console.log('3D World Coordinates:', {
-        x: point.x.toFixed(2),
-        y: point.y.toFixed(2),
-        z: point.z.toFixed(2)
-      });
-      console.log('GPS Coordinates:', {
-        latitude: gpsCoords.latitude.toFixed(6),
-        longitude: gpsCoords.longitude.toFixed(6),
-        altitude: gpsCoords.altitude.toFixed(1)
-      });
+      // Click detected - coordinates available in point and gpsCoords
     }
   };
 

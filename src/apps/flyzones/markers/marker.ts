@@ -104,7 +104,7 @@ export const createMarker = async (
   const showPopup = () => {
     if (!popupContainer) return;
     
-    console.log("Showing popup for:", title);
+    // Showing popup
     
     // Create popup content
     const popupContent = document.createElement('div');

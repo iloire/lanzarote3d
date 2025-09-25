@@ -251,7 +251,7 @@ export const copyToClipboard = (text: string): Promise<void> => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text)
         .then(() => {
-          console.log('Text copied to clipboard');
+          // Text copied to clipboard
           resolve();
         })
         .catch(err => {
@@ -272,7 +272,7 @@ export const copyToClipboard = (text: string): Promise<void> => {
         const successful = document.execCommand('copy');
         document.body.removeChild(textArea);
         if (successful) {
-          console.log('Text copied to clipboard (fallback)');
+          // Text copied to clipboard (fallback)
           resolve();
         } else {
           console.error('Failed to copy text (fallback)');
@@ -681,23 +681,23 @@ export const resetLocation = (state: EditorState, scene: THREE.Scene): void => {
     state.markers = [];
     state.flyZones = [];
     
-    console.log("Location reset. All markers and flyzones removed.");
+    // Location reset. All markers and flyzones removed.
   } else {
-    console.log("No location to reset.");
+    // No location to reset.
   }
 };
 
 // Add the undo function
 export const undoLastAction = (state: EditorState, scene: THREE.Scene): void => {
   if (state.history.length === 0) {
-    console.log("Nothing to undo");
+    // Nothing to undo
     return;
   }
   
   const lastAction = state.history.pop();
   if (!lastAction) return;
   
-  console.log("Undoing action:", lastAction.type);
+  // Undoing action
   
   // Remove the object from the scene
   scene.remove(lastAction.object);
@@ -745,7 +745,7 @@ export const undoLastAction = (state: EditorState, scene: THREE.Scene): void => 
       break;
   }
   
-  console.log("Undo complete");
+  // Undo complete
 };
 
 // Add these functions to save and load state from localStorage
@@ -814,7 +814,7 @@ export const saveToLocalStorage = (state: EditorState): void => {
     };
     
     localStorage.setItem('locationEditor', JSON.stringify(serializable));
-    console.log('State saved to localStorage');
+    // State saved to localStorage
   } catch (error) {
     console.error('Failed to save state to localStorage:', error);
   }
@@ -900,7 +900,7 @@ export const loadFromLocalStorage = (scene: THREE.Scene): EditorState | null => 
       });
     }
     
-    console.log('State loaded from localStorage');
+    // State loaded from localStorage
     return state;
   } catch (error) {
     console.error('Failed to load state from localStorage:', error);
@@ -911,7 +911,7 @@ export const loadFromLocalStorage = (scene: THREE.Scene): EditorState | null => 
 // Clear localStorage
 export const clearLocalStorage = (): void => {
   localStorage.removeItem('locationEditor');
-  console.log('LocationEditor localStorage cleared');
+  // LocationEditor localStorage cleared
 };
 
 // Helper to get the current location

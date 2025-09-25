@@ -7,21 +7,13 @@ const VoxelStory = {
   load: async (options: StoryOptions) => {
     const { scene, camera, controls, renderer } = options;
     
-    console.log('Starting VoxelStory load');
+    // Starting VoxelStory load
     
     // Create and add elephant to scene
     const example = createVoxelExample();
     scene.add(example);
     
-    console.log('Scene info:', {
-      children: scene.children.length,
-      renderInfo: renderer.info.render,
-      sceneObjects: scene.children.map(child => ({
-        type: child.type,
-        position: child.position,
-        visible: child.visible
-      }))
-    });
+    // Scene initialized with voxel example
 
     // Add multiple lights for better visibility
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
@@ -50,10 +42,7 @@ const VoxelStory = {
     controls.maxDistance = 5000;
     controls.update();
 
-    console.log('Camera setup:', {
-      position: camera.position,
-      target: controls.target
-    });
+    // Camera positioned for viewing
 
     // Add axes helper for debugging
     const axesHelper = new THREE.AxesHelper(1000);

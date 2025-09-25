@@ -284,7 +284,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
   }
 
   handleCamMode = (mode: CameraMode) => {
-    console.log("CAMERA:", mode);
+    // Camera mode changed
     this.props.onSelectCamera(mode);
   };
 

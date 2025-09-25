@@ -51,7 +51,7 @@ const FlyZones = {
     
     // Function to load locations and create markers
     const loadLocations = async () => {
-      console.log("Available locations:", locations);
+      // Loading available locations
       if (locations.length === 0) {
         console.error("No locations found!");
         
@@ -63,11 +63,11 @@ const FlyZones = {
         scene.add(dummyCube);
       }
       
-      console.log("Loading locations:", locations);
+      // Processing locations
       
       // Create location markers
       for (const location of locations) {
-        console.log("Creating marker for location:", location.title);
+        // Creating location marker
         
         // Create a simple sphere to represent the location
         const locationMarker = await createSimpleMarker({
@@ -102,7 +102,7 @@ const FlyZones = {
         // Create takeoff markers
         if (location.takeoffs && location.takeoffs.length > 0) {
           for (const takeoff of location.takeoffs) {
-            console.log("Creating marker for takeoff:", takeoff.title);
+            // Creating takeoff marker
             
             // Create a takeoff marker
             const navigateToWrapper = (position: THREE.Vector3, location?: FlyLocation) => {
@@ -146,7 +146,7 @@ const FlyZones = {
         // Create landing markers
         if (location.landingSpots && location.landingSpots.length > 0) {
           for (const landing of location.landingSpots) {
-            console.log("Creating marker for landing:", landing.title);
+            // Creating landing marker
             
             // Create a landing marker (cylinder)
             const landingGeometry = new THREE.CylinderGeometry(150, 150, 50, 16);
@@ -183,7 +183,7 @@ const FlyZones = {
         
         // Create flyzone visualization if available
         if (location.flyzone) {
-          console.log("Creating flyzone for location:", location.title);
+          // Creating flyzone visualization
           
           // Create a custom flyzone visualization
           const flyzone = await createCustomFlyZone(location.flyzone);
@@ -229,7 +229,7 @@ const FlyZones = {
       ground.position.y = -10; // Slightly below origin
       scene.add(ground);
       
-      console.log("Scene setup complete");
+      // Scene setup complete
     };
 
     // Call this function before loadLocations
@@ -374,7 +374,7 @@ const FlyZones = {
         // Traverse up to find the root object with userData
         while (current && current.parent) {
           if (current.userData && current.userData['isInteractive']) {
-            console.log("Clicked on interactive object:", current);
+            // Clicked on interactive object
             if (current.userData['onClick']) {
               current.userData['onClick']();
             }

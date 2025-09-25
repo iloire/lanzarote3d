@@ -54,7 +54,7 @@ const HelmetWorkshop = {
 
     helmets.forEach((helmetConfig, index) => {
       let helmet;
-      console.log("Creating helmet:", helmetConfig.type); // Debug log
+      // Creating helmet
 
       switch (helmetConfig.type) {
         case HelmetType.Default:
@@ -72,7 +72,7 @@ const HelmetWorkshop = {
       }
 
       const mesh = helmet.load();
-      console.log("Helmet mesh:", mesh); // Debug log
+      // Helmet mesh created
 
       // Calculate grid position
       const row = Math.floor(index / ITEMS_PER_ROW);

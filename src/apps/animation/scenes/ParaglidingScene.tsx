@@ -55,7 +55,7 @@ export class ParaglidingScene {
       this.soundManager.play('wind');
       this.soundManager.play('ambient');
     } catch (error) {
-      console.log('Audio loading failed (optional):', error);
+      // Audio loading failed (optional)
     }
   }
 

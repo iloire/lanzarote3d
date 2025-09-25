@@ -16,7 +16,7 @@ export const setupAnimationLoop = (
   landingMarkersVisible: boolean
 ): void => {
   const animate = () => {
-    console.log("Animation frame running");
+    // Animation frame running
     requestAnimationFrame(animate);
     update();
     controls.update();

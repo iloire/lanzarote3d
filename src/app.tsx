@@ -167,7 +167,7 @@ const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAp
     };
     animate();
 
-    console.log("triangles:", renderer.info.render.triangles);
+    // Rendering complete
   };
 
   useEffect(() => {
