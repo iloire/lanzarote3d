@@ -13,11 +13,20 @@ THREE.Cache.enabled = true;
 const scriptTag = document.currentScript as HTMLScriptElement;
 const bundleName = scriptTag?.src.match(/([^\/]+)\.bundle\.js$/)?.[1] || 'animation';
 
+// Map bundle names to story names
+const bundleToStoryMap: Record<string, string> = {
+  'main': 'animation',
+  'flyzones': 'flyzones',
+  'game': 'game'
+};
+
+const storyName = bundleToStoryMap[bundleName] || 'animation';
+
 const rootElement = document.getElementById("root");
 if (rootElement && WebGL.isWebGLAvailable()) {
   const root = createRoot(rootElement);
-  root.render(<App showAppSelection={true} showPublic={true} showDev={false} showExperiments={false} initialStory={bundleName} />);
-  logger.info(`${bundleName} story started`);
+  root.render(<App showAppSelection={true} showPublic={true} showDev={false} showExperiments={false} initialStory={storyName} />);
+  logger.info(`${storyName} story started from ${bundleName} bundle`);
 } else if (rootElement) {
   const warning = WebGL.getWebGLErrorMessage();
   rootElement.appendChild(warning);
