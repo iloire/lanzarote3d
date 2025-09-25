@@ -10,6 +10,7 @@ import Wing from './Wing';
 // Type exports
 export type { VehicleConfig } from '../../types';
 export type { ParagliderOptions } from './Paraglider';
+export type { ParagliderVoxelOptions } from './ParagliderVoxel';
 export type { PilotOptions } from './Pilot';
 
 // Component exports
