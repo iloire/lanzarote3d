@@ -65,7 +65,22 @@ const createRenderer = (sizes: { width: number; height: number }) => {
   });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(sizes.width, sizes.height);
+
+  // Configure renderer for visual consistency with Three.js 0.149
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.0; // Default was changed in newer versions
+
+  // Use sRGB color space (replaces outputEncoding from older versions)
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+  // Enable legacy lighting mode for backward compatibility
+  // This maintains the lighting behavior from Three.js < 0.155
+  THREE.ColorManagement.enabled = true;
+
+  // Shadow settings for consistency
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
   return renderer;
 };
 

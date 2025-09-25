@@ -146,7 +146,7 @@ const LocationEditor = {
 
     // Render loop
     const animate = () => {
-      TWEEN.update();
+      update();
       
       // Update hover states
       raycaster.setFromCamera(mouse, camera);

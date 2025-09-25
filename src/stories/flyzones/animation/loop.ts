@@ -19,7 +19,7 @@ export const setupAnimationLoop = (
   const animate = () => {
     console.log("Animation frame running");
     requestAnimationFrame(animate);
-    TWEEN.update();
+    update();
     controls.update();
     
     // Render the scene

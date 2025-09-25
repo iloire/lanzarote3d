@@ -94,7 +94,7 @@ const Animation3 = {
         const time = performance.now() * 0.001;
         camera.position.y = camera.baseY + Math.sin(time * floatSpeed * Math.PI * 2) * floatAmplitude;
       }
-      TWEEN.update();
+      update();
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
       controls.update();

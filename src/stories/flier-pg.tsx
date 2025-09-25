@@ -75,7 +75,7 @@ const ParagliderWorkshop = {
       renderer.render(scene, camera);
       const lookAt = mesh.position.clone().add(new THREE.Vector3(0, 0, 0));
       camera.lookAt(lookAt);
-      TWEEN.update();
+      update();
       controls.update(); 
 
     };

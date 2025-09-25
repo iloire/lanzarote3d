@@ -231,7 +231,7 @@ const PhotoBooth = {
     env.addBoats(water);
 
     const animate = () => {
-      TWEEN.update();
+      update();
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
     };
