@@ -60,13 +60,20 @@
     "downlevelIteration": true,
     "preserveConstEnums": true,
     "isolatedModules": true,
+    "noEmitOnError": false,
+    "stripInternal": true,
 
     // Interop and Compatibility
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
+    "assumeChangesOnlyAffectDirectDependencies": true,
 
     // Type Roots
-    "typeRoots": ["./src/typings/", "./node_modules/@types"]
+    "typeRoots": ["./src/typings/", "./node_modules/@types"],
+
+    // Performance Optimizations
+    "incremental": true,
+    "tsBuildInfoFile": "./built/.tsbuildinfo"
   },
   "include": [
     "./src/**/*",
