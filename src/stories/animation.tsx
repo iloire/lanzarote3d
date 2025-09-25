@@ -81,10 +81,8 @@ const Animation3 = {
     camera.position.copy(initialCameraPosition);
     camera.lookAt(pgPos);
 
-    console.log('Starting camera animation from', initialCameraPosition, 'to', finalCameraPosition);
     camera.animateTo(finalCameraPosition,
       pgPos, 2000, controls, () => {
-        console.log('Camera animation completed');
         camera.baseY = camera.position.y;
     });
 
@@ -95,11 +93,6 @@ const Animation3 = {
         const floatAmplitude = 1.2; // units up/down
         const time = performance.now() * 0.001;
         camera.position.y = camera.baseY + Math.sin(time * floatSpeed * Math.PI * 2) * floatAmplitude;
-      } else {
-        // Debug: check if baseY is ever set
-        if (Math.random() < 0.001) { // Log occasionally to avoid spam
-          console.log('baseY not set yet, camera.position.y:', camera.position.y);
-        }
       }
       update(performance.now());
 

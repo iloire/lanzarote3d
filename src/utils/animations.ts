@@ -11,8 +11,6 @@ const Animations = {
     time: number = 2000,
     callBack?: () => void,
   ) => {
-    console.log('animateCamera called with:', { newPosition, newTarget, time });
-
     // Store tween for debugging and manual update if needed
     const tween = new Tween({
       x1: camera.position.x,
@@ -42,17 +40,11 @@ const Animations = {
       controls.target.z = object.z2;
       controls.update();
 
-      // Debug occasionally to see if tween is progressing
-      if (Math.random() < 0.01) {
-        console.log('Tween updating, camera position:', {x: object.x1, y: object.y1, z: object.z1});
-      }
     });
     tween.onComplete(function () {
-      console.log('Camera tween completed');
       callBack && callBack();
     });
     tween.easing(Easing.Cubic.InOut);
-    console.log('Starting tween...');
     tween.start();
 
     // Store the tween globally so it can be updated from anywhere
