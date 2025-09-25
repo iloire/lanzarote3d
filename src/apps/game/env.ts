@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import Environment from "../env/environment";
+import Environment from "../shared/env/environment";
 import Weather from "../../elements/weather";
 
 const BIRDS = false;

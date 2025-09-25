@@ -6,7 +6,7 @@ import ParagliderVoxel, {
 } from "../components/paraglider-voxel";
 import Tandem from "../components/tandem";
 import { PilotHeadType } from "../components/parts/pilot-head";
-import Environment from "./env/environment";
+import Environment from "./shared/env/environment";
 import Weather, { WeatherOptions } from "../foundation/components/physics/Weather";
 import adriModel from "../../assets/foundation/models/characters/adri.obj";
 import adriTextureImage from "../../assets/foundation/models/characters/adri.png";

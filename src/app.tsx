@@ -5,11 +5,11 @@ import * as THREE from "three";
 import Sky from "./foundation/components/environment/Sky";
 import Water from "./foundation/components/environment/Water";
 import Island from "./components/island";
-import Stories from "./stories/index";
+import Stories from "./apps/shared/index";
 import { CameraController as Camera, CameraMode } from './foundation/systems/scene/CameraController';
 import Menu from './menu';
 import Controls from "./foundation/utils/controls";
-import { StoryOptions } from "./stories/types";
+import { StoryOptions } from "./apps/shared/types";
 
 import "./index.css";
 
