@@ -1,5 +1,5 @@
-import { GPS, Media, WindDirection, WindCondition, Takeoff, LandingSpot, FlightPhase, FlyZoneShape, LocationMetadata, Location } from '../helpers/types';
-export { GPS, Media, WindDirection, WindCondition, Takeoff, LandingSpot, FlightPhase, FlyZoneShape, LocationMetadata, Location };
+import { GPS, Media } from '../helpers/types-test';
+export { GPS, Media, };
 export { default as famara } from './famara';
 export { default as teguise } from './teguise';
 declare const locations: Location[];

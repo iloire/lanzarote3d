@@ -1,34 +1,12 @@
 import * as THREE from "three";
-import {
-  GPS,
-  Media,
-  WindDirection,
-  WindCondition,
-  Takeoff,
-  LandingSpot,
-  FlightPhase,
-  FlyZoneShape,
-  LocationMetadata,
-  Location
-} from '../helpers/types';
+// Re-export all types from helpers/types
+export * from '../helpers/types';
 
 // Import locations
 import famara from './famara';
 import teguise from './teguise';
 
-// Export type definitions
-export {
-  GPS,
-  Media,
-  WindDirection,
-  WindCondition,
-  Takeoff,
-  LandingSpot,
-  FlightPhase,
-  FlyZoneShape,
-  LocationMetadata,
-  Location
-};
+// Types are exported above with export *
 
 // Export individual locations
 export { default as famara } from './famara';

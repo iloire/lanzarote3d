@@ -6,6 +6,6 @@ export type WaterOptions = {
 export default class Water {
     options: WaterOptions;
     constructor(options: WaterOptions);
-    load(sunPosition: THREE.Vector3): THREE.Mesh<THREE.PlaneGeometry, THREE.MeshLambertMaterial> | WaterEffect;
+    load(sunPosition: THREE.Vector3): THREE.Mesh<THREE.PlaneGeometry, THREE.MeshLambertMaterial, THREE.Object3DEventMap> | WaterEffect;
 }
 //# sourceMappingURL=water.d.ts.map

@@ -22,7 +22,7 @@ declare class ParagliderVoxel implements IFlyable {
     rightRelease(): void;
     speedBar(): void;
     releaseSpeedBar(): void;
-    getMesh(): THREE.Object3D<THREE.Event>;
+    getMesh(): THREE.Object3D<THREE.Object3DEventMap>;
     load(gui?: any): Promise<THREE.Object3D>;
 }
 export default ParagliderVoxel;

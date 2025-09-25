@@ -4,7 +4,7 @@ declare const Helpers: {
     drawPoint(scene: THREE.Scene, position: THREE.Vector3): void;
     createHelpers: (scene: THREE.Scene) => void;
     getAxisHelper: (len: number) => THREE.AxesHelper;
-    getGrid: (pos: THREE.Vector3) => THREE.Object3D<THREE.Event>;
+    getGrid: (pos: THREE.Vector3) => THREE.Object3D<THREE.Object3DEventMap>;
 };
 export default Helpers;
 //# sourceMappingURL=helpers.d.ts.map

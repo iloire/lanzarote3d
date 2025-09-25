@@ -11,7 +11,7 @@ export {
   setupPinBasics
 } from '../markers/marker';
 
-export { Marker } from '../markers/markers';
+// Marker interface is exported from ./types
 export { createSimpleMarker } from '../markers/marker-creator';
 
 // Export types and helpers (avoid duplication)

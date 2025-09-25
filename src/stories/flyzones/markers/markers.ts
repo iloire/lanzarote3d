@@ -7,8 +7,8 @@ const TWEEN = { Tween, Easing, update };
 // Define the MarkerObject class that properly extends THREE.Object3D
 export class MarkerObject extends THREE.Object3D {
   type: MarkerType;
-  hoverAnimation: TWEEN.Tween<any>;
-  unhoverAnimation: TWEEN.Tween<any>;
+  hoverAnimation: Tween<any>;
+  unhoverAnimation: Tween<any>;
   showPopup: () => void;
   setVisibility: (visible: boolean) => void;
   flyzone?: THREE.Object3D;
@@ -31,15 +31,6 @@ export class MarkerObject extends THREE.Object3D {
   }
 }
 
-// Define the Marker interface for use in the application
-export interface Marker {
-  type: MarkerType;
-  position: THREE.Vector3;
-  object?: THREE.Object3D | MarkerObject;
-  label?: CSS2DObject;
-  data?: any;
-  pin: THREE.Object3D | MarkerObject;
-  setVisibility?: (visible: boolean) => void;
-}
+// Marker interface is now defined in ../helpers/types.ts to avoid circular dependencies
 
 // Add any other marker-related functions here 

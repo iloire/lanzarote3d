@@ -1,6 +1,5 @@
 import * as THREE from 'three';
-import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer';
-import { MarkerObject } from '../markers/markers';
+import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 
 export enum MarkerType {
   LOCATION = 'location',
@@ -8,8 +7,16 @@ export enum MarkerType {
   LANDING = 'landing'
 }
 
-// Use the Marker interface from markers.ts
-export { Marker } from '../markers/markers';
+// Define the Marker interface here to avoid circular dependencies
+export interface Marker {
+  type: MarkerType;
+  position: THREE.Vector3;
+  object?: THREE.Object3D;
+  label?: CSS2DObject;
+  data?: any;
+  pin: THREE.Object3D;
+  setVisibility?: (visible: boolean) => void;
+}
 
 // Export type definitions
 export interface GPS {
@@ -98,4 +105,4 @@ export interface Location extends LocationMetadata {
   takeoffs: Takeoff[];
   landingSpots?: LandingSpot[];
   flyzone?: FlyZoneShape;
-} 
+}

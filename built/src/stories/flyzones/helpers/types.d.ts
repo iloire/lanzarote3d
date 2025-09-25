@@ -1,10 +1,17 @@
-import * as THREE from 'three';
 export declare enum MarkerType {
     LOCATION = "location",
     TAKEOFF = "takeoff",
     LANDING = "landing"
 }
-export { Marker } from '../markers/markers';
+export interface Marker {
+    type: MarkerType;
+    position: any;
+    object?: any;
+    label?: any;
+    data?: any;
+    pin: any;
+    setVisibility?: (visible: boolean) => void;
+}
 export interface GPS {
     latitude: number;
     longitude: number;
@@ -33,7 +40,7 @@ export interface Takeoff {
     id: string;
     title: string;
     description: string;
-    position: THREE.Vector3;
+    position: any;
     gps?: GPS;
     elevation: number;
     conditions: WindCondition[];
@@ -43,7 +50,7 @@ export interface LandingSpot {
     id: string;
     title: string;
     description: string;
-    position: THREE.Vector3;
+    position: any;
     gps?: GPS;
     elevation: number;
     type: 'primary' | 'secondary' | 'emergency';
@@ -52,7 +59,7 @@ export interface LandingSpot {
 export interface FlightPhase {
     type: string;
     gps: GPS;
-    position: THREE.Vector3;
+    position: any;
     dimensions: {
         width: number;
         height: number;
@@ -70,11 +77,11 @@ export interface LocationMetadata {
     id: string;
     title: string;
     description: string;
-    position: THREE.Vector3;
+    position: any;
     gps?: GPS;
     cameraView: {
-        position: THREE.Vector3;
-        lookAt?: THREE.Vector3;
+        position: any;
+        lookAt?: any;
         distance?: number;
     };
 }

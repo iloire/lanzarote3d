@@ -100,5 +100,5 @@ export declare const clearLocalStorage: () => void;
 export declare const getCurrentLocation: (state: EditorState) => EditorLocation | null;
 export declare const setCurrentLocation: (state: EditorState, index: number | null) => void;
 export declare const deleteLocation: (state: EditorState, index: number, scene: THREE.Scene) => void;
-export declare const editLocation: (state: EditorState, index: number, properties: Partial<Pick<EditorLocation, 'title' | 'description'>>) => void;
+export declare const editLocation: (state: EditorState, index: number, properties: Partial<Pick<EditorLocation, "title" | "description">>) => void;
 //# sourceMappingURL=state.d.ts.map

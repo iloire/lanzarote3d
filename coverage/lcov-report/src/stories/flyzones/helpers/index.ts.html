@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/30</span>
+                <span class='fraction'>0/25</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/23</span>
+                <span class='fraction'>0/17</span>
             </div>
         
             
@@ -88,16 +88,8 @@
 <a name='L23'></a><a href='#L23'>23</a>
 <a name='L24'></a><a href='#L24'>24</a>
 <a name='L25'></a><a href='#L25'>25</a>
-<a name='L26'></a><a href='#L26'>26</a>
-<a name='L27'></a><a href='#L27'>27</a>
-<a name='L28'></a><a href='#L28'>28</a>
-<a name='L29'></a><a href='#L29'>29</a>
-<a name='L30'></a><a href='#L30'>30</a>
-<a name='L31'></a><a href='#L31'>31</a>
-<a name='L32'></a><a href='#L32'>32</a>
-<a name='L33'></a><a href='#L33'>33</a>
-<a name='L34'></a><a href='#L34'>34</a>
-<a name='L35'></a><a href='#L35'>35</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L26'></a><a href='#L26'>26</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -110,15 +102,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -130,8 +113,8 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >export {</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// Export marker functionality
+<span class="cstat-no" title="statement not covered" >export {</span>
 <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >  MarkerObject,</span></span>
 <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >  createMarker,</span></span>
 <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >  createSimpleMarker </span>as createBasicMarker,</span>
@@ -143,28 +126,18 @@
 <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >  setupPinBasics</span></span>
 } from '../markers/marker';
 &nbsp;
-export { Marker } from '../markers/markers';
-&nbsp;
-<span class="cstat-no" title="statement not covered" >export * from './types';</span>
-<span class="cstat-no" title="statement not covered" >export * from './popup';</span>
-<span class="cstat-no" title="statement not covered" >export * from './flyzone';</span>
+// Marker interface is exported from ./types
 <span class="cstat-no" title="statement not covered" >export { <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >c</span>reateSimpleMarker </span>} from '../markers/marker-creator';</span>
 &nbsp;
-// Re-export constants
-<span class="cstat-no" title="statement not covered" >export {</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >  FLYZONE_COLORS,</span></span>
-} from '../config/flyzone-config';
-&nbsp;
-<span class="cstat-no" title="statement not covered" >export {<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >W</span>IND_ARROW}</span> from '../config/wind-config';</span>
-<span class="cstat-no" title="statement not covered" >export {<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >V</span>ISIBILITY_THRESHOLDS,</span> <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >T</span>AKEOFF_VISIBILITY_THRESHOLD}</span> from '../config/marker-config';</span>
-<span class="cstat-no" title="statement not covered" >export {<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >P</span>IN_COLORS,</span> <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >P</span>IN_SIZES,</span> <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >P</span>IN_FADE_DURATION}</span> from '../config/marker-config';</span>
-&nbsp;
-// Re-export other modules
+// Export types and helpers (avoid duplication)
 <span class="cstat-no" title="statement not covered" >export * from './types';</span>
 <span class="cstat-no" title="statement not covered" >export * from './popup';</span>
 <span class="cstat-no" title="statement not covered" >export * from './flyzone';</span>
-<span class="cstat-no" title="statement not covered" >export * from '../markers/marker';</span>
+&nbsp;
+// Re-export configuration constants
+<span class="cstat-no" title="statement not covered" >export { <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >F</span>LYZONE_COLORS </span>} from '../config/flyzone-config';</span>
+<span class="cstat-no" title="statement not covered" >export { <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >W</span>IND_ARROW </span>} from '../config/wind-config';</span>
+<span class="cstat-no" title="statement not covered" >export { <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >V</span>ISIBILITY_THRESHOLDS,</span> <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >T</span>AKEOFF_VISIBILITY_THRESHOLD,</span> <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >P</span>IN_COLORS,</span> <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >P</span>IN_SIZES,</span> <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >P</span>IN_FADE_DURATION </span>} from '../config/marker-config';</span>
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -172,7 +145,7 @@ export { Marker } from '../markers/markers';
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-25T09:57:58.167Z
+                at 2025-09-25T10:31:35.139Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>
