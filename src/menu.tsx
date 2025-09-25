@@ -38,12 +38,12 @@ class Menu extends React.Component<MenuProps> {
       { story: "workshop", name: "workshop", description: "workshop" },
       { story: "clouds", name: "clouds", description: "clouds" },
       { story: "night", name: "night", description: "night mode" },
+      { story: "paragliderVoxel", name: "Paraglider Voxel" },
     ];
 
     // Dev/testing features
     const experimentStories = [
       { story: "game", name: "game (WIP)", description: "The game, work in progress!" },
-      { story: "paragliderVoxel", name: "Paraglider Voxel" },
     ];
 
     // Dev-only features
