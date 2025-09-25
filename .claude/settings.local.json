@@ -21,7 +21,9 @@
       "Bash(xargs:*)",
       "Bash(npm ls:*)",
       "Bash(npx npm-check-updates:*)",
-      "Bash(timeout 10 npm start:*)"
+      "Bash(timeout 10 npm start:*)",
+      "Bash(npm info eslint versions:*)",
+      "Bash(npm info:*)"
     ],
     "deny": [],
     "ask": []
