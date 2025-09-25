@@ -13,6 +13,8 @@ export const createCustomFlyZone = (shape: FlyZoneShape) => {
   }));
   
   phases.forEach((phase) => {
+    if (!phase.dimensions || !phase.position) return;
+
     // Create box geometry
     const boxGeometry = new THREE.BoxGeometry(
       phase.dimensions.width,

@@ -26,7 +26,7 @@ export const setupMouseClickHandler = (
     const intersects = raycaster.intersectObjects(scene.children, true);
     
     // If we hit something, log the coordinates
-    if (intersects.length > 0) {
+    if (intersects.length > 0 && intersects[0]) {
       const point = intersects[0].point;
       const gpsCoords = worldToGPS(point);
       

@@ -58,7 +58,7 @@ const createRenderer = (sizes: { width: number; height: number }) => {
   const renderer = new THREE.WebGLRenderer({
     // powerPreference: "low-power" ,
     powerPreference: "high-performance",
-    canvas: document.querySelector("canvas.webgl"),
+    canvas: document.querySelector("canvas.webgl") || undefined,
     antialias: true,
     alpha: true,
     logarithmicDepthBuffer: true,
@@ -154,7 +154,7 @@ const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAp
     };
 
     // Call the load method on the selected story
-    if (Stories[initialStory] && Stories[initialStory].load) {
+    if (initialStory && Stories[initialStory] && Stories[initialStory].load) {
       await Stories[initialStory].load(storyOptions);
     } else {
       console.error(`Story "${initialStory}" not found or doesn't have a load method`);

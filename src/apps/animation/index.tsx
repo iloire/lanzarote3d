@@ -67,7 +67,7 @@ const Animation = {
     env.addHouses(terrain);
     env.addBoats(water);
 
-    const pgPos = paraglidersVoxel[0].position.clone();
+    const pgPos = paraglidersVoxel[0]?.position.clone() || new THREE.Vector3();
 
     const initialCameraPosition = new THREE.Vector3(6760, 949, -461);
     const finalCameraPosition = new THREE.Vector3(
