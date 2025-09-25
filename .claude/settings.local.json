@@ -20,7 +20,8 @@
       "Bash(npx serve:*)",
       "Bash(xargs:*)",
       "Bash(npm ls:*)",
-      "Bash(npx npm-check-updates:*)"
+      "Bash(npx npm-check-updates:*)",
+      "Bash(timeout 10 npm start:*)"
     ],
     "deny": [],
     "ask": []
