@@ -251,7 +251,7 @@ const PhotoBooth = {
     console.log('PhotoBooth: Environment setup complete');
 
     const animate = () => {
-      update();
+      update(performance.now());
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
     };

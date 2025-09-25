@@ -95,8 +95,19 @@ const Animation3 = {
         const floatAmplitude = 1.2; // units up/down
         const time = performance.now() * 0.001;
         camera.position.y = camera.baseY + Math.sin(time * floatSpeed * Math.PI * 2) * floatAmplitude;
+      } else {
+        // Debug: check if baseY is ever set
+        if (Math.random() < 0.001) { // Log occasionally to avoid spam
+          console.log('baseY not set yet, camera.position.y:', camera.position.y);
+        }
       }
-      update();
+      update(performance.now());
+
+      // Also manually update the camera tween if it exists
+      const cameraTween = (window as any).activeCameraTween;
+      if (cameraTween) {
+        cameraTween.update(performance.now());
+      }
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
       controls.update();

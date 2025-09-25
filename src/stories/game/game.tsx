@@ -307,7 +307,7 @@ const Game = {
       }
 
       vario.updateReading(pg.altitude());
-      update();
+      update(performance.now());
       camera.update();
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
