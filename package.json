@@ -44,7 +44,11 @@
     "eslint-plugin-prettier": "^5.0.0",
     "eslint-plugin-react": "^7.33.0",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "prettier": "^3.0.0"
+    "prettier": "^3.0.0",
+    "@testing-library/jest-dom": "^6.0.0",
+    "@testing-library/react": "^14.0.0",
+    "jsdom": "^24.0.0",
+    "identity-obj-proxy": "^3.0.0"
   },
   "scripts": {
     "clean": "rm -R dist || true",
