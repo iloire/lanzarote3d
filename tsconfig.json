@@ -32,18 +32,21 @@
     "strictPropertyInitialization": false,
     "noImplicitReturns": true,
     "noImplicitThis": true,
-    "useUnknownInCatchVariables": false,
+    "useUnknownInCatchVariables": true,
     "alwaysStrict": true,
     "exactOptionalPropertyTypes": false,
     "noImplicitOverride": true,
-    "noPropertyAccessFromIndexSignature": false,
-    "noUncheckedIndexedAccess": false,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true,
 
     // Linting (Enhanced for Foundation)
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": false,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "noImplicitUseStrict": false,
 
     // Emit Configuration (NPM Package Ready)
     "outDir": "./built",
