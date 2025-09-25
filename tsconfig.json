@@ -24,7 +24,7 @@
     "verbatimModuleSyntax": false,
 
     // Type Checking (Progressive Strictness)
-    "strict": false,
+    "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
