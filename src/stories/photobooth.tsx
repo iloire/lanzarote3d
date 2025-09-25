@@ -237,7 +237,7 @@ const PhotoBooth = {
     const cloudOptions = { colors: ["#F64A8A", "#F987C5", "#DE3163"] };
 
     console.log('PhotoBooth: Adding clouds, thermals count:', thermals.length);
-    env.addClouds(weather, thermals, cloudOptions);
+    env.addClouds(thermals, cloudOptions);
     console.log('PhotoBooth: Adding trees');
     env.addTrees(terrain);
     console.log('PhotoBooth: Adding houses');

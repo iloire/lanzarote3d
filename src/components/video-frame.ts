@@ -27,7 +27,7 @@ export default class VideoFrame {
 
   }
 
-  async load(gui?: any): Promise<THREE.Object3D> {
+  async load(): Promise<THREE.Object3D> {
     const options = this.options;
     const video = createVideo(options.videoUrl);
     document.body.appendChild(video);

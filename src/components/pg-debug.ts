@@ -33,7 +33,7 @@ const createTrajectoryArrow = (
   return arrow;
 };
 
-const createGravityArrow = (mesh: THREE.Object3D, len: number) => {
+const createGravityArrow = (len: number) => {
   const dir = DOWN_DIRECTION.clone();
   const arrow = new THREE.ArrowHelper(dir, ORIGIN, len, 0xff0000);
   return arrow;
@@ -49,7 +49,6 @@ const createDirectionArrow = (
 };
 
 const createCentripetalArrow = (
-  mesh: THREE.Object3D,
   len: number,
   color
 ): THREE.ArrowHelper => {

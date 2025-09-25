@@ -44,7 +44,6 @@ class Thermal {
     dimensions: ThermalDimensions,
     initialPosition: THREE.Vector3,
     opacity,
-    weather: Weather,
     isMainThermal: boolean,
     isSuperThermal: boolean
   ) {

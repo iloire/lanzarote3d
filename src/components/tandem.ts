@@ -14,7 +14,7 @@ class Tandem {
     this.options = options;
   }
 
-  async load(gui?: any): Promise<THREE.Object3D> {
+  async load(): Promise<THREE.Object3D> {
     const mesh = new THREE.Object3D();
 
     const glider = new Glider(this.options.glider);

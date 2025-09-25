@@ -19,7 +19,7 @@ export type TandemPilotOptions = {
   passenger: PilotOptions;
 }
 
-const getPilotLegs = (options: PilotOptions, armRotation: number) => {
+const getPilotLegs = (options: PilotOptions) => {
   const shoesMat = getColoredMaterial(options.shoesColor || '#333');
   const pantsMat = getColoredMaterial(options.suitColor2 || '#666');
 

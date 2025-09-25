@@ -42,7 +42,6 @@ export const generateThermalPair = (
     dimensions,
     options.position,
     options.opacity,
-    options.weather,
     true,
     options.superThermal
   );
@@ -57,7 +56,6 @@ export const generateThermalPair = (
     coreDimensions,
     options.position,
     options.opacity,
-    options.weather,
     false,
     false
   );

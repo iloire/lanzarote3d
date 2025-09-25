@@ -1,7 +1,6 @@
 import * as THREE from "three";
-import { PilotHeadOptions } from "../pilot-head";
 
-const getSunGlasses1 = (options: PilotHeadOptions): THREE.Group => {
+const getSunGlasses1 = (): THREE.Group => {
   const group = new THREE.Group();
 
   const glassGeo = new THREE.BoxGeometry(150, 105, 10);

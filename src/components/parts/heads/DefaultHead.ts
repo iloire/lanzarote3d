@@ -18,7 +18,7 @@ export class DefaultHead extends BaseHead {
     group.add(this.getHelmet());
 
     if (this.options.glassesType === GlassesType.SunGlasses1) {
-      head.add(getSunGlasses1(this.options));
+      head.add(getSunGlasses1());
     } else {
       head.add(getDefaultGlasses(this.options));
     }

@@ -10,8 +10,7 @@ import Time from "../utils/time";
 import GuiHelper from "../utils/gui";
 
 const calculateLightIntensity = (
-  timeOfDayInHours: number,
-  monthOfTheYear: number
+  timeOfDayInHours: number
 ) => {
   // Increased all values to make colors more vibrant
   if (timeOfDayInHours < 6) {
@@ -42,8 +41,7 @@ const calculateLightIntensity = (
 };
 
 const calculateSunPosition = (
-  timeOfDayInHours: number,
-  monthOfTheYear: number
+  timeOfDayInHours: number
 ): THREE.Vector3 => {
   const sunPosition = new THREE.Vector3();
   // phi is how far the point is from the North Pole
@@ -88,7 +86,7 @@ export default class Sky extends THREE.Object3D {
     skyOptions?: SkyOptions
   ) {
     super();
-    this.sunPosition = calculateSunPosition(timeOfDayInHours, monthOfTheYear);
+    this.sunPosition = calculateSunPosition(timeOfDayInHours);
     this.monthOfTheYear = monthOfTheYear;
     this.skyOptions = {
       ...defaultSkyOptions,
@@ -118,8 +116,7 @@ export default class Sky extends THREE.Object3D {
     );
 
     const lightIntensity = calculateLightIntensity(
-      timeOfDayInHours,
-      monthOfTheYear
+      timeOfDayInHours
     );
 
     this.directionalLight = new THREE.DirectionalLight(
@@ -188,31 +185,22 @@ export default class Sky extends THREE.Object3D {
   }
 
   updateSunPosition(timeOfDayInHours: number) {
-    this.sunPosition = calculateSunPosition(
-      timeOfDayInHours,
-      this.monthOfTheYear
-    );
+    this.sunPosition = calculateSunPosition(timeOfDayInHours);
     this.sky.material.uniforms["sunPosition"].value.copy(this.sunPosition);
     this.pointLight.position.copy(
       this.sunPosition.clone().multiplyScalar(10000)
     );
-    this.pointLight.intensity = calculateLightIntensity(
-      timeOfDayInHours,
-      this.monthOfTheYear
-    );
+    this.pointLight.intensity = calculateLightIntensity(timeOfDayInHours);
 
     if (this.directionalLight) {
       this.directionalLight.position.copy(
         this.sunPosition.clone().multiplyScalar(10000)
       );
       this.directionalLight.intensity =
-        calculateLightIntensity(timeOfDayInHours, this.monthOfTheYear) * 0.3;
+        calculateLightIntensity(timeOfDayInHours) * 0.3;
       // this.directionalLightHelper.update();
     }
-    this.ambientLight.intensity = calculateLightIntensity(
-      timeOfDayInHours,
-      this.monthOfTheYear
-    );
+    this.ambientLight.intensity = calculateLightIntensity(timeOfDayInHours);
   }
 
   addToScene(scene: THREE.Scene) {

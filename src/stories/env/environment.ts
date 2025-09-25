@@ -216,7 +216,6 @@ class Environment {
   }
 
   async addClouds(
-    weather: Weather,
     thermals: Thermal[],
     options: CloudOptions
   ): Promise<THREE.Object3D[]> {

@@ -59,7 +59,7 @@ const Animation3 = {
     const thermals = env.generateThermals(weather, 0);
     const cloudOptions = { colors: ['#F64A8A', '#F987C5', '#DE3163'] }
 
-    env.addClouds(weather, thermals, cloudOptions);
+    env.addClouds(thermals, cloudOptions);
     env.addTrees(terrain);
     env.addHouses(terrain);
     env.addBoats(water);
