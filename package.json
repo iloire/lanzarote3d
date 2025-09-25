@@ -55,6 +55,7 @@
     "clean": "rm -R dist || true",
     "start": "webpack serve --mode development --open --hot",
     "dev": "yarn start",
+    "build": "webpack --mode production",
     "build-all": "webpack --mode production",
     "build-staging": "yarn clean && yarn build-all",
     "delete-staging": "aws s3 rm s3://lanzarote3d --recursive --profile lanzaroteparagliding",
