@@ -281,9 +281,9 @@ class Flier extends THREE.EventDispatcher {
 
     const startPosition = this.position();
     const nextPosition = this.position().add(combinedMoveVector);
-    const tween = new TWEEN.Tween(startPosition)
+    const tween = new Tween(startPosition)
       .to(nextPosition, TICK_INTERVAL) // Set the duration of the animation to 1000 milliseconds (1 second)
-      // .easing(TWEEN.Easing.Quadratic.InOut) // Set the easing function for the animation
+      // .easing(Easing.Quadratic.InOut) // Set the easing function for the animation
       .onUpdate(() => {
         // Update the position of the object on each frame of the animation
         this.mesh.position.copy(startPosition);

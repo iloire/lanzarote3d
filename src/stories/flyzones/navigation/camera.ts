@@ -27,42 +27,42 @@ export const navigateTo = (
       ));
     
     // Animate camera movement
-    new TWEEN.Tween(camera.position)
+    new Tween(camera.position)
       .to({
         x: cameraPosition.x,
         y: cameraPosition.y,
         z: cameraPosition.z
       }, 2000)
-      .easing(TWEEN.Easing.Cubic.InOut)
+      .easing(Easing.Cubic.InOut)
       .start();
     
     // Animate controls target
-    new TWEEN.Tween(controls.target)
+    new Tween(controls.target)
       .to({
         x: cameraTarget.x,
         y: cameraTarget.y,
         z: cameraTarget.z
       }, 2000)
-      .easing(TWEEN.Easing.Cubic.InOut)
+      .easing(Easing.Cubic.InOut)
       .start();
   } else {
     // Simple navigation without specific camera view
-    new TWEEN.Tween(camera.position)
+    new Tween(camera.position)
       .to({
         x: position.x + 1000,
         y: position.y + 1000,
         z: position.z + 1000
       }, 2000)
-      .easing(TWEEN.Easing.Cubic.InOut)
+      .easing(Easing.Cubic.InOut)
       .start();
     
-    new TWEEN.Tween(controls.target)
+    new Tween(controls.target)
       .to({
         x: position.x,
         y: position.y,
         z: position.z
       }, 2000)
-      .easing(TWEEN.Easing.Cubic.InOut)
+      .easing(Easing.Cubic.InOut)
       .start();
   }
 }; 

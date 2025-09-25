@@ -261,15 +261,15 @@ export const createHoverAnimations = (pin: THREE.Object3D, isTakeoff: boolean) =
   if (isMeshWithMaterial(pin)) {
     const colors = isTakeoff ? PIN_COLORS[MarkerType.TAKEOFF] : PIN_COLORS[MarkerType.LOCATION];
     return {
-      hover: new TWEEN.Tween(pin.material)
+      hover: new Tween(pin.material)
         .to({ opacity: 1, emissive: new THREE.Color(colors.main) }, 200),
-      unhover: new TWEEN.Tween(pin.material)
+      unhover: new Tween(pin.material)
         .to({ opacity: 0.8, emissive: new THREE.Color(colors.emissive) }, 200)
     };
   }
   return {
-    hover: new TWEEN.Tween({}).to({}, 0),
-    unhover: new TWEEN.Tween({}).to({}, 0)
+    hover: new Tween({}).to({}, 0),
+    unhover: new Tween({}).to({}, 0)
   };
 };
 
@@ -283,7 +283,7 @@ export const createFadeAnimation = (pin: THREE.Object3D) => {
   });
   
   return {
-    fadeIn: new TWEEN.Tween({ opacity: 0 })
+    fadeIn: new Tween({ opacity: 0 })
       .to({ opacity: 1 }, PIN_FADE_DURATION)
       .onUpdate(({ opacity }) => {
         fadeTargets.forEach(target => {
@@ -292,7 +292,7 @@ export const createFadeAnimation = (pin: THREE.Object3D) => {
           }
         });
       }),
-    fadeOut: new TWEEN.Tween({ opacity: 1 })
+    fadeOut: new Tween({ opacity: 1 })
       .to({ opacity: 0 }, PIN_FADE_DURATION)
       .onUpdate(({ opacity }) => {
         fadeTargets.forEach(target => {

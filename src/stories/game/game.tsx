@@ -63,7 +63,7 @@ const analytics = new Analytics();
 const Game = {
   load: async (options: StoryOptions) => {
     const { camera, scene, renderer, terrain, water, sky, gui, controls } = options;
-    
+
 
     sky.updateSunPosition(TIME_OF_DAY);
 
@@ -121,7 +121,7 @@ const Game = {
       const keyCode = event.which;
       if (keyCode == 90) {
         //z
-        
+
       } else if (keyCode == 77) {
         //m
         bgMusic.toggle();

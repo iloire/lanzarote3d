@@ -58,9 +58,9 @@ const tweakSize = (mesh: THREE.Object3D, interval: number) => {
   const scaleZ = mesh.scale.z * multiplier;
 
   const targetPosition = new THREE.Vector3(scaleX, scaleY, scaleZ);
-  new TWEEN.Tween(mesh.scale)
+  new Tween(mesh.scale)
     .to(targetPosition, interval)
-    .easing(TWEEN.Easing.Cubic.InOut)
+    .easing(Easing.Cubic.InOut)
     .start();
 };
 
@@ -73,9 +73,9 @@ const tweakPos = (mesh: THREE.Object3D, interval: number) => {
   const posZ = mesh.position.z * multiplier;
 
   const targetPosition = new THREE.Vector3(posX, posY, posZ);
-  new TWEEN.Tween(mesh.position)
+  new Tween(mesh.position)
     .to(targetPosition, interval)
-    .easing(TWEEN.Easing.Cubic.InOut)
+    .easing(Easing.Cubic.InOut)
     .start();
 };
 

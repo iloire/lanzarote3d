@@ -21,8 +21,8 @@ export class MarkerObject extends THREE.Object3D {
     this.add(pin);
     
     // Initialize with empty functions, to be set by the creator
-    this.hoverAnimation = new TWEEN.Tween({}).to({}, 0);
-    this.unhoverAnimation = new TWEEN.Tween({}).to({}, 0);
+    this.hoverAnimation = new Tween({}).to({}, 0);
+    this.unhoverAnimation = new Tween({}).to({}, 0);
     this.showPopup = () => {};
     this.setVisibility = (visible: boolean) => {
       this.visible = visible;

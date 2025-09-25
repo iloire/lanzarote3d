@@ -1,5 +1,4 @@
 import { Tween, Easing, update } from "@tweenjs/tween.js";
-const TWEEN = { Tween, Easing, update };
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
@@ -12,7 +11,7 @@ const Animations = {
     time: number = 2000,
     callBack?: () => void,
   ) => {
-    const tween = new TWEEN.Tween({
+    const tween = new Tween({
       x1: camera.position.x,
       y1: camera.position.y,
       z1: camera.position.z,
@@ -43,7 +42,7 @@ const Animations = {
     tween.onComplete(function () {
       callBack && callBack();
     });
-    tween.easing(TWEEN.Easing.Cubic.InOut);
+    tween.easing(Easing.Cubic.InOut);
     tween.start();
   },
 };
