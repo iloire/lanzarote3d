@@ -1,7 +1,4 @@
 import * as THREE from "three";
-import Sky from "../components/sky";
-import React from "react";
-import { createRoot } from "react-dom/client";
 import HangGlider from "../components/hangglider";
 import Helpers from "../utils/helpers";
 import { StoryOptions } from "./types";

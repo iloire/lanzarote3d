@@ -1,6 +1,3 @@
-import * as THREE from "three";
-import React from "react";
-import { createRoot } from "react-dom/client";
 import { StoryOptions } from "./types";
 
 const Night = {

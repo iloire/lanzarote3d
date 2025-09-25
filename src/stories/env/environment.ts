@@ -220,7 +220,6 @@ class Environment {
     thermals: Thermal[],
     options: CloudOptions
   ): Promise<THREE.Object3D[]> {
-    const lclLevel = weather.getLclLevel();
     // from thermals
     const mainThermals = thermals.filter((t) => t.isMainThermal());
     const clouds = await Promise.all(

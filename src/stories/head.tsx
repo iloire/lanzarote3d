@@ -1,6 +1,4 @@
 import * as THREE from "three";
-import Controls from "../utils/controls";
-import Sky from "../components/sky";
 import PilotHead, {
   GlassesType,
   PilotHeadType,
@@ -104,13 +102,12 @@ const Head = {
       );
       const glassesTypeName = headOptions.glassesType
         ? Object.keys(GlassesType).find(
-            (key) => GlassesType[key] === headOptions.glassesType,
-          )
+          (key) => GlassesType[key] === headOptions.glassesType,
+        )
         : null;
 
-      label.innerHTML = `<strong>${headTypeName}</strong><br>helmet:${helmetTypeName}${
-        glassesTypeName ? "<br> glasses:" + glassesTypeName : ""
-      }`;
+      label.innerHTML = `<strong>${headTypeName}</strong><br>helmet:${helmetTypeName}${glassesTypeName ? "<br> glasses:" + glassesTypeName : ""
+        }`;
 
       labelContainer.appendChild(label);
 

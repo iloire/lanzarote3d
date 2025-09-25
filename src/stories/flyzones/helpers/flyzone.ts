@@ -6,7 +6,6 @@ import { getConfig } from '../config';
 
 export const createCustomFlyZone = (shape: FlyZoneShape) => {
   const group = new THREE.Group();
-  const config = getConfig();
   
   // Create boxes for each phase
   const phases = Object.keys(shape.phases).map(key => ({

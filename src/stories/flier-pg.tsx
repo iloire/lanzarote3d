@@ -1,6 +1,4 @@
 import * as THREE from "three";
-import { Tween, Easing, update } from "@tweenjs/tween.js";
-const TWEEN = { Tween, Easing, update };
 import Paraglider from "../components/paraglider";
 import Flier, { FlierConstructor } from "../components/base/flier";
 import Helpers from "../utils/helpers";

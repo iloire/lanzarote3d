@@ -1,6 +1,4 @@
 import * as THREE from "three";
-import Controls from "../utils/controls";
-import Sky from "../components/sky";
 import ParagliderVoxel from "../components/paraglider-voxel";
 import Helpers from "../utils/helpers";
 import adriModel from "../models/adri.obj";
