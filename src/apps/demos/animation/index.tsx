@@ -234,8 +234,8 @@ class AnimationApp extends AppBase {
 
         // Add gentle floating motion like a cloud
         const time = (Date.now() - startTime) * 0.0005; // Slow motion
-        const floatAmplitude = 8; // Vertical float range in units
-        const floatSpeed = 0.8; // Speed of floating motion
+        const floatAmplitude = 2; // Vertical float range in units
+        const floatSpeed = 1.2; // Speed of floating motion
 
         // Store original position during animation, only apply floating after animation completes
         if (this.animatorInstance === undefined) {

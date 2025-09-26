@@ -58,7 +58,7 @@ export const THEMES: Record<string, Theme> = {
     },
     water: {
       color: '#ffb74d',
-      opacity: 0.8,
+      opacity: 0.5,
     },
     weather: {
       windDirectionDegreesFromNorth: 270,
@@ -81,7 +81,7 @@ export const THEMES: Record<string, Theme> = {
       fogDensity: 0.0005,
     },
     clouds: {
-      colors: ['#FFFAFA', '#D3D3D3', '#808080', '#E0F6FF', '#B0E0E6', '#87CEEB'],
+      colors: ['#FFFFFF', '#E6F3FF', '#87CEEB', '#2F4F4F'],
       density: 0.6,
       opacity: 0.95,
     },
