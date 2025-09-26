@@ -117,7 +117,7 @@ class GameApp extends AppBase {
       await this.setupParaglider(scene, gui, terrain, water, thermals);
 
       // Setup game controls and UI
-      this.setupGameControls(camera, controls, scene, renderer);
+      this.setupGameControls(camera, controls, scene, renderer, gui);
       this.setupUI();
 
       // Setup wind indicator
@@ -176,7 +176,7 @@ class GameApp extends AppBase {
 
   }
 
-  private setupGameControls(camera: any, controls: any, scene: THREE.Scene, renderer: THREE.WebGLRenderer): void {
+  private setupGameControls(camera: any, controls: any, scene: THREE.Scene, renderer: THREE.WebGLRenderer, gui: any): void {
     const onDocumentKeyDown = (event: KeyboardEvent) => {
       const keyCode = event.which;
       if (keyCode === 90) {
