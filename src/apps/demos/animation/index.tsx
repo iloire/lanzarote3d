@@ -69,19 +69,25 @@ const Animation = {
 
     const pgPos = paraglidersVoxel[0]?.position.clone() || new THREE.Vector3();
 
-    const initialCameraPosition = new THREE.Vector3(6760, 949, -461);
+    // Starting position - further away from the paraglider
+    const initialCameraPosition = new THREE.Vector3(6500, 1100, -200);
+
+    // Final position - closer to the paraglider
     const finalCameraPosition = new THREE.Vector3(
-      pgPos.x - 200,
-      pgPos.y + 90,
-      pgPos.z + 450
+      pgPos.x - 100,  // Closer than before
+      pgPos.y + 50,   // Slightly above
+      pgPos.z + 200   // Behind the paraglider
     );
 
     camera.position.copy(initialCameraPosition);
     camera.lookAt(pgPos);
 
+    // Animate the camera slowly towards the paraglider over 8 seconds
     camera.animateTo(finalCameraPosition,
-      pgPos, 2000, controls, () => {
+      pgPos, 8000, controls, () => {
+        // Camera animation complete - stop here
         camera.baseY = camera.position.y;
+        controls.enabled = true; // Enable user controls after animation
     });
 
     const animate = () => {

@@ -14,6 +14,7 @@ export interface AppMetadata {
   tags?: string[];
   status?: 'public' | 'experimental' | 'dev';
   priority?: number; // For ordering in menus
+  hidden?: boolean; // Hide from menu when true
 }
 
 export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
@@ -265,7 +266,9 @@ export function getAppsByTag(tag: string): AppMetadata[] {
  * Get apps by status with optional category filter
  */
 export function getAppsByStatus(status: 'public' | 'experimental' | 'dev', category?: 'experience' | 'tool' | 'demo'): AppMetadata[] {
-  let apps = getAllApps().filter(app => app.status === status);
+  let apps = getAllApps()
+    .filter(app => app.status === status)
+    .filter(app => !app.hidden); // Filter out hidden apps
   if (category) {
     apps = apps.filter(app => app.category === category);
   }

@@ -14,6 +14,26 @@ class Menu extends React.Component<MenuProps> {
     loadingProcess: 0,
     showAppSelection: false,
     hoveredRoute: null as string | null,
+    isMobile: false,
+    isMenuOpen: false,
+  };
+
+  override componentDidMount() {
+    this.checkIfMobile();
+    window.addEventListener('resize', this.checkIfMobile);
+  }
+
+  override componentWillUnmount() {
+    window.removeEventListener('resize', this.checkIfMobile);
+  }
+
+  checkIfMobile = () => {
+    const isMobile = window.innerWidth <= 768;
+    this.setState({ isMobile });
+  };
+
+  toggleMenu = () => {
+    this.setState({ isMenuOpen: !this.state.isMenuOpen });
   };
 
   navigateTo(route: string) {
@@ -59,7 +79,12 @@ class Menu extends React.Component<MenuProps> {
           >
             <button
               className={selectedStory === routeKey ? "selected" : ""}
-              onClick={() => this.navigateTo(app.route)}
+              onClick={() => {
+                this.navigateTo(app.route);
+                if (this.state.isMobile) {
+                  this.setState({ isMenuOpen: false });
+                }
+              }}
             >
               {app.name}
             </button>
@@ -71,7 +96,50 @@ class Menu extends React.Component<MenuProps> {
       });
 
     const { showPublic = true, showExperiments: showExperiments = true, showDev: showDev = true } = this.props;
+    const { isMobile, isMenuOpen } = this.state;
 
+    // Mobile menu
+    if (isMobile) {
+      return (
+        <div className="appOptions mobile">
+          <div className="mobile-header">
+            <h2>Lanzarote 3D</h2>
+            <button
+              className="hamburger-menu"
+              onClick={this.toggleMenu}
+              aria-label="Toggle menu"
+            >
+              <span className={`hamburger-line ${isMenuOpen ? 'open' : ''}`}></span>
+              <span className={`hamburger-line ${isMenuOpen ? 'open' : ''}`}></span>
+              <span className={`hamburger-line ${isMenuOpen ? 'open' : ''}`}></span>
+            </button>
+          </div>
+
+          <div className={`mobile-menu-content ${isMenuOpen ? 'open' : ''}`}>
+            {showPublic && publicApps.length > 0 && (
+              <>
+                <h3>Main</h3>
+                {renderButtons(publicApps)}
+              </>
+            )}
+            {showExperiments && experimentalApps.length > 0 && (
+              <>
+                <h3>Experiments</h3>
+                {renderButtons(experimentalApps)}
+              </>
+            )}
+            {showDev && devApps.length > 0 && (
+              <>
+                <h3>Development</h3>
+                {renderButtons(devApps)}
+              </>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // Desktop menu
     return (
       <div className="appOptions">
         {showPublic && publicApps.length > 0 && (
