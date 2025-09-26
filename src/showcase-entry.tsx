@@ -15,15 +15,21 @@ const queryStory = params.get('story');
 const scriptTag = document.currentScript as HTMLScriptElement;
 const bundleName = scriptTag?.src.match(/([^/]+)\.bundle\.js$/)?.[1] || 'animation';
 
-// Map bundle names to story names
+// Map bundle names to story names (bundle name -> story key in Stories object)
 const bundleToStoryMap: Record<string, string> = {
   main: 'animation',
+  animation: 'animation',
+  photobooth: 'photobooth',
+  workshop: 'workshop',
+  clouds: 'clouds',
+  night: 'night',
+  paragliderVoxel: 'paragliderVoxel', // Uses the alias in Stories object
   flyzones: 'flyzones',
   game: 'game',
 };
 
-// Priority: query parameter > bundle name mapping > default
-const storyName = queryStory || bundleToStoryMap[bundleName] || 'animation';
+// Priority: query parameter > bundle name mapping > bundle name itself > default
+const storyName = queryStory || bundleToStoryMap[bundleName] || bundleName || 'animation';
 
 // Enable dev menus on localhost
 const isLocalhost =
@@ -41,6 +47,7 @@ if (rootElement && WebGL.isWebGLAvailable()) {
       initialStory={storyName}
     />
   );
+  console.log(`Loading story: "${storyName}" (query: ${queryStory || 'none'}, bundle: ${bundleName}, script src: ${scriptTag?.src})`);
   logger.info(`${storyName} story started (query: ${queryStory || 'none'}, bundle: ${bundleName})`);
 } else if (rootElement) {
   const warning = WebGL.getWebGLErrorMessage();
