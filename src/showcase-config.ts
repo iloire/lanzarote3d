@@ -17,7 +17,6 @@ export function generateBundleToStoryMap(): Record<string, string> {
     'flyzones',
     'workshop',
     'location-editor',
-    'clouds',
     'night',
     'paragliderVoxel',
     'terrain',
@@ -29,6 +28,7 @@ export function generateBundleToStoryMap(): Record<string, string> {
     'hangglider',
     'paraglider',
     'flier-pg',
+    // clouds moved to dev section
   ];
 
   const map: Record<string, string> = {};

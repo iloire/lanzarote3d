@@ -116,7 +116,7 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       category: 'demo',
       requiresWebGL: true,
       tags: ['weather', 'environment', 'effects'],
-      status: 'public',
+      status: 'dev',
       priority: 2,
     },
     night: {

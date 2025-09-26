@@ -18,7 +18,6 @@ const showcaseApps = [
   { name: 'location-editor', title: 'Lanzarote - Location Editor', filename: 'location-editor.html' },
 
   // Demos
-  { name: 'clouds', title: 'Lanzarote - Clouds', filename: 'clouds.html' },
   { name: 'night', title: 'Lanzarote - Night', filename: 'night.html' },
   { name: 'paragliderVoxel', title: 'Lanzarote - Paraglider Voxel', filename: 'paragliderVoxel.html' },
   { name: 'terrain', title: 'Lanzarote - Terrain', filename: 'terrain.html' },
