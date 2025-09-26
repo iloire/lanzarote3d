@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { update } from "@tweenjs/tween.js";
+import * as TWEEN from "@tweenjs/tween.js";
 import { ParagliderVoxel } from "../../../foundation/components/vehicles";
 import type { ParagliderVoxelOptions } from "../../../foundation/components/vehicles";
 import Environment from "../../shared/env/environment";
@@ -7,6 +7,7 @@ import Weather, { WeatherOptions } from "../../../foundation/components/physics/
 import adriModel from '../../../../assets/foundation/models/characters/adri.obj';
 import adriTextureImage from '../../../../assets/foundation/models/characters/adri.png';
 import { StoryOptions } from "../../shared/types";
+import Animations from "../../../foundation/utils/animations";
 
 const WEATHER_SETTINGS: WeatherOptions = {
   windDirectionDegreesFromNorth: 310,
@@ -81,18 +82,25 @@ const Animation = {
 
     camera.position.copy(initialCameraPosition);
     camera.lookAt(pgPos);
+    controls.target.copy(pgPos);
+    controls.update();
 
     // Animate the camera slowly towards the paraglider over 8 seconds
-    camera.animateTo(finalCameraPosition,
-      pgPos, 8000, controls, () => {
+    Animations.animateCamera(
+      camera,
+      controls,
+      finalCameraPosition,
+      pgPos,
+      8000,
+      () => {
         // Camera animation complete - stop here
-        camera.baseY = camera.position.y;
         controls.enabled = true; // Enable user controls after animation
-    });
+      }
+    );
 
     const animate = () => {
       requestAnimationFrame(animate);
-      update(performance.now());
+      TWEEN.update(performance.now());
       renderer.render(scene, camera);
     };
     animate();
