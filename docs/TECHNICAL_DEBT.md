@@ -153,6 +153,44 @@ This document tracks technical debt and issues that need to be addressed for imp
 
 ---
 
+## Design Decisions & Architecture Evaluations
+
+### Apps Directory Structure Evaluation
+**Status**: ✅ Evaluated - No Change Recommended
+**Date**: 2025-09-26
+**Question**: Should apps be restructured with an additional `/applications` parent directory?
+
+**Current Structure** (Recommended):
+```
+src/apps/
+├── config/           # Central app registry
+├── demos/            # Standalone demo applications (3 apps)
+├── experiences/      # Full interactive experiences (2 apps)
+├── shared/           # Shared utilities & AppBase
+└── tools/            # Development/authoring tools (2 apps)
+```
+
+**Proposed Alternative** (Not Recommended):
+```
+src/apps/
+├── config/
+├── shared/
+└── applications/     # NEW grouping level
+    ├── demos/
+    ├── experiences/
+    └── tools/
+```
+
+**Decision**: Keep current structure
+**Reasoning**:
+- Current structure is already well-organized with clear logical separation
+- Proposed change adds unnecessary nesting without significant benefit
+- Would require extensive migration (69+ files, webpack configs, registry paths)
+- Flat structure with 3 clear categories is more conventional and easier to navigate
+- Each category has a distinct purpose: demos (showcase), experiences (interactive), tools (development)
+
+---
+
 ## How to Use This File
 
 1. **Add new debt**: When you find technical debt, add it to the appropriate priority section
