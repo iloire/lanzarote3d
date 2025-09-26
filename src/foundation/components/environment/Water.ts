@@ -14,10 +14,11 @@ export default class Water {
   }
 
   load(sunPosition: THREE.Vector3) {
+    console.log('=== water load')
     const waterGeometry = new THREE.PlaneGeometry(this.options.size, this.options.size);
     const mat = new THREE.MeshLambertMaterial({ color: 0x000511 });
     mat.transparent = true;
-    mat.opacity = 0.6;
+    // mat.opacity = 0.6;
     this.waterMesh = new THREE.Mesh(waterGeometry, mat);
     this.waterMesh.rotation.x = -Math.PI / 2;
     return this.waterMesh;

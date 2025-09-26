@@ -23,8 +23,7 @@ export const THEMES: Record<string, Theme> = {
     },
     water: {
       color: '#ff1744',
-      opacity: 0.7,
-      waveIntensity: 0.6,
+      opacity: 0.2,
     },
     weather: {
       windDirectionDegreesFromNorth: 310,
@@ -60,7 +59,6 @@ export const THEMES: Record<string, Theme> = {
     water: {
       color: '#ffb74d',
       opacity: 0.8,
-      waveIntensity: 0.4,
     },
     weather: {
       windDirectionDegreesFromNorth: 270,
@@ -97,7 +95,6 @@ export const THEMES: Record<string, Theme> = {
     water: {
       color: '#1976d2',
       opacity: 0.9,
-      waveIntensity: 0.2,
     },
     weather: {
       windDirectionDegreesFromNorth: 0,
@@ -134,7 +131,6 @@ export const THEMES: Record<string, Theme> = {
     water: {
       color: '#263238',
       opacity: 0.85,
-      waveIntensity: 0.9,
     },
     weather: {
       windDirectionDegreesFromNorth: 45,
@@ -171,7 +167,6 @@ export const THEMES: Record<string, Theme> = {
     water: {
       color: '#6d4c41',
       opacity: 0.8,
-      waveIntensity: 0.5,
     },
     weather: {
       windDirectionDegreesFromNorth: 225,
@@ -208,7 +203,6 @@ export const THEMES: Record<string, Theme> = {
     water: {
       color: '#2196f3',
       opacity: 0.85,
-      waveIntensity: 0.5,
     },
     weather: {
       windDirectionDegreesFromNorth: 310,

@@ -32,7 +32,6 @@ export interface WaterTheme {
   opacity: number;
   roughness?: number;
   animated?: boolean;
-  waveIntensity?: number;
 }
 
 export interface WeatherTheme {
