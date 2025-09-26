@@ -22,7 +22,7 @@ export const DEFAULT_FLIGHT_KEYBINDINGS: KeyBinding[] = [
 
 export class FlightControls {
   private inputHandler: InputHandler;
-  private flier?: Flier;
+  private flier?: Flier | undefined;
   private config: FlightControlsConfig;
 
   private leftPressed: boolean = false;
@@ -37,7 +37,7 @@ export class FlightControls {
 
     this.inputHandler = new InputHandler({
       keyBindings: this.config.keyBindings!,
-      mouseSensitivity: this.config.rotationSensitivity,
+      mouseSensitivity: this.config.rotationSensitivity || 1,
     });
 
     this.setupControls();
@@ -45,17 +45,17 @@ export class FlightControls {
 
   private setupControls(): void {
     // Key press handlers
-    this.inputHandler.addEventListener('keydown', (event: CustomEvent) => {
-      this.handleKeyDown(event.detail);
+    this.inputHandler.addEventListener('keydown', (event: Event) => {
+      this.handleKeyDown((event as CustomEvent).detail);
     });
 
-    this.inputHandler.addEventListener('keyup', (event: CustomEvent) => {
-      this.handleKeyUp(event.detail);
+    this.inputHandler.addEventListener('keyup', (event: Event) => {
+      this.handleKeyUp((event as CustomEvent).detail);
     });
 
     // Mouse controls for turn input
-    this.inputHandler.addEventListener('mousemove', (event: CustomEvent) => {
-      this.handleMouseMove(event.detail);
+    this.inputHandler.addEventListener('mousemove', (event: Event) => {
+      this.handleMouseMove((event as CustomEvent).detail);
     });
   }
 

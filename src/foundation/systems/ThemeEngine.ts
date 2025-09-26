@@ -17,8 +17,6 @@ export class ThemeEngine {
   ): Promise<void> {
     const {
       skipComponents = [],
-      animateTransition = false,
-      transitionDuration = 1000,
     } = applicationOptions;
 
     console.log(`Applying theme: ${theme.name}`);
@@ -53,9 +51,9 @@ export class ThemeEngine {
    * Apply theme to environment components (clouds, terrain, weather)
    */
   static async applyToEnvironment(
-    env: Environment,
+    _env: Environment,
     theme: Theme,
-    options?: { terrain?: THREE.Mesh }
+    _options?: { terrain?: THREE.Mesh }
   ): Promise<void> {
     console.log(`Applying theme to environment: ${theme.name}`);
 

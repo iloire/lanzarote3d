@@ -153,7 +153,7 @@ export const addTakeoff = (
 
   const takeoff: EditorTakeoff = {
     id: `takeoff-${Date.now()}`,
-    title: `Takeoff ${state.locations[state.currentLocationIndex]?.takeoffs.length + 1 || 1}`,
+    title: `Takeoff ${(state.locations[state.currentLocationIndex]?.takeoffs.length ?? 0) + 1}`,
     description: 'Description of the takeoff',
     position: position.clone(),
     gps: gps,
@@ -189,7 +189,7 @@ export const addLandingSpot = (
 
   const landingSpot: EditorLandingSpot = {
     id: `landing-${Date.now()}`,
-    title: `Landing ${state.locations[state.currentLocationIndex]?.landingSpots.length + 1 || 1}`,
+    title: `Landing ${(state.locations[state.currentLocationIndex]?.landingSpots.length ?? 0) + 1}`,
     description: 'Description of the landing spot',
     position: position.clone(),
     gps: gps,
@@ -660,8 +660,8 @@ const createFlyZonePhaseMarker = (position: THREE.Vector3, type: string): THREE.
   );
   box.add(wireframe);
 
-  box.userData.type = 'flyzone';
-  box.userData.phaseType = type;
+  box.userData['type'] = 'flyzone';
+  box.userData['phaseType'] = type;
 
   return box;
 };
@@ -814,6 +814,7 @@ export const saveToLocalStorage = (state: EditorState): void => {
           phases: Object.keys(location.flyzone.phases).reduce(
             (acc, key) => {
               const phase = location.flyzone.phases[key];
+              if (!phase) return acc;
               acc[key] = {
                 ...phase,
                 position: {
@@ -958,13 +959,14 @@ export const deleteLocation = (state: EditorState, index: number, scene: THREE.S
   if (index < 0 || index >= state.locations.length) return;
 
   const location = state.locations[index];
+  if (!location) return;
 
   // Remove all markers for this location
   const markersToRemove: THREE.Object3D[] = [];
 
   // Find the location marker
   const locationMarker = state.markers.find(
-    m => m.userData.type === 'location' && m.userData.locationId === location.id
+    m => m.userData['type'] === 'location' && m.userData['locationId'] === location.id
   );
   if (locationMarker) markersToRemove.push(locationMarker);
 
@@ -981,7 +983,7 @@ export const deleteLocation = (state: EditorState, index: number, scene: THREE.S
   // Find flyzone objects
   Object.keys(location.flyzone.phases).forEach(key => {
     const phase = location.flyzone.phases[key];
-    if (phase.object) markersToRemove.push(phase.object);
+    if (phase && phase.object) markersToRemove.push(phase.object);
   });
 
   // Remove all markers from scene
@@ -1019,6 +1021,7 @@ export const editLocation = (
   if (index < 0 || index >= state.locations.length) return;
 
   const location = state.locations[index];
+  if (!location) return;
 
   // Update properties
   if (properties.title !== undefined) location.title = properties.title;

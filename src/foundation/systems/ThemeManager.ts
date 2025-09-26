@@ -164,7 +164,10 @@ class ThemeManager {
   async applyThemeByIndex(index: number): Promise<boolean> {
     const themes = this.getAvailableThemes();
     if (index >= 0 && index < themes.length) {
-      return this.applyTheme(themes[index].id);
+      const theme = themes[index];
+      if (theme) {
+        return this.applyTheme(theme.id);
+      }
     }
     return false;
   }

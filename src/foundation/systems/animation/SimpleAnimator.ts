@@ -85,8 +85,8 @@ export class SimpleAnimator {
       startTime: performance.now(),
       isRunning: true,
       animate: animateFunction,
-      onComplete,
       easing,
+      ...(onComplete && { onComplete }),
     };
 
     this.animations.set(id, animation);

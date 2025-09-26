@@ -24,7 +24,7 @@ export interface PerformanceThresholds {
 }
 
 export class PerformanceMonitor {
-  private renderer?: THREE.WebGLRenderer;
+  private renderer?: THREE.WebGLRenderer | undefined;
   private metrics: PerformanceMetrics;
   private thresholds: PerformanceThresholds;
 
@@ -82,11 +82,12 @@ export class PerformanceMonitor {
     }
 
     // Update memory usage
-    if (performance.memory) {
+    const perfMemory = (performance as any).memory;
+    if (perfMemory) {
       this.metrics.memoryUsage = {
-        usedJSHeapSize: performance.memory.usedJSHeapSize,
-        totalJSHeapSize: performance.memory.totalJSHeapSize,
-        jsHeapSizeLimit: performance.memory.jsHeapSizeLimit,
+        usedJSHeapSize: perfMemory.usedJSHeapSize,
+        totalJSHeapSize: perfMemory.totalJSHeapSize,
+        jsHeapSizeLimit: perfMemory.jsHeapSizeLimit,
       };
     }
 

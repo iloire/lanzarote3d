@@ -42,7 +42,7 @@ class Birds extends AutoFlier {
 
     // Set up animations
     const animations = gltf.animations;
-    if (animations && animations.length > 0) {
+    if (animations && animations.length > 0 && animations[0]) {
       this.mixer = new THREE.AnimationMixer(gltf.scene);
       const animationAction = this.mixer.clipAction(animations[0]);
       animationAction.setDuration(animationAction.getClip().duration / this.animationSpeed);
@@ -50,7 +50,7 @@ class Birds extends AutoFlier {
     }
 
     // Position at start of path
-    if (path.length > 0) {
+    if (path.length > 0 && path[0]) {
       this.mesh.position.copy(path[0]);
       // Reset to start of path
       this.resetPath();
@@ -86,7 +86,7 @@ class Birds extends AutoFlier {
       if (!this.isAnimating) return;
 
       const delta = clock.getDelta();
-      this.mixer.update(delta);
+      this.mixer?.update(delta);
       if (this.path.length) {
         this.move();
       }
@@ -108,7 +108,7 @@ class Birds extends AutoFlier {
     this.stop();
     // Clean up mixer and mesh
     if (this.mixer) {
-      this.mixer.stopAllActions();
+      this.mixer.stopAllAction();
     }
     if (this.mesh) {
       this.mesh.geometry?.dispose();

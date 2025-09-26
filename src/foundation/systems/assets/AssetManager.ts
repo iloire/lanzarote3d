@@ -141,7 +141,8 @@ export class AssetManager {
     const promises = assets.map(asset => {
       if (asset.startsWith('apps/')) {
         const [, appName, ...pathParts] = asset.split('/');
-        return this.loadAppAsset(appName, pathParts.join('/'));
+        const assetPath = pathParts.join('/');
+        return this.loadAppAsset(appName || '', assetPath || '');
       } else if (asset.startsWith('models/')) {
         return this.loadModel(asset.replace('models/', ''));
       } else if (asset.startsWith('textures/')) {
