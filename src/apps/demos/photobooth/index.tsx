@@ -11,6 +11,7 @@ import adriTextureImage from '../../../../assets/foundation/models/characters/ad
 import { StoryOptions } from '../../shared/types';
 import { THEMES } from '../../../foundation/themes';
 import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';
+import { AppBase } from '../../shared/AppBase';
 
 // Use the sunset theme for PhotoBooth's romantic atmosphere
 const PHOTOBOOTH_THEME = THEMES.sunset;
@@ -171,80 +172,204 @@ const paragliders: ParagliderConfig[] = [
   },
 ];
 
-const PhotoBooth = {
-  load: async (options: StoryOptions) => {
-    const { camera, scene, renderer, terrain, water, controls, sky } = options;
+/**
+ * PhotoBooth Demo - Beautiful static 3D scene showcasing paragliders and environment
+ * Second app converted to use AppBase architecture
+ */
+class PhotoBoothApp extends AppBase {
+  private environment?: Environment;
+  private animationId?: number;
+  private paragliderMeshes: THREE.Object3D[] = [];
 
-    controls.enabled = true;
+  constructor() {
+    super({
+      name: 'Photobooth',
+      description: 'Beautiful static 3D scene showcasing paragliders and environment',
+      requiredComponents: ['scene', 'camera', 'renderer', 'terrain', 'water', 'controls'],
+      scene: {
+        environment: 'lanzarote',
+        lighting: 'dynamic',
+        physics: false,
+        fog: {
+          enabled: true,
+          color: 0xff6b6b, // Warm sunset fog
+          near: 1000,
+          far: 20000
+        }
+      },
+      performance: {
+        monitoring: true,
+        logIntervalMs: 15000 // Log performance every 15 seconds
+      }
+    });
+  }
 
-    // Apply theme to scene
-    const theme = options.theme || PHOTOBOOTH_THEME;
-    await ThemeEngine.apply(options, theme);
+  async load(options: StoryOptions): Promise<void> {
+    try {
+      // Initialize core systems from AppBase
+      this.initializeCore(options);
 
-    const initialPos = new THREE.Vector3(6200, 970, 175);
-    const lookAtPos = paraglidersVoxel[0]?.position || new THREE.Vector3();
+      const { camera, scene, renderer, terrain, water, controls } = options;
 
-    // Set camera position and look at target
+      controls.enabled = true;
 
-    // Set camera position directly since duration is 0
-    camera.position.copy(initialPos);
-    camera.lookAt(lookAtPos);
-    controls.target.copy(lookAtPos);
-    controls.update();
+      // Apply theme to scene
+      const theme = options.theme || PHOTOBOOTH_THEME;
+      await ThemeEngine.apply(options, theme);
 
-    // Add paragliders
-    paragliders.forEach(async p => {
-      const paraglider = new Paraglider(p.pg);
-      const mesh = await paraglider.load();
-      mesh.position.copy(p.position);
-      const scale = 0.001;
-      mesh.scale.set(scale, scale, scale);
-      scene.add(mesh);
-      // Regular paraglider added
+      const initialPos = new THREE.Vector3(6200, 970, 175);
+      const lookAtPos = paraglidersVoxel[0]?.position || new THREE.Vector3();
+
+      // Set camera position and look at target
+      camera.position.copy(initialPos);
+      camera.lookAt(lookAtPos);
+      controls.target.copy(lookAtPos);
+      controls.update();
+
+      // Load paragliders with proper tracking for disposal
+      await this.loadParagliders(scene);
+
+      // must render before adding env
+      renderer.render(scene, camera);
+
+      // Set up environment using theme
+      this.environment = new Environment(scene);
+      const weather = this.environment.createWeatherFromTheme(theme);
+      const thermals = this.environment.generateThermals(weather, 0);
+
+      // Add environment elements using theme
+      await this.environment.addCloudsFromTheme(thermals, theme);
+      this.environment.addTrees(terrain);
+      this.environment.addHouses(terrain);
+      this.environment.addBoats(water);
+
+      // Start animation loop
+      this.startAnimationLoop(renderer, scene, camera);
+
+      this.isLoaded = true;
+      console.log(`✅ ${this.config.name} loaded successfully with ${this.paragliderMeshes.length} paragliders`);
+
+    } catch (error) {
+      this.handleError(error as Error, 'load');
+      throw error;
+    }
+  }
+
+  private async loadParagliders(scene: THREE.Scene): Promise<void> {
+    // Add regular paragliders
+    const paragliderPromises = paragliders.map(async p => {
+      try {
+        const paraglider = new Paraglider(p.pg);
+        const mesh = await paraglider.load();
+        mesh.position.copy(p.position);
+        const scale = 0.001;
+        mesh.scale.set(scale, scale, scale);
+        scene.add(mesh);
+        this.paragliderMeshes.push(mesh);
+        return mesh;
+      } catch (error) {
+        this.handleError(error as Error, 'loading regular paraglider');
+      }
     });
 
     // Add voxel paragliders
-    paraglidersVoxel.forEach(async p => {
-      const paraglider = new ParagliderVoxel(p.pg);
-      const mesh = await paraglider.load();
-      mesh.position.copy(p.position);
-      const scale = 0.01;
-      mesh.scale.set(scale, scale, scale);
-      scene.add(mesh);
-      // Voxel paraglider added
+    const voxelPromises = paraglidersVoxel.map(async p => {
+      try {
+        const paraglider = new ParagliderVoxel(p.pg);
+        const mesh = await paraglider.load();
+        mesh.position.copy(p.position);
+        const scale = 0.01;
+        mesh.scale.set(scale, scale, scale);
+        scene.add(mesh);
+        this.paragliderMeshes.push(mesh);
+        return mesh;
+      } catch (error) {
+        this.handleError(error as Error, 'loading voxel paraglider');
+      }
     });
 
     // Add tandems
-    tandems.forEach(async p => {
-      const tandem = new Tandem(p.pg);
-      const mesh = await tandem.load();
-      mesh.position.copy(p.position);
-      const scale = 0.001;
-      mesh.scale.set(scale, scale, scale);
-      scene.add(mesh);
-      // Tandem added
+    const tandemPromises = tandems.map(async p => {
+      try {
+        const tandem = new Tandem(p.pg);
+        const mesh = await tandem.load();
+        mesh.position.copy(p.position);
+        const scale = 0.001;
+        mesh.scale.set(scale, scale, scale);
+        scene.add(mesh);
+        this.paragliderMeshes.push(mesh);
+        return mesh;
+      } catch (error) {
+        this.handleError(error as Error, 'loading tandem');
+      }
     });
 
-    // must render before adding env
-    renderer.render(scene, camera);
+    // Wait for all paragliders to load
+    await Promise.all([...paragliderPromises, ...voxelPromises, ...tandemPromises]);
+  }
 
-    // Set up environment using theme
-    const env = new Environment(scene);
-    const weather = env.createWeatherFromTheme(theme);
-    const thermals = env.generateThermals(weather, 0);
-
-    // Add environment elements using theme
-    await env.addCloudsFromTheme(thermals, theme);
-    env.addTrees(terrain);
-    env.addHouses(terrain);
-    env.addBoats(water);
-
+  private startAnimationLoop(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.Camera): void {
     const animate = () => {
-      renderer.render(scene, camera);
-      requestAnimationFrame(animate);
+      try {
+        // Update performance monitoring
+        this.updatePerformance();
+
+        renderer.render(scene, camera);
+        this.animationId = requestAnimationFrame(animate);
+      } catch (error) {
+        this.handleError(error as Error, 'animation loop');
+      }
     };
     animate();
+  }
+
+  public dispose(): void {
+    console.log(`🧹 Disposing ${this.config.name}`);
+
+    // Cancel animation loop
+    if (this.animationId) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = undefined;
+    }
+
+    // Dispose paraglider meshes
+    this.paragliderMeshes.forEach(mesh => {
+      // Dispose geometry and materials if they exist
+      if (mesh.geometry) {
+        mesh.geometry.dispose();
+      }
+      if (Array.isArray(mesh.material)) {
+        mesh.material.forEach(material => material.dispose());
+      } else if (mesh.material) {
+        mesh.material.dispose();
+      }
+    });
+    this.paragliderMeshes.length = 0;
+
+    // Dispose environment resources
+    if (this.environment) {
+      this.environment = undefined;
+    }
+
+    // Call parent dispose
+    super.dispose();
+  }
+}
+
+// Create singleton instance
+const photoBoothApp = new PhotoBoothApp();
+
+// Export in the expected format for the Stories system
+const PhotoBooth = {
+  load: async (options: StoryOptions) => {
+    return photoBoothApp.load(options);
   },
+  dispose: () => {
+    return photoBoothApp.dispose();
+  },
+  getAppInfo: () => {
+    return photoBoothApp.getAppInfo();
+  }
 };
 
 export default PhotoBooth;
