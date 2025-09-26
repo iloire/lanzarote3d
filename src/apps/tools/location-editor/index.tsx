@@ -13,27 +13,90 @@ import {
 import { createEditorUI } from './ui';
 import { setupInteraction } from './interaction';
 import './styles.css'; // Import the CSS
+import { AppBase } from '../../shared/AppBase';
 
-const LocationEditor = {
-  load: async (options: StoryOptions) => {
-    const { camera, scene, renderer, controls, gui, terrain } = options;
+/**
+ * Location Editor App - Interactive location creation and editing tool
+ * Seventh app converted to use AppBase architecture
+ */
+class LocationEditorApp extends AppBase {
+  private editorState?: EditorState;
+  private labelRenderer?: any;
+  private animationId?: number;
+  private resizeHandler?: () => void;
+  private raycaster?: THREE.Raycaster;
+  private mouse?: THREE.Vector2;
+  private debugSphere?: THREE.Object3D;
 
-    camera.position.set(1000, 5000, 1000);
+  constructor() {
+    super({
+      name: 'Location Editor',
+      description: 'Interactive tool for creating and editing flight locations with takeoffs, landings, and fly zones',
+      requiredComponents: ['scene', 'camera', 'renderer', 'controls', 'gui', 'terrain'],
+      scene: {
+        environment: 'lanzarote',
+        lighting: 'dynamic',
+        physics: false,
+        fog: {
+          enabled: false // Clear visibility for precise editing
+        }
+      },
+      performance: {
+        monitoring: true,
+        logIntervalMs: 25000 // Log performance every 25 seconds
+      }
+    });
+  }
 
-    // Location Editor loading...
+  async load(options: StoryOptions): Promise<void> {
+    try {
+      // Initialize core systems from AppBase
+      this.initializeCore(options);
 
-    // Store scene in window for UI access
-    (window as any).__editorScene = scene;
+      const { camera, scene, renderer, controls, gui, terrain } = options;
 
-    // Initialize editor state
-    let editorState: EditorState;
+      // Set initial camera position
+      camera.position.set(1000, 5000, 1000);
+
+      // Store scene in window for UI access
+      (window as any).__editorScene = scene;
+
+      // Initialize editor state
+      this.initializeEditorState(scene);
+
+      // Setup components
+      this.setupLabelRenderer();
+      this.setupTerrain(terrain);
+      this.setupInteraction(renderer, camera, scene);
+      this.setupGUI(gui, scene);
+      this.setupDebugVisuals(scene);
+
+      // Create UI
+      createEditorUI(this.editorState!);
+
+      // Initialize cursor style
+      this.updateCursorStyle(this.editorState!.mode, renderer);
+
+      // Setup event handlers and start animation
+      this.setupEventHandlers();
+      this.startAnimationLoop(scene, camera, renderer, controls);
+
+      this.isLoaded = true;
+      console.log(`✅ ${this.config.name} loaded successfully`);
+
+    } catch (error) {
+      this.handleError(error as Error, 'load');
+      throw error;
+    }
+  }
+
+  private initializeEditorState(scene: THREE.Scene): void {
     const savedState = loadFromLocalStorage(scene);
 
     if (savedState) {
-      editorState = savedState;
-      // Loaded state from localStorage
+      this.editorState = savedState;
     } else {
-      editorState = {
+      this.editorState = {
         locations: [],
         currentLocationIndex: null,
         selectedItem: null,
@@ -44,83 +107,13 @@ const LocationEditor = {
         history: [],
       };
     }
+  }
 
-    // Setup renderers and containers
-    const labelRenderer = setupLabelRenderer();
+  private setupLabelRenderer(): void {
+    this.labelRenderer = setupLabelRenderer();
+  }
 
-    // Setup editor GUI
-    const editorFolder = gui.addFolder('Location Editor');
-    editorFolder.open(); // Make sure the folder is open
-
-    // Mode selection
-    const modeFolder = editorFolder.addFolder('Mode');
-    modeFolder.open(); // Make sure the folder is open
-    modeFolder
-      .add(editorState, 'mode', ['location', 'takeoff', 'landing', 'flyzone'])
-      .name('Edit Mode')
-      .onChange((value: string) => {
-        // Switched mode
-        updateCursorStyle(value);
-        saveState(); // Save after mode change
-      });
-
-    // FlyZone phase type selection (only visible in flyzone mode)
-    const flyZoneFolder = editorFolder.addFolder('FlyZone Settings');
-    flyZoneFolder.open(); // Make sure the folder is open
-    flyZoneFolder
-      .add(editorState, 'flyZonePhaseType', ['takeoff', 'ridge', 'approach', 'landing'])
-      .name('Phase Type')
-      .onChange(() => {
-        saveState(); // Save after flyzone type change
-      });
-
-    // Export button
-    editorFolder
-      .add({ exportData: () => exportLocationData(editorState) }, 'exportData')
-      .name('Export Location Data');
-
-    // Reset button
-    editorFolder
-      .add(
-        {
-          resetLocation: () => {
-            resetLocation(editorState, scene);
-            clearLocalStorage(); // Clear localStorage when resetting
-            createEditorUI(editorState);
-          },
-        },
-        'resetLocation'
-      )
-      .name('Reset Location');
-
-    // Undo button
-    editorFolder
-      .add({ undoLastAction: () => undoLastAction(editorState, scene) }, 'undoLastAction')
-      .name('Undo Last Action')
-      .onChange(() => {
-        // Update UI after undo
-        createEditorUI(editorState);
-      });
-
-    // Add a function to save state after changes
-    const saveState = () => {
-      saveToLocalStorage(editorState);
-    };
-
-    // Add a clear storage button to the GUI
-    editorFolder
-      .add(
-        {
-          clearStorage: () => {
-            clearLocalStorage();
-            resetLocation(editorState, scene);
-            createEditorUI(editorState);
-          },
-        },
-        'clearStorage'
-      )
-      .name('Clear Saved Data');
-
+  private setupTerrain(terrain: any): void {
     // Make sure terrain is clickable
     if (terrain) {
       terrain.traverse((child: any) => {
@@ -130,55 +123,121 @@ const LocationEditor = {
         }
       });
     }
+  }
 
-    // Setup interaction
-    const { raycaster, mouse } = setupInteraction(renderer, camera, scene, editorState);
+  private setupInteraction(renderer: any, camera: any, scene: THREE.Scene): void {
+    const result = setupInteraction(renderer, camera, scene, this.editorState!);
+    this.raycaster = result.raycaster;
+    this.mouse = result.mouse;
+  }
 
-    // Create UI
-    createEditorUI(editorState);
+  private setupGUI(gui: any, scene: THREE.Scene): void {
+    if (!gui || !this.editorState) return;
 
-    // Helper function to update cursor style based on mode
-    const updateCursorStyle = (mode: string) => {
-      switch (mode) {
-        case 'location':
-          renderer.domElement.style.cursor = 'crosshair';
-          break;
-        case 'takeoff':
-          renderer.domElement.style.cursor = 'cell';
-          break;
-        case 'landing':
-          renderer.domElement.style.cursor = 'copy';
-          break;
-        case 'flyzone':
-          renderer.domElement.style.cursor = 'pointer';
-          break;
-        default:
-          renderer.domElement.style.cursor = 'default';
-      }
-    };
+    // Setup editor GUI
+    const editorFolder = gui.addFolder('Location Editor');
+    editorFolder.open();
 
-    // Initialize cursor style
-    updateCursorStyle(editorState.mode);
+    // Mode selection
+    const modeFolder = editorFolder.addFolder('Mode');
+    modeFolder.open();
+    modeFolder
+      .add(this.editorState, 'mode', ['location', 'takeoff', 'landing', 'flyzone'])
+      .name('Edit Mode')
+      .onChange((value: string) => {
+        this.updateCursorStyle(value);
+        this.saveState();
+      });
 
-    // Render loop
-    const animate = () => {
-      // Removed TWEEN update - no longer needed
+    // FlyZone phase type selection
+    const flyZoneFolder = editorFolder.addFolder('FlyZone Settings');
+    flyZoneFolder.open();
+    flyZoneFolder
+      .add(this.editorState, 'flyZonePhaseType', ['takeoff', 'ridge', 'approach', 'landing'])
+      .name('Phase Type')
+      .onChange(() => {
+        this.saveState();
+      });
 
-      // Update hover states
-      raycaster.setFromCamera(mouse, camera);
+    // Export button
+    editorFolder
+      .add({ exportData: () => this.exportData() }, 'exportData')
+      .name('Export Location Data');
 
-      renderer.render(scene, camera);
-      labelRenderer.render(scene, camera);
-      requestAnimationFrame(animate);
-      controls.update();
-    };
+    // Reset button
+    editorFolder
+      .add({ resetLocation: () => this.resetLocation(scene) }, 'resetLocation')
+      .name('Reset Location');
 
-    // Initialize
-    window.addEventListener('resize', () =>
-      labelRenderer.setSize(window.innerWidth, window.innerHeight)
-    );
-    animate();
+    // Undo button
+    editorFolder
+      .add({ undoLastAction: () => this.undoLastAction(scene) }, 'undoLastAction')
+      .name('Undo Last Action');
 
+    // Clear storage button
+    editorFolder
+      .add({ clearStorage: () => this.clearStorage(scene) }, 'clearStorage')
+      .name('Clear Saved Data');
+  }
+
+  private saveState(): void {
+    if (this.editorState) {
+      saveToLocalStorage(this.editorState);
+    }
+  }
+
+  private exportData(): void {
+    if (this.editorState) {
+      exportLocationData(this.editorState);
+    }
+  }
+
+  private resetLocation(scene: THREE.Scene): void {
+    if (this.editorState) {
+      resetLocation(this.editorState, scene);
+      clearLocalStorage();
+      createEditorUI(this.editorState);
+    }
+  }
+
+  private undoLastAction(scene: THREE.Scene): void {
+    if (this.editorState) {
+      undoLastAction(this.editorState, scene);
+      createEditorUI(this.editorState);
+    }
+  }
+
+  private clearStorage(scene: THREE.Scene): void {
+    if (this.editorState) {
+      clearLocalStorage();
+      resetLocation(this.editorState, scene);
+      createEditorUI(this.editorState);
+    }
+  }
+
+  private updateCursorStyle(mode: string, renderer?: any): void {
+    const rendererElement = renderer?.domElement || document.querySelector('canvas');
+    if (!rendererElement) return;
+
+    switch (mode) {
+      case 'location':
+        rendererElement.style.cursor = 'crosshair';
+        break;
+      case 'takeoff':
+        rendererElement.style.cursor = 'cell';
+        break;
+      case 'landing':
+        rendererElement.style.cursor = 'copy';
+        break;
+      case 'flyzone':
+        rendererElement.style.cursor = 'pointer';
+        break;
+      default:
+        rendererElement.style.cursor = 'default';
+    }
+  }
+
+  private setupDebugVisuals(scene: THREE.Scene): void {
     // Add a debug sphere to verify the scene is working
     const debugSphere = new THREE.Mesh(
       new THREE.SphereGeometry(500, 32, 32),
@@ -186,7 +245,108 @@ const LocationEditor = {
     );
     debugSphere.position.set(0, 1000, 0);
     scene.add(debugSphere);
-    // Debug sphere added
+    this.debugSphere = debugSphere;
+  }
+
+  private setupEventHandlers(): void {
+    // Setup window resize handler
+    this.resizeHandler = () => {
+      if (this.labelRenderer) {
+        this.labelRenderer.setSize(window.innerWidth, window.innerHeight);
+      }
+    };
+    window.addEventListener('resize', this.resizeHandler);
+  }
+
+  private startAnimationLoop(scene: THREE.Scene, camera: any, renderer: any, controls: any): void {
+    const animate = () => {
+      try {
+        // Update performance monitoring
+        this.updatePerformance();
+
+        // Update hover states
+        if (this.raycaster && this.mouse) {
+          this.raycaster.setFromCamera(this.mouse, camera);
+        }
+
+        renderer.render(scene, camera);
+        if (this.labelRenderer) {
+          this.labelRenderer.render(scene, camera);
+        }
+        controls.update();
+
+        this.animationId = requestAnimationFrame(animate);
+      } catch (error) {
+        this.handleError(error as Error, 'animation loop');
+      }
+    };
+    animate();
+  }
+
+  public dispose(): void {
+    console.log(`🧹 Disposing ${this.config.name}`);
+
+    // Cancel animation loop
+    if (this.animationId) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = undefined;
+    }
+
+    // Cleanup resize handler
+    if (this.resizeHandler) {
+      window.removeEventListener('resize', this.resizeHandler);
+      this.resizeHandler = undefined;
+    }
+
+    // Cleanup label renderer
+    if (this.labelRenderer && this.labelRenderer.domElement && this.labelRenderer.domElement.parentNode) {
+      this.labelRenderer.domElement.parentNode.removeChild(this.labelRenderer.domElement);
+      this.labelRenderer = undefined;
+    }
+
+    // Cleanup debug sphere
+    if (this.debugSphere) {
+      if (this.debugSphere.geometry) {
+        this.debugSphere.geometry.dispose();
+      }
+      if (this.debugSphere.material) {
+        if (Array.isArray(this.debugSphere.material)) {
+          this.debugSphere.material.forEach(material => material.dispose());
+        } else {
+          this.debugSphere.material.dispose();
+        }
+      }
+      this.debugSphere = undefined;
+    }
+
+    // Clear window reference
+    if ((window as any).__editorScene) {
+      delete (window as any).__editorScene;
+    }
+
+    // Clear editor state
+    this.editorState = undefined;
+    this.raycaster = undefined;
+    this.mouse = undefined;
+
+    // Call parent dispose
+    super.dispose();
+  }
+}
+
+// Create singleton instance
+const locationEditorApp = new LocationEditorApp();
+
+// Export in the expected format for the Stories system
+const LocationEditor = {
+  load: async (options: StoryOptions) => {
+    return locationEditorApp.load(options);
+  },
+  dispose: () => {
+    return locationEditorApp.dispose();
+  },
+  getAppInfo: () => {
+    return locationEditorApp.getAppInfo();
   },
 };
 
