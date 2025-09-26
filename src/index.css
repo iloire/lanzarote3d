@@ -18,16 +18,15 @@ body {
 }
 
 .appOptions div.button button {
-
   background: #222;
   color: #f5f5f5;
   border: none;
-  padding: 0.5em 0.7em;
+  padding: 0.4em 0.7em;
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   font-size: 1em;
   cursor: pointer;
-  margin: 0.2em;
+  margin: 0;
   transition: background 0.2s, color 0.2s, transform 0.15s;
 }
 
@@ -48,7 +47,7 @@ body {
 .appOptions div.button {
   display: flex;
   align-items: center;
-  margin-bottom: 0.5em;
+  margin-bottom: 0.2em;
 }
 
 .appOptions div.button span.description {
@@ -156,7 +155,7 @@ body {
 }
 
 .mobile-menu-content .button {
-  margin: 0.5em 0;
+  margin: 0.2em 0;
 }
 
 .mobile-menu-content .button button {
