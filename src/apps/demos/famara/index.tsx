@@ -3,10 +3,10 @@ import Environment from '../../shared/env/environment';
 import { StoryOptions } from '../../shared/types';
 import { THEMES } from '../../../foundation/themes';
 import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';
-import { AppBase, AppConfig } from '../../shared/AppBase';
+import { AppBase } from '../../shared/AppBase';
 
 // Use the natural theme from our theme library
-const FAMARA_THEME = THEMES.natural;
+const FAMARA_THEME = THEMES['natural'];
 
 /**
  * Famara Demo - Based on PhotoBooth but without paragliders

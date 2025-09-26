@@ -186,7 +186,7 @@ export const THEMES: Record<string, Theme> = {
       timeOfDay: 13,
       sunIntensity: 2.2,
       fogColor: '#f5f5f5',
-      fogDensity: 0.0005,
+      fogDensity: 0,
     },
     clouds: {
       colors: ['#FFFFFF', '#E0E0E0', '#C0C0C0', '#A0A0A0', '#808080', '#606060'],

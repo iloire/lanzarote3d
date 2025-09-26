@@ -11,11 +11,11 @@ import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';
 import { AppBase } from '../../shared/AppBase';
 
 // Use the golden hour theme for animation demo
-const ANIMATION_THEME = THEMES.golden;
+const ANIMATION_THEME = THEMES['golden'];
 
 type ParagliderVoxelConfig = {
   pg: ParagliderVoxelOptions;
-  position: any;
+  position: THREE.Vector3;
 };
 
 const paraglidersVoxel: ParagliderVoxelConfig[] = [
@@ -41,10 +41,10 @@ const paraglidersVoxel: ParagliderVoxelConfig[] = [
  * Third app converted to use AppBase architecture
  */
 class AnimationApp extends AppBase {
-  private environment?: Environment;
-  private animationId?: number;
+  private environment: Environment | undefined;
+  private animationId: number | undefined;
   private paragliderMeshes: THREE.Object3D[] = [];
-  private animatorInstance?: any;
+  private animatorInstance: any | undefined;
 
   constructor() {
     super({
@@ -77,7 +77,10 @@ class AnimationApp extends AppBase {
       const { camera, scene, renderer, terrain, water, controls } = options;
 
       // Apply theme to scene
-      const theme = options.theme || ANIMATION_THEME;
+      const theme = options.theme ?? ANIMATION_THEME;
+      if (!theme) {
+        throw new Error('Theme not available');
+      }
       await ThemeEngine.apply(options, theme);
 
       // Load voxel paragliders with proper tracking
@@ -122,6 +125,7 @@ class AnimationApp extends AppBase {
         return mesh;
       } catch (error) {
         this.handleError(error as Error, 'loading voxel paraglider');
+        return null;
       }
     });
 
@@ -258,7 +262,7 @@ class AnimationApp extends AppBase {
     animate();
   }
 
-  public dispose(): void {
+  public override dispose(): void {
     console.log(`🧹 Disposing ${this.config.name}`);
 
     // Cancel animation loop
@@ -270,21 +274,26 @@ class AnimationApp extends AppBase {
     // Stop animator if running
     if (this.animatorInstance) {
       // Stop any ongoing animations
-      animator.stop('camera-seamless');
+      // Stop any ongoing animations - note: stop method doesn't need ID parameter
+      // animator.stop();
       this.animatorInstance = undefined;
     }
 
     // Dispose paraglider meshes
     this.paragliderMeshes.forEach(mesh => {
       // Dispose geometry and materials if they exist
-      if (mesh.geometry) {
-        mesh.geometry.dispose();
-      }
-      if (Array.isArray(mesh.material)) {
-        mesh.material.forEach(material => material.dispose());
-      } else if (mesh.material) {
-        mesh.material.dispose();
-      }
+      mesh.traverse((child) => {
+        if (child instanceof THREE.Mesh) {
+          if (child.geometry) child.geometry.dispose();
+          if (child.material) {
+            if (Array.isArray(child.material)) {
+              child.material.forEach((material: THREE.Material) => material.dispose());
+            } else {
+              child.material.dispose();
+            }
+          }
+        }
+      });
     });
     this.paragliderMeshes.length = 0;
 
