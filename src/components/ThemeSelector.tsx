@@ -91,7 +91,7 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
 
     try {
       await themeManager.applyTheme(themeId);
-      this.setState({ isOpen: false });
+      // Keep modal open so user can try multiple themes easily
     } catch (error) {
       console.error('Failed to apply theme:', error);
     } finally {
