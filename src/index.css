@@ -45,9 +45,22 @@ body {
   font-size: 90%;
 }
 
-.appOptions div.button span {
+.appOptions div.button {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5em;
+}
+
+.appOptions div.button span.description {
   color: white;
   margin-left: 0.5em;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  pointer-events: none;
+}
+
+.appOptions div.button span.description.visible {
+  opacity: 1;
 }
 
 .appOptions h2 {

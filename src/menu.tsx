@@ -13,6 +13,7 @@ class Menu extends React.Component<MenuProps> {
   override state = {
     loadingProcess: 0,
     showAppSelection: false,
+    hoveredRoute: null as string | null,
   };
 
   navigateTo(route: string) {
@@ -47,15 +48,24 @@ class Menu extends React.Component<MenuProps> {
     const renderButtons = (apps: AppMetadata[]) =>
       apps.map((app) => {
         const routeKey = app.route.replace('/', '');
+        const isHovered = this.state.hoveredRoute === routeKey;
+
         return (
-          <div className="button" key={routeKey}>
+          <div
+            className="button"
+            key={routeKey}
+            onMouseEnter={() => this.setState({ hoveredRoute: routeKey })}
+            onMouseLeave={() => this.setState({ hoveredRoute: null })}
+          >
             <button
               className={selectedStory === routeKey ? "selected" : ""}
               onClick={() => this.navigateTo(app.route)}
             >
               {app.name}
             </button>
-            <span>{app.description}</span>
+            <span className={`description ${isHovered ? 'visible' : ''}`}>
+              {app.description}
+            </span>
           </div>
         );
       });
