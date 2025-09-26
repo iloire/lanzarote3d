@@ -1,7 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import * as THREE from "three";
-import { update } from "@tweenjs/tween.js";
 import BackgroundSound from "../../../foundation/systems/audio/BackgroundAudio";
 import Flier, { FlierConstructor } from "../../../foundation/types/flier";
 import Paraglider from "../../../foundation/components/vehicles/Paraglider";
@@ -16,6 +15,7 @@ import { addGameEnvironment } from "./env";
 import locations from "./lanzarote";
 import { WindIndicator } from "../../../foundation/components/physics";
 import { StoryOptions } from "../types";
+import AnimationManager from "../../../foundation/systems/animation/AnimationManager";
 const KMH_TO_MS = 3.6;
 
 const FOG_ENABLED = true;
@@ -295,7 +295,8 @@ const Game = {
 
     renderer.render(scene, camera);
 
-    const animate = () => {
+    // Register game animation with centralized manager
+    AnimationManager.register('game-main', () => {
 
       if (gameStatus !== GameStatus.Started) {
         const timeMultiplier = 0.000008;
@@ -306,13 +307,9 @@ const Game = {
       }
 
       vario.updateReading(pg.altitude());
-      update(performance.now());
       camera.update();
       renderer.render(scene, camera);
-      requestAnimationFrame(animate);
-    };
-
-    animate();
+    }, 100); // Standard priority for game logic
 
     // Game rendering complete
   },

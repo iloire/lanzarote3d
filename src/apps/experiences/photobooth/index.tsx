@@ -180,7 +180,7 @@ const PhotoBooth = {
 
     controls.enabled = true;
 
-    const initialPos = new THREE.Vector3(6800, 870, -475);
+    const initialPos = new THREE.Vector3(6800, 970, -475);
     const lookAtPos = paraglidersVoxel[0]?.position || new THREE.Vector3();
 
     // Set camera position and look at target

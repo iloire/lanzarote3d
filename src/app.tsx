@@ -10,6 +10,7 @@ import { CameraController as Camera } from './foundation/systems/scene/CameraCon
 import Menu from './menu';
 import Controls from "./foundation/utils/controls";
 import { StoryOptions } from "./apps/shared/types";
+import AnimationManager from "./foundation/systems/animation/AnimationManager";
 
 import "./index.css";
 
@@ -93,7 +94,7 @@ const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAp
     const scene = new THREE.Scene();
 
     // Sky setup
-    const sky = new Sky(20, 3);
+    const sky = new Sky(19, 3);
     sky.addToScene(scene);
     sky.addGui(gui);
 
@@ -160,12 +161,10 @@ const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAp
       console.error(`Story "${initialStory}" not found or doesn't have a load method`);
     }
 
-    // Animation loop
-    const animate = () => {
-      requestAnimationFrame(animate);
+    // Register main app animations with centralized manager
+    AnimationManager.register('main-stats', () => {
       stats.update();
-    };
-    animate();
+    }, 0); // Highest priority (stats first)
 
     // Rendering complete
   };
@@ -177,6 +176,7 @@ const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAp
 
     return () => {
       // Cleanup
+      AnimationManager.unregister('main-stats');
       renderer?.dispose();
     };
   }, []);

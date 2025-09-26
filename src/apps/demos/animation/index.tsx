@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import * as TWEEN from "@tweenjs/tween.js";
 import { ParagliderVoxel } from "../../../foundation/components/vehicles";
 import type { ParagliderVoxelOptions } from "../../../foundation/components/vehicles";
 import Environment from "../../shared/env/environment";
@@ -8,6 +7,7 @@ import adriModel from '../../../../assets/foundation/models/characters/adri.obj'
 import adriTextureImage from '../../../../assets/foundation/models/characters/adri.png';
 import { StoryOptions } from "../../shared/types";
 import Animations from "../../../foundation/utils/animations";
+import AnimationManager from "../../../foundation/systems/animation/AnimationManager";
 
 const WEATHER_SETTINGS: WeatherOptions = {
   windDirectionDegreesFromNorth: 310,
@@ -69,6 +69,7 @@ const Animation = {
     env.addBoats(water);
 
     const pgPos = paraglidersVoxel[0]?.position.clone() || new THREE.Vector3();
+    console.log('Paraglider position:', pgPos);
 
     // Starting position - further away from the paraglider
     const initialCameraPosition = new THREE.Vector3(6500, 1100, -200);
@@ -80,30 +81,45 @@ const Animation = {
       pgPos.z + 200   // Behind the paraglider
     );
 
+    console.log('Initial camera position:', initialCameraPosition);
+    console.log('Final camera position:', finalCameraPosition);
+
+    // Set initial camera position and look at the paraglider
     camera.position.copy(initialCameraPosition);
     camera.lookAt(pgPos);
-    controls.target.copy(pgPos);
-    controls.update();
 
-    // Animate the camera slowly towards the paraglider over 8 seconds
-    Animations.animateCamera(
-      camera,
-      controls,
-      finalCameraPosition,
-      pgPos,
-      8000,
-      () => {
-        // Camera animation complete - stop here
-        controls.enabled = true; // Enable user controls after animation
-      }
-    );
+    // Ensure controls are set up properly
+    if (controls) {
+      controls.target.copy(pgPos);
+      controls.update();
+      controls.enabled = false; // Disable controls during animation
+    }
 
-    const animate = () => {
-      requestAnimationFrame(animate);
-      TWEEN.update(performance.now());
+    // Start the camera animation after a short delay to ensure everything is loaded
+    setTimeout(() => {
+      console.log('Starting camera animation...');
+      console.log('Controls enabled:', controls?.enabled);
+
+      Animations.animateCamera(
+        camera,
+        controls,
+        finalCameraPosition,
+        pgPos,
+        8000,
+        () => {
+          // Camera animation complete - enable user controls
+          if (controls) {
+            controls.enabled = true;
+          }
+          console.log('Camera animation complete');
+        }
+      );
+    }, 100);
+
+    // Register animation app with centralized manager
+    AnimationManager.register('animation-demo-render', () => {
       renderer.render(scene, camera);
-    };
-    animate();
+    }, 50); // Lower priority than stats but higher than other apps
 
     // Animation app initialized
   }

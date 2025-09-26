@@ -1,10 +1,10 @@
 import * as THREE from 'three';
-import { update } from '@tweenjs/tween.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { Marker } from '../helpers/index';
 import { VISIBILITY_THRESHOLDS } from '../config/marker-config';
 import { MarkerType } from '../helpers/index';
+import AnimationManager from '../../../../foundation/systems/animation/AnimationManager';
 
 export const setupAnimationLoop = (
   renderer: THREE.WebGLRenderer,
@@ -15,28 +15,27 @@ export const setupAnimationLoop = (
   markers: Marker[],
   landingMarkersVisible: boolean
 ): void => {
-  const animate = () => {
-    // Animation frame running
-    requestAnimationFrame(animate);
-    update();
+  // Register flyzones animation with centralized manager
+  AnimationManager.register('flyzones-main', () => {
+    // Update controls
     controls.update();
-    
+
     // Render the scene
     renderer.render(scene, camera);
-    
+
     // Update label renderer
     labelRenderer.render(scene, camera);
-    
+
     // Update marker visibility based on camera distance
     markers.forEach(marker => {
       if (!marker.position) return;
-      
+
       // Calculate distance to camera
       const distance = camera.position.distanceTo(marker.position);
-      
+
       // Determine visibility based on marker type and distance
       let visible = false;
-      
+
       if (marker.type === MarkerType.LOCATION) {
         // Location markers are visible when far away
         visible = distance > VISIBILITY_THRESHOLDS.LOCATION_PIN;
@@ -47,7 +46,7 @@ export const setupAnimationLoop = (
         // Landing markers are visible when close and landing markers are enabled
         visible = distance < VISIBILITY_THRESHOLDS.LANDING && landingMarkersVisible;
       }
-      
+
       // Update visibility
       if (marker.setVisibility) {
         marker.setVisibility(visible);
@@ -62,8 +61,5 @@ export const setupAnimationLoop = (
         }
       }
     });
-  };
-
-  // Start animation loop
-  animate();
+  }, 75); // Medium priority for flyzones
 }; 

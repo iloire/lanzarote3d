@@ -34,7 +34,8 @@
       "Bash(rmdir:*)",
       "Bash(cut:*)",
       "Bash(grep:*)",
-      "Read(//Users/**)"
+      "Read(//Users/**)",
+      "mcp__ide__getDiagnostics"
     ],
     "deny": [],
     "ask": []
