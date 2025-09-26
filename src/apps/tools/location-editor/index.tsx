@@ -20,13 +20,13 @@ import { AppBase } from '../../shared/AppBase';
  * Seventh app converted to use AppBase architecture
  */
 class LocationEditorApp extends AppBase {
-  private editorState?: EditorState;
-  private labelRenderer?: any;
-  private animationId?: number;
-  private resizeHandler?: () => void;
-  private raycaster?: THREE.Raycaster;
-  private mouse?: THREE.Vector2;
-  private debugSphere?: THREE.Object3D;
+  private editorState: EditorState | undefined;
+  private labelRenderer: any;
+  private animationId: number | undefined;
+  private resizeHandler: (() => void) | undefined;
+  private raycaster: THREE.Raycaster | undefined;
+  private mouse: THREE.Vector2 | undefined;
+  private debugSphere: THREE.Object3D | undefined;
 
   constructor() {
     super({
@@ -283,7 +283,7 @@ class LocationEditorApp extends AppBase {
     animate();
   }
 
-  public dispose(): void {
+  public override dispose(): void {
     console.log(`🧹 Disposing ${this.config.name}`);
 
     // Cancel animation loop
@@ -310,14 +310,15 @@ class LocationEditorApp extends AppBase {
 
     // Cleanup debug sphere
     if (this.debugSphere) {
-      if (this.debugSphere.geometry) {
-        this.debugSphere.geometry.dispose();
+      const mesh = this.debugSphere as THREE.Mesh;
+      if (mesh.geometry) {
+        mesh.geometry.dispose();
       }
-      if (this.debugSphere.material) {
-        if (Array.isArray(this.debugSphere.material)) {
-          this.debugSphere.material.forEach(material => material.dispose());
+      if (mesh.material) {
+        if (Array.isArray(mesh.material)) {
+          mesh.material.forEach(material => material.dispose());
         } else {
-          this.debugSphere.material.dispose();
+          mesh.material.dispose();
         }
       }
       this.debugSphere = undefined;

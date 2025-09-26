@@ -52,16 +52,16 @@ class Flier extends THREE.EventDispatcher<FlierEventMap> {
   terrain: THREE.Mesh;
   water: THREE.Mesh;
   thermals: Thermal[];
-  speedBar: boolean;
-  ears: boolean;
+  speedBar: boolean = false;
+  ears: boolean = false;
   interval: number | null = null;
-  mesh: THREE.Object3D;
-  flyable: IFlyable;
+  mesh!: THREE.Object3D;
+  flyable!: IFlyable;
   wrapSpeed: number = 1;
   flyingTime: number = 0;
   metersFlown: number = 0;
-  isLeftInput: boolean;
-  isRightInput: boolean;
+  isLeftInput: boolean = false;
+  isRightInput: boolean = false;
   trajectory: TrajectoryPoint[] = [];
   tickCounter: number = 0;
   __rollAngleRadians: number = 0;
@@ -70,13 +70,14 @@ class Flier extends THREE.EventDispatcher<FlierEventMap> {
   __directionInput: number = 0;
   lift: number = 0;
   rotationInertia = 0;
-  debug: boolean;
+  debug: boolean = false;
   numberGroundTouches: number = 0;
   perfStats: any; // stats
+  id: string = Math.random().toString(36).substr(2, 9); // Generate random ID
 
   constructor(options: FlierConstructor, envOptions: EnvOptions, debug?: boolean) {
     super();
-    this.debug = debug;
+    this.debug = debug ?? false;
     this.speedBar = false;
     this.options = options;
     this.weather = envOptions.weather;

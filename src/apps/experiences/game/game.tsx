@@ -1,4 +1,4 @@
-import * as React from 'react';
+// import * as React from 'react';
 import { createRoot } from 'react-dom/client';
 import * as THREE from 'three';
 import BackgroundSound from '../../../foundation/systems/audio/BackgroundAudio';
@@ -238,17 +238,17 @@ class GameApp extends AppBase {
       });
   }
 
-  private setCameraMode(_mode: CameraMode, camera: any): void {
-    camera.setCameraMode(_mode, this.pg);
-    const mesh = this.pg?.getMesh();
-    if (mesh) {
-      if (_mode === CameraMode.FirstPersonView) {
-        mesh.visible = false;
-      } else {
-        mesh.visible = true;
-      }
-    }
-  }
+  // private setCameraMode(_mode: CameraMode, _camera: any): void {
+  //   _camera.setCameraMode(_mode, this.pg);
+  //   const mesh = this.pg?.getMesh();
+  //   if (mesh) {
+  //     if (_mode === CameraMode.FirstPersonView) {
+  //       mesh.visible = false;
+  //     } else {
+  //       mesh.visible = true;
+  //     }
+  //   }
+  // }
 
   private setupUI(): void {
     if (!this.pg || !this.vario || !this.weather || !this.analytics) return;

@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+// import * as THREE from 'three';
 import { SceneManager } from '../../foundation/systems/scene';
 import { PerformanceMonitor } from '../../foundation/systems/analytics';
 import { StoryOptions } from './types';

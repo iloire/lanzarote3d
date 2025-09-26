@@ -48,13 +48,13 @@ export const addMeshAroundArea = (
       throw new Error(
         'can not calculate terrain height. Perphaps you need to render the scene first'
       );
-      break;
     }
     const meshPos = new THREE.Vector3(newX, terrainHeight, newZ);
-    const currentScale = obj.scale.x;
+    const currentScale = obj?.scale.x || 1;
     const newScale = currentScale * (1 + 0.1 * rndIntBetween(-3, 3));
 
-    const meshClone = obj.clone();
+    const meshClone = obj?.clone();
+    if (!meshClone) return;
     meshClone.scale.set(newScale, newScale, newScale);
     meshClone.position.copy(meshPos);
     meshClone.rotation.copy(getRandomRotation());

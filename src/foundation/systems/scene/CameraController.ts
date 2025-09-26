@@ -33,7 +33,7 @@ enum KeyCodes {
   out = 34, // page down
 }
 
-function onDocumentKeyDown(event) {
+function onDocumentKeyDown(event: KeyboardEvent) {
   const keyCode = event.which;
   if (keyCode === KeyCodes.left) {
     isLeftViewing = true;
@@ -50,7 +50,7 @@ function onDocumentKeyDown(event) {
   }
 }
 
-function onDocumentKeyUp(event) {
+function onDocumentKeyUp(event: KeyboardEvent) {
   const keyCode = event.which;
   if (keyCode === KeyCodes.left) {
     isLeftViewing = false;
@@ -68,16 +68,16 @@ function onDocumentKeyUp(event) {
 }
 
 export class CameraController extends THREE.PerspectiveCamera {
-  mode: CameraMode;
-  target: Flier;
-  terrain: THREE.Mesh;
+  mode: CameraMode = CameraMode.FollowTarget;
+  target!: Flier;
+  terrain!: THREE.Mesh;
   angle: number = DEFAULT_ANGLE;
   angleY: number = DEFAULT_ANGLE_Y;
   distance: number = DEFAULT_FOLLOW_DISTANCE;
   angleIncrement: number = 0.02;
   distanceIncrement: number = 0.9;
   firstPersonViewOffset: THREE.Vector3 = new THREE.Vector3(0, 0.1, 0);
-  directionToLook: THREE.Vector3;
+  directionToLook: THREE.Vector3 = new THREE.Vector3(0, 0, 1);
   viewRotationHorizontal: number = 0;
   viewRotationVertical: number = 0;
   floatStartTime = performance.now();
@@ -88,7 +88,7 @@ export class CameraController extends THREE.PerspectiveCamera {
     this.terrain = terrain;
   }
 
-  addGui(gui) {
+  addGui(gui: any) {
     GuiHelper.addLocationGui(gui, 'Camera', this, { min: 0, max: 10000 });
     GuiHelper.addPositionGui(gui, 'Camera.firstPersonViewOffset', this.firstPersonViewOffset, {
       min: -20,

@@ -1,7 +1,7 @@
 import React from 'react';
 import { CameraMode } from '../../../foundation/systems/scene/CameraController';
 import Paraglider from '../../../foundation/types/flier';
-import Vario from '../../audio/vario';
+import Vario from '../../../foundation/systems/audio/VarioSound';
 import { Weather } from '../../../foundation/components/physics';
 import arrowLeftImg from '../../../../assets/apps/shared/icons/left-chevron.png';
 import arrowRightImg from '../../../../assets/apps/shared/icons/right-chevron.png';
@@ -169,7 +169,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     this.setUpViewUI();
   }
 
-  getMouseDirection(e, target) {
+  getMouseDirection(e: any, target: any) {
     const rect = target.getBoundingClientRect();
     const x = e.clientX - rect.left; //x position within the element.
     const y = e.clientY - rect.top; //y position within the element.
@@ -180,7 +180,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     return { x: directionX, y: directionY };
   }
 
-  applyNavigationMouseMove(e, target, isMouseDown) {
+  applyNavigationMouseMove(e: any, target: any, isMouseDown: boolean) {
     const direction = this.getMouseDirection(e, target);
     this.handleViewUIChange(direction);
     if (isMouseDown) {
@@ -191,24 +191,26 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
   setUpViewUI() {
     let mouseDown = false;
     const viewUIelement = document.getElementById('root');
-    viewUIelement.onmousemove = (e: any) => {
-      this.applyNavigationMouseMove(e, e.target, mouseDown);
-    };
-    viewUIelement.onmousedown = (e: any) => {
-      if (e.button == 0) {
-        mouseDown = true;
+    if (viewUIelement) {
+      viewUIelement.onmousemove = (e: any) => {
         this.applyNavigationMouseMove(e, e.target, mouseDown);
-      }
-    };
-    viewUIelement.onmouseup = (e: any) => {
-      if (e.button == 0) {
-        mouseDown = false;
-        this.handleBreakUIChange(0);
-      }
-    };
+      };
+      viewUIelement.onmousedown = (e: any) => {
+        if (e.button == 0) {
+          mouseDown = true;
+          this.applyNavigationMouseMove(e, e.target, mouseDown);
+        }
+      };
+      viewUIelement.onmouseup = (e: any) => {
+        if (e.button == 0) {
+          mouseDown = false;
+          this.handleBreakUIChange(0);
+        }
+      };
+    }
   }
 
-  onDocumentKeyDown = event => {
+  onDocumentKeyDown = (event: KeyboardEvent) => {
     const keyCode = event.which;
     if (keyCode === 50) {
       //2
@@ -254,7 +256,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     }
   };
 
-  onDocumentKeyUp = event => {
+  onDocumentKeyUp = (event: KeyboardEvent) => {
     const keyCode = event.which;
     if (keyCode == 65) {
       //a
@@ -274,7 +276,10 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     const numberCameraModes = Object.keys(CameraMode).length / 2;
     const nextMode = cameraMode < numberCameraModes - 1 ? cameraMode + 1 : 1;
     this.setState({ cameraMode: nextMode }, () => {
-      this.handleCamMode(CameraMode[CameraMode[nextMode]]);
+      const modeKey = CameraMode[nextMode] as keyof typeof CameraMode;
+      if (modeKey) {
+        this.handleCamMode(CameraMode[modeKey]);
+      }
     });
   }
 
@@ -347,7 +352,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
   };
 
   override render() {
-    const availableForPlaying = location => location.availableForPlaying;
+    const availableForPlaying = (location: any) => location.availableForPlaying;
     const isGameStarted = !this.state.showStartButton;
     const buttons = this.props.locations.filter(availableForPlaying).map(location => (
       <button

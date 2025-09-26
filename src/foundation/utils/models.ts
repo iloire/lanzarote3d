@@ -41,21 +41,21 @@ const Models = {
   ): Promise<THREE.Object3D> => {
     const gltf = await modelLoader(model, true, manager);
     const mesh: THREE.Object3D =
-      gltf.scene.children.length === 1 ? gltf.scene.children[0] : gltf.scene;
+      gltf.scene.children.length === 1 ? gltf.scene.children[0]! : gltf.scene;
     mesh.castShadow = true;
     return mesh;
   },
   loadSimple: async (model: string, manager?: THREE.LoadingManager): Promise<THREE.Object3D> => {
     const gltf = await modelLoader(model, false, manager);
     const mesh: THREE.Object3D =
-      gltf.scene.children.length === 1 ? gltf.scene.children[0] : gltf.scene;
+      gltf.scene.children.length === 1 ? gltf.scene.children[0]! : gltf.scene;
     mesh.castShadow = true;
     return mesh;
   },
   load: async (model: any, scale: number, pos?: THREE.Vector3): Promise<THREE.Object3D> => {
     console.warn('deprecated, use loadsimple instead');
     const gltf = await modelLoader(model, false);
-    const mesh: THREE.Object3D = gltf.scene.children[0];
+    const mesh: THREE.Object3D = gltf.scene.children[0]!;
     mesh.scale.set(scale, scale, scale);
     if (pos) {
       mesh.position.copy(pos);

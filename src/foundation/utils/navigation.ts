@@ -1,4 +1,4 @@
-import Animations from './animations';
+// import Animations from './animations'; // TODO: Missing animations module
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
@@ -6,59 +6,34 @@ type Callback = () => void | {};
 
 const Navigation = (camera: THREE.PerspectiveCamera, controls: OrbitControls) => {
   const nav = {
-    default: (t: number = 1600, cb?: Callback) => {
-      Animations.animateCamera(
-        camera,
-        controls,
-        new THREE.Vector3(30, 10, 115),
-        new THREE.Vector3(50, 0, 0),
-        t || 1600,
-        cb || (() => {})
-      );
+    default: (_t: number = 1600, cb?: Callback) => {
+      // TODO: Restore when Animations module is available
+      console.warn('Navigation.default: Animations module not available');
+      if (cb) cb();
     },
 
-    famara: (t: number = 1600, cb?: Callback) => {
-      Animations.animateCamera(
-        camera,
-        controls,
-        new THREE.Vector3(-40, 10, -10),
-        new THREE.Vector3(50, 0, 0),
-        t || 1600,
-        cb || (() => {})
-      );
+    famara: (_t: number = 1600, cb?: Callback) => {
+      // TODO: Restore when Animations module is available
+      console.warn('Navigation.famara: Animations module not available');
+      if (cb) cb();
     },
 
-    orzola: (t: number = 1600, cb?: Callback) => {
-      Animations.animateCamera(
-        camera,
-        controls,
-        new THREE.Vector3(120, 10, -70),
-        new THREE.Vector3(20, 0, -30),
-        t || 1600,
-        cb || (() => {})
-      );
+    orzola: (_t: number = 1600, cb?: Callback) => {
+      // TODO: Restore when Animations module is available
+      console.warn('Navigation.orzola: Animations module not available');
+      if (cb) cb();
     },
 
-    macher: (t: number = 1600, cb?: Callback) => {
-      Animations.animateCamera(
-        camera,
-        controls,
-        new THREE.Vector3(-30, 10, 100),
-        new THREE.Vector3(-20, 0, 0),
-        t || 1600,
-        cb || (() => {})
-      );
+    macher: (_t: number = 1600, cb?: Callback) => {
+      // TODO: Restore when Animations module is available
+      console.warn('Navigation.macher: Animations module not available');
+      if (cb) cb();
     },
 
-    tenesar: (t: number = 1600, cb?: Callback) => {
-      Animations.animateCamera(
-        camera,
-        controls,
-        new THREE.Vector3(-30, 5, -20),
-        new THREE.Vector3(-20, 0, 0),
-        t || 1600,
-        cb || (() => {})
-      );
+    tenesar: (_t: number = 1600, cb?: Callback) => {
+      // TODO: Restore when Animations module is available
+      console.warn('Navigation.tenesar: Animations module not available');
+      if (cb) cb();
     },
   };
 
@@ -94,7 +69,7 @@ const Navigation = (camera: THREE.PerspectiveCamera, controls: OrbitControls) =>
     document.removeEventListener('keydown', keydownListener);
   };
 
-  function onDocumentKeyDown(event) {
+  function onDocumentKeyDown(event: KeyboardEvent) {
     var keyCode = event.which;
     if (keyCode == 87) {
       //w

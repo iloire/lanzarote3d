@@ -15,7 +15,7 @@ export const getTerrainHeightBelowPosition = (
   }
   const intersectsFloor = rayVertical.intersectObjects([terrain]);
   if (intersectsFloor.length === 1) {
-    const height = intersectsFloor[0].point.y;
+    const height = intersectsFloor[0]!.point.y;
     if (height >= pos.y) {
       // terrain above pg, crash
       return NaN;

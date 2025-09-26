@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import Environment from '../../shared/env/environment';
-import Weather from '../../elements/weather';
+import Weather from '../../../foundation/components/physics/Weather';
 
 const BIRDS = false;
 const HGLIDER = false;

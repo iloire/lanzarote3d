@@ -140,7 +140,7 @@ class AutoFlier {
   // Get the next target position for lookahead
   getNextTarget(): THREE.Vector3 | null {
     if (this.path.length === 0 || !this.path[this.currentPointIndex]) return null;
-    return this.path[this.currentPointIndex].clone();
+    return this.path[this.currentPointIndex]!.clone();
   }
 
   // Get progress along the current path (0-1)

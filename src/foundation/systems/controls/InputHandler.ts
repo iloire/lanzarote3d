@@ -44,37 +44,37 @@ export class InputHandler extends EventTarget {
     const keydownHandler = (event: KeyboardEvent) => this.handleKeyDown(event);
     const keyupHandler = (event: KeyboardEvent) => this.handleKeyUp(event);
 
-    document.addEventListener('keydown', keydownHandler);
-    document.addEventListener('keyup', keyupHandler);
+    document.addEventListener('keydown', keydownHandler as EventListener);
+    document.addEventListener('keyup', keyupHandler as EventListener);
 
-    this.boundHandlers.set('keydown', keydownHandler);
-    this.boundHandlers.set('keyup', keyupHandler);
+    this.boundHandlers.set('keydown', keydownHandler as EventListener);
+    this.boundHandlers.set('keyup', keyupHandler as EventListener);
 
     // Mouse events
     const mousemoveHandler = (event: MouseEvent) => this.handleMouseMove(event);
     const mousedownHandler = (event: MouseEvent) => this.handleMouseDown(event);
     const mouseupHandler = (event: MouseEvent) => this.handleMouseUp(event);
 
-    document.addEventListener('mousemove', mousemoveHandler);
-    document.addEventListener('mousedown', mousedownHandler);
-    document.addEventListener('mouseup', mouseupHandler);
+    document.addEventListener('mousemove', mousemoveHandler as EventListener);
+    document.addEventListener('mousedown', mousedownHandler as EventListener);
+    document.addEventListener('mouseup', mouseupHandler as EventListener);
 
-    this.boundHandlers.set('mousemove', mousemoveHandler);
-    this.boundHandlers.set('mousedown', mousedownHandler);
-    this.boundHandlers.set('mouseup', mouseupHandler);
+    this.boundHandlers.set('mousemove', mousemoveHandler as EventListener);
+    this.boundHandlers.set('mousedown', mousedownHandler as EventListener);
+    this.boundHandlers.set('mouseup', mouseupHandler as EventListener);
 
     // Touch events
     const touchstartHandler = (event: TouchEvent) => this.handleTouchStart(event);
     const touchmoveHandler = (event: TouchEvent) => this.handleTouchMove(event);
     const touchendHandler = (event: TouchEvent) => this.handleTouchEnd(event);
 
-    document.addEventListener('touchstart', touchstartHandler);
-    document.addEventListener('touchmove', touchmoveHandler);
-    document.addEventListener('touchend', touchendHandler);
+    document.addEventListener('touchstart', touchstartHandler as EventListener);
+    document.addEventListener('touchmove', touchmoveHandler as EventListener);
+    document.addEventListener('touchend', touchendHandler as EventListener);
 
-    this.boundHandlers.set('touchstart', touchstartHandler);
-    this.boundHandlers.set('touchmove', touchmoveHandler);
-    this.boundHandlers.set('touchend', touchendHandler);
+    this.boundHandlers.set('touchstart', touchstartHandler as EventListener);
+    this.boundHandlers.set('touchmove', touchmoveHandler as EventListener);
+    this.boundHandlers.set('touchend', touchendHandler as EventListener);
   }
 
   private handleKeyDown(event: KeyboardEvent): void {

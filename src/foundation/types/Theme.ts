@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+// import * as THREE from 'three';
 
 export interface SkyTheme {
   timeOfDay: number; // 0-24 hours

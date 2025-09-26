@@ -22,7 +22,7 @@ export interface SceneComponents {
 export class SceneManager {
   private scene: THREE.Scene;
   private config: SceneConfig;
-  private components: SceneComponents;
+  private components!: SceneComponents;
 
   constructor(config: SceneConfig = {}) {
     this.config = {

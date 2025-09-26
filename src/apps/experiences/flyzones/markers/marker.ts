@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+// import * as TWEEN from '@tweenjs/tween.js';
 import { animator } from '../../../../foundation/systems/animation/SimpleAnimator';
 import { MarkerType } from '../helpers/types';
 import { PIN_COLORS, PIN_SIZES, PIN_FADE_DURATION } from '../config/marker-config';
@@ -23,8 +24,8 @@ export const setupLabelRenderer = () => {
 export class MarkerObject {
   pin: THREE.Object3D;
   type: MarkerType;
-  hoverAnimation: (() => void) | Tween<any>;
-  unhoverAnimation: (() => void) | Tween<any>;
+  hoverAnimation: (() => void) | any;
+  unhoverAnimation: (() => void) | any;
   showPopup: () => void;
   setVisibility: (visible: boolean) => void;
   flyzone?: THREE.Object3D;

@@ -1,12 +1,12 @@
 import * as THREE from 'three';
 import { MarkerType } from '../helpers/types';
-import { Tween } from '@tweenjs/tween.js';
+// import * as TWEEN from '@tweenjs/tween.js';
 
 // Define the MarkerObject class that properly extends THREE.Object3D
 export class MarkerObject extends THREE.Object3D {
   override type: MarkerType;
-  hoverAnimation: (() => void) | Tween<any>;
-  unhoverAnimation: (() => void) | Tween<any>;
+  hoverAnimation: (() => void) | any;
+  unhoverAnimation: (() => void) | any;
   showPopup: () => void;
   setVisibility: (visible: boolean) => void;
   flyzone?: THREE.Object3D;
