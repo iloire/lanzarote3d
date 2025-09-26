@@ -38,7 +38,7 @@ class Clouds {
   }
   async load(scale: number, pos: THREE.Vector3): Promise<THREE.Object3D> {
     const group = new THREE.Group();
-    const nClouds = random(2, 5);
+    const nClouds = random(2, 6);
     for (let i = 0; i < nClouds; i++) {
       const cloud = await getRandomCloud(this.options);
       group.add(cloud);
