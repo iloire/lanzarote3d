@@ -13,7 +13,7 @@ export const THEMES: Record<string, Theme> = {
       fogDensity: 0.003,
     },
     clouds: {
-      colors: ['#F64A8A', '#F987C5', '#DE3163'],
+      colors: ['#F64A8A', '#F987C5', '#DE3163', '#FFB6C1', '#FF69B4', '#E6004D'],
       density: 1.0,
       opacity: 0.8,
     },
@@ -51,7 +51,7 @@ export const THEMES: Record<string, Theme> = {
       fogDensity: 0.002,
     },
     clouds: {
-      colors: ['#FFD700', '#FFA500', '#FF8C00'],
+      colors: ['#FFD700', '#FFA500', '#FF8C00', '#FFFF99', '#FFE135', '#DAA520'],
       density: 0.8,
       opacity: 0.9,
     },
@@ -89,7 +89,7 @@ export const THEMES: Record<string, Theme> = {
       fogDensity: 0.001,
     },
     clouds: {
-      colors: ['#FFFAFA', '#D3D3D3', '#808080'],
+      colors: ['#FFFAFA', '#D3D3D3', '#808080', '#E0F6FF', '#B0E0E6', '#87CEEB'],
       density: 0.6,
       opacity: 0.95,
     },
@@ -128,7 +128,7 @@ export const THEMES: Record<string, Theme> = {
       fogDensity: 0.005,
     },
     clouds: {
-      colors: ['#2F2F2F', '#4A4A4A', '#F5F5F5'],
+      colors: ['#2F2F2F', '#4A4A4A', '#F5F5F5', '#1A1A1A', '#696969', '#D3D3D3', '#000000'],
       density: 1.2,
       opacity: 0.95,
     },
@@ -167,7 +167,7 @@ export const THEMES: Record<string, Theme> = {
       fogDensity: 0.002,
     },
     clouds: {
-      colors: ['#87CEEB', '#B0E0E6', '#F0F8FF'],
+      colors: ['#87CEEB', '#B0E0E6', '#F0F8FF', '#E6E6FA', '#DDA0DD', '#9370DB'],
       density: 0.9,
       opacity: 0.7,
     },
@@ -206,7 +206,7 @@ export const THEMES: Record<string, Theme> = {
       fogDensity: 0.004,
     },
     clouds: {
-      colors: ['#CD853F', '#DEB887', '#F5DEB3'],
+      colors: ['#CD853F', '#DEB887', '#F5DEB3', '#D2691E', '#BC8F8F', '#F4A460'],
       density: 0.7,
       opacity: 0.85,
     },
@@ -245,7 +245,7 @@ export const THEMES: Record<string, Theme> = {
       fogDensity: 0.003,
     },
     clouds: {
-      colors: ['#9932CC', '#00FF7F', '#FF1493'],
+      colors: ['#9932CC', '#00FF7F', '#FF1493', '#8A2BE2', '#00FFFF', '#FF00FF', '#ADFF2F'],
       density: 1.1,
       opacity: 0.8,
     },
@@ -327,7 +327,7 @@ export const THEMES: Record<string, Theme> = {
       fogDensity: 0.001,
     },
     clouds: {
-      colors: ['#00FF00', '#00CC00', '#008800'],
+      colors: ['#00FF00', '#00CC00', '#008800', '#32CD32', '#90EE90', '#006400'],
       density: 0.5,
       opacity: 0.6,
     },
@@ -366,7 +366,7 @@ export const THEMES: Record<string, Theme> = {
       fogDensity: 0.001,
     },
     clouds: {
-      colors: ['#ffffff', '#f0f8ff', '#e6f3ff'],
+      colors: ['#ffffff', '#f0f8ff', '#e6f3ff', '#f5f5f5', '#fffafa'],
       density: 0.8,
       opacity: 0.9,
     },
