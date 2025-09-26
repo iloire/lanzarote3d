@@ -4,6 +4,7 @@ import { StoryOptions } from '../../shared/types';
 import { getDefaultTheme } from '../../../foundation/themes';
 import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';
 import { AppBase } from '../../shared/AppBase';
+import { OrbitControlsHelper, ORBIT_CONTROLS_PRESETS } from '../../../foundation/utils/OrbitControlsHelper';
 
 /**
  * Famara Demo - Based on PhotoBooth but without paragliders
@@ -55,8 +56,11 @@ class FamaraApp extends AppBase {
       // Set camera position and look at target
       camera.position.copy(initialPos);
       camera.lookAt(lookAtPos);
-      controls.target.copy(lookAtPos);
-      controls.update();
+
+      // Apply landscape viewing controls for Famara beach exploration
+      OrbitControlsHelper.focusOnTarget(controls, lookAtPos,
+        ORBIT_CONTROLS_PRESETS.landscape
+      );
 
       // must render before adding env
       renderer.render(scene, camera);
@@ -93,7 +97,7 @@ class FamaraApp extends AppBase {
       await this.environment.addHangGlider(hangGliderPath);
 
       // Start animation loop
-      this.startAnimationLoop(renderer, scene, camera);
+      this.startAnimationLoop(renderer, scene, camera, controls);
 
       this.isLoaded = true;
       console.log(`✅ ${this.config.name} loaded successfully`);
@@ -104,11 +108,14 @@ class FamaraApp extends AppBase {
     }
   }
 
-  private startAnimationLoop(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.Camera): void {
+  private startAnimationLoop(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.Camera, controls: any): void {
     const animate = () => {
       try {
         // Update performance monitoring
         this.updatePerformance();
+
+        // Update controls for damping
+        OrbitControlsHelper.update(controls);
 
         renderer.render(scene, camera);
         this.animationId = requestAnimationFrame(animate);

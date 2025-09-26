@@ -12,6 +12,8 @@ import Controls from './foundation/utils/controls';
 import { StoryOptions } from './apps/shared/types';
 import { themeManager } from './foundation/systems/ThemeManager';
 import { ThemeEngine } from './foundation/systems/ThemeEngine';
+import { getAllApps } from './apps/config/app-registry';
+import { getThemeById } from './foundation/themes';
 
 import './index.css';
 
@@ -159,6 +161,22 @@ const App: React.FC<AppProps> = ({
       gui,
       controls,
     };
+
+    // Check for app-specific theme override
+    const allApps = getAllApps();
+    const currentApp = allApps.find(app => app.route.replace('/', '') === initialStory);
+
+    if (currentApp?.theme) {
+      const appTheme = getThemeById(currentApp.theme);
+      if (appTheme) {
+        console.log(`🎨 Applying app-specific theme: ${appTheme.name} for app: ${currentApp.name}`);
+        // Apply the app-specific theme before initializing theme manager
+        await ThemeEngine.apply(storyOptions, appTheme);
+        storyOptions.theme = appTheme;
+      } else {
+        console.warn(`🎨 App-specific theme '${currentApp.theme}' not found for app: ${currentApp.name}`);
+      }
+    }
 
     // Initialize theme manager for dynamic theme switching
     themeManager.initialize(storyOptions);

@@ -12,6 +12,7 @@ import { StoryOptions } from '../../shared/types';
 import { getDefaultTheme } from '../../../foundation/themes';
 import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';
 import { AppBase } from '../../shared/AppBase';
+import { OrbitControlsHelper, ORBIT_CONTROLS_PRESETS } from '../../../foundation/utils/OrbitControlsHelper';
 
 const tandems = [
   {
@@ -217,8 +218,11 @@ class PhotoBoothApp extends AppBase {
       // Set camera position and look at target
       camera.position.copy(initialPos);
       camera.lookAt(lookAtPos);
-      controls.target.copy(lookAtPos);
-      controls.update();
+
+      // Apply landscape viewing controls for photobooth exploration
+      OrbitControlsHelper.focusOnTarget(controls, lookAtPos,
+        ORBIT_CONTROLS_PRESETS.landscape
+      );
 
       // Load paragliders with proper tracking for disposal
       await this.loadParagliders(scene);
@@ -238,7 +242,7 @@ class PhotoBoothApp extends AppBase {
       this.environment.addBoats(water);
 
       // Start animation loop
-      this.startAnimationLoop(renderer, scene, camera);
+      this.startAnimationLoop(renderer, scene, camera, controls);
 
       this.isLoaded = true;
       console.log(`✅ ${this.config.name} loaded successfully with ${this.paragliderMeshes.length} paragliders`);
@@ -305,11 +309,14 @@ class PhotoBoothApp extends AppBase {
     await Promise.all([...paragliderPromises, ...voxelPromises, ...tandemPromises]);
   }
 
-  private startAnimationLoop(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.Camera): void {
+  private startAnimationLoop(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.Camera, controls: any): void {
     const animate = () => {
       try {
         // Update performance monitoring
         this.updatePerformance();
+
+        // Update controls for damping
+        OrbitControlsHelper.update(controls);
 
         renderer.render(scene, camera);
         this.animationId = requestAnimationFrame(animate);

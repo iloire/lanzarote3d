@@ -1,16 +1,20 @@
-import { Theme } from '../types/Theme';
+import { SkyTheme, Theme } from '../types/Theme';
+
+const defaultSky: SkyTheme = {
+  timeOfDay: 15,
+  sunIntensity: 1.2,
+  fogEnabled: true,
+  fogColor: '#c2c2c2',
+  fogDensity: 0.0001
+}
 
 export const THEMES: Record<string, Theme> = {
   default: {
     id: 'default',
     name: 'Default Theme',
-    sky: {
-      timeOfDay: 15,
-      sunIntensity: 1.2,
-      fogEnabled: false,
-    },
+    sky: defaultSky,
     clouds: {
-      colors: ['#2F2F2F', '#4A4A4A', '#F5F5F5', '#1A1A1A', '#696969', '#D3D3D3', '#000000'],
+      colors: ['#4A4A4A', '#F5F5F5', '#696969', '#D3D3D3'],
       density: 1.2,
       opacity: 0.95,
     },
@@ -39,13 +43,9 @@ export const THEMES: Record<string, Theme> = {
   sunset: {
     id: 'sunset',
     name: 'Sunset Romance',
-    sky: {
-      timeOfDay: 19,
-      sunIntensity: 2.3,
-      fogEnabled: false,
-    },
+    sky: defaultSky,
     clouds: {
-      colors: ['#F64A8A', '#F987C5', '#DE3163', '#FFB6C1', '#FF69B4', '#E6004D'],
+      colors: ['#F64A8A', '#F987C5', '#DE3163', '#FFB6C1', '#FF69B4'],
       density: 1.0,
       opacity: 0.8,
     },
@@ -148,7 +148,7 @@ export const THEMES: Record<string, Theme> = {
       fogEnabled: false,
     },
     clouds: {
-      colors: ['#2F2F2F', '#4A4A4A', '#F5F5F5', '#1A1A1A', '#696969', '#D3D3D3', '#000000'],
+      colors: ['#2F2F2F', '#4A4A4A', '#F5F5F5', '#696969', '#D3D3D3'],
       density: 1.2,
       opacity: 0.95,
     },

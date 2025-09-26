@@ -39,7 +39,8 @@
       "Bash(npm uninstall:*)",
       "Bash(wc:*)",
       "Bash(yarn pre-deploy:*)",
-      "Bash(yarn build-staging)"
+      "Bash(yarn build-staging)",
+      "Bash(git branch:*)"
     ],
     "deny": [],
     "ask": []

@@ -9,6 +9,7 @@ import { animator } from '../../../foundation/systems/animation/SimpleAnimator';
 import { getDefaultTheme } from '../../../foundation/themes';
 import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';
 import { AppBase } from '../../shared/AppBase';
+import { OrbitControlsHelper, ORBIT_CONTROLS_PRESETS } from '../../../foundation/utils/OrbitControlsHelper';
 
 type ParagliderVoxelConfig = {
   pg: ParagliderVoxelOptions;
@@ -83,7 +84,7 @@ class AnimationApp extends AppBase {
       // Set up environment using theme
       this.environment = new Environment(scene);
       const weather = this.environment.createWeatherFromTheme(theme);
-      const thermals = this.environment.generateThermals(weather, 0);
+      const thermals = this.environment.generateThermals(weather, 0.7);
 
       // Add environment elements using theme
       await this.environment.addCloudsFromTheme(thermals, theme);
@@ -151,7 +152,7 @@ class AnimationApp extends AppBase {
     }
 
     // Start animation loop
-    this.startAnimationLoop(renderer, scene, camera);
+    this.startAnimationLoop(renderer, scene, camera, controls);
 
     // Start the dramatic two-phase camera animation
     setTimeout(() => {
@@ -211,6 +212,22 @@ class AnimationApp extends AppBase {
           // Animation complete
           if (controls) {
             controls.enabled = true;
+
+            // Apply orbit control limits using the reusable utility
+            const pgPos = paraglidersVoxel[0]?.position || new THREE.Vector3();
+            OrbitControlsHelper.focusOnTarget(controls, pgPos,
+              OrbitControlsHelper.createCenteredLimits(pgPos, {
+                ...ORBIT_CONTROLS_PRESETS.closeSubject,
+                // Customize if needed
+                minDistance: 50,
+                maxDistance: 1000,
+                panBoundary: {
+                  center: pgPos,
+                  radius: 300,
+                  verticalScale: 0.5
+                }
+              })
+            );
           }
           // Allow floating motion to begin
           this.animatorInstance = undefined;
@@ -219,7 +236,7 @@ class AnimationApp extends AppBase {
     }, 100);
   }
 
-  private startAnimationLoop(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.Camera): void {
+  private startAnimationLoop(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.Camera, controls: any): void {
     let startTime = Date.now();
 
     const animate = () => {
@@ -243,6 +260,9 @@ class AnimationApp extends AppBase {
           camera.position.x += floatX * 0.01;
           camera.position.z += floatZ * 0.01;
         }
+
+        // Update controls for damping to work
+        OrbitControlsHelper.update(controls);
 
         renderer.render(scene, camera);
         this.animationId = requestAnimationFrame(animate);

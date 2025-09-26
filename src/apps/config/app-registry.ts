@@ -15,6 +15,7 @@ export interface AppMetadata {
   status?: 'public' | 'experimental' | 'dev';
   priority?: number; // For ordering in menus
   hidden?: boolean; // Hide from menu when true
+  theme?: string; // Optional theme ID that overrides global theme selection
 }
 
 export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
@@ -72,7 +73,7 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
 
   demos: {
     animation: {
-      name: "Famara",
+      name: "Pechos famara animation",
       description: "Automated cinematic flight demonstration showcasing 3D capabilities",
       entry: "./demos/animation/index.tsx",
       route: "/animation",
@@ -80,10 +81,11 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       requiresWebGL: true,
       tags: ["cinematic", "automated", "demonstration", "showcase"],
       status: "public",
-      priority: 1
+      priority: 1,
+      theme: "sunset" // Override global theme with sunset for cinematic effect
     },
     photobooth: {
-      name: "Photobooth",
+      name: "Famara static",
       description: "Beautiful static 3D scene showcasing paragliders and environment",
       entry: "./demos/photobooth/index.tsx",
       route: "/photobooth",
@@ -102,7 +104,8 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       requiresWebGL: true,
       tags: ["landscape", "nature", "scenic", "beach"],
       status: "public",
-      priority: 3
+      priority: 3,
+      theme: "natural" // Override with natural theme for pure landscape experience
     },
 
     // Workshop Component Demos

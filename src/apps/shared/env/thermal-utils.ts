@@ -5,7 +5,7 @@ import { rndIntBetween } from "../../../foundation/utils/math";
 
 
 const generateRandomLcl = (lclLevel: number): number => {
-  return lclLevel + rndIntBetween(-200, 3000);
+  return lclLevel + rndIntBetween(-200, 200);
 };
 
 
@@ -22,8 +22,8 @@ const generateRandomThermalDimensions = (
   lclLevel: number,
   isSuperThermal: boolean
 ): ThermalDimensions => {
-  const multiplier = isSuperThermal ? 1.4 : 1;
-  const heightMultiplier = isSuperThermal ? 1.3 : 1;
+  const multiplier = isSuperThermal ? 1.3 : 1;
+  const heightMultiplier = isSuperThermal ? 1.1 : 1;
   return {
     bottomRadius: rndIntBetween(400 * multiplier, 440 * multiplier),
     topRadius: rndIntBetween(500 * multiplier, 900 * multiplier),

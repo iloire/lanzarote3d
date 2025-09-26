@@ -188,28 +188,28 @@ class Environment {
 
   generateThermals(weather: Weather, opacity: number = 0.05): Thermal[] {
     // famara
-    const options: ThermalGenerationOptions = {
-      position: new THREE.Vector3(5727, 0, -535),
+    const baseOptions: ThermalGenerationOptions = {
+      position: new THREE.Vector3(0, 0, 0),
       weather,
       superThermal: false,
       opacity
     };
 
-    const allThermals = generateThermalPair(options)
-      .concat(generateThermalPair({ ...options, position: new THREE.Vector3(7127, 0, -1405) }))
-      .concat(generateThermalPair({ ...options, position: new THREE.Vector3(3027, 0, 1005) }))
+    const allThermals = generateThermalPair(baseOptions)
+      .concat(generateThermalPair({ ...baseOptions, position: new THREE.Vector3(7127, 0, -1405) }))
+      .concat(generateThermalPair({ ...baseOptions, position: new THREE.Vector3(3027, 0, 1005) }))
       // tenesar
-      .concat(generateThermalPair({ ...options, position: new THREE.Vector3(-4827, 0, -855) }))
+      .concat(generateThermalPair({ ...baseOptions, position: new THREE.Vector3(-4827, 0, -855) }))
       // mirador
-      .concat(generateThermalPair({ ...options, position: new THREE.Vector3(15027, 0, -12555) }))
+      .concat(generateThermalPair({ ...baseOptions, position: new THREE.Vector3(15027, 0, -12555) }))
       //pq
-      .concat(generateThermalPair({ ...options, position: new THREE.Vector3(-6227, 0, 14055) }))
+      .concat(generateThermalPair({ ...baseOptions, position: new THREE.Vector3(-6227, 0, 14055) }))
       //mala
-      .concat(generateThermalPair({ ...options, position: new THREE.Vector3(14227, 0, -3755) }))
+      .concat(generateThermalPair({ ...baseOptions, position: new THREE.Vector3(14227, 0, -3755) }))
       // pq
-      .concat(generateThermalPair({ ...options, position: new THREE.Vector3(-3927, 0, 9830) }))
-      .concat(generateThermalPair({ ...options, position: new THREE.Vector3(592, 0, 5530) }))
-      .concat(generateThermalPair({ ...options, position: new THREE.Vector3(15027, 0, -12555), superThermal: true }))
+      .concat(generateThermalPair({ ...baseOptions, position: new THREE.Vector3(-3927, 0, 9830) }))
+      .concat(generateThermalPair({ ...baseOptions, position: new THREE.Vector3(592, 0, 5530) }))
+      .concat(generateThermalPair({ ...baseOptions, position: new THREE.Vector3(15027, 0, -12555), superThermal: true }))
 
 
     this.thermals.concat(allThermals);
