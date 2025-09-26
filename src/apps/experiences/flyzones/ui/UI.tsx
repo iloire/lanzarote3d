@@ -20,7 +20,7 @@ const FlyzonesUI: React.FC<UIProps> = ({
   onNavigate,
   onToggleLandings,
   onToggleRuler,
-  showRulerButton = false
+  showRulerButton = false,
 }) => {
   const [isMenuVisible, setIsMenuVisible] = useState(true);
 
@@ -33,7 +33,7 @@ const FlyzonesUI: React.FC<UIProps> = ({
           marginBottom: '10px',
           background: isMenuVisible ? '#4CAF50' : '#f44336',
           color: 'white',
-          fontWeight: 'bold'
+          fontWeight: 'bold',
         }}
         title={isMenuVisible ? 'Hide Menu' : 'Show Menu'}
       >
@@ -43,10 +43,7 @@ const FlyzonesUI: React.FC<UIProps> = ({
       {/* Menu content - conditionally visible */}
       {isMenuVisible && (
         <>
-          <LocationButtons
-            locations={locations}
-            onNavigate={onNavigate}
-          />
+          <LocationButtons locations={locations} onNavigate={onNavigate} />
           <ToggleButtons
             landingMarkersVisible={landingMarkersVisible}
             onToggleLandings={onToggleLandings}
@@ -60,12 +57,12 @@ const FlyzonesUI: React.FC<UIProps> = ({
 };
 
 export const createUI = (props: UIProps) => {
-  const rootElement = document.getElementById("legend-points");
+  const rootElement = document.getElementById('legend-points');
   if (!rootElement) {
-    console.error("Legend points element not found");
+    console.error('Legend points element not found');
     return;
   }
 
   const root = createRoot(rootElement);
   root.render(<FlyzonesUI {...props} />);
-}; 
+};

@@ -7,12 +7,12 @@ import AutoFlier from "../../types/auto-flier";
 const clock = new THREE.Clock();
 
 class Birds extends AutoFlier {
-  mixer: any;
+  mixer: THREE.AnimationMixer | null = null;
   interval: number;
 
   async load(path: THREE.Vector3[], gui?: any): Promise<THREE.Mesh> {
     this.path = path;
-    const gltf: any = await Models.loadGltf(model);
+    const gltf = await Models.loadGltf(model);
     this.mesh = gltf.scene.children[0];
     this.mesh.scale.set(1, 1, 1);
     const animations = gltf.animations;
@@ -32,13 +32,53 @@ class Birds extends AutoFlier {
     return this.mesh;
   }
 
+  private animationId: number | null = null;
+  private isAnimating: boolean = false;
+
   animate() {
-    const delta = clock.getDelta();
-    this.mixer.update(delta);
-    if (this.path.length) {
-      this.move();
+    if (!this.isAnimating) {
+      this.isAnimating = true;
+      this.startAnimation();
     }
-    requestAnimationFrame(() => this.animate());
+  }
+
+  private startAnimation() {
+    const animateLoop = () => {
+      if (!this.isAnimating) return;
+
+      const delta = clock.getDelta();
+      this.mixer.update(delta);
+      if (this.path.length) {
+        this.move();
+      }
+
+      this.animationId = requestAnimationFrame(animateLoop);
+    };
+    animateLoop();
+  }
+
+  stop() {
+    this.isAnimating = false;
+    if (this.animationId !== null) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = null;
+    }
+  }
+
+  dispose() {
+    this.stop();
+    // Clean up mixer and mesh
+    if (this.mixer) {
+      this.mixer.stopAllActions();
+    }
+    if (this.mesh) {
+      this.mesh.geometry?.dispose();
+      if (Array.isArray(this.mesh.material)) {
+        this.mesh.material.forEach(material => material.dispose());
+      } else {
+        this.mesh.material?.dispose();
+      }
+    }
   }
 
   override position(): THREE.Vector3 {

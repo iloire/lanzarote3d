@@ -1,12 +1,12 @@
-import * as THREE from "three";
-import { ParagliderVoxel } from "../../../foundation/components/vehicles";
-import type { ParagliderVoxelOptions } from "../../../foundation/components/vehicles";
-import Environment from "../../shared/env/environment";
-import Weather, { WeatherOptions } from "../../../foundation/components/physics/Weather";
+import * as THREE from 'three';
+import { ParagliderVoxel } from '../../../foundation/components/vehicles';
+import type { ParagliderVoxelOptions } from '../../../foundation/components/vehicles';
+import Environment from '../../shared/env/environment';
+import Weather, { WeatherOptions } from '../../../foundation/components/physics/Weather';
 import adriModel from '../../../../assets/foundation/models/characters/adri.obj';
 import adriTextureImage from '../../../../assets/foundation/models/characters/adri.png';
-import { StoryOptions } from "../../shared/types";
-import { animator } from "../../../foundation/systems/animation/SimpleAnimator";
+import { StoryOptions } from '../../shared/types';
+import { animator } from '../../../foundation/systems/animation/SimpleAnimator';
 
 const WEATHER_SETTINGS: WeatherOptions = {
   windDirectionDegreesFromNorth: 310,
@@ -15,9 +15,9 @@ const WEATHER_SETTINGS: WeatherOptions = {
 };
 
 type ParagliderVoxelConfig = {
-  pg: ParagliderVoxelOptions,
-  position: any
-}
+  pg: ParagliderVoxelOptions;
+  position: any;
+};
 
 const paraglidersVoxel: ParagliderVoxelConfig[] = [
   {
@@ -26,15 +26,15 @@ const paraglidersVoxel: ParagliderVoxelConfig[] = [
         wingColor1: '#c30010',
         wingColor2: '#b100cd',
         inletsColor: 'pink',
-        numeroCajones: 35
+        numeroCajones: 35,
       },
       pilot: {
         objFile: adriModel,
-        textureFile: adriTextureImage
+        textureFile: adriTextureImage,
       },
     },
-    position: new THREE.Vector3(6897, 920, -705)
-  }
+    position: new THREE.Vector3(6897, 920, -705),
+  },
 ];
 
 /**
@@ -45,7 +45,7 @@ const Animation = {
     const { camera, scene, renderer, terrain, water, controls } = options;
 
     // Add voxel paragliders
-    paraglidersVoxel.forEach(async (p) => {
+    paraglidersVoxel.forEach(async p => {
       const paraglider = new ParagliderVoxel(p.pg);
       const mesh = await paraglider.load();
       mesh.position.copy(p.position);
@@ -60,7 +60,7 @@ const Animation = {
     const env = new Environment(scene);
     const weather = new Weather(WEATHER_SETTINGS);
     const thermals = env.generateThermals(weather, 0);
-    const cloudOptions = { colors: ['#F64A8A', '#F987C5', '#DE3163'] }
+    const cloudOptions = { colors: ['#F64A8A', '#F987C5', '#DE3163'] };
 
     env.addClouds(thermals, cloudOptions);
     env.addTrees(terrain);
@@ -68,7 +68,6 @@ const Animation = {
     env.addBoats(water);
 
     const pgPos = paraglidersVoxel[0]?.position.clone() || new THREE.Vector3();
-    console.log('Paraglider position:', pgPos);
 
     // Starting position - extremely far away on the other side of the island
     const initialCameraPosition = new THREE.Vector3(-2000, 2500, 5000);
@@ -78,13 +77,10 @@ const Animation = {
 
     // Final position - slow, careful approach to the paraglider
     const finalCameraPosition = new THREE.Vector3(
-      pgPos.x - 100,  // Close to paraglider
-      pgPos.y + 50,   // Slightly above
-      pgPos.z + 200   // Behind the paraglider
+      pgPos.x - 100, // Close to paraglider
+      pgPos.y + 50, // Slightly above
+      pgPos.z + 200 // Behind the paraglider
     );
-
-    console.log('Initial camera position:', initialCameraPosition);
-    console.log('Final camera position:', finalCameraPosition);
 
     // Set initial camera position and look at the paraglider
     camera.position.copy(initialCameraPosition);
@@ -106,67 +102,69 @@ const Animation = {
 
     // Start the dramatic two-phase camera animation
     setTimeout(() => {
-      console.log('Starting dramatic camera animation...');
-      console.log('Phase 1: Fast approach from other side of island');
-      console.log('From:', initialCameraPosition.x.toFixed(1), initialCameraPosition.y.toFixed(1), initialCameraPosition.z.toFixed(1));
-      console.log('To intermediate:', intermediatePosition.x.toFixed(1), intermediatePosition.y.toFixed(1), intermediatePosition.z.toFixed(1));
-
       // Store initial positions
       const startTarget = controls ? controls.target.clone() : pgPos.clone();
 
       // Single seamless animation with custom easing (8 seconds total)
-      animator.animate('camera-seamless', 8000, (progress) => {
-        let currentPosition, phase;
+      animator.animate(
+        'camera-seamless',
+        8000,
+        progress => {
+          let currentPosition;
 
-        if (progress < 0.35) {
-          // Phase 1: Fast approach (first 35% = 2.8 seconds)
-          phase = 'fast';
-          const phase1Progress = progress / 0.35; // 0-1 for first phase
-          // Use smooth acceleration with gentle end
-          const easedProgress = phase1Progress * phase1Progress * (3 - 2 * phase1Progress); // smoothstep
-          currentPosition = new THREE.Vector3().lerpVectors(initialCameraPosition, intermediatePosition, easedProgress);
+          if (progress < 0.35) {
+            // Phase 1: Fast approach (first 35% = 2.8 seconds)
+            const phase1Progress = progress / 0.35; // 0-1 for first phase
+            // Use smooth acceleration with gentle end
+            const easedProgress = phase1Progress * phase1Progress * (3 - 2 * phase1Progress); // smoothstep
+            currentPosition = new THREE.Vector3().lerpVectors(
+              initialCameraPosition,
+              intermediatePosition,
+              easedProgress
+            );
 
-          // Look towards the area gradually
-          const lookTarget = new THREE.Vector3().lerpVectors(startTarget, pgPos, easedProgress * 0.6);
-          if (controls) {
-            controls.target.copy(lookTarget);
-            controls.update();
+            // Look towards the area gradually
+            const lookTarget = new THREE.Vector3().lerpVectors(
+              startTarget,
+              pgPos,
+              easedProgress * 0.6
+            );
+            if (controls) {
+              controls.target.copy(lookTarget);
+              controls.update();
+            }
+          } else {
+            // Phase 2: Slow approach (last 65% = 5.2 seconds)
+            const phase2Progress = (progress - 0.35) / 0.65; // 0-1 for second phase
+            // Use very smooth decelerated easing that connects perfectly
+            const easedProgress = 1 - Math.pow(1 - phase2Progress, 2.5); // smooth deceleration
+            currentPosition = new THREE.Vector3().lerpVectors(
+              intermediatePosition,
+              finalCameraPosition,
+              easedProgress
+            );
+
+            // Gradually focus on the paraglider with smooth transition
+            if (controls) {
+              const targetProgress = Math.min(phase2Progress * 1.5, 1.0); // More gradual targeting
+              controls.target.lerpVectors(controls.target, pgPos, targetProgress * 0.05); // Very smooth
+              controls.update();
+            }
           }
-        } else {
-          // Phase 2: Slow approach (last 65% = 5.2 seconds)
-          phase = 'slow';
-          const phase2Progress = (progress - 0.35) / 0.65; // 0-1 for second phase
-          // Use very smooth decelerated easing that connects perfectly
-          const easedProgress = 1 - Math.pow(1 - phase2Progress, 2.5); // smooth deceleration
-          currentPosition = new THREE.Vector3().lerpVectors(intermediatePosition, finalCameraPosition, easedProgress);
 
-          // Gradually focus on the paraglider with smooth transition
+          camera.position.copy(currentPosition);
+        },
+        () => {
+          // Animation complete
           if (controls) {
-            const targetProgress = Math.min(phase2Progress * 1.5, 1.0); // More gradual targeting
-            controls.target.lerpVectors(controls.target, pgPos, targetProgress * 0.05); // Very smooth
-            controls.update();
+            controls.enabled = true;
           }
         }
-
-        camera.position.copy(currentPosition);
-
-        // Debug output
-        const percentage = Math.floor(progress * 100);
-        if (percentage % 10 === 0 && percentage !== Math.floor((progress - 0.01) * 100)) {
-          console.log(`${percentage}% (${phase} phase):`,
-            camera.position.x.toFixed(1), camera.position.y.toFixed(1), camera.position.z.toFixed(1));
-        }
-      }, () => {
-        // Animation complete
-        if (controls) {
-          controls.enabled = true;
-        }
-        console.log('Seamless dramatic camera animation complete!');
-      });
+      );
     }, 100);
 
     // Animation app initialized
-  }
+  },
 };
 
 export default Animation;

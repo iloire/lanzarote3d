@@ -1,8 +1,8 @@
-import Pilot from "../../../../foundation/components/vehicles/Pilot";
-import TandemPilot from "../../../../foundation/components/characters/TandemPilot";
-import Helpers from "../../../../foundation/utils/helpers";
-import { GlassesType, PilotHeadType } from "../../../../foundation/components/characters/PilotHead";
-import { StoryOptions } from "../../../shared/types";
+import Pilot from '../../../../foundation/components/vehicles/Pilot';
+import TandemPilot from '../../../../foundation/components/characters/TandemPilot';
+import Helpers from '../../../../foundation/utils/helpers';
+import { GlassesType, PilotHeadType } from '../../../../foundation/components/characters/PilotHead';
+import { StoryOptions } from '../../../shared/types';
 
 const PilotWorkshop = {
   load: async (options: StoryOptions) => {
@@ -22,9 +22,9 @@ const PilotWorkshop = {
         head: {
           headType: PilotHeadType.Default,
           helmetOptions: {
-            color: "#ffff00",
-            color2: "#cccccc",
-            color3: "#999999",
+            color: '#ffff00',
+            color2: '#cccccc',
+            color3: '#999999',
           },
         },
       },
@@ -38,7 +38,7 @@ const PilotWorkshop = {
     ];
 
     let x = -1400;
-    pilots.forEach(async (options) => {
+    pilots.forEach(async options => {
       const pilot = new Pilot(options);
       const mesh = await pilot.load();
       mesh.position.set(x, -300, -500);
@@ -49,13 +49,13 @@ const PilotWorkshop = {
     const tandem = new TandemPilot({
       pilot: {
         head: { headType: PilotHeadType.Default },
-        suitColor: "green",
-        shoesColor: "black",
+        suitColor: 'green',
+        shoesColor: 'black',
       },
       passenger: {
         head: { headType: PilotHeadType.Default },
-        suitColor: "orange",
-        shoesColor: "gray",
+        suitColor: 'orange',
+        shoesColor: 'gray',
       },
     });
     const meshTandem = await tandem.load();

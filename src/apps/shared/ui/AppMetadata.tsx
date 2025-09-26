@@ -26,7 +26,7 @@ interface AppMetadataProps {
 export const AppMetadata: React.FC<AppMetadataProps> = ({
   appInfo,
   show,
-  position = 'top-right'
+  position = 'top-right',
 }) => {
   if (!show) return null;
 
@@ -34,7 +34,7 @@ export const AppMetadata: React.FC<AppMetadataProps> = ({
     'top-left': 'top-4 left-4',
     'top-right': 'top-4 right-4',
     'bottom-left': 'bottom-4 left-4',
-    'bottom-right': 'bottom-4 right-4'
+    'bottom-right': 'bottom-4 right-4',
   };
 
   return (
@@ -42,7 +42,7 @@ export const AppMetadata: React.FC<AppMetadataProps> = ({
       className={`fixed ${positionStyles[position]} z-50 bg-black bg-opacity-80 text-white p-4 rounded-lg text-sm font-mono max-w-xs`}
       style={{
         backdropFilter: 'blur(10px)',
-        border: '1px solid rgba(255, 255, 255, 0.1)'
+        border: '1px solid rgba(255, 255, 255, 0.1)',
       }}
     >
       <div className="mb-2">
@@ -75,10 +75,7 @@ export const AppMetadata: React.FC<AppMetadataProps> = ({
         <div className="text-gray-400 text-xs mb-1">Foundation Components:</div>
         <div className="flex flex-wrap gap-1">
           {appInfo.components.map((component, index) => (
-            <span
-              key={index}
-              className="bg-blue-600 bg-opacity-30 px-2 py-1 rounded text-xs"
-            >
+            <span key={index} className="bg-blue-600 bg-opacity-30 px-2 py-1 rounded text-xs">
               {component}
             </span>
           ))}
@@ -86,9 +83,7 @@ export const AppMetadata: React.FC<AppMetadataProps> = ({
       </div>
 
       <div className="mt-2 pt-2 border-t border-gray-600">
-        <div className="text-xs text-gray-500">
-          🏗️ Built with Foundation v3.0.0
-        </div>
+        <div className="text-xs text-gray-500">🏗️ Built with Foundation v3.0.0</div>
       </div>
     </div>
   );

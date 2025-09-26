@@ -6,13 +6,13 @@ import { STLExporter } from 'three/examples/jsm/exporters/STLExporter';
 const VoxelStory = {
   load: async (options: StoryOptions) => {
     const { scene, camera, controls, renderer } = options;
-    
+
     // Starting VoxelStory load
-    
+
     // Create and add elephant to scene
     const example = createVoxelExample();
     scene.add(example);
-    
+
     // Scene initialized with voxel example
 
     // Add multiple lights for better visibility
@@ -54,10 +54,10 @@ const VoxelStory = {
 
     // Add a platform under the elephant
     const platformGeometry = new THREE.PlaneGeometry(2000, 2000);
-    const platformMaterial = new THREE.MeshPhongMaterial({ 
+    const platformMaterial = new THREE.MeshPhongMaterial({
       color: 0x666666,
       shininess: 0,
-      side: THREE.DoubleSide
+      side: THREE.DoubleSide,
     });
     const platform = new THREE.Mesh(platformGeometry, platformMaterial);
     platform.rotation.x = -Math.PI / 2;
@@ -89,7 +89,6 @@ const VoxelStory = {
 
     addDownloadButton();
 
-
     const animate = () => {
       requestAnimationFrame(animate);
       renderer.render(scene, camera);
@@ -100,7 +99,7 @@ const VoxelStory = {
     camera.lookAt(lookAt);
     controls.update();
     animate();
-  }
+  },
 };
 
-export default VoxelStory; 
+export default VoxelStory;

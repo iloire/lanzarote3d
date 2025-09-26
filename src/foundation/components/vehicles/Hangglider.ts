@@ -44,7 +44,7 @@ class HangGliderModel extends AutoFlier {
     this.mesh.add(pilotMesh);
     this.mesh.add(wingMesh);
 
-    if (path.length > 1) {
+    if (path.length > 0 && path[0]) {
       this.mesh.position.copy(path[0]);
     }
 
@@ -57,11 +57,48 @@ class HangGliderModel extends AutoFlier {
     return this.mesh;
   }
 
+  private animationId: number | null = null;
+  private isAnimating: boolean = false;
+
   animate() {
-    if (this.path.length) {
-      this.move();
+    if (!this.isAnimating) {
+      this.isAnimating = true;
+      this.startAnimation();
     }
-    requestAnimationFrame(() => this.animate());
+  }
+
+  private startAnimation() {
+    const animateLoop = () => {
+      if (!this.isAnimating) return;
+
+      if (this.path.length) {
+        this.move();
+      }
+
+      this.animationId = requestAnimationFrame(animateLoop);
+    };
+    animateLoop();
+  }
+
+  stop() {
+    this.isAnimating = false;
+    if (this.animationId !== null) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = null;
+    }
+  }
+
+  dispose() {
+    this.stop();
+    // Clean up mesh and materials if needed
+    if (this.mesh) {
+      this.mesh.geometry?.dispose();
+      if (Array.isArray(this.mesh.material)) {
+        this.mesh.material.forEach(material => material.dispose());
+      } else {
+        this.mesh.material?.dispose();
+      }
+    }
   }
 }
 

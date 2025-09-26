@@ -1,14 +1,13 @@
-import * as THREE from "three";
-import ParagliderVoxel from "../../../../foundation/components/vehicles/ParagliderVoxel";
-import Helpers from "../../../../foundation/utils/helpers";
-import adriModel from "../../../../../assets/foundation/models/characters/adri.obj";
-import adriTextureImage from "../../../../../assets/foundation/models/characters/adri.png";
-import { StoryOptions } from "../../../shared/types";
+import * as THREE from 'three';
+import ParagliderVoxel from '../../../../foundation/components/vehicles/ParagliderVoxel';
+import Helpers from '../../../../foundation/utils/helpers';
+import adriModel from '../../../../../assets/foundation/models/characters/adri.obj';
+import adriTextureImage from '../../../../../assets/foundation/models/characters/adri.png';
+import { StoryOptions } from '../../../shared/types';
 
 const ParagliderVoxelWorkshop = {
   load: async (options: StoryOptions) => {
-    const { camera, scene, renderer, terrain, water, sky, gui, controls } =
-      options;
+    const { camera, scene, renderer, terrain, water, sky, gui, controls } = options;
 
     controls.enabled = true;
 
@@ -20,12 +19,12 @@ const ParagliderVoxelWorkshop = {
     sky.updateSunPosition(12);
 
     const gliderOptions = {
-      wingColor1: "#c30010",
-      wingColor2: "#b100cd",
-      breakColor: "#ffffff",
-      lineFrontColor: "#ffffff",
-      lineBackColor: "#ffffff",
-      inletsColor: "#333333",
+      wingColor1: '#c30010',
+      wingColor2: '#b100cd',
+      breakColor: '#ffffff',
+      lineFrontColor: '#ffffff',
+      lineBackColor: '#ffffff',
+      inletsColor: '#333333',
       numeroCajones: 40,
       bandLength: 500,
       carabinersSeparationMM: 300,

@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import * as dat from "dat.gui";
 
 export type GuiHelperOptions = {
   max: number;
@@ -7,7 +8,7 @@ export type GuiHelperOptions = {
 
 const GuiHelper = {
   addRotationGui: (
-    gui: any,
+    gui: dat.GUI,
     name: string,
     rotation: THREE.Euler,
     options: GuiHelperOptions = { min: -2 * Math.PI, max: 2 * Math.PI }
@@ -27,7 +28,7 @@ const GuiHelper = {
   },
 
   addPositionGui: (
-    gui: any,
+    gui: dat.GUI,
     name: string,
     pos: THREE.Vector3,
     options: GuiHelperOptions = { min: -100, max: 100 }
@@ -47,7 +48,7 @@ const GuiHelper = {
   },
 
   addLocationGui: (
-    gui: any,
+    gui: dat.GUI,
     name: string,
     obj: THREE.Object3D,
     options?: GuiHelperOptions

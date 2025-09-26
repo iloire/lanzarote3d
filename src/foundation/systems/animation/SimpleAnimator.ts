@@ -56,7 +56,6 @@ export class SimpleAnimator {
     this.isRunning = true;
     this.lastTime = performance.now();
     this.loop();
-    console.log('SimpleAnimator started');
   }
 
   /**
@@ -68,7 +67,6 @@ export class SimpleAnimator {
       this.animationId = null;
     }
     this.isRunning = false;
-    console.log('SimpleAnimator stopped');
   }
 
   /**
@@ -92,7 +90,6 @@ export class SimpleAnimator {
     };
 
     this.animations.set(id, animation);
-    console.log(`Animation '${id}' started (${duration}ms)`);
 
     // Start the loop if not running
     if (!this.isRunning) {
@@ -108,7 +105,6 @@ export class SimpleAnimator {
     if (animation) {
       animation.isRunning = false;
       this.animations.delete(id);
-      console.log(`Animation '${id}' stopped`);
     }
   }
 
@@ -160,7 +156,6 @@ export class SimpleAnimator {
           if (animation.onComplete) {
             animation.onComplete();
           }
-          console.log(`Animation '${id}' completed`);
         }
       } catch (error) {
         console.error(`Error in animation '${id}':`, error);

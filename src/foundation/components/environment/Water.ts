@@ -11,6 +11,9 @@ export type WaterOptions = {
 
 export default class Water {
   options: WaterOptions;
+  private animationId: number | null = null;
+  private isAnimating: boolean = false;
+  private waterMesh: THREE.Mesh | WaterEffect | null = null;
 
   constructor(options: WaterOptions) {
     this.options = options;
@@ -22,16 +25,10 @@ export default class Water {
       const mat = new THREE.MeshLambertMaterial({ color: 0x000511 });
       mat.transparent = true;
       mat.opacity = 0.6;
-      const meshWater = new THREE.Mesh(waterGeometry, mat);
-      meshWater.rotation.x = -Math.PI / 2;
-      return meshWater;
+      this.waterMesh = new THREE.Mesh(waterGeometry, mat);
+      this.waterMesh.rotation.x = -Math.PI / 2;
+      return this.waterMesh;
     } else {
-      function animate() {
-        if (water.material.uniforms["time"]?.value !== undefined) {
-          water.material.uniforms["time"].value += 1.0 / 60.0;
-        }
-        requestAnimationFrame(animate);
-      }
       const water = new WaterEffect(waterGeometry, {
         // textureWidth: 512,
         // textureHeight: 512,
@@ -51,8 +48,51 @@ export default class Water {
         ?.copy(sunPosition)
         ?.normalize();
       water.receiveShadow = true;
-      animate();
+      this.waterMesh = water;
+      this.animate();
       return water;
+    }
+  }
+
+  animate() {
+    if (!this.isAnimating && this.waterMesh && !USE_PLAIN_WATER) {
+      this.isAnimating = true;
+      this.startAnimation();
+    }
+  }
+
+  private startAnimation() {
+    const animateLoop = () => {
+      if (!this.isAnimating || !this.waterMesh) return;
+
+      const water = this.waterMesh as WaterEffect;
+      if (water.material.uniforms["time"]?.value !== undefined) {
+        water.material.uniforms["time"].value += 1.0 / 60.0;
+      }
+
+      this.animationId = requestAnimationFrame(animateLoop);
+    };
+    animateLoop();
+  }
+
+  stop() {
+    this.isAnimating = false;
+    if (this.animationId !== null) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = null;
+    }
+  }
+
+  dispose() {
+    this.stop();
+    // Clean up mesh and materials if needed
+    if (this.waterMesh) {
+      this.waterMesh.geometry?.dispose();
+      if (Array.isArray(this.waterMesh.material)) {
+        this.waterMesh.material.forEach(material => material.dispose());
+      } else {
+        this.waterMesh.material?.dispose();
+      }
     }
   }
 }

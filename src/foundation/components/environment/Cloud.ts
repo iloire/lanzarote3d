@@ -84,31 +84,77 @@ export type CloudOptions = {
 
 class Cloud {
   options: CloudOptions;
+  private interval: number | null = null;
+  private animationId: number | null = null;
+  private isAnimating: boolean = false;
+  private mesh: THREE.Object3D | null = null;
 
   constructor(options: CloudOptions) {
     this.options = options;
   }
 
-  interval: number | null = null;
-
   async load(): Promise<THREE.Object3D> {
-    const mesh = await generateCloud(this.options);
+    this.mesh = await generateCloud(this.options);
     const interval = 3000;
     this.interval = setInterval(() => {
-      mesh.children.forEach((m) => {
-        tweakSize(m, interval);
-        tweakPos(m, interval);
-      });
+      if (this.mesh) {
+        this.mesh.children.forEach((m) => {
+          tweakSize(m, interval);
+          tweakPos(m, interval);
+        });
+      }
     }, interval) as unknown as number;
 
-    const animate = (mesh: THREE.Object3D) => {
-      const timer = (Date.now() + Math.random() * 1000) * 0.0001;
-      mesh.position.y = mesh.position.y + Math.sin(timer) * 0.1;
-      requestAnimationFrame(() => animate(mesh));
-    };
+    this.animate();
+    return this.mesh;
+  }
 
-    animate(mesh);
-    return mesh;
+  animate() {
+    if (!this.isAnimating && this.mesh) {
+      this.isAnimating = true;
+      this.startAnimation();
+    }
+  }
+
+  private startAnimation() {
+    const animateLoop = () => {
+      if (!this.isAnimating || !this.mesh) return;
+
+      const timer = (Date.now() + Math.random() * 1000) * 0.0001;
+      this.mesh.position.y = this.mesh.position.y + Math.sin(timer) * 0.1;
+
+      this.animationId = requestAnimationFrame(animateLoop);
+    };
+    animateLoop();
+  }
+
+  stop() {
+    this.isAnimating = false;
+    if (this.animationId !== null) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = null;
+    }
+    if (this.interval !== null) {
+      clearInterval(this.interval);
+      this.interval = null;
+    }
+  }
+
+  dispose() {
+    this.stop();
+    // Clean up mesh and materials
+    if (this.mesh) {
+      this.mesh.children.forEach(child => {
+        if (child instanceof THREE.Mesh) {
+          child.geometry?.dispose();
+          if (Array.isArray(child.material)) {
+            child.material.forEach(material => material.dispose());
+          } else {
+            child.material?.dispose();
+          }
+        }
+      });
+    }
   }
 }
 

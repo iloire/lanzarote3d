@@ -1,11 +1,10 @@
-import Glider from "../../../../foundation/components/vehicles/Glider";
-import Helpers from "../../../../foundation/utils/helpers";
-import { StoryOptions } from "../../../shared/types";
+import Glider from '../../../../foundation/components/vehicles/Glider';
+import Helpers from '../../../../foundation/utils/helpers';
+import { StoryOptions } from '../../../shared/types';
 
 const GliderWorkshop = {
   load: async (options: StoryOptions) => {
-    const { camera, scene, renderer, terrain, water, sky, gui, controls } =
-      options;
+    const { camera, scene, renderer, terrain, water, sky, gui, controls } = options;
 
     controls.enabled = true;
 
@@ -17,12 +16,12 @@ const GliderWorkshop = {
     sky.updateSunPosition(12);
 
     const gliderOptions = {
-      wingColor1: "#c30010",
-      wingColor2: "#b100cd",
-      breakColor: "#333333",
-      lineFrontColor: "#000000",
-      lineBackColor: "#333333",
-      inletsColor: "#333333",
+      wingColor1: '#c30010',
+      wingColor2: '#b100cd',
+      breakColor: '#333333',
+      lineFrontColor: '#000000',
+      lineBackColor: '#333333',
+      inletsColor: '#333333',
       numeroCajones: 30,
     };
 

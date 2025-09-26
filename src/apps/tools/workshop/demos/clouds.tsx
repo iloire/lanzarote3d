@@ -1,7 +1,7 @@
-import * as THREE from "three";
-import Clouds from "../../../../foundation/components/environment/Clouds";
-import Helpers from "../../../../foundation/utils/helpers";
-import { StoryOptions } from "../../../shared/types";
+import * as THREE from 'three';
+import Clouds from '../../../../foundation/components/environment/Clouds';
+import Helpers from '../../../../foundation/utils/helpers';
+import { StoryOptions } from '../../../shared/types';
 
 const CloudsWorkshop = {
   load: async (options: StoryOptions) => {
@@ -14,11 +14,8 @@ const CloudsWorkshop = {
     Helpers.createHelpers(scene);
     sky.updateSunPosition(12);
 
-    const cloudOptions = { colors: ["#F64A8A", "#F987C5", "#DE3163"] };
-    const mesh = await new Clouds(cloudOptions).load(
-      1,
-      new THREE.Vector3(0, 0, 0),
-    );
+    const cloudOptions = { colors: ['#F64A8A', '#F987C5', '#DE3163'] };
+    const mesh = await new Clouds(cloudOptions).load(1, new THREE.Vector3(0, 0, 0));
     mesh.scale.set(0.1, 0.1, 0.1);
     mesh.position.set(0, 0, 0);
     scene.add(mesh);

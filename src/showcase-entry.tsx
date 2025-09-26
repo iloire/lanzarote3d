@@ -1,10 +1,10 @@
-import { createRoot } from "react-dom/client";
-import * as THREE from "three";
-import WebGL from "./WebGL";
-import App from "./app";
-import { logger } from "./foundation/utils/logger";
+import { createRoot } from 'react-dom/client';
+import * as THREE from 'three';
+import WebGL from './WebGL';
+import App from './app';
+import { logger } from './foundation/utils/logger';
 
-import "./index.css";
+import './index.css';
 
 THREE.Cache.enabled = true;
 
@@ -17,27 +17,30 @@ const bundleName = scriptTag?.src.match(/([^\/]+)\.bundle\.js$/)?.[1] || 'animat
 
 // Map bundle names to story names
 const bundleToStoryMap: Record<string, string> = {
-  'main': 'animation',
-  'flyzones': 'flyzones',
-  'game': 'game'
+  main: 'animation',
+  flyzones: 'flyzones',
+  game: 'game',
 };
 
 // Priority: query parameter > bundle name mapping > default
 const storyName = queryStory || bundleToStoryMap[bundleName] || 'animation';
 
 // Enable dev menus on localhost
-const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const isLocalhost =
+  window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
-const rootElement = document.getElementById("root");
+const rootElement = document.getElementById('root');
 if (rootElement && WebGL.isWebGLAvailable()) {
   const root = createRoot(rootElement);
-  root.render(<App
-    showAppSelection={true}
-    showPublic={true}
-    showDev={isLocalhost}
-    showExperiments={isLocalhost}
-    initialStory={storyName}
-  />);
+  root.render(
+    <App
+      showAppSelection={true}
+      showPublic={true}
+      showDev={isLocalhost}
+      showExperiments={isLocalhost}
+      initialStory={storyName}
+    />
+  );
   logger.info(`${storyName} story started (query: ${queryStory || 'none'}, bundle: ${bundleName})`);
 } else if (rootElement) {
   const warning = WebGL.getWebGLErrorMessage();

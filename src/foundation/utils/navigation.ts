@@ -84,7 +84,15 @@ const Navigation = (camera: THREE.PerspectiveCamera, controls: OrbitControls) =>
   }
 
   const xSpeed = 0.1;
-  document.addEventListener("keydown", onDocumentKeyDown, false);
+
+  // Store reference to listener for cleanup
+  const keydownListener = onDocumentKeyDown;
+  document.addEventListener("keydown", keydownListener, false);
+
+  // Return cleanup function
+  const cleanup = () => {
+    document.removeEventListener("keydown", keydownListener);
+  };
 
   function onDocumentKeyDown(event) {
     var keyCode = event.which;
@@ -107,34 +115,48 @@ const Navigation = (camera: THREE.PerspectiveCamera, controls: OrbitControls) =>
     controls.update();
   }
 
+  // Store point click listeners for cleanup
+  const pointClickListeners = new Map<Element, EventListener>();
+
   document.querySelectorAll(".point").forEach((item) => {
-    item.addEventListener(
-      "click",
-      (event: any) => {
-        let className =
-          event.target.classList[event.target.classList.length - 1];
-        switch (className) {
-          case "label-0": // famara
-            nav.famara();
-            break;
-          case "label-1": // mirador Orzola
-            nav.orzola();
-            break;
-          case "label-2": // macher
-            nav.macher();
-            break;
-          case "label-3": // Tenesar
-            nav.tenesar();
-            break;
-          default:
-            break;
-        }
-      },
-      false
-    );
+    const clickListener = (event: Event) => {
+      const target = event.target as Element;
+      let className = target.classList[target.classList.length - 1];
+      switch (className) {
+        case "label-0": // famara
+          nav.famara();
+          break;
+        case "label-1": // mirador Orzola
+          nav.orzola();
+          break;
+        case "label-2": // macher
+          nav.macher();
+          break;
+        case "label-3": // Tenesar
+          nav.tenesar();
+          break;
+        default:
+          break;
+      }
+    };
+
+    item.addEventListener("click", clickListener, false);
+    pointClickListeners.set(item, clickListener);
   });
 
-  return nav;
+  // Enhanced navigation object with cleanup
+  const navWithCleanup = {
+    ...nav,
+    dispose: () => {
+      cleanup();
+      pointClickListeners.forEach((listener, element) => {
+        element.removeEventListener("click", listener);
+      });
+      pointClickListeners.clear();
+    }
+  };
+
+  return navWithCleanup;
 };
 
 export default Navigation;

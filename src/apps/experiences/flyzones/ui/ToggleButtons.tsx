@@ -7,27 +7,23 @@ interface ToggleButtonsProps {
   showRulerButton?: boolean;
 }
 
-const ToggleButtons: React.FC<ToggleButtonsProps> = ({ 
-  landingMarkersVisible, 
+const ToggleButtons: React.FC<ToggleButtonsProps> = ({
+  landingMarkersVisible,
   onToggleLandings,
   onToggleRuler,
-  showRulerButton = false
+  showRulerButton = false,
 }) => {
   return (
     <div className="toggle-buttons">
-      <button 
+      <button
         onClick={() => onToggleLandings(!landingMarkersVisible)}
-        className={landingMarkersVisible ? "active" : ""}
+        className={landingMarkersVisible ? 'active' : ''}
       >
-        {landingMarkersVisible ? "Hide Landings" : "Show Landings"}
+        {landingMarkersVisible ? 'Hide Landings' : 'Show Landings'}
       </button>
-      
+
       {showRulerButton && onToggleRuler && (
-        <button 
-          id="ruler-toggle-btn"
-          onClick={onToggleRuler}
-          className=""
-        >
+        <button id="ruler-toggle-btn" onClick={onToggleRuler} className="">
           Ruler Tool
         </button>
       )}
@@ -35,4 +31,4 @@ const ToggleButtons: React.FC<ToggleButtonsProps> = ({
   );
 };
 
-export default ToggleButtons; 
+export default ToggleButtons;

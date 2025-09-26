@@ -20,8 +20,9 @@ let isDownViewing = false;
 let isZoomInViewing = false;
 let isZoomOutViewing = false;
 
-document.addEventListener("keydown", onDocumentKeyDown, false);
-document.addEventListener("keyup", onDocumentKeyUp, false);
+// Event listeners will be added when controller is initialized
+let keydownListener: ((event: KeyboardEvent) => void) | null = null;
+let keyupListener: ((event: KeyboardEvent) => void) | null = null;
 
 enum KeyCodes {
   left = 37, // left arrow
@@ -228,6 +229,30 @@ export class CameraController extends THREE.PerspectiveCamera {
     // view rotation
     this.rotateY(-1 * this.viewRotationHorizontal * 1.5);
     this.rotateX(-1 * this.viewRotationVertical * 1.5);
+  }
+
+  dispose() {
+    // Clean up event listeners
+    if (keydownListener) {
+      document.removeEventListener("keydown", keydownListener);
+      keydownListener = null;
+    }
+    if (keyupListener) {
+      document.removeEventListener("keyup", keyupListener);
+      keyupListener = null;
+    }
+  }
+
+  // Static method to initialize event listeners
+  static initializeEventListeners() {
+    if (!keydownListener) {
+      keydownListener = onDocumentKeyDown;
+      document.addEventListener("keydown", keydownListener, false);
+    }
+    if (!keyupListener) {
+      keyupListener = onDocumentKeyUp;
+      document.addEventListener("keyup", keyupListener, false);
+    }
   }
 }
 

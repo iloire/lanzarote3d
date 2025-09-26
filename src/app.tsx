@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from "react";
-import GUI from "lil-gui";
-import Stats from "three/examples/jsm/libs/stats.module";
-import * as THREE from "three";
-import Sky from "./foundation/components/environment/Sky";
-import Water from "./foundation/components/environment/Water";
-import Island from "./foundation/components/scenery/Island";
-import Stories from "./apps/shared/index";
+import React, { useEffect, useState } from 'react';
+import GUI from 'lil-gui';
+import Stats from 'three/examples/jsm/libs/stats.module';
+import * as THREE from 'three';
+import Sky from './foundation/components/environment/Sky';
+import Water from './foundation/components/environment/Water';
+import Island from './foundation/components/scenery/Island';
+import Stories from './apps/shared/index';
 import { CameraController as Camera } from './foundation/systems/scene/CameraController';
 import Menu from './menu';
-import Controls from "./foundation/utils/controls";
-import { StoryOptions } from "./apps/shared/types";
+import Controls from './foundation/utils/controls';
+import { StoryOptions } from './apps/shared/types';
 
-import "./index.css";
+import './index.css';
 
 THREE.Cache.enabled = true;
 
@@ -57,15 +57,14 @@ const SCENE_CONFIG: SceneConfig = {
 const createRenderer = (sizes: { width: number; height: number }) => {
   const renderer = new THREE.WebGLRenderer({
     // powerPreference: "low-power" ,
-    powerPreference: "high-performance",
-    canvas: document.querySelector("canvas.webgl") || undefined,
+    powerPreference: 'high-performance',
+    canvas: document.querySelector('canvas.webgl') || undefined,
     antialias: true,
     alpha: true,
     logarithmicDepthBuffer: true,
   });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(sizes.width, sizes.height);
-
 
   // Shadow settings for consistency
   renderer.shadowMap.enabled = true;
@@ -74,7 +73,13 @@ const createRenderer = (sizes: { width: number; height: number }) => {
   return renderer;
 };
 
-const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAppSelection = false, showPublic, showExperiments, showDev }) => {
+const App: React.FC<AppProps> = ({
+  initialStory,
+  showAppSelection: initialShowAppSelection = false,
+  showPublic,
+  showExperiments,
+  showDev,
+}) => {
   const [loadingProcess, setLoadingProcess] = useState(0);
   const [showAppSelection] = useState(initialShowAppSelection);
   const [renderer, setRenderer] = useState<THREE.WebGLRenderer | null>(null);
@@ -118,13 +123,13 @@ const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAp
     scene.add(camera);
 
     // Event listeners
-    window.addEventListener("resize", () => {
+    window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    document.addEventListener("keydown", (event) => {
+    document.addEventListener('keydown', event => {
       if (event.key.toLowerCase() === 'z') {
         gui._hidden ? gui.show() : gui.hide();
       }
@@ -150,7 +155,7 @@ const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAp
       water,
       sky,
       gui,
-      controls
+      controls,
     };
 
     // Call the load method on the selected story
@@ -195,6 +200,6 @@ const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAp
 
 const stats = new Stats();
 stats.showPanel(0);
-document.getElementById("stats")?.appendChild(stats.dom);
+document.getElementById('stats')?.appendChild(stats.dom);
 
 export default App;

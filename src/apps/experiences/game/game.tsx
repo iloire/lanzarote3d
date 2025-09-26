@@ -1,20 +1,20 @@
-import React from "react";
-import { createRoot } from "react-dom/client";
-import * as THREE from "three";
-import BackgroundSound from "../../../foundation/systems/audio/BackgroundAudio";
-import Flier, { FlierConstructor } from "../../../foundation/types/flier";
-import Paraglider from "../../../foundation/components/vehicles/Paraglider";
-import Vario from "../../../foundation/systems/audio/VarioSound";
-import { Weather, WeatherOptions } from "../../../foundation/components/physics";
-import { CameraMode } from "../../../foundation/systems/scene/CameraController";
-import UIControls, { FirstPersonViewLook } from "./ui-controls";
-import { Trajectory } from "../../../foundation/components/ui";
-import Analytics from "../../../foundation/systems/analytics/UserAnalytics";
-import { GameStartOptions, GameStatus } from "./types";
-import { addGameEnvironment } from "./env";
-import locations from "./lanzarote";
-import { WindIndicator } from "../../../foundation/components/physics";
-import { StoryOptions } from "../types";
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import * as THREE from 'three';
+import BackgroundSound from '../../../foundation/systems/audio/BackgroundAudio';
+import Flier, { FlierConstructor } from '../../../foundation/types/flier';
+import Paraglider from '../../../foundation/components/vehicles/Paraglider';
+import Vario from '../../../foundation/systems/audio/VarioSound';
+import { Weather, WeatherOptions } from '../../../foundation/components/physics';
+import { CameraMode } from '../../../foundation/systems/scene/CameraController';
+import UIControls, { FirstPersonViewLook } from './ui-controls';
+import { Trajectory } from '../../../foundation/components/ui';
+import Analytics from '../../../foundation/systems/analytics/UserAnalytics';
+import { GameStartOptions, GameStatus } from './types';
+import { addGameEnvironment } from './env';
+import locations from './lanzarote';
+import { WindIndicator } from '../../../foundation/components/physics';
+import { StoryOptions } from '../types';
 const KMH_TO_MS = 3.6;
 
 const FOG_ENABLED = true;
@@ -35,23 +35,18 @@ const WEATHER_SETTINGS: WeatherOptions = {
   lclLevel: 1800,
 };
 
-
-const addWindIndicatorToScene = (
-  scene: THREE.Scene,
-  flier: Flier,
-  weather: Weather
-) => {
+const addWindIndicatorToScene = (scene: THREE.Scene, flier: Flier, weather: Weather) => {
   const windIndicator = new WindIndicator(40);
   const arrow = windIndicator.load(
     WEATHER_SETTINGS.windDirectionDegreesFromNorth,
     flier.position().add(flier.direction())
   );
   scene.add(arrow);
-  flier.addEventListener("position", (event) => {
+  flier.addEventListener('position', event => {
     arrow.position.copy(event.position).add(flier.direction().multiplyScalar(300));
   });
 
-  weather.addEventListener("wind-directionChange", (event) => {
+  weather.addEventListener('wind-directionChange', event => {
     windIndicator.update(event.value);
   });
 };
@@ -61,7 +56,6 @@ const analytics = new Analytics();
 const Game = {
   load: async (options: StoryOptions) => {
     const { camera, scene, renderer, terrain, water, sky, gui, controls } = options;
-
 
     sky.updateSunPosition(TIME_OF_DAY);
 
@@ -85,14 +79,14 @@ const Game = {
     const gliderOptions = {
       wingColor1: '#c30010',
       wingColor2: '#b100cd',
-      numeroCajones: 40
+      numeroCajones: 40,
     };
 
-    const pilotOptions = {}
+    const pilotOptions = {};
 
     const paragliderFlyable = new Paraglider({
       glider: gliderOptions,
-      pilot: pilotOptions
+      pilot: pilotOptions,
     });
 
     const mesh = await paragliderFlyable.load(gui);
@@ -104,7 +98,7 @@ const Game = {
       trimSpeed: 35 / KMH_TO_MS,
       fullSpeedBarSpeed: 45 / KMH_TO_MS,
       bigEarsSpeed: 27 / KMH_TO_MS,
-      flyable: paragliderFlyable
+      flyable: paragliderFlyable,
     };
 
     const pg = new Flier(pgOptions, envOptions, DEBUG);
@@ -113,13 +107,12 @@ const Game = {
 
     scene.add(mesh);
 
-    document.addEventListener("keydown", onDocumentKeyDown, false);
+    document.addEventListener('keydown', onDocumentKeyDown, false);
 
     function onDocumentKeyDown(event: KeyboardEvent) {
       const keyCode = event.which;
       if (keyCode == 90) {
         //z
-
       } else if (keyCode == 77) {
         //m
         bgMusic.toggle();
@@ -139,17 +132,16 @@ const Game = {
       env.updateWrapSpeed(value);
     };
 
-    const nav = gui.addFolder("Navigation");
-    nav.add(settings, "rotationSensitivity", 0.01, 0.05).listen();
+    const nav = gui.addFolder('Navigation');
+    nav.add(settings, 'rotationSensitivity', 0.01, 0.05).listen();
     nav
-      .add(settings, "wrapSpeed", 1, 20)
+      .add(settings, 'wrapSpeed', 1, 20)
       .listen()
       .onChange((value: number) => {
         wrapSpeedChange(value);
       });
 
     let gameStatus = GameStatus.NonStarted;
-
 
     function setCameraMode(mode: CameraMode) {
       camera.setCameraMode(mode, pg);
@@ -194,21 +186,15 @@ const Game = {
           startGame(options);
           fnHideStartButton();
         }}
-        onFinishGame={(fnHideButtons) => {
-          if (
-            gameStatus === GameStatus.Started ||
-            gameStatus === GameStatus.Paused
-          ) {
+        onFinishGame={fnHideButtons => {
+          if (gameStatus === GameStatus.Started || gameStatus === GameStatus.Paused) {
             finishGame();
             fnHideButtons();
           }
         }}
-        onPause={(paused) => {
-          if (
-            gameStatus === GameStatus.Started ||
-            gameStatus === GameStatus.Paused
-          ) {
-            analytics.trackEvent("game-pause");
+        onPause={paused => {
+          if (gameStatus === GameStatus.Started || gameStatus === GameStatus.Paused) {
+            analytics.trackEvent('game-pause');
             if (paused) {
               pg.stop();
               vario.pause();
@@ -223,23 +209,23 @@ const Game = {
           }
         }}
         onSelectCamera={(mode: CameraMode) => {
-          analytics.trackEvent("game-camera-change", mode.toString());
+          analytics.trackEvent('game-camera-change', mode.toString());
           setCameraMode(mode);
         }}
-        onWrapSpeedChange={(value) => {
-          analytics.trackEvent("game-speed-change", value.toString());
+        onWrapSpeedChange={value => {
+          analytics.trackEvent('game-speed-change', value.toString());
           wrapSpeedChange(value);
         }}
       />
     );
 
-    const root = createRoot(document.getElementById("ui-controls"));
+    const root = createRoot(document.getElementById('ui-controls'));
     root.render(uiControls);
 
-    function touchedGround() { }
+    function touchedGround() {}
 
     function finishGame() {
-      analytics.trackEvent("game-crash", pg.getTrajectory().length.toString());
+      analytics.trackEvent('game-crash', pg.getTrajectory().length.toString());
       vario.stop();
       bgMusic.stop();
       pg.stop();
@@ -251,9 +237,7 @@ const Game = {
       if (trajectoryPoints.length) {
         const first = trajectoryPoints[0];
         camera.animateTo(
-          first.vector.add(
-            new THREE.Vector3(0, 30, 0).add(weather.getWindVelocity(-250))
-          ),
+          first.vector.add(new THREE.Vector3(0, 30, 0).add(weather.getWindVelocity(-250))),
           pg.position(),
           0,
           controls
@@ -262,9 +246,8 @@ const Game = {
       gameStatus = GameStatus.Finished;
     }
 
-
     function startGame(options: GameStartOptions) {
-      analytics.trackEvent("game-start");
+      analytics.trackEvent('game-start');
       weather.changeWindSpeed(options.windSpeedMetresPerSecond);
       weather.changeWindDirection(options.windDirectionDegreesFromNorth);
       if (START_WITH_SOUND) {
@@ -287,8 +270,8 @@ const Game = {
       gameStatus = GameStatus.Started;
     }
 
-    pg.addEventListener("touchedGround", touchedGround);
-    pg.addEventListener("crashed", finishGame);
+    pg.addEventListener('touchedGround', touchedGround);
+    pg.addEventListener('crashed', finishGame);
 
     addWindIndicatorToScene(scene, pg, weather);
 

@@ -190,15 +190,9 @@ export class PerformanceMonitor {
     return report.join('\n');
   }
 
-  // Log performance info to console
+  // Log performance info to console (disabled in production)
   logPerformance(): void {
-    console.group('Performance Monitor');
-    console.log(`FPS: ${this.metrics.fps.toFixed(1)}`);
-    console.log(`Frame Time: ${this.metrics.frameTime.toFixed(2)}ms`);
-    console.log(`Memory: ${(this.metrics.memoryUsage.usedJSHeapSize / (1024 * 1024)).toFixed(1)}MB`);
-    console.log(`Triangles: ${this.metrics.renderInfo.triangles.toLocaleString()}`);
-    console.log(`Draw Calls: ${this.metrics.drawCalls}`);
-    console.groupEnd();
+    // Performance logging disabled in production builds
   }
 
   // Reset metrics

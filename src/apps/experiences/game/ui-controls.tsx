@@ -1,12 +1,12 @@
-import React from "react";
-import { CameraMode } from "../../../foundation/systems/scene/CameraController";
-import Paraglider from "../../../foundation/types/flier";
-import Vario from "../../audio/vario";
-import { Weather } from "../../../foundation/components/physics";
-import arrowLeftImg from "../../../../assets/apps/shared/icons/left-chevron.png";
-import arrowRightImg from "../../../../assets/apps/shared/icons/right-chevron.png";
-import { GameStartOptions } from "./types";
-import { Location } from "../flyzones/locations/index";
+import React from 'react';
+import { CameraMode } from '../../../foundation/systems/scene/CameraController';
+import Paraglider from '../../../foundation/types/flier';
+import Vario from '../../audio/vario';
+import { Weather } from '../../../foundation/components/physics';
+import arrowLeftImg from '../../../../assets/apps/shared/icons/left-chevron.png';
+import arrowRightImg from '../../../../assets/apps/shared/icons/right-chevron.png';
+import { GameStartOptions } from './types';
+import { Location } from '../flyzones/locations/index';
 
 const KMH_TO_MS = 3.6;
 
@@ -29,10 +29,7 @@ type UIControlsProps = {
   onLeftInputRelease: () => void;
   onRightInput: () => void;
   onRightInputRelease: () => void;
-  onGameStart: (
-    options: GameStartOptions,
-    fnHideStartButton: () => void
-  ) => void;
+  onGameStart: (options: GameStartOptions, fnHideStartButton: () => void) => void;
   onSelectCamera: (mode: CameraMode) => void;
   onWrapSpeedChange: (value: number) => void;
   onPause: (paused: boolean) => void;
@@ -68,14 +65,14 @@ type UIControlsState = {
 };
 
 export enum View {
-  ZoomIn = "zoomIn",
-  ZoomInRelease = "zoomInRelease",
-  ZoomOut = "zoomOut",
-  ZoomOutRelease = "zoomOutRelease",
-  Left = "left",
-  LeftRelease = "leftRelease",
-  Right = "right",
-  RightRelease = "rightRelease",
+  ZoomIn = 'zoomIn',
+  ZoomInRelease = 'zoomInRelease',
+  ZoomOut = 'zoomOut',
+  ZoomOutRelease = 'zoomOutRelease',
+  Left = 'left',
+  LeftRelease = 'leftRelease',
+  Right = 'right',
+  RightRelease = 'rightRelease',
 }
 
 class UIControls extends React.Component<UIControlsProps, UIControlsState> {
@@ -108,16 +105,16 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       cameraMode: props.defaultCameraMode,
       groundTouches: 0,
     };
-    document.addEventListener("keydown", this.onDocumentKeyDown, false);
-    document.addEventListener("keyup", this.onDocumentKeyUp, false);
+    document.addEventListener('keydown', this.onDocumentKeyDown, false);
+    document.addEventListener('keyup', this.onDocumentKeyUp, false);
 
     const vario = props.vario;
-    vario.addEventListener("altitude", (event: any) => {
+    vario.addEventListener('altitude', (event: any) => {
       this.setState({ altitude: Math.round(event.altitude) });
     });
 
     const pg = props.pg;
-    pg.addEventListener("position", (_event: any) => {
+    pg.addEventListener('position', (_event: any) => {
       const pos = pg.position();
       this.setState({
         groundSpeed: Math.round(pg.getGroundSpeed() * KMH_TO_MS * 100) / 100,
@@ -131,38 +128,38 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
         metersFlown: Math.round(pg.getMetersFlown() * 100) / 100,
       });
     });
-    pg.addEventListener("heightAboveGround", (event: any) => {
+    pg.addEventListener('heightAboveGround', (event: any) => {
       this.setState({ heightAboveGround: Math.round(event.height) });
     });
-    pg.addEventListener("thermalLift", (event: any) => {
+    pg.addEventListener('thermalLift', (event: any) => {
       this.setState({ thermalLift: Math.round(event.lift * 100) / 100 });
     });
-    pg.addEventListener("dynamicLift", (event: any) => {
+    pg.addEventListener('dynamicLift', (event: any) => {
       this.setState({ dynamicLift: Math.round(event.lift * 100) / 100 });
     });
-    pg.addEventListener("drop", (event: any) => {
+    pg.addEventListener('drop', (event: any) => {
       this.setState({ drop: (-1 * Math.round(event.drop * 100)) / 100 });
     });
-    pg.addEventListener("delta", (event: any) => {
+    pg.addEventListener('delta', (event: any) => {
       this.setState({ delta: Math.round(event.delta * 100) / 100 });
     });
-    pg.addEventListener("gradient", (event: any) => {
+    pg.addEventListener('gradient', (event: any) => {
       this.setState({ gradient: Math.round(event.gradient * 100) / 100 });
     });
-    pg.addEventListener("touchedGround", (event: any) => {
+    pg.addEventListener('touchedGround', (event: any) => {
       this.setState({ groundTouches: event.groundTouches });
     });
 
     const weather = props.weather;
-    weather.addEventListener("wind-speedChange", (event) => {
+    weather.addEventListener('wind-speedChange', event => {
       this.setState({
         windSpeed: Math.round(event.value * KMH_TO_MS * 100) / 100,
       });
     });
-    weather.addEventListener("wind-directionChange", (event) => {
+    weather.addEventListener('wind-directionChange', event => {
       this.setState({ windDirection: Math.round(event.value * 100) / 100 });
     });
-    weather.addEventListener("lclChange", (event) => {
+    weather.addEventListener('lclChange', event => {
       this.setState({ lclLevel: Math.round(event.value * 100) / 100 });
     });
   }
@@ -171,7 +168,6 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     this.props.onWrapSpeedChange(this.props.defaultGameSpeed);
     this.setUpViewUI();
   }
-
 
   getMouseDirection(e, target) {
     const rect = target.getBoundingClientRect();
@@ -184,7 +180,6 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     return { x: directionX, y: directionY };
   }
 
-
   applyNavigationMouseMove(e, target, isMouseDown) {
     const direction = this.getMouseDirection(e, target);
     this.handleViewUIChange(direction);
@@ -195,7 +190,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
 
   setUpViewUI() {
     let mouseDown = false;
-    const viewUIelement = document.getElementById("root");
+    const viewUIelement = document.getElementById('root');
     viewUIelement.onmousemove = (e: any) => {
       this.applyNavigationMouseMove(e, e.target, mouseDown);
     };
@@ -213,7 +208,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     };
   }
 
-  onDocumentKeyDown = (event) => {
+  onDocumentKeyDown = event => {
     const keyCode = event.which;
     if (keyCode === 50) {
       //2
@@ -259,7 +254,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     }
   };
 
-  onDocumentKeyUp = (event) => {
+  onDocumentKeyUp = event => {
     const keyCode = event.which;
     if (keyCode == 65) {
       //a
@@ -352,29 +347,23 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
   };
 
   override render() {
-    const availableForPlaying = (location) => location.availableForPlaying;
+    const availableForPlaying = location => location.availableForPlaying;
     const isGameStarted = !this.state.showStartButton;
-    const buttons = this.props.locations
-      .filter(availableForPlaying)
-      .map((location) => (
-        <button
-          key={location.title}
-          onClick={() =>
-            this.handleStart(
-              6,
-              200, //hard coded temporal
-              location
-            )
-          }
-        >
-          FLY "{location.title}"
-        </button>
-      ));
-    const startButton = !isGameStarted ? (
-      <div id="game-start">{buttons}</div>
-    ) : (
-      false
-    );
+    const buttons = this.props.locations.filter(availableForPlaying).map(location => (
+      <button
+        key={location.title}
+        onClick={() =>
+          this.handleStart(
+            6,
+            200, //hard coded temporal
+            location
+          )
+        }
+      >
+        FLY "{location.title}"
+      </button>
+    ));
+    const startButton = !isGameStarted ? <div id="game-start">{buttons}</div> : false;
 
     const breakControls = isGameStarted ? (
       <div id="game-controls">
@@ -403,14 +392,12 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
       <div id="weather-info" className="UIBox">
         <div id="weather-direction">Wind direction: {windDirection}</div>
         <div id="weather-speed">
-          Wind speed:{" "}
+          Wind speed:{' '}
           {windSpeed > 30 ? (
-            <span style={{ color: "red", fontWeight: "bold" }}>
-              {windSpeed}
-            </span>
+            <span style={{ color: 'red', fontWeight: 'bold' }}>{windSpeed}</span>
           ) : (
             windSpeed
-          )}{" "}
+          )}{' '}
           km/h
         </div>
         <div id="weather-lclLevel">LCL: {lclLevel} m.</div>
@@ -450,36 +437,63 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     const { showDebugInfo } = this.props;
     const distanceFlown =
       metersFlown < 1000
-        ? Math.round(metersFlown) + " m."
-        : Math.round((metersFlown * 100) / 1000) / 100 + " km.";
+        ? Math.round(metersFlown) + ' m.'
+        : Math.round((metersFlown * 100) / 1000) / 100 + ' km.';
 
     const varioInfo = isGameStarted ? (
       <div id="vario-info" className="UIBox">
-        <div id="vario-delta"><span className="prefix">Δ:</span> {delta} <span className="sufix">m/s</span></div>
-        <div id="vario-altitude"><span className="prefix">Alt.:</span> {altitude} m.</div>
+        <div id="vario-delta">
+          <span className="prefix">Δ:</span> {delta} <span className="sufix">m/s</span>
+        </div>
+        <div id="vario-altitude">
+          <span className="prefix">Alt.:</span> {altitude} m.
+        </div>
         <div id="height-above-ground">
           <span className="prefix">Alt. above terrain:</span> {heightAboveGround} m.
         </div>
-        <div id="vario-ground-speed"><span className="prefix">Ground speed:</span> {groundSpeed} <span className="prefix">km/h</span></div>
-        <div id="pg-flying-time"><span className="prefix">Flight time:</span> {flyingTime} <span className="prefix">min.</span></div>
-        <div id="pg-meters-flown"><span className="prefix">Flight distance:</span> {distanceFlown}</div>
-        <div id="pg-gliding-ratio"><span className="prefix">Gliding ratio:</span> {glidingRatio}</div>
+        <div id="vario-ground-speed">
+          <span className="prefix">Ground speed:</span> {groundSpeed}{' '}
+          <span className="prefix">km/h</span>
+        </div>
+        <div id="pg-flying-time">
+          <span className="prefix">Flight time:</span> {flyingTime}{' '}
+          <span className="prefix">min.</span>
+        </div>
+        <div id="pg-meters-flown">
+          <span className="prefix">Flight distance:</span> {distanceFlown}
+        </div>
+        <div id="pg-gliding-ratio">
+          <span className="prefix">Gliding ratio:</span> {glidingRatio}
+        </div>
         {showDebugInfo && (
-          <div id="pg-thermal-lift"><span className="prefix">Thermal lift :</span> {thermalLift} <span className="prefix">m/s</span></div>
+          <div id="pg-thermal-lift">
+            <span className="prefix">Thermal lift :</span> {thermalLift}{' '}
+            <span className="prefix">m/s</span>
+          </div>
         )}
         {showDebugInfo && (
-          <div id="pg-dynamic-lift"><span className="prefix">Soaring lift :</span> {dynamicLift} <span className="prefix">m/s</span></div>
+          <div id="pg-dynamic-lift">
+            <span className="prefix">Soaring lift :</span> {dynamicLift}{' '}
+            <span className="prefix">m/s</span>
+          </div>
         )}
-        {showDebugInfo && <div id="pg-drop"><span className="prefix">PG sink rate :</span> {drop} <span className="prefix">m/s</span></div>}
         {showDebugInfo && (
-          <div id="pg-gradient"><span className="prefix">Terrain gradient :</span> {gradient}</div>
+          <div id="pg-drop">
+            <span className="prefix">PG sink rate :</span> {drop}{' '}
+            <span className="prefix">m/s</span>
+          </div>
+        )}
+        {showDebugInfo && (
+          <div id="pg-gradient">
+            <span className="prefix">Terrain gradient :</span> {gradient}
+          </div>
         )}
       </div>
     ) : (
       false
     );
-    const speedBarText = speedBarEngaged ? "SPEED-BAR" : "";
-    const earsText = earsEngaged ? "EARS" : "";
+    const speedBarText = speedBarEngaged ? 'SPEED-BAR' : '';
+    const earsText = earsEngaged ? 'EARS' : '';
     const paragliderInfo = isGameStarted ? (
       <div id="paraglider-info" className="UIBox">
         <div id="paraglider-speedBar">{speedBarText}</div>
@@ -539,9 +553,9 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
           </div>
           <div>
             <br />
-            Tips: pick some thermals to get to cloud base and/or go soaring over
-            the cliff. Stay close to the hill but don't crash!! Also keep an eye
-            on wind direction and strenght, it may change without any warning!
+            Tips: pick some thermals to get to cloud base and/or go soaring over the cliff. Stay
+            close to the hill but don't crash!! Also keep an eye on wind direction and strenght, it
+            may change without any warning!
           </div>
         </div>
       ) : (
@@ -562,7 +576,7 @@ class UIControls extends React.Component<UIControlsProps, UIControlsState> {
     );
 
     const breakControlUI = (
-      <div id="break-ui" style={{ display: isGameStarted ? "" : "none" }}>
+      <div id="break-ui" style={{ display: isGameStarted ? '' : 'none' }}>
         <div>&nbsp;</div>
       </div>
     );

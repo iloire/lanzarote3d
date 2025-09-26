@@ -1,10 +1,10 @@
-import * as THREE from "three";
-import { Paraglider } from "../../../../foundation/components/vehicles";
-import Flier, { FlierConstructor } from "../../../../foundation/types/flier";
-import Helpers from "../../../../foundation/utils/helpers";
-import Weather, { WeatherOptions } from "../../../../foundation/components/physics/Weather";
-import { StoryOptions } from "../../../shared/types";
-    
+import * as THREE from 'three';
+import { Paraglider } from '../../../../foundation/components/vehicles';
+import Flier, { FlierConstructor } from '../../../../foundation/types/flier';
+import Helpers from '../../../../foundation/utils/helpers';
+import Weather, { WeatherOptions } from '../../../../foundation/components/physics/Weather';
+import { StoryOptions } from '../../../shared/types';
+
 const KMH_TO_MS = 3.6;
 
 const WEATHER_SETTINGS: WeatherOptions = {
@@ -16,7 +16,7 @@ const WEATHER_SETTINGS: WeatherOptions = {
 const ParagliderWorkshop = {
   load: async (options: StoryOptions) => {
     const { camera, scene, renderer, terrain, water, sky, gui, controls } = options;
-    
+
     terrain.visible = true;
     water.visible = true;
 
@@ -30,12 +30,12 @@ const ParagliderWorkshop = {
     const gliderOptions = {
       wingColor1: '#c30010',
       wingColor2: '#b100cd',
-      numeroCajones: 40
+      numeroCajones: 40,
     };
-    const pilotOptions = {}
+    const pilotOptions = {};
     const pgFlyable = new Paraglider({
       glider: gliderOptions,
-      pilot: pilotOptions
+      pilot: pilotOptions,
     });
 
     const mesh = await pgFlyable.load(gui);
@@ -49,7 +49,7 @@ const ParagliderWorkshop = {
       trimSpeed: 35 / KMH_TO_MS,
       fullSpeedBarSpeed: 45 / KMH_TO_MS,
       bigEarsSpeed: 27 / KMH_TO_MS,
-      flyable: pgFlyable
+      flyable: pgFlyable,
     };
 
     const weather = new Weather(WEATHER_SETTINGS);
@@ -74,8 +74,7 @@ const ParagliderWorkshop = {
       const lookAt = mesh.position.clone().add(new THREE.Vector3(0, 0, 0));
       camera.lookAt(lookAt);
       // Removed TWEEN update - no longer needed
-      controls.update(); 
-
+      controls.update();
     };
 
     animate();

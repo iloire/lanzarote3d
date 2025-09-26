@@ -12,13 +12,11 @@ const LocationButtons: React.FC<LocationButtonsProps> = ({ locations, onNavigate
     <>
       {locations.map(location => (
         <div key={location.id}>
-          <button onClick={() => onNavigate(location.position, location)}>
-            {location.title}
-          </button>
+          <button onClick={() => onNavigate(location.position, location)}>{location.title}</button>
         </div>
       ))}
     </>
   );
 };
 
-export default LocationButtons; 
+export default LocationButtons;

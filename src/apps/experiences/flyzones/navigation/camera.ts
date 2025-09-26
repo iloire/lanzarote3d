@@ -41,7 +41,6 @@ export const navigateTo = (
     }, () => {
       // Re-enable controls after animation completes
       controls.enabled = true;
-      console.log('Camera navigation complete - controls enabled');
     });
   } else {
     // Simple navigation without specific camera view
@@ -61,7 +60,6 @@ export const navigateTo = (
     }, () => {
       // Re-enable controls after animation completes
       controls.enabled = true;
-      console.log('Simple camera navigation complete - controls enabled');
     });
   }
 }; 

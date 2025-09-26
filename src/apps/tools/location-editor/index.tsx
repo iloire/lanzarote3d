@@ -1,16 +1,24 @@
-import * as THREE from "three";
-import { StoryOptions } from "../../shared/types";
-import { setupLabelRenderer } from "../../experiences/flyzones/markers/marker";
-import { EditorState, exportLocationData, resetLocation, undoLastAction, saveToLocalStorage, loadFromLocalStorage, clearLocalStorage } from "./state";
-import { createEditorUI } from "./ui";
-import { setupInteraction } from "./interaction";
-import "./styles.css"; // Import the CSS
+import * as THREE from 'three';
+import { StoryOptions } from '../../shared/types';
+import { setupLabelRenderer } from '../../experiences/flyzones/markers/marker';
+import {
+  EditorState,
+  exportLocationData,
+  resetLocation,
+  undoLastAction,
+  saveToLocalStorage,
+  loadFromLocalStorage,
+  clearLocalStorage,
+} from './state';
+import { createEditorUI } from './ui';
+import { setupInteraction } from './interaction';
+import './styles.css'; // Import the CSS
 
 const LocationEditor = {
   load: async (options: StoryOptions) => {
     const { camera, scene, renderer, controls, gui, terrain } = options;
 
-    camera.position.set(1000,5000,1000);
+    camera.position.set(1000, 5000, 1000);
 
     // Location Editor loading...
 
@@ -29,11 +37,11 @@ const LocationEditor = {
         locations: [],
         currentLocationIndex: null,
         selectedItem: null,
-        mode: "location", // Start in location creation mode
-        flyZonePhaseType: "takeoff",
+        mode: 'location', // Start in location creation mode
+        flyZonePhaseType: 'takeoff',
         markers: [],
         flyZones: [],
-        history: []
+        history: [],
       };
     }
 
@@ -43,41 +51,51 @@ const LocationEditor = {
     // Setup editor GUI
     const editorFolder = gui.addFolder('Location Editor');
     editorFolder.open(); // Make sure the folder is open
-    
+
     // Mode selection
     const modeFolder = editorFolder.addFolder('Mode');
     modeFolder.open(); // Make sure the folder is open
-    modeFolder.add(editorState, 'mode', ['location', 'takeoff', 'landing', 'flyzone'])
+    modeFolder
+      .add(editorState, 'mode', ['location', 'takeoff', 'landing', 'flyzone'])
       .name('Edit Mode')
       .onChange((value: string) => {
         // Switched mode
         updateCursorStyle(value);
         saveState(); // Save after mode change
       });
-    
+
     // FlyZone phase type selection (only visible in flyzone mode)
     const flyZoneFolder = editorFolder.addFolder('FlyZone Settings');
     flyZoneFolder.open(); // Make sure the folder is open
-    flyZoneFolder.add(editorState, 'flyZonePhaseType', ['takeoff', 'ridge', 'approach', 'landing'])
+    flyZoneFolder
+      .add(editorState, 'flyZonePhaseType', ['takeoff', 'ridge', 'approach', 'landing'])
       .name('Phase Type')
       .onChange(() => {
         saveState(); // Save after flyzone type change
       });
-    
+
     // Export button
-    editorFolder.add({ exportData: () => exportLocationData(editorState) }, 'exportData')
+    editorFolder
+      .add({ exportData: () => exportLocationData(editorState) }, 'exportData')
       .name('Export Location Data');
-    
+
     // Reset button
-    editorFolder.add({ resetLocation: () => {
-      resetLocation(editorState, scene);
-      clearLocalStorage(); // Clear localStorage when resetting
-      createEditorUI(editorState);
-    }}, 'resetLocation')
+    editorFolder
+      .add(
+        {
+          resetLocation: () => {
+            resetLocation(editorState, scene);
+            clearLocalStorage(); // Clear localStorage when resetting
+            createEditorUI(editorState);
+          },
+        },
+        'resetLocation'
+      )
       .name('Reset Location');
 
     // Undo button
-    editorFolder.add({ undoLastAction: () => undoLastAction(editorState, scene) }, 'undoLastAction')
+    editorFolder
+      .add({ undoLastAction: () => undoLastAction(editorState, scene) }, 'undoLastAction')
       .name('Undo Last Action')
       .onChange(() => {
         // Update UI after undo
@@ -90,11 +108,17 @@ const LocationEditor = {
     };
 
     // Add a clear storage button to the GUI
-    editorFolder.add({ clearStorage: () => {
-      clearLocalStorage();
-      resetLocation(editorState, scene);
-      createEditorUI(editorState);
-    }}, 'clearStorage')
+    editorFolder
+      .add(
+        {
+          clearStorage: () => {
+            clearLocalStorage();
+            resetLocation(editorState, scene);
+            createEditorUI(editorState);
+          },
+        },
+        'clearStorage'
+      )
       .name('Clear Saved Data');
 
     // Make sure terrain is clickable
@@ -115,7 +139,7 @@ const LocationEditor = {
 
     // Helper function to update cursor style based on mode
     const updateCursorStyle = (mode: string) => {
-      switch(mode) {
+      switch (mode) {
         case 'location':
           renderer.domElement.style.cursor = 'crosshair';
           break;
@@ -132,17 +156,17 @@ const LocationEditor = {
           renderer.domElement.style.cursor = 'default';
       }
     };
-    
+
     // Initialize cursor style
     updateCursorStyle(editorState.mode);
 
     // Render loop
     const animate = () => {
       // Removed TWEEN update - no longer needed
-      
+
       // Update hover states
       raycaster.setFromCamera(mouse, camera);
-      
+
       renderer.render(scene, camera);
       labelRenderer.render(scene, camera);
       requestAnimationFrame(animate);
@@ -150,7 +174,9 @@ const LocationEditor = {
     };
 
     // Initialize
-    window.addEventListener('resize', () => labelRenderer.setSize(window.innerWidth, window.innerHeight));
+    window.addEventListener('resize', () =>
+      labelRenderer.setSize(window.innerWidth, window.innerHeight)
+    );
     animate();
 
     // Add a debug sphere to verify the scene is working
@@ -164,4 +190,4 @@ const LocationEditor = {
   },
 };
 
-export default LocationEditor; 
+export default LocationEditor;

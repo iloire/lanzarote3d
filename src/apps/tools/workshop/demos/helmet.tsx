@@ -1,14 +1,17 @@
-import * as THREE from "three";
-import Helpers from "../../../../foundation/utils/helpers";
-import { HelmetOptions, HelmetType } from "../../../../foundation/components/characters/helmets/types";
-import { DefaultHelmet } from "../../../../foundation/components/characters/helmets/DefaultHelmet";
-import { FullFaceHelmet } from "../../../../foundation/components/characters/helmets/FullFaceHelmet";
-import { HelmetWithHorns } from "../../../../foundation/components/characters/helmets/HelmetWithHorns";
-import { StoryOptions } from "../../../shared/types";
+import * as THREE from 'three';
+import Helpers from '../../../../foundation/utils/helpers';
+import {
+  HelmetOptions,
+  HelmetType,
+} from '../../../../foundation/components/characters/helmets/types';
+import { DefaultHelmet } from '../../../../foundation/components/characters/helmets/DefaultHelmet';
+import { FullFaceHelmet } from '../../../../foundation/components/characters/helmets/FullFaceHelmet';
+import { HelmetWithHorns } from '../../../../foundation/components/characters/helmets/HelmetWithHorns';
+import { StoryOptions } from '../../../shared/types';
 
 const toHexColor = (num: number): string => {
   const hex = num.toString(16);
-  return "#" + "0".repeat(6 - hex.length) + hex;
+  return '#' + '0'.repeat(6 - hex.length) + hex;
 };
 
 const HelmetWorkshop = {
@@ -25,19 +28,19 @@ const HelmetWorkshop = {
     sky.updateSunPosition(12);
 
     // Create container for labels
-    const labelContainer = document.createElement("div");
-    labelContainer.style.position = "absolute";
-    labelContainer.style.top = "0";
-    labelContainer.style.left = "0";
-    labelContainer.style.width = "100%";
-    labelContainer.style.height = "100%";
-    labelContainer.style.pointerEvents = "none";
+    const labelContainer = document.createElement('div');
+    labelContainer.style.position = 'absolute';
+    labelContainer.style.top = '0';
+    labelContainer.style.left = '0';
+    labelContainer.style.width = '100%';
+    labelContainer.style.height = '100%';
+    labelContainer.style.pointerEvents = 'none';
     document.body.appendChild(labelContainer);
 
     // Create array of helmet configurations
     const helmets = Object.keys(HelmetType)
-      .filter((key) => isNaN(Number(key)))
-      .map((helmetKey) => {
+      .filter(key => isNaN(Number(key)))
+      .map(helmetKey => {
         return {
           type: HelmetType[helmetKey],
           options: {
@@ -48,8 +51,8 @@ const HelmetWorkshop = {
         };
       });
 
-    let x = -800;
-    let z = 0;
+    const x = -800;
+    const z = 0;
     const ITEMS_PER_ROW = 3;
 
     helmets.forEach((helmetConfig, index) => {
@@ -67,7 +70,7 @@ const HelmetWorkshop = {
           helmet = new HelmetWithHorns(helmetConfig.options);
           break;
         default:
-          console.warn("Unknown helmet type:", helmetConfig.type); // Debug log
+          console.warn('Unknown helmet type:', helmetConfig.type); // Debug log
           return;
       }
 
@@ -82,18 +85,18 @@ const HelmetWorkshop = {
       scene.add(mesh);
 
       // Create HTML label
-      const label = document.createElement("div");
-      label.style.position = "absolute";
-      label.style.color = "white";
-      label.style.padding = "10px";
-      label.style.background = "rgba(0, 0, 0, 0.5)";
-      label.style.borderRadius = "5px";
-      label.style.textAlign = "center";
-      label.style.fontSize = "14px";
-      label.style.fontFamily = "Arial, sans-serif";
+      const label = document.createElement('div');
+      label.style.position = 'absolute';
+      label.style.color = 'white';
+      label.style.padding = '10px';
+      label.style.background = 'rgba(0, 0, 0, 0.5)';
+      label.style.borderRadius = '5px';
+      label.style.textAlign = 'center';
+      label.style.fontSize = '14px';
+      label.style.fontFamily = 'Arial, sans-serif';
 
       const helmetTypeName = Object.keys(HelmetType).find(
-        (key) => HelmetType[key] === helmetConfig.type,
+        key => HelmetType[key] === helmetConfig.type
       );
 
       label.innerHTML = `<strong>Helmet: ${helmetTypeName}</strong><br>
@@ -128,7 +131,7 @@ const HelmetWorkshop = {
       requestAnimationFrame(animate);
 
       // Update all labels
-      scene.traverse((object) => {
+      scene.traverse(object => {
         if ((object as any).updateLabel) {
           (object as any).updateLabel();
         }
@@ -149,4 +152,3 @@ const HelmetWorkshop = {
 };
 
 export default HelmetWorkshop;
-

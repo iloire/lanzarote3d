@@ -1,5 +1,5 @@
-import React from "react";
-import { getAppsByStatus, type AppMetadata } from "./apps/config/app-registry";
+import React from 'react';
+import { getAppsByStatus, type AppMetadata } from './apps/config/app-registry';
 
 interface MenuProps {
   showPublic?: boolean;
@@ -44,18 +44,19 @@ class Menu extends React.Component<MenuProps> {
   navigateTo(route: string) {
     // In development, use query parameters
     // In production, use separate HTML files
-    const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const isDevelopment =
+      window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
     // Remove leading slash if present
     const cleanRoute = route.replace(/^\//, '');
 
     if (isDevelopment) {
-      window.location.href = "?story=" + cleanRoute;
+      window.location.href = '?story=' + cleanRoute;
     } else {
-      if (cleanRoute === "animation") {
-        window.location.href = "index.html";
+      if (cleanRoute === 'animation') {
+        window.location.href = 'index.html';
       } else {
-        window.location.href = cleanRoute + ".html";
+        window.location.href = cleanRoute + '.html';
       }
     }
   }
@@ -68,10 +69,10 @@ class Menu extends React.Component<MenuProps> {
 
     // Get selected story from URL
     const params = new URLSearchParams(window.location.search);
-    const selectedStory = params.get("story");
+    const selectedStory = params.get('story');
 
     const renderButtons = (apps: AppMetadata[]) =>
-      apps.map((app) => {
+      apps.map(app => {
         const routeKey = app.route.replace('/', '');
         const isHovered = this.state.hoveredRoute === routeKey;
 
@@ -83,7 +84,7 @@ class Menu extends React.Component<MenuProps> {
             onMouseLeave={() => this.setState({ hoveredRoute: null })}
           >
             <button
-              className={selectedStory === routeKey ? "selected" : ""}
+              className={selectedStory === routeKey ? 'selected' : ''}
               onClick={() => {
                 this.navigateTo(app.route);
                 if (this.state.isMobile) {
@@ -93,14 +94,16 @@ class Menu extends React.Component<MenuProps> {
             >
               {app.name}
             </button>
-            <span className={`description ${isHovered ? 'visible' : ''}`}>
-              {app.description}
-            </span>
+            <span className={`description ${isHovered ? 'visible' : ''}`}>{app.description}</span>
           </div>
         );
       });
 
-    const { showPublic = true, showExperiments: showExperiments = true, showDev: showDev = true } = this.props;
+    const {
+      showPublic = true,
+      showExperiments: showExperiments = true,
+      showDev: showDev = true,
+    } = this.props;
     const { isMobile, isMenuOpen, isMenuVisible } = this.state;
 
     // Mobile menu
@@ -118,17 +121,13 @@ class Menu extends React.Component<MenuProps> {
                   border: 'none',
                   borderRadius: '4px',
                   padding: '8px 12px',
-                  fontSize: '12px'
+                  fontSize: '12px',
                 }}
                 title={isMenuVisible ? 'Hide Menu' : 'Show Menu'}
               >
                 {isMenuVisible ? 'Hide' : 'Show'}
               </button>
-              <button
-                className="hamburger-menu"
-                onClick={this.toggleMenu}
-                aria-label="Toggle menu"
-              >
+              <button className="hamburger-menu" onClick={this.toggleMenu} aria-label="Toggle menu">
                 <span className={`hamburger-line ${isMenuOpen ? 'open' : ''}`}></span>
                 <span className={`hamburger-line ${isMenuOpen ? 'open' : ''}`}></span>
                 <span className={`hamburger-line ${isMenuOpen ? 'open' : ''}`}></span>
@@ -173,7 +172,7 @@ class Menu extends React.Component<MenuProps> {
               background: isMenuVisible ? '#4CAF50' : '#f44336',
               color: 'white',
               fontWeight: 'bold',
-              marginBottom: '10px'
+              marginBottom: '10px',
             }}
             title={isMenuVisible ? 'Hide Menu' : 'Show Menu'}
           >

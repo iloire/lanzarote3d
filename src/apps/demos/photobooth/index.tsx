@@ -1,15 +1,15 @@
-import * as THREE from "three";
-import { Paraglider, ParagliderOptions } from "../../../foundation/components/vehicles";
+import * as THREE from 'three';
+import { Paraglider, ParagliderOptions } from '../../../foundation/components/vehicles';
 import ParagliderVoxel, {
   ParagliderVoxelOptions,
-} from "../../../foundation/components/vehicles/ParagliderVoxel";
-import Tandem from "../../../foundation/components/vehicles/Tandem";
-import { PilotHeadType } from "../../../foundation/components/characters/PilotHead";
-import Environment from "../../shared/env/environment";
-import Weather, { WeatherOptions } from "../../../foundation/components/physics/Weather";
-import adriModel from "../../../../assets/foundation/models/characters/adri.obj";
-import adriTextureImage from "../../../../assets/foundation/models/characters/adri.png";
-import { StoryOptions } from "../../shared/types";
+} from '../../../foundation/components/vehicles/ParagliderVoxel';
+import Tandem from '../../../foundation/components/vehicles/Tandem';
+import { PilotHeadType } from '../../../foundation/components/characters/PilotHead';
+import Environment from '../../shared/env/environment';
+import Weather, { WeatherOptions } from '../../../foundation/components/physics/Weather';
+import adriModel from '../../../../assets/foundation/models/characters/adri.obj';
+import adriTextureImage from '../../../../assets/foundation/models/characters/adri.png';
+import { StoryOptions } from '../../shared/types';
 
 const WEATHER_SETTINGS: WeatherOptions = {
   windDirectionDegreesFromNorth: 310,
@@ -21,12 +21,12 @@ const tandems = [
   {
     pg: {
       glider: {
-        wingColor1: "#c30010",
-        wingColor2: "#b100cd",
-        breakColor: "#ffffff",
-        lineFrontColor: "#ffffff",
-        lineBackColor: "#ffffff",
-        inletsColor: "#333333",
+        wingColor1: '#c30010',
+        wingColor2: '#b100cd',
+        breakColor: '#ffffff',
+        lineFrontColor: '#ffffff',
+        lineBackColor: '#ffffff',
+        inletsColor: '#333333',
         numeroCajones: 35,
       },
       pilot: {
@@ -34,9 +34,9 @@ const tandems = [
           head: {
             headType: PilotHeadType.Default,
             helmetOptions: {
-              color: "#ffff00",
-              color2: "#cccccc",
-              color3: "#999999",
+              color: '#ffff00',
+              color2: '#cccccc',
+              color3: '#999999',
             },
           },
         },
@@ -44,13 +44,13 @@ const tandems = [
           head: {
             headType: PilotHeadType.Default,
             helmetOptions: {
-              color: "#ffffff",
-              color2: "#cccccc",
-              color3: "#999999",
+              color: '#ffffff',
+              color2: '#cccccc',
+              color3: '#999999',
             },
           },
-          suitColor: "red",
-          suitColor2: "green",
+          suitColor: 'red',
+          suitColor2: 'green',
         },
       },
     },
@@ -67,9 +67,9 @@ const paraglidersVoxel: ParagliderVoxelConfig[] = [
   {
     pg: {
       glider: {
-        wingColor1: "#c30010",
-        wingColor2: "#b100cd",
-        inletsColor: "pink",
+        wingColor1: '#c30010',
+        wingColor2: '#b100cd',
+        inletsColor: 'pink',
         numeroCajones: 35,
       },
       pilot: {
@@ -90,18 +90,18 @@ const paragliders: ParagliderConfig[] = [
   {
     pg: {
       glider: {
-        wingColor1: "#c30010",
-        wingColor2: "#b100cd",
-        inletsColor: "pink",
+        wingColor1: '#c30010',
+        wingColor2: '#b100cd',
+        inletsColor: 'pink',
         numeroCajones: 35,
       },
       pilot: {
         head: {
           headType: PilotHeadType.Default,
           helmetOptions: {
-            color: "#ffff00",
-            color2: "#cccccc",
-            color3: "#999999",
+            color: '#ffff00',
+            color2: '#cccccc',
+            color3: '#999999',
           },
         },
       },
@@ -111,18 +111,18 @@ const paragliders: ParagliderConfig[] = [
   {
     pg: {
       glider: {
-        wingColor1: "#FFA500",
-        wingColor2: "#b100cd",
-        inletsColor: "white",
+        wingColor1: '#FFA500',
+        wingColor2: '#b100cd',
+        inletsColor: 'white',
         numeroCajones: 50,
       },
       pilot: {
         head: {
           headType: PilotHeadType.Default,
           helmetOptions: {
-            color: "#ffff00",
-            color2: "#cccccc",
-            color3: "#999999",
+            color: '#ffff00',
+            color2: '#cccccc',
+            color3: '#999999',
           },
         },
       },
@@ -132,18 +132,18 @@ const paragliders: ParagliderConfig[] = [
   {
     pg: {
       glider: {
-        wingColor1: "#FFA500",
-        wingColor2: "#b100cd",
-        inletsColor: "#333333",
+        wingColor1: '#FFA500',
+        wingColor2: '#b100cd',
+        inletsColor: '#333333',
         numeroCajones: 40,
       },
       pilot: {
         head: {
           headType: PilotHeadType.Default,
           helmetOptions: {
-            color: "#ffff00",
-            color2: "#cccccc",
-            color3: "#999999",
+            color: '#ffff00',
+            color2: '#cccccc',
+            color3: '#999999',
           },
         },
       },
@@ -153,18 +153,18 @@ const paragliders: ParagliderConfig[] = [
   {
     pg: {
       glider: {
-        wingColor1: "#FFA500",
-        wingColor2: "#b100cd",
-        inletsColor: "pink",
+        wingColor1: '#FFA500',
+        wingColor2: '#b100cd',
+        inletsColor: 'pink',
         numeroCajones: 40,
       },
       pilot: {
         head: {
           headType: PilotHeadType.Default,
           helmetOptions: {
-            color: "#ffff00",
-            color2: "#cccccc",
-            color3: "#999999",
+            color: '#ffff00',
+            color2: '#cccccc',
+            color3: '#999999',
           },
         },
       },
@@ -179,7 +179,7 @@ const PhotoBooth = {
 
     controls.enabled = true;
 
-    const initialPos = new THREE.Vector3(6800, 970, -475);
+    const initialPos = new THREE.Vector3(6200, 970, 175);
     const lookAtPos = paraglidersVoxel[0]?.position || new THREE.Vector3();
 
     // Set camera position and look at target
@@ -230,7 +230,7 @@ const PhotoBooth = {
     const env = new Environment(scene);
     const weather = new Weather(WEATHER_SETTINGS);
     const thermals = env.generateThermals(weather, 0);
-    const cloudOptions = { colors: ["#F64A8A", "#F987C5", "#DE3163"] };
+    const cloudOptions = { colors: ['#F64A8A', '#F987C5', '#DE3163'] };
 
     // Add environment elements
     env.addClouds(thermals, cloudOptions);

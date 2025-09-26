@@ -1,11 +1,11 @@
-import * as THREE from "three";
-import textureImg from "../../../../../assets/foundation/textures/environment/h-map-lanzarote.png";
-import { StoryOptions } from "../../../shared/types";
+import * as THREE from 'three';
+import textureImg from '../../../../../assets/foundation/textures/environment/h-map-lanzarote.png';
+import { StoryOptions } from '../../../shared/types';
 
 const terrainGenerator1 = (groundGeo: any, displacement: any) => {
   const groundMaterial = new THREE.MeshPhongMaterial({
     wireframe: true,
-    color: "red",
+    color: 'red',
     reflectivity: 0.4,
     displacementMap: displacement,
     displacementScale: 623,
@@ -19,7 +19,7 @@ const terrainGenerator1 = (groundGeo: any, displacement: any) => {
 
 const terrainGenerator2 = (groundGeo: any, displacement: any) => {
   const groundMaterial2 = new THREE.MeshPhongMaterial({
-    color: "yellow",
+    color: 'yellow',
     reflectivity: 0.4,
     displacementMap: displacement,
     displacementScale: 323,
@@ -34,7 +34,7 @@ const terrainGenerator2 = (groundGeo: any, displacement: any) => {
 const terrainGenerator3 = (groundGeo, displacement) => {
   const groundMaterial2 = new THREE.MeshPhongMaterial({
     wireframe: true,
-    color: "yellow",
+    color: 'yellow',
     reflectivity: 0.4,
     displacementMap: displacement,
     displacementScale: 323,
@@ -50,7 +50,7 @@ const waterGenerator = () => {
   const waterGeometry = new THREE.PlaneGeometry(10000, 10000, 300, 300);
   const waterMaterial = new THREE.MeshPhongMaterial({
     wireframe: false,
-    color: "blue",
+    color: 'blue',
     // displacementBias: 2,
   });
   const mesh = new THREE.Mesh(waterGeometry, waterMaterial);
