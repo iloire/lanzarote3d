@@ -54,7 +54,8 @@ const createHalfWing = (options: GliderOptions): HalfWing => {
   const lineMat = new THREE.LineBasicMaterial({
     color: options.lineBackColor,
     transparent: true,
-    opacity: 0.2,
+    opacity: 0.01,
+    side: THREE.FrontSide,
   });
   const breakLineMat = new THREE.LineBasicMaterial({
     color: 'yellow',

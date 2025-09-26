@@ -57,8 +57,6 @@ class Clouds {
   updateColors(newColors: string[]) {
     if (!this.group || !newColors || newColors.length === 0) return;
 
-    console.log('Updating cloud group colors:', newColors);
-
     // Update options for future reference
     this.options.colors = newColors;
 

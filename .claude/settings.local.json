@@ -45,7 +45,8 @@
       "Bash(yarn build-showcase)",
       "Bash(git rm:*)",
       "Bash(yarn lint:*)",
-      "Bash(yarn format:check)"
+      "Bash(yarn format:check)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []
