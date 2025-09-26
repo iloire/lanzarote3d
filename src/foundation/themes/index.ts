@@ -10,7 +10,7 @@ export const THEMES: Record<string, Theme> = {
       timeOfDay: 19,
       sunIntensity: 2.3,
       fogColor: '#ff6b6b',
-      fogDensity: 0.003,
+      fogDensity: 0.0015,
     },
     clouds: {
       colors: ['#F64A8A', '#F987C5', '#DE3163', '#FFB6C1', '#FF69B4', '#E6004D'],
@@ -48,7 +48,7 @@ export const THEMES: Record<string, Theme> = {
       timeOfDay: 17.5,
       sunIntensity: 2.0,
       fogColor: '#ffd54f',
-      fogDensity: 0.002,
+      fogDensity: 0.001,
     },
     clouds: {
       colors: ['#FFD700', '#FFA500', '#FF8C00', '#FFFF99', '#FFE135', '#DAA520'],
@@ -86,7 +86,7 @@ export const THEMES: Record<string, Theme> = {
       timeOfDay: 14,
       sunIntensity: 1.8,
       fogColor: '#e3f2fd',
-      fogDensity: 0.001,
+      fogDensity: 0.0005,
     },
     clouds: {
       colors: ['#FFFAFA', '#D3D3D3', '#808080', '#E0F6FF', '#B0E0E6', '#87CEEB'],
@@ -125,7 +125,7 @@ export const THEMES: Record<string, Theme> = {
       timeOfDay: 15,
       sunIntensity: 1.2,
       fogColor: '#37474f',
-      fogDensity: 0.005,
+      fogDensity: 0.0025,
     },
     clouds: {
       colors: ['#2F2F2F', '#4A4A4A', '#F5F5F5', '#1A1A1A', '#696969', '#D3D3D3', '#000000'],
@@ -164,7 +164,7 @@ export const THEMES: Record<string, Theme> = {
       timeOfDay: 20,
       sunIntensity: 1.6,
       fogColor: '#e1f5fe',
-      fogDensity: 0.002,
+      fogDensity: 0.001,
     },
     clouds: {
       colors: ['#87CEEB', '#B0E0E6', '#F0F8FF', '#E6E6FA', '#DDA0DD', '#9370DB'],
@@ -203,7 +203,7 @@ export const THEMES: Record<string, Theme> = {
       timeOfDay: 16,
       sunIntensity: 1.8,
       fogColor: '#d7ccc8',
-      fogDensity: 0.004,
+      fogDensity: 0.002,
     },
     clouds: {
       colors: ['#CD853F', '#DEB887', '#F5DEB3', '#D2691E', '#BC8F8F', '#F4A460'],
@@ -242,7 +242,7 @@ export const THEMES: Record<string, Theme> = {
       timeOfDay: 12,
       sunIntensity: 2.5,
       fogColor: '#4a148c',
-      fogDensity: 0.003,
+      fogDensity: 0.0015,
     },
     clouds: {
       colors: ['#9932CC', '#00FF7F', '#FF1493', '#8A2BE2', '#00FFFF', '#FF00FF', '#ADFF2F'],
@@ -282,7 +282,7 @@ export const THEMES: Record<string, Theme> = {
       timeOfDay: 22,
       sunIntensity: 2.8,
       fogColor: '#ff0080',
-      fogDensity: 0.002,
+      fogDensity: 0.001,
     },
     clouds: {
       colors: ['#FF99FF', '#FFB3D1', '#DDA0DD'],
@@ -324,7 +324,7 @@ export const THEMES: Record<string, Theme> = {
       timeOfDay: 0,
       sunIntensity: 0.5,
       fogColor: '#003300',
-      fogDensity: 0.001,
+      fogDensity: 0.0005,
     },
     clouds: {
       colors: ['#00FF00', '#00CC00', '#008800', '#32CD32', '#90EE90', '#006400'],
@@ -363,7 +363,7 @@ export const THEMES: Record<string, Theme> = {
       timeOfDay: 13,
       sunIntensity: 2.2,
       fogColor: '#f5f5f5',
-      fogDensity: 0.001,
+      fogDensity: 0.0005,
     },
     clouds: {
       colors: ['#ffffff', '#f0f8ff', '#e6f3ff', '#f5f5f5', '#fffafa'],

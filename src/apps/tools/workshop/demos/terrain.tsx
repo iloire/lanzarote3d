@@ -229,7 +229,7 @@ const TerrainWorkshop = {
       metalness: 0.0,
       emissiveIntensity: 0.5,
       animateVertices: false,
-      fogDensity: 0.002,
+      fogDensity: 0.001,
     };
 
     let currentTerrain: THREE.Mesh | null = null;
@@ -388,7 +388,7 @@ const TerrainWorkshop = {
             metalness: 0.0,
             emissiveIntensity: 0.5,
             animateVertices: false,
-            fogDensity: 0.002,
+            fogDensity: 0.001,
           });
           createTerrain(terrainControl.style, terrainControl.useProceduralNoise);
         },
@@ -460,7 +460,7 @@ const TerrainWorkshop = {
         .onChange(() => createTerrain(currentStyle, terrainControl.useProceduralNoise));
 
       visualFolder
-        .add(settings, 'fogDensity', 0, 0.01)
+        .add(settings, 'fogDensity', 0, 0.005)
         .name('Fog Density')
         .onChange(value => {
           if (scene.fog) {
