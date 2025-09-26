@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { Paraglider } from "../../../foundation/components/vehicles";
-import { Boat } from "../../../foundation/components/scenery";
+import { Boat, Tree, Stone, Island } from "../../../foundation/components/scenery";
 import { House, HouseType } from "../../../foundation/components/scenery";
 import { PineTree } from "../../../foundation/components/scenery";
 import Helpers from "../../../foundation/utils/helpers";
@@ -72,16 +72,18 @@ const Workshop = {
       pilot: pilotOptions,
     });
     const mesh = await paraglider.load(gui);
-    mesh.position.set(0, 0, 0);
+    mesh.position.set(-20, 0, 0); // Move paraglider away from houses
     mesh.scale.set(0.01, 0.01, 0.01);
     scene.add(mesh);
 
+    const labels: THREE.Mesh[] = [];
+
     const boat = new Boat();
     const boatMesh = boat.load(gui);
-    boatMesh.position.set(20, 0, 30);
+    boatMesh.position.set(-30, 0, 80);
     scene.add(boatMesh);
-
-    const labels: THREE.Mesh[] = [];
+    labels.push(createLabel("Boat", new THREE.Vector3(-30, -10, 80)));
+    scene.add(labels[labels.length - 1]);
 
     const houseSmall = new House(HouseType.Small);
     const houseSmallMesh = houseSmall.load(gui);
@@ -114,8 +116,46 @@ const Workshop = {
     const pineTree = new PineTree();
     const pineTreeMesh = pineTree.load();
     pineTreeMesh.scale.set(3, 3, 3);
-    pineTreeMesh.position.set(20, 0, 30);
+    pineTreeMesh.position.set(30, 0, 120);
     scene.add(pineTreeMesh);
+    labels.push(createLabel("Pine Tree", new THREE.Vector3(30, -10, 120)));
+    scene.add(labels[labels.length - 1]);
+
+    // Add regular tree
+    const tree = new Tree();
+    const treeMesh = tree.load();
+    treeMesh.scale.set(2, 2, 2);
+    treeMesh.position.set(60, 0, 120);
+    scene.add(treeMesh);
+    labels.push(createLabel("Tree", new THREE.Vector3(60, -10, 120)));
+    scene.add(labels[labels.length - 1]);
+
+    // Add stones
+    const stone1 = new Stone();
+    const stone1Mesh = stone1.load();
+    stone1Mesh.position.set(100, 0, 30);
+    stone1Mesh.scale.set(2, 2, 2);
+    scene.add(stone1Mesh);
+    labels.push(createLabel("Stone", new THREE.Vector3(100, -10, 30)));
+    scene.add(labels[labels.length - 1]);
+
+    // Add another stone with different scale
+    const stone2 = new Stone();
+    const stone2Mesh = stone2.load();
+    stone2Mesh.position.set(130, 0, 60);
+    stone2Mesh.scale.set(1.5, 3, 1.5);
+    scene.add(stone2Mesh);
+    labels.push(createLabel("Tall Stone", new THREE.Vector3(130, -10, 60)));
+    scene.add(labels[labels.length - 1]);
+
+    // Add island (async loading)
+    const loadingManager = new THREE.LoadingManager();
+    const islandMesh = await Island.load(loadingManager);
+    islandMesh.position.set(-50, 0, 50);
+    islandMesh.scale.set(0.5, 0.5, 0.5);
+    scene.add(islandMesh);
+    labels.push(createLabel("Island", new THREE.Vector3(-50, -10, 50)));
+    scene.add(labels[labels.length - 1]);
 
     const animate = () => {
       requestAnimationFrame(animate);
@@ -128,8 +168,8 @@ const Workshop = {
       controls.update();
     };
 
-    const lookAt = new THREE.Vector3(0, 0, 45); // Center point between all houses
-    camera.position.set(200, 100, -100); // Further away and better angle
+    const lookAt = new THREE.Vector3(40, 0, 60); // Center point between all spread-out components
+    camera.position.set(400, 200, -150); // Much further away to show all scenery
     camera.lookAt(lookAt);
     animate();
   },

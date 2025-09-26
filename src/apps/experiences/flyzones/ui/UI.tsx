@@ -37,7 +37,7 @@ const FlyzonesUI: React.FC<UIProps> = ({
         }}
         title={isMenuVisible ? 'Hide Menu' : 'Show Menu'}
       >
-        {isMenuVisible ? '🙈 Hide' : '👁️ Show'} Menu
+        {isMenuVisible ? 'Hide' : 'Show'} Menu
       </button>
 
       {/* Menu content - conditionally visible */}

@@ -122,7 +122,7 @@ class Menu extends React.Component<MenuProps> {
                 }}
                 title={isMenuVisible ? 'Hide Menu' : 'Show Menu'}
               >
-                {isMenuVisible ? '🙈' : '👁️'}
+                {isMenuVisible ? 'Hide' : 'Show'}
               </button>
               <button
                 className="hamburger-menu"
@@ -177,7 +177,7 @@ class Menu extends React.Component<MenuProps> {
             }}
             title={isMenuVisible ? 'Hide Menu' : 'Show Menu'}
           >
-            {isMenuVisible ? '🙈 Hide' : '👁️ Show'}
+            {isMenuVisible ? 'Hide' : 'Show'}
           </button>
         </div>
 
