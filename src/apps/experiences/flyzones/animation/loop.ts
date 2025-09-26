@@ -4,7 +4,6 @@ import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { Marker } from '../helpers/index';
 import { VISIBILITY_THRESHOLDS } from '../config/marker-config';
 import { MarkerType } from '../helpers/index';
-import AnimationManager from '../../../../foundation/systems/animation/AnimationManager';
 
 export const setupAnimationLoop = (
   renderer: THREE.WebGLRenderer,
@@ -15,8 +14,10 @@ export const setupAnimationLoop = (
   markers: Marker[],
   landingMarkersVisible: boolean
 ): void => {
-  // Register flyzones animation with centralized manager
-  AnimationManager.register('flyzones-main', () => {
+  // Simple, direct animation loop
+  const animate = () => {
+    requestAnimationFrame(animate);
+
     // Update controls
     controls.update();
 
@@ -61,5 +62,8 @@ export const setupAnimationLoop = (
         }
       }
     });
-  }, 75); // Medium priority for flyzones
+  };
+
+  // Start the animation loop
+  animate();
 }; 

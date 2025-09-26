@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { update } from "@tweenjs/tween.js";
 import { Paraglider, ParagliderOptions } from "../../../foundation/components/vehicles";
 import ParagliderVoxel, {
   ParagliderVoxelOptions,
@@ -240,7 +239,6 @@ const PhotoBooth = {
     env.addBoats(water);
 
     const animate = () => {
-      update(performance.now());
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
     };

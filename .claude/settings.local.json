@@ -35,7 +35,8 @@
       "Bash(cut:*)",
       "Bash(grep:*)",
       "Read(//Users/**)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(npm uninstall:*)"
     ],
     "deny": [],
     "ask": []

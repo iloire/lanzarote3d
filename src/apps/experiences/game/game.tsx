@@ -15,7 +15,6 @@ import { addGameEnvironment } from "./env";
 import locations from "./lanzarote";
 import { WindIndicator } from "../../../foundation/components/physics";
 import { StoryOptions } from "../types";
-import AnimationManager from "../../../foundation/systems/animation/AnimationManager";
 const KMH_TO_MS = 3.6;
 
 const FOG_ENABLED = true;
@@ -295,8 +294,9 @@ const Game = {
 
     renderer.render(scene, camera);
 
-    // Register game animation with centralized manager
-    AnimationManager.register('game-main', () => {
+    // Simple, direct game loop - easy to understand and debug
+    const animate = () => {
+      requestAnimationFrame(animate);
 
       if (gameStatus !== GameStatus.Started) {
         const timeMultiplier = 0.000008;
@@ -309,7 +309,8 @@ const Game = {
       vario.updateReading(pg.altitude());
       camera.update();
       renderer.render(scene, camera);
-    }, 100); // Standard priority for game logic
+    };
+    animate();
 
     // Game rendering complete
   },

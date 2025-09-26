@@ -10,7 +10,6 @@ import { CameraController as Camera } from './foundation/systems/scene/CameraCon
 import Menu from './menu';
 import Controls from "./foundation/utils/controls";
 import { StoryOptions } from "./apps/shared/types";
-import AnimationManager from "./foundation/systems/animation/AnimationManager";
 
 import "./index.css";
 
@@ -143,11 +142,12 @@ const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAp
       controls.enabled = false;
     }
 
-    // Register main app animations with centralized manager FIRST
-    // This ensures the AnimationManager is running before any stories load
-    AnimationManager.register('main-stats', () => {
+    // Simple, direct animation loop - no complex manager needed
+    const animate = () => {
+      requestAnimationFrame(animate);
       stats.update();
-    }, 0); // Highest priority (stats first)
+    };
+    animate();
 
     const storyOptions: StoryOptions = {
       camera,
@@ -177,7 +177,6 @@ const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAp
 
     return () => {
       // Cleanup
-      AnimationManager.unregister('main-stats');
       renderer?.dispose();
     };
   }, []);

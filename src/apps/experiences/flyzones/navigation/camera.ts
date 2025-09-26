@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Tween, Easing } from '@tweenjs/tween.js';
+import { animator } from '../../../../foundation/systems/animation/SimpleAnimator';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { Location } from '../locations';
 
@@ -25,43 +25,29 @@ export const navigateTo = (
         relativePos.z * distance
       ));
     
-    // Animate camera movement
-    new Tween(camera.position)
-      .to({
-        x: cameraPosition.x,
-        y: cameraPosition.y,
-        z: cameraPosition.z
-      }, 2000)
-      .easing(Easing.Cubic.InOut)
-      .start();
-    
-    // Animate controls target
-    new Tween(controls.target)
-      .to({
-        x: cameraTarget.x,
-        y: cameraTarget.y,
-        z: cameraTarget.z
-      }, 2000)
-      .easing(Easing.Cubic.InOut)
-      .start();
+    // Animate camera movement with SimpleAnimator
+    const startPosition = camera.position.clone();
+    const startTarget = controls.target.clone();
+
+    animator.animate('flyzones-navigate', 2000, (progress) => {
+      // Animate camera position
+      camera.position.lerpVectors(startPosition, cameraPosition, progress);
+      // Animate target
+      controls.target.lerpVectors(startTarget, cameraTarget, progress);
+      controls.update();
+    });
   } else {
     // Simple navigation without specific camera view
-    new Tween(camera.position)
-      .to({
-        x: position.x + 1000,
-        y: position.y + 1000,
-        z: position.z + 1000
-      }, 2000)
-      .easing(Easing.Cubic.InOut)
-      .start();
-    
-    new Tween(controls.target)
-      .to({
-        x: position.x,
-        y: position.y,
-        z: position.z
-      }, 2000)
-      .easing(Easing.Cubic.InOut)
-      .start();
+    const startPosition = camera.position.clone();
+    const startTarget = controls.target.clone();
+    const defaultCameraPosition = new THREE.Vector3(position.x + 1000, position.y + 1000, position.z + 1000);
+
+    animator.animate('flyzones-navigate-simple', 2000, (progress) => {
+      // Animate camera position
+      camera.position.lerpVectors(startPosition, defaultCameraPosition, progress);
+      // Animate target
+      controls.target.lerpVectors(startTarget, position, progress);
+      controls.update();
+    });
   }
 }; 

@@ -6,7 +6,6 @@ import Weather, { WeatherOptions } from "../../../foundation/components/physics/
 import adriModel from '../../../../assets/foundation/models/characters/adri.obj';
 import adriTextureImage from '../../../../assets/foundation/models/characters/adri.png';
 import { StoryOptions } from "../../shared/types";
-import AnimationManager from "../../../foundation/systems/animation/AnimationManager";
 import { animator } from "../../../foundation/systems/animation/SimpleAnimator";
 
 const WEATHER_SETTINGS: WeatherOptions = {
@@ -95,10 +94,12 @@ const Animation = {
       controls.enabled = false; // Disable controls during animation
     }
 
-    // Register animation app with centralized manager first to ensure TWEEN loop is running
-    AnimationManager.register('animation-demo-render', () => {
+    // Simple, direct rendering loop
+    const animate = () => {
+      requestAnimationFrame(animate);
       renderer.render(scene, camera);
-    }, 50); // Lower priority than stats but higher than other apps
+    };
+    animate();
 
     // Start the camera animation after a short delay to ensure everything is loaded
     setTimeout(() => {

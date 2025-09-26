@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import Flier from "../../types/flier";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import Animations from "../../utils/animations";
+import { animator } from "../animation/SimpleAnimator";
 import GuiHelper from "../../utils/gui";
 
 const DEFAULT_FOLLOW_DISTANCE = 180;
@@ -180,14 +180,19 @@ export class CameraController extends THREE.PerspectiveCamera {
     controls: OrbitControls,
     cb: any = () => { }
   ) {
-    Animations.animateCamera(
-      this,
-      controls,
-      newPosition,
-      newTarget,
-      duration,
-      cb
-    );
+    // Store initial positions
+    const startPosition = this.position.clone();
+    const startTarget = controls.target.clone();
+
+    // Simple animation using our SimpleAnimator
+    animator.animate(`camera-${Date.now()}`, duration, (progress) => {
+      // Interpolate camera position
+      this.position.lerpVectors(startPosition, newPosition, progress);
+
+      // Interpolate look target
+      controls.target.lerpVectors(startTarget, newTarget, progress);
+      controls.update();
+    }, cb);
   }
 
   followTarget() {
