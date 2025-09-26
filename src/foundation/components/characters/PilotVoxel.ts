@@ -17,9 +17,23 @@ class PilotVoxel {
     const mesh = await Models.loadObj(this.options.objFile);
     const textureLoader = new THREE.TextureLoader();
     const texture = textureLoader.load(this.options.textureFile);
+
+    // Ensure texture uses correct color space and filtering
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.magFilter = THREE.NearestFilter;
+    texture.minFilter = THREE.NearestFilter;
+
     mesh.traverse(function (child) {
       if ((child as any).isMesh) {
-        (child as any).material.map = texture;
+        // Create a new material with better lighting properties
+        const material = new THREE.MeshStandardMaterial({
+          map: texture,
+          transparent: false,
+          side: THREE.DoubleSide,
+          roughness: 0.8,
+          metalness: 0.1,
+        });
+        (child as any).material = material;
       }
     });
     return mesh;

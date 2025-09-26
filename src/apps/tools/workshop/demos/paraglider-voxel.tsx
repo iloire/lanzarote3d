@@ -19,12 +19,12 @@ const ParagliderVoxelWorkshop = {
     sky.updateSunPosition(12);
 
     const gliderOptions = {
-      wingColor1: '#c30010',
-      wingColor2: '#b100cd',
-      breakColor: '#ffffff',
-      lineFrontColor: '#ffffff',
-      lineBackColor: '#ffffff',
-      inletsColor: '#333333',
+      wingColor1: '#ff4444',
+      wingColor2: '#44ff44',
+      breakColor: '#ffff00',
+      lineFrontColor: '#000000',
+      lineBackColor: '#000000',
+      inletsColor: '#ffffff',
       numeroCajones: 40,
       bandLength: 500,
       carabinersSeparationMM: 300,

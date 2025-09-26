@@ -131,7 +131,7 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       priority: 3,
     },
     'paraglider-voxel': {
-      name: 'Voxel',
+      name: 'Voxel pilot',
       description: 'Voxel-based paraglider component showcase',
       entry: './tools/workshop/demos/paraglider-voxel',
       route: '/paraglider-voxel',
