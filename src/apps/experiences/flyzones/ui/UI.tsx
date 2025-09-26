@@ -35,21 +35,61 @@ const FlyzonesUI: React.FC<UIProps> = ({
           color: 'white',
           fontWeight: 'bold',
         }}
-        title={isMenuVisible ? 'Hide Menu' : 'Show Menu'}
+        title={isMenuVisible ? 'Hide Bar' : 'Show Bar'}
       >
-        {isMenuVisible ? 'Hide' : 'Show'} Menu
+        {isMenuVisible ? 'Hide Bar' : 'Show Bar'}
       </button>
 
       {/* Menu content - conditionally visible */}
       {isMenuVisible && (
         <>
-          <LocationButtons locations={locations} onNavigate={onNavigate} />
-          <ToggleButtons
-            landingMarkersVisible={landingMarkersVisible}
-            onToggleLandings={onToggleLandings}
-            {...(onToggleRuler && { onToggleRuler })}
-            showRulerButton={showRulerButton}
-          />
+          {/* Flying Zones Section */}
+          <div style={{
+            marginBottom: '15px',
+            padding: '8px',
+            background: 'rgba(0, 150, 255, 0.1)',
+            border: '1px solid rgba(0, 150, 255, 0.3)',
+            borderRadius: '6px'
+          }}>
+            <div style={{
+              color: 'white',
+              fontSize: '12px',
+              fontWeight: 'bold',
+              marginBottom: '8px',
+              textAlign: 'center',
+              textTransform: 'uppercase',
+              letterSpacing: '1px'
+            }}>
+              ✈️ Flying Zones
+            </div>
+            <LocationButtons locations={locations} onNavigate={onNavigate} />
+          </div>
+
+          {/* Action Tools Section */}
+          <div style={{
+            padding: '8px',
+            background: 'rgba(255, 150, 0, 0.1)',
+            border: '1px solid rgba(255, 150, 0, 0.3)',
+            borderRadius: '6px'
+          }}>
+            <div style={{
+              color: 'white',
+              fontSize: '12px',
+              fontWeight: 'bold',
+              marginBottom: '8px',
+              textAlign: 'center',
+              textTransform: 'uppercase',
+              letterSpacing: '1px'
+            }}>
+              🛠️ Tools
+            </div>
+            <ToggleButtons
+              landingMarkersVisible={landingMarkersVisible}
+              onToggleLandings={onToggleLandings}
+              {...(onToggleRuler && { onToggleRuler })}
+              showRulerButton={showRulerButton}
+            />
+          </div>
         </>
       )}
     </div>

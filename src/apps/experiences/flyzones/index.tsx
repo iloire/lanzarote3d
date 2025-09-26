@@ -233,35 +233,69 @@ class FlyZonesApp extends AppBase {
         if (location.landingSpots && location.landingSpots.length > 0) {
           for (const landing of location.landingSpots) {
             try {
-              // Create a landing marker (cylinder)
-              const landingGeometry = new THREE.CylinderGeometry(150, 150, 50, 16);
-              const landingMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff });
-              const landingMarker = new THREE.Mesh(landingGeometry, landingMaterial);
-              landingMarker.position.copy(landing.position);
-              scene.add(landingMarker);
+              // Create improved landing marker with color based on type
+              const isPrimary = landing.type === 'primary';
+              const markerColor = isPrimary ? 0x00ff00 : 0xffaa00; // Green for primary, orange for secondary
 
-              // Create a label for the landing
+              // Create main cylinder with better proportions
+              const landingGeometry = new THREE.CylinderGeometry(120, 180, 40, 20);
+              const landingMaterial = new THREE.MeshLambertMaterial({
+                color: markerColor,
+                transparent: true,
+                opacity: 0.8
+              });
+              const landingMarker = new THREE.Mesh(landingGeometry, landingMaterial);
+
+              // Add glow effect
+              const glowGeometry = new THREE.CylinderGeometry(140, 200, 44, 20);
+              const glowMaterial = new THREE.MeshBasicMaterial({
+                color: markerColor,
+                transparent: true,
+                opacity: 0.3
+              });
+              const glowMarker = new THREE.Mesh(glowGeometry, glowMaterial);
+
+              // Position markers
+              landingMarker.position.copy(landing.position);
+              glowMarker.position.copy(landing.position);
+
+              // Create a group for the landing marker
+              const landingGroup = new THREE.Group();
+              landingGroup.add(glowMarker);
+              landingGroup.add(landingMarker);
+
+              scene.add(landingGroup);
+
+              // Create a label for the landing with improved styling
               const landingLabelDiv = document.createElement('div');
               landingLabelDiv.className = 'landing-label';
-              landingLabelDiv.textContent = landing.title;
+              landingLabelDiv.textContent = `${landing.title} ${isPrimary ? '🎯' : '⚠️'}`;
+              landingLabelDiv.style.background = isPrimary
+                ? 'rgba(0, 255, 0, 0.8)'
+                : 'rgba(255, 170, 0, 0.8)';
+              landingLabelDiv.style.color = 'white';
+              landingLabelDiv.style.padding = '4px 8px';
+              landingLabelDiv.style.borderRadius = '4px';
+              landingLabelDiv.style.fontSize = '14px';
+              landingLabelDiv.style.fontWeight = 'bold';
 
               const landingLabel = new CSS2DObject(landingLabelDiv);
               landingLabel.position.copy(landing.position);
-              landingLabel.position.y += 100; // Offset the label above the marker
+              landingLabel.position.y += 120; // Offset the label above the marker
               scene.add(landingLabel);
 
               // Add to markers array
               this.markers.push({
                 type: MarkerType.LANDING,
                 position: landing.position,
-                object: landingMarker,
+                object: landingGroup,
                 label: landingLabel,
                 data: landing,
-                pin: landingMarker,
+                pin: landingGroup,
               });
 
               // Add to landing markers array for toggling visibility
-              this.landingMarkers.push(landingMarker);
+              this.landingMarkers.push(landingGroup);
               this.landingMarkers.push(landingLabel);
             } catch (error) {
               this.handleError(error as Error, `loading landing spot ${landing.title}`);
