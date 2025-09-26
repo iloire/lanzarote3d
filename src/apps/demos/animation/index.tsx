@@ -6,8 +6,8 @@ import Weather, { WeatherOptions } from "../../../foundation/components/physics/
 import adriModel from '../../../../assets/foundation/models/characters/adri.obj';
 import adriTextureImage from '../../../../assets/foundation/models/characters/adri.png';
 import { StoryOptions } from "../../shared/types";
-import Animations from "../../../foundation/utils/animations";
 import AnimationManager from "../../../foundation/systems/animation/AnimationManager";
+import { animator } from "../../../foundation/systems/animation/SimpleAnimator";
 
 const WEATHER_SETTINGS: WeatherOptions = {
   windDirectionDegreesFromNorth: 310,
@@ -102,23 +102,37 @@ const Animation = {
 
     // Start the camera animation after a short delay to ensure everything is loaded
     setTimeout(() => {
-      console.log('Starting camera animation...');
-      console.log('Controls enabled:', controls?.enabled);
+      console.log('Starting simple camera animation...');
+      console.log('From:', camera.position.x.toFixed(1), camera.position.y.toFixed(1), camera.position.z.toFixed(1));
+      console.log('To:', finalCameraPosition.x.toFixed(1), finalCameraPosition.y.toFixed(1), finalCameraPosition.z.toFixed(1));
 
-      Animations.animateCamera(
-        camera,
-        controls,
-        finalCameraPosition,
-        pgPos,
-        8000,
-        () => {
-          // Camera animation complete - enable user controls
-          if (controls) {
-            controls.enabled = true;
-          }
-          console.log('Camera animation complete');
+      // Store initial positions
+      const startPosition = camera.position.clone();
+      const startTarget = controls ? controls.target.clone() : pgPos.clone();
+
+      // Simple, clear animation with no dependencies
+      animator.animate('camera-move', 8000, (progress) => {
+        // Interpolate camera position
+        camera.position.lerpVectors(startPosition, finalCameraPosition, progress);
+
+        // Interpolate look target
+        if (controls) {
+          controls.target.lerpVectors(startTarget, pgPos, progress);
+          controls.update();
         }
-      );
+
+        // Debug output every 10%
+        if (Math.floor(progress * 10) !== Math.floor((progress - 0.01) * 10)) {
+          console.log(`Camera animation ${Math.floor(progress * 100)}%:`,
+            camera.position.x.toFixed(1), camera.position.y.toFixed(1), camera.position.z.toFixed(1));
+        }
+      }, () => {
+        // Animation complete
+        if (controls) {
+          controls.enabled = true;
+        }
+        console.log('Camera animation complete!');
+      });
     }, 100);
 
     // Animation app initialized

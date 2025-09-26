@@ -20,6 +20,13 @@ This document tracks technical debt and issues that need to be addressed for imp
 **Impact**: Performance, potential conflicts, duplicate rendering
 **Solution**: ✅ Implemented centralized AnimationManager singleton that coordinates all animations with priority-based execution
 
+### Animation System Complexity (Architectural Improvement)
+**Status**: ✅ Improved
+**Files**: `src/foundation/systems/animation/SimpleAnimator.ts`, `src/apps/demos/animation/index.tsx`
+**Issue**: Previous animation system was too complex with hidden dependencies (AnimationManager → TWEEN → Animations utility) making debugging difficult
+**Impact**: Hard to debug animation issues, timing problems, mixed responsibilities
+**Solution**: ✅ Created SimpleAnimator - self-contained, no external dependencies, transparent operation, easy to debug
+
 ## Medium Priority
 
 ### Missing Error Handling in Audio Systems
