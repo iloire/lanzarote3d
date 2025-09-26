@@ -4,7 +4,7 @@ import { StoryOptions } from "./types";
 import Animation from "../demos/animation/index";
 import Game from "../experiences/game/game";
 import FlyZones from "../experiences/flyzones/index";
-import PhotoBooth from "../experiences/photobooth";
+import PhotoBooth from "../demos/photobooth";
 import LocationEditor from "../tools/location-editor/index";
 
 // Import workshop demos

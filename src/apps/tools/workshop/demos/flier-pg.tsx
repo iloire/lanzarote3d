@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { update } from "@tweenjs/tween.js";
 import { Paraglider } from "../../../../foundation/components/vehicles";
 import Flier, { FlierConstructor } from "../../../../foundation/types/flier";
 import Helpers from "../../../../foundation/utils/helpers";
@@ -74,7 +73,7 @@ const ParagliderWorkshop = {
       renderer.render(scene, camera);
       const lookAt = mesh.position.clone().add(new THREE.Vector3(0, 0, 0));
       camera.lookAt(lookAt);
-      update(performance.now());
+      // Removed TWEEN update - no longer needed
       controls.update(); 
 
     };

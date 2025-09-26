@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { update } from "@tweenjs/tween.js";
 import { StoryOptions } from "../../shared/types";
 import { setupLabelRenderer } from "../../experiences/flyzones/markers/marker";
 import { EditorState, exportLocationData, resetLocation, undoLastAction, saveToLocalStorage, loadFromLocalStorage, clearLocalStorage } from "./state";
@@ -139,7 +138,7 @@ const LocationEditor = {
 
     // Render loop
     const animate = () => {
-      update();
+      // Removed TWEEN update - no longer needed
       
       // Update hover states
       raycaster.setFromCamera(mouse, camera);

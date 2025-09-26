@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Tween } from "@tweenjs/tween.js";
+import { animator } from "../systems/animation/SimpleAnimator";
 import Weather from "../components/physics/Weather";
 import Thermal from "../components/physics/Thermal";
 import GuiHelper from "../utils/gui";
@@ -296,14 +296,11 @@ class Flier extends THREE.EventDispatcher<FlierEventMap> {
 
     const startPosition = this.position();
     const nextPosition = this.position().add(combinedMoveVector);
-    new Tween(startPosition)
-      .to(nextPosition, TICK_INTERVAL) // Set the duration of the animation to 1000 milliseconds (1 second)
-      // .easing(Easing.Quadratic.InOut) // Set the easing function for the animation
-      .onUpdate(() => {
-        // Update the position of the object on each frame of the animation
-        this.mesh.position.copy(startPosition);
-      })
-      .start(); // Start the animation
+
+    animator.animate(`flier-move-${this.id}`, TICK_INTERVAL, (progress) => {
+      // Update the position of the object on each frame of the animation
+      this.mesh.position.lerpVectors(startPosition, nextPosition, progress);
+    });
 
     this.dispatchEvent({ type: "position", position: this.mesh.position });
 

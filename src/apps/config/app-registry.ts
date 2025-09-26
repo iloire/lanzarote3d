@@ -43,17 +43,6 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       status: "dev",
       priority: 3
     },
-    photobooth: {
-      name: "3D Showcase",
-      description: "Beautiful static 3D scene showcasing paragliders and environment",
-      entry: "./experiences/photobooth/index.tsx",
-      route: "/photobooth",
-      category: "experience",
-      requiresWebGL: true,
-      tags: ["showcase", "static", "visual", "presentation"],
-      status: "public",
-      priority: 2
-    }
   },
 
   tools: {
@@ -92,6 +81,17 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       tags: ["cinematic", "automated", "demonstration", "showcase"],
       status: "public",
       priority: 1
+    },
+    photobooth: {
+      name: "3D Showcase",
+      description: "Beautiful static 3D scene showcasing paragliders and environment",
+      entry: "./demos/photobooth/index.tsx",
+      route: "/photobooth",
+      category: "demo",
+      requiresWebGL: true,
+      tags: ["showcase", "static", "visual", "presentation"],
+      status: "public",
+      priority: 2
     },
 
     // Workshop Component Demos

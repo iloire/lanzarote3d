@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { rndBetween, rndIntBetween } from "../../utils/math";
-import { Tween, Easing } from "@tweenjs/tween.js";
+import { animator } from "../../systems/animation/SimpleAnimator";
 
 const generateCloudPart = (
   radius: number,
@@ -54,11 +54,12 @@ const tweakSize = (mesh: THREE.Object3D, interval: number) => {
   const scaleY = mesh.scale.y * multiplier;
   const scaleZ = mesh.scale.z * multiplier;
 
+  const startScale = mesh.scale.clone();
   const targetPosition = new THREE.Vector3(scaleX, scaleY, scaleZ);
-  new Tween(mesh.scale)
-    .to(targetPosition, interval)
-    .easing(Easing.Cubic.InOut)
-    .start();
+
+  animator.animate(`cloud-scale-${Math.random()}`, interval, (progress) => {
+    mesh.scale.lerpVectors(startScale, targetPosition, progress);
+  });
 };
 
 const tweakPos = (mesh: THREE.Object3D, interval: number) => {
@@ -69,11 +70,12 @@ const tweakPos = (mesh: THREE.Object3D, interval: number) => {
   const posY = mesh.position.y * multiplier;
   const posZ = mesh.position.z * multiplier;
 
+  const startPosition = mesh.position.clone();
   const targetPosition = new THREE.Vector3(posX, posY, posZ);
-  new Tween(mesh.position)
-    .to(targetPosition, interval)
-    .easing(Easing.Cubic.InOut)
-    .start();
+
+  animator.animate(`cloud-pos-${Math.random()}`, interval, (progress) => {
+    mesh.position.lerpVectors(startPosition, targetPosition, progress);
+  });
 };
 
 export type CloudOptions = {

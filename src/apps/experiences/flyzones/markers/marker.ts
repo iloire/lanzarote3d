@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Tween } from '@tweenjs/tween.js';
+import { animator } from '../../../../foundation/systems/animation/SimpleAnimator';
 import { MarkerType } from '../helpers/types';
 import { PIN_COLORS, PIN_SIZES, PIN_FADE_DURATION } from '../config/marker-config';
 import { Paraglider } from '../../../../foundation/components/vehicles';
@@ -259,47 +259,74 @@ export const setupPinBasics = (pin: THREE.Object3D, position: THREE.Vector3, typ
 export const createHoverAnimations = (pin: THREE.Object3D, isTakeoff: boolean) => {
   if (isMeshWithMaterial(pin)) {
     const colors = isTakeoff ? PIN_COLORS[MarkerType.TAKEOFF] : PIN_COLORS[MarkerType.LOCATION];
+    const startOpacity = pin.material.opacity || 0.8;
+    const startEmissive = pin.material.emissive.clone();
+
     return {
-      hover: new Tween(pin.material)
-        .to({ opacity: 1, emissive: new THREE.Color(colors.main) }, 200),
-      unhover: new Tween(pin.material)
-        .to({ opacity: 0.8, emissive: new THREE.Color(colors.emissive) }, 200)
+      hover: {
+        start: () => {
+          animator.animate(`hover-${pin.id}`, 200, (progress) => {
+            if ('opacity' in pin.material) {
+              pin.material.opacity = THREE.MathUtils.lerp(startOpacity, 1, progress);
+            }
+            if ('emissive' in pin.material) {
+              pin.material.emissive.lerpColors(startEmissive, new THREE.Color(colors.main), progress);
+            }
+          });
+        }
+      },
+      unhover: {
+        start: () => {
+          animator.animate(`unhover-${pin.id}`, 200, (progress) => {
+            if ('opacity' in pin.material) {
+              pin.material.opacity = THREE.MathUtils.lerp(1, 0.8, progress);
+            }
+            if ('emissive' in pin.material) {
+              pin.material.emissive.lerpColors(new THREE.Color(colors.main), new THREE.Color(colors.emissive), progress);
+            }
+          });
+        }
+      }
     };
   }
   return {
-    hover: new Tween({}).to({}, 0),
-    unhover: new Tween({}).to({}, 0)
+    hover: { start: () => {} },
+    unhover: { start: () => {} }
   };
 };
 
 export const createFadeAnimation = (pin: THREE.Object3D) => {
   const fadeTargets: { material: THREE.Material }[] = [];
-  
+
   pin.traverse((child) => {
     if (child instanceof THREE.Mesh && child.material) {
       fadeTargets.push({ material: child.material });
     }
   });
-  
+
   return {
-    fadeIn: new Tween({ opacity: 0 })
-      .to({ opacity: 1 }, PIN_FADE_DURATION)
-      .onUpdate(({ opacity }) => {
-        fadeTargets.forEach(target => {
-          if ('opacity' in target.material) {
-            target.material.opacity = opacity;
-          }
+    fadeIn: {
+      start: () => {
+        animator.animate(`fade-in-${pin.id}`, PIN_FADE_DURATION, (progress) => {
+          fadeTargets.forEach(target => {
+            if ('opacity' in target.material) {
+              target.material.opacity = THREE.MathUtils.lerp(0, 1, progress);
+            }
+          });
         });
-      }),
-    fadeOut: new Tween({ opacity: 1 })
-      .to({ opacity: 0 }, PIN_FADE_DURATION)
-      .onUpdate(({ opacity }) => {
-        fadeTargets.forEach(target => {
-          if ('opacity' in target.material) {
-            target.material.opacity = opacity;
-          }
+      }
+    },
+    fadeOut: {
+      start: () => {
+        animator.animate(`fade-out-${pin.id}`, PIN_FADE_DURATION, (progress) => {
+          fadeTargets.forEach(target => {
+            if ('opacity' in target.material) {
+              target.material.opacity = THREE.MathUtils.lerp(1, 0, progress);
+            }
+          });
         });
-      })
+      }
+    }
   };
 };
 
