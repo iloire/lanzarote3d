@@ -217,16 +217,37 @@ class AnimationApp extends AppBase {
           if (controls) {
             controls.enabled = true;
           }
+          // Allow floating motion to begin
+          this.animatorInstance = undefined;
         }
       );
     }, 100);
   }
 
   private startAnimationLoop(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.Camera): void {
+    let startTime = Date.now();
+
     const animate = () => {
       try {
         // Update performance monitoring
         this.updatePerformance();
+
+        // Add gentle floating motion like a cloud
+        const time = (Date.now() - startTime) * 0.0005; // Slow motion
+        const floatAmplitude = 8; // Vertical float range in units
+        const floatSpeed = 0.8; // Speed of floating motion
+
+        // Store original position during animation, only apply floating after animation completes
+        if (this.animatorInstance === undefined) {
+          // Apply subtle floating motion in multiple directions for more natural cloud-like movement
+          const floatY = Math.sin(time * floatSpeed) * floatAmplitude;
+          const floatX = Math.sin(time * floatSpeed * 0.7) * (floatAmplitude * 0.3); // Slower, smaller horizontal drift
+          const floatZ = Math.cos(time * floatSpeed * 0.5) * (floatAmplitude * 0.2); // Even slower depth variation
+
+          camera.position.y += floatY * 0.02; // Very gentle motion
+          camera.position.x += floatX * 0.01;
+          camera.position.z += floatZ * 0.01;
+        }
 
         renderer.render(scene, camera);
         this.animationId = requestAnimationFrame(animate);
