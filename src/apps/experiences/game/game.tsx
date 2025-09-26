@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { createRoot } from 'react-dom/client';
 import * as THREE from 'three';
 import BackgroundSound from '../../../foundation/systems/audio/BackgroundAudio';
@@ -8,7 +8,6 @@ import Vario from '../../../foundation/systems/audio/VarioSound';
 import { Weather, WeatherOptions } from '../../../foundation/components/physics';
 import { CameraMode } from '../../../foundation/systems/scene/CameraController';
 import UIControls, { FirstPersonViewLook } from './ui-controls';
-import { Trajectory } from '../../../foundation/components/ui';
 import Analytics from '../../../foundation/systems/analytics/UserAnalytics';
 import { GameStartOptions, GameStatus } from './types';
 import { addGameEnvironment } from './env';
@@ -36,39 +35,39 @@ const WEATHER_SETTINGS: WeatherOptions = {
   lclLevel: 1800,
 };
 
-const addWindIndicatorToScene = (scene: THREE.Scene, flier: Flier, weather: Weather) => {
-  const windIndicator = new WindIndicator(40);
-  const arrow = windIndicator.load(
-    WEATHER_SETTINGS.windDirectionDegreesFromNorth,
-    flier.position().add(flier.direction())
-  );
-  scene.add(arrow);
-  flier.addEventListener('position', event => {
-    arrow.position.copy(event.position).add(flier.direction().multiplyScalar(300));
-  });
+// const addWindIndicatorToScene = (scene: THREE.Scene, flier: Flier, weather: Weather) => {
+//   const windIndicator = new WindIndicator(40);
+//   const arrow = windIndicator.load(
+//     WEATHER_SETTINGS.windDirectionDegreesFromNorth,
+//     flier.position().add(flier.direction())
+//   );
+//   scene.add(arrow);
+//   flier.addEventListener('position', event => {
+//     arrow.position.copy(event.position).add(flier.direction().multiplyScalar(300));
+//   });
 
-  weather.addEventListener('wind-directionChange', event => {
-    windIndicator.update(event.value);
-  });
-};
+//   weather.addEventListener('wind-directionChange', event => {
+//     windIndicator.update(event.value);
+//   });
+// };
 
-const analytics = new Analytics();
+// const analytics = new Analytics();
 
 /**
  * Game App - Interactive paragliding simulation with physics and controls
  * Fifth app converted to use AppBase architecture
  */
 class GameApp extends AppBase {
-  private animationId?: number;
-  private weather?: Weather;
-  private bgMusic?: BackgroundSound;
-  private vario?: Vario;
-  private pg?: Flier;
-  private analytics?: Analytics;
+  private animationId: number | undefined;
+  private weather: Weather | undefined;
+  private bgMusic: BackgroundSound | undefined;
+  private vario: Vario | undefined;
+  private pg: Flier | undefined;
+  private analytics: Analytics | undefined;
   private gameStatus: GameStatus = GameStatus.NonStarted;
   private eventListeners: (() => void)[] = [];
-  private trajectoryMesh?: THREE.Object3D;
-  private uiRoot?: any;
+  private trajectoryMesh: THREE.Object3D | undefined;
+  private uiRoot: any | undefined;
 
   constructor() {
     super({
@@ -176,7 +175,7 @@ class GameApp extends AppBase {
 
   }
 
-  private setupGameControls(camera: any, controls: any, scene: THREE.Scene, renderer: THREE.WebGLRenderer, gui: any): void {
+  private setupGameControls(_camera: any, _controls: any, _scene: THREE.Scene, _renderer: THREE.WebGLRenderer, gui: any): void {
     const onDocumentKeyDown = (event: KeyboardEvent) => {
       const keyCode = event.which;
       if (keyCode === 90) {
@@ -220,11 +219,11 @@ class GameApp extends AppBase {
       });
   }
 
-  private setCameraMode(mode: CameraMode, camera: any): void {
-    camera.setCameraMode(mode, this.pg);
+  private setCameraMode(_mode: CameraMode, camera: any): void {
+    camera.setCameraMode(_mode, this.pg);
     const mesh = this.pg?.getMesh();
     if (mesh) {
-      if (mode === CameraMode.FirstPersonView) {
+      if (_mode === CameraMode.FirstPersonView) {
         mesh.visible = false;
       } else {
         mesh.visible = true;
@@ -259,9 +258,9 @@ class GameApp extends AppBase {
         onTurnMouseInputChange={(direction: number) => {
           this.pg?.directionInput(direction);
         }}
-        onViewUIChange={(direction: FirstPersonViewLook) => {
+        onViewUIChange={(_direction: FirstPersonViewLook) => {
           if (this.gameStatus === GameStatus.Started) {
-            // camera.lookDirection(direction.x, direction.y); // TODO: Fix camera reference
+            // camera.lookDirection(_direction.x, _direction.y); // TODO: Fix camera reference
           }
         }}
         onGameStart={(options: GameStartOptions, fnHideStartButton) => {
@@ -405,7 +404,7 @@ class GameApp extends AppBase {
     animate();
   }
 
-  public dispose(): void {
+  public override dispose(): void {
     console.log(`🧹 Disposing ${this.config.name}`);
 
     // Cancel animation loop
@@ -442,14 +441,18 @@ class GameApp extends AppBase {
 
     // Dispose trajectory mesh if exists
     if (this.trajectoryMesh) {
-      if (this.trajectoryMesh.geometry) {
-        this.trajectoryMesh.geometry.dispose();
-      }
-      if (Array.isArray(this.trajectoryMesh.material)) {
-        this.trajectoryMesh.material.forEach(material => material.dispose());
-      } else if (this.trajectoryMesh.material) {
-        this.trajectoryMesh.material.dispose();
-      }
+      this.trajectoryMesh.traverse((child) => {
+        if (child instanceof THREE.Mesh) {
+          if (child.geometry) child.geometry.dispose();
+          if (child.material) {
+            if (Array.isArray(child.material)) {
+              child.material.forEach((material: THREE.Material) => material.dispose());
+            } else {
+              child.material.dispose();
+            }
+          }
+        }
+      });
       this.trajectoryMesh = undefined;
     }
 
