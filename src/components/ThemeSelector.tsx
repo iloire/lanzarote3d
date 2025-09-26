@@ -127,12 +127,8 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
         }}
         title={theme.description}
       >
-        <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>
-          {theme.name}
-        </div>
-        <div style={{ fontSize: '10px', opacity: 0.8 }}>
-          {theme.category || 'general'}
-        </div>
+        <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>{theme.name}</div>
+        <div style={{ fontSize: '10px', opacity: 0.8 }}>{theme.category || 'general'}</div>
       </button>
     );
   };
@@ -168,14 +164,16 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
         </button>
 
         {isOpen && (
-          <div style={{
-            background: 'rgba(0,0,0,0.9)',
-            border: '1px solid #666',
-            borderRadius: '4px',
-            padding: '10px',
-            maxHeight: '300px',
-            overflowY: 'auto' as const,
-          }}>
+          <div
+            style={{
+              background: 'rgba(0,0,0,0.9)',
+              border: '1px solid #666',
+              borderRadius: '4px',
+              padding: '10px',
+              maxHeight: '300px',
+              overflowY: 'auto' as const,
+            }}
+          >
             {isApplying && (
               <div style={{ color: '#F64A8A', fontSize: '12px', marginBottom: '10px' }}>
                 🔄 Applying theme...
@@ -186,13 +184,15 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
               const categoryThemes = themeManager.getThemesByCategory(category);
               return (
                 <div key={category} style={{ marginBottom: '10px' }}>
-                  <div style={{
-                    color: '#F64A8A',
-                    fontSize: '12px',
-                    fontWeight: 'bold',
-                    marginBottom: '5px',
-                    textTransform: 'uppercase' as const,
-                  }}>
+                  <div
+                    style={{
+                      color: '#F64A8A',
+                      fontSize: '12px',
+                      fontWeight: 'bold',
+                      marginBottom: '5px',
+                      textTransform: 'uppercase' as const,
+                    }}
+                  >
                     {category} ({categoryThemes.length})
                   </div>
                   {categoryThemes.map(this.renderThemeButton)}
@@ -241,38 +241,44 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
         </button>
 
         {isOpen && (
-          <div style={{
-            position: 'absolute' as const,
-            left: '100%',
-            top: '0',
-            background: 'rgba(0,0,0,0.95)',
-            border: '2px solid #F64A8A',
-            borderRadius: '8px',
-            padding: '15px',
-            minWidth: '280px',
-            maxHeight: '400px',
-            overflowY: 'auto' as const,
-            zIndex: 9999,
-            boxShadow: '0 8px 32px rgba(0,0,0,0.8)',
-          }}>
-            <div style={{
-              color: '#F64A8A',
-              fontSize: '14px',
-              fontWeight: 'bold',
-              marginBottom: '10px',
-              borderBottom: '1px solid #333',
-              paddingBottom: '8px',
-            }}>
+          <div
+            style={{
+              position: 'absolute' as const,
+              left: '100%',
+              top: '0',
+              background: 'rgba(0,0,0,0.95)',
+              border: '2px solid #F64A8A',
+              borderRadius: '8px',
+              padding: '15px',
+              minWidth: '280px',
+              maxHeight: '400px',
+              overflowY: 'auto' as const,
+              zIndex: 9999,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.8)',
+            }}
+          >
+            <div
+              style={{
+                color: '#F64A8A',
+                fontSize: '14px',
+                fontWeight: 'bold',
+                marginBottom: '10px',
+                borderBottom: '1px solid #333',
+                paddingBottom: '8px',
+              }}
+            >
               🎨 Choose Theme
             </div>
 
             {isApplying && (
-              <div style={{
-                color: '#F64A8A',
-                fontSize: '12px',
-                marginBottom: '10px',
-                textAlign: 'center' as const,
-              }}>
+              <div
+                style={{
+                  color: '#F64A8A',
+                  fontSize: '12px',
+                  marginBottom: '10px',
+                  textAlign: 'center' as const,
+                }}
+              >
                 🔄 Applying theme...
               </div>
             )}
@@ -281,14 +287,16 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
               const categoryThemes = themeManager.getThemesByCategory(category);
               return (
                 <div key={category} style={{ marginBottom: '15px' }}>
-                  <div style={{
-                    color: '#F64A8A',
-                    fontSize: '11px',
-                    fontWeight: 'bold',
-                    marginBottom: '8px',
-                    textTransform: 'uppercase' as const,
-                    letterSpacing: '0.5px',
-                  }}>
+                  <div
+                    style={{
+                      color: '#F64A8A',
+                      fontSize: '11px',
+                      fontWeight: 'bold',
+                      marginBottom: '8px',
+                      textTransform: 'uppercase' as const,
+                      letterSpacing: '0.5px',
+                    }}
+                  >
                     📂 {category} ({categoryThemes.length})
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '4px' }}>
@@ -298,14 +306,16 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
               );
             })}
 
-            <div style={{
-              fontSize: '10px',
-              color: '#999',
-              marginTop: '15px',
-              paddingTop: '10px',
-              borderTop: '1px solid #333',
-              textAlign: 'center' as const,
-            }}>
+            <div
+              style={{
+                fontSize: '10px',
+                color: '#999',
+                marginTop: '15px',
+                paddingTop: '10px',
+                borderTop: '1px solid #333',
+                textAlign: 'center' as const,
+              }}
+            >
               💡 Themes change lighting, colors, and atmosphere in real-time
             </div>
           </div>
