@@ -87,14 +87,14 @@ class FamaraApp extends AppBase {
       await this.environment.addBirds(birdPath);
 
       // Add hang glider for variety (different from paragliders)
-      const hangGliderPath = [
-        new THREE.Vector3(6000, 1500, -200),
-        new THREE.Vector3(6200, 1400, -400),
-        new THREE.Vector3(6400, 1300, -600),
-        new THREE.Vector3(6600, 1200, -400),
-        new THREE.Vector3(6400, 1100, -200),
-      ];
-      await this.environment.addHangGlider(hangGliderPath);
+      // const hangGliderPath = [
+      //   new THREE.Vector3(6000, 1500, -200),
+      //   new THREE.Vector3(6200, 1400, -400),
+      //   new THREE.Vector3(6400, 1300, -600),
+      //   new THREE.Vector3(6600, 1200, -400),
+      //   new THREE.Vector3(6400, 1100, -200),
+      // ];
+      // await this.environment.addHangGlider(hangGliderPath);
 
       // Start animation loop
       this.startAnimationLoop(renderer, scene, camera, controls);
