@@ -76,13 +76,13 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       requiresWebGL: true,
       tags: ["development", "components", "testing", "demo"],
       status: "public",
-      priority: 1
+      priority: 9
     }
   },
 
   demos: {
     animation: {
-      name: "Flight Animation",
+      name: "Famara",
       description: "Automated cinematic flight demonstration showcasing 3D capabilities",
       entry: "./demos/animation/index.tsx",
       route: "/animation",
@@ -103,7 +103,7 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       requiresWebGL: true,
       tags: ["weather", "environment", "effects"],
       status: "public",
-      priority: 5
+      priority: 2
     },
     night: {
       name: "Night Mode",
@@ -114,7 +114,7 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       requiresWebGL: true,
       tags: ["lighting", "atmosphere", "visual"],
       status: "public",
-      priority: 6
+      priority: 3
     },
     'paraglider-voxel': {
       name: "Paraglider Voxel",
@@ -125,7 +125,7 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       requiresWebGL: true,
       tags: ["voxel", "paraglider", "component"],
       status: "public",
-      priority: 7
+      priority: 3
     },
 
     // Development Demos
@@ -236,7 +236,7 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
  */
 export function getAppsByCategory(category: 'experience' | 'tool' | 'demo'): Record<string, AppMetadata> {
   const categoryKey = category === 'experience' ? 'experiences' :
-                      category === 'tool' ? 'tools' : 'demos';
+    category === 'tool' ? 'tools' : 'demos';
   return APP_REGISTRY[categoryKey] || {};
 }
 
