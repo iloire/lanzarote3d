@@ -120,7 +120,7 @@ const createHalfWing = (options: GliderOptions): HalfWing => {
     frontCajones.add(frontCajon);
   }
 
-  const band = createBand({ color: 'red', bandLength: options.bandLength || 0 });
+  const band = createBand({ color: 'red', bandLength: options.bandLength || DEFAULT_BAND_LENGTH });
   band.position.copy(carabinerLocation);
 
   group.add(band);
