@@ -62,12 +62,12 @@ export class AssetManager {
     return new Promise((resolve, reject) => {
       this.textureLoader.load(
         fullPath,
-        (texture) => {
+        texture => {
           this.cache.set(fullPath, texture);
           resolve(texture);
         },
         undefined,
-        (error) => {
+        error => {
           console.error(`Failed to load texture: ${path}`, error);
           reject(error);
         }
@@ -88,12 +88,12 @@ export class AssetManager {
     return new Promise((resolve, reject) => {
       this.audioLoader.load(
         fullPath,
-        (buffer) => {
+        buffer => {
           this.cache.set(fullPath, buffer);
           resolve(buffer);
         },
         undefined,
-        (error) => {
+        error => {
           console.error(`Failed to load audio: ${path}`, error);
           reject(error);
         }
@@ -169,7 +169,7 @@ export class AssetManager {
   static getCacheInfo(): { size: number; keys: string[] } {
     return {
       size: this.cache.size,
-      keys: Array.from(this.cache.keys())
+      keys: Array.from(this.cache.keys()),
     };
   }
 
@@ -178,7 +178,7 @@ export class AssetManager {
     return new Promise((resolve, reject) => {
       this.gltfLoader.load(
         path,
-        (gltf) => {
+        gltf => {
           this.cache.set(path, gltf);
           resolve(gltf);
         },
@@ -192,7 +192,7 @@ export class AssetManager {
     return new Promise((resolve, reject) => {
       this.objLoader.load(
         path,
-        (object) => {
+        object => {
           this.cache.set(path, object);
           resolve(object);
         },
@@ -206,7 +206,7 @@ export class AssetManager {
     return new Promise((resolve, reject) => {
       this.textureLoader.load(
         path,
-        (texture) => {
+        texture => {
           this.cache.set(path, texture);
           resolve(texture);
         },
@@ -220,7 +220,7 @@ export class AssetManager {
     return new Promise((resolve, reject) => {
       this.audioLoader.load(
         path,
-        (buffer) => {
+        buffer => {
           this.cache.set(path, buffer);
           resolve(buffer);
         },

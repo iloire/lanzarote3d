@@ -87,7 +87,10 @@ export class ThemeEngine {
     if (sky.fogEnabled === false) {
       // Explicitly disable fog
       options.scene.fog = null;
-    } else if (sky.fogEnabled === true || (sky.fogEnabled === undefined && sky.fogColor && sky.fogDensity !== undefined)) {
+    } else if (
+      sky.fogEnabled === true ||
+      (sky.fogEnabled === undefined && sky.fogColor && sky.fogDensity !== undefined)
+    ) {
       // Apply fog if explicitly enabled OR if fog properties are defined (backward compatibility)
       const fogColor = new THREE.Color(sky.fogColor || '#000000');
       const fogDensity = sky.fogDensity !== undefined ? sky.fogDensity : 0.001;

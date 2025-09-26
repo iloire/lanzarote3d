@@ -1,5 +1,5 @@
-import * as THREE from "three";
-import GuiHelper from "../../utils/gui";
+import * as THREE from 'three';
+import GuiHelper from '../../utils/gui';
 
 const mat = new THREE.MeshLambertMaterial({ color: 0xffffff });
 const sail_mat = new THREE.MeshLambertMaterial({ color: 0x666666 });
@@ -16,7 +16,7 @@ class Boat {
     mesh.add(meshSail);
 
     if (gui) {
-      GuiHelper.addLocationGui(gui, "boat", mesh);
+      GuiHelper.addLocationGui(gui, 'boat', mesh);
     }
     return mesh;
   }

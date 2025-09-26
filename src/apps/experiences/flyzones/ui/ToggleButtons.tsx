@@ -25,7 +25,7 @@ const ToggleButtons: React.FC<ToggleButtonsProps> = ({
     cursor: 'pointer',
     transition: 'all 0.2s ease',
     boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
-    marginBottom: '4px'
+    marginBottom: '4px',
   });
 
   return (
@@ -33,12 +33,12 @@ const ToggleButtons: React.FC<ToggleButtonsProps> = ({
       <button
         onClick={() => onToggleLandings(!landingMarkersVisible)}
         style={buttonStyle(landingMarkersVisible)}
-        onMouseEnter={(e) => {
+        onMouseEnter={e => {
           e.currentTarget.style.transform = 'translateY(-1px)';
           e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.4)';
           e.currentTarget.style.filter = 'brightness(1.1)';
         }}
-        onMouseLeave={(e) => {
+        onMouseLeave={e => {
           e.currentTarget.style.transform = 'translateY(0)';
           e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
           e.currentTarget.style.filter = 'brightness(1)';
@@ -52,12 +52,12 @@ const ToggleButtons: React.FC<ToggleButtonsProps> = ({
           id="ruler-toggle-btn"
           onClick={onToggleRuler}
           style={buttonStyle(false)}
-          onMouseEnter={(e) => {
+          onMouseEnter={e => {
             e.currentTarget.style.transform = 'translateY(-1px)';
             e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.4)';
             e.currentTarget.style.filter = 'brightness(1.1)';
           }}
-          onMouseLeave={(e) => {
+          onMouseLeave={e => {
             e.currentTarget.style.transform = 'translateY(0)';
             e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
             e.currentTarget.style.filter = 'brightness(1)';

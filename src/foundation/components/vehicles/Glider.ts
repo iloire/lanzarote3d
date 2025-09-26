@@ -1,5 +1,5 @@
-import * as THREE from "three";
-import GuiHelper from "../../utils/gui";
+import * as THREE from 'three';
+import GuiHelper from '../../utils/gui';
 
 const halfWingLength = 4000; // mm
 const DEFAULT_BAND_LENGTH = 400; //mm
@@ -14,8 +14,8 @@ const DEFAULT_OPTIONS: GliderOptions = {
   lineFrontColor: '#ffffff',
   lineBackColor: '#ffffff',
   inletsColor: '#333333',
-  numeroCajones: 40
-}
+  numeroCajones: 40,
+};
 
 export type GliderOptions = {
   wingColor1?: string;
@@ -27,7 +27,7 @@ export type GliderOptions = {
   numeroCajones?: number;
   carabinersSeparationMM?: number;
   bandLength?: number;
-}
+};
 
 type HalfWing = {
   wingBreakSystem: THREE.Object3D;
@@ -71,8 +71,16 @@ const createHalfWing = (options: GliderOptions): HalfWing => {
 
   let shape = 0;
 
-  const carabinerLocation = new THREE.Vector3(-3000, halfWingLength - (options.carabinersSeparationMM || defaultCarabinersSeparationMM) / 2, 0);
-  const handsLocation = new THREE.Vector3(-3100, halfWingLength - (options.carabinersSeparationMM || defaultCarabinersSeparationMM) / 2, 120);
+  const carabinerLocation = new THREE.Vector3(
+    -3000,
+    halfWingLength - (options.carabinersSeparationMM || defaultCarabinersSeparationMM) / 2,
+    0
+  );
+  const handsLocation = new THREE.Vector3(
+    -3100,
+    halfWingLength - (options.carabinersSeparationMM || defaultCarabinersSeparationMM) / 2,
+    120
+  );
   const breaksJoinLocation = new THREE.Vector3(-2400, halfWingLength / 1.1, 250);
 
   for (let n = 0; n < options.numeroCajones; n++) {
@@ -84,7 +92,7 @@ const createHalfWing = (options: GliderOptions): HalfWing => {
 
     const cajon = createCajon(cajonWidth, cajonHeight, deep, mat_wing);
 
-    shape = shape + (options.numeroCajones - n) ^ 2 * 13.05;
+    shape = (shape + (options.numeroCajones - n)) ^ (2 * 13.05);
     cajon.position.set(shape, distanceCajon, 0);
 
     const breakDeep = deep / 10;
@@ -136,7 +144,9 @@ const createHalfWing = (options: GliderOptions): HalfWing => {
   breakJoinToHandLocations.push(breaksJoinLocation);
   breakJoinToHandLocations.push(handsLocation);
 
-  const geometryBreakJoinToHand = new THREE.BufferGeometry().setFromPoints(breakJoinToHandLocations); // create the geometry from the points
+  const geometryBreakJoinToHand = new THREE.BufferGeometry().setFromPoints(
+    breakJoinToHandLocations
+  ); // create the geometry from the points
   const breakJoinToHandSegments = new THREE.LineSegments(geometryBreakJoinToHand, breakLineMat); // create the line segments
   group.add(breakJoinToHandSegments);
   //
@@ -144,12 +154,10 @@ const createHalfWing = (options: GliderOptions): HalfWing => {
   return { wing: group, wingBreakSystem };
 };
 
-
 type BandOptions = {
   color: string;
   bandLength: number;
-
-}
+};
 const createBand = (options: BandOptions) => {
   const bandLength = options.bandLength || DEFAULT_BAND_LENGTH;
   const mat = new THREE.MeshLambertMaterial({ color: options.color });
@@ -161,20 +169,19 @@ const createBand = (options: BandOptions) => {
   band.translateY(bandLength / 2);
   group.add(band);
   return group;
-}
-
+};
 
 class Glider {
   leftWing!: HalfWing;
   rightWing!: HalfWing;
   fullWing!: THREE.Mesh;
 
-  options: GliderOptions
+  options: GliderOptions;
 
   constructor(options: GliderOptions) {
     this.options = {
       ...DEFAULT_OPTIONS,
-      ...options
+      ...options,
     };
   }
 
@@ -197,7 +204,10 @@ class Glider {
     this.leftWing = createHalfWing(this.options);
     this.leftWing.wing.scale.z = -1;
 
-    this.rightWing = { wing: this.leftWing.wing.clone(), wingBreakSystem: this.leftWing.wingBreakSystem.clone() };
+    this.rightWing = {
+      wing: this.leftWing.wing.clone(),
+      wingBreakSystem: this.leftWing.wingBreakSystem.clone(),
+    };
     this.rightWing.wing.scale.y = -1;
     this.rightWing.wing.translateY(halfWingLength * 2);
 
@@ -212,9 +222,9 @@ class Glider {
   async load(gui?: any): Promise<THREE.Mesh> {
     const wing = this.createWing();
     if (gui) {
-      GuiHelper.addLocationGui(gui, "leftWing", this.leftWing.wing);
-      GuiHelper.addLocationGui(gui, "rightWing", this.rightWing.wing);
-      GuiHelper.addLocationGui(gui, "wing", this.fullWing);
+      GuiHelper.addLocationGui(gui, 'leftWing', this.leftWing.wing);
+      GuiHelper.addLocationGui(gui, 'rightWing', this.rightWing.wing);
+      GuiHelper.addLocationGui(gui, 'wing', this.fullWing);
     }
     return wing;
   }

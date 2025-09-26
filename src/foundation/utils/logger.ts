@@ -8,7 +8,7 @@ export enum LogLevel {
   INFO = 1,
   WARN = 2,
   ERROR = 3,
-  NONE = 4
+  NONE = 4,
 }
 
 class Logger {
@@ -16,9 +16,10 @@ class Logger {
 
   constructor() {
     // Set log level based on environment
-    this.level = (typeof process !== 'undefined' && process.env?.['NODE_ENV']) === 'production'
-      ? LogLevel.WARN
-      : LogLevel.DEBUG;
+    this.level =
+      (typeof process !== 'undefined' && process.env?.['NODE_ENV']) === 'production'
+        ? LogLevel.WARN
+        : LogLevel.DEBUG;
   }
 
   debug(message: string, ...args: any[]): void {

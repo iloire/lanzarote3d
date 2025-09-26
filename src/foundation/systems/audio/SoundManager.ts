@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import * as THREE from 'three';
 
 export interface SoundConfig {
   volume?: number;
@@ -41,7 +41,7 @@ export class SoundManager {
       positional: false,
       maxDistance: 1000,
       rolloffFactor: 1,
-      ...config
+      ...config,
     };
 
     // Create appropriate audio object
@@ -60,7 +60,7 @@ export class SoundManager {
       source,
       config: finalConfig,
       isLoaded: false,
-      isPlaying: false
+      isPlaying: false,
     };
 
     this.sounds.set(id, soundInstance);
@@ -69,7 +69,7 @@ export class SoundManager {
     return new Promise((resolve, reject) => {
       this.audioLoader.load(
         source,
-        (buffer) => {
+        buffer => {
           audio.setBuffer(buffer);
           audio.setLoop(finalConfig.loop!);
           audio.setVolume(finalConfig.volume! * this.masterVolume);
@@ -81,7 +81,7 @@ export class SoundManager {
           resolve();
         },
         undefined,
-        (error) => {
+        error => {
           console.error(`Failed to load sound ${id}:`, error);
           reject(error);
         }

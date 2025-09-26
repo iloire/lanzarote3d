@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import * as THREE from 'three';
 
 const getSunGlasses1 = (): THREE.Group => {
   const group = new THREE.Group();
@@ -26,6 +26,6 @@ const getSunGlasses1 = (): THREE.Group => {
   group.add(glassu);
 
   return group;
-}
+};
 
 export default getSunGlasses1;

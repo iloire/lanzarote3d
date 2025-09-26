@@ -10,8 +10,8 @@ const metadata = {
   position: new THREE.Vector3(0, 0, 0), // Will be calculated from takeoffs
   cameraView: {
     position: new THREE.Vector3(5000, 2000, 5000),
-    lookAt: new THREE.Vector3(0, 0, 0) // Will be updated to match position
-  }
+    lookAt: new THREE.Vector3(0, 0, 0), // Will be updated to match position
+  },
 };
 
 // Teguise Takeoffs
@@ -21,69 +21,69 @@ const takeoffs: Takeoff[] = [
     title: 'Teguise Main Takeoff',
     description: 'Main takeoff point with excellent thermal conditions.',
     gps: {
-      latitude: 29.0750,
-      longitude: -13.5200,
-      altitude: 380
+      latitude: 29.075,
+      longitude: -13.52,
+      altitude: 380,
     },
-    position: gpsToWorld(29.0750, -13.5200, 380),
+    position: gpsToWorld(29.075, -13.52, 380),
     elevation: 380,
     conditions: [
       {
         direction: {
           ideal: 270,
-          range: [240, 300]
+          range: [240, 300],
         },
         speed: {
           min: 8,
           max: 22,
-          ideal: 15
+          ideal: 15,
         },
         rating: 5,
-        description: 'Perfect thermal conditions'
-      }
+        description: 'Perfect thermal conditions',
+      },
     ],
     mediaItems: [
       {
         type: 'image',
         url: '/assets/images/teguise-main.jpg',
-        title: 'Teguise Main Takeoff'
-      }
-    ]
+        title: 'Teguise Main Takeoff',
+      },
+    ],
   },
   {
     id: 'takeoff-teguise-east',
     title: 'Teguise East Takeoff',
     description: 'Eastern takeoff with good morning conditions.',
     gps: {
-      latitude: 29.0760,
-      longitude: -13.5150,
-      altitude: 350
+      latitude: 29.076,
+      longitude: -13.515,
+      altitude: 350,
     },
-    position: gpsToWorld(29.0760, -13.5150, 350),
+    position: gpsToWorld(29.076, -13.515, 350),
     elevation: 350,
     conditions: [
       {
         direction: {
           ideal: 90,
-          range: [60, 120]
+          range: [60, 120],
         },
         speed: {
           min: 5,
           max: 18,
-          ideal: 12
+          ideal: 12,
         },
         rating: 4,
-        description: 'Good morning conditions'
-      }
+        description: 'Good morning conditions',
+      },
     ],
     mediaItems: [
       {
         type: 'image',
         url: '/assets/images/teguise-east.jpg',
-        title: 'Teguise East'
-      }
-    ]
-  }
+        title: 'Teguise East',
+      },
+    ],
+  },
 ];
 
 // Teguise Landing Spots
@@ -93,21 +93,21 @@ const landingSpots: LandingSpot[] = [
     title: 'Teguise Main Landing',
     description: 'Main landing area with ample space and easy access.',
     gps: {
-      latitude: 29.0730,
-      longitude: -13.5180,
-      altitude: 120
+      latitude: 29.073,
+      longitude: -13.518,
+      altitude: 120,
     },
-    position: gpsToWorld(29.0730, -13.5180, 120),
+    position: gpsToWorld(29.073, -13.518, 120),
     elevation: 120,
     type: 'primary',
     mediaItems: [
       {
         type: 'image',
         url: '/assets/images/teguise-landing.jpg',
-        title: 'Teguise Landing'
-      }
-    ]
-  }
+        title: 'Teguise Landing',
+      },
+    ],
+  },
 ];
 
 // Teguise Flyzone
@@ -117,59 +117,62 @@ const flyzone: FlyZoneShape = {
     takeoff: {
       type: 'takeoff',
       gps: {
-        latitude: 29.0750,
-        longitude: -13.5200,
-        altitude: 380
+        latitude: 29.075,
+        longitude: -13.52,
+        altitude: 380,
       },
-      position: gpsToWorld(29.0750, -13.5200, 380),
+      position: gpsToWorld(29.075, -13.52, 380),
       dimensions: {
         width: 400,
         height: 100,
-        length: 400
+        length: 400,
       },
-      nextPhases: ['thermal']
+      nextPhases: ['thermal'],
     },
     thermal: {
       type: 'thermal',
       gps: {
-        latitude: 29.0740,
-        longitude: -13.5190,
-        altitude: 600
+        latitude: 29.074,
+        longitude: -13.519,
+        altitude: 600,
       },
-      position: gpsToWorld(29.0740, -13.5190, 600),
+      position: gpsToWorld(29.074, -13.519, 600),
       dimensions: {
         width: 1000,
         height: 800,
-        length: 1000
+        length: 1000,
       },
-      nextPhases: ['landing']
+      nextPhases: ['landing'],
     },
     landing: {
       type: 'landing',
       gps: {
-        latitude: 29.0730,
-        longitude: -13.5180,
-        altitude: 120
+        latitude: 29.073,
+        longitude: -13.518,
+        altitude: 120,
       },
-      position: gpsToWorld(29.0730, -13.5180, 120),
+      position: gpsToWorld(29.073, -13.518, 120),
       dimensions: {
         width: 600,
         height: 100,
-        length: 600
+        length: 600,
       },
-      nextPhases: []
-    }
-  }
+      nextPhases: [],
+    },
+  },
 };
 
 // Calculate the center position based on takeoffs
 const calculateCenterPosition = (takeoffs: Takeoff[]): THREE.Vector3 => {
   if (takeoffs.length === 0) return new THREE.Vector3(0, 0, 0);
-  
-  const sum = takeoffs.reduce((acc, takeoff) => {
-    return acc.add(takeoff.position);
-  }, new THREE.Vector3(0, 0, 0));
-  
+
+  const sum = takeoffs.reduce(
+    (acc, takeoff) => {
+      return acc.add(takeoff.position);
+    },
+    new THREE.Vector3(0, 0, 0)
+  );
+
   return sum.divideScalar(takeoffs.length);
 };
 
@@ -182,7 +185,7 @@ const teguise: Location = {
   ...metadata,
   takeoffs,
   landingSpots,
-  flyzone
+  flyzone,
 };
 
-export default teguise; 
+export default teguise;

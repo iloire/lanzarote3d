@@ -1,12 +1,10 @@
-import * as THREE from "three";
-import { BaseHead } from "./BaseHead";
-import { GlassesType } from "../../PilotHead";
-import getDefaultGlasses from "../glasses/default";
-import getSunGlasses1 from "../glasses/sunglasses1";
+import * as THREE from 'three';
+import { BaseHead } from './BaseHead';
+import { GlassesType } from '../../PilotHead';
+import getDefaultGlasses from '../glasses/default';
+import getSunGlasses1 from '../glasses/sunglasses1';
 
 export class DefaultHead extends BaseHead {
- 
-
   load(): THREE.Group {
     const group = new THREE.Group();
 
@@ -42,4 +40,4 @@ export class DefaultHead extends BaseHead {
 
     return group;
   }
-} 
+}

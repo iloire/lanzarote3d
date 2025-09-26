@@ -24,4 +24,4 @@ export const getConfig = () => {
 export const updateConfig = (newConfig: Partial<typeof defaultConfig>) => {
   Object.assign(defaultConfig, newConfig);
   return { ...defaultConfig };
-}; 
+};

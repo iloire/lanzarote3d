@@ -1,11 +1,10 @@
-import * as THREE from "three";
-import Models from "../../utils/models";
+import * as THREE from 'three';
+import Models from '../../utils/models';
 
 export type PilotVoxelOptions = {
   objFile: string;
-  textureFile: string
+  textureFile: string;
 };
-
 
 class PilotVoxel {
   options: PilotVoxelOptions;
@@ -18,7 +17,7 @@ class PilotVoxel {
     const mesh = await Models.loadObj(this.options.objFile);
     const textureLoader = new THREE.TextureLoader();
     const texture = textureLoader.load(this.options.textureFile);
-    mesh.traverse(function(child) {
+    mesh.traverse(function (child) {
       if (child.isMesh) {
         child.material.map = texture;
       }

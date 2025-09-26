@@ -1,6 +1,6 @@
-import Animations from "./animations";
-import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import Animations from './animations';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 type Callback = () => void | {};
 
@@ -87,11 +87,11 @@ const Navigation = (camera: THREE.PerspectiveCamera, controls: OrbitControls) =>
 
   // Store reference to listener for cleanup
   const keydownListener = onDocumentKeyDown;
-  document.addEventListener("keydown", keydownListener, false);
+  document.addEventListener('keydown', keydownListener, false);
 
   // Return cleanup function
   const cleanup = () => {
-    document.removeEventListener("keydown", keydownListener);
+    document.removeEventListener('keydown', keydownListener);
   };
 
   function onDocumentKeyDown(event) {
@@ -118,21 +118,21 @@ const Navigation = (camera: THREE.PerspectiveCamera, controls: OrbitControls) =>
   // Store point click listeners for cleanup
   const pointClickListeners = new Map<Element, EventListener>();
 
-  document.querySelectorAll(".point").forEach((item) => {
+  document.querySelectorAll('.point').forEach(item => {
     const clickListener = (event: Event) => {
       const target = event.target as Element;
       let className = target.classList[target.classList.length - 1];
       switch (className) {
-        case "label-0": // famara
+        case 'label-0': // famara
           nav.famara();
           break;
-        case "label-1": // mirador Orzola
+        case 'label-1': // mirador Orzola
           nav.orzola();
           break;
-        case "label-2": // macher
+        case 'label-2': // macher
           nav.macher();
           break;
-        case "label-3": // Tenesar
+        case 'label-3': // Tenesar
           nav.tenesar();
           break;
         default:
@@ -140,7 +140,7 @@ const Navigation = (camera: THREE.PerspectiveCamera, controls: OrbitControls) =>
       }
     };
 
-    item.addEventListener("click", clickListener, false);
+    item.addEventListener('click', clickListener, false);
     pointClickListeners.set(item, clickListener);
   });
 
@@ -150,10 +150,10 @@ const Navigation = (camera: THREE.PerspectiveCamera, controls: OrbitControls) =>
     dispose: () => {
       cleanup();
       pointClickListeners.forEach((listener, element) => {
-        element.removeEventListener("click", listener);
+        element.removeEventListener('click', listener);
       });
       pointClickListeners.clear();
-    }
+    },
   };
 
   return navWithCleanup;

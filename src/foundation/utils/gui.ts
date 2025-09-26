@@ -1,5 +1,5 @@
-import * as THREE from "three";
-import * as dat from "dat.gui";
+import * as THREE from 'three';
+import * as dat from 'dat.gui';
 
 export type GuiHelperOptions = {
   max: number;
@@ -15,14 +15,14 @@ const GuiHelper = {
   ) => {
     const { min, max } = options;
     const g = gui.addFolder(name);
-    g.add(rotation, "x", min, max)
-      .name(name + ".rotation.x")
+    g.add(rotation, 'x', min, max)
+      .name(name + '.rotation.x')
       .listen();
-    g.add(rotation, "y", min, max)
-      .name(name + ".rotation.y")
+    g.add(rotation, 'y', min, max)
+      .name(name + '.rotation.y')
       .listen();
-    g.add(rotation, "z", min, max)
-      .name(name + ".rotation.z")
+    g.add(rotation, 'z', min, max)
+      .name(name + '.rotation.z')
       .listen();
     g.open(false);
   },
@@ -35,26 +35,21 @@ const GuiHelper = {
   ) => {
     const { min, max } = options;
     const g = gui.addFolder(name);
-    g.add(pos, "x", min, max)
-      .name(name + ".position.x")
+    g.add(pos, 'x', min, max)
+      .name(name + '.position.x')
       .listen();
-    g.add(pos, "y", min, max)
-      .name(name + ".position.y")
+    g.add(pos, 'y', min, max)
+      .name(name + '.position.y')
       .listen();
-    g.add(pos, "z", min, max)
-      .name(name + ".position.z")
+    g.add(pos, 'z', min, max)
+      .name(name + '.position.z')
       .listen();
     g.open(false);
   },
 
-  addLocationGui: (
-    gui: dat.GUI,
-    name: string,
-    obj: THREE.Object3D,
-    options?: GuiHelperOptions
-  ) => {
-    GuiHelper.addPositionGui(gui, name + " position", obj.position, options);
-    GuiHelper.addRotationGui(gui, name + " rotation", obj.rotation);
+  addLocationGui: (gui: dat.GUI, name: string, obj: THREE.Object3D, options?: GuiHelperOptions) => {
+    GuiHelper.addPositionGui(gui, name + ' position', obj.position, options);
+    GuiHelper.addRotationGui(gui, name + ' rotation', obj.rotation);
   },
 };
 

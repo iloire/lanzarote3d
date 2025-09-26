@@ -1,5 +1,5 @@
-import * as THREE from "three";
-import { logger } from "./logger";
+import * as THREE from 'three';
+import { logger } from './logger';
 
 const Helpers = {
   drawSphericalPosition: (

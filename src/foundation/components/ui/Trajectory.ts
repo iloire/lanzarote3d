@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import * as THREE from 'three';
 
 export enum TrajectoryPointType {
   Normal,
@@ -22,7 +22,7 @@ const getColor = (type: TrajectoryPointType): number => {
   } else if (type === TrajectoryPointType.Ears) {
     return 0x000000;
   } else {
-    throw new Error("unsupported type");
+    throw new Error('unsupported type');
   }
 };
 
@@ -42,15 +42,15 @@ class Trajectory {
 
   constructor(points: TrajectoryPoint[], dotRadius: number) {
     this.points = points;
-    const vectors = points.map((p) => p.vector);
+    const vectors = points.map(p => p.vector);
     const geometry = new THREE.BufferGeometry().setFromPoints(vectors);
     const material = new THREE.LineBasicMaterial({ color: 0xffffff });
     const group = new THREE.Group();
     const line = new THREE.Line(geometry, material);
     group.add(line);
 
-    const balls = points.map((point) => this.createDot(dotRadius, point));
-    balls.forEach((ball) => group.add(ball));
+    const balls = points.map(point => this.createDot(dotRadius, point));
+    balls.forEach(ball => group.add(ball));
     this.mesh = group;
   }
 

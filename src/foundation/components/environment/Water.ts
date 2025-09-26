@@ -1,9 +1,9 @@
-import * as THREE from "three";
-import { Water as WaterEffect } from "three/examples/jsm/objects/Water";
+import * as THREE from 'three';
+import { Water as WaterEffect } from 'three/examples/jsm/objects/Water';
 
 export type WaterOptions = {
   size: number;
-}
+};
 
 export default class Water {
   options: WaterOptions;
@@ -14,7 +14,7 @@ export default class Water {
   }
 
   load(sunPosition: THREE.Vector3) {
-    console.log('=== water load')
+    console.log('=== water load');
     const waterGeometry = new THREE.PlaneGeometry(this.options.size, this.options.size);
     const mat = new THREE.MeshLambertMaterial({ color: 0x000511 });
     mat.transparent = true;
@@ -42,7 +42,7 @@ export default class Water {
    * Apply water theme settings to the water mesh
    */
   applyTheme(waterTheme: any) {
-    console.log('==== watertheme')
+    console.log('==== watertheme');
     if (!this.waterMesh || !this.waterMesh.material) return;
 
     const material = this.waterMesh.material as THREE.MeshLambertMaterial;

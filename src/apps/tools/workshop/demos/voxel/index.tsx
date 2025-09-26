@@ -19,20 +19,21 @@ class VoxelDemoApp extends AppBase {
   constructor() {
     super({
       name: 'Voxel Demo',
-      description: '3D voxel visualization demo with multiple lighting and STL export functionality',
+      description:
+        '3D voxel visualization demo with multiple lighting and STL export functionality',
       requiredComponents: ['scene', 'camera', 'controls', 'renderer'],
       scene: {
         environment: 'custom',
         lighting: 'static',
         physics: false,
         fog: {
-          enabled: false // Fog handled by theme system
-        }
+          enabled: false, // Fog handled by theme system
+        },
       },
       performance: {
         monitoring: true,
-        logIntervalMs: 30000 // Log performance every 30 seconds
-      }
+        logIntervalMs: 30000, // Log performance every 30 seconds
+      },
     });
   }
 
@@ -67,7 +68,6 @@ class VoxelDemoApp extends AppBase {
 
       this.isLoaded = true;
       console.log(`✅ ${this.config.name} loaded successfully`);
-
     } catch (error) {
       this.handleError(error as Error, 'load');
       throw error;
@@ -216,7 +216,7 @@ class VoxelDemoApp extends AppBase {
 
     // Dispose voxel example
     if (this.voxelExample) {
-      this.voxelExample.traverse((child) => {
+      this.voxelExample.traverse(child => {
         if (child instanceof THREE.Mesh) {
           if (child.geometry) child.geometry.dispose();
           if (child.material) {

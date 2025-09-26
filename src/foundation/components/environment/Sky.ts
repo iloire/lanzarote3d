@@ -1,17 +1,12 @@
-import * as THREE from "three";
-import { Sky as SkyExample } from "three/examples/jsm/objects/Sky";
-import {
-  Lensflare,
-  LensflareElement,
-} from "three/examples/jsm/objects/Lensflare.js";
-import lensflareTexture0 from "../../../../assets/foundation/textures/effects/lensflare0.png";
-import lensflareTexture1 from "../../../../assets/foundation/textures/effects/lensflare1.png";
-import Time from "../../utils/time";
-import GuiHelper from "../../utils/gui";
+import * as THREE from 'three';
+import { Sky as SkyExample } from 'three/examples/jsm/objects/Sky';
+import { Lensflare, LensflareElement } from 'three/examples/jsm/objects/Lensflare.js';
+import lensflareTexture0 from '../../../../assets/foundation/textures/effects/lensflare0.png';
+import lensflareTexture1 from '../../../../assets/foundation/textures/effects/lensflare1.png';
+import Time from '../../utils/time';
+import GuiHelper from '../../utils/gui';
 
-const calculateLightIntensity = (
-  timeOfDayInHours: number
-) => {
+const calculateLightIntensity = (timeOfDayInHours: number) => {
   // Increased all values to make colors more vibrant
   if (timeOfDayInHours < 6) {
     return 1.8;
@@ -40,9 +35,7 @@ const calculateLightIntensity = (
   return 1.8;
 };
 
-const calculateSunPosition = (
-  timeOfDayInHours: number
-): THREE.Vector3 => {
+const calculateSunPosition = (timeOfDayInHours: number): THREE.Vector3 => {
   const sunPosition = new THREE.Vector3();
   // phi is how far the point is from the North Pole
   const phi = THREE.MathUtils.degToRad(
@@ -80,21 +73,17 @@ export default class Sky extends THREE.Object3D {
   directionalLightHelper!: THREE.DirectionalLightHelper;
   skyOptions: SkyOptions;
 
-  constructor(
-    timeOfDayInHours: number,
-    monthOfTheYear: number,
-    skyOptions?: SkyOptions
-  ) {
+  constructor(timeOfDayInHours: number, monthOfTheYear: number, skyOptions?: SkyOptions) {
     super();
     this.sunPosition = calculateSunPosition(timeOfDayInHours);
     this.monthOfTheYear = monthOfTheYear;
     this.skyOptions = {
       ...defaultSkyOptions,
-      ...skyOptions
+      ...skyOptions,
     };
 
     this.sky = new SkyExample();
-    this.sky.material.uniforms["sunPosition"]?.value?.copy(this.sunPosition);
+    this.sky.material.uniforms['sunPosition']?.value?.copy(this.sunPosition);
     this.sky.scale.setScalar(10000000);
 
     const skyUniforms = this.sky.material.uniforms;
@@ -102,7 +91,7 @@ export default class Sky extends THREE.Object3D {
       if (skyUniforms[key]) {
         skyUniforms[key].value = this.skyOptions[key];
       } else {
-        console.error(key, "not found");
+        console.error(key, 'not found');
       }
     }
 
@@ -111,23 +100,14 @@ export default class Sky extends THREE.Object3D {
     this.pointLight = new THREE.PointLight(0xffffff, intensity, distance);
     this.pointLight.castShadow = true;
     this.pointLight.color.setHSL(0.995, 0.5, 0.9);
-    this.pointLight.position.copy(
-      this.sunPosition.clone().multiplyScalar(1000000)
-    );
+    this.pointLight.position.copy(this.sunPosition.clone().multiplyScalar(1000000));
 
-    const lightIntensity = calculateLightIntensity(
-      timeOfDayInHours
-    );
+    const lightIntensity = calculateLightIntensity(timeOfDayInHours);
 
-    this.directionalLight = new THREE.DirectionalLight(
-      0xffffff,
-      lightIntensity
-    );
+    this.directionalLight = new THREE.DirectionalLight(0xffffff, lightIntensity);
 
     this.directionalLight.castShadow = true;
-    this.directionalLight.position.copy(
-      this.sunPosition.clone().multiplyScalar(100000)
-    );
+    this.directionalLight.position.copy(this.sunPosition.clone().multiplyScalar(100000));
 
     // this.directionalLightHelper = new THREE.DirectionalLightHelper(
     //   this.directionalLight,
@@ -138,45 +118,32 @@ export default class Sky extends THREE.Object3D {
   }
 
   addSkyGui(gui) {
-    const skyGui = gui.addFolder("Sky options");
+    const skyGui = gui.addFolder('Sky options');
     const skyUniforms = this.sky.material.uniforms;
     for (const key in this.skyOptions) {
       if (skyUniforms[key]) {
-        skyGui.add(skyUniforms[key], "value", 0, 10).name(key).listen();
+        skyGui.add(skyUniforms[key], 'value', 0, 10).name(key).listen();
       }
     }
-    GuiHelper.addPositionGui(
-      gui,
-      "sun",
-      this.sky.material.uniforms["sunPosition"]?.value
-    );
+    GuiHelper.addPositionGui(gui, 'sun', this.sky.material.uniforms['sunPosition']?.value);
   }
 
   addGui(gui) {
-    const skyGui = gui.addFolder("Sky");
-    skyGui
-      .add(this.ambientLight, "intensity", 0, 10)
-      .name("ambient.intensity")
-      .listen();
+    const skyGui = gui.addFolder('Sky');
+    skyGui.add(this.ambientLight, 'intensity', 0, 10).name('ambient.intensity').listen();
 
     if (this.directionalLight) {
-      skyGui
-        .add(this.directionalLight, "intensity", 0, 10)
-        .name("directional.intensity")
-        .listen();
+      skyGui.add(this.directionalLight, 'intensity', 0, 10).name('directional.intensity').listen();
     }
 
-    skyGui
-      .add(this.pointLight, "intensity", 0, 10)
-      .name("pointLight.intensity")
-      .listen();
+    skyGui.add(this.pointLight, 'intensity', 0, 10).name('pointLight.intensity').listen();
 
     const skyUniforms = this.sky.material.uniforms;
     for (const key in this.skyOptions) {
       if (skyUniforms[key]) {
         skyGui
           .add(skyUniforms[key], 'value', 0, 1)
-          .name("skyOptions." + key)
+          .name('skyOptions.' + key)
           .listen();
       }
     }
@@ -186,18 +153,13 @@ export default class Sky extends THREE.Object3D {
 
   updateSunPosition(timeOfDayInHours: number) {
     this.sunPosition = calculateSunPosition(timeOfDayInHours);
-    this.sky.material.uniforms["sunPosition"]?.value?.copy(this.sunPosition);
-    this.pointLight.position.copy(
-      this.sunPosition.clone().multiplyScalar(10000)
-    );
+    this.sky.material.uniforms['sunPosition']?.value?.copy(this.sunPosition);
+    this.pointLight.position.copy(this.sunPosition.clone().multiplyScalar(10000));
     this.pointLight.intensity = calculateLightIntensity(timeOfDayInHours);
 
     if (this.directionalLight) {
-      this.directionalLight.position.copy(
-        this.sunPosition.clone().multiplyScalar(10000)
-      );
-      this.directionalLight.intensity =
-        calculateLightIntensity(timeOfDayInHours) * 0.3;
+      this.directionalLight.position.copy(this.sunPosition.clone().multiplyScalar(10000));
+      this.directionalLight.intensity = calculateLightIntensity(timeOfDayInHours) * 0.3;
       // this.directionalLightHelper.update();
     }
     this.ambientLight.intensity = calculateLightIntensity(timeOfDayInHours);
@@ -222,9 +184,7 @@ export default class Sky extends THREE.Object3D {
     const textureFlare1 = textureLoader.load(lensflareTexture1);
     const lensflare = new Lensflare();
     const size = 600;
-    lensflare.addElement(
-      new LensflareElement(textureFlare0, size, 0, light.color)
-    );
+    lensflare.addElement(new LensflareElement(textureFlare0, size, 0, light.color));
     lensflare.addElement(new LensflareElement(textureFlare1, size, 0.6));
     // lensflare.addElement(new LensflareElement(textureFlare1, size, 0.7));
     // lensflare.addElement(new LensflareElement(textureFlare1, size, 0.9));

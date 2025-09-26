@@ -1,5 +1,5 @@
-import * as THREE from "three";
-import GuiHelper from "../../utils/gui";
+import * as THREE from 'three';
+import GuiHelper from '../../utils/gui';
 
 const getColorMaterial = (color: number) => {
   return new THREE.MeshPhongMaterial({ color });
@@ -9,9 +9,9 @@ const mat = getColorMaterial(0xffffff);
 const mat_window = getColorMaterial(0x004d1a);
 const mat_door = getColorMaterial(0x004d1a);
 const mat_door2 = getColorMaterial(0x4d0000);
-const mat_roof = getColorMaterial(0x8B4513);  // Brown color for roof
-const mat_frame = getColorMaterial(0x4a4a4a);  // Dark gray for window frames
-const mat_modern = getColorMaterial(0xCCCCCC); // Light gray for modern houses
+const mat_roof = getColorMaterial(0x8b4513); // Brown color for roof
+const mat_frame = getColorMaterial(0x4a4a4a); // Dark gray for window frames
+const mat_modern = getColorMaterial(0xcccccc); // Light gray for modern houses
 const mat_modern_window = getColorMaterial(0x000080); // Navy blue for modern windows
 
 export enum HouseType {
@@ -38,9 +38,12 @@ class House {
   private addBasicWindows(mesh: THREE.Mesh) {
     // Window with frame
     const windowGeo = new THREE.BoxGeometry(4, 4, 4);
-    const window = new THREE.Mesh(windowGeo, this.type === HouseType.Modern ? mat_modern_window : mat_window);
+    const window = new THREE.Mesh(
+      windowGeo,
+      this.type === HouseType.Modern ? mat_modern_window : mat_window
+    );
     window.position.set(9, 4, 4);
-    
+
     // Add frame around window
     const frameGeo = new THREE.BoxGeometry(5, 5, 4.5);
     const frame = new THREE.Mesh(frameGeo, mat_frame);
@@ -72,14 +75,14 @@ class House {
       // Add traditional roof
       const roofGeo = new THREE.ConeGeometry(15, 10, 4);
       const roof = new THREE.Mesh(roofGeo, mat_roof);
-      roof.position.set(0, this.height/2 + 3, 0);
+      roof.position.set(0, this.height / 2 + 3, 0);
       roof.rotation.y = Math.PI / 4;
       mesh.add(roof);
     } else {
       // Add flat modern roof with slight overhang
       const flatRoofGeo = new THREE.BoxGeometry(22, 1, 22);
       const flatRoof = new THREE.Mesh(flatRoofGeo, mat_modern);
-      flatRoof.position.set(0, this.height/2 + 0.5, 0);
+      flatRoof.position.set(0, this.height / 2 + 0.5, 0);
       mesh.add(flatRoof);
     }
 
@@ -87,7 +90,10 @@ class House {
 
     // Add door based on house type
     const doorGeo = new THREE.BoxGeometry(6, 8, 6);
-    const door = new THREE.Mesh(doorGeo, this.type === HouseType.Modern ? mat_modern_window : mat_door);
+    const door = new THREE.Mesh(
+      doorGeo,
+      this.type === HouseType.Modern ? mat_modern_window : mat_door
+    );
     door.position.set(8, -5, 0);
     mesh.add(door);
 
@@ -106,7 +112,7 @@ class House {
       // Add extension roof
       const roofGeo2 = new THREE.ConeGeometry(12, 8, 4);
       const roof2 = new THREE.Mesh(roofGeo2, mat_roof);
-      roof2.position.set(0, (this.height - 9)/2 - 1, 10);
+      roof2.position.set(0, (this.height - 9) / 2 - 1, 10);
       roof2.rotation.y = Math.PI / 4;
       mesh.add(roof2);
 
@@ -120,8 +126,6 @@ class House {
       garageDoorFrame.position.copy(garageDoor.position);
       mesh.add(garageDoorFrame);
     } else if (this.type === HouseType.Large) {
-
-
       // Add garage similar to medium house
       const garageGeo = new THREE.BoxGeometry(15, this.height - 15, 20);
       const garage = new THREE.Mesh(garageGeo, mat);
@@ -144,10 +148,7 @@ class House {
       panoramicWindow.position.set(0, 2, 10);
       mesh.add(panoramicWindow);
 
-      const panoramicFrame = new THREE.Mesh(
-        new THREE.BoxGeometry(13, 9, 1),
-        mat_frame
-      );
+      const panoramicFrame = new THREE.Mesh(new THREE.BoxGeometry(13, 9, 1), mat_frame);
       panoramicFrame.position.copy(panoramicWindow.position);
       mesh.add(panoramicFrame);
 
@@ -165,8 +166,8 @@ class House {
     }
 
     if (gui) {
-      GuiHelper.addLocationGui(gui, "window", window);
-      GuiHelper.addLocationGui(gui, "window2", window2);
+      GuiHelper.addLocationGui(gui, 'window', window);
+      GuiHelper.addLocationGui(gui, 'window2', window2);
     }
 
     return mesh;

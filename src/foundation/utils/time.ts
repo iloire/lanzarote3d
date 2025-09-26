@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import * as THREE from 'three';
 
 const Time = {
   getSunAltitudeDegreesAccordingToTimeOfDay: (timeOfDayInHours: number) => {
@@ -7,11 +7,7 @@ const Time = {
     if (timeOfDayInHours < minSun || timeOfDayInHours > maxSun) {
       return 0;
     }
-    const valueInRange = THREE.MathUtils.clamp(
-      timeOfDayInHours,
-      minSun,
-      maxSun
-    );
+    const valueInRange = THREE.MathUtils.clamp(timeOfDayInHours, minSun, maxSun);
     const input_range = maxSun - minSun;
     const input_normalized = (valueInRange - minSun) / input_range;
     const degrees = THREE.MathUtils.lerp(-89, 89, input_normalized);

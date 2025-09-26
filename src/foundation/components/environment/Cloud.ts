@@ -1,12 +1,8 @@
-import * as THREE from "three";
-import { rndBetween, rndIntBetween } from "../../utils/math";
-import { animator } from "../../systems/animation/SimpleAnimator";
+import * as THREE from 'three';
+import { rndBetween, rndIntBetween } from '../../utils/math';
+import { animator } from '../../systems/animation/SimpleAnimator';
 
-const generateCloudPart = (
-  radius: number,
-  scale: number,
-  material: THREE.Material
-) => {
+const generateCloudPart = (radius: number, scale: number, material: THREE.Material) => {
   const geo_cloudPart = new THREE.IcosahedronGeometry(radius, 0);
   const cloudPart = new THREE.Mesh(geo_cloudPart, material);
   const scaleX = rndBetween(scale * 0.9, scale * 1.1);
@@ -49,7 +45,7 @@ const generateCloud = async (options: CloudOptions): Promise<THREE.Object3D> => 
       ? materials[monochromeIndex]!
       : materials[rndIntBetween(0, materials.length - 1)]!;
 
-    console.log(material)
+    console.log(material);
 
     const scale = r(i * 0.9, i * 1.1);
     const posX = 1.7 * radius * r(-1 * i, i);
@@ -74,7 +70,7 @@ const tweakSize = (mesh: THREE.Object3D, interval: number) => {
   const startScale = mesh.scale.clone();
   const targetPosition = new THREE.Vector3(scaleX, scaleY, scaleZ);
 
-  animator.animate(`cloud-scale-${Math.random()}`, interval, (progress) => {
+  animator.animate(`cloud-scale-${Math.random()}`, interval, progress => {
     mesh.scale.lerpVectors(startScale, targetPosition, progress);
   });
 };
@@ -90,14 +86,14 @@ const tweakPos = (mesh: THREE.Object3D, interval: number) => {
   const startPosition = mesh.position.clone();
   const targetPosition = new THREE.Vector3(posX, posY, posZ);
 
-  animator.animate(`cloud-pos-${Math.random()}`, interval, (progress) => {
+  animator.animate(`cloud-pos-${Math.random()}`, interval, progress => {
     mesh.position.lerpVectors(startPosition, targetPosition, progress);
   });
 };
 
 export type CloudOptions = {
-  colors?: string[]
-}
+  colors?: string[];
+};
 
 class Cloud {
   options: CloudOptions;
@@ -115,7 +111,7 @@ class Cloud {
     const interval = 3000;
     this.interval = setInterval(() => {
       if (this.mesh) {
-        this.mesh.children.forEach((m) => {
+        this.mesh.children.forEach(m => {
           tweakSize(m, interval);
           tweakPos(m, interval);
         });

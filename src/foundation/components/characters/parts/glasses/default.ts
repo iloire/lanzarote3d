@@ -1,5 +1,5 @@
-import * as THREE from "three";
-import { PilotHeadOptions } from "../pilot-head";
+import * as THREE from 'three';
+import { PilotHeadOptions } from '../pilot-head';
 
 const getColoredMaterial = (color: string) => {
   return new THREE.MeshStandardMaterial({
@@ -54,6 +54,6 @@ const getDefaultGlasses = (options: PilotHeadOptions): THREE.Group => {
   group.add(retinaRight);
 
   return group;
-}
+};
 
 export default getDefaultGlasses;

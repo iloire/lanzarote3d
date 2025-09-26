@@ -1,9 +1,9 @@
-import * as THREE from "three";
-import { PilotHeadOptions } from "../../PilotHead";
-import { DefaultHelmet } from "../../helmets/DefaultHelmet";
-import { FullFaceHelmet } from "../../helmets/FullFaceHelmet";
-import { HelmetWithHorns } from "../../helmets/HelmetWithHorns";
-import { HelmetType } from "../../helmets/types";
+import * as THREE from 'three';
+import { PilotHeadOptions } from '../../PilotHead';
+import { DefaultHelmet } from '../../helmets/DefaultHelmet';
+import { FullFaceHelmet } from '../../helmets/FullFaceHelmet';
+import { HelmetWithHorns } from '../../helmets/HelmetWithHorns';
+import { HelmetType } from '../../helmets/types';
 
 export abstract class BaseHead {
   protected options: PilotHeadOptions;
@@ -33,4 +33,4 @@ export abstract class BaseHead {
   }
 
   abstract load(): THREE.Group;
-} 
+}

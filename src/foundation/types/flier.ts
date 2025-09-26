@@ -1,15 +1,11 @@
-import * as THREE from "three";
-import { animator } from "../systems/animation/SimpleAnimator";
-import Weather from "../components/physics/Weather";
-import Thermal from "../components/physics/Thermal";
-import GuiHelper from "../utils/gui";
-import { TrajectoryPoint, TrajectoryPointType } from "../components/ui/Trajectory";
-import { getTerrainHeightBelowPosition } from "../utils/collision";
-import {
-  FORWARD_DIRECTION,
-  UP_DIRECTION,
-  DOWN_DIRECTION,
-} from "./common";
+import * as THREE from 'three';
+import { animator } from '../systems/animation/SimpleAnimator';
+import Weather from '../components/physics/Weather';
+import Thermal from '../components/physics/Thermal';
+import GuiHelper from '../utils/gui';
+import { TrajectoryPoint, TrajectoryPointType } from '../components/ui/Trajectory';
+import { getTerrainHeightBelowPosition } from '../utils/collision';
+import { FORWARD_DIRECTION, UP_DIRECTION, DOWN_DIRECTION } from './common';
 import IFlyable from './IFlyable';
 
 const ANTI_CRASH_ENABLED = false;
@@ -78,11 +74,7 @@ class Flier extends THREE.EventDispatcher<FlierEventMap> {
   numberGroundTouches: number = 0;
   perfStats: any; // stats
 
-  constructor(
-    options: FlierConstructor,
-    envOptions: EnvOptions,
-    debug?: boolean
-  ) {
+  constructor(options: FlierConstructor, envOptions: EnvOptions, debug?: boolean) {
     super();
     this.debug = debug;
     this.speedBar = false;
@@ -142,7 +134,7 @@ class Flier extends THREE.EventDispatcher<FlierEventMap> {
   tick(multiplier: number) {
     this.tickCounter++;
 
-    this.perfStats && this.perfStats.startTick("move");
+    this.perfStats && this.perfStats.startTick('move');
     this.move(multiplier);
 
     if (this.tickCounter % 5 === 0) {
@@ -150,7 +142,7 @@ class Flier extends THREE.EventDispatcher<FlierEventMap> {
       if (this.hasTouchedGround(this.terrain, this.water)) {
         this.numberGroundTouches++;
         this.dispatchEvent({
-          type: "touchedGround",
+          type: 'touchedGround',
           groundTouches: this.numberGroundTouches,
         });
         this.trajectory.push({
@@ -161,7 +153,7 @@ class Flier extends THREE.EventDispatcher<FlierEventMap> {
           // Anti-crash mode enabled
         } else {
           this.dispatchEvent({
-            type: "crashed",
+            type: 'crashed',
           });
         }
       } else {
@@ -180,57 +172,43 @@ class Flier extends THREE.EventDispatcher<FlierEventMap> {
     const turnMultiplier = THREE.MathUtils.clamp(multiplier, 0, 0.07);
     if (this.__directionInput === 0) {
       if (this.isLeftInput) {
-        this.rotationInertia -=
-          turnMultiplier * keyBreakMultiplier * rotationSmoother;
+        this.rotationInertia -= turnMultiplier * keyBreakMultiplier * rotationSmoother;
       } else if (this.isRightInput) {
-        this.rotationInertia +=
-          turnMultiplier * keyBreakMultiplier * rotationSmoother;
+        this.rotationInertia += turnMultiplier * keyBreakMultiplier * rotationSmoother;
       } else if (Math.abs(this.rotationInertia) > 0) {
         // passive recovery of momentum
         this.rotationInertia -=
-          passiveRecoveryMultiplier *
-          turnMultiplier *
-          (this.rotationInertia * rotationSmoother);
+          passiveRecoveryMultiplier * turnMultiplier * (this.rotationInertia * rotationSmoother);
       }
     } else {
       // apply analogic input
-      if (
-        Math.sign(this.__directionInput) !== Math.sign(this.rotationInertia)
-      ) {
+      if (Math.sign(this.__directionInput) !== Math.sign(this.rotationInertia)) {
         // break input against inertia. We may it a bit stronger input
-        this.rotationInertia +=
-          2 * turnMultiplier * this.__directionInput * rotationSmoother;
+        this.rotationInertia += 2 * turnMultiplier * this.__directionInput * rotationSmoother;
       } else {
-        this.rotationInertia +=
-          turnMultiplier * this.__directionInput * rotationSmoother;
+        this.rotationInertia += turnMultiplier * this.__directionInput * rotationSmoother;
       }
     }
 
     this.rotationInertia = THREE.MathUtils.clamp(this.rotationInertia, -50, 50);
 
-    this.rotate(
-      this.rotationInertia * rotationSmoother,
-      this.rotationInertia * 1.3
-    );
+    this.rotate(this.rotationInertia * rotationSmoother, this.rotationInertia * 1.3);
 
     if (this.tickCounter % 10 === 0) {
       //save point
       this.trajectory.push({
-        type: this.speedBar
-          ? TrajectoryPointType.SpeedBar
-          : TrajectoryPointType.Normal,
+        type: this.speedBar ? TrajectoryPointType.SpeedBar : TrajectoryPointType.Normal,
         vector: this.position(),
       });
     }
-    this.perfStats && this.perfStats.endTick("move");
+    this.perfStats && this.perfStats.endTick('move');
   }
 
   rotate(yRotationIncrement: number = 0, zAngle: number) {
     const maxAngle = 75;
 
     const yRotation =
-      this.mesh.rotation.y +
-      -1 * yRotationIncrement * getRotationValue(this.wrapSpeed);
+      this.mesh.rotation.y + -1 * yRotationIncrement * getRotationValue(this.wrapSpeed);
 
     const validZAngle = THREE.MathUtils.clamp(zAngle, -1 * maxAngle, maxAngle);
     const zRotation = -1 * Math.abs(THREE.MathUtils.degToRad(validZAngle));
@@ -256,16 +234,14 @@ class Flier extends THREE.EventDispatcher<FlierEventMap> {
     const drop = this.airSpeed() / this.glidingRatio();
     const downVector = DOWN_DIRECTION.clone().multiplyScalar(multiplier * drop);
     this.dispatchEvent({
-      type: "drop",
+      type: 'drop',
       drop,
     });
 
     const lift = this.lift;
-    const liftVector = this.direction(UP_DIRECTION).multiplyScalar(
-      multiplier * lift
-    );
+    const liftVector = this.direction(UP_DIRECTION).multiplyScalar(multiplier * lift);
     this.dispatchEvent({
-      type: "dynamicLift",
+      type: 'dynamicLift',
       lift,
     });
 
@@ -274,17 +250,13 @@ class Flier extends THREE.EventDispatcher<FlierEventMap> {
       // Thermal detection logic
     }
     const liftThermal = 2 * inHowManyThermals;
-    const liftThermalVector = UP_DIRECTION.clone().multiplyScalar(
-      multiplier * liftThermal
-    );
+    const liftThermalVector = UP_DIRECTION.clone().multiplyScalar(multiplier * liftThermal);
     this.dispatchEvent({
-      type: "thermalLift",
+      type: 'thermalLift',
       lift: liftThermal,
     });
 
-    const velocityVector = this.direction().multiplyScalar(
-      multiplier * this.airSpeed()
-    );
+    const velocityVector = this.direction().multiplyScalar(multiplier * this.airSpeed());
     const windVector = this.weather.getWindVelocity(multiplier);
 
     const combinedMoveVector = new THREE.Vector3(0, 0, 0)
@@ -297,52 +269,49 @@ class Flier extends THREE.EventDispatcher<FlierEventMap> {
     const startPosition = this.position();
     const nextPosition = this.position().add(combinedMoveVector);
 
-    animator.animate(`flier-move-${this.id}`, TICK_INTERVAL, (progress) => {
+    animator.animate(`flier-move-${this.id}`, TICK_INTERVAL, progress => {
       // Update the position of the object on each frame of the animation
       this.mesh.position.lerpVectors(startPosition, nextPosition, progress);
     });
 
-    this.dispatchEvent({ type: "position", position: this.mesh.position });
+    this.dispatchEvent({ type: 'position', position: this.mesh.position });
 
     const delta = combinedMoveVector.y / multiplier;
     this.dispatchEvent({
-      type: "delta",
+      type: 'delta',
       delta,
     });
   }
 
   addGui(gui: any) {
     const pg = this.mesh;
-    GuiHelper.addLocationGui(gui, "Paraglider", pg, {
+    GuiHelper.addLocationGui(gui, 'Paraglider', pg, {
       min: -20000,
       max: 20000,
     });
 
-    const pgWindGui = gui.addFolder("Paraglider wing");
+    const pgWindGui = gui.addFolder('Paraglider wing');
 
     pgWindGui
-      .add(this.options, "trimSpeed", 20 / 3.6, 70 / 3.6)
-      .name("trim speed")
+      .add(this.options, 'trimSpeed', 20 / 3.6, 70 / 3.6)
+      .name('trim speed')
       .listen();
     pgWindGui
-      .add(this.options, "fullSpeedBarSpeed", 0, 70 / 3.6)
-      .name("full speedbar speed")
+      .add(this.options, 'fullSpeedBarSpeed', 0, 70 / 3.6)
+      .name('full speedbar speed')
       .listen();
     pgWindGui
-      .add(this.options, "glidingRatio", 1, 30 / 3.6)
-      .name("gliding ratio")
+      .add(this.options, 'glidingRatio', 1, 30 / 3.6)
+      .name('gliding ratio')
       .listen();
 
-    const pgEnv = gui.addFolder("Paraglider env");
-    pgEnv.add(this, "__lift").name("lift").listen();
-    pgEnv.add(this, "__gradient").name("gradient").listen();
+    const pgEnv = gui.addFolder('Paraglider env');
+    pgEnv.add(this, '__lift').name('lift').listen();
+    pgEnv.add(this, '__gradient').name('gradient').listen();
 
-    const pgPhysics = gui.addFolder("Paraglider physics");
-    pgPhysics.add(this, "rotationInertia", -10, 10).name("inertia").listen();
-    pgPhysics
-      .add(this, "__directionInput", -50, 50)
-      .name("directionInput")
-      .listen();
+    const pgPhysics = gui.addFolder('Paraglider physics');
+    pgPhysics.add(this, 'rotationInertia', -10, 10).name('inertia').listen();
+    pgPhysics.add(this, '__directionInput', -50, 50).name('directionInput').listen();
   }
 
   directionInput(direction: number) {
@@ -383,11 +352,7 @@ class Flier extends THREE.EventDispatcher<FlierEventMap> {
 
   hasTouchedGround(terrain: THREE.Mesh, water: THREE.Mesh): boolean {
     const pos = this.mesh.position;
-    const terrainBelowHeight = getTerrainHeightBelowPosition(
-      pos,
-      terrain,
-      water
-    );
+    const terrainBelowHeight = getTerrainHeightBelowPosition(pos, terrain, water);
     const paragliderIsCloseEnoughToTerrain = pos.y - terrainBelowHeight < 20;
     return isNaN(terrainBelowHeight) || paragliderIsCloseEnoughToTerrain;
   }
@@ -406,15 +371,11 @@ class Flier extends THREE.EventDispatcher<FlierEventMap> {
     }
     const heightAboveGround = pos.y - heightPos;
     this.dispatchEvent({
-      type: "heightAboveGround",
+      type: 'heightAboveGround',
       height: heightAboveGround,
     });
     const posBarlovento = pos.clone().addScaledVector(windDirection, -delta);
-    const heightPosBarlovento = getTerrainHeightBelowPosition(
-      posBarlovento,
-      terrain,
-      water
-    );
+    const heightPosBarlovento = getTerrainHeightBelowPosition(posBarlovento, terrain, water);
     const gradient = (heightPos - heightPosBarlovento) / delta;
     return gradient > 0 ? gradient : 0; // TODO
   }
@@ -430,16 +391,14 @@ class Flier extends THREE.EventDispatcher<FlierEventMap> {
       this.water,
       this.weather.getWindDirection()
     );
-    this.dispatchEvent({ type: "gradient", gradient });
+    this.dispatchEvent({ type: 'gradient', gradient });
     this.__gradient = gradient;
 
     const paragliderHeight = height;
-    const pgHeightToTerrainHeightRatio =
-      (paragliderHeight - height) / paragliderHeight;
-    const heightLiftComponent =
-      (1 - pgHeightToTerrainHeightRatio) * height * 0.002;
+    const pgHeightToTerrainHeightRatio = (paragliderHeight - height) / paragliderHeight;
+    const heightLiftComponent = (1 - pgHeightToTerrainHeightRatio) * height * 0.002;
     const lift = heightLiftComponent * gradient;
-    this.dispatchEvent({ type: "lift", lift });
+    this.dispatchEvent({ type: 'lift', lift });
     this.__lift = lift;
     return lift;
   }

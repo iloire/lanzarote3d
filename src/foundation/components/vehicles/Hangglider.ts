@@ -1,10 +1,9 @@
-import * as THREE from "three";
-import { Pilot } from "./";
-import Wing from "./Wing";
-import GuiHelper from "../../utils/gui";
-import AutoFlier from "../../types/auto-flier";
-import { PilotHeadType } from "../characters/PilotHead";
-
+import * as THREE from 'three';
+import { Pilot } from './';
+import Wing from './Wing';
+import GuiHelper from '../../utils/gui';
+import AutoFlier from '../../types/auto-flier';
+import { PilotHeadType } from '../characters/PilotHead';
 
 const DEFAULT_OPTIONS = {
   head: {
@@ -12,9 +11,9 @@ const DEFAULT_OPTIONS = {
     helmetOptions: {
       color: '#ffffff',
       color2: '#cccccc',
-      color3: '#999999'
-    }
-  }
+      color3: '#999999',
+    },
+  },
   // ... rest of options
 };
 
@@ -49,8 +48,8 @@ class HangGliderModel extends AutoFlier {
     }
 
     if (gui) {
-      GuiHelper.addLocationGui(gui, "Hanglider pilot", pilotMesh);
-      GuiHelper.addLocationGui(gui, "Hanglider", this.mesh);
+      GuiHelper.addLocationGui(gui, 'Hanglider pilot', pilotMesh);
+      GuiHelper.addLocationGui(gui, 'Hanglider', this.mesh);
     }
 
     this.animate();

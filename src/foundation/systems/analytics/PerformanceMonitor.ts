@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import * as THREE from 'three';
 
 export interface PerformanceMetrics {
   fps: number;
@@ -42,7 +42,7 @@ export class PerformanceMonitor {
       minFps: 30,
       maxFrameTime: 33.33, // ~30 FPS
       maxMemoryUsage: 100 * 1024 * 1024, // 100MB
-      ...thresholds
+      ...thresholds,
     };
 
     this.metrics = {
@@ -51,15 +51,15 @@ export class PerformanceMonitor {
       memoryUsage: {
         usedJSHeapSize: 0,
         totalJSHeapSize: 0,
-        jsHeapSizeLimit: 0
+        jsHeapSizeLimit: 0,
       },
       renderInfo: {
         triangles: 0,
         geometries: 0,
         textures: 0,
-        programs: 0
+        programs: 0,
       },
-      drawCalls: 0
+      drawCalls: 0,
     };
   }
 
@@ -86,7 +86,7 @@ export class PerformanceMonitor {
       this.metrics.memoryUsage = {
         usedJSHeapSize: performance.memory.usedJSHeapSize,
         totalJSHeapSize: performance.memory.totalJSHeapSize,
-        jsHeapSizeLimit: performance.memory.jsHeapSizeLimit
+        jsHeapSizeLimit: performance.memory.jsHeapSizeLimit,
       };
     }
 
@@ -97,7 +97,7 @@ export class PerformanceMonitor {
         triangles: info.render.triangles,
         geometries: info.memory.geometries,
         textures: info.memory.textures,
-        programs: info.programs?.length || 0
+        programs: info.programs?.length || 0,
       };
       this.metrics.drawCalls = info.render.calls;
     }
@@ -115,9 +115,15 @@ export class PerformanceMonitor {
       this.triggerWarning('frameTime', this.metrics.frameTime, this.thresholds.maxFrameTime);
     }
 
-    if (this.thresholds.maxMemoryUsage &&
-        this.metrics.memoryUsage.usedJSHeapSize > this.thresholds.maxMemoryUsage) {
-      this.triggerWarning('memoryUsage', this.metrics.memoryUsage.usedJSHeapSize, this.thresholds.maxMemoryUsage);
+    if (
+      this.thresholds.maxMemoryUsage &&
+      this.metrics.memoryUsage.usedJSHeapSize > this.thresholds.maxMemoryUsage
+    ) {
+      this.triggerWarning(
+        'memoryUsage',
+        this.metrics.memoryUsage.usedJSHeapSize,
+        this.thresholds.maxMemoryUsage
+      );
     }
   }
 
@@ -184,7 +190,7 @@ export class PerformanceMonitor {
       `Geometries: ${this.metrics.renderInfo.geometries}`,
       `Textures: ${this.metrics.renderInfo.textures}`,
       `Programs: ${this.metrics.renderInfo.programs}`,
-      ``
+      ``,
     ];
 
     return report.join('\n');

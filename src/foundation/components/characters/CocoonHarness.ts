@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import * as THREE from 'three';
 
 const getColoredMaterial = (color: string) => {
   return new THREE.MeshStandardMaterial({
@@ -15,12 +15,11 @@ export type CocoonHarnessOptions = {
   width?: number;
   height?: number;
   depth?: number;
-}
+};
 
 const DEFAULT_WIDTH = 400;
 const DEFAULT_HEIGHT = 400;
 const DEFAULT_DEPTH = 700;
-
 
 class CocoonHarness {
   options: CocoonHarnessOptions;
@@ -38,7 +37,7 @@ class CocoonHarness {
       mesh.position.y = posY;
       mesh.position.z = posZ;
       return mesh;
-    }
+    };
 
     const width = this.options.width || DEFAULT_WIDTH;
     const height = this.options.height || DEFAULT_HEIGHT;
@@ -64,21 +63,21 @@ class CocoonHarness {
     group.add(subBody);
 
     const cola = getSquare(150, 400, 300, 0, -350, -300, '#333');
-    group.add(cola)
+    group.add(cola);
 
     const cola2 = getSquare(100, 300, 400, 0, -320, -430, '#333');
-    group.add(cola2)
+    group.add(cola2);
 
     const colaAdorno = getSquare(170, 40, 400, 0, -400, -400, '#666');
-    group.add(colaAdorno)
+    group.add(colaAdorno);
 
     const front = getSquare(200, 300, 400, 0, -400, 800, '#333');
-    group.add(front)
+    group.add(front);
 
     const reserveHandleMat = getColoredMaterial('red');
     const reserveHandleGeo = new THREE.BoxGeometry(70, 45, 130);
     const reserve = new THREE.Mesh(reserveHandleGeo, reserveHandleMat);
-    reserve.position.x = -1 * width / 2;
+    reserve.position.x = (-1 * width) / 2;
     reserve.position.y = -410;
     reserve.position.z = 180;
     group.add(reserve);
@@ -90,13 +89,12 @@ class CocoonHarness {
     carabinerLeft.position.set(this.options.carabinerSeparationMM / 2, -180, 280);
 
     const carabinerRight = carabinerLeft.clone();
-    carabinerRight.position.set(-1 * this.options.carabinerSeparationMM / 2, -180, 280);
+    carabinerRight.position.set((-1 * this.options.carabinerSeparationMM) / 2, -180, 280);
     group.add(carabinerLeft);
     group.add(carabinerRight);
 
     return group;
   }
-
 }
 
 export default CocoonHarness;

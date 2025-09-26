@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import * as THREE from 'three';
 import PilotHead, { PilotHeadOptions } from './PilotHead';
 import { PilotOptions } from '../vehicles/Pilot';
 
@@ -17,7 +17,7 @@ const getHead = (options: PilotHeadOptions): THREE.Group => {
 export type TandemPilotOptions = {
   pilot: PilotOptions;
   passenger: PilotOptions;
-}
+};
 
 const getPilotLegs = (options: PilotOptions) => {
   const shoesMat = getColoredMaterial(options.shoesColor || '#333');
@@ -50,7 +50,7 @@ const getPilotLegs = (options: PilotOptions) => {
   group.add(feetLeft);
 
   return group;
-}
+};
 
 const getPilotArms = (options: PilotOptions, armRotation: number) => {
   const suitMat = getColoredMaterial(options.suitColor || '#333');
@@ -89,7 +89,7 @@ const getPilotArms = (options: PilotOptions, armRotation: number) => {
   group.add(armRight);
 
   return group;
-}
+};
 
 class TandemPilot {
   options: TandemPilotOptions;

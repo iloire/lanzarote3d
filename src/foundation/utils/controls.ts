@@ -1,5 +1,5 @@
-import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 const Controls = {
   createControls: (camera: THREE.PerspectiveCamera, renderer: any): OrbitControls => {
@@ -15,10 +15,10 @@ const Controls = {
     // controls.maxDistance = 220;
 
     controls.keys = {
-      LEFT: "ArrowLeft", //left arrow
-      UP: "ArrowUp", // up arrow
-      RIGHT: "ArrowRight", // right arrow
-      BOTTOM: "ArrowDown", // down arrow
+      LEFT: 'ArrowLeft', //left arrow
+      UP: 'ArrowUp', // up arrow
+      RIGHT: 'ArrowRight', // right arrow
+      BOTTOM: 'ArrowDown', // down arrow
     };
 
     controls.listenToKeyEvents(window);

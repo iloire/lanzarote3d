@@ -1,5 +1,5 @@
-import * as THREE from "three";
-import Flier from "../../types/flier";
+import * as THREE from 'three';
+import Flier from '../../types/flier';
 
 // Define event types for Vario
 export interface VarioEventMap {
@@ -10,7 +10,7 @@ export interface VarioEventMap {
 class Vario extends THREE.EventDispatcher<VarioEventMap> {
   sound: any;
   pg: Flier;
-  status: string = "off";
+  status: string = 'off';
   paused: boolean = false;
   lastRecord: number = 0;
   high: number = 0;
@@ -38,12 +38,24 @@ class Vario extends THREE.EventDispatcher<VarioEventMap> {
 
     try {
       const [beep200, beep400, beep600, beep800, beep1000, beep1200] = await Promise.all([
-        import("../../../../assets/foundation/audio/vario/audiocheck.net_sin_200Hz_-3dBFS_0.3s.wav"),
-        import("../../../../assets/foundation/audio/vario/audiocheck.net_sin_400Hz_-3dBFS_0.3s.wav"),
-        import("../../../../assets/foundation/audio/vario/audiocheck.net_sin_600Hz_-3dBFS_0.3s.wav"),
-        import("../../../../assets/foundation/audio/vario/audiocheck.net_sin_800Hz_-3dBFS_0.3s.wav"),
-        import("../../../../assets/foundation/audio/vario/audiocheck.net_sin_1000Hz_-3dBFS_0.3s.wav"),
-        import("../../../../assets/foundation/audio/vario/audiocheck.net_sin_1200Hz_-3dBFS_0.3s.wav")
+        import(
+          '../../../../assets/foundation/audio/vario/audiocheck.net_sin_200Hz_-3dBFS_0.3s.wav'
+        ),
+        import(
+          '../../../../assets/foundation/audio/vario/audiocheck.net_sin_400Hz_-3dBFS_0.3s.wav'
+        ),
+        import(
+          '../../../../assets/foundation/audio/vario/audiocheck.net_sin_600Hz_-3dBFS_0.3s.wav'
+        ),
+        import(
+          '../../../../assets/foundation/audio/vario/audiocheck.net_sin_800Hz_-3dBFS_0.3s.wav'
+        ),
+        import(
+          '../../../../assets/foundation/audio/vario/audiocheck.net_sin_1000Hz_-3dBFS_0.3s.wav'
+        ),
+        import(
+          '../../../../assets/foundation/audio/vario/audiocheck.net_sin_1200Hz_-3dBFS_0.3s.wav'
+        ),
       ]);
 
       this.beepFiles = {
@@ -52,7 +64,7 @@ class Vario extends THREE.EventDispatcher<VarioEventMap> {
         beep600: beep600.default,
         beep800: beep800.default,
         beep1000: beep1000.default,
-        beep1200: beep1200.default
+        beep1200: beep1200.default,
       };
 
       this.loaded = true;
@@ -73,17 +85,17 @@ class Vario extends THREE.EventDispatcher<VarioEventMap> {
   }
 
   start() {
-    this.status = "on";
-    this.dispatchEvent({ type: "status", status: "on" });
+    this.status = 'on';
+    this.dispatchEvent({ type: 'status', status: 'on' });
   }
 
   stop() {
-    this.status = "off";
-    this.dispatchEvent({ type: "status", status: "off" });
+    this.status = 'off';
+    this.dispatchEvent({ type: 'status', status: 'off' });
   }
 
   toggle() {
-    if (this.status === "off") {
+    if (this.status === 'off') {
       this.start();
     } else {
       this.stop();
@@ -97,7 +109,7 @@ class Vario extends THREE.EventDispatcher<VarioEventMap> {
     }
     const delta = (this.high - this.lastRecord || this.high) / this.wrapSpeed;
     this.lastRecord = this.high;
-    if (this.status === "on") {
+    if (this.status === 'on') {
       if (Math.abs(delta) > 0.5) {
         this.play(delta).catch(error => {
           console.error('Error playing vario sound:', error);
@@ -153,19 +165,19 @@ class Vario extends THREE.EventDispatcher<VarioEventMap> {
     const audioLoader = new THREE.AudioLoader();
     audioLoader.load(
       beepUrl,
-      (buffer) => {
+      buffer => {
         this.sound.setBuffer(buffer);
         this.sound.play();
       },
       undefined, // onProgress
-      (error) => {
+      error => {
         console.error('Error loading vario beep:', error);
       }
     );
   }
 
   updateReading(altitude: number) {
-    this.dispatchEvent({ type: "altitude", altitude });
+    this.dispatchEvent({ type: 'altitude', altitude });
     this.high = altitude;
   }
 }

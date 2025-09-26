@@ -1,13 +1,13 @@
-import * as THREE from "three";
-import Pilot, { PilotOptions } from "./Pilot";
-import Glider, { GliderOptions } from "./Glider";
-import GuiHelper from "../../utils/gui";
-import IFlyable from "../../types/IFlyable";
+import * as THREE from 'three';
+import Pilot, { PilotOptions } from './Pilot';
+import Glider, { GliderOptions } from './Glider';
+import GuiHelper from '../../utils/gui';
+import IFlyable from '../../types/IFlyable';
 
 export type ParagliderOptions = {
   glider: GliderOptions;
   pilot: PilotOptions;
-}
+};
 
 class Paraglider implements IFlyable {
   mesh!: THREE.Object3D;
@@ -57,7 +57,6 @@ class Paraglider implements IFlyable {
     this.pilot.releaseSpeedBar();
   }
 
-
   getMesh() {
     if (!this.mesh) {
       throw Error('mesh not loaded - use load');
@@ -75,7 +74,6 @@ class Paraglider implements IFlyable {
     wing.translateX(300);
     this.mesh.add(wing);
 
-
     this.pilot = new Pilot(this.options.pilot);
     this.pilotMesh = this.pilot.load();
 
@@ -86,8 +84,8 @@ class Paraglider implements IFlyable {
     this.mesh.add(this.pilotMesh);
 
     if (gui) {
-      GuiHelper.addLocationGui(gui, "Pilot model", this.pilotMesh);
-      GuiHelper.addLocationGui(gui, "Paraglider model", this.mesh);
+      GuiHelper.addLocationGui(gui, 'Pilot model', this.pilotMesh);
+      GuiHelper.addLocationGui(gui, 'Paraglider model', this.mesh);
     }
 
     this.axesHelper = new THREE.AxesHelper(100);
@@ -95,7 +93,6 @@ class Paraglider implements IFlyable {
     this.mesh.add(this.axesHelper);
     return this.mesh;
   }
-
 }
 
 export default Paraglider;

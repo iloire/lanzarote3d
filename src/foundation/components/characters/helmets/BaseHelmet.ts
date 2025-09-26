@@ -1,5 +1,5 @@
-import * as THREE from "three";
-import { HelmetOptions } from "./types";
+import * as THREE from 'three';
+import { HelmetOptions } from './types';
 
 export abstract class BaseHelmet {
   protected options: HelmetOptions;
@@ -13,4 +13,4 @@ export abstract class BaseHelmet {
   }
 
   abstract load(): THREE.Group;
-} 
+}

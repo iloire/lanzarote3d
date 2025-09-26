@@ -1,5 +1,5 @@
-import Cloud, { CloudOptions } from "./Cloud";
-import * as THREE from "three";
+import Cloud, { CloudOptions } from './Cloud';
+import * as THREE from 'three';
 
 const randomNumber = (min: number, max: number) => Math.random() * min + max;
 
@@ -27,8 +27,7 @@ const getRandomCloud = async (options: CloudOptions) => {
   return cloud;
 };
 
-const random = (min: number, max: number): number =>
-  Math.floor(Math.random() * (max - min)) + min;
+const random = (min: number, max: number): number => Math.floor(Math.random() * (max - min)) + min;
 
 class Clouds {
   options: CloudOptions;

@@ -4,7 +4,10 @@ import { StoryOptions } from '../../shared/types';
 import { getDefaultTheme } from '../../../foundation/themes';
 import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';
 import { AppBase } from '../../shared/AppBase';
-import { OrbitControlsHelper, ORBIT_CONTROLS_PRESETS } from '../../../foundation/utils/OrbitControlsHelper';
+import {
+  OrbitControlsHelper,
+  ORBIT_CONTROLS_PRESETS,
+} from '../../../foundation/utils/OrbitControlsHelper';
 
 /**
  * Famara Demo - Based on PhotoBooth but without paragliders
@@ -26,13 +29,13 @@ class FamaraApp extends AppBase {
         lighting: 'dynamic',
         physics: false,
         fog: {
-          enabled: false // Fog handled by theme system
-        }
+          enabled: false, // Fog handled by theme system
+        },
       },
       performance: {
         monitoring: true,
-        logIntervalMs: 10000 // Log performance every 10 seconds
-      }
+        logIntervalMs: 10000, // Log performance every 10 seconds
+      },
     });
   }
 
@@ -58,9 +61,7 @@ class FamaraApp extends AppBase {
       camera.lookAt(lookAtPos);
 
       // Apply landscape viewing controls for Famara beach exploration
-      OrbitControlsHelper.focusOnTarget(controls, lookAtPos,
-        ORBIT_CONTROLS_PRESETS['landscape']
-      );
+      OrbitControlsHelper.focusOnTarget(controls, lookAtPos, ORBIT_CONTROLS_PRESETS['landscape']);
 
       // must render before adding env
       renderer.render(scene, camera);
@@ -101,14 +102,18 @@ class FamaraApp extends AppBase {
 
       this.isLoaded = true;
       console.log(`✅ ${this.config.name} loaded successfully`);
-
     } catch (error) {
       this.handleError(error as Error, 'load');
       throw error;
     }
   }
 
-  private startAnimationLoop(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.Camera, controls: any): void {
+  private startAnimationLoop(
+    renderer: THREE.WebGLRenderer,
+    scene: THREE.Scene,
+    camera: THREE.Camera,
+    controls: any
+  ): void {
     const animate = () => {
       try {
         // Update performance monitoring
@@ -159,7 +164,7 @@ const Famara = {
   },
   getAppInfo: () => {
     return famaraApp.getAppInfo();
-  }
+  },
 };
 
 export default Famara;

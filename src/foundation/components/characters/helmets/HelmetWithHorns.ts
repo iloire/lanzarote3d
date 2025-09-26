@@ -1,10 +1,10 @@
-import * as THREE from "three";
-import { BaseHelmet } from "./BaseHelmet";
+import * as THREE from 'three';
+import { BaseHelmet } from './BaseHelmet';
 
 export class HelmetWithHorns extends BaseHelmet {
   load(): THREE.Group {
     const group = new THREE.Group();
-    
+
     // Main helmet shell
     const helmetMat = this.getColoredMaterial(this.options.color);
     const helmetGeo = new THREE.BoxGeometry(400, 190, 390);
@@ -15,7 +15,7 @@ export class HelmetWithHorns extends BaseHelmet {
     // Horns
     const hornMat = this.getColoredMaterial(this.options.color2);
     const hornGeo = new THREE.ConeGeometry(40, 150, 4);
-    
+
     const leftHorn = new THREE.Mesh(hornGeo, hornMat);
     leftHorn.position.set(-120, 300, 0);
     leftHorn.rotation.z = -0.3;
@@ -36,4 +36,4 @@ export class HelmetWithHorns extends BaseHelmet {
 
     return group;
   }
-} 
+}

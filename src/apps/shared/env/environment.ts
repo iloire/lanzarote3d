@@ -1,20 +1,20 @@
-import * as THREE from "three";
-import { Clouds } from "../../../foundation/components/environment";
-import { Weather } from "../../../foundation/components/physics";
-import { Thermal } from "../../../foundation/components/physics";
-import { rndIntBetween } from "../../../foundation/utils/math";
-import Tree from "../../../foundation/components/scenery/Tree";
-import PineTree from "../../../foundation/components/scenery/PineTree";
-import Stone from "../../../foundation/components/scenery/Stone";
-import House, { HouseType } from "../../../foundation/components/scenery/House";
-import Boat from "../../../foundation/components/scenery/Boat";
-import Birds from "../../../foundation/components/wildlife/Birds";
-import { Hangglider as HangGlider } from "../../../foundation/components/vehicles";
-import { addMeshAroundArea } from "./mesh-utils";
-import { generateThermalPair, ThermalGenerationOptions } from "./thermal-utils";
-import { CloudOptions } from "../../../foundation/components/environment";
-import { Theme } from "../../../foundation/types/Theme";
-import { ThemeEngine } from "../../../foundation/systems/ThemeEngine";
+import * as THREE from 'three';
+import { Clouds } from '../../../foundation/components/environment';
+import { Weather } from '../../../foundation/components/physics';
+import { Thermal } from '../../../foundation/components/physics';
+import { rndIntBetween } from '../../../foundation/utils/math';
+import Tree from '../../../foundation/components/scenery/Tree';
+import PineTree from '../../../foundation/components/scenery/PineTree';
+import Stone from '../../../foundation/components/scenery/Stone';
+import House, { HouseType } from '../../../foundation/components/scenery/House';
+import Boat from '../../../foundation/components/scenery/Boat';
+import Birds from '../../../foundation/components/wildlife/Birds';
+import { Hangglider as HangGlider } from '../../../foundation/components/vehicles';
+import { addMeshAroundArea } from './mesh-utils';
+import { generateThermalPair, ThermalGenerationOptions } from './thermal-utils';
+import { CloudOptions } from '../../../foundation/components/environment';
+import { Theme } from '../../../foundation/types/Theme';
+import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';
 
 class Environment {
   birds!: Birds;
@@ -40,7 +40,7 @@ class Environment {
       rotationSpeed: 0.06,
       forwardAxis: 'z', // Back to Z axis but will fix orientation in rotation logic
       scale: 1,
-      animationSpeed: 1.2
+      animationSpeed: 1.2,
     });
     const birdsMesh = await this.birds.load(path, gui);
     this.scene.add(birdsMesh);
@@ -56,20 +56,8 @@ class Environment {
     const boat = new Boat().load();
     const scale = 3;
     boat.scale.set(scale, scale, scale);
-    addMeshAroundArea(
-      [boat],
-      new THREE.Vector3(7879, 0, -4445),
-      5,
-      water,
-      this.scene
-    );
-    addMeshAroundArea(
-      [boat],
-      new THREE.Vector3(8279, 0, -6155),
-      4,
-      water,
-      this.scene
-    );
+    addMeshAroundArea([boat], new THREE.Vector3(7879, 0, -4445), 5, water, this.scene);
+    addMeshAroundArea([boat], new THREE.Vector3(8279, 0, -6155), 4, water, this.scene);
   }
 
   addHouses(terrain: THREE.Mesh) {
@@ -154,42 +142,17 @@ class Environment {
     );
   }
 
-
   addTrees(terrain: THREE.Mesh, scale: number = 2) {
     const tree = new Tree().load();
     tree.scale.set(scale, scale, scale);
-    addMeshAroundArea(
-      [tree],
-      new THREE.Vector3(6879, 0, -545),
-      100,
-      terrain,
-      this.scene,
-      100,
-      5
-    );
-    addMeshAroundArea(
-      [tree],
-      new THREE.Vector3(8879, 0, -2245),
-      100,
-      terrain,
-      this.scene,
-      100,
-      5
-    );
-    addMeshAroundArea(
-      [tree],
-      new THREE.Vector3(5600, 0, 705),
-      100,
-      terrain,
-      this.scene,
-      40,
-      5
-    );
+    addMeshAroundArea([tree], new THREE.Vector3(6879, 0, -545), 100, terrain, this.scene, 100, 5);
+    addMeshAroundArea([tree], new THREE.Vector3(8879, 0, -2245), 100, terrain, this.scene, 100, 5);
+    addMeshAroundArea([tree], new THREE.Vector3(5600, 0, 705), 100, terrain, this.scene, 40, 5);
   }
 
   addThermals(weather: Weather, opacity: number = 0.05): Thermal[] {
     const thermals = this.generateThermals(weather, opacity);
-    thermals.forEach((t) => {
+    thermals.forEach(t => {
       this.scene.add(t.getMesh());
     });
     return thermals;
@@ -201,7 +164,7 @@ class Environment {
       position: new THREE.Vector3(0, 0, 0),
       weather,
       superThermal: false,
-      opacity
+      opacity,
     };
 
     const allThermals = generateThermalPair(baseOptions)
@@ -210,7 +173,9 @@ class Environment {
       // tenesar
       .concat(generateThermalPair({ ...baseOptions, position: new THREE.Vector3(-4827, 0, -855) }))
       // mirador
-      .concat(generateThermalPair({ ...baseOptions, position: new THREE.Vector3(15027, 0, -12555) }))
+      .concat(
+        generateThermalPair({ ...baseOptions, position: new THREE.Vector3(15027, 0, -12555) })
+      )
       //pq
       .concat(generateThermalPair({ ...baseOptions, position: new THREE.Vector3(-6227, 0, 14055) }))
       //mala
@@ -218,22 +183,24 @@ class Environment {
       // pq
       .concat(generateThermalPair({ ...baseOptions, position: new THREE.Vector3(-3927, 0, 9830) }))
       .concat(generateThermalPair({ ...baseOptions, position: new THREE.Vector3(592, 0, 5530) }))
-      .concat(generateThermalPair({ ...baseOptions, position: new THREE.Vector3(15027, 0, -12555), superThermal: true }))
-
+      .concat(
+        generateThermalPair({
+          ...baseOptions,
+          position: new THREE.Vector3(15027, 0, -12555),
+          superThermal: true,
+        })
+      );
 
     this.thermals.concat(allThermals);
 
     return allThermals;
   }
 
-  async addClouds(
-    thermals: Thermal[],
-    options: CloudOptions
-  ): Promise<THREE.Object3D[]> {
+  async addClouds(thermals: Thermal[], options: CloudOptions): Promise<THREE.Object3D[]> {
     // from thermals
-    const mainThermals = thermals.filter((t) => t.isMainThermal());
+    const mainThermals = thermals.filter(t => t.isMainThermal());
     const clouds = await Promise.all(
-      mainThermals.map((t) => {
+      mainThermals.map(t => {
         if (t.isSuperThermal()) {
           return new Clouds(options).load(
             3,
@@ -255,7 +222,7 @@ class Environment {
         }
       })
     );
-    clouds.forEach((c) => {
+    clouds.forEach(c => {
       this.scene.add(c);
     });
 
@@ -264,11 +231,8 @@ class Environment {
       { x: 5120, y: 2000, z: -10100 },
       { x: 2600, y: 2300, z: 842 },
       { x: -3600, y: 2300, z: 8042 },
-    ].map(async (pos) => {
-      const cloud = await new Clouds(options).load(
-        1,
-        new THREE.Vector3(pos.x, pos.y, pos.z)
-      );
+    ].map(async pos => {
+      const cloud = await new Clouds(options).load(1, new THREE.Vector3(pos.x, pos.y, pos.z));
       this.scene.add(cloud);
     });
     return clouds;
@@ -283,10 +247,7 @@ class Environment {
   /**
    * Add clouds using theme settings
    */
-  async addCloudsFromTheme(
-    thermals: Thermal[],
-    theme: Theme
-  ): Promise<THREE.Object3D[]> {
+  async addCloudsFromTheme(thermals: Thermal[], theme: Theme): Promise<THREE.Object3D[]> {
     const cloudOptions = ThemeEngine.getCloudOptionsFromTheme(theme);
     return this.addClouds(thermals, cloudOptions);
   }

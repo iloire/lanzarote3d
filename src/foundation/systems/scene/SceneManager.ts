@@ -1,6 +1,6 @@
-import * as THREE from "three";
-import { Sky } from "../../components/environment";
-import { Weather } from "../../components/physics";
+import * as THREE from 'three';
+import { Sky } from '../../components/environment';
+import { Weather } from '../../components/physics';
 
 export interface SceneConfig {
   environment?: 'lanzarote' | 'custom';
@@ -29,7 +29,7 @@ export class SceneManager {
       environment: 'lanzarote',
       lighting: 'dynamic',
       physics: false,
-      ...config
+      ...config,
     };
 
     this.scene = new THREE.Scene();
@@ -52,8 +52,8 @@ export class SceneManager {
       scene: this.scene,
       lighting: {
         ambientLight,
-        directionalLight
-      }
+        directionalLight,
+      },
     };
 
     // Setup environment-specific components
@@ -78,7 +78,7 @@ export class SceneManager {
       this.components.weather = new Weather({
         windDirectionDegreesFromNorth: 310,
         speedMetresPerSecond: 5,
-        lclLevel: 1800
+        lclLevel: 1800,
       });
     }
   }

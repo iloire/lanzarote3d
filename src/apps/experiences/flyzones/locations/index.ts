@@ -15,11 +15,6 @@ export { default as mala } from './mala';
 export { default as playaQuemada } from './playa-quemada';
 
 // Create a default export with all locations
-const locations: FlyLocation[] = [
-  famara,
-  teguise,
-  mala,
-  playaQuemada
-];
+const locations: FlyLocation[] = [famara, teguise, mala, playaQuemada];
 
 export default locations;

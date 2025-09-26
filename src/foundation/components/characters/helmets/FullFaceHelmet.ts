@@ -1,10 +1,10 @@
-import * as THREE from "three";
-import { BaseHelmet } from "./BaseHelmet";
+import * as THREE from 'three';
+import { BaseHelmet } from './BaseHelmet';
 
 export class FullFaceHelmet extends BaseHelmet {
   load(): THREE.Group {
     const group = new THREE.Group();
-    
+
     // Main helmet shell
     const helmetMat = this.getColoredMaterial(this.options.color);
     const helmetGeo = new THREE.BoxGeometry(400, 400, 390);
@@ -37,4 +37,4 @@ export class FullFaceHelmet extends BaseHelmet {
 
     return group;
   }
-} 
+}

@@ -1,8 +1,6 @@
-import * as THREE from "three";
+import * as THREE from 'three';
 
-const getDirectionFromNorth = (
-  directionDegreesFromNorth: number
-): THREE.Vector3 => {
+const getDirectionFromNorth = (directionDegreesFromNorth: number): THREE.Vector3 => {
   const dir = new THREE.Vector3();
   const dirPhi = THREE.MathUtils.degToRad(-directionDegreesFromNorth);
   dir.setFromSphericalCoords(1, Math.PI / 2, dirPhi);
@@ -32,12 +30,7 @@ class WindIndicator {
   }
   arrow!: THREE.ArrowHelper;
   load(directionDegrees: number, origin: THREE.Vector3): THREE.ArrowHelper {
-    this.arrow = createWindArrow(
-      directionDegrees,
-      this.length,
-      origin,
-      0xffffff
-    );
+    this.arrow = createWindArrow(directionDegrees, this.length, origin, 0xffffff);
     return this.arrow;
   }
 

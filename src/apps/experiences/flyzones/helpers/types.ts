@@ -4,7 +4,7 @@ import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 export enum MarkerType {
   LOCATION = 'location',
   TAKEOFF = 'takeoff',
-  LANDING = 'landing'
+  LANDING = 'landing',
 }
 
 // Define the Marker interface here to avoid circular dependencies

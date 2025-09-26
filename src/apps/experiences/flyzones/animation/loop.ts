@@ -66,4 +66,4 @@ export const setupAnimationLoop = (
 
   // Start the animation loop
   animate();
-}; 
+};

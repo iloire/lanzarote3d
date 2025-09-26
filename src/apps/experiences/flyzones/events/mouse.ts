@@ -13,7 +13,7 @@ export const setupMouseClickHandler = (
     if (document.getElementById('ruler-toggle-btn')?.classList.contains('active')) {
       return;
     }
-    
+
     // Calculate mouse position in normalized device coordinates
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -23,7 +23,7 @@ export const setupMouseClickHandler = (
 
     // Find intersections with the terrain
     const intersects = raycaster.intersectObjects(scene.children, true);
-    
+
     // If we hit something, coordinates are available for future use
     if (intersects.length > 0 && intersects[0]) {
       // Click detected - coordinates available in intersects[0].point
@@ -38,4 +38,4 @@ export const setupMouseClickHandler = (
   return () => {
     renderer.domElement.removeEventListener('click', onMouseClick);
   };
-}; 
+};

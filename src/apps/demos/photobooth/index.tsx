@@ -12,7 +12,10 @@ import { StoryOptions } from '../../shared/types';
 import { getDefaultTheme } from '../../../foundation/themes';
 import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';
 import { AppBase } from '../../shared/AppBase';
-import { OrbitControlsHelper, ORBIT_CONTROLS_PRESETS } from '../../../foundation/utils/OrbitControlsHelper';
+import {
+  OrbitControlsHelper,
+  ORBIT_CONTROLS_PRESETS,
+} from '../../../foundation/utils/OrbitControlsHelper';
 
 const tandems = [
   {
@@ -189,13 +192,13 @@ class PhotoBoothApp extends AppBase {
         lighting: 'dynamic',
         physics: false,
         fog: {
-          enabled: false // Fog handled by theme system
-        }
+          enabled: false, // Fog handled by theme system
+        },
       },
       performance: {
         monitoring: true,
-        logIntervalMs: 15000 // Log performance every 15 seconds
-      }
+        logIntervalMs: 15000, // Log performance every 15 seconds
+      },
     });
   }
 
@@ -220,9 +223,7 @@ class PhotoBoothApp extends AppBase {
       camera.lookAt(lookAtPos);
 
       // Apply landscape viewing controls for photobooth exploration
-      OrbitControlsHelper.focusOnTarget(controls, lookAtPos,
-        ORBIT_CONTROLS_PRESETS['landscape']
-      );
+      OrbitControlsHelper.focusOnTarget(controls, lookAtPos, ORBIT_CONTROLS_PRESETS['landscape']);
 
       // Load paragliders with proper tracking for disposal
       await this.loadParagliders(scene);
@@ -245,8 +246,9 @@ class PhotoBoothApp extends AppBase {
       this.startAnimationLoop(renderer, scene, camera, controls);
 
       this.isLoaded = true;
-      console.log(`✅ ${this.config.name} loaded successfully with ${this.paragliderMeshes.length} paragliders`);
-
+      console.log(
+        `✅ ${this.config.name} loaded successfully with ${this.paragliderMeshes.length} paragliders`
+      );
     } catch (error) {
       this.handleError(error as Error, 'load');
       throw error;
@@ -309,7 +311,12 @@ class PhotoBoothApp extends AppBase {
     await Promise.all([...paragliderPromises, ...voxelPromises, ...tandemPromises]);
   }
 
-  private startAnimationLoop(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.Camera, controls: any): void {
+  private startAnimationLoop(
+    renderer: THREE.WebGLRenderer,
+    scene: THREE.Scene,
+    camera: THREE.Camera,
+    controls: any
+  ): void {
     const animate = () => {
       try {
         // Update performance monitoring
@@ -339,7 +346,7 @@ class PhotoBoothApp extends AppBase {
     // Dispose paraglider meshes
     this.paragliderMeshes.forEach(mesh => {
       // Dispose geometry and materials if they exist
-      mesh.traverse((child) => {
+      mesh.traverse(child => {
         if (child instanceof THREE.Mesh) {
           if (child.geometry) child.geometry.dispose();
           if (child.material) {
@@ -377,7 +384,7 @@ const PhotoBooth = {
   },
   getAppInfo: () => {
     return photoBoothApp.getAppInfo();
-  }
+  },
 };
 
 export default PhotoBooth;

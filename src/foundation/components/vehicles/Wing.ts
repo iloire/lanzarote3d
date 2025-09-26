@@ -1,5 +1,5 @@
-import * as THREE from "three";
-import GuiHelper from "../../utils/gui";
+import * as THREE from 'three';
+import GuiHelper from '../../utils/gui';
 
 const mat_wing = new THREE.MeshLambertMaterial({ color: 0x00ffff });
 
@@ -60,9 +60,9 @@ class HGWing {
 
     fullWing.translateZ(-78);
     if (gui) {
-      GuiHelper.addLocationGui(gui, "leftWing", leftWing.wing);
-      GuiHelper.addLocationGui(gui, "rightWing", rightWing.wing);
-      GuiHelper.addLocationGui(gui, "wing", fullWing);
+      GuiHelper.addLocationGui(gui, 'leftWing', leftWing.wing);
+      GuiHelper.addLocationGui(gui, 'rightWing', rightWing.wing);
+      GuiHelper.addLocationGui(gui, 'wing', fullWing);
     }
     return fullWing;
   }

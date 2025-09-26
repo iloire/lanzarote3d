@@ -28,7 +28,7 @@ export class MarkerObject {
   showPopup: () => void;
   setVisibility: (visible: boolean) => void;
   flyzone?: THREE.Object3D;
-  
+
   constructor(pin: THREE.Object3D, type: MarkerType) {
     this.pin = pin;
     this.type = type;
@@ -37,19 +37,19 @@ export class MarkerObject {
     this.showPopup = () => {};
     this.setVisibility = () => {};
   }
-  
+
   get userData() {
     return this.pin.userData;
   }
-  
+
   get visible() {
     return this.pin.visible;
   }
-  
+
   set visible(value: boolean) {
     this.pin.visible = value;
   }
-  
+
   traverse(callback: (object: THREE.Object3D) => void) {
     this.pin.traverse(callback);
   }
@@ -70,16 +70,17 @@ export const createMarker = async (
 ): Promise<MarkerObject> => {
   const pin = await createPinMesh(type);
   setupPinBasics(pin, position, type);
-  
+
   // Add wind arrow for takeoffs
   if (type === MarkerType.TAKEOFF && conditions && conditions.length > 0) {
-    const bestConditions = conditions.reduce((best, current) => 
-      current.rating > best.rating ? current : best, conditions[0]
+    const bestConditions = conditions.reduce(
+      (best, current) => (current.rating > best.rating ? current : best),
+      conditions[0]
     );
     const windArrow = createWindArrow(bestConditions.direction.ideal);
     pin.add(windArrow);
   }
-  
+
   scene.add(pin);
 
   // Add label
@@ -97,19 +98,19 @@ export const createMarker = async (
     type,
     position,
     camera,
-    fadeAnimation
+    fadeAnimation,
   });
 
   // Create popup handler
   const showPopup = () => {
     if (!popupContainer) return;
-    
+
     // Showing popup
-    
+
     // Create popup content
     const popupContent = document.createElement('div');
     popupContent.className = 'popup-content';
-    
+
     // Add close button
     const closeButton = document.createElement('button');
     closeButton.className = 'popup-close-btn';
@@ -118,24 +119,24 @@ export const createMarker = async (
       popupContainer.style.display = 'none';
     };
     popupContent.appendChild(closeButton);
-    
+
     // Add title
     const titleElement = document.createElement('h2');
     titleElement.textContent = title || '';
     popupContent.appendChild(titleElement);
-    
+
     // Add description
     if (description) {
       const descElement = document.createElement('p');
       descElement.textContent = description;
       popupContent.appendChild(descElement);
     }
-    
+
     // Add media items
     if (mediaItems && mediaItems.length > 0) {
       const mediaContainer = document.createElement('div');
       mediaContainer.className = 'media-container';
-      
+
       mediaItems.forEach(item => {
         if (item.type === 'image') {
           const img = document.createElement('img');
@@ -151,15 +152,15 @@ export const createMarker = async (
           mediaContainer.appendChild(video);
         }
       });
-      
+
       popupContent.appendChild(mediaContainer);
     }
-    
+
     // Show the popup
     popupContainer.innerHTML = '';
     popupContainer.appendChild(popupContent);
     popupContainer.style.display = 'block';
-    
+
     // Position the popup near the marker
     const screenPosition = worldToScreen(position, camera, setupLabelRenderer());
     popupContainer.style.left = `${screenPosition.x}px`;
@@ -185,13 +186,13 @@ export const createMarker = async (
 export const createPinMesh = async (type: MarkerType) => {
   const colors = PIN_COLORS[type];
   const sizes = PIN_SIZES[type];
-  
-  const geometry = new THREE.CylinderGeometry(sizes.radius/3, sizes.radius, sizes.height, 12, 1);
-  const material = new THREE.MeshPhongMaterial({ 
+
+  const geometry = new THREE.CylinderGeometry(sizes.radius / 3, sizes.radius, sizes.height, 12, 1);
+  const material = new THREE.MeshPhongMaterial({
     color: colors.main,
     emissive: colors.emissive,
     transparent: true,
-    opacity: 0.8
+    opacity: 0.8,
   });
 
   const gliderOptions = {
@@ -208,8 +209,8 @@ export const createPinMesh = async (type: MarkerType) => {
       helmetOptions: {
         color: '#ffffff',
         color2: '#cccccc',
-        color3: '#999999'
-      }
+        color3: '#999999',
+      },
     },
     carabinerColor: '#333',
   };
@@ -220,12 +221,12 @@ export const createPinMesh = async (type: MarkerType) => {
     helmetOptions: {
       color: '#ffffff',
       color2: '#cccccc',
-      color3: '#999999'
-    }
+      color3: '#999999',
+    },
   };
 
   const mesh = new THREE.Mesh(geometry, material);
-  mesh.position.add(new THREE.Vector3(0, sizes.height/2, 0));
+  mesh.position.add(new THREE.Vector3(0, sizes.height / 2, 0));
   const group = new THREE.Group();
   group.add(mesh);
 
@@ -245,7 +246,7 @@ export const setupPinBasics = (pin: THREE.Object3D, position: THREE.Vector3, typ
   pin.userData['type'] = type;
   pin.userData['hoverable'] = true;
   pin.userData['clickable'] = true;
-  
+
   // Make sure all children inherit the clickable property
   pin.traverse(child => {
     if (child !== pin) {
@@ -265,40 +266,48 @@ export const createHoverAnimations = (pin: THREE.Object3D, isTakeoff: boolean) =
     return {
       hover: {
         start: () => {
-          animator.animate(`hover-${pin.id}`, 200, (progress) => {
+          animator.animate(`hover-${pin.id}`, 200, progress => {
             if ('opacity' in pin.material) {
               pin.material.opacity = THREE.MathUtils.lerp(startOpacity, 1, progress);
             }
             if ('emissive' in pin.material) {
-              pin.material.emissive.lerpColors(startEmissive, new THREE.Color(colors.main), progress);
+              pin.material.emissive.lerpColors(
+                startEmissive,
+                new THREE.Color(colors.main),
+                progress
+              );
             }
           });
-        }
+        },
       },
       unhover: {
         start: () => {
-          animator.animate(`unhover-${pin.id}`, 200, (progress) => {
+          animator.animate(`unhover-${pin.id}`, 200, progress => {
             if ('opacity' in pin.material) {
               pin.material.opacity = THREE.MathUtils.lerp(1, 0.8, progress);
             }
             if ('emissive' in pin.material) {
-              pin.material.emissive.lerpColors(new THREE.Color(colors.main), new THREE.Color(colors.emissive), progress);
+              pin.material.emissive.lerpColors(
+                new THREE.Color(colors.main),
+                new THREE.Color(colors.emissive),
+                progress
+              );
             }
           });
-        }
-      }
+        },
+      },
     };
   }
   return {
     hover: { start: () => {} },
-    unhover: { start: () => {} }
+    unhover: { start: () => {} },
   };
 };
 
 export const createFadeAnimation = (pin: THREE.Object3D) => {
   const fadeTargets: { material: THREE.Material }[] = [];
 
-  pin.traverse((child) => {
+  pin.traverse(child => {
     if (child instanceof THREE.Mesh && child.material) {
       fadeTargets.push({ material: child.material });
     }
@@ -307,36 +316,36 @@ export const createFadeAnimation = (pin: THREE.Object3D) => {
   return {
     fadeIn: {
       start: () => {
-        animator.animate(`fade-in-${pin.id}`, PIN_FADE_DURATION, (progress) => {
+        animator.animate(`fade-in-${pin.id}`, PIN_FADE_DURATION, progress => {
           fadeTargets.forEach(target => {
             if ('opacity' in target.material) {
               target.material.opacity = THREE.MathUtils.lerp(0, 1, progress);
             }
           });
         });
-      }
+      },
     },
     fadeOut: {
       start: () => {
-        animator.animate(`fade-out-${pin.id}`, PIN_FADE_DURATION, (progress) => {
+        animator.animate(`fade-out-${pin.id}`, PIN_FADE_DURATION, progress => {
           fadeTargets.forEach(target => {
             if ('opacity' in target.material) {
               target.material.opacity = THREE.MathUtils.lerp(1, 0, progress);
             }
           });
         });
-      }
-    }
+      },
+    },
   };
 };
 
 export const createVisibilityHandler = (params: {
-  pin: THREE.Object3D,
-  label: CSS2DObject,
-  type: MarkerType,
-  position: THREE.Vector3,
-  camera: THREE.Camera,
-  fadeAnimation: ReturnType<typeof createFadeAnimation>
+  pin: THREE.Object3D;
+  label: CSS2DObject;
+  type: MarkerType;
+  position: THREE.Vector3;
+  camera: THREE.Camera;
+  fadeAnimation: ReturnType<typeof createFadeAnimation>;
 }) => {
   return (visible: boolean) => {
     params.pin.visible = visible;
@@ -350,7 +359,9 @@ export const createVisibilityHandler = (params: {
   };
 };
 
-const isMeshWithMaterial = (obj: THREE.Object3D): obj is THREE.Mesh<THREE.BufferGeometry, THREE.MeshPhongMaterial> => {
+const isMeshWithMaterial = (
+  obj: THREE.Object3D
+): obj is THREE.Mesh<THREE.BufferGeometry, THREE.MeshPhongMaterial> => {
   return obj instanceof THREE.Mesh && 'material' in obj;
 };
 
@@ -361,10 +372,10 @@ export const createSimpleMarker = async (
 ): Promise<MarkerObject> => {
   const pin = await createPinMesh(type);
   setupPinBasics(pin, position, type);
-  
+
   // Setup animations
   const { hover, unhover } = createHoverAnimations(pin, type === MarkerType.TAKEOFF);
-  
+
   // Create a simple marker using the MarkerObject class
   const marker = new MarkerObject(pin, type);
   marker.hoverAnimation = hover;
@@ -378,6 +389,6 @@ export const createSimpleMarker = async (
       }
     });
   };
-  
+
   return marker;
-}; 
+};

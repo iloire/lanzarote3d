@@ -1,4 +1,4 @@
-import { Location } from "../flyzones/locations/index";
+import { Location } from '../flyzones/locations/index';
 
 export type GameStartOptions = {
   startingLocation: Location;

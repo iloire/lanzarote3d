@@ -26,7 +26,7 @@ body {
   padding: 0.4em 0.7em;
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  font-size: 0.80em;
+  font-size: 0.8em;
   cursor: pointer;
   margin: 0;
   text-transform: uppercase;
@@ -49,7 +49,6 @@ body {
 .appOptions div.button button.selected {
   background: #f64a8a;
   color: #fff;
-
 }
 
 .appOptions div.button {
@@ -374,7 +373,8 @@ body {
   font-size: 100%;
 }
 
-#game-start-normal {}
+#game-start-normal {
+}
 
 #game-start-strong {
   margin-left: 40px;

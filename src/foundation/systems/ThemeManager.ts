@@ -42,7 +42,9 @@ class ThemeManager {
         console.log(`ThemeManager initialized with saved theme: ${savedTheme.name}`);
       } else {
         this.currentTheme = getDefaultTheme();
-        console.log(`ThemeManager initialized with default theme (saved theme not found): ${this.currentTheme.name}`);
+        console.log(
+          `ThemeManager initialized with default theme (saved theme not found): ${this.currentTheme.name}`
+        );
       }
     } else if (!this.currentTheme) {
       this.currentTheme = getDefaultTheme();
@@ -155,7 +157,6 @@ class ThemeManager {
       }
     });
   }
-
 
   /**
    * Quick apply theme by index (for keyboard shortcuts)

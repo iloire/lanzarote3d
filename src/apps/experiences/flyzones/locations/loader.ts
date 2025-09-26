@@ -10,4 +10,4 @@ export const loadAllLocations = async (): Promise<FlyLocation[]> => {
 // Get a location by ID
 export const getLocationById = async (id: string): Promise<FlyLocation | undefined> => {
   return locations.find(location => location.id === id);
-}; 
+};

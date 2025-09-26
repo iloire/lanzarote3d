@@ -50,19 +50,28 @@ class WorkshopApp extends AppBase {
     super({
       name: 'Workshop',
       description: 'Component showcase displaying various 3D objects with interactive labels',
-      requiredComponents: ['scene', 'camera', 'renderer', 'terrain', 'water', 'sky', 'gui', 'controls'],
+      requiredComponents: [
+        'scene',
+        'camera',
+        'renderer',
+        'terrain',
+        'water',
+        'sky',
+        'gui',
+        'controls',
+      ],
       scene: {
         environment: 'custom',
         lighting: 'static',
         physics: false,
         fog: {
-          enabled: false // Workshop focuses on clear component visibility
-        }
+          enabled: false, // Workshop focuses on clear component visibility
+        },
       },
       performance: {
         monitoring: true,
-        logIntervalMs: 20000 // Log performance every 20 seconds
-      }
+        logIntervalMs: 20000, // Log performance every 20 seconds
+      },
     });
   }
 
@@ -90,8 +99,9 @@ class WorkshopApp extends AppBase {
       this.startAnimationLoop(camera, renderer, scene, controls);
 
       this.isLoaded = true;
-      console.log(`✅ ${this.config.name} loaded successfully with ${this.componentMeshes.length} components`);
-
+      console.log(
+        `✅ ${this.config.name} loaded successfully with ${this.componentMeshes.length} components`
+      );
     } catch (error) {
       this.handleError(error as Error, 'load');
       throw error;
@@ -152,7 +162,7 @@ class WorkshopApp extends AppBase {
       { type: HouseType.Small, position: [0, 0, 0], label: 'Small House' },
       { type: HouseType.Medium, position: [0, 0, 30], label: 'Medium House' },
       { type: HouseType.Large, position: [0, 0, 60], label: 'Large House' },
-      { type: HouseType.Modern, position: [0, 0, 90], label: 'Modern House' }
+      { type: HouseType.Modern, position: [0, 0, 90], label: 'Modern House' },
     ];
 
     for (const config of houseConfigs) {
@@ -163,7 +173,10 @@ class WorkshopApp extends AppBase {
         scene.add(houseMesh);
         this.componentMeshes.push(houseMesh);
 
-        const houseLabel = createLabel(config.label, new THREE.Vector3(config.position[0], -10, config.position[2]));
+        const houseLabel = createLabel(
+          config.label,
+          new THREE.Vector3(config.position[0], -10, config.position[2])
+        );
         scene.add(houseLabel);
         this.labelMeshes.push(houseLabel);
       } catch (error) {
@@ -205,7 +218,7 @@ class WorkshopApp extends AppBase {
     // Load stones
     const stoneConfigs = [
       { position: [100, 0, 30], scale: [2, 2, 2], label: 'Stone' },
-      { position: [130, 0, 60], scale: [1.5, 3, 1.5], label: 'Tall Stone' }
+      { position: [130, 0, 60], scale: [1.5, 3, 1.5], label: 'Tall Stone' },
     ];
 
     for (const config of stoneConfigs) {
@@ -217,7 +230,10 @@ class WorkshopApp extends AppBase {
         scene.add(stoneMesh);
         this.componentMeshes.push(stoneMesh);
 
-        const stoneLabel = createLabel(config.label, new THREE.Vector3(config.position[0], -10, config.position[2]));
+        const stoneLabel = createLabel(
+          config.label,
+          new THREE.Vector3(config.position[0], -10, config.position[2])
+        );
         scene.add(stoneLabel);
         this.labelMeshes.push(stoneLabel);
       } catch (error) {
@@ -248,7 +264,12 @@ class WorkshopApp extends AppBase {
     camera.lookAt(lookAt);
   }
 
-  private startAnimationLoop(camera: THREE.Camera, renderer: THREE.WebGLRenderer, scene: THREE.Scene, controls: any): void {
+  private startAnimationLoop(
+    camera: THREE.Camera,
+    renderer: THREE.WebGLRenderer,
+    scene: THREE.Scene,
+    controls: any
+  ): void {
     const animate = () => {
       try {
         // Update performance monitoring

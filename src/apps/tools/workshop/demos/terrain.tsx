@@ -323,12 +323,17 @@ const TerrainWorkshop = {
       // Direct theme buttons
       const themesFolder = themeFolder.addFolder('🎨 All Themes');
       ALL_THEMES.forEach(theme => {
-        themesFolder.add({
-          apply: async () => {
-            await syncTerrainWithTheme(theme);
-            updateInfo();
-          }
-        }, 'apply').name(`${theme.name}`);
+        themesFolder
+          .add(
+            {
+              apply: async () => {
+                await syncTerrainWithTheme(theme);
+                updateInfo();
+              },
+            },
+            'apply'
+          )
+          .name(`${theme.name}`);
       });
 
       // Quick theme selector
@@ -338,7 +343,7 @@ const TerrainWorkshop = {
         applyFullTheme: async () => {
           await syncTerrainWithTheme(currentTheme);
           updateInfo();
-        }
+        },
       };
 
       themeFolder

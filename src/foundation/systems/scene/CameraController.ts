@@ -1,8 +1,8 @@
-import * as THREE from "three";
-import Flier from "../../types/flier";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { animator } from "../animation/SimpleAnimator";
-import GuiHelper from "../../utils/gui";
+import * as THREE from 'three';
+import Flier from '../../types/flier';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { animator } from '../animation/SimpleAnimator';
+import GuiHelper from '../../utils/gui';
 
 const DEFAULT_FOLLOW_DISTANCE = 180;
 const DEFAULT_ANGLE = -Math.PI / 5.8;
@@ -83,30 +83,19 @@ export class CameraController extends THREE.PerspectiveCamera {
   floatStartTime = performance.now();
   baseY: number = 0;
 
-  constructor(
-    fov: number,
-    aspect: number,
-    near: number,
-    far: number,
-    terrain: THREE.Mesh
-  ) {
+  constructor(fov: number, aspect: number, near: number, far: number, terrain: THREE.Mesh) {
     super(fov, aspect, near, far);
     this.terrain = terrain;
   }
 
   addGui(gui) {
-    GuiHelper.addLocationGui(gui, "Camera", this, { min: 0, max: 10000 });
-    GuiHelper.addPositionGui(
-      gui,
-      "Camera.firstPersonViewOffset",
-      this.firstPersonViewOffset,
-      {
-        min: -20,
-        max: 20,
-      }
-    );
-    const g = gui.addFolder("Camera.followTarget");
-    g.add(this, "angle", -Math.PI, Math.PI).name("angle").listen();
+    GuiHelper.addLocationGui(gui, 'Camera', this, { min: 0, max: 10000 });
+    GuiHelper.addPositionGui(gui, 'Camera.firstPersonViewOffset', this.firstPersonViewOffset, {
+      min: -20,
+      max: 20,
+    });
+    const g = gui.addFolder('Camera.followTarget');
+    g.add(this, 'angle', -Math.PI, Math.PI).name('angle').listen();
   }
 
   update() {
@@ -116,17 +105,17 @@ export class CameraController extends THREE.PerspectiveCamera {
     if (this.mode === CameraMode.FollowTarget) {
       // Camera switching to follow target mode
       if (!this.target) {
-        throw new Error("Camera target is not set");
+        throw new Error('Camera target is not set');
       }
       this.followTarget();
     } else if (this.mode === CameraMode.FirstPersonView) {
       // Camera switching to first person mode
       if (!this.target) {
-        throw new Error("Camera target is not set");
+        throw new Error('Camera target is not set');
       }
       this.firstPersonView();
     } else {
-      throw new Error("invalid camera mode");
+      throw new Error('invalid camera mode');
     }
 
     isLeftViewing && this.turnLeft();
@@ -179,21 +168,26 @@ export class CameraController extends THREE.PerspectiveCamera {
     newTarget: THREE.Vector3,
     duration: number = 2000,
     controls: OrbitControls,
-    cb: any = () => { }
+    cb: any = () => {}
   ) {
     // Store initial positions
     const startPosition = this.position.clone();
     const startTarget = controls.target.clone();
 
     // Simple animation using our SimpleAnimator
-    animator.animate(`camera-${Date.now()}`, duration, (progress) => {
-      // Interpolate camera position
-      this.position.lerpVectors(startPosition, newPosition, progress);
+    animator.animate(
+      `camera-${Date.now()}`,
+      duration,
+      progress => {
+        // Interpolate camera position
+        this.position.lerpVectors(startPosition, newPosition, progress);
 
-      // Interpolate look target
-      controls.target.lerpVectors(startTarget, newTarget, progress);
-      controls.update();
-    }, cb);
+        // Interpolate look target
+        controls.target.lerpVectors(startTarget, newTarget, progress);
+        controls.update();
+      },
+      cb
+    );
   }
 
   followTarget() {
@@ -222,9 +216,7 @@ export class CameraController extends THREE.PerspectiveCamera {
     this.lookAt(lookAt);
 
     // adjust for roll
-    this.rotateZ(
-      -1 * (this.viewRotationHorizontal / 4 + pg.getMesh().rotation.z)
-    );
+    this.rotateZ(-1 * (this.viewRotationHorizontal / 4 + pg.getMesh().rotation.z));
 
     // view rotation
     this.rotateY(-1 * this.viewRotationHorizontal * 1.5);
@@ -234,11 +226,11 @@ export class CameraController extends THREE.PerspectiveCamera {
   dispose() {
     // Clean up event listeners
     if (keydownListener) {
-      document.removeEventListener("keydown", keydownListener);
+      document.removeEventListener('keydown', keydownListener);
       keydownListener = null;
     }
     if (keyupListener) {
-      document.removeEventListener("keyup", keyupListener);
+      document.removeEventListener('keyup', keyupListener);
       keyupListener = null;
     }
   }
@@ -247,11 +239,11 @@ export class CameraController extends THREE.PerspectiveCamera {
   static initializeEventListeners() {
     if (!keydownListener) {
       keydownListener = onDocumentKeyDown;
-      document.addEventListener("keydown", keydownListener, false);
+      document.addEventListener('keydown', keydownListener, false);
     }
     if (!keyupListener) {
       keyupListener = onDocumentKeyUp;
-      document.addEventListener("keyup", keyupListener, false);
+      document.addEventListener('keyup', keyupListener, false);
     }
   }
 }

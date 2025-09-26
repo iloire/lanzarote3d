@@ -1,12 +1,12 @@
-import * as THREE from "three";
-import { BaseHead } from "./BaseHead";
+import * as THREE from 'three';
+import { BaseHead } from './BaseHead';
 
 export class WarriorHead extends BaseHead {
   private addBeard(): THREE.Group {
     const group = new THREE.Group();
     const material = new THREE.MeshPhongMaterial({
       color: this.options.beardColor,
-      flatShading: true
+      flatShading: true,
     });
 
     const shape1 = new THREE.Shape();
@@ -25,13 +25,13 @@ export class WarriorHead extends BaseHead {
     const primarySettings = {
       steps: 2,
       depth: 1,
-      bevelEnabled: false
+      bevelEnabled: false,
     };
 
     const secondarySettings = {
       steps: 2,
       depth: 1,
-      bevelEnabled: false
+      bevelEnabled: false,
     };
 
     const primaryBeardGeo = new THREE.ExtrudeGeometry(shape1, primarySettings);
@@ -62,7 +62,7 @@ export class WarriorHead extends BaseHead {
     const group = new THREE.Group();
     const material = new THREE.MeshPhongMaterial({
       color: 0xcc613d,
-      flatShading: true
+      flatShading: true,
     });
 
     const mustacheGeo = new THREE.BoxGeometry(0.6, 0.2, 0.25);
@@ -114,8 +114,8 @@ export class WarriorHead extends BaseHead {
     helmet.translateY(2.2);
     helmet.translateZ(-0.3);
     group.add(helmet);
-    group.scale.set(200,200,200);
+    group.scale.set(200, 200, 200);
 
     return group;
   }
-} 
+}

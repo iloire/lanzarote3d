@@ -63,14 +63,19 @@ const CloudsWorkshop = {
       // Direct theme buttons
       const themesFolder = themeFolder.addFolder('🎨 All Themes');
       ALL_THEMES.forEach(theme => {
-        themesFolder.add({
-          apply: async () => {
-            currentTheme = theme;
-            await themeManager.applyTheme(theme.id);
-            await createClouds(theme);
-            updateInfo();
-          }
-        }, 'apply').name(`${theme.name}`);
+        themesFolder
+          .add(
+            {
+              apply: async () => {
+                currentTheme = theme;
+                await themeManager.applyTheme(theme.id);
+                await createClouds(theme);
+                updateInfo();
+              },
+            },
+            'apply'
+          )
+          .name(`${theme.name}`);
       });
 
       // Quick theme selector
@@ -82,7 +87,7 @@ const CloudsWorkshop = {
           await themeManager.applyTheme(currentTheme.id);
           await createClouds(currentTheme);
           updateInfo();
-        }
+        },
       };
 
       themeFolder

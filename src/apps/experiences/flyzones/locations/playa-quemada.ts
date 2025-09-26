@@ -6,12 +6,13 @@ import { gpsToWorld } from '../helpers/gps';
 const metadata = {
   id: 'playa-quemada',
   title: 'Playa Quemada',
-  description: 'Remote coastal flying site with pristine volcanic landscape and reliable thermal conditions.',
+  description:
+    'Remote coastal flying site with pristine volcanic landscape and reliable thermal conditions.',
   position: new THREE.Vector3(0, 0, 0), // Will be calculated from takeoffs
   cameraView: {
     position: new THREE.Vector3(9500, 1800, -1500),
-    lookAt: new THREE.Vector3(0, 0, 0) // Will be updated to match position
-  }
+    lookAt: new THREE.Vector3(0, 0, 0), // Will be updated to match position
+  },
 };
 
 // Playa Quemada Takeoffs
@@ -19,36 +20,37 @@ const takeoffs: Takeoff[] = [
   {
     id: 'takeoff-quemada-main',
     title: 'Playa Quemada Main Takeoff',
-    description: 'Primary launch site overlooking the dramatic volcanic coastline with good thermal potential.',
+    description:
+      'Primary launch site overlooking the dramatic volcanic coastline with good thermal potential.',
     gps: {
-      latitude: 28.9180,
+      latitude: 28.918,
       longitude: -13.7325,
-      altitude: 165
+      altitude: 165,
     },
-    position: gpsToWorld(28.9180, -13.7325, 165),
+    position: gpsToWorld(28.918, -13.7325, 165),
     elevation: 165,
     conditions: [
       {
         direction: {
           ideal: 60,
-          range: [30, 100]
+          range: [30, 100],
         },
         speed: {
           min: 6,
           max: 18,
-          ideal: 12
+          ideal: 12,
         },
         rating: 4,
-        description: 'Good thermal conditions, light to moderate winds'
-      }
+        description: 'Good thermal conditions, light to moderate winds',
+      },
     ],
     mediaItems: [
       {
         type: 'image',
         url: '/assets/images/quemada-takeoff.jpg',
-        title: 'Playa Quemada Takeoff'
-      }
-    ]
+        title: 'Playa Quemada Takeoff',
+      },
+    ],
   },
   {
     id: 'takeoff-quemada-south',
@@ -57,7 +59,7 @@ const takeoffs: Takeoff[] = [
     gps: {
       latitude: 28.9165,
       longitude: -13.7335,
-      altitude: 140
+      altitude: 140,
     },
     position: gpsToWorld(28.9165, -13.7335, 140),
     elevation: 140,
@@ -65,25 +67,25 @@ const takeoffs: Takeoff[] = [
       {
         direction: {
           ideal: 90,
-          range: [60, 120]
+          range: [60, 120],
         },
         speed: {
           min: 8,
           max: 20,
-          ideal: 14
+          ideal: 14,
         },
         rating: 4,
-        description: 'Protected from strong NE winds'
-      }
+        description: 'Protected from strong NE winds',
+      },
     ],
     mediaItems: [
       {
         type: 'image',
         url: '/assets/images/quemada-south.jpg',
-        title: 'Playa Quemada South'
-      }
-    ]
-  }
+        title: 'Playa Quemada South',
+      },
+    ],
+  },
 ];
 
 // Playa Quemada Landing Spots
@@ -93,41 +95,41 @@ const landingSpots: LandingSpot[] = [
     title: 'Playa Quemada Beach',
     description: 'Small volcanic beach with dark sand, suitable landing in calm conditions.',
     gps: {
-      latitude: 28.9170,
-      longitude: -13.7340,
-      altitude: 3
+      latitude: 28.917,
+      longitude: -13.734,
+      altitude: 3,
     },
-    position: gpsToWorld(28.9170, -13.7340, 3),
+    position: gpsToWorld(28.917, -13.734, 3),
     elevation: 3,
     type: 'primary',
     mediaItems: [
       {
         type: 'image',
         url: '/assets/images/quemada-beach.jpg',
-        title: 'Playa Quemada Beach'
-      }
-    ]
+        title: 'Playa Quemada Beach',
+      },
+    ],
   },
   {
     id: 'landing-quemada-field',
     title: 'Inland Field',
     description: 'Open field inland from the coast, safer option in stronger wind conditions.',
     gps: {
-      latitude: 28.9190,
-      longitude: -13.7280,
-      altitude: 25
+      latitude: 28.919,
+      longitude: -13.728,
+      altitude: 25,
     },
-    position: gpsToWorld(28.9190, -13.7280, 25),
+    position: gpsToWorld(28.919, -13.728, 25),
     elevation: 25,
     type: 'secondary',
     mediaItems: [
       {
         type: 'image',
         url: '/assets/images/quemada-field.jpg',
-        title: 'Inland Field'
-      }
-    ]
-  }
+        title: 'Inland Field',
+      },
+    ],
+  },
 ];
 
 // Playa Quemada Flyzone
@@ -138,57 +140,60 @@ const flyzone: FlyZoneShape = {
       type: 'takeoff',
       gps: {
         latitude: 28.9173,
-        longitude: -13.7330,
-        altitude: 153
+        longitude: -13.733,
+        altitude: 153,
       },
-      position: gpsToWorld(28.9173, -13.7330, 153),
+      position: gpsToWorld(28.9173, -13.733, 153),
       dimensions: {
         width: 350,
         height: 70,
-        length: 350
+        length: 350,
       },
-      nextPhases: ['thermal']
+      nextPhases: ['thermal'],
     },
     thermal: {
       type: 'thermal',
       gps: {
-        latitude: 28.9180,
-        longitude: -13.7310,
-        altitude: 200
+        latitude: 28.918,
+        longitude: -13.731,
+        altitude: 200,
       },
-      position: gpsToWorld(28.9180, -13.7310, 200),
+      position: gpsToWorld(28.918, -13.731, 200),
       dimensions: {
         width: 800,
         height: 400,
-        length: 800
+        length: 800,
       },
-      nextPhases: ['landing']
+      nextPhases: ['landing'],
     },
     landing: {
       type: 'landing',
       gps: {
-        latitude: 28.9170,
-        longitude: -13.7340,
-        altitude: 3
+        latitude: 28.917,
+        longitude: -13.734,
+        altitude: 3,
       },
-      position: gpsToWorld(28.9170, -13.7340, 3),
+      position: gpsToWorld(28.917, -13.734, 3),
       dimensions: {
         width: 500,
         height: 60,
-        length: 500
+        length: 500,
       },
-      nextPhases: []
-    }
-  }
+      nextPhases: [],
+    },
+  },
 };
 
 // Calculate the center position based on takeoffs
 const calculateCenterPosition = (takeoffs: Takeoff[]): THREE.Vector3 => {
   if (takeoffs.length === 0) return new THREE.Vector3(0, 0, 0);
 
-  const sum = takeoffs.reduce((acc, takeoff) => {
-    return acc.add(takeoff.position);
-  }, new THREE.Vector3(0, 0, 0));
+  const sum = takeoffs.reduce(
+    (acc, takeoff) => {
+      return acc.add(takeoff.position);
+    },
+    new THREE.Vector3(0, 0, 0)
+  );
 
   return sum.divideScalar(takeoffs.length);
 };
@@ -202,7 +207,7 @@ const playaQuemada: Location = {
   ...metadata,
   takeoffs,
   landingSpots,
-  flyzone
+  flyzone,
 };
 
 export default playaQuemada;

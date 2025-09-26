@@ -1,16 +1,20 @@
-import * as THREE from "three";
-import { DefaultHead } from "./parts/heads/DefaultHead";
-import { WarriorHead } from "./parts/heads/WarriorHead";
-import { SkeletonHead } from "./parts/heads/SkeletonHead";
-import { DevilHead } from "./parts/heads/DevilHead";
-import { HelmetType, HelmetOptions } from "./helmets/types";
+import * as THREE from 'three';
+import { DefaultHead } from './parts/heads/DefaultHead';
+import { WarriorHead } from './parts/heads/WarriorHead';
+import { SkeletonHead } from './parts/heads/SkeletonHead';
+import { DevilHead } from './parts/heads/DevilHead';
+import { HelmetType, HelmetOptions } from './helmets/types';
 
 export enum PilotHeadType {
-  Default, Warrior, Skeleton, Devil
+  Default,
+  Warrior,
+  Skeleton,
+  Devil,
 }
 
 export enum GlassesType {
-  Default, SunGlasses1
+  Default,
+  SunGlasses1,
 }
 
 export interface PilotHeadOptions {
@@ -35,9 +39,9 @@ const DEFAULT_OPTIONS = {
   helmetOptions: {
     color: 'yellow',
     color2: 'white',
-    color3: '#c2c2c2'
-  }
-}
+    color3: '#c2c2c2',
+  },
+};
 
 class PilotHead {
   private options: PilotHeadOptions;
@@ -45,7 +49,7 @@ class PilotHead {
   constructor(options: PilotHeadOptions) {
     this.options = {
       ...DEFAULT_OPTIONS,
-      ...options
+      ...options,
     };
   }
 

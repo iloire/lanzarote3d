@@ -1,6 +1,6 @@
-import * as THREE from "three";
-import Environment from "../../shared/env/environment";
-import Weather from "../../elements/weather";
+import * as THREE from 'three';
+import Environment from '../../shared/env/environment';
+import Weather from '../../elements/weather';
 
 const BIRDS = false;
 const HGLIDER = false;
@@ -16,7 +16,7 @@ export const addGameEnvironment = (
 
   const thermals = env.addThermals(weather);
 
-  const cloudOptions = { colors: ['#F64A8A', '#F987C5', '#DE3163'] }
+  const cloudOptions = { colors: ['#F64A8A', '#F987C5', '#DE3163'] };
   env.addClouds(thermals, cloudOptions);
   env.addTrees(terrain);
   env.addStones(terrain);
@@ -30,7 +30,7 @@ export const addGameEnvironment = (
       { x: 4500, y: 1390, z: -1768 },
     ];
     env.addBirds(
-      birdsPath.map((p) => new THREE.Vector3(p.x, p.y, p.z)),
+      birdsPath.map(p => new THREE.Vector3(p.x, p.y, p.z)),
       gui
     );
   }
@@ -45,7 +45,7 @@ export const addGameEnvironment = (
       { x: 11000, y: 2790, z: -7468 },
     ];
     env.addHangGlider(
-      hgPath.map((p) => new THREE.Vector3(p.x, p.y, p.z)),
+      hgPath.map(p => new THREE.Vector3(p.x, p.y, p.z)),
       gui
     );
   }

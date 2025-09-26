@@ -142,7 +142,7 @@ class Menu extends React.Component<MenuProps> {
             )}
             {showDev && devApps.length > 0 && (
               <>
-              <h3>Development</h3>
+                <h3>Development</h3>
                 {renderButtons(devApps)}
               </>
             )}

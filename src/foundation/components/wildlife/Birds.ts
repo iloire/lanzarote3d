@@ -1,8 +1,8 @@
-import * as THREE from "three";
-import GuiHelper from "../../utils/gui";
-import Models from "../../utils/models";
-import model from "../../../../assets/foundation/models/environment/birds.glb";
-import AutoFlier, { AutoFlierOptions } from "../../types/auto-flier";
+import * as THREE from 'three';
+import GuiHelper from '../../utils/gui';
+import Models from '../../utils/models';
+import model from '../../../../assets/foundation/models/environment/birds.glb';
+import AutoFlier, { AutoFlierOptions } from '../../types/auto-flier';
 
 const clock = new THREE.Clock();
 
@@ -25,7 +25,7 @@ class Birds extends AutoFlier {
       smoothRotation: options.smoothRotation ?? true, // Smooth banking turns
       rotationSpeed: options.rotationSpeed ?? 0.08, // Realistic bird turning speed
       forwardAxis: options.forwardAxis ?? '-z', // Assuming bird model faces -Z direction
-      ...options
+      ...options,
     });
 
     this.scale = options.scale ?? 1;
@@ -59,13 +59,15 @@ class Birds extends AutoFlier {
     this.animate();
 
     if (gui) {
-      GuiHelper.addLocationGui(gui, "Birds", this.mesh, {
+      GuiHelper.addLocationGui(gui, 'Birds', this.mesh, {
         min: -10000,
         max: 10000,
       });
     }
 
-    console.log(`🐦 Birds loaded with ${path.length} waypoints, forward axis: ${this.getForwardAxis()}`);
+    console.log(
+      `🐦 Birds loaded with ${path.length} waypoints, forward axis: ${this.getForwardAxis()}`
+    );
     return this.mesh;
   }
 

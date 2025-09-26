@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import * as THREE from 'three';
 
 const createThermalMesh = (
   topRadius: number,
@@ -7,12 +7,7 @@ const createThermalMesh = (
   opacity: number,
   initialPosition: THREE.Vector3
 ) => {
-  const geometry = new THREE.CylinderGeometry(
-    topRadius,
-    bottomRadius,
-    height,
-    32
-  );
+  const geometry = new THREE.CylinderGeometry(topRadius, bottomRadius, height, 32);
 
   const material = new THREE.MeshBasicMaterial({
     color: 0xff0000,

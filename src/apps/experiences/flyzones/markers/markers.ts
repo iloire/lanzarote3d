@@ -11,13 +11,13 @@ export class MarkerObject extends THREE.Object3D {
   setVisibility: (visible: boolean) => void;
   flyzone?: THREE.Object3D;
   pin: THREE.Object3D;
-  
+
   constructor(pin: THREE.Object3D, type: MarkerType) {
     super();
     this.type = type;
     this.pin = pin;
     this.add(pin);
-    
+
     // Initialize with empty functions, to be set by the creator
     this.hoverAnimation = () => {};
     this.unhoverAnimation = () => {};
@@ -32,4 +32,4 @@ export class MarkerObject extends THREE.Object3D {
 // Re-export Marker interface from types.ts to maintain API compatibility
 export type { Marker } from '../helpers/types';
 
-// Add any other marker-related functions here 
+// Add any other marker-related functions here

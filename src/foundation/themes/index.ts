@@ -5,8 +5,8 @@ const defaultSky: SkyTheme = {
   sunIntensity: 1.2,
   fogEnabled: true,
   fogColor: '#333333',
-  fogDensity: 0.00001
-}
+  fogDensity: 0.00001,
+};
 
 export const THEMES: Record<string, Theme> = {
   default: {
@@ -79,7 +79,16 @@ export const THEMES: Record<string, Theme> = {
       fogEnabled: false,
     },
     clouds: {
-      colors: ['#FFD700', '#FFA500', '#FF8C00', '#FFFF99', '#FFE135', '#DAA520', '#FFF8F0', '#FF6B6B'],
+      colors: [
+        '#FFD700',
+        '#FFA500',
+        '#FF8C00',
+        '#FFFF99',
+        '#FFE135',
+        '#DAA520',
+        '#FFF8F0',
+        '#FF6B6B',
+      ],
       density: 0.8,
       opacity: 0.9,
     },
@@ -243,7 +252,6 @@ export const THEMES: Record<string, Theme> = {
       shadowIntensity: 1.0,
     },
   },
-
 };
 
 // Helper functions for theme management

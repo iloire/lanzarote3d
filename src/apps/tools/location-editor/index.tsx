@@ -31,20 +31,21 @@ class LocationEditorApp extends AppBase {
   constructor() {
     super({
       name: 'Location Editor',
-      description: 'Interactive tool for creating and editing flight locations with takeoffs, landings, and fly zones',
+      description:
+        'Interactive tool for creating and editing flight locations with takeoffs, landings, and fly zones',
       requiredComponents: ['scene', 'camera', 'renderer', 'controls', 'gui', 'terrain'],
       scene: {
         environment: 'lanzarote',
         lighting: 'dynamic',
         physics: false,
         fog: {
-          enabled: false // Clear visibility for precise editing
-        }
+          enabled: false, // Clear visibility for precise editing
+        },
       },
       performance: {
         monitoring: true,
-        logIntervalMs: 25000 // Log performance every 25 seconds
-      }
+        logIntervalMs: 25000, // Log performance every 25 seconds
+      },
     });
   }
 
@@ -83,7 +84,6 @@ class LocationEditorApp extends AppBase {
 
       this.isLoaded = true;
       console.log(`✅ ${this.config.name} loaded successfully`);
-
     } catch (error) {
       this.handleError(error as Error, 'load');
       throw error;
@@ -299,7 +299,11 @@ class LocationEditorApp extends AppBase {
     }
 
     // Cleanup label renderer
-    if (this.labelRenderer && this.labelRenderer.domElement && this.labelRenderer.domElement.parentNode) {
+    if (
+      this.labelRenderer &&
+      this.labelRenderer.domElement &&
+      this.labelRenderer.domElement.parentNode
+    ) {
       this.labelRenderer.domElement.parentNode.removeChild(this.labelRenderer.domElement);
       this.labelRenderer = undefined;
     }

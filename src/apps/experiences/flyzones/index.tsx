@@ -47,20 +47,21 @@ class FlyZonesApp extends AppBase {
   constructor() {
     super({
       name: 'FlyZones',
-      description: 'Flight zone visualization with interactive markers, landing spots, and navigation controls',
+      description:
+        'Flight zone visualization with interactive markers, landing spots, and navigation controls',
       requiredComponents: ['scene', 'camera', 'renderer', 'controls', 'gui'],
       scene: {
         environment: 'custom',
         lighting: 'static',
         physics: false,
         fog: {
-          enabled: false // Clear visibility for flight zone visualization
-        }
+          enabled: false, // Clear visibility for flight zone visualization
+        },
       },
       performance: {
         monitoring: true,
-        logIntervalMs: 15000 // Log performance every 15 seconds
-      }
+        logIntervalMs: 15000, // Log performance every 15 seconds
+      },
     });
   }
 
@@ -94,7 +95,6 @@ class FlyZonesApp extends AppBase {
 
       this.isLoaded = true;
       console.log(`✅ ${this.config.name} loaded successfully with ${this.markers.length} markers`);
-
     } catch (error) {
       this.handleError(error as Error, 'load');
       throw error;
@@ -242,7 +242,7 @@ class FlyZonesApp extends AppBase {
               const landingMaterial = new THREE.MeshLambertMaterial({
                 color: markerColor,
                 transparent: true,
-                opacity: 0.8
+                opacity: 0.8,
               });
               const landingMarker = new THREE.Mesh(landingGeometry, landingMaterial);
 
@@ -251,7 +251,7 @@ class FlyZonesApp extends AppBase {
               const glowMaterial = new THREE.MeshBasicMaterial({
                 color: markerColor,
                 transparent: true,
-                opacity: 0.3
+                opacity: 0.3,
               });
               const glowMarker = new THREE.Mesh(glowGeometry, glowMaterial);
 
@@ -426,8 +426,8 @@ class FlyZonesApp extends AppBase {
         this.currentLocation = location;
         navigateTo(position, camera, controls, location);
       },
-      onToggleLandings: (visible) =>
-        toggleLandingMarkers(this.landingMarkers, visible, (v) => this.setLandingMarkersVisible(v)),
+      onToggleLandings: visible =>
+        toggleLandingMarkers(this.landingMarkers, visible, v => this.setLandingMarkersVisible(v)),
       onToggleRuler: () => this.toggleRuler(),
       showRulerButton: true,
     });
@@ -534,7 +534,11 @@ class FlyZonesApp extends AppBase {
     }
 
     // Cleanup label renderer
-    if (this.labelRenderer && this.labelRenderer.domElement && this.labelRenderer.domElement.parentNode) {
+    if (
+      this.labelRenderer &&
+      this.labelRenderer.domElement &&
+      this.labelRenderer.domElement.parentNode
+    ) {
       this.labelRenderer.domElement.parentNode.removeChild(this.labelRenderer.domElement);
       this.labelRenderer = undefined;
     }
@@ -548,7 +552,7 @@ class FlyZonesApp extends AppBase {
     // Clear markers and landing markers arrays
     this.markers.forEach(marker => {
       if (marker.object) {
-        marker.object.traverse((child) => {
+        marker.object.traverse(child => {
           if (child instanceof THREE.Mesh) {
             if (child.geometry) child.geometry.dispose();
             if (child.material) {
@@ -565,7 +569,7 @@ class FlyZonesApp extends AppBase {
     this.markers.length = 0;
 
     this.landingMarkers.forEach(marker => {
-      marker.traverse((child) => {
+      marker.traverse(child => {
         if (child instanceof THREE.Mesh) {
           if (child.geometry) child.geometry.dispose();
           if (child.material) {

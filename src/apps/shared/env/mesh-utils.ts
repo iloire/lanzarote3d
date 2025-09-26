@@ -1,5 +1,5 @@
-import * as THREE from "three";
-import { rndBetween, rndIntBetween } from "../../../foundation/utils/math";
+import * as THREE from 'three';
+import { rndBetween, rndIntBetween } from '../../../foundation/utils/math';
 
 const getRandomRotation = (): THREE.Euler => {
   return new THREE.Euler(0, rndBetween(0, Math.PI), 0);
@@ -32,22 +32,22 @@ export const addMeshAroundArea = (
   for (let index = 0; index < numberItemsToAdd; index++) {
     const meshType = meshTypes[rndIntBetween(0, meshTypes.length - 1)];
     let obj;
-    if (typeof meshType === "function") {
+    if (typeof meshType === 'function') {
       obj = meshType();
     } else {
       obj = meshType;
     }
-    const newX =
-      centerPosition.x + (minDistance || 30 + index) * rndIntBetween(1, 5);
-    const newZ =
-      centerPosition.z + (minDistance || 30 + index) * rndIntBetween(1, 10);
+    const newX = centerPosition.x + (minDistance || 30 + index) * rndIntBetween(1, 5);
+    const newZ = centerPosition.z + (minDistance || 30 + index) * rndIntBetween(1, 10);
 
     const terrainHeight = getTerrainHeight(newX, newZ, terrain);
     if (isNaN(terrainHeight)) {
       // Mesh types available
       // Center position calculated
       // Terrain mesh available
-      throw new Error("can not calculate terrain height. Perphaps you need to render the scene first");
+      throw new Error(
+        'can not calculate terrain height. Perphaps you need to render the scene first'
+      );
       break;
     }
     const meshPos = new THREE.Vector3(newX, terrainHeight, newZ);

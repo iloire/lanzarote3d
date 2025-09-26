@@ -5,7 +5,7 @@ import { WindCondition } from './types';
 export const createWindArrow = (
   position: THREE.Vector3,
   direction: number, // Direction in degrees (0-360)
-  speed: number,     // Wind speed
+  speed: number, // Wind speed
   color: number = 0xffffff
 ): THREE.Object3D => {
   // Create a group to hold the arrow
@@ -16,7 +16,7 @@ export const createWindArrow = (
   const shaftMaterial = new THREE.MeshLambertMaterial({
     color,
     transparent: true,
-    opacity: 0.9
+    opacity: 0.9,
   });
   const shaft = new THREE.Mesh(shaftGeometry, shaftMaterial);
   shaft.rotation.x = Math.PI / 2; // Rotate to point forward
@@ -26,7 +26,7 @@ export const createWindArrow = (
   const headMaterial = new THREE.MeshLambertMaterial({
     color: color,
     transparent: true,
-    opacity: 0.95
+    opacity: 0.95,
   });
   const head = new THREE.Mesh(headGeometry, headMaterial);
   head.position.y = 80; // Position at the end of the shaft
@@ -36,7 +36,7 @@ export const createWindArrow = (
   const glowMaterial = new THREE.MeshBasicMaterial({
     color: color,
     transparent: true,
-    opacity: 0.3
+    opacity: 0.3,
   });
 
   // Create glow effect around the head
@@ -75,11 +75,16 @@ export const createWindArrowsForTakeoff = (
   conditions: WindCondition[]
 ): THREE.Object3D[] => {
   const arrows: THREE.Object3D[] = [];
-  
+
   // Find the best condition (highest rating)
-  const bestCondition = conditions.length > 0 ? conditions.reduce((best, current) =>
-    current.rating > best.rating ? current : best, conditions[0]!) : null;
-  
+  const bestCondition =
+    conditions.length > 0
+      ? conditions.reduce(
+          (best, current) => (current.rating > best.rating ? current : best),
+          conditions[0]!
+        )
+      : null;
+
   if (bestCondition) {
     // Create an arrow for the ideal direction with vibrant green
     const idealDirection = bestCondition.direction.ideal;
@@ -111,6 +116,6 @@ export const createWindArrowsForTakeoff = (
     const maxArrow = createWindArrow(maxArrowPos, maxDir, idealSpeed * 0.8, 0xff9500);
     arrows.push(maxArrow);
   }
-  
+
   return arrows;
-}; 
+};

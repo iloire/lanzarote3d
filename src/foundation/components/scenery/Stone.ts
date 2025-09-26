@@ -1,5 +1,5 @@
 // inspired in: https://codepen.io/yitliu/pen/gOaPxRX
-import * as THREE from "three";
+import * as THREE from 'three';
 const mat_stone = new THREE.MeshLambertMaterial({ color: 0x9eaeac });
 
 class Stone {

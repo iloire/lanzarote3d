@@ -7,15 +7,15 @@ export const LANZAROTE_GPS_CONFIG = {
     gps: {
       latitude: 29.1187513,
       longitude: -13.5654236,
-      altitude: 30
+      altitude: 30,
     },
     world: new THREE.Vector3(6642.48, 55.95, -3853.59),
   },
   scale: {
-    metersPerDegreeLatitude: 111320/2, // Approximate meters per degree at this latitude
-    metersPerDegreeLongitude: 107550/2, // Approximate meters per degree at this latitude
-    northOffset: 180 // Assuming your world Z axis points north
-  }
+    metersPerDegreeLatitude: 111320 / 2, // Approximate meters per degree at this latitude
+    metersPerDegreeLongitude: 107550 / 2, // Approximate meters per degree at this latitude
+    northOffset: 180, // Assuming your world Z axis points north
+  },
 };
 
-// You can add other locations or calibration points here 
+// You can add other locations or calibration points here

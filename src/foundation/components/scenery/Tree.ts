@@ -1,5 +1,5 @@
 // inspired in: https://codepen.io/yitliu/pen/gOaPxRX
-import * as THREE from "three";
+import * as THREE from 'three';
 var mat_grey = new THREE.MeshLambertMaterial({ color: 0xf3f2f7 });
 var mat_yellow = new THREE.MeshLambertMaterial({ color: 0xfeb42b });
 var mat_green = new THREE.MeshLambertMaterial({ color: 0xb2d2a4 });
@@ -71,11 +71,7 @@ class Tree {
     for (var i = 1; i < 8; i += 2) {
       subStems[i].rotation.x = -subStems[i - 1].rotation.x;
       subStems[i].scale.z = subStems[i - 1].scale.z;
-      subStems[i].position.set(
-        0,
-        subStems[i - 1].position.y,
-        -subStems[i - 1].position.z
-      );
+      subStems[i].position.set(0, subStems[i - 1].position.y, -subStems[i - 1].position.z);
     }
     leaf.rotation.x = pi / 3;
     leaf.rotation.z = 0.2;

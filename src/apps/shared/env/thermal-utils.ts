@@ -1,22 +1,19 @@
-import * as THREE from "three";
-import { Weather } from "../../../foundation/components/physics";
-import { Thermal, ThermalDimensions } from "../../../foundation/components/physics";
-import { rndIntBetween } from "../../../foundation/utils/math";
-
+import * as THREE from 'three';
+import { Weather } from '../../../foundation/components/physics';
+import { Thermal, ThermalDimensions } from '../../../foundation/components/physics';
+import { rndIntBetween } from '../../../foundation/utils/math';
 
 const generateRandomLcl = (lclLevel: number): number => {
   return lclLevel + rndIntBetween(-200, 200);
 };
 
-
 export type ThermalGenerationOptions = {
-  position: THREE.Vector3,
-  weather: Weather,
-  superThermal: boolean,
-  dimensions?: ThermalDimensions,
+  position: THREE.Vector3;
+  weather: Weather;
+  superThermal: boolean;
+  dimensions?: ThermalDimensions;
   opacity?: number;
-}
-
+};
 
 const generateRandomThermalDimensions = (
   lclLevel: number,
@@ -31,11 +28,9 @@ const generateRandomThermalDimensions = (
   };
 };
 
-export const generateThermalPair = (
-  options: ThermalGenerationOptions
-): Thermal[] => {
-
-  const dimensions = options.dimensions ||
+export const generateThermalPair = (options: ThermalGenerationOptions): Thermal[] => {
+  const dimensions =
+    options.dimensions ||
     generateRandomThermalDimensions(options.weather.getLclLevel(), options.superThermal);
 
   const thermal = new Thermal(
@@ -49,15 +44,9 @@ export const generateThermalPair = (
   const coreDimensions = {
     bottomRadius: dimensions.bottomRadius * 0.4,
     topRadius: dimensions.topRadius * 0.6,
-    height: dimensions.height
+    height: dimensions.height,
   };
 
-  const core = new Thermal(
-    coreDimensions,
-    options.position,
-    options.opacity,
-    false,
-    false
-  );
+  const core = new Thermal(coreDimensions, options.position, options.opacity, false, false);
   return [thermal, core];
 };

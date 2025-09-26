@@ -1,7 +1,7 @@
-import * as THREE from "three";
+import * as THREE from 'three';
 import { SceneManager } from '../../foundation/systems/scene';
 import { PerformanceMonitor } from '../../foundation/systems/analytics';
-import { StoryOptions } from "./types";
+import { StoryOptions } from './types';
 
 export interface AppConfig {
   name: string;
@@ -58,7 +58,7 @@ export abstract class AppBase {
       this.performanceMonitor = new PerformanceMonitor(renderer, {
         minFps: 30,
         maxFrameTime: 33.33,
-        maxMemoryUsage: 150 * 1024 * 1024 // 150MB
+        maxMemoryUsage: 150 * 1024 * 1024, // 150MB
       });
 
       // Log performance periodically
@@ -107,7 +107,7 @@ export abstract class AppBase {
       description: this.config.description,
       components: this.config.requiredComponents,
       isLoaded: this.isLoaded,
-      performance: this.performanceMonitor?.getMetrics()
+      performance: this.performanceMonitor?.getMetrics(),
     };
   }
 

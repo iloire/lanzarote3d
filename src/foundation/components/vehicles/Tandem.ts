@@ -1,11 +1,11 @@
-import * as THREE from "three";
-import TandemPilot, { TandemPilotOptions } from "../characters/TandemPilot";
-import Glider, { GliderOptions } from "./Glider";
+import * as THREE from 'three';
+import TandemPilot, { TandemPilotOptions } from '../characters/TandemPilot';
+import Glider, { GliderOptions } from './Glider';
 
 export type TandemOptions = {
   glider: GliderOptions;
   pilot: TandemPilotOptions;
-}
+};
 
 class Tandem {
   options: TandemOptions;
@@ -23,7 +23,6 @@ class Tandem {
     wing.position.y = 2800;
     wing.position.x = 300;
     mesh.add(wing);
-
 
     const pilot = new TandemPilot(this.options.pilot);
     const pilotMesh = pilot.load();

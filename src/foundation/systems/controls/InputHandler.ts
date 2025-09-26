@@ -33,7 +33,7 @@ export class InputHandler extends EventTarget {
     this.config = {
       mouseSensitivity: 1.0,
       touchSensitivity: 1.0,
-      ...config
+      ...config,
     };
 
     this.setupEventListeners();
@@ -84,13 +84,15 @@ export class InputHandler extends EventTarget {
     this.keyStates.set(key, true);
 
     // Find action for this key
-    const binding = this.config.keyBindings.find(b =>
-      b.key.toLowerCase() === key || b.keyCode === keyCode
+    const binding = this.config.keyBindings.find(
+      b => b.key.toLowerCase() === key || b.keyCode === keyCode
     );
 
-    this.dispatchEvent(new CustomEvent('keydown', {
-      detail: { key, keyCode, action: binding?.action }
-    }));
+    this.dispatchEvent(
+      new CustomEvent('keydown', {
+        detail: { key, keyCode, action: binding?.action },
+      })
+    );
   }
 
   private handleKeyUp(event: KeyboardEvent): void {
@@ -100,13 +102,15 @@ export class InputHandler extends EventTarget {
     this.keyStates.set(key, false);
 
     // Find action for this key
-    const binding = this.config.keyBindings.find(b =>
-      b.key.toLowerCase() === key || b.keyCode === keyCode
+    const binding = this.config.keyBindings.find(
+      b => b.key.toLowerCase() === key || b.keyCode === keyCode
     );
 
-    this.dispatchEvent(new CustomEvent('keyup', {
-      detail: { key, keyCode, action: binding?.action }
-    }));
+    this.dispatchEvent(
+      new CustomEvent('keyup', {
+        detail: { key, keyCode, action: binding?.action },
+      })
+    );
   }
 
   private handleMouseMove(event: MouseEvent): void {
@@ -116,43 +120,55 @@ export class InputHandler extends EventTarget {
     this.mouseState.x = event.clientX;
     this.mouseState.y = event.clientY;
 
-    this.dispatchEvent(new CustomEvent('mousemove', {
-      detail: { deltaX, deltaY }
-    }));
+    this.dispatchEvent(
+      new CustomEvent('mousemove', {
+        detail: { deltaX, deltaY },
+      })
+    );
   }
 
   private handleMouseDown(event: MouseEvent): void {
-    this.mouseState.buttons |= (1 << event.button);
+    this.mouseState.buttons |= 1 << event.button;
 
-    this.dispatchEvent(new CustomEvent('mousedown', {
-      detail: { button: event.button, x: event.clientX, y: event.clientY }
-    }));
+    this.dispatchEvent(
+      new CustomEvent('mousedown', {
+        detail: { button: event.button, x: event.clientX, y: event.clientY },
+      })
+    );
   }
 
   private handleMouseUp(event: MouseEvent): void {
     this.mouseState.buttons &= ~(1 << event.button);
 
-    this.dispatchEvent(new CustomEvent('mouseup', {
-      detail: { button: event.button, x: event.clientX, y: event.clientY }
-    }));
+    this.dispatchEvent(
+      new CustomEvent('mouseup', {
+        detail: { button: event.button, x: event.clientX, y: event.clientY },
+      })
+    );
   }
 
   private handleTouchStart(event: TouchEvent): void {
-    this.dispatchEvent(new CustomEvent('touchstart', {
-      detail: { touches: Array.from(event.touches) }
-    }));
+    this.dispatchEvent(
+      new CustomEvent('touchstart', {
+        detail: { touches: Array.from(event.touches) },
+      })
+    );
   }
 
   private handleTouchMove(event: TouchEvent): void {
-    this.dispatchEvent(new CustomEvent('touchmove', {
-      detail: { touches: Array.from(event.touches) }
-    }));
+    this.dispatchEvent(
+      new CustomEvent('touchmove', {
+        detail: { touches: Array.from(event.touches) },
+      })
+    );
   }
 
   private handleTouchEnd(event: TouchEvent): void {
-    this.dispatchEvent(new CustomEvent('touchend', {
-      detail: { touches: Array.from(event.changedTouches) }
-    }));
+    this.dispatchEvent(
+      new CustomEvent('touchend', {
+        detail: { touches: Array.from(event.changedTouches) },
+      })
+    );
   }
 
   // Public API methods

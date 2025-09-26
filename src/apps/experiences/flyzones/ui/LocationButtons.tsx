@@ -10,10 +10,10 @@ interface LocationButtonsProps {
 const LocationButtons: React.FC<LocationButtonsProps> = ({ locations, onNavigate }) => {
   // Define colors for each location for visual distinction
   const locationColors = {
-    'famara': '#00ff88',
-    'teguise': '#ff6b6b',
-    'mala': '#ff9500',
-    'playa-quemada': '#9400d3'
+    famara: '#00ff88',
+    teguise: '#ff6b6b',
+    mala: '#ff9500',
+    'playa-quemada': '#9400d3',
   };
 
   return (
@@ -37,12 +37,12 @@ const LocationButtons: React.FC<LocationButtonsProps> = ({ locations, onNavigate
                 transition: 'all 0.2s ease',
                 boxShadow: `0 2px 4px rgba(0,0,0,0.3)`,
               }}
-              onMouseEnter={(e) => {
+              onMouseEnter={e => {
                 e.currentTarget.style.transform = 'translateY(-1px)';
                 e.currentTarget.style.boxShadow = `0 4px 8px rgba(0,0,0,0.4)`;
                 e.currentTarget.style.filter = 'brightness(1.1)';
               }}
-              onMouseLeave={(e) => {
+              onMouseLeave={e => {
                 e.currentTarget.style.transform = 'translateY(0)';
                 e.currentTarget.style.boxShadow = `0 2px 4px rgba(0,0,0,0.3)`;
                 e.currentTarget.style.filter = 'brightness(1)';

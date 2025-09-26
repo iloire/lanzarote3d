@@ -7,10 +7,10 @@ export const toggleLandingMarkers = (
 ): void => {
   landingMarkers.forEach(marker => {
     marker.visible = visible;
-    
+
     // Also update the clickable property to prevent invisible markers from being clickable
     marker.userData['clickable'] = visible;
-    
+
     // Update all children as well
     marker.traverse(child => {
       if (child !== marker) {
@@ -19,6 +19,6 @@ export const toggleLandingMarkers = (
       }
     });
   });
-  
+
   setLandingMarkersVisible(visible);
-}; 
+};

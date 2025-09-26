@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import * as THREE from 'three';
 
 export interface AutoFlierOptions {
   speed?: number;
@@ -46,7 +46,6 @@ class AutoFlier {
   getForwardAxis(): 'x' | 'y' | 'z' | '-x' | '-y' | '-z' {
     return this.forwardAxis;
   }
-
 
   private orientTowardsTarget(targetPosition: THREE.Vector3) {
     if (!this.mesh) return;
@@ -121,7 +120,9 @@ class AutoFlier {
       this.mesh.position.add(direction);
 
       // For birds flying backwards, orient them 180 degrees from their movement direction
-      const behindPosition = currentPosition.clone().sub(direction.clone().normalize().multiplyScalar(10));
+      const behindPosition = currentPosition
+        .clone()
+        .sub(direction.clone().normalize().multiplyScalar(10));
       this.orientTowardsTarget(behindPosition);
     }
 

@@ -1,6 +1,6 @@
-import * as THREE from "three";
+import * as THREE from 'three';
 import PilotHead, { PilotHeadOptions, PilotHeadType } from '../characters/PilotHead';
-import CocoonHarness from "../characters/CocoonHarness";
+import CocoonHarness from '../characters/CocoonHarness';
 import { HelmetType } from '../characters/helmets/types';
 
 const DEFAULT_OPTIONS = {
@@ -10,15 +10,15 @@ const DEFAULT_OPTIONS = {
     helmetOptions: {
       color: '#ffffff',
       color2: '#cccccc',
-      color3: '#999999'
-    }
+      color3: '#999999',
+    },
   },
   skinColor: '#e0bea5',
   suitColor: '#ff0000',
   suitColor2: '#cc0000',
   shoesColor: '#333333',
-  carabinerColor: '#666666'
-}
+  carabinerColor: '#666666',
+};
 
 export type PilotOptions = {
   head?: PilotHeadOptions;
@@ -35,7 +35,6 @@ const getColoredMaterial = (color: string) => {
     side: THREE.DoubleSide,
   });
 };
-
 
 const getHead = (options: PilotHeadOptions): THREE.Group => {
   const pilotHead = new PilotHead(options);
@@ -54,7 +53,7 @@ class Pilot {
   constructor(options: PilotOptions) {
     this.options = {
       ...DEFAULT_OPTIONS,
-      ...options
+      ...options,
     };
   }
 
@@ -73,7 +72,7 @@ class Pilot {
       color1: '#333',
       color2: '#666',
       carabinerColor: this.options.carabinerColor,
-      carabinerSeparationMM: 300
+      carabinerSeparationMM: 300,
     });
 
     const suitMat = getColoredMaterial(this.options.suitColor);

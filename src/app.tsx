@@ -174,7 +174,9 @@ const App: React.FC<AppProps> = ({
         await ThemeEngine.apply(storyOptions, appTheme);
         storyOptions.theme = appTheme;
       } else {
-        console.warn(`🎨 App-specific theme '${currentApp.theme}' not found for app: ${currentApp.name}`);
+        console.warn(
+          `🎨 App-specific theme '${currentApp.theme}' not found for app: ${currentApp.name}`
+        );
       }
     }
 

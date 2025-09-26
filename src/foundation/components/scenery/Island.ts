@@ -1,10 +1,9 @@
-import * as THREE from "three";
-import model from "../../../../assets/foundation/models/environment/lanzarote.glb";
-import Models from "../../utils/models";
-import { MeshBVH, acceleratedRaycast } from "three-mesh-bvh";
+import * as THREE from 'three';
+import model from '../../../../assets/foundation/models/environment/lanzarote.glb';
+import Models from '../../utils/models';
+import { MeshBVH, acceleratedRaycast } from 'three-mesh-bvh';
 
 THREE.Mesh.prototype.raycast = acceleratedRaycast;
-
 
 // const loadTexture = async (manager): Promise<any> => {
 //   const textureLoader = new THREE.TextureLoader(manager);
@@ -25,8 +24,6 @@ const loadFromBlenderModel = async (manager: THREE.LoadingManager) => {
   mesh.geometry.boundsTree = new MeshBVH(mesh.geometry);
   return mesh;
 };
-
-
 
 const Island = {
   load: async (manager: THREE.LoadingManager): Promise<THREE.Mesh> => {

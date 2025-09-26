@@ -17,7 +17,7 @@ export const DEFAULT_FLIGHT_KEYBINDINGS: KeyBinding[] = [
   { key: 'pagedown', keyCode: 34, action: 'zoom-out', description: 'Zoom out' },
   { key: 's', keyCode: 83, action: 'speed-bar', description: 'Toggle speed bar' },
   { key: 'e', keyCode: 69, action: 'big-ears', description: 'Toggle big ears' },
-  { key: 'm', keyCode: 77, action: 'audio-toggle', description: 'Toggle audio' }
+  { key: 'm', keyCode: 77, action: 'audio-toggle', description: 'Toggle audio' },
 ];
 
 export class FlightControls {
@@ -32,12 +32,12 @@ export class FlightControls {
     this.config = {
       rotationSensitivity: 0.002,
       keyBindings: DEFAULT_FLIGHT_KEYBINDINGS,
-      ...config
+      ...config,
     };
 
     this.inputHandler = new InputHandler({
       keyBindings: this.config.keyBindings!,
-      mouseSensitivity: this.config.rotationSensitivity
+      mouseSensitivity: this.config.rotationSensitivity,
     });
 
     this.setupControls();

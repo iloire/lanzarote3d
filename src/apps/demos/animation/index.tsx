@@ -9,7 +9,10 @@ import { animator } from '../../../foundation/systems/animation/SimpleAnimator';
 import { getDefaultTheme } from '../../../foundation/themes';
 import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';
 import { AppBase } from '../../shared/AppBase';
-import { OrbitControlsHelper, ORBIT_CONTROLS_PRESETS } from '../../../foundation/utils/OrbitControlsHelper';
+import {
+  OrbitControlsHelper,
+  ORBIT_CONTROLS_PRESETS,
+} from '../../../foundation/utils/OrbitControlsHelper';
 
 type ParagliderVoxelConfig = {
   pg: ParagliderVoxelOptions;
@@ -47,20 +50,21 @@ class AnimationApp extends AppBase {
   constructor() {
     super({
       name: 'Animation Demo',
-      description: 'Dramatic camera animation showcasing voxel paragliders with golden hour lighting',
+      description:
+        'Dramatic camera animation showcasing voxel paragliders with golden hour lighting',
       requiredComponents: ['scene', 'camera', 'renderer', 'terrain', 'water', 'controls'],
       scene: {
         environment: 'lanzarote',
         lighting: 'dynamic',
         physics: false,
         fog: {
-          enabled: false // Fog handled by theme system
-        }
+          enabled: false, // Fog handled by theme system
+        },
       },
       performance: {
         monitoring: true,
-        logIntervalMs: 12000 // Log performance every 12 seconds
-      }
+        logIntervalMs: 12000, // Log performance every 12 seconds
+      },
     });
   }
 
@@ -101,13 +105,13 @@ class AnimationApp extends AppBase {
       ];
       await this.environment.addBirds(birdPath);
 
-
       // Setup camera animation sequence
       this.setupCameraAnimation(camera, controls, renderer, scene);
 
       this.isLoaded = true;
-      console.log(`✅ ${this.config.name} loaded successfully with ${this.paragliderMeshes.length} paragliders`);
-
+      console.log(
+        `✅ ${this.config.name} loaded successfully with ${this.paragliderMeshes.length} paragliders`
+      );
     } catch (error) {
       this.handleError(error as Error, 'load');
       throw error;
@@ -134,7 +138,12 @@ class AnimationApp extends AppBase {
     await Promise.all(voxelPromises);
   }
 
-  private setupCameraAnimation(camera: THREE.Camera, controls: any, renderer: THREE.WebGLRenderer, scene: THREE.Scene): void {
+  private setupCameraAnimation(
+    camera: THREE.Camera,
+    controls: any,
+    renderer: THREE.WebGLRenderer,
+    scene: THREE.Scene
+  ): void {
     const pgPos = paraglidersVoxel[0]?.position.clone() || new THREE.Vector3();
 
     // Starting position - extremely far away on the other side of the island
@@ -225,7 +234,9 @@ class AnimationApp extends AppBase {
 
             // Apply orbit control limits using the reusable utility
             const pgPos = paraglidersVoxel[0]?.position || new THREE.Vector3();
-            OrbitControlsHelper.focusOnTarget(controls, pgPos,
+            OrbitControlsHelper.focusOnTarget(
+              controls,
+              pgPos,
               OrbitControlsHelper.createCenteredLimits(pgPos, {
                 ...ORBIT_CONTROLS_PRESETS['closeSubject'],
                 // Customize if needed
@@ -234,8 +245,8 @@ class AnimationApp extends AppBase {
                 panBoundary: {
                   center: pgPos,
                   radius: 500,
-                  verticalScale: 0.5
-                }
+                  verticalScale: 0.5,
+                },
               })
             );
           }
@@ -246,7 +257,12 @@ class AnimationApp extends AppBase {
     }, 100);
   }
 
-  private startAnimationLoop(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.Camera, controls: any): void {
+  private startAnimationLoop(
+    renderer: THREE.WebGLRenderer,
+    scene: THREE.Scene,
+    camera: THREE.Camera,
+    controls: any
+  ): void {
     let startTime = Date.now();
 
     const animate = () => {
@@ -303,7 +319,7 @@ class AnimationApp extends AppBase {
     // Dispose paraglider meshes
     this.paragliderMeshes.forEach(mesh => {
       // Dispose geometry and materials if they exist
-      mesh.traverse((child) => {
+      mesh.traverse(child => {
         if (child instanceof THREE.Mesh) {
           if (child.geometry) child.geometry.dispose();
           if (child.material) {

@@ -73,7 +73,16 @@ class GameApp extends AppBase {
     super({
       name: 'Paragliding Game',
       description: 'Interactive paragliding simulation with physics, weather, and flight controls',
-      requiredComponents: ['scene', 'camera', 'renderer', 'terrain', 'water', 'sky', 'gui', 'controls'],
+      requiredComponents: [
+        'scene',
+        'camera',
+        'renderer',
+        'terrain',
+        'water',
+        'sky',
+        'gui',
+        'controls',
+      ],
       scene: {
         environment: 'lanzarote',
         lighting: 'dynamic',
@@ -82,13 +91,13 @@ class GameApp extends AppBase {
           enabled: FOG_ENABLED,
           color: 0x000000,
           near: 1,
-          far: 22500
-        }
+          far: 22500,
+        },
       },
       performance: {
         monitoring: true,
-        logIntervalMs: 5000 // More frequent monitoring for interactive game
-      }
+        logIntervalMs: 5000, // More frequent monitoring for interactive game
+      },
     });
   }
 
@@ -127,14 +136,19 @@ class GameApp extends AppBase {
 
       this.isLoaded = true;
       console.log(`✅ ${this.config.name} loaded successfully`);
-
     } catch (error) {
       this.handleError(error as Error, 'load');
       throw error;
     }
   }
 
-  private async setupParaglider(scene: THREE.Scene, gui: any, terrain: any, water: any, thermals: any): Promise<void> {
+  private async setupParaglider(
+    scene: THREE.Scene,
+    gui: any,
+    terrain: any,
+    water: any,
+    thermals: any
+  ): Promise<void> {
     const envOptions = {
       weather: this.weather!,
       terrain,
@@ -172,10 +186,15 @@ class GameApp extends AppBase {
     this.pg.addGui(gui);
 
     scene.add(mesh);
-
   }
 
-  private setupGameControls(_camera: any, _controls: any, _scene: THREE.Scene, _renderer: THREE.WebGLRenderer, gui: any): void {
+  private setupGameControls(
+    _camera: any,
+    _controls: any,
+    _scene: THREE.Scene,
+    _renderer: THREE.WebGLRenderer,
+    gui: any
+  ): void {
     const onDocumentKeyDown = (event: KeyboardEvent) => {
       const keyCode = event.which;
       if (keyCode === 90) {
@@ -305,7 +324,6 @@ class GameApp extends AppBase {
       this.uiRoot = createRoot(uiContainer);
       this.uiRoot.render(uiControls);
     }
-
   }
 
   private touchedGround(): void {
@@ -367,7 +385,6 @@ class GameApp extends AppBase {
     this.weather.addEventListener('wind-directionChange', event => {
       windIndicator.update(event.value);
     });
-
   }
 
   private startGameLoop(camera: any, renderer: THREE.WebGLRenderer, scene: THREE.Scene): void {
@@ -441,7 +458,7 @@ class GameApp extends AppBase {
 
     // Dispose trajectory mesh if exists
     if (this.trajectoryMesh) {
-      this.trajectoryMesh.traverse((child) => {
+      this.trajectoryMesh.traverse(child => {
         if (child instanceof THREE.Mesh) {
           if (child.geometry) child.geometry.dispose();
           if (child.material) {

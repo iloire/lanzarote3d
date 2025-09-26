@@ -23,7 +23,7 @@ export interface Animation {
  */
 export const Easing = {
   linear: (t: number) => t,
-  easeInOut: (t: number) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t,
+  easeInOut: (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t),
   easeIn: (t: number) => t * t,
   easeOut: (t: number) => t * (2 - t),
 };
@@ -86,7 +86,7 @@ export class SimpleAnimator {
       isRunning: true,
       animate: animateFunction,
       onComplete,
-      easing
+      easing,
     };
 
     this.animations.set(id, animation);
@@ -123,7 +123,7 @@ export class SimpleAnimator {
     return {
       isRunning: this.isRunning,
       activeAnimations: Array.from(this.animations.keys()),
-      count: this.animations.size
+      count: this.animations.size,
     };
   }
 

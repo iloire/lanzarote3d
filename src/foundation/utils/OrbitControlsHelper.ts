@@ -42,19 +42,19 @@ export const ORBIT_CONTROLS_PRESETS: OrbitControlsPresets = {
   closeSubject: {
     minDistance: 50,
     maxDistance: 1000,
-    minPolarAngle: Math.PI * 0.1,  // 18 degrees from top
+    minPolarAngle: Math.PI * 0.1, // 18 degrees from top
     maxPolarAngle: Math.PI * 0.85, // 153 degrees from top
     panBoundary: {
       center: new THREE.Vector3(0, 0, 0),
       radius: 300,
-      verticalScale: 0.5
+      verticalScale: 0.5,
     },
     rotateSpeed: 0.3,
     zoomSpeed: 0.5,
     panSpeed: 0.4,
     enableDamping: true,
     dampingFactor: 0.1,
-    autoRotate: false
+    autoRotate: false,
   },
 
   // Medium exploration limits (for terrain/landscape viewing)
@@ -62,18 +62,18 @@ export const ORBIT_CONTROLS_PRESETS: OrbitControlsPresets = {
     minDistance: 100,
     maxDistance: 5000,
     minPolarAngle: Math.PI * 0.05, // 9 degrees from top
-    maxPolarAngle: Math.PI * 0.9,  // 162 degrees from top
+    maxPolarAngle: Math.PI * 0.9, // 162 degrees from top
     panBoundary: {
       center: new THREE.Vector3(0, 0, 0),
       radius: 2000,
-      verticalScale: 0.3
+      verticalScale: 0.3,
     },
     rotateSpeed: 0.5,
     zoomSpeed: 0.7,
     panSpeed: 0.6,
     enableDamping: true,
     dampingFactor: 0.05,
-    autoRotate: false
+    autoRotate: false,
   },
 
   // Wide exploration (for large scenes)
@@ -85,14 +85,14 @@ export const ORBIT_CONTROLS_PRESETS: OrbitControlsPresets = {
     panBoundary: {
       center: new THREE.Vector3(0, 0, 0),
       radius: 10000,
-      verticalScale: 1.0
+      verticalScale: 1.0,
     },
     rotateSpeed: 0.8,
     zoomSpeed: 1.0,
     panSpeed: 0.8,
     enableDamping: true,
     dampingFactor: 0.03,
-    autoRotate: false
+    autoRotate: false,
   },
 
   // Cinematic mode (slow, smooth movements)
@@ -107,7 +107,7 @@ export const ORBIT_CONTROLS_PRESETS: OrbitControlsPresets = {
     enableDamping: true,
     dampingFactor: 0.15,
     autoRotate: true,
-    autoRotateSpeed: 0.3
+    autoRotateSpeed: 0.3,
   },
 
   // No limits (unrestricted)
@@ -116,8 +116,8 @@ export const ORBIT_CONTROLS_PRESETS: OrbitControlsPresets = {
     zoomSpeed: 1.0,
     panSpeed: 1.0,
     enableDamping: false,
-    autoRotate: false
-  }
+    autoRotate: false,
+  },
 };
 
 export class OrbitControlsHelper {
@@ -227,7 +227,7 @@ export class OrbitControlsHelper {
     if (limits.panBoundary) {
       limits.panBoundary = {
         ...limits.panBoundary,
-        center: center.clone()
+        center: center.clone(),
       };
     }
 
@@ -237,11 +237,7 @@ export class OrbitControlsHelper {
   /**
    * Update controls target and apply limits around new target
    */
-  static focusOnTarget(
-    controls: any,
-    target: THREE.Vector3,
-    limits?: OrbitControlsLimits
-  ): void {
+  static focusOnTarget(controls: any, target: THREE.Vector3, limits?: OrbitControlsLimits): void {
     if (!controls) return;
 
     // Update target
@@ -266,7 +262,7 @@ export class OrbitControlsHelper {
     newLimits: OrbitControlsLimits,
     duration: number = 1000
   ): Promise<void> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       // For now, just apply immediately
       // TODO: Implement smooth transitions using tweening
       this.applyLimits(controls, newLimits);
