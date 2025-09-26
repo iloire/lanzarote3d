@@ -66,13 +66,6 @@ const createRenderer = (sizes: { width: number; height: number }) => {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(sizes.width, sizes.height);
 
-  // Configure renderer for vibrant colors like original Three.js
-  renderer.toneMapping = THREE.LinearToneMapping;
-  renderer.toneMappingExposure = 1.2;
-
-  // Use Linear color space for more vibrant colors (like older Three.js)
-  renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
-  THREE.ColorManagement.enabled = false;
 
   // Shadow settings for consistency
   renderer.shadowMap.enabled = true;

@@ -114,12 +114,12 @@ const Animation = {
       // Store initial positions
       const startTarget = controls ? controls.target.clone() : pgPos.clone();
 
-      // Single seamless animation with custom easing (12 seconds total)
-      animator.animate('camera-seamless', 12000, (progress) => {
+      // Single seamless animation with custom easing (8 seconds total)
+      animator.animate('camera-seamless', 8000, (progress) => {
         let currentPosition, phase;
 
         if (progress < 0.35) {
-          // Phase 1: Fast approach (first 35% = 4.2 seconds)
+          // Phase 1: Fast approach (first 35% = 2.8 seconds)
           phase = 'fast';
           const phase1Progress = progress / 0.35; // 0-1 for first phase
           // Use smooth acceleration with gentle end
@@ -133,7 +133,7 @@ const Animation = {
             controls.update();
           }
         } else {
-          // Phase 2: Slow approach (last 65% = 7.8 seconds)
+          // Phase 2: Slow approach (last 65% = 5.2 seconds)
           phase = 'slow';
           const phase2Progress = (progress - 0.35) / 0.65; // 0-1 for second phase
           // Use very smooth decelerated easing that connects perfectly
