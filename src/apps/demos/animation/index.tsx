@@ -8,6 +8,7 @@ import { StoryOptions } from '../../shared/types';
 import { animator } from '../../../foundation/systems/animation/SimpleAnimator';
 import { THEMES } from '../../../foundation/themes';
 import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';
+import { AppBase } from '../../shared/AppBase';
 
 // Use the golden hour theme for animation demo
 const ANIMATION_THEME = THEMES.golden;
@@ -36,38 +37,98 @@ const paraglidersVoxel: ParagliderVoxelConfig[] = [
 ];
 
 /**
- * Animation App - Restored original animation with voxel paraglider
+ * Animation Demo - Restored original animation with voxel paraglider
+ * Third app converted to use AppBase architecture
  */
-const Animation = {
-  load: async (options: StoryOptions) => {
-    const { camera, scene, renderer, terrain, water, controls, sky } = options;
+class AnimationApp extends AppBase {
+  private environment?: Environment;
+  private animationId?: number;
+  private paragliderMeshes: THREE.Object3D[] = [];
+  private animatorInstance?: any;
 
-    // Apply theme to scene
-    const theme = options.theme || ANIMATION_THEME;
-    await ThemeEngine.apply(options, theme);
+  constructor() {
+    super({
+      name: 'Animation Demo',
+      description: 'Dramatic camera animation showcasing voxel paragliders with golden hour lighting',
+      requiredComponents: ['scene', 'camera', 'renderer', 'terrain', 'water', 'controls'],
+      scene: {
+        environment: 'lanzarote',
+        lighting: 'dynamic',
+        physics: false,
+        fog: {
+          enabled: true,
+          color: 0xffb347, // Golden hour fog
+          near: 1000,
+          far: 20000
+        }
+      },
+      performance: {
+        monitoring: true,
+        logIntervalMs: 12000 // Log performance every 12 seconds
+      }
+    });
+  }
 
-    // Add voxel paragliders
-    paraglidersVoxel.forEach(async p => {
-      const paraglider = new ParagliderVoxel(p.pg);
-      const mesh = await paraglider.load();
-      mesh.position.copy(p.position);
-      const scale = 0.01;
-      mesh.scale.set(scale, scale, scale);
-      scene.add(mesh);
+  async load(options: StoryOptions): Promise<void> {
+    try {
+      // Initialize core systems from AppBase
+      this.initializeCore(options);
+
+      const { camera, scene, renderer, terrain, water, controls } = options;
+
+      // Apply theme to scene
+      const theme = options.theme || ANIMATION_THEME;
+      await ThemeEngine.apply(options, theme);
+
+      // Load voxel paragliders with proper tracking
+      await this.loadParagliders(scene);
+
+      // must render before adding env
+      renderer.render(scene, camera);
+
+      // Set up environment using theme
+      this.environment = new Environment(scene);
+      const weather = this.environment.createWeatherFromTheme(theme);
+      const thermals = this.environment.generateThermals(weather, 0);
+
+      // Add environment elements using theme
+      await this.environment.addCloudsFromTheme(thermals, theme);
+      this.environment.addTrees(terrain);
+      this.environment.addHouses(terrain);
+      this.environment.addBoats(water);
+
+      // Setup camera animation sequence
+      this.setupCameraAnimation(camera, controls, renderer, scene);
+
+      this.isLoaded = true;
+      console.log(`✅ ${this.config.name} loaded successfully with ${this.paragliderMeshes.length} paragliders`);
+
+    } catch (error) {
+      this.handleError(error as Error, 'load');
+      throw error;
+    }
+  }
+
+  private async loadParagliders(scene: THREE.Scene): Promise<void> {
+    const voxelPromises = paraglidersVoxel.map(async p => {
+      try {
+        const paraglider = new ParagliderVoxel(p.pg);
+        const mesh = await paraglider.load();
+        mesh.position.copy(p.position);
+        const scale = 0.01;
+        mesh.scale.set(scale, scale, scale);
+        scene.add(mesh);
+        this.paragliderMeshes.push(mesh);
+        return mesh;
+      } catch (error) {
+        this.handleError(error as Error, 'loading voxel paraglider');
+      }
     });
 
-    // must render before adding env
-    renderer.render(scene, camera);
+    await Promise.all(voxelPromises);
+  }
 
-    const env = new Environment(scene);
-    const weather = env.createWeatherFromTheme(theme);
-    const thermals = env.generateThermals(weather, 0);
-
-    await env.addCloudsFromTheme(thermals, theme);
-    env.addTrees(terrain);
-    env.addHouses(terrain);
-    env.addBoats(water);
-
+  private setupCameraAnimation(camera: THREE.Camera, controls: any, renderer: THREE.WebGLRenderer, scene: THREE.Scene): void {
     const pgPos = paraglidersVoxel[0]?.position.clone() || new THREE.Vector3();
 
     // Starting position - extremely far away on the other side of the island
@@ -94,12 +155,8 @@ const Animation = {
       controls.enabled = false; // Disable controls during animation
     }
 
-    // Simple, direct rendering loop
-    const animate = () => {
-      requestAnimationFrame(animate);
-      renderer.render(scene, camera);
-    };
-    animate();
+    // Start animation loop
+    this.startAnimationLoop(renderer, scene, camera);
 
     // Start the dramatic two-phase camera animation
     setTimeout(() => {
@@ -107,7 +164,7 @@ const Animation = {
       const startTarget = controls ? controls.target.clone() : pgPos.clone();
 
       // Single seamless animation with custom easing (8 seconds total)
-      animator.animate(
+      this.animatorInstance = animator.animate(
         'camera-seamless',
         8000,
         progress => {
@@ -163,8 +220,76 @@ const Animation = {
         }
       );
     }, 100);
+  }
 
-    // Animation app initialized
+  private startAnimationLoop(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.Camera): void {
+    const animate = () => {
+      try {
+        // Update performance monitoring
+        this.updatePerformance();
+
+        renderer.render(scene, camera);
+        this.animationId = requestAnimationFrame(animate);
+      } catch (error) {
+        this.handleError(error as Error, 'animation loop');
+      }
+    };
+    animate();
+  }
+
+  public dispose(): void {
+    console.log(`🧹 Disposing ${this.config.name}`);
+
+    // Cancel animation loop
+    if (this.animationId) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = undefined;
+    }
+
+    // Stop animator if running
+    if (this.animatorInstance) {
+      // Stop any ongoing animations
+      animator.stop('camera-seamless');
+      this.animatorInstance = undefined;
+    }
+
+    // Dispose paraglider meshes
+    this.paragliderMeshes.forEach(mesh => {
+      // Dispose geometry and materials if they exist
+      if (mesh.geometry) {
+        mesh.geometry.dispose();
+      }
+      if (Array.isArray(mesh.material)) {
+        mesh.material.forEach(material => material.dispose());
+      } else if (mesh.material) {
+        mesh.material.dispose();
+      }
+    });
+    this.paragliderMeshes.length = 0;
+
+    // Dispose environment resources
+    if (this.environment) {
+      this.environment = undefined;
+    }
+
+    // Call parent dispose
+    super.dispose();
+  }
+}
+
+// Create singleton instance
+const animationApp = new AnimationApp();
+
+// Export in the expected format for the Stories system
+const Animation = {
+  load: async (options: StoryOptions) => {
+    return animationApp.load(options);
+  },
+  dispose: () => {
+    return animationApp.dispose();
+  },
+  getAppInfo: () => {
+    return animationApp.getAppInfo();
   },
 };
 
