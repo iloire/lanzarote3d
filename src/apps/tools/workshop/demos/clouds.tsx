@@ -28,7 +28,7 @@ const CLOUD_THEMES = {
   arctic: {
     name: 'Arctic White',
     colors: ['#FFFAFA', '#F8F8FF', '#F5F5F5'], // Pure white theme
-  }
+  },
 };
 
 const CloudsWorkshop = {
@@ -51,7 +51,7 @@ const CloudsWorkshop = {
       if (currentClouds) {
         scene.remove(currentClouds);
         // Dispose of materials and geometries
-        currentClouds.traverse((child) => {
+        currentClouds.traverse(child => {
           if (child instanceof THREE.Mesh) {
             child.geometry?.dispose();
             if (Array.isArray(child.material)) {
@@ -84,18 +84,18 @@ const CloudsWorkshop = {
       const themeNames = Object.keys(CLOUD_THEMES);
       const themeControl = {
         theme: currentTheme,
-        regenerate: () => createClouds(themeControl.theme)
+        regenerate: () => createClouds(themeControl.theme),
       };
 
-      cloudFolder.add(themeControl, 'theme', themeNames)
+      cloudFolder
+        .add(themeControl, 'theme', themeNames)
         .name('Theme')
         .onChange(async (value: string) => {
           currentTheme = value;
           await createClouds(value);
         });
 
-      cloudFolder.add(themeControl, 'regenerate')
-        .name('Regenerate Clouds');
+      cloudFolder.add(themeControl, 'regenerate').name('Regenerate Clouds');
 
       // Display current theme info
       const infoDiv = document.createElement('div');
@@ -121,13 +121,22 @@ const CloudsWorkshop = {
             <strong>Colors:</strong>
           </div>
           <div style="display: flex; gap: 5px; margin-bottom: 10px;">
-            ${theme.colors.map(color =>
-              `<div style="width: 20px; height: 20px; background: ${color}; border: 1px solid #666; border-radius: 3px;" title="${color}"></div>`
-            ).join('')}
+            ${theme.colors
+              .map(
+                color =>
+                  `<div style="width: 20px; height: 20px; background: ${color}; border: 1px solid #666; border-radius: 3px;" title="${color}"></div>`
+              )
+              .join('')}
           </div>
-          <div style="font-size: 12px; opacity: 0.8;">
+          <div style="font-size: 12px; opacity: 0.8; line-height: 1.3;">
             Available themes: ${Object.keys(CLOUD_THEMES).length}<br>
-            Use GUI controls to switch themes
+            Use GUI controls or keyboard shortcuts
+          </div>
+          <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #333; font-size: 11px; line-height: 1.3;">
+            <div style="color: #F64A8A; font-weight: bold; margin-bottom: 5px;">⌨️ Keyboard Shortcuts:</div>
+            <div>← → (or ↑ ↓): Switch themes</div>
+            <div>1-6: Direct theme selection</div>
+            <div>R: Regenerate clouds</div>
           </div>
         `;
       };
@@ -135,13 +144,80 @@ const CloudsWorkshop = {
       updateInfo();
       document.body.appendChild(infoDiv);
 
-      // Update info when theme changes
-      const originalOnChange = cloudFolder.controllers[0].onChange;
-      cloudFolder.controllers[0].onChange = (value: string) => {
-        originalOnChange(value);
-        currentTheme = value;
-        updateInfo();
+      // Update info when theme changes - access the controller directly
+      const themeController = cloudFolder.controllers.find(c => c.property === 'theme');
+      if (themeController) {
+        const originalOnChange = themeController.onChange;
+        themeController.onChange = (value: string) => {
+          const result = originalOnChange.call(themeController, value);
+          currentTheme = value;
+          updateInfo();
+          return result;
+        };
+      }
+
+      // Keyboard shortcuts for theme switching
+      const handleKeyPress = (event: KeyboardEvent) => {
+        const themeKeys = Object.keys(CLOUD_THEMES);
+        const currentIndex = themeKeys.indexOf(currentTheme);
+
+        switch (event.key) {
+          case 'ArrowLeft':
+          case 'ArrowDown': {
+            // Previous theme
+            event.preventDefault();
+            const prevIndex = (currentIndex - 1 + themeKeys.length) % themeKeys.length;
+            const prevTheme = themeKeys[prevIndex];
+            if (prevTheme) {
+              currentTheme = prevTheme;
+              createClouds(prevTheme);
+              updateInfo();
+            }
+            break;
+          }
+          case 'ArrowRight':
+          case 'ArrowUp': {
+            // Next theme
+            event.preventDefault();
+            const nextIndex = (currentIndex + 1) % themeKeys.length;
+            const nextTheme = themeKeys[nextIndex];
+            if (nextTheme) {
+              currentTheme = nextTheme;
+              createClouds(nextTheme);
+              updateInfo();
+            }
+            break;
+          }
+          case '1':
+          case '2':
+          case '3':
+          case '4':
+          case '5':
+          case '6': {
+            // Direct theme selection (1-6)
+            event.preventDefault();
+            const themeIndex = parseInt(event.key) - 1;
+            if (themeIndex >= 0 && themeIndex < themeKeys.length) {
+              const selectedTheme = themeKeys[themeIndex];
+              if (selectedTheme) {
+                currentTheme = selectedTheme;
+                createClouds(selectedTheme);
+                updateInfo();
+              }
+            }
+            break;
+          }
+          case 'r':
+          case 'R':
+            // Regenerate current theme
+            event.preventDefault();
+            createClouds(currentTheme);
+            break;
+        }
       };
+
+      // Add keyboard event listeners
+      document.addEventListener('keydown', handleKeyPress);
 
       cloudFolder.open();
     }

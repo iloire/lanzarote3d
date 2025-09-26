@@ -5,7 +5,7 @@ body {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  font-family: "Ubuntu Mono", monospace;
+  font-family: 'Ubuntu Mono', monospace;
   font-weight: 400;
   font-style: normal;
 }
@@ -28,19 +28,22 @@ body {
   font-size: 1em;
   cursor: pointer;
   margin: 0;
-  transition: background 0.2s, color 0.2s, transform 0.15s;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    transform 0.15s;
   pointer-events: auto; /* Buttons should capture clicks */
 }
 
 .appOptions div.button button:hover {
-  background: #F64A8A;
+  background: #f64a8a;
   color: #fff;
   transform: translateY(-2px) scale(1.03);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
 }
 
 .appOptions div.button button.selected {
-  background: #F64A8A;
+  background: #f64a8a;
   color: #fff;
   margin-bottom: 0.4em;
   font-size: 90%;
@@ -347,7 +350,8 @@ body {
   font-size: 100%;
 }
 
-#game-start-normal {}
+#game-start-normal {
+}
 
 #game-start-strong {
   margin-left: 40px;

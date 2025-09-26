@@ -191,7 +191,7 @@ const PhotoBooth = {
     controls.update();
 
     // Add paragliders
-    paragliders.forEach(async (p, index) => {
+    paragliders.forEach(async p => {
       const paraglider = new Paraglider(p.pg);
       const mesh = await paraglider.load();
       mesh.position.copy(p.position);
@@ -202,7 +202,7 @@ const PhotoBooth = {
     });
 
     // Add voxel paragliders
-    paraglidersVoxel.forEach(async (p, index) => {
+    paraglidersVoxel.forEach(async p => {
       const paraglider = new ParagliderVoxel(p.pg);
       const mesh = await paraglider.load();
       mesh.position.copy(p.position);
@@ -213,7 +213,7 @@ const PhotoBooth = {
     });
 
     // Add tandems
-    tandems.forEach(async (p, index) => {
+    tandems.forEach(async p => {
       const tandem = new Tandem(p.pg);
       const mesh = await tandem.load();
       mesh.position.copy(p.position);

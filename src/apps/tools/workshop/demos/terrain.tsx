@@ -24,7 +24,11 @@ interface TerrainSettings {
 }
 
 // Create procedural noise texture
-const createNoiseTexture = (width: number, height: number, scale: number = 0.1): THREE.DataTexture => {
+const createNoiseTexture = (
+  width: number,
+  height: number,
+  scale: number = 0.1
+): THREE.DataTexture => {
   const size = width * height;
   const data = new Uint8Array(size);
 
@@ -51,127 +55,134 @@ const TERRAIN_STYLES: Record<string, TerrainStyle> = {
   volcanic: {
     name: 'Volcanic Lava',
     description: 'Glowing volcanic terrain with emissive lava flows',
-    material: (displacement, settings) => new THREE.MeshStandardMaterial({
-      color: 0x8B0000,
-      emissive: 0xFF4500,
-      emissiveIntensity: settings.emissiveIntensity,
-      displacementMap: displacement,
-      displacementScale: settings.displacementScale,
-      displacementBias: settings.displacementBias,
-      roughness: settings.roughness,
-      metalness: 0.1,
-      wireframe: settings.wireframe,
-      transparent: settings.transparency < 1.0,
-      opacity: settings.transparency,
-    }),
+    material: (displacement, settings) =>
+      new THREE.MeshStandardMaterial({
+        color: 0x8b0000,
+        emissive: 0xff4500,
+        emissiveIntensity: settings.emissiveIntensity,
+        displacementMap: displacement,
+        displacementScale: settings.displacementScale,
+        displacementBias: settings.displacementBias,
+        roughness: settings.roughness,
+        metalness: 0.1,
+        wireframe: settings.wireframe,
+        transparent: settings.transparency < 1.0,
+        opacity: settings.transparency,
+      }),
   },
 
   arctic: {
     name: 'Arctic Tundra',
     description: 'Frozen landscape with icy crystalline surfaces',
-    material: (displacement, settings) => new THREE.MeshStandardMaterial({
-      color: 0xE6F3FF,
-      emissive: 0x4169E1,
-      emissiveIntensity: settings.emissiveIntensity * 0.3,
-      displacementMap: displacement,
-      displacementScale: settings.displacementScale * 0.6,
-      displacementBias: settings.displacementBias,
-      roughness: 0.1,
-      metalness: settings.metalness,
-      wireframe: settings.wireframe,
-      transparent: settings.transparency < 1.0,
-      opacity: settings.transparency,
-    }),
+    material: (displacement, settings) =>
+      new THREE.MeshStandardMaterial({
+        color: 0xe6f3ff,
+        emissive: 0x4169e1,
+        emissiveIntensity: settings.emissiveIntensity * 0.3,
+        displacementMap: displacement,
+        displacementScale: settings.displacementScale * 0.6,
+        displacementBias: settings.displacementBias,
+        roughness: 0.1,
+        metalness: settings.metalness,
+        wireframe: settings.wireframe,
+        transparent: settings.transparency < 1.0,
+        opacity: settings.transparency,
+      }),
   },
 
   desert: {
     name: 'Sahara Dunes',
     description: 'Sandy desert with golden dunes and heat distortion',
-    material: (displacement, settings) => new THREE.MeshStandardMaterial({
-      color: 0xF4A460,
-      emissive: 0xFFD700,
-      emissiveIntensity: settings.emissiveIntensity * 0.5,
-      displacementMap: displacement,
-      displacementScale: settings.displacementScale * 1.5,
-      displacementBias: settings.displacementBias,
-      roughness: settings.roughness,
-      metalness: 0.0,
-      wireframe: settings.wireframe,
-      transparent: settings.transparency < 1.0,
-      opacity: settings.transparency,
-    }),
+    material: (displacement, settings) =>
+      new THREE.MeshStandardMaterial({
+        color: 0xf4a460,
+        emissive: 0xffd700,
+        emissiveIntensity: settings.emissiveIntensity * 0.5,
+        displacementMap: displacement,
+        displacementScale: settings.displacementScale * 1.5,
+        displacementBias: settings.displacementBias,
+        roughness: settings.roughness,
+        metalness: 0.0,
+        wireframe: settings.wireframe,
+        transparent: settings.transparency < 1.0,
+        opacity: settings.transparency,
+      }),
   },
 
   alien: {
     name: 'Alien World',
     description: 'Otherworldly terrain with exotic materials and colors',
-    material: (displacement, settings) => new THREE.MeshStandardMaterial({
-      color: 0x9932CC,
-      emissive: 0x00FF7F,
-      emissiveIntensity: settings.emissiveIntensity,
-      displacementMap: displacement,
-      displacementScale: settings.displacementScale * 2.0,
-      displacementBias: settings.displacementBias,
-      roughness: settings.roughness * 0.5,
-      metalness: settings.metalness,
-      wireframe: settings.wireframe,
-      transparent: settings.transparency < 1.0,
-      opacity: settings.transparency,
-    }),
+    material: (displacement, settings) =>
+      new THREE.MeshStandardMaterial({
+        color: 0x9932cc,
+        emissive: 0x00ff7f,
+        emissiveIntensity: settings.emissiveIntensity,
+        displacementMap: displacement,
+        displacementScale: settings.displacementScale * 2.0,
+        displacementBias: settings.displacementBias,
+        roughness: settings.roughness * 0.5,
+        metalness: settings.metalness,
+        wireframe: settings.wireframe,
+        transparent: settings.transparency < 1.0,
+        opacity: settings.transparency,
+      }),
   },
 
   crystal: {
     name: 'Crystal Caves',
     description: 'Crystalline formations with refractive surfaces',
-    material: (displacement, settings) => new THREE.MeshPhysicalMaterial({
-      color: 0x87CEEB,
-      emissive: 0xADD8E6,
-      emissiveIntensity: settings.emissiveIntensity * 0.4,
-      displacementMap: displacement,
-      displacementScale: settings.displacementScale,
-      displacementBias: settings.displacementBias,
-      roughness: 0.0,
-      metalness: 0.0,
-      transmission: 0.3,
-      thickness: 5,
-      wireframe: settings.wireframe,
-      transparent: true,
-      opacity: settings.transparency * 0.8,
-    }),
+    material: (displacement, settings) =>
+      new THREE.MeshPhysicalMaterial({
+        color: 0x87ceeb,
+        emissive: 0xadd8e6,
+        emissiveIntensity: settings.emissiveIntensity * 0.4,
+        displacementMap: displacement,
+        displacementScale: settings.displacementScale,
+        displacementBias: settings.displacementBias,
+        roughness: 0.0,
+        metalness: 0.0,
+        transmission: 0.3,
+        thickness: 5,
+        wireframe: settings.wireframe,
+        transparent: true,
+        opacity: settings.transparency * 0.8,
+      }),
   },
 
   wireframe: {
     name: 'Digital Matrix',
     description: 'Cyberpunk wireframe with glowing edges',
-    material: (displacement, settings) => new THREE.MeshStandardMaterial({
-      color: 0x00FF00,
-      emissive: 0x00FF00,
-      emissiveIntensity: settings.emissiveIntensity,
-      displacementMap: displacement,
-      displacementScale: settings.displacementScale,
-      displacementBias: settings.displacementBias,
-      wireframe: true,
-      transparent: settings.transparency < 1.0,
-      opacity: settings.transparency,
-    }),
+    material: (displacement, settings) =>
+      new THREE.MeshStandardMaterial({
+        color: 0x00ff00,
+        emissive: 0x00ff00,
+        emissiveIntensity: settings.emissiveIntensity,
+        displacementMap: displacement,
+        displacementScale: settings.displacementScale,
+        displacementBias: settings.displacementBias,
+        wireframe: true,
+        transparent: settings.transparency < 1.0,
+        opacity: settings.transparency,
+      }),
   },
 
   plasma: {
     name: 'Plasma Energy',
     description: 'Energy-based terrain with dynamic plasma effects',
-    material: (displacement, settings) => new THREE.MeshStandardMaterial({
-      color: 0xFF00FF,
-      emissive: 0xFF1493,
-      emissiveIntensity: settings.emissiveIntensity * 1.5,
-      displacementMap: displacement,
-      displacementScale: settings.displacementScale,
-      displacementBias: settings.displacementBias,
-      roughness: 0.2,
-      metalness: settings.metalness,
-      wireframe: settings.wireframe,
-      transparent: settings.transparency < 1.0,
-      opacity: settings.transparency,
-    }),
+    material: (displacement, settings) =>
+      new THREE.MeshStandardMaterial({
+        color: 0xff00ff,
+        emissive: 0xff1493,
+        emissiveIntensity: settings.emissiveIntensity * 1.5,
+        displacementMap: displacement,
+        displacementScale: settings.displacementScale,
+        displacementBias: settings.displacementBias,
+        roughness: 0.2,
+        metalness: settings.metalness,
+        wireframe: settings.wireframe,
+        transparent: settings.transparency < 1.0,
+        opacity: settings.transparency,
+      }),
     postProcess: (mesh, settings) => {
       if (settings.animateVertices) {
         const geometry = mesh.geometry as THREE.PlaneGeometry;
@@ -216,7 +227,6 @@ const TerrainWorkshop = {
 
     let currentTerrain: THREE.Mesh | null = null;
     let currentStyle = 'volcanic';
-    let animationId: number | null = null;
 
     // Load textures
     const loader = new THREE.TextureLoader();
@@ -314,7 +324,8 @@ const TerrainWorkshop = {
         },
       };
 
-      terrainFolder.add(terrainControl, 'style', styleNames)
+      terrainFolder
+        .add(terrainControl, 'style', styleNames)
         .name('🎨 Style')
         .onChange((value: string) => {
           currentStyle = value;
@@ -322,7 +333,8 @@ const TerrainWorkshop = {
           updateInfo();
         });
 
-      terrainFolder.add(terrainControl, 'useProceduralNoise')
+      terrainFolder
+        .add(terrainControl, 'useProceduralNoise')
         .name('🔄 Procedural Noise')
         .onChange((value: boolean) => {
           createTerrain(currentStyle, value);
@@ -330,47 +342,57 @@ const TerrainWorkshop = {
 
       // Displacement settings
       const displacementFolder = terrainFolder.addFolder('⛰️ Displacement');
-      displacementFolder.add(settings, 'displacementScale', 0, 2000)
+      displacementFolder
+        .add(settings, 'displacementScale', 0, 2000)
         .name('Scale')
         .onChange(() => createTerrain(currentStyle, terrainControl.useProceduralNoise));
 
-      displacementFolder.add(settings, 'displacementBias', -1, 1)
+      displacementFolder
+        .add(settings, 'displacementBias', -1, 1)
         .name('Bias')
         .onChange(() => createTerrain(currentStyle, terrainControl.useProceduralNoise));
 
-      displacementFolder.add(settings, 'segments', 50, 500, 1)
+      displacementFolder
+        .add(settings, 'segments', 50, 500, 1)
         .name('Detail Level')
         .onChange(() => createTerrain(currentStyle, terrainControl.useProceduralNoise));
 
       // Visual settings
       const visualFolder = terrainFolder.addFolder('✨ Visual Effects');
-      visualFolder.add(settings, 'wireframe')
+      visualFolder
+        .add(settings, 'wireframe')
         .name('Wireframe')
         .onChange(() => createTerrain(currentStyle, terrainControl.useProceduralNoise));
 
-      visualFolder.add(settings, 'transparency', 0, 1)
+      visualFolder
+        .add(settings, 'transparency', 0, 1)
         .name('Transparency')
         .onChange(() => createTerrain(currentStyle, terrainControl.useProceduralNoise));
 
-      visualFolder.add(settings, 'roughness', 0, 1)
+      visualFolder
+        .add(settings, 'roughness', 0, 1)
         .name('Roughness')
         .onChange(() => createTerrain(currentStyle, terrainControl.useProceduralNoise));
 
-      visualFolder.add(settings, 'metalness', 0, 1)
+      visualFolder
+        .add(settings, 'metalness', 0, 1)
         .name('Metalness')
         .onChange(() => createTerrain(currentStyle, terrainControl.useProceduralNoise));
 
-      visualFolder.add(settings, 'emissiveIntensity', 0, 2)
+      visualFolder
+        .add(settings, 'emissiveIntensity', 0, 2)
         .name('Glow Intensity')
         .onChange(() => createTerrain(currentStyle, terrainControl.useProceduralNoise));
 
-      visualFolder.add(settings, 'animateVertices')
+      visualFolder
+        .add(settings, 'animateVertices')
         .name('Dynamic Animation')
         .onChange(() => createTerrain(currentStyle, terrainControl.useProceduralNoise));
 
-      visualFolder.add(settings, 'fogDensity', 0, 0.01)
+      visualFolder
+        .add(settings, 'fogDensity', 0, 0.01)
         .name('Fog Density')
-        .onChange((value) => {
+        .onChange(value => {
           if (scene.fog) {
             scene.fog.far = 20000 / (1 + value * 100);
           }
@@ -416,12 +438,16 @@ const TerrainWorkshop = {
       updateInfo();
       document.body.appendChild(infoDiv);
 
-      // Update info when style changes
-      const originalOnChange = terrainFolder.controllers[0].onChange;
-      terrainFolder.controllers[0].onChange = (value: string) => {
-        originalOnChange(value);
-        updateInfo();
-      };
+      // Update info when style changes - access the controller directly
+      const styleController = terrainFolder.controllers.find(c => c.property === 'style');
+      if (styleController) {
+        const originalOnChange = styleController.onChange;
+        styleController.onChange = (value: string) => {
+          const result = originalOnChange.call(styleController, value);
+          updateInfo();
+          return result;
+        };
+      }
 
       terrainFolder.open();
       displacementFolder.open();

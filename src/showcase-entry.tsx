@@ -13,7 +13,7 @@ const params = new URLSearchParams(window.location.search);
 const queryStory = params.get('story');
 
 const scriptTag = document.currentScript as HTMLScriptElement;
-const bundleName = scriptTag?.src.match(/([^\/]+)\.bundle\.js$/)?.[1] || 'animation';
+const bundleName = scriptTag?.src.match(/([^/]+)\.bundle\.js$/)?.[1] || 'animation';
 
 // Map bundle names to story names
 const bundleToStoryMap: Record<string, string> = {

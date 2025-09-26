@@ -110,7 +110,7 @@
 }
 
 .undo-button {
-  background: #2196F3;
+  background: #2196f3;
   color: white;
   border: none;
   padding: 8px 15px;
@@ -184,7 +184,7 @@
 }
 
 .location-list li.active {
-  background: #2196F3;
+  background: #2196f3;
   color: white;
 }
 
@@ -295,4 +295,4 @@
 
 .export-button:hover {
   background: #f57c00;
-} 
+}

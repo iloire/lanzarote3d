@@ -37,7 +37,9 @@
       "Read(//Users/**)",
       "mcp__ide__getDiagnostics",
       "Bash(npm uninstall:*)",
-      "Bash(wc:*)"
+      "Bash(wc:*)",
+      "Bash(yarn pre-deploy:*)",
+      "Bash(yarn build-staging)"
     ],
     "deny": [],
     "ask": []
