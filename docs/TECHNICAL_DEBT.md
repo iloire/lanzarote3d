@@ -42,7 +42,7 @@ This document tracks technical debt and issues that need to be addressed for imp
 **Files**: `src/app.tsx`, `src/apps/demos/animation/index.tsx`, `src/apps/experiences/game/game.tsx`, `src/apps/experiences/flyzones/animation/loop.ts`
 **Issue**: Multiple competing animation loops. Main app has its own loop, individual apps create their own loops.
 **Impact**: Performance, potential conflicts, duplicate rendering
-**Solution**: ✅ Implemented centralized AnimationManager singleton that coordinates all animations with priority-based execution
+**Solution**: ✅ Implemented AppBase architecture with standardized animation loop management across all 8 applications
 
 ### Animation System Complexity (Architectural Improvement)
 **Status**: ✅ Improved
@@ -50,6 +50,22 @@ This document tracks technical debt and issues that need to be addressed for imp
 **Issue**: Previous animation system was too complex with hidden dependencies (AnimationManager → TWEEN → Animations utility) making debugging difficult
 **Impact**: Hard to debug animation issues, timing problems, mixed responsibilities
 **Solution**: ✅ Created SimpleAnimator - self-contained, no external dependencies, transparent operation, easy to debug
+
+### App Architecture Inconsistency
+**Status**: ✅ Fixed
+**Files**: All 8 applications converted to AppBase
+**Issue**: Applications used inconsistent patterns (simple objects vs class-based), no standardized error handling, resource management, or performance monitoring
+**Impact**: Inconsistent developer experience, potential memory leaks, no visibility into performance issues
+**Files Affected**:
+- ✅ `src/apps/demos/famara/index.tsx` - Converted to AppBase
+- ✅ `src/apps/demos/photobooth/index.tsx` - Converted to AppBase
+- ✅ `src/apps/demos/animation/index.tsx` - Converted to AppBase
+- ✅ `src/apps/tools/workshop/index.tsx` - Converted to AppBase
+- ✅ `src/apps/experiences/game/game.tsx` - Converted to AppBase
+- ✅ `src/apps/experiences/flyzones/index.tsx` - Converted to AppBase
+- ✅ `src/apps/tools/location-editor/index.tsx` - Converted to AppBase
+- ✅ `src/apps/tools/workshop/demos/voxel/index.tsx` - Converted to AppBase
+**Solution**: ✅ Implemented unified AppBase architecture with standardized lifecycle management, performance monitoring, error handling, and resource cleanup
 
 ## Medium Priority
 
@@ -71,14 +87,14 @@ This document tracks technical debt and issues that need to be addressed for imp
 **Impact**: User experience when audio fails to load
 
 ### Event Listener Memory Leaks
-**Status**: ⚠️ Potential Issue
-**Files**: 50+ event listeners across codebase
+**Status**: ✅ Significantly Improved
+**Files**: All AppBase applications now have proper cleanup
 **Issue**: Many event listeners lack proper cleanup mechanisms
 **Impact**: Memory leaks, degraded performance over time
 **Files Affected**:
-- `src/apps/experiences/flyzones/events/mouse.ts` - Partial cleanup
-- Multiple window resize listeners without cleanup tracking
-**Solution**: Audit and implement proper cleanup for all event listeners
+- `src/apps/experiences/flyzones/events/mouse.ts` - ✅ Now has proper cleanup in AppBase
+- Multiple window resize listeners - ✅ Now tracked and cleaned up in dispose() methods
+**Solution**: ✅ AppBase architecture ensures all event listeners are properly cleaned up via standardized dispose() methods
 
 ### Hardcoded Scene Configuration
 **Status**: Identified
