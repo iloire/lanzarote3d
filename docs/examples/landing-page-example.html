@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landing Page with Lanzarote 3D Background</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            overflow-x: hidden;
+            background: #000; /* Fallback */
+        }
+
+        /* 3D Background Container */
+        #lanzarote3d-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 1s ease;
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            padding: 2rem;
+        }
+
+        .hero-content {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 3rem 2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 600px;
+            color: white;
+            animation: fadeInUp 1s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(45deg, #F64A8A, #DE3163);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(246, 74, 138, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(246, 74, 138, 0.4);
+        }
+
+        /* Content Sections */
+        .content-section {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .glass-card h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .glass-card p {
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem 2rem;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            transition: background 0.3s ease;
+        }
+
+        .nav.scrolled {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.7;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            /* Hide 3D background on mobile for performance */
+            #lanzarote3d-container {
+                display: none;
+            }
+
+            body {
+                background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .hero-content {
+                padding: 2rem 1.5rem;
+            }
+
+            .nav-links {
+                display: none; /* Simplified nav on mobile */
+            }
+        }
+
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            #lanzarote3d-container {
+                display: none;
+            }
+
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loader"></div>
+    </div>
+
+    <!-- 3D Background Container -->
+    <div id="lanzarote3d-container"></div>
+
+    <!-- Navigation -->
+    <nav class="nav" id="navigation">
+        <div class="nav-content">
+            <a href="#" class="logo">Your Brand</a>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>Welcome to Paradise</h1>
+            <p>Experience the breathtaking beauty of Lanzarote through stunning 3D landscapes. Immerse yourself in a world where technology meets natural wonder.</p>
+            <a href="#about" class="cta-button">Explore Now</a>
+        </div>
+    </section>
+
+    <!-- Content Sections -->
+    <section class="content-section" id="about">
+        <div class="glass-card">
+            <h2>About Our Vision</h2>
+            <p>We believe in creating digital experiences that transport you to another world. Our 3D backgrounds aren't just visual elements—they're gateways to adventure, bringing the majestic landscapes of Lanzarote directly to your screen.</p>
+        </div>
+    </section>
+
+    <section class="content-section" id="services">
+        <div class="glass-card">
+            <h2>What We Offer</h2>
+            <p>From cinematic camera movements to interactive 3D environments, we provide cutting-edge web experiences that captivate and engage your audience. Perfect for travel sites, portfolios, and brands that want to make an unforgettable first impression.</p>
+        </div>
+    </section>
+
+    <section class="content-section" id="contact">
+        <div class="glass-card">
+            <h2>Get In Touch</h2>
+            <p>Ready to transform your website with stunning 3D backgrounds? Contact us to discuss how we can bring your vision to life with immersive, interactive experiences that your users will never forget.</p>
+            <br>
+            <a href="mailto:contact@example.com" class="cta-button">Contact Us</a>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script>
+        // Navigation scroll effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navigation');
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 3D Background Initialization (Placeholder)
+        // In a real implementation, you would load the actual Lanzarote 3D demo here
+        window.addEventListener('load', () => {
+            // Simulate loading time
+            setTimeout(() => {
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                loadingOverlay.classList.add('hidden');
+
+                // Initialize 3D background here
+                // Example: loadLanzarote3DDemo('animation', { container: '#lanzarote3d-container' });
+                console.log('3D background would be initialized here');
+            }, 2000);
+        });
+
+        // Performance monitoring
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(() => {
+                // Initialize 3D background during idle time
+                console.log('Idle time detected - safe to load 3D background');
+            });
+        }
+
+        // Pause/resume based on page visibility
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                console.log('Page hidden - pause 3D animations');
+                // window.lanzarote3DBackground?.pause();
+            } else {
+                console.log('Page visible - resume 3D animations');
+                // window.lanzarote3DBackground?.resume();
+            }
+        });
+    </script>
+
+    <!--
+    To integrate the actual Lanzarote 3D demo:
+
+    1. Copy the built files from lanzarote3d/dist/ to your website
+    2. Include the main bundle:
+       <script src="path/to/main.bundle.js"></script>
+
+    3. Replace the console.log with actual initialization:
+       loadLanzarote3DDemo('animation', {
+           container: document.getElementById('lanzarote3d-container'),
+           showUI: false,
+           autoStart: true,
+           loop: true
+       });
+    -->
+</body>
+</html>

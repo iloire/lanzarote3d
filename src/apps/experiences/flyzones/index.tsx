@@ -337,6 +337,17 @@ const FlyZones = {
       labelRenderer.setSize(window.innerWidth, window.innerHeight);
     });
 
+    // Initialize controls settings
+    if (controls) {
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.enableZoom = true;
+      controls.enableRotate = true;
+      controls.enablePan = true;
+      controls.maxDistance = 50000;
+      controls.minDistance = 100;
+    }
+
     // Set initial position
     const flyLocations = locations as FlyLocation[];
     const initialPosition = flyLocations.length > 0 && flyLocations[0]?.position

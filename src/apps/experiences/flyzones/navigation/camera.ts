@@ -29,12 +29,19 @@ export const navigateTo = (
     const startPosition = camera.position.clone();
     const startTarget = controls.target.clone();
 
+    // Disable controls during animation
+    controls.enabled = false;
+
     animator.animate('flyzones-navigate', 2000, (progress) => {
       // Animate camera position
       camera.position.lerpVectors(startPosition, cameraPosition, progress);
       // Animate target
       controls.target.lerpVectors(startTarget, cameraTarget, progress);
       controls.update();
+    }, () => {
+      // Re-enable controls after animation completes
+      controls.enabled = true;
+      console.log('Camera navigation complete - controls enabled');
     });
   } else {
     // Simple navigation without specific camera view
@@ -42,12 +49,19 @@ export const navigateTo = (
     const startTarget = controls.target.clone();
     const defaultCameraPosition = new THREE.Vector3(position.x + 1000, position.y + 1000, position.z + 1000);
 
+    // Disable controls during animation
+    controls.enabled = false;
+
     animator.animate('flyzones-navigate-simple', 2000, (progress) => {
       // Animate camera position
       camera.position.lerpVectors(startPosition, defaultCameraPosition, progress);
       // Animate target
       controls.target.lerpVectors(startTarget, position, progress);
       controls.update();
+    }, () => {
+      // Re-enable controls after animation completes
+      controls.enabled = true;
+      console.log('Simple camera navigation complete - controls enabled');
     });
   }
 }; 

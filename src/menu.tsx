@@ -16,6 +16,7 @@ class Menu extends React.Component<MenuProps> {
     hoveredRoute: null as string | null,
     isMobile: false,
     isMenuOpen: false,
+    isMenuVisible: true, // New state for menu visibility
   };
 
   override componentDidMount() {
@@ -34,6 +35,10 @@ class Menu extends React.Component<MenuProps> {
 
   toggleMenu = () => {
     this.setState({ isMenuOpen: !this.state.isMenuOpen });
+  };
+
+  toggleMenuVisibility = () => {
+    this.setState({ isMenuVisible: !this.state.isMenuVisible });
   };
 
   navigateTo(route: string) {
@@ -96,7 +101,7 @@ class Menu extends React.Component<MenuProps> {
       });
 
     const { showPublic = true, showExperiments: showExperiments = true, showDev: showDev = true } = this.props;
-    const { isMobile, isMenuOpen } = this.state;
+    const { isMobile, isMenuOpen, isMenuVisible } = this.state;
 
     // Mobile menu
     if (isMobile) {
@@ -104,37 +109,55 @@ class Menu extends React.Component<MenuProps> {
         <div className="appOptions mobile">
           <div className="mobile-header">
             <h2>Lanzarote 3D</h2>
-            <button
-              className="hamburger-menu"
-              onClick={this.toggleMenu}
-              aria-label="Toggle menu"
-            >
-              <span className={`hamburger-line ${isMenuOpen ? 'open' : ''}`}></span>
-              <span className={`hamburger-line ${isMenuOpen ? 'open' : ''}`}></span>
-              <span className={`hamburger-line ${isMenuOpen ? 'open' : ''}`}></span>
-            </button>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                onClick={this.toggleMenuVisibility}
+                style={{
+                  background: isMenuVisible ? '#4CAF50' : '#f44336',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  padding: '8px 12px',
+                  fontSize: '12px'
+                }}
+                title={isMenuVisible ? 'Hide Menu' : 'Show Menu'}
+              >
+                {isMenuVisible ? '🙈' : '👁️'}
+              </button>
+              <button
+                className="hamburger-menu"
+                onClick={this.toggleMenu}
+                aria-label="Toggle menu"
+              >
+                <span className={`hamburger-line ${isMenuOpen ? 'open' : ''}`}></span>
+                <span className={`hamburger-line ${isMenuOpen ? 'open' : ''}`}></span>
+                <span className={`hamburger-line ${isMenuOpen ? 'open' : ''}`}></span>
+              </button>
+            </div>
           </div>
 
-          <div className={`mobile-menu-content ${isMenuOpen ? 'open' : ''}`}>
-            {showPublic && publicApps.length > 0 && (
-              <>
-                <h3>Main</h3>
-                {renderButtons(publicApps)}
-              </>
-            )}
-            {showExperiments && experimentalApps.length > 0 && (
-              <>
-                <h3>Experiments</h3>
-                {renderButtons(experimentalApps)}
-              </>
-            )}
-            {showDev && devApps.length > 0 && (
-              <>
-                <h3>Development</h3>
-                {renderButtons(devApps)}
-              </>
-            )}
-          </div>
+          {isMenuVisible && (
+            <div className={`mobile-menu-content ${isMenuOpen ? 'open' : ''}`}>
+              {showPublic && publicApps.length > 0 && (
+                <>
+                  <h3>Main</h3>
+                  {renderButtons(publicApps)}
+                </>
+              )}
+              {showExperiments && experimentalApps.length > 0 && (
+                <>
+                  <h3>Experiments</h3>
+                  {renderButtons(experimentalApps)}
+                </>
+              )}
+              {showDev && devApps.length > 0 && (
+                <>
+                  <h3>Development</h3>
+                  {renderButtons(devApps)}
+                </>
+              )}
+            </div>
+          )}
         </div>
       );
     }
@@ -142,22 +165,43 @@ class Menu extends React.Component<MenuProps> {
     // Desktop menu
     return (
       <div className="appOptions">
-        {showPublic && publicApps.length > 0 && (
+        {/* Toggle button - always visible */}
+        <div className="button">
+          <button
+            onClick={this.toggleMenuVisibility}
+            style={{
+              background: isMenuVisible ? '#4CAF50' : '#f44336',
+              color: 'white',
+              fontWeight: 'bold',
+              marginBottom: '10px'
+            }}
+            title={isMenuVisible ? 'Hide Menu' : 'Show Menu'}
+          >
+            {isMenuVisible ? '🙈 Hide' : '👁️ Show'}
+          </button>
+        </div>
+
+        {/* Menu content - conditionally visible */}
+        {isMenuVisible && (
           <>
-            <h2>Lanzarote 3D</h2>
-            {renderButtons(publicApps)}
-          </>
-        )}
-        {showExperiments && experimentalApps.length > 0 && (
-          <>
-            <h2>Experiments</h2>
-            {renderButtons(experimentalApps)}
-          </>
-        )}
-        {showDev && devApps.length > 0 && (
-          <>
-            <h2>Development</h2>
-            {renderButtons(devApps)}
+            {showPublic && publicApps.length > 0 && (
+              <>
+                <h2>Lanzarote 3D</h2>
+                {renderButtons(publicApps)}
+              </>
+            )}
+            {showExperiments && experimentalApps.length > 0 && (
+              <>
+                <h2>Experiments</h2>
+                {renderButtons(experimentalApps)}
+              </>
+            )}
+            {showDev && devApps.length > 0 && (
+              <>
+                <h2>Development</h2>
+                {renderButtons(devApps)}
+              </>
+            )}
           </>
         )}
       </div>

@@ -70,11 +70,11 @@ const Animation = {
     const pgPos = paraglidersVoxel[0]?.position.clone() || new THREE.Vector3();
     console.log('Paraglider position:', pgPos);
 
-    // Starting position - far away on the other side of the island
-    const initialCameraPosition = new THREE.Vector3(3000, 1500, 2000);
+    // Starting position - extremely far away on the other side of the island
+    const initialCameraPosition = new THREE.Vector3(-2000, 2500, 5000);
 
     // Intermediate position - approaching the area quickly
-    const intermediatePosition = new THREE.Vector3(6000, 1200, 500);
+    const intermediatePosition = new THREE.Vector3(4500, 1600, 1500);
 
     // Final position - slow, careful approach to the paraglider
     const finalCameraPosition = new THREE.Vector3(
@@ -114,36 +114,36 @@ const Animation = {
       // Store initial positions
       const startTarget = controls ? controls.target.clone() : pgPos.clone();
 
-      // Single seamless animation with custom easing (10 seconds total)
-      animator.animate('camera-seamless', 10000, (progress) => {
+      // Single seamless animation with custom easing (12 seconds total)
+      animator.animate('camera-seamless', 12000, (progress) => {
         let currentPosition, phase;
 
-        if (progress < 0.4) {
-          // Phase 1: Fast approach (first 40% = 4 seconds)
+        if (progress < 0.35) {
+          // Phase 1: Fast approach (first 35% = 4.2 seconds)
           phase = 'fast';
-          const phase1Progress = progress / 0.4; // 0-1 for first phase
-          // Use accelerated easing for quick movement
+          const phase1Progress = progress / 0.35; // 0-1 for first phase
+          // Use smooth acceleration with gentle end
           const easedProgress = phase1Progress * phase1Progress * (3 - 2 * phase1Progress); // smoothstep
           currentPosition = new THREE.Vector3().lerpVectors(initialCameraPosition, intermediatePosition, easedProgress);
 
           // Look towards the area gradually
-          const lookTarget = new THREE.Vector3().lerpVectors(startTarget, pgPos, easedProgress * 0.5);
+          const lookTarget = new THREE.Vector3().lerpVectors(startTarget, pgPos, easedProgress * 0.6);
           if (controls) {
             controls.target.copy(lookTarget);
             controls.update();
           }
         } else {
-          // Phase 2: Slow approach (last 60% = 6 seconds)
+          // Phase 2: Slow approach (last 65% = 7.8 seconds)
           phase = 'slow';
-          const phase2Progress = (progress - 0.4) / 0.6; // 0-1 for second phase
-          // Use decelerated easing for slow movement
-          const easedProgress = Math.sqrt(phase2Progress); // slow start, maintains smoothness
+          const phase2Progress = (progress - 0.35) / 0.65; // 0-1 for second phase
+          // Use very smooth decelerated easing that connects perfectly
+          const easedProgress = 1 - Math.pow(1 - phase2Progress, 2.5); // smooth deceleration
           currentPosition = new THREE.Vector3().lerpVectors(intermediatePosition, finalCameraPosition, easedProgress);
 
-          // Gradually focus on the paraglider
+          // Gradually focus on the paraglider with smooth transition
           if (controls) {
-            const currentTarget = controls.target.clone();
-            controls.target.lerpVectors(currentTarget, pgPos, easedProgress * 0.1); // Very gradual
+            const targetProgress = Math.min(phase2Progress * 1.5, 1.0); // More gradual targeting
+            controls.target.lerpVectors(controls.target, pgPos, targetProgress * 0.05); // Very smooth
             controls.update();
           }
         }

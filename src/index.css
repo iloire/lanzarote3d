@@ -188,9 +188,9 @@ body {
 .points {
   position: absolute;
   top: 20px;
-  left: 20px;
+  right: 20px; /* Move to top-right to avoid main menu overlap */
   z-index: 1000;
-  pointer-events: auto;
+  pointer-events: none; /* Allow camera controls to work through this area */
 }
 
 .points button {
@@ -203,6 +203,7 @@ body {
   border: 1px solid #ccc;
   cursor: pointer;
   display: block;
+  pointer-events: auto; /* Buttons should capture clicks */
 }
 
 .points button:hover {
