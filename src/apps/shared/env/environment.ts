@@ -32,7 +32,16 @@ class Environment {
   }
 
   async addBirds(path: THREE.Vector3[], gui?: any) {
-    this.birds = new Birds();
+    // Create birds with optimized flight parameters for the environment
+    this.birds = new Birds({
+      speed: 2,
+      arrivalThreshold: 20,
+      smoothRotation: true,
+      rotationSpeed: 0.06,
+      forwardAxis: 'z', // Back to Z axis but will fix orientation in rotation logic
+      scale: 1,
+      animationSpeed: 1.2
+    });
     const birdsMesh = await this.birds.load(path, gui);
     this.scene.add(birdsMesh);
   }

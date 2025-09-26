@@ -2,33 +2,70 @@ import * as THREE from "three";
 import GuiHelper from "../../utils/gui";
 import Models from "../../utils/models";
 import model from "../../../../assets/foundation/models/environment/birds.glb";
-import AutoFlier from "../../types/auto-flier";
+import AutoFlier, { AutoFlierOptions } from "../../types/auto-flier";
 
 const clock = new THREE.Clock();
+
+export interface BirdsOptions extends AutoFlierOptions {
+  scale?: number;
+  animationSpeed?: number;
+}
 
 class Birds extends AutoFlier {
   mixer: THREE.AnimationMixer | null = null;
   interval: number;
+  private scale: number = 1;
+  private animationSpeed: number = 1;
+
+  constructor(options: BirdsOptions = {}) {
+    // Configure bird-specific flight behavior
+    super({
+      speed: options.speed ?? 2, // Moderate flying speed
+      arrivalThreshold: options.arrivalThreshold ?? 15, // Larger threshold for natural turns
+      smoothRotation: options.smoothRotation ?? true, // Smooth banking turns
+      rotationSpeed: options.rotationSpeed ?? 0.08, // Realistic bird turning speed
+      forwardAxis: options.forwardAxis ?? '-z', // Assuming bird model faces -Z direction
+      ...options
+    });
+
+    this.scale = options.scale ?? 1;
+    this.animationSpeed = options.animationSpeed ?? 1;
+  }
 
   async load(path: THREE.Vector3[], gui?: any): Promise<THREE.Mesh> {
     this.path = path;
     const gltf = await Models.loadGltf(model);
     this.mesh = gltf.scene.children[0];
-    this.mesh.scale.set(1, 1, 1);
+
+    // Apply custom scale
+    this.mesh.scale.set(this.scale, this.scale, this.scale);
+
+    // Set up animations
     const animations = gltf.animations;
-    this.mixer = new THREE.AnimationMixer(gltf.scene);
-    const animationAction = this.mixer.clipAction(animations[0]);
-    animationAction.play();
-    if (path.length > 1) {
-      this.mesh.position.copy(path[0]);
+    if (animations && animations.length > 0) {
+      this.mixer = new THREE.AnimationMixer(gltf.scene);
+      const animationAction = this.mixer.clipAction(animations[0]);
+      animationAction.setDuration(animationAction.getClip().duration / this.animationSpeed);
+      animationAction.play();
     }
+
+    // Position at start of path
+    if (path.length > 0) {
+      this.mesh.position.copy(path[0]);
+      // Reset to start of path
+      this.resetPath();
+    }
+
     this.animate();
+
     if (gui) {
       GuiHelper.addLocationGui(gui, "Birds", this.mesh, {
         min: -10000,
         max: 10000,
       });
     }
+
+    console.log(`🐦 Birds loaded with ${path.length} waypoints, forward axis: ${this.getForwardAxis()}`);
     return this.mesh;
   }
 
