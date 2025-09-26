@@ -1,7 +1,7 @@
 Implement the following tasks if any is added follwing the instructions described below:
 ---
 TASKS:
-- add a close icon to the modal theme window.
+
 ---
 
 ### Instructions

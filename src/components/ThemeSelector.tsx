@@ -167,8 +167,29 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
               border: '1px solid #666',
               borderRadius: '4px',
               padding: '10px',
+              position: 'relative' as const,
             }}
           >
+            <button
+              onClick={this.toggleOpen}
+              style={{
+                position: 'absolute' as const,
+                top: '5px',
+                right: '5px',
+                background: 'transparent',
+                border: 'none',
+                color: '#999',
+                fontSize: '16px',
+                cursor: 'pointer',
+                padding: '2px 6px',
+                borderRadius: '2px',
+                lineHeight: '1',
+              }}
+              title="Close theme selector"
+            >
+              ✕
+            </button>
+
             {isApplying && (
               <div style={{ color: '#4CAF50', fontSize: '12px', marginBottom: '10px' }}>
                 🔄 Applying theme...
@@ -234,6 +255,33 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
               boxShadow: '0 8px 32px rgba(0,0,0,0.8)',
             }}
           >
+            <button
+              onClick={this.toggleOpen}
+              style={{
+                position: 'absolute' as const,
+                top: '8px',
+                right: '8px',
+                background: 'transparent',
+                border: 'none',
+                color: '#999',
+                fontSize: '18px',
+                cursor: 'pointer',
+                padding: '2px 6px',
+                borderRadius: '2px',
+                lineHeight: '1',
+                transition: 'color 0.2s ease',
+              }}
+              title="Close theme selector"
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = '#fff';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = '#999';
+              }}
+            >
+              ✕
+            </button>
+
             {isApplying && (
               <div
                 style={{

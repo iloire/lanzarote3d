@@ -2,8 +2,8 @@ import { SkyTheme, Theme } from '../types/Theme';
 
 const defaultSky: SkyTheme = {
   timeOfDay: 15,
-  sunIntensity: 1.2,
-  fogEnabled: true,
+  sunIntensity: 2,
+  fogEnabled: false,
   fogColor: '#333333',
   fogDensity: 0.00001,
 };
@@ -45,51 +45,6 @@ export const THEMES: Record<string, Theme> = {
     },
   },
 
-  sunset: {
-    id: 'sunset',
-    name: 'Sunset',
-    sky: {
-      ...defaultSky,
-      directionalLight: {
-        intensity: 0.8,
-        color: '#FFA500',
-        castShadow: true,
-        shadowMapSize: 2048,
-      },
-    },
-    clouds: {
-      colors: ['#F64A8A', '#F987C5', '#DE3163', '#FFB6C1', '#FF69B4'],
-      density: 1.0,
-      opacity: 0.8,
-    },
-    terrain: {
-      style: 'volcanic',
-      customMaterial: {
-        color: '#8B4513',
-        emissive: '#FF4500',
-        emissiveIntensity: 0.8,
-        roughness: 0.6,
-        metalness: 0.1,
-        opacity: 1.0,
-        wireframe: false,
-        visible: true,
-      },
-    },
-    water: {
-      color: '#ff1744',
-      opacity: 0.2,
-    },
-    weather: {
-      windDirectionDegreesFromNorth: 310,
-      speedMetresPerSecond: 5,
-      lclLevel: 1800,
-    },
-    ambient: {
-      lightingIntensity: 1.2,
-      shadowIntensity: 0.8,
-    },
-  },
-
   golden: {
     id: 'golden',
     name: 'Golden Hour',
@@ -126,7 +81,7 @@ export const THEMES: Record<string, Theme> = {
       },
     },
     water: {
-      color: '#ffb74d',
+      color: 'orange',
       opacity: 0.5,
     },
     weather: {
