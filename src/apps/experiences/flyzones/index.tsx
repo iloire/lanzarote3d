@@ -36,13 +36,13 @@ class FlyZonesApp extends AppBase {
   private markers: MarkerHelper[] = [];
   private landingMarkers: THREE.Object3D[] = [];
   private landingMarkersVisible = true;
-  private currentLocation?: FlyLocation;
-  private popupContainer?: HTMLElement;
-  private labelRenderer?: any;
-  private ruler?: any;
-  private animationId?: number;
-  private cleanupMouseHandler?: () => void;
-  private resizeHandler?: () => void;
+  private currentLocation: FlyLocation | undefined;
+  private popupContainer: HTMLElement | undefined;
+  private labelRenderer: any | undefined;
+  private ruler: any | undefined;
+  private animationId: number | undefined;
+  private cleanupMouseHandler: (() => void) | undefined;
+  private resizeHandler: (() => void) | undefined;
 
   constructor() {
     super({
@@ -199,7 +199,7 @@ class FlyZonesApp extends AppBase {
                 takeoff.mediaItems,
                 MarkerType.TAKEOFF,
                 scene,
-                this.popupContainer!,
+                this.popupContainer as HTMLDivElement,
                 navigateToWrapper,
                 this.currentLocation,
                 camera,
@@ -472,7 +472,7 @@ class FlyZonesApp extends AppBase {
     animate();
   }
 
-  public dispose(): void {
+  public override dispose(): void {
     console.log(`🧹 Disposing ${this.config.name}`);
 
     // Cancel animation loop
@@ -513,28 +513,36 @@ class FlyZonesApp extends AppBase {
 
     // Clear markers and landing markers arrays
     this.markers.forEach(marker => {
-      if (marker.object && marker.object.geometry) {
-        marker.object.geometry.dispose();
-      }
-      if (marker.object && marker.object.material) {
-        if (Array.isArray(marker.object.material)) {
-          marker.object.material.forEach(material => material.dispose());
-        } else {
-          marker.object.material.dispose();
-        }
+      if (marker.object) {
+        marker.object.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            if (child.geometry) child.geometry.dispose();
+            if (child.material) {
+              if (Array.isArray(child.material)) {
+                child.material.forEach((material: THREE.Material) => material.dispose());
+              } else {
+                child.material.dispose();
+              }
+            }
+          }
+        });
       }
     });
     this.markers.length = 0;
 
     this.landingMarkers.forEach(marker => {
-      if (marker.geometry) {
-        marker.geometry.dispose();
-      }
-      if (Array.isArray(marker.material)) {
-        marker.material.forEach(material => material.dispose());
-      } else if (marker.material) {
-        marker.material.dispose();
-      }
+      marker.traverse((child) => {
+        if (child instanceof THREE.Mesh) {
+          if (child.geometry) child.geometry.dispose();
+          if (child.material) {
+            if (Array.isArray(child.material)) {
+              child.material.forEach((material: THREE.Material) => material.dispose());
+            } else {
+              child.material.dispose();
+            }
+          }
+        }
+      });
     });
     this.landingMarkers.length = 0;
 
