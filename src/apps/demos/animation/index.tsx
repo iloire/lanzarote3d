@@ -96,6 +96,9 @@ class AnimationApp extends AppBase {
       this.environment.addHouses(terrain);
       this.environment.addBoats(water);
 
+      // Make environment available for theme switching
+      options.environment = this.environment;
+
       const birdPath = [
         new THREE.Vector3(5000, 1000, 0),
         new THREE.Vector3(6000, 1100, -500),

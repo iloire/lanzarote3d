@@ -241,6 +241,9 @@ class PhotoBoothApp extends AppBase {
       this.environment.addHouses(terrain);
       this.environment.addBoats(water);
 
+      // Make environment available for theme switching
+      options.environment = this.environment;
+
       // Start animation loop
       this.startAnimationLoop(renderer, scene, camera, controls);
 
@@ -254,23 +257,6 @@ class PhotoBoothApp extends AppBase {
   }
 
   private async loadParagliders(scene: THREE.Scene): Promise<void> {
-    // Add regular paragliders
-    const paragliderPromises = paragliders.map(async p => {
-      try {
-        const paraglider = new Paraglider(p.pg);
-        const mesh = await paraglider.load();
-        mesh.position.copy(p.position);
-        const scale = 0.001;
-        mesh.scale.set(scale, scale, scale);
-        scene.add(mesh);
-        this.paragliderMeshes.push(mesh);
-        return mesh;
-      } catch (error) {
-        this.handleError(error as Error, 'loading regular paraglider');
-        return null;
-      }
-    });
-
     // Add voxel paragliders
     const voxelPromises = paraglidersVoxel.map(async p => {
       try {

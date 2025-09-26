@@ -3,6 +3,20 @@
 export interface SkyTheme {
   timeOfDay: number; // 0-24 hours
   sunIntensity?: number;
+  directionalLight?: {
+    intensity?: number;
+    color?: string;
+    castShadow?: boolean;
+    shadowMapSize?: number;
+    shadowCamera?: {
+      near?: number;
+      far?: number;
+      left?: number;
+      right?: number;
+      top?: number;
+      bottom?: number;
+    };
+  };
   fogEnabled?: boolean; // Whether to apply fog at all
   fogColor?: string;
   fogDensity?: number;
@@ -23,8 +37,12 @@ export interface TerrainTheme {
     emissiveIntensity?: number;
     roughness?: number;
     metalness?: number;
+    opacity?: number;
+    transparent?: boolean;
+    wireframe?: boolean;
     displacementScale?: number;
     displacementBias?: number;
+    visible?: boolean;
   };
 }
 
@@ -69,7 +87,7 @@ export interface ThemeApplicationOptions {
   preserveCamera?: boolean;
   animateTransition?: boolean;
   transitionDuration?: number;
-  skipComponents?: Array<'sky' | 'clouds' | 'terrain' | 'water' | 'weather' | 'ambient'>;
+  skipComponents?: Array<'sky' | 'clouds' | 'terrain' | 'water' | 'weather' | 'ambient' | 'environment'>;
 }
 
 export default Theme;

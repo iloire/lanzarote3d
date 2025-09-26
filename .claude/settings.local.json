@@ -42,7 +42,8 @@
       "Bash(yarn build-staging)",
       "Bash(git branch:*)",
       "Bash(npx prettier:*)",
-      "Bash(yarn build-showcase)"
+      "Bash(yarn build-showcase)",
+      "Bash(git rm:*)"
     ],
     "deny": [],
     "ask": []

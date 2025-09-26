@@ -35,6 +35,16 @@ export class ThemeEngine {
         await this.applyWaterTheme(options.water, theme);
       }
 
+      // Apply terrain styling to Island component
+      if (!skipComponents.includes('terrain') && theme.terrain && options.terrainInstance) {
+        await this.applyTerrainTheme(options.terrainInstance, theme);
+      }
+
+      // Apply environment styling (clouds, etc.)
+      if (!skipComponents.includes('environment') && theme.clouds && options.environment) {
+        await this.applyEnvironmentTheme(options.environment, theme);
+      }
+
       // Apply ambient scene settings
       if (!skipComponents.includes('ambient') && theme.ambient) {
         await this.applyAmbientTheme(options, theme);
@@ -51,18 +61,21 @@ export class ThemeEngine {
    * Apply theme to environment components (clouds, terrain, weather)
    */
   static async applyToEnvironment(
-    _env: Environment,
+    env: Environment,
     theme: Theme,
     _options?: { terrain?: THREE.Mesh }
   ): Promise<void> {
     console.log(`Applying theme to environment: ${theme.name}`);
 
     try {
+      // Update cloud colors for existing clouds
+      env.updateCloudColors(theme);
+
       // Weather settings are applied when creating Weather instance
       // This is handled in the demo files
 
-      // Note: Clouds and terrain are typically handled during creation
-      // but we can add methods to update them post-creation if needed
+      // Note: Terrain is typically handled during creation
+      // but we can add methods to update it post-creation if needed
 
       console.log(`Theme '${theme.name}' applied to environment successfully`);
     } catch (error) {
@@ -109,6 +122,30 @@ export class ThemeEngine {
       material.opacity = water.opacity;
       material.transparent = water.opacity < 1.0;
       material.needsUpdate = true;
+    }
+  }
+
+  /**
+   * Apply terrain theme to Island component
+   */
+  private static async applyTerrainTheme(terrainInstance: any, theme: Theme): Promise<void> {
+    if (terrainInstance && typeof terrainInstance.applyTheme === 'function') {
+      console.log('🌍 Applying terrain theme to Island component');
+      terrainInstance.applyTheme(theme.terrain);
+    } else {
+      console.warn('🌍 Terrain instance not available or does not support theming');
+    }
+  }
+
+  /**
+   * Apply environment theme (clouds, etc.)
+   */
+  private static async applyEnvironmentTheme(environment: any, theme: Theme): Promise<void> {
+    if (environment && typeof environment.updateCloudColors === 'function') {
+      console.log('🌥️ Applying environment theme to update cloud colors');
+      environment.updateCloudColors(theme);
+    } else {
+      console.warn('🌥️ Environment instance not available or does not support cloud color theming');
     }
   }
 

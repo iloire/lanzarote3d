@@ -132,6 +132,28 @@ class ThemeManager {
   }
 
   /**
+   * Apply the saved theme after story has loaded (includes environment)
+   */
+  async applySavedThemeAfterLoad(): Promise<void> {
+    if (!this.isReady() || !this.currentTheme) {
+      console.warn('Cannot apply saved theme after load: ThemeManager not ready');
+      return;
+    }
+
+    // Check if the current theme is from localStorage (not default applied by story)
+    const savedThemeId = this.loadThemeFromStorage();
+    if (savedThemeId && this.currentTheme.id === savedThemeId) {
+      try {
+        console.log(`📱 Applying saved theme "${this.currentTheme.name}" after story load`);
+        await ThemeEngine.apply(this.storyOptions!, this.currentTheme);
+        this.notifyListeners(this.currentTheme);
+      } catch (error) {
+        console.error(`Failed to apply saved theme "${this.currentTheme.name}" after story load:`, error);
+      }
+    }
+  }
+
+  /**
    * Add a listener for theme changes
    */
   addListener(callback: (theme: Theme) => void): void {
@@ -194,6 +216,7 @@ class ThemeManager {
       return null;
     }
   }
+
 
   /**
    * Clear saved theme from localStorage

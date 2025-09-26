@@ -23,6 +23,11 @@ export const THEMES: Record<string, Theme> = {
       customMaterial: {
         color: '#424242',
         emissiveIntensity: 0.3,
+        roughness: 0.8,
+        metalness: 0.0,
+        opacity: 1.0,
+        wireframe: false,
+        visible: true,
       },
     },
     water: {
@@ -42,8 +47,16 @@ export const THEMES: Record<string, Theme> = {
 
   sunset: {
     id: 'sunset',
-    name: 'Sunset Romance',
-    sky: defaultSky,
+    name: 'Sunset',
+    sky: {
+      ...defaultSky,
+      directionalLight: {
+        intensity: 0.8,
+        color: '#FFA500',
+        castShadow: true,
+        shadowMapSize: 2048,
+      },
+    },
     clouds: {
       colors: ['#F64A8A', '#F987C5', '#DE3163', '#FFB6C1', '#FF69B4'],
       density: 1.0,
@@ -52,7 +65,14 @@ export const THEMES: Record<string, Theme> = {
     terrain: {
       style: 'volcanic',
       customMaterial: {
+        color: '#8B4513',
+        emissive: '#FF4500',
         emissiveIntensity: 0.8,
+        roughness: 0.6,
+        metalness: 0.1,
+        opacity: 1.0,
+        wireframe: false,
+        visible: true,
       },
     },
     water: {
@@ -95,7 +115,14 @@ export const THEMES: Record<string, Theme> = {
     terrain: {
       style: 'desert',
       customMaterial: {
+        color: '#DAA520',
+        emissive: '#FFD700',
         emissiveIntensity: 0.5,
+        roughness: 0.7,
+        metalness: 0.0,
+        opacity: 1.0,
+        wireframe: true,
+        visible: true,
       },
     },
     water: {
@@ -120,6 +147,20 @@ export const THEMES: Record<string, Theme> = {
       timeOfDay: 14,
       sunIntensity: 1.8,
       fogEnabled: false,
+      directionalLight: {
+        intensity: 1.2,
+        color: '#E6F3FF',
+        castShadow: true,
+        shadowMapSize: 4096,
+        shadowCamera: {
+          near: 0.5,
+          far: 50000,
+          left: -10000,
+          right: 10000,
+          top: 10000,
+          bottom: -10000,
+        },
+      },
     },
     clouds: {
       colors: ['#FFFFFF', '#E6F3FF', '#87CEEB', '#2F4F4F'],
@@ -129,8 +170,14 @@ export const THEMES: Record<string, Theme> = {
     terrain: {
       style: 'arctic',
       customMaterial: {
+        color: '#ffffff',
+        emissive: '#87CEEB',
+        emissiveIntensity: 0.2,
         roughness: 0.1,
         metalness: 0.3,
+        opacity: 1.0,
+        wireframe: true,
+        visible: true,
       },
     },
     water: {
@@ -155,6 +202,12 @@ export const THEMES: Record<string, Theme> = {
       timeOfDay: 15,
       sunIntensity: 1.2,
       fogEnabled: false,
+      directionalLight: {
+        intensity: 0.4,
+        color: '#404040',
+        castShadow: true,
+        shadowMapSize: 1024,
+      },
     },
     clouds: {
       colors: ['#2F2F2F', '#4A4A4A', '#F5F5F5', '#696969', '#D3D3D3'],
@@ -164,8 +217,15 @@ export const THEMES: Record<string, Theme> = {
     terrain: {
       style: 'volcanic',
       customMaterial: {
-        color: '#424242',
-        emissiveIntensity: 0.3,
+        color: '#FFFF00', // Bright yellow wireframe for dramatic storm effect
+        emissive: '#FFD700', // Golden yellow glow
+        emissiveIntensity: 0.4,
+        roughness: 0.9,
+        metalness: 0.0,
+        wireframe: true, // Show terrain wireframe during storms
+        opacity: 0.9,
+        transparent: true,
+        visible: true,
       },
     },
     water: {
@@ -200,7 +260,13 @@ export const THEMES: Record<string, Theme> = {
       style: 'desert',
       customMaterial: {
         color: '#8d6e63',
+        emissive: '#D2691E',
         emissiveIntensity: 0.4,
+        roughness: 0.8,
+        metalness: 0.0,
+        opacity: 1.0,
+        wireframe: false,
+        visible: true,
       },
     },
     water: {
@@ -234,8 +300,14 @@ export const THEMES: Record<string, Theme> = {
     terrain: {
       style: 'desert',
       customMaterial: {
+        color: '#A0522D',
+        emissive: '#F4A460',
+        emissiveIntensity: 0.1,
         roughness: 0.8,
         metalness: 0.0,
+        opacity: 1.0,
+        wireframe: false,
+        visible: true,
       },
     },
     water: {

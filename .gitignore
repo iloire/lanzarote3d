@@ -1,5 +1,8 @@
 node_modules
 *.log
 dist/*
+built/*
+*.d.ts
+*.d.ts.map
 .DS_Store
 TODO.md

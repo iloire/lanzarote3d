@@ -4,7 +4,7 @@ import Stats from 'three/examples/jsm/libs/stats.module';
 import * as THREE from 'three';
 import Sky from './foundation/components/environment/Sky';
 import Water from './foundation/components/environment/Water';
-import Island from './foundation/components/scenery/Island';
+import { Island } from './foundation/components/scenery/Island';
 import Stories from './apps/shared/index';
 import { CameraController as Camera } from './foundation/systems/scene/CameraController';
 import Menu from './menu';
@@ -110,7 +110,8 @@ const App: React.FC<AppProps> = ({
     };
 
     // Island setup
-    const island = await Island.load(loadingManager);
+    const islandInstance = new Island();
+    const island = await islandInstance.load(loadingManager);
     island.scale.set(SCENE_CONFIG.scale, SCENE_CONFIG.scale, SCENE_CONFIG.scale);
     island.position.set(...SCENE_CONFIG.islandPosition);
     scene.add(island);
@@ -156,6 +157,7 @@ const App: React.FC<AppProps> = ({
       scene,
       renderer,
       terrain: island,
+      terrainInstance: islandInstance,
       water,
       sky,
       gui,
@@ -191,6 +193,9 @@ const App: React.FC<AppProps> = ({
       if (storyOptions.theme && ThemeEngine.getCurrentTheme()) {
         themeManager.setCurrentTheme(ThemeEngine.getCurrentTheme()!);
       }
+
+      // Apply saved theme after story has loaded (includes environment for cloud colors)
+      await themeManager.applySavedThemeAfterLoad();
     } else {
       console.error(`Story "${initialStory}" not found or doesn't have a load method`);
     }

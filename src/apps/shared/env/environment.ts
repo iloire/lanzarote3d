@@ -20,6 +20,7 @@ class Environment {
   birds!: Birds;
   hg!: HangGlider;
   thermals: Thermal[] = [];
+  cloudInstances: Clouds[] = [];
   scene: THREE.Scene;
 
   constructor(scene: THREE.Scene) {
@@ -197,45 +198,56 @@ class Environment {
   }
 
   async addClouds(thermals: Thermal[], options: CloudOptions): Promise<THREE.Object3D[]> {
+    // Clear previous cloud instances
+    this.cloudInstances = [];
+
     // from thermals
     const mainThermals = thermals.filter(t => t.isMainThermal());
-    const clouds = await Promise.all(
-      mainThermals.map(t => {
-        if (t.isSuperThermal()) {
-          return new Clouds(options).load(
-            3,
-            new THREE.Vector3(
-              t.getPosition().x,
-              t.getDimensions().height * (1 + 0.01 * rndIntBetween(10, 30)),
-              t.getPosition().z
-            )
-          );
-        } else {
-          return new Clouds(options).load(
-            1,
-            new THREE.Vector3(
-              t.getPosition().x,
-              t.getDimensions().height * (1 + 0.01 * rndIntBetween(10, 30)),
-              t.getPosition().z
-            )
-          );
-        }
-      })
-    );
+    const cloudPromises = mainThermals.map(async t => {
+      const cloudInstance = new Clouds(options);
+      this.cloudInstances.push(cloudInstance);
+
+      if (t.isSuperThermal()) {
+        return cloudInstance.load(
+          3,
+          new THREE.Vector3(
+            t.getPosition().x,
+            t.getDimensions().height * (1 + 0.01 * rndIntBetween(10, 30)),
+            t.getPosition().z
+          )
+        );
+      } else {
+        return cloudInstance.load(
+          1,
+          new THREE.Vector3(
+            t.getPosition().x,
+            t.getDimensions().height * (1 + 0.01 * rndIntBetween(10, 30)),
+            t.getPosition().z
+          )
+        );
+      }
+    });
+
+    const clouds = await Promise.all(cloudPromises);
     clouds.forEach(c => {
       this.scene.add(c);
     });
 
     // custom clouds
-    [
+    const customCloudPromises = [
       { x: 5120, y: 2000, z: -10100 },
       { x: 2600, y: 2300, z: 842 },
       { x: -3600, y: 2300, z: 8042 },
     ].map(async pos => {
-      const cloud = await new Clouds(options).load(1, new THREE.Vector3(pos.x, pos.y, pos.z));
+      const cloudInstance = new Clouds(options);
+      this.cloudInstances.push(cloudInstance);
+      const cloud = await cloudInstance.load(1, new THREE.Vector3(pos.x, pos.y, pos.z));
       this.scene.add(cloud);
+      return cloud;
     });
-    return clouds;
+
+    const customClouds = await Promise.all(customCloudPromises);
+    return clouds.concat(customClouds);
   }
 
   getThermals(): Thermal[] {
@@ -250,6 +262,19 @@ class Environment {
   async addCloudsFromTheme(thermals: Thermal[], theme: Theme): Promise<THREE.Object3D[]> {
     const cloudOptions = ThemeEngine.getCloudOptionsFromTheme(theme);
     return this.addClouds(thermals, cloudOptions);
+  }
+
+  /**
+   * Update cloud colors for theme switching
+   */
+  updateCloudColors(theme: Theme): void {
+    const cloudOptions = ThemeEngine.getCloudOptionsFromTheme(theme);
+    if (cloudOptions.colors && cloudOptions.colors.length > 0) {
+      console.log('Updating cloud colors for theme:', theme.name, cloudOptions.colors);
+      this.cloudInstances.forEach(cloudInstance => {
+        cloudInstance.updateColors(cloudOptions.colors!);
+      });
+    }
   }
 
   /**

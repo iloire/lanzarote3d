@@ -77,6 +77,9 @@ class FamaraApp extends AppBase {
       this.environment.addHouses(terrain);
       this.environment.addBoats(water);
 
+      // Make environment available for theme switching
+      options.environment = this.environment;
+
       // Add birds for more natural ambiance
       const birdPath = [
         new THREE.Vector3(5000, 1000, 0),

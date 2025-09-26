@@ -31,6 +31,7 @@ const random = (min: number, max: number): number => Math.floor(Math.random() * 
 
 class Clouds {
   options: CloudOptions;
+  private group: THREE.Group | null = null;
 
   constructor(options: CloudOptions) {
     this.options = options;
@@ -38,7 +39,9 @@ class Clouds {
 
   async load(scale: number, pos: THREE.Vector3): Promise<THREE.Object3D> {
     const group = new THREE.Group();
+    this.group = group;
     const nClouds = random(2, 6);
+
     for (let i = 0; i < nClouds; i++) {
       const cloud = await getRandomCloud(this.options);
       group.add(cloud);
@@ -46,6 +49,35 @@ class Clouds {
     }
     group.scale.set(scale, scale, scale);
     return group;
+  }
+
+  /**
+   * Update colors of all clouds in this cloud group
+   */
+  updateColors(newColors: string[]) {
+    if (!this.group || !newColors || newColors.length === 0) return;
+
+    console.log('Updating cloud group colors:', newColors);
+
+    // Update options for future reference
+    this.options.colors = newColors;
+
+    // Since we don't store Cloud instances, we need to traverse the group
+    // and update materials directly on the mesh children
+    this.group.traverse((child) => {
+      if (child instanceof THREE.Mesh && child.material) {
+        // Dispose old material
+        if (Array.isArray(child.material)) {
+          child.material.forEach(material => material.dispose());
+        } else {
+          child.material.dispose();
+        }
+
+        // Apply new material (random selection from new colors)
+        const materialIndex = Math.floor(Math.random() * newColors.length);
+        child.material = new THREE.MeshLambertMaterial({ color: newColors[materialIndex] });
+      }
+    });
   }
 }
 

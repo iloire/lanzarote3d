@@ -153,6 +153,40 @@ class Cloud {
     }
   }
 
+  /**
+   * Update cloud colors by recreating materials with new colors
+   */
+  updateColors(newColors: string[]) {
+    if (!this.mesh || !newColors || newColors.length === 0) return;
+
+    console.log('Updating cloud colors:', newColors);
+
+    // Create new materials with the new colors
+    const newMaterials: THREE.MeshLambertMaterial[] = [];
+    newColors.forEach(color => {
+      newMaterials.push(new THREE.MeshLambertMaterial({ color }));
+    });
+
+    // Update each cloud part's material
+    this.mesh.children.forEach((child) => {
+      if (child instanceof THREE.Mesh) {
+        // Dispose old material
+        if (Array.isArray(child.material)) {
+          child.material.forEach(material => material.dispose());
+        } else {
+          child.material?.dispose();
+        }
+
+        // Apply new material (random selection from new colors)
+        const materialIndex = Math.floor(Math.random() * newMaterials.length);
+        child.material = newMaterials[materialIndex]!;
+      }
+    });
+
+    // Update stored options for future reference
+    this.options.colors = newColors;
+  }
+
   dispose() {
     this.stop();
     // Clean up mesh and materials
