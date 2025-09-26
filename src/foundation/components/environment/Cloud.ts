@@ -20,20 +20,35 @@ const generateCloudPart = (
 };
 
 const generateCloud = async (options: CloudOptions): Promise<THREE.Object3D> => {
-  const mat_cloud = new THREE.MeshLambertMaterial({ color: options.colors && options.colors[0] || 0xffffff });
-  const mat_cloud2 = new THREE.MeshLambertMaterial({ color: options.colors && options.colors[1] || 0x666666 });
-  const mat_cloud3 = new THREE.MeshLambertMaterial({ color: options.colors && options.colors[2] || 0x999999 });
-  const materials = [mat_cloud, mat_cloud2, mat_cloud3];
+  // Create materials for ALL available colors, not just the first 3
+  const materials: THREE.MeshLambertMaterial[] = [];
+  if (options.colors && options.colors.length > 0) {
+    // Use all provided colors from the theme
+    options.colors.forEach(color => {
+      materials.push(new THREE.MeshLambertMaterial({ color }));
+    });
+  } else {
+    // Fallback to default grayscale if no colors provided
+    materials.push(new THREE.MeshLambertMaterial({ color: 0xffffff }));
+    materials.push(new THREE.MeshLambertMaterial({ color: 0x666666 }));
+    materials.push(new THREE.MeshLambertMaterial({ color: 0x999999 }));
+  }
 
   const radius = 40;
   const r = rndBetween;
   const n = rndIntBetween(3, 8);
   const group = new THREE.Group();
 
-  const materialIndex = rndIntBetween(0, materials.length - 1);
-  const material = materials[materialIndex] || materials[0]!; // Fallback to first material, non-null assertion
+  // Randomly decide if this cloud should be monochrome or multi-colored
+  const useMonochrome = Math.random() < 0.3; // 30% chance of single-color cloud
+  const monochromeIndex = rndIntBetween(0, materials.length - 1);
 
   for (let i = 0; i < n; i++) {
+    // Each cloud part can have a different material for more color variety
+    const material = useMonochrome
+      ? materials[monochromeIndex]!
+      : materials[rndIntBetween(0, materials.length - 1)]!;
+
     const scale = r(i * 0.9, i * 1.1);
     const posX = 1.7 * radius * r(-1 * i, i);
     const posY = 0.3 * radius * r(-1 * i, i);
