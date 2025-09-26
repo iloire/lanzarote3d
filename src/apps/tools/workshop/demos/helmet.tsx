@@ -7,6 +7,11 @@ import {
 import { DefaultHelmet } from '../../../../foundation/components/characters/helmets/DefaultHelmet';
 import { FullFaceHelmet } from '../../../../foundation/components/characters/helmets/FullFaceHelmet';
 import { HelmetWithHorns } from '../../../../foundation/components/characters/helmets/HelmetWithHorns';
+import { SpikedHelmet } from '../../../../foundation/components/characters/helmets/SpikedHelmet';
+import { WingedHelmet } from '../../../../foundation/components/characters/helmets/WingedHelmet';
+import { CrownHelmet } from '../../../../foundation/components/characters/helmets/CrownHelmet';
+import { SharkHelmet } from '../../../../foundation/components/characters/helmets/SharkHelmet';
+import { CrystalHelmet } from '../../../../foundation/components/characters/helmets/CrystalHelmet';
 import { StoryOptions } from '../../../shared/types';
 
 const toHexColor = (num: number): string => {
@@ -56,7 +61,7 @@ const HelmetWorkshop = {
     const ITEMS_PER_ROW = 3;
 
     helmets.forEach((helmetConfig, index) => {
-      let helmet;
+      let helmet: any;
       // Creating helmet
 
       switch (helmetConfig.type) {
@@ -68,6 +73,21 @@ const HelmetWorkshop = {
           break;
         case HelmetType.WithHorns:
           helmet = new HelmetWithHorns(helmetConfig.options);
+          break;
+        case HelmetType.Spiked:
+          helmet = new SpikedHelmet(helmetConfig.options);
+          break;
+        case HelmetType.Winged:
+          helmet = new WingedHelmet(helmetConfig.options);
+          break;
+        case HelmetType.Crown:
+          helmet = new CrownHelmet(helmetConfig.options);
+          break;
+        case HelmetType.Shark:
+          helmet = new SharkHelmet(helmetConfig.options);
+          break;
+        case HelmetType.Crystal:
+          helmet = new CrystalHelmet(helmetConfig.options);
           break;
         default:
           console.warn('Unknown helmet type:', helmetConfig.type); // Debug log
