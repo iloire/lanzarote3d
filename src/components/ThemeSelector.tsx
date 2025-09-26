@@ -166,8 +166,6 @@ Theme: {currentTheme?.name || 'None'}
               border: '1px solid #666',
               borderRadius: '4px',
               padding: '10px',
-              maxHeight: '300px',
-              overflowY: 'auto' as const,
             }}
           >
             {isApplying && (
@@ -231,8 +229,6 @@ Theme: {currentTheme?.name || 'None'}
               borderRadius: '8px',
               padding: '15px',
               minWidth: '280px',
-              maxHeight: '250px',
-              overflowY: 'auto' as const,
               zIndex: 9999,
               boxShadow: '0 8px 32px rgba(0,0,0,0.8)',
             }}
