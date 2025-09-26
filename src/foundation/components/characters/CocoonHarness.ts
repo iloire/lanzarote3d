@@ -89,7 +89,7 @@ class CocoonHarness {
     carabinerLeft.position.set(this.options.carabinerSeparationMM / 2, -180, 280);
 
     const carabinerRight = carabinerLeft.clone();
-    carabinerRight.position.set((-1 * this.options.carabinerSeparationMM) / 2, -180, 280);
+    // carabinerRight.position.set((-1 * this.options.carabinerSeparationMM) / 2, -180, 280);
     group.add(carabinerLeft);
     group.add(carabinerRight);
 

@@ -31,7 +31,7 @@ class Menu extends React.Component<MenuProps> {
   }
 
   checkIfMobile = () => {
-    const isMobile = window.innerWidth <= 768;
+    const isMobile = window.innerWidth <= 1024; // Increased threshold for tablets and large phones
     this.setState({ isMobile });
   };
 
