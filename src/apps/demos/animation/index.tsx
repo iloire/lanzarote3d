@@ -217,7 +217,7 @@ class AnimationApp extends AppBase {
             const pgPos = paraglidersVoxel[0]?.position || new THREE.Vector3();
             OrbitControlsHelper.focusOnTarget(controls, pgPos,
               OrbitControlsHelper.createCenteredLimits(pgPos, {
-                ...ORBIT_CONTROLS_PRESETS.closeSubject,
+                ...ORBIT_CONTROLS_PRESETS['closeSubject'],
                 // Customize if needed
                 minDistance: 50,
                 maxDistance: 1500,

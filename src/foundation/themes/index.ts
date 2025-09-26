@@ -282,7 +282,7 @@ export const THEMES: Record<string, Theme> = {
 
 // Helper functions for theme management
 export const getThemeById = (id: string): Theme | undefined => {
-  return THEMES[id];
+  return THEMES[id] as Theme | undefined;
 };
 
 export const getDefaultTheme = (): Theme => {

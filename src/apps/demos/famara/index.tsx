@@ -59,7 +59,7 @@ class FamaraApp extends AppBase {
 
       // Apply landscape viewing controls for Famara beach exploration
       OrbitControlsHelper.focusOnTarget(controls, lookAtPos,
-        ORBIT_CONTROLS_PRESETS.landscape
+        ORBIT_CONTROLS_PRESETS['landscape']
       );
 
       // must render before adding env

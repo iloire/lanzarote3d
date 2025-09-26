@@ -221,7 +221,7 @@ class PhotoBoothApp extends AppBase {
 
       // Apply landscape viewing controls for photobooth exploration
       OrbitControlsHelper.focusOnTarget(controls, lookAtPos,
-        ORBIT_CONTROLS_PRESETS.landscape
+        ORBIT_CONTROLS_PRESETS['landscape']
       );
 
       // Load paragliders with proper tracking for disposal

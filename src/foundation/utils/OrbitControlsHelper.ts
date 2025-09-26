@@ -219,7 +219,7 @@ export class OrbitControlsHelper {
    */
   static createCenteredLimits(
     center: THREE.Vector3,
-    preset: OrbitControlsLimits = ORBIT_CONTROLS_PRESETS.closeSubject
+    preset: OrbitControlsLimits = ORBIT_CONTROLS_PRESETS['closeSubject']
   ): OrbitControlsLimits {
     const limits = { ...preset };
 
