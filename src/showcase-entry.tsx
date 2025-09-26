@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import WebGL from './WebGL';
 import App from './app';
 import { logger } from './foundation/utils/logger';
+import { bundleToStoryMap } from './showcase-config';
 
 import './index.css';
 
@@ -14,20 +15,6 @@ const queryStory = params.get('story');
 
 const scriptTag = document.currentScript as HTMLScriptElement;
 const bundleName = scriptTag?.src.match(/([^/]+)\.bundle\.js$/)?.[1] || 'animation';
-
-// Map bundle names to story names (bundle name -> story key in Stories object)
-const bundleToStoryMap: Record<string, string> = {
-  main: 'animation',
-  animation: 'animation',
-  photobooth: 'photobooth',
-  workshop: 'workshop',
-  clouds: 'clouds',
-  night: 'night',
-  paragliderVoxel: 'paragliderVoxel', // Uses the alias in Stories object
-  famara: 'famara',
-  flyzones: 'flyzones',
-  game: 'game',
-};
 
 // Priority: query parameter > bundle name mapping > bundle name itself > default
 const storyName = queryStory || bundleToStoryMap[bundleName] || bundleName || 'animation';

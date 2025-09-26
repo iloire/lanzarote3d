@@ -1,7 +1,11 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
-const stories = [
+/**
+ * Centralized showcase configuration
+ * To add a new app: Just add an entry here!
+ */
+const showcaseApps = [
   // Main experiences
   { name: 'animation', title: 'Lanzarote - Animation', filename: 'index.html' },
   { name: 'photobooth', title: 'Lanzarote - Photo Booth', filename: 'photobooth.html' },
@@ -9,16 +13,25 @@ const stories = [
   { name: 'game', title: 'Lanzarote - Game', filename: 'game.html' },
   { name: 'flyzones', title: 'Lanzarote - Fly Zones', filename: 'flyzones.html' },
 
-  // Workshop and demos
+  // Tools
   { name: 'workshop', title: 'Lanzarote - Workshop', filename: 'workshop.html' },
+  { name: 'location-editor', title: 'Lanzarote - Location Editor', filename: 'location-editor.html' },
+
+  // Demos
   { name: 'clouds', title: 'Lanzarote - Clouds', filename: 'clouds.html' },
   { name: 'night', title: 'Lanzarote - Night', filename: 'night.html' },
-  { name: 'paragliderVoxel', title: 'Lanzarote - Paraglider Voxel', filename: 'paragliderVoxel.html' }
+  { name: 'paragliderVoxel', title: 'Lanzarote - Paraglider Voxel', filename: 'paragliderVoxel.html' },
+  { name: 'terrain', title: 'Lanzarote - Terrain', filename: 'terrain.html' },
+  { name: 'glider', title: 'Lanzarote - Glider', filename: 'glider.html' },
+  { name: 'pilot', title: 'Lanzarote - Pilot', filename: 'pilot.html' },
 ];
 
+// Export for use in other files
+module.exports.showcaseApps = showcaseApps;
+
 // Generate entry points dynamically - all use the same entry file
-const entries = stories.reduce((acc, story) => {
-  acc[story.name] = './src/showcase-entry.tsx';
+const entries = showcaseApps.reduce((acc, app) => {
+  acc[app.name] = './src/showcase-entry.tsx';
   return acc;
 }, {});
 
@@ -96,13 +109,13 @@ module.exports = {
     extensions: [".tsx", ".ts", ".js", ".jsx"],
   },
   plugins: [
-    // Generate HTML plugins dynamically for each story
-    ...stories.map(story =>
+    // Generate HTML plugins dynamically for each app
+    ...showcaseApps.map(app =>
       new HtmlWebpackPlugin({
         template: path.join(__dirname, "./src/templates/showcase.html"),
-        chunks: [story.name],
-        filename: story.filename,
-        title: story.title
+        chunks: [app.name],
+        filename: app.filename,
+        title: app.title
       })
     ),
   ],
