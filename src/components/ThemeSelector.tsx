@@ -156,7 +156,7 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
             marginBottom: '5px',
           }}
         >
-          🎨 Theme: {currentTheme?.name || 'None'}
+Theme: {currentTheme?.name || 'None'}
         </button>
 
         {isOpen && (
@@ -217,7 +217,7 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
           }}
           title="Change application theme"
         >
-          🎨 {currentTheme?.name || 'No Theme'}
+{currentTheme?.name || 'No Theme'}
         </button>
 
         {isOpen && (
@@ -237,18 +237,6 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
               boxShadow: '0 8px 32px rgba(0,0,0,0.8)',
             }}
           >
-            <div
-              style={{
-                color: '#F64A8A',
-                fontSize: '14px',
-                fontWeight: 'bold',
-                marginBottom: '10px',
-                borderBottom: '1px solid #333',
-                paddingBottom: '8px',
-              }}
-            >
-              🎨 Choose Theme
-            </div>
 
             {isApplying && (
               <div
