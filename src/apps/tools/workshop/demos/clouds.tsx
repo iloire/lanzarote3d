@@ -2,17 +2,16 @@ import * as THREE from 'three';
 import Clouds from '../../../../foundation/components/environment/Clouds';
 import Helpers from '../../../../foundation/utils/helpers';
 import { StoryOptions } from '../../../shared/types';
-import { THEMES, getAllThemes, getThemeById } from '../../../../foundation/themes';
+import { getAllThemes, getThemeById } from '../../../../foundation/themes';
 import { ThemeEngine } from '../../../../foundation/systems/ThemeEngine';
 import { themeManager } from '../../../../foundation/systems/ThemeManager';
-import Environment from '../../../shared/env/environment';
 
 // Use themes from our comprehensive theme system
 const ALL_THEMES = getAllThemes();
 
 const CloudsWorkshop = {
   load: async (options: StoryOptions) => {
-    const { camera, scene, renderer, terrain, water, sky, controls, gui } = options;
+    const { camera, scene, renderer, terrain, water, controls, gui } = options;
     controls.enabled = true;
 
     terrain.visible = false;
@@ -24,7 +23,9 @@ const CloudsWorkshop = {
     let currentTheme = ALL_THEMES[0]; // Start with first theme
 
     // Apply initial theme (theme manager should already be initialized by app.tsx)
-    await themeManager.applyTheme(currentTheme.id);
+    if (currentTheme) {
+      await themeManager.applyTheme(currentTheme.id);
+    }
 
     // Create clouds using theme
     const createClouds = async (theme: any) => {

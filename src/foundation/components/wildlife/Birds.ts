@@ -13,7 +13,7 @@ export interface BirdsOptions extends AutoFlierOptions {
 
 class Birds extends AutoFlier {
   mixer: THREE.AnimationMixer | null = null;
-  interval: number;
+  interval: number = 0;
   private scale: number = 1;
   private animationSpeed: number = 1;
 
@@ -35,7 +35,7 @@ class Birds extends AutoFlier {
   async load(path: THREE.Vector3[], gui?: any): Promise<THREE.Mesh> {
     this.path = path;
     const gltf = await Models.loadGltf(model);
-    this.mesh = gltf.scene.children[0];
+    this.mesh = gltf.scene.children[0] as THREE.Mesh;
 
     // Apply custom scale
     this.mesh.scale.set(this.scale, this.scale, this.scale);

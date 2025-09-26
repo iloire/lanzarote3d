@@ -45,8 +45,8 @@ const createHalfWing = (scale?: THREE.Vector3): HalfWing => {
 };
 
 class HGWing {
-  leftWing: HalfWing;
-  rightWing: HalfWing;
+  leftWing!: HalfWing;
+  rightWing!: HalfWing;
 
   async load(gui?: any): Promise<THREE.Mesh> {
     const fullWing = new THREE.Mesh();

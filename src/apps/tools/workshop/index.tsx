@@ -169,7 +169,7 @@ class WorkshopApp extends AppBase {
       try {
         const house = new House(config.type);
         const houseMesh = house.load(gui);
-        houseMesh.position.set(...config.position);
+        houseMesh.position.set(config.position[0] ?? 0, config.position[1] ?? 0, config.position[2] ?? 0);
         scene.add(houseMesh);
         this.componentMeshes.push(houseMesh);
 
@@ -225,8 +225,8 @@ class WorkshopApp extends AppBase {
       try {
         const stone = new Stone();
         const stoneMesh = stone.load();
-        stoneMesh.position.set(...config.position);
-        stoneMesh.scale.set(...config.scale);
+        stoneMesh.position.set(config.position[0] ?? 0, config.position[1] ?? 0, config.position[2] ?? 0);
+        stoneMesh.scale.set(config.scale[0] ?? 1, config.scale[1] ?? 1, config.scale[2] ?? 1);
         scene.add(stoneMesh);
         this.componentMeshes.push(stoneMesh);
 
@@ -290,17 +290,18 @@ class WorkshopApp extends AppBase {
     animate();
   }
 
-  public dispose(): void {
+  public override dispose(): void {
     console.log(`🧹 Disposing ${this.config.name}`);
 
     // Cancel animation loop
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
-      this.animationId = undefined;
+      this.animationId = 0;
     }
 
     // Dispose component meshes
-    this.componentMeshes.forEach(mesh => {
+    this.componentMeshes.forEach(obj => {
+      const mesh = obj as THREE.Mesh;
       if (mesh.geometry) {
         mesh.geometry.dispose();
       }
@@ -318,7 +319,11 @@ class WorkshopApp extends AppBase {
         label.geometry.dispose();
       }
       if (label.material) {
-        label.material.dispose();
+        if (Array.isArray(label.material)) {
+          label.material.forEach(mat => mat.dispose());
+        } else {
+          label.material.dispose();
+        }
       }
     });
     this.labelMeshes.length = 0;

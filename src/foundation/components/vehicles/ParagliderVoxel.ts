@@ -13,8 +13,8 @@ class ParagliderVoxel implements IFlyable {
   mesh: THREE.Object3D;
   glider: Glider;
   pilot: PilotVoxel;
-  pilotMesh: THREE.Object3D;
-  axesHelper: THREE.AxesHelper;
+  pilotMesh!: THREE.Object3D;
+  axesHelper!: THREE.AxesHelper;
   options: ParagliderVoxelOptions;
 
   constructor(options: ParagliderVoxelOptions) {

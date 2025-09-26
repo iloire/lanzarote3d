@@ -44,10 +44,10 @@ const getHead = (options: PilotHeadOptions): THREE.Group => {
 const BREAK_Y_MOVE = 180; //mm
 
 class Pilot {
-  armRight: THREE.Mesh;
-  armLeft: THREE.Mesh;
-  body: THREE.Mesh;
-  head: THREE.Group;
+  armRight!: THREE.Mesh;
+  armLeft!: THREE.Mesh;
+  body!: THREE.Mesh;
+  head!: THREE.Group;
   options: PilotOptions;
 
   constructor(options: PilotOptions) {
@@ -71,12 +71,12 @@ class Pilot {
     const harness = new CocoonHarness({
       color1: '#333',
       color2: '#666',
-      carabinerColor: this.options.carabinerColor,
+      carabinerColor: this.options.carabinerColor || 'orange',
       carabinerSeparationMM: 300,
     });
 
-    const suitMat = getColoredMaterial(this.options.suitColor);
-    const skinMat = getColoredMaterial(this.options.skinColor);
+    const suitMat = getColoredMaterial(this.options.suitColor || 'green');
+    const skinMat = getColoredMaterial(this.options.skinColor || 'orange');
 
     group.add(harness.load());
 
@@ -117,7 +117,7 @@ class Pilot {
 
   load(): THREE.Object3D {
     const group = new THREE.Group();
-    this.head = getHead(this.options.head);
+    this.head = getHead(this.options.head || {});
     group.add(this.head);
     group.add(this.getBody());
     return group;
