@@ -1,5 +1,7 @@
 import React from 'react';
 import { getAppsByStatus, type AppMetadata } from './apps/config/app-registry';
+import ThemeSelector from './components/ThemeSelector';
+import { themeManager } from './foundation/systems/ThemeManager';
 
 interface MenuProps {
   showPublic?: boolean;
@@ -42,6 +44,9 @@ class Menu extends React.Component<MenuProps> {
   };
 
   navigateTo(route: string) {
+    // Disable theme manager before navigation
+    themeManager.disable();
+
     // In development, use query parameters
     // In production, use separate HTML files
     const isDevelopment =
@@ -112,51 +117,36 @@ class Menu extends React.Component<MenuProps> {
         <div className="appOptions mobile">
           <div className="mobile-header">
             <h2>Lanzarote 3D</h2>
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button
-                onClick={this.toggleMenuVisibility}
-                style={{
-                  background: isMenuVisible ? '#4CAF50' : '#f44336',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  padding: '8px 12px',
-                  fontSize: '12px',
-                }}
-                title={isMenuVisible ? 'Hide Menu' : 'Show Menu'}
-              >
-                {isMenuVisible ? 'Hide' : 'Show'}
-              </button>
-              <button className="hamburger-menu" onClick={this.toggleMenu} aria-label="Toggle menu">
-                <span className={`hamburger-line ${isMenuOpen ? 'open' : ''}`}></span>
-                <span className={`hamburger-line ${isMenuOpen ? 'open' : ''}`}></span>
-                <span className={`hamburger-line ${isMenuOpen ? 'open' : ''}`}></span>
-              </button>
-            </div>
+            <button className="hamburger-menu" onClick={this.toggleMenu} aria-label="Toggle menu">
+              <span className={`hamburger-line ${isMenuOpen ? 'open' : ''}`}></span>
+              <span className={`hamburger-line ${isMenuOpen ? 'open' : ''}`}></span>
+              <span className={`hamburger-line ${isMenuOpen ? 'open' : ''}`}></span>
+            </button>
           </div>
 
-          {isMenuVisible && (
-            <div className={`mobile-menu-content ${isMenuOpen ? 'open' : ''}`}>
-              {showPublic && publicApps.length > 0 && (
-                <>
-                  <h3>Main</h3>
-                  {renderButtons(publicApps)}
-                </>
-              )}
-              {showExperiments && experimentalApps.length > 0 && (
-                <>
-                  <h3>Experiments</h3>
-                  {renderButtons(experimentalApps)}
-                </>
-              )}
-              {showDev && devApps.length > 0 && (
-                <>
-                  <h3>Development</h3>
-                  {renderButtons(devApps)}
-                </>
-              )}
-            </div>
-          )}
+          <div className={`mobile-menu-content ${isMenuOpen ? 'open' : ''}`}>
+            {/* Theme Selector for Mobile */}
+            <ThemeSelector isMobile={true} />
+
+            {showPublic && publicApps.length > 0 && (
+              <>
+                <h3>Main</h3>
+                {renderButtons(publicApps)}
+              </>
+            )}
+            {showExperiments && experimentalApps.length > 0 && (
+              <>
+                <h3>Experiments</h3>
+                {renderButtons(experimentalApps)}
+              </>
+            )}
+            {showDev && devApps.length > 0 && (
+              <>
+              <h3>Development</h3>
+                {renderButtons(devApps)}
+              </>
+            )}
+          </div>
         </div>
       );
     }
@@ -183,6 +173,9 @@ class Menu extends React.Component<MenuProps> {
         {/* Menu content - conditionally visible */}
         {isMenuVisible && (
           <>
+            {/* Theme Selector for Desktop */}
+            <ThemeSelector isMobile={false} />
+
             {showPublic && publicApps.length > 0 && (
               <>
                 <h2>Lanzarote 3D</h2>

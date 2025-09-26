@@ -10,6 +10,8 @@ import { CameraController as Camera } from './foundation/systems/scene/CameraCon
 import Menu from './menu';
 import Controls from './foundation/utils/controls';
 import { StoryOptions } from './apps/shared/types';
+import { themeManager } from './foundation/systems/ThemeManager';
+import { ThemeEngine } from './foundation/systems/ThemeEngine';
 
 import './index.css';
 
@@ -158,9 +160,17 @@ const App: React.FC<AppProps> = ({
       controls,
     };
 
+    // Initialize theme manager for dynamic theme switching
+    themeManager.initialize(storyOptions);
+
     // Call the load method on the selected story
     if (initialStory && Stories[initialStory] && Stories[initialStory].load) {
       await Stories[initialStory].load(storyOptions);
+
+      // If the story applied a theme, capture it in the theme manager
+      if (storyOptions.theme && ThemeEngine.getCurrentTheme()) {
+        themeManager.setCurrentTheme(ThemeEngine.getCurrentTheme()!);
+      }
     } else {
       console.error(`Story "${initialStory}" not found or doesn't have a load method`);
     }

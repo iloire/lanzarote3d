@@ -1,0 +1,324 @@
+import React, { Component } from 'react';
+import { themeManager } from '../foundation/systems/ThemeManager';
+import { Theme } from '../foundation/types/Theme';
+
+interface ThemeSelectorProps {
+  isMobile?: boolean;
+}
+
+interface ThemeSelectorState {
+  isOpen: boolean;
+  currentTheme: Theme | null;
+  availableThemes: Theme[];
+  themeCategories: string[];
+  isReady: boolean;
+  isApplying: boolean;
+}
+
+class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
+  private themeChangeListener: (theme: Theme) => void;
+
+  constructor(props: ThemeSelectorProps) {
+    super(props);
+
+    this.state = {
+      isOpen: false,
+      currentTheme: null,
+      availableThemes: [],
+      themeCategories: [],
+      isReady: false,
+      isApplying: false,
+    };
+
+    // Bind theme change listener
+    this.themeChangeListener = this.handleThemeChange.bind(this);
+  }
+
+  componentDidMount() {
+    // Add theme change listener
+    themeManager.addListener(this.themeChangeListener);
+
+    // Initialize state
+    this.updateState();
+
+    // Check if theme manager becomes ready periodically
+    this.checkThemeManagerReady();
+  }
+
+  componentWillUnmount() {
+    // Remove theme change listener
+    themeManager.removeListener(this.themeChangeListener);
+  }
+
+  checkThemeManagerReady = () => {
+    const checkInterval = setInterval(() => {
+      if (themeManager.isReady()) {
+        this.updateState();
+        clearInterval(checkInterval);
+      }
+    }, 100);
+
+    // Stop checking after 10 seconds
+    setTimeout(() => {
+      clearInterval(checkInterval);
+    }, 10000);
+  };
+
+  updateState = () => {
+    this.setState({
+      isReady: themeManager.isReady(),
+      currentTheme: themeManager.getCurrentTheme(),
+      availableThemes: themeManager.getAvailableThemes(),
+      themeCategories: themeManager.getThemeCategories(),
+    });
+  };
+
+  handleThemeChange = (theme: Theme) => {
+    this.setState({
+      currentTheme: theme,
+      isApplying: false,
+    });
+  };
+
+  toggleOpen = () => {
+    this.setState({ isOpen: !this.state.isOpen });
+  };
+
+  handleThemeSelect = async (themeId: string) => {
+    if (this.state.isApplying) return;
+
+    this.setState({ isApplying: true });
+
+    try {
+      await themeManager.applyTheme(themeId);
+      this.setState({ isOpen: false });
+    } catch (error) {
+      console.error('Failed to apply theme:', error);
+    } finally {
+      this.setState({ isApplying: false });
+    }
+  };
+
+  renderThemeButton = (theme: Theme) => {
+    const { currentTheme, isApplying } = this.state;
+    const isActive = currentTheme?.id === theme.id;
+    const isDisabled = isApplying;
+
+    return (
+      <button
+        key={theme.id}
+        onClick={() => this.handleThemeSelect(theme.id)}
+        disabled={isDisabled}
+        style={{
+          background: isActive ? '#F64A8A' : '#333',
+          color: 'white',
+          border: isActive ? '2px solid #F64A8A' : '1px solid #666',
+          borderRadius: '4px',
+          padding: '8px 12px',
+          margin: '2px',
+          fontSize: '12px',
+          cursor: isDisabled ? 'not-allowed' : 'pointer',
+          opacity: isDisabled ? 0.6 : 1,
+          minWidth: '120px',
+          textAlign: 'left' as const,
+          display: 'block',
+          width: '100%',
+          transition: 'all 0.2s ease',
+        }}
+        title={theme.description}
+      >
+        <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>
+          {theme.name}
+        </div>
+        <div style={{ fontSize: '10px', opacity: 0.8 }}>
+          {theme.category || 'general'}
+        </div>
+      </button>
+    );
+  };
+
+  renderMobileView = () => {
+    const { isOpen, isReady, currentTheme, themeCategories, isApplying } = this.state;
+
+    if (!isReady) {
+      return (
+        <div style={{ padding: '10px', color: 'white', fontSize: '12px' }}>
+          🎨 Theme system loading...
+        </div>
+      );
+    }
+
+    return (
+      <div style={{ marginTop: '10px' }}>
+        <button
+          onClick={this.toggleOpen}
+          style={{
+            background: '#4CAF50',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            padding: '10px 15px',
+            fontSize: '14px',
+            width: '100%',
+            cursor: 'pointer',
+            marginBottom: '5px',
+          }}
+        >
+          🎨 Theme: {currentTheme?.name || 'None'}
+        </button>
+
+        {isOpen && (
+          <div style={{
+            background: 'rgba(0,0,0,0.9)',
+            border: '1px solid #666',
+            borderRadius: '4px',
+            padding: '10px',
+            maxHeight: '300px',
+            overflowY: 'auto' as const,
+          }}>
+            {isApplying && (
+              <div style={{ color: '#F64A8A', fontSize: '12px', marginBottom: '10px' }}>
+                🔄 Applying theme...
+              </div>
+            )}
+
+            {themeCategories.map(category => {
+              const categoryThemes = themeManager.getThemesByCategory(category);
+              return (
+                <div key={category} style={{ marginBottom: '10px' }}>
+                  <div style={{
+                    color: '#F64A8A',
+                    fontSize: '12px',
+                    fontWeight: 'bold',
+                    marginBottom: '5px',
+                    textTransform: 'uppercase' as const,
+                  }}>
+                    {category} ({categoryThemes.length})
+                  </div>
+                  {categoryThemes.map(this.renderThemeButton)}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  renderDesktopView = () => {
+    const { isOpen, isReady, currentTheme, themeCategories, isApplying } = this.state;
+
+    if (!isReady) {
+      return (
+        <div className="button">
+          <button
+            disabled
+            style={{
+              background: '#666',
+              color: '#ccc',
+              cursor: 'not-allowed',
+            }}
+          >
+            🎨 Loading themes...
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <div className="button" style={{ marginBottom: '10px' }}>
+        <button
+          onClick={this.toggleOpen}
+          style={{
+            background: isOpen ? '#F64A8A' : '#4CAF50',
+            color: 'white',
+            fontWeight: 'bold',
+            position: 'relative' as const,
+          }}
+          title="Change application theme"
+        >
+          🎨 {currentTheme?.name || 'No Theme'}
+        </button>
+
+        {isOpen && (
+          <div style={{
+            position: 'absolute' as const,
+            left: '100%',
+            top: '0',
+            background: 'rgba(0,0,0,0.95)',
+            border: '2px solid #F64A8A',
+            borderRadius: '8px',
+            padding: '15px',
+            minWidth: '280px',
+            maxHeight: '400px',
+            overflowY: 'auto' as const,
+            zIndex: 9999,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.8)',
+          }}>
+            <div style={{
+              color: '#F64A8A',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              marginBottom: '10px',
+              borderBottom: '1px solid #333',
+              paddingBottom: '8px',
+            }}>
+              🎨 Choose Theme
+            </div>
+
+            {isApplying && (
+              <div style={{
+                color: '#F64A8A',
+                fontSize: '12px',
+                marginBottom: '10px',
+                textAlign: 'center' as const,
+              }}>
+                🔄 Applying theme...
+              </div>
+            )}
+
+            {themeCategories.map(category => {
+              const categoryThemes = themeManager.getThemesByCategory(category);
+              return (
+                <div key={category} style={{ marginBottom: '15px' }}>
+                  <div style={{
+                    color: '#F64A8A',
+                    fontSize: '11px',
+                    fontWeight: 'bold',
+                    marginBottom: '8px',
+                    textTransform: 'uppercase' as const,
+                    letterSpacing: '0.5px',
+                  }}>
+                    📂 {category} ({categoryThemes.length})
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '4px' }}>
+                    {categoryThemes.map(this.renderThemeButton)}
+                  </div>
+                </div>
+              );
+            })}
+
+            <div style={{
+              fontSize: '10px',
+              color: '#999',
+              marginTop: '15px',
+              paddingTop: '10px',
+              borderTop: '1px solid #333',
+              textAlign: 'center' as const,
+            }}>
+              💡 Themes change lighting, colors, and atmosphere in real-time
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  render() {
+    const { isMobile } = this.props;
+
+    return isMobile ? this.renderMobileView() : this.renderDesktopView();
+  }
+}
+
+export default ThemeSelector;

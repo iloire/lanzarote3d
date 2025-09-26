@@ -1,9 +1,6 @@
 Implement the following tasks if any is added follwing the instructions described below:
 ---
 TASKS:
-- tweak the package.json scripts to make sure we are always passing the linter before deploying
-- the clouds themes are amazing! but make it possible to select the current one without having to go to GUI controls
-
 ---
 
 ### Instructions
