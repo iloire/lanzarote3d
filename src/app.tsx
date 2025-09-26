@@ -148,7 +148,9 @@ const App: React.FC<AppProps> = ({
     // Simple, direct animation loop - no complex manager needed
     const animate = () => {
       requestAnimationFrame(animate);
-      stats.update();
+      if (process.env.NODE_ENV === 'development') {
+        stats.update();
+      }
     };
     animate();
 
@@ -234,7 +236,9 @@ const App: React.FC<AppProps> = ({
 };
 
 const stats = new Stats();
-stats.showPanel(0);
-document.getElementById('stats')?.appendChild(stats.dom);
+if (process.env.NODE_ENV === 'development') {
+  stats.showPanel(0);
+  document.getElementById('stats')?.appendChild(stats.dom);
+}
 
 export default App;
