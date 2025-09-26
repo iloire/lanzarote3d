@@ -114,48 +114,54 @@ const Animation = {
       // Store initial positions
       const startTarget = controls ? controls.target.clone() : pgPos.clone();
 
-      // Phase 1: Fast approach from the other side (4 seconds)
-      animator.animate('camera-phase1', 4000, (progress) => {
-        // Quick movement to intermediate position
-        camera.position.lerpVectors(initialCameraPosition, intermediatePosition, progress);
+      // Single seamless animation with custom easing (10 seconds total)
+      animator.animate('camera-seamless', 10000, (progress) => {
+        let currentPosition, phase;
 
-        // Look towards the area but not directly at paraglider yet
-        const lookTarget = new THREE.Vector3().lerpVectors(startTarget, pgPos, progress * 0.5);
-        if (controls) {
-          controls.target.copy(lookTarget);
-          controls.update();
-        }
+        if (progress < 0.4) {
+          // Phase 1: Fast approach (first 40% = 4 seconds)
+          phase = 'fast';
+          const phase1Progress = progress / 0.4; // 0-1 for first phase
+          // Use accelerated easing for quick movement
+          const easedProgress = phase1Progress * phase1Progress * (3 - 2 * phase1Progress); // smoothstep
+          currentPosition = new THREE.Vector3().lerpVectors(initialCameraPosition, intermediatePosition, easedProgress);
 
-        // Debug output every 25%
-        if (Math.floor(progress * 4) !== Math.floor((progress - 0.01) * 4)) {
-          console.log(`Phase 1: ${Math.floor(progress * 100)}% - Fast approach`);
-        }
-      }, () => {
-        console.log('Phase 1 complete - Starting slow final approach');
-
-        // Phase 2: Slow, careful approach to paraglider (6 seconds)
-        animator.animate('camera-phase2', 6000, (progress) => {
-          // Slow movement from intermediate to final position
-          camera.position.lerpVectors(intermediatePosition, finalCameraPosition, progress);
+          // Look towards the area gradually
+          const lookTarget = new THREE.Vector3().lerpVectors(startTarget, pgPos, easedProgress * 0.5);
+          if (controls) {
+            controls.target.copy(lookTarget);
+            controls.update();
+          }
+        } else {
+          // Phase 2: Slow approach (last 60% = 6 seconds)
+          phase = 'slow';
+          const phase2Progress = (progress - 0.4) / 0.6; // 0-1 for second phase
+          // Use decelerated easing for slow movement
+          const easedProgress = Math.sqrt(phase2Progress); // slow start, maintains smoothness
+          currentPosition = new THREE.Vector3().lerpVectors(intermediatePosition, finalCameraPosition, easedProgress);
 
           // Gradually focus on the paraglider
           if (controls) {
-            controls.target.lerpVectors(controls.target, pgPos, progress);
+            const currentTarget = controls.target.clone();
+            controls.target.lerpVectors(currentTarget, pgPos, easedProgress * 0.1); // Very gradual
             controls.update();
           }
+        }
 
-          // Debug output every 16.7% (every second)
-          if (Math.floor(progress * 6) !== Math.floor((progress - 0.01) * 6)) {
-            console.log(`Phase 2: ${Math.floor(progress * 100)}% - Slow approach`,
-              camera.position.x.toFixed(1), camera.position.y.toFixed(1), camera.position.z.toFixed(1));
-          }
-        }, () => {
-          // Animation complete
-          if (controls) {
-            controls.enabled = true;
-          }
-          console.log('Dramatic camera animation complete!');
-        });
+        camera.position.copy(currentPosition);
+
+        // Debug output
+        const percentage = Math.floor(progress * 100);
+        if (percentage % 10 === 0 && percentage !== Math.floor((progress - 0.01) * 100)) {
+          console.log(`${percentage}% (${phase} phase):`,
+            camera.position.x.toFixed(1), camera.position.y.toFixed(1), camera.position.z.toFixed(1));
+        }
+      }, () => {
+        // Animation complete
+        if (controls) {
+          controls.enabled = true;
+        }
+        console.log('Seamless dramatic camera animation complete!');
       });
     }, 100);
 
