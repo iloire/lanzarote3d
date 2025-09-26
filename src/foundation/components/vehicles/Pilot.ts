@@ -117,7 +117,7 @@ class Pilot {
 
   load(): THREE.Object3D {
     const group = new THREE.Group();
-    this.head = getHead(this.options.head || {});
+    this.head = getHead((this.options.head || { headType: 'helmet' }) as PilotHeadOptions);
     group.add(this.head);
     group.add(this.getBody());
     return group;

@@ -1,0 +1,1 @@
+{"version":3,"file":"IFlyable.d.ts","sourceRoot":"","sources":["../../../../src/foundation/types/IFlyable.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,KAAK,MAAM,OAAO,CAAC;AAE/B,MAAM,CAAC,OAAO,WAAW,QAAQ;IAC/B,IAAI,EAAE,MAAM,IAAI,CAAC;IACjB,WAAW,EAAE,MAAM,IAAI,CAAC;IACxB,KAAK,EAAE,MAAM,IAAI,CAAC;IAClB,YAAY,EAAE,MAAM,IAAI,CAAC;IACzB,OAAO,EAAE,MAAM,KAAK,CAAC,QAAQ,CAAC;CAC/B"}

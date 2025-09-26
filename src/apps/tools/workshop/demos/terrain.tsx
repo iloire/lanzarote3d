@@ -481,10 +481,10 @@ const TerrainWorkshop = {
         infoDiv.innerHTML = `
           <h3 style="margin: 0 0 10px 0; color: #F64A8A;">🎨 ${currentTheme.name}</h3>
           <div style="margin-bottom: 8px; font-size: 12px; opacity: 0.9;">
-            <strong>Theme:</strong> ${currentTheme.category || 'general'}
+            <strong>Theme:</strong> ${(currentTheme as any).category || 'general'}
           </div>
           <div style="margin-bottom: 8px; font-size: 11px; opacity: 0.8; line-height: 1.3;">
-            ${currentTheme.description}
+            ${(currentTheme as any).description || ''}
           </div>
           <h4 style="margin: 15px 0 8px 0; color: #F64A8A; font-size: 14px;">🌍 ${style.name}</h4>
           <p style="margin: 0 0 15px 0; opacity: 0.9; font-size: 12px; line-height: 1.4;">
@@ -518,12 +518,12 @@ const TerrainWorkshop = {
       // Update info when style changes - access the controller directly
       const styleController = terrainFolder.controllers.find(c => c.property === 'style');
       if (styleController) {
-        const originalOnChange = styleController.onChange;
-        styleController.onChange = (value: string) => {
-          const result = originalOnChange.call(styleController, value);
+        const originalOnChange = styleController.onChange as any;
+        styleController.onChange = ((value: string) => {
+          const result = originalOnChange ? originalOnChange.call(styleController, value) : null;
           updateInfo();
           return result;
-        };
+        }) as any;
       }
 
       // Enhanced keyboard shortcuts for theme switching

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { StoryOptions } from '../types';
+import { StoryOptions } from '../../../../shared/types';
 import createVoxelExample from './example';
 import { STLExporter } from 'three/examples/jsm/exporters/STLExporter';
 import { AppBase } from '../../../../shared/AppBase';
@@ -233,14 +233,15 @@ class VoxelDemoApp extends AppBase {
 
     // Dispose platform
     if (this.platform) {
-      if (this.platform.geometry) {
-        this.platform.geometry.dispose();
+      const mesh = this.platform as THREE.Mesh;
+      if (mesh.geometry) {
+        mesh.geometry.dispose();
       }
-      if (this.platform.material) {
-        if (Array.isArray(this.platform.material)) {
-          this.platform.material.forEach(material => material.dispose());
+      if (mesh.material) {
+        if (Array.isArray(mesh.material)) {
+          mesh.material.forEach(material => material.dispose());
         } else {
-          this.platform.material.dispose();
+          mesh.material.dispose();
         }
       }
       this.platform = undefined;

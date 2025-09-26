@@ -18,8 +18,8 @@ class PilotVoxel {
     const textureLoader = new THREE.TextureLoader();
     const texture = textureLoader.load(this.options.textureFile);
     mesh.traverse(function (child) {
-      if (child.isMesh) {
-        child.material.map = texture;
+      if ((child as any).isMesh) {
+        (child as any).material.map = texture;
       }
     });
     return mesh;
