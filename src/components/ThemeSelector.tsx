@@ -97,10 +97,29 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
     }
   };
 
+  getThemeColor = (theme: Theme): string => {
+    // Extract predominant color from theme
+    switch (theme.id) {
+      case 'golden':
+        return '#FFD700';
+      case 'arctic':
+        return '#87CEEB';
+      case 'storm':
+        return '#4A4A4A';
+      case 'autumn':
+        return '#CD853F';
+      case 'natural':
+        return '#2196f3';
+      default:
+        return '#4CAF50';
+    }
+  };
+
   renderThemeButton = (theme: Theme) => {
     const { currentTheme, isApplying } = this.state;
     const isActive = currentTheme?.id === theme.id;
     const isDisabled = isApplying;
+    const themeColor = this.getThemeColor(theme);
 
     return (
       <button
@@ -108,9 +127,9 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
         onClick={() => this.handleThemeSelect(theme.id)}
         disabled={isDisabled}
         style={{
-          background: isActive ? '#4CAF50' : '#333',
+          background: isActive ? themeColor : `linear-gradient(135deg, ${themeColor}88, ${themeColor}44)`,
           color: 'white',
-          border: isActive ? '2px solid #4CAF50' : '1px solid #666',
+          border: isActive ? `2px solid ${themeColor}` : `1px solid ${themeColor}66`,
           borderRadius: '4px',
           padding: '8px 12px',
           margin: '2px',
@@ -274,10 +293,10 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
                 zIndex: 10000,
               }}
               title="Close theme selector"
-              onMouseEnter={(e) => {
+              onMouseEnter={e => {
                 e.currentTarget.style.color = '#fff';
               }}
-              onMouseLeave={(e) => {
+              onMouseLeave={e => {
                 e.currentTarget.style.color = '#999';
               }}
             >

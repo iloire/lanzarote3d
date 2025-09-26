@@ -1,50 +1,6 @@
-import { SkyTheme, Theme } from '../types/Theme';
-
-const defaultSky: SkyTheme = {
-  timeOfDay: 15,
-  sunIntensity: 2,
-  fogEnabled: false,
-  fogColor: '#333333',
-  fogDensity: 0.00001,
-};
+import { Theme } from '../types/Theme';
 
 export const THEMES: Record<string, Theme> = {
-  default: {
-    id: 'default',
-    name: 'Default Theme',
-    sky: defaultSky,
-    clouds: {
-      colors: ['#4A4A4A', '#F5F5F5', '#696969', '#D3D3D3'],
-      density: 1.2,
-      opacity: 0.95,
-    },
-    terrain: {
-      style: 'volcanic',
-      customMaterial: {
-        color: '#424242',
-        emissiveIntensity: 0.3,
-        roughness: 0.8,
-        metalness: 0.0,
-        opacity: 1.0,
-        wireframe: false,
-        visible: true,
-      },
-    },
-    water: {
-      color: '#263238',
-      opacity: 0.85,
-    },
-    weather: {
-      windDirectionDegreesFromNorth: 45,
-      speedMetresPerSecond: 12,
-      lclLevel: 1500,
-    },
-    ambient: {
-      lightingIntensity: 0.7,
-      shadowIntensity: 1.4,
-    },
-  },
-
   golden: {
     id: 'golden',
     name: 'Golden Hour',
@@ -287,7 +243,7 @@ export const getThemeById = (id: string): Theme | undefined => {
 };
 
 export const getDefaultTheme = (): Theme => {
-  return THEMES['default'] as Theme;
+  return THEMES['golden'] as Theme;
 };
 
 export const getAllThemes = (): Theme[] => {
