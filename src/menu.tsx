@@ -126,7 +126,7 @@ class Menu extends React.Component<MenuProps> {
 
           <div className={`mobile-menu-content ${isMenuOpen ? 'open' : ''}`}>
             {/* Theme Selector for Mobile */}
-            <ThemeSelector isMobile={true} />
+            <ThemeSelector isMobile={true} onMobileThemeSelect={this.toggleMenu} />
 
             {showPublic && publicApps.length > 0 && (
               <>

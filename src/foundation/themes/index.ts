@@ -4,6 +4,7 @@ export const THEMES: Record<string, Theme> = {
   golden: {
     id: 'golden',
     name: 'Golden Hour',
+    enabled: true,
     sky: {
       timeOfDay: 17.5,
       sunIntensity: 2.0,
@@ -54,6 +55,7 @@ export const THEMES: Record<string, Theme> = {
   arctic: {
     id: 'arctic',
     name: 'Arctic Winter',
+    enabled: true,
     sky: {
       timeOfDay: 14,
       sunIntensity: 1.8,
@@ -109,6 +111,7 @@ export const THEMES: Record<string, Theme> = {
   storm: {
     id: 'storm',
     name: 'Storm Clouds',
+    enabled: true,
     sky: {
       timeOfDay: 15,
       sunIntensity: 1.2,
@@ -157,6 +160,7 @@ export const THEMES: Record<string, Theme> = {
   autumn: {
     id: 'autumn',
     name: 'Autumn Mist',
+    enabled: false,
     sky: {
       timeOfDay: 16,
       sunIntensity: 1.8,
@@ -198,6 +202,7 @@ export const THEMES: Record<string, Theme> = {
   natural: {
     id: 'natural',
     name: 'Natural Famara',
+    enabled: true,
     sky: {
       timeOfDay: 13,
       sunIntensity: 2.2,
@@ -247,7 +252,7 @@ export const getDefaultTheme = (): Theme => {
 };
 
 export const getAllThemes = (): Theme[] => {
-  return Object.values(THEMES);
+  return Object.values(THEMES).filter(theme => theme.enabled !== false);
 };
 
 export default THEMES;

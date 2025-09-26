@@ -43,7 +43,9 @@
       "Bash(git branch:*)",
       "Bash(npx prettier:*)",
       "Bash(yarn build-showcase)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(yarn lint:*)",
+      "Bash(yarn format:check)"
     ],
     "deny": [],
     "ask": []

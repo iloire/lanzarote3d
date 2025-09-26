@@ -150,10 +150,10 @@ class AnimationApp extends AppBase {
     const pgPos = paraglidersVoxel[0]?.position.clone() || new THREE.Vector3();
 
     // Starting position - extremely far away on the other side of the island
-    const initialCameraPosition = new THREE.Vector3(-2000, 2500, 5000);
+    const initialCameraPosition = new THREE.Vector3(-2000, 2200, 5000);
 
     // Intermediate position - approaching the area quickly
-    const intermediatePosition = new THREE.Vector3(4500, 1600, 1500);
+    const intermediatePosition = new THREE.Vector3(4500, 1800, 1500);
 
     // Final position - slow, careful approach to the paraglider
     const finalCameraPosition = new THREE.Vector3(

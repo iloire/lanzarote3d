@@ -69,6 +69,7 @@ export interface AmbientTheme {
 export interface Theme {
   id: string;
   name: string;
+  enabled?: boolean;
 
   // Core environmental components
   sky: SkyTheme;

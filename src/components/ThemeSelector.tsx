@@ -4,6 +4,7 @@ import { Theme } from '../foundation/types/Theme';
 
 interface ThemeSelectorProps {
   isMobile?: boolean;
+  onMobileThemeSelect?: () => void;
 }
 
 interface ThemeSelectorState {
@@ -91,6 +92,10 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
       // On mobile, close the menu after theme selection for better UX
       if (this.props.isMobile) {
         this.setState({ isOpen: false });
+        // Also close the parent mobile menu if callback provided
+        if (this.props.onMobileThemeSelect) {
+          this.props.onMobileThemeSelect();
+        }
       }
     } catch (error) {
       // eslint-disable-next-line no-console
@@ -181,7 +186,7 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
             marginBottom: '5px',
           }}
         >
-          🎨 {currentTheme?.name || 'Default Theme'}
+          🎨 Theme: {currentTheme?.name || 'Default Theme'}
         </button>
 
         {isOpen && (
