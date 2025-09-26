@@ -107,9 +107,9 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
         onClick={() => this.handleThemeSelect(theme.id)}
         disabled={isDisabled}
         style={{
-          background: isActive ? '#F64A8A' : '#333',
+          background: isActive ? '#4CAF50' : '#333',
           color: 'white',
-          border: isActive ? '2px solid #F64A8A' : '1px solid #666',
+          border: isActive ? '2px solid #4CAF50' : '1px solid #666',
           borderRadius: '4px',
           padding: '8px 12px',
           margin: '2px',
@@ -156,7 +156,7 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
             marginBottom: '5px',
           }}
         >
-Theme: {currentTheme?.name || 'None'}
+🎨 {currentTheme?.name || 'Default Theme'}
         </button>
 
         {isOpen && (
@@ -169,7 +169,7 @@ Theme: {currentTheme?.name || 'None'}
             }}
           >
             {isApplying && (
-              <div style={{ color: '#F64A8A', fontSize: '12px', marginBottom: '10px' }}>
+              <div style={{ color: '#4CAF50', fontSize: '12px', marginBottom: '10px' }}>
                 🔄 Applying theme...
               </div>
             )}
@@ -208,14 +208,14 @@ Theme: {currentTheme?.name || 'None'}
         <button
           onClick={this.toggleOpen}
           style={{
-            background: isOpen ? '#F64A8A' : '#4CAF50',
+            background: isOpen ? '#4CAF50' : '#4CAF50',
             color: 'white',
             fontWeight: 'bold',
             position: 'relative' as const,
           }}
           title="Change application theme"
         >
-{currentTheme?.name || 'No Theme'}
+🎨 {currentTheme?.name || 'Default Theme'}
         </button>
 
         {isOpen && (
@@ -225,7 +225,7 @@ Theme: {currentTheme?.name || 'None'}
               left: '100%',
               top: '0',
               background: 'rgba(0,0,0,0.95)',
-              border: '2px solid #F64A8A',
+              border: '2px solid #4CAF50',
               borderRadius: '8px',
               padding: '15px',
               minWidth: '280px',
@@ -237,7 +237,7 @@ Theme: {currentTheme?.name || 'None'}
             {isApplying && (
               <div
                 style={{
-                  color: '#F64A8A',
+                  color: '#4CAF50',
                   fontSize: '12px',
                   marginBottom: '10px',
                   textAlign: 'center' as const,

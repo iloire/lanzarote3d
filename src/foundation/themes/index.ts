@@ -1,14 +1,48 @@
 import { Theme } from '../types/Theme';
 
 export const THEMES: Record<string, Theme> = {
+  default: {
+    id: 'default',
+    name: 'Default Theme',
+    sky: {
+      timeOfDay: 15,
+      sunIntensity: 1.2,
+      fogEnabled: false,
+    },
+    clouds: {
+      colors: ['#2F2F2F', '#4A4A4A', '#F5F5F5', '#1A1A1A', '#696969', '#D3D3D3', '#000000'],
+      density: 1.2,
+      opacity: 0.95,
+    },
+    terrain: {
+      style: 'volcanic',
+      customMaterial: {
+        color: '#424242',
+        emissiveIntensity: 0.3,
+      },
+    },
+    water: {
+      color: '#263238',
+      opacity: 0.85,
+    },
+    weather: {
+      windDirectionDegreesFromNorth: 45,
+      speedMetresPerSecond: 12,
+      lclLevel: 1500,
+    },
+    ambient: {
+      lightingIntensity: 0.7,
+      shadowIntensity: 1.4,
+    },
+  },
+
   sunset: {
     id: 'sunset',
     name: 'Sunset Romance',
     sky: {
       timeOfDay: 19,
       sunIntensity: 2.3,
-      fogColor: '#ff6b6b',
-      fogDensity: 0.0015,
+      fogEnabled: false,
     },
     clouds: {
       colors: ['#F64A8A', '#F987C5', '#DE3163', '#FFB6C1', '#FF69B4', '#E6004D'],
@@ -42,8 +76,7 @@ export const THEMES: Record<string, Theme> = {
     sky: {
       timeOfDay: 17.5,
       sunIntensity: 2.0,
-      fogColor: '#ffd54f',
-      fogDensity: 0.001,
+      fogEnabled: false,
     },
     clouds: {
       colors: ['#FFD700', '#FFA500', '#FF8C00', '#FFFF99', '#FFE135', '#DAA520', '#FFF8F0', '#FF6B6B'],
@@ -77,8 +110,7 @@ export const THEMES: Record<string, Theme> = {
     sky: {
       timeOfDay: 14,
       sunIntensity: 1.8,
-      fogColor: '#e3f2fd',
-      fogDensity: 0.0005,
+      fogEnabled: false,
     },
     clouds: {
       colors: ['#FFFFFF', '#E6F3FF', '#87CEEB', '#2F4F4F'],
@@ -113,8 +145,7 @@ export const THEMES: Record<string, Theme> = {
     sky: {
       timeOfDay: 15,
       sunIntensity: 1.2,
-      fogColor: '#37474f',
-      fogDensity: 0.0025,
+      fogEnabled: false,
     },
     clouds: {
       colors: ['#2F2F2F', '#4A4A4A', '#F5F5F5', '#1A1A1A', '#696969', '#D3D3D3', '#000000'],
@@ -149,8 +180,7 @@ export const THEMES: Record<string, Theme> = {
     sky: {
       timeOfDay: 16,
       sunIntensity: 1.8,
-      fogColor: '#d7ccc8',
-      fogDensity: 0.002,
+      fogEnabled: false,
     },
     clouds: {
       colors: ['#CD853F', '#DEB887', '#F5DEB3', '#D2691E', '#BC8F8F', '#F4A460'],
@@ -185,8 +215,7 @@ export const THEMES: Record<string, Theme> = {
     sky: {
       timeOfDay: 13,
       sunIntensity: 2.2,
-      fogColor: '#f5f5f5',
-      fogDensity: 0,
+      fogEnabled: false,
     },
     clouds: {
       colors: ['#FFFFFF', '#E0E0E0', '#C0C0C0', '#A0A0A0', '#808080', '#606060'],
@@ -214,11 +243,50 @@ export const THEMES: Record<string, Theme> = {
       shadowIntensity: 1.0,
     },
   },
+
+  clearday: {
+    id: 'clearday',
+    name: 'Clear Day',
+    sky: {
+      timeOfDay: 12,
+      sunIntensity: 2.5,
+      fogEnabled: false, // Explicitly disable fog for crystal clear visibility
+    },
+    clouds: {
+      colors: ['#FFFFFF', '#F0F8FF', '#E6F3FF'],
+      density: 0.2,
+      opacity: 0.7,
+    },
+    terrain: {
+      style: 'desert',
+      customMaterial: {
+        color: '#f4a460',
+        emissiveIntensity: 0.2,
+      },
+    },
+    water: {
+      color: '#00bcd4',
+      opacity: 0.95,
+    },
+    weather: {
+      windDirectionDegreesFromNorth: 225,
+      speedMetresPerSecond: 4,
+      lclLevel: 2500,
+    },
+    ambient: {
+      lightingIntensity: 1.2,
+      shadowIntensity: 0.8,
+    },
+  },
 };
 
 // Helper functions for theme management
 export const getThemeById = (id: string): Theme | undefined => {
   return THEMES[id];
+};
+
+export const getDefaultTheme = (): Theme => {
+  return THEMES['default'];
 };
 
 export const getAllThemes = (): Theme[] => {

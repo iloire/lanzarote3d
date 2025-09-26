@@ -3,6 +3,7 @@ import * as THREE from 'three';
 export interface SkyTheme {
   timeOfDay: number; // 0-24 hours
   sunIntensity?: number;
+  fogEnabled?: boolean; // Whether to apply fog at all
   fogColor?: string;
   fogDensity?: number;
 }

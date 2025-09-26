@@ -9,12 +9,9 @@ import Environment from '../../shared/env/environment';
 import adriModel from '../../../../assets/foundation/models/characters/adri.obj';
 import adriTextureImage from '../../../../assets/foundation/models/characters/adri.png';
 import { StoryOptions } from '../../shared/types';
-import { THEMES } from '../../../foundation/themes';
+import { getDefaultTheme } from '../../../foundation/themes';
 import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';
 import { AppBase } from '../../shared/AppBase';
-
-// Use the sunset theme for PhotoBooth's romantic atmosphere
-const PHOTOBOOTH_THEME = THEMES['sunset'];
 
 const tandems = [
   {
@@ -191,10 +188,7 @@ class PhotoBoothApp extends AppBase {
         lighting: 'dynamic',
         physics: false,
         fog: {
-          enabled: true,
-          color: 0xff6b6b, // Warm sunset fog
-          near: 1000,
-          far: 20000
+          enabled: false // Fog handled by theme system
         }
       },
       performance: {
@@ -214,10 +208,7 @@ class PhotoBoothApp extends AppBase {
       controls.enabled = true;
 
       // Apply theme to scene
-      const theme = options.theme ?? PHOTOBOOTH_THEME;
-      if (!theme) {
-        throw new Error('Theme not available');
-      }
+      const theme = options.theme ?? getDefaultTheme();
       await ThemeEngine.apply(options, theme);
 
       const initialPos = new THREE.Vector3(6200, 970, 175);

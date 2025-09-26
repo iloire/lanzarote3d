@@ -26,10 +26,7 @@ class VoxelDemoApp extends AppBase {
         lighting: 'static',
         physics: false,
         fog: {
-          enabled: true,
-          color: 0x000000,
-          near: 1000,
-          far: 5000
+          enabled: false // Fog handled by theme system
         }
       },
       performance: {
@@ -148,8 +145,8 @@ class VoxelDemoApp extends AppBase {
   }
 
   private setupFog(scene: THREE.Scene): void {
-    // Add fog to the scene for depth
-    scene.fog = new THREE.Fog(0x000000, 1000, 5000);
+    // Note: Fog is handled by ThemeEngine to avoid conflicts
+    // Remove manual fog application to prevent conflicts with theme system
   }
 
   private setupDownloadButton(): void {

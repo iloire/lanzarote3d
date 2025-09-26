@@ -6,12 +6,7 @@ export interface SceneConfig {
   environment?: 'lanzarote' | 'custom';
   lighting?: 'dynamic' | 'static';
   physics?: boolean;
-  fog?: {
-    enabled: boolean;
-    color?: number;
-    near?: number;
-    far?: number;
-  };
+  // Note: fog is handled by ThemeEngine to avoid conflicts
 }
 
 export interface SceneComponents {
@@ -34,7 +29,6 @@ export class SceneManager {
       environment: 'lanzarote',
       lighting: 'dynamic',
       physics: false,
-      fog: { enabled: false },
       ...config
     };
 
@@ -52,13 +46,7 @@ export class SceneManager {
     this.scene.add(ambientLight);
     this.scene.add(directionalLight);
 
-    // Setup fog if enabled
-    if (this.config.fog?.enabled) {
-      const fogColor = this.config.fog.color || 0x000000;
-      const fogNear = this.config.fog.near || 1;
-      const fogFar = this.config.fog.far || 22500;
-      this.scene.fog = new THREE.Fog(fogColor, fogNear, fogFar);
-    }
+    // Note: Fog is handled by ThemeEngine to avoid conflicts
 
     this.components = {
       scene: this.scene,
@@ -112,16 +100,8 @@ export class SceneManager {
     objects.forEach(obj => this.scene.remove(obj));
   }
 
-  setFog(enabled: boolean, color?: number, near?: number, far?: number): void {
-    if (enabled) {
-      const fogColor = color || 0x000000;
-      const fogNear = near || 1;
-      const fogFar = far || 22500;
-      this.scene.fog = new THREE.Fog(fogColor, fogNear, fogFar);
-    } else {
-      this.scene.fog = null;
-    }
-  }
+  // Note: setFog method removed - fog is handled by ThemeEngine to avoid conflicts
+  // Use ThemeEngine.apply() to manage fog settings consistently
 
   updateLighting(timeOfDay: number): void {
     if (this.components.sky) {

@@ -1,12 +1,9 @@
 import * as THREE from 'three';
 import Environment from '../../shared/env/environment';
 import { StoryOptions } from '../../shared/types';
-import { THEMES } from '../../../foundation/themes';
+import { getDefaultTheme } from '../../../foundation/themes';
 import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';
 import { AppBase } from '../../shared/AppBase';
-
-// Use the natural theme from our theme library
-const FAMARA_THEME = THEMES['natural'];
 
 /**
  * Famara Demo - Based on PhotoBooth but without paragliders
@@ -28,10 +25,7 @@ class FamaraApp extends AppBase {
         lighting: 'dynamic',
         physics: false,
         fog: {
-          enabled: true,
-          color: 0xf5f5f5,
-          near: 1000,
-          far: 20000
+          enabled: false // Fog handled by theme system
         }
       },
       performance: {
@@ -51,10 +45,7 @@ class FamaraApp extends AppBase {
       controls.enabled = true;
 
       // Apply theme to scene
-      const theme = options.theme ?? FAMARA_THEME;
-      if (!theme) {
-        throw new Error('Theme not available');
-      }
+      const theme = options.theme ?? getDefaultTheme();
       await ThemeEngine.apply(options, theme);
 
       // Position camera to showcase Famara beach area (no paragliders to focus on)

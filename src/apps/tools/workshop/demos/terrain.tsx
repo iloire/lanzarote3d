@@ -243,9 +243,8 @@ const TerrainWorkshop = {
     const displacement = loader.load(textureImg);
     const proceduralNoise = createNoiseTexture(512, 512, 0.02);
 
-    // Environment fog
-    const fog = new THREE.Fog(0x000000, 1000, 20000);
-    scene.fog = fog;
+    // Note: Fog is handled by ThemeEngine to avoid conflicts
+    // Remove manual fog application to prevent conflicts with theme system
 
     const createTerrain = (styleKey: string, useProceduralNoise = false) => {
       // Remove existing terrain
@@ -275,17 +274,8 @@ const TerrainWorkshop = {
         style.postProcess(mesh, settings);
       }
 
-      // Update fog color based on style
-      const fogColors: Record<string, number> = {
-        volcanic: 0x330000,
-        arctic: 0x001133,
-        desert: 0x332200,
-        alien: 0x220033,
-        crystal: 0x003322,
-        wireframe: 0x000000,
-        plasma: 0x110022,
-      };
-      scene.fog!.color.setHex(fogColors[styleKey] || 0x000000);
+      // Note: Fog color is handled by ThemeEngine to avoid conflicts
+      // Remove manual fog color updates to prevent conflicts with theme system
 
       return mesh;
     };
@@ -454,11 +444,10 @@ const TerrainWorkshop = {
 
       visualFolder
         .add(settings, 'fogDensity', 0, 0.005)
-        .name('Fog Density')
+        .name('Fog Density (Read-only - controlled by theme)')
         .onChange(value => {
-          if (scene.fog) {
-            scene.fog.far = 20000 / (1 + value * 100);
-          }
+          // Note: Fog density is controlled by ThemeEngine
+          console.log('Fog density setting changed but not applied - controlled by theme system');
         });
 
       // Action buttons

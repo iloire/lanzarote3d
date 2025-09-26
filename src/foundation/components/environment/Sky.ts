@@ -254,11 +254,6 @@ export default class Sky extends THREE.Object3D {
       this.ambientLight.intensity = skyTheme.sunIntensity;
     }
 
-    // Apply fog if scene is provided
-    if (scene && skyTheme.fogColor && skyTheme.fogDensity !== undefined) {
-      const fogColor = new THREE.Color(skyTheme.fogColor);
-      const fog = new THREE.Fog(fogColor, 1000, Math.min(20000, 20000 / (1 + skyTheme.fogDensity * 100)));
-      scene.fog = fog;
-    }
+    // Note: Fog is handled by ThemeEngine to avoid conflicts
   }
 }

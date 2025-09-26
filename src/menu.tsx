@@ -164,9 +164,9 @@ class Menu extends React.Component<MenuProps> {
               fontWeight: 'bold',
               marginBottom: '10px',
             }}
-            title={isMenuVisible ? 'Hide Menu' : 'Show Menu'}
+            title={isMenuVisible ? 'Hide Bar' : 'Show Bar'}
           >
-            {isMenuVisible ? 'Hide' : 'Show'}
+            {isMenuVisible ? 'Hide Bar' : 'Show Bar'}
           </button>
         </div>
 

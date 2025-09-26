@@ -6,12 +6,9 @@ import adriModel from '../../../../assets/foundation/models/characters/adri.obj'
 import adriTextureImage from '../../../../assets/foundation/models/characters/adri.png';
 import { StoryOptions } from '../../shared/types';
 import { animator } from '../../../foundation/systems/animation/SimpleAnimator';
-import { THEMES } from '../../../foundation/themes';
+import { getDefaultTheme } from '../../../foundation/themes';
 import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';
 import { AppBase } from '../../shared/AppBase';
-
-// Use the golden hour theme for animation demo
-const ANIMATION_THEME = THEMES['golden'];
 
 type ParagliderVoxelConfig = {
   pg: ParagliderVoxelOptions;
@@ -56,10 +53,7 @@ class AnimationApp extends AppBase {
         lighting: 'dynamic',
         physics: false,
         fog: {
-          enabled: true,
-          color: 0xffb347, // Golden hour fog
-          near: 1000,
-          far: 20000
+          enabled: false // Fog handled by theme system
         }
       },
       performance: {
@@ -77,10 +71,7 @@ class AnimationApp extends AppBase {
       const { camera, scene, renderer, terrain, water, controls } = options;
 
       // Apply theme to scene
-      const theme = options.theme ?? ANIMATION_THEME;
-      if (!theme) {
-        throw new Error('Theme not available');
-      }
+      const theme = options.theme ?? getDefaultTheme();
       await ThemeEngine.apply(options, theme);
 
       // Load voxel paragliders with proper tracking

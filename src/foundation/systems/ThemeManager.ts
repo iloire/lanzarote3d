@@ -1,5 +1,5 @@
 import { Theme } from '../types/Theme';
-import { getAllThemes, getThemeById } from '../themes';
+import { getAllThemes, getThemeById, getDefaultTheme } from '../themes';
 import { ThemeEngine } from './ThemeEngine';
 import { StoryOptions } from '../../apps/shared/types';
 
@@ -14,6 +14,7 @@ class ThemeManager {
   private storyOptions: StoryOptions | null = null;
   private isEnabled: boolean = false;
   private listeners: Array<(theme: Theme) => void> = [];
+  private readonly STORAGE_KEY = 'lanzarote3d_selected_theme';
 
   /**
    * Get singleton instance of ThemeManager
@@ -31,7 +32,24 @@ class ThemeManager {
   initialize(storyOptions: StoryOptions): void {
     this.storyOptions = storyOptions;
     this.isEnabled = true;
-    console.log('ThemeManager initialized');
+
+    // Load theme from localStorage or use default
+    const savedThemeId = this.loadThemeFromStorage();
+    if (savedThemeId) {
+      const savedTheme = getThemeById(savedThemeId);
+      if (savedTheme) {
+        this.currentTheme = savedTheme;
+        console.log(`ThemeManager initialized with saved theme: ${savedTheme.name}`);
+      } else {
+        this.currentTheme = getDefaultTheme();
+        console.log(`ThemeManager initialized with default theme (saved theme not found): ${this.currentTheme.name}`);
+      }
+    } else if (!this.currentTheme) {
+      this.currentTheme = getDefaultTheme();
+      console.log(`ThemeManager initialized with default theme: ${this.currentTheme.name}`);
+    } else {
+      console.log('ThemeManager initialized');
+    }
   }
 
   /**
@@ -89,6 +107,9 @@ class ThemeManager {
       // Update current theme
       this.currentTheme = theme;
 
+      // Save theme to localStorage
+      this.saveThemeToStorage(theme.id);
+
       // Notify listeners
       this.notifyListeners(theme);
 
@@ -145,6 +166,41 @@ class ThemeManager {
       return this.applyTheme(themes[index].id);
     }
     return false;
+  }
+
+  /**
+   * Save theme ID to localStorage
+   */
+  private saveThemeToStorage(themeId: string): void {
+    try {
+      localStorage.setItem(this.STORAGE_KEY, themeId);
+    } catch (error) {
+      console.warn('Failed to save theme to localStorage:', error);
+    }
+  }
+
+  /**
+   * Load theme ID from localStorage
+   */
+  private loadThemeFromStorage(): string | null {
+    try {
+      return localStorage.getItem(this.STORAGE_KEY);
+    } catch (error) {
+      console.warn('Failed to load theme from localStorage:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Clear saved theme from localStorage
+   */
+  clearSavedTheme(): void {
+    try {
+      localStorage.removeItem(this.STORAGE_KEY);
+      console.log('Saved theme cleared from localStorage');
+    } catch (error) {
+      console.warn('Failed to clear theme from localStorage:', error);
+    }
   }
 }
 
