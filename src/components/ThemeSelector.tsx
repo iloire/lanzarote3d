@@ -88,7 +88,10 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
 
     try {
       await themeManager.applyTheme(themeId);
-      // Keep modal open so user can try multiple themes easily
+      // On mobile, close the menu after theme selection for better UX
+      if (this.props.isMobile) {
+        this.setState({ isOpen: false });
+      }
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Failed to apply theme:', error);
@@ -127,7 +130,9 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
         onClick={() => this.handleThemeSelect(theme.id)}
         disabled={isDisabled}
         style={{
-          background: isActive ? themeColor : `linear-gradient(135deg, ${themeColor}88, ${themeColor}44)`,
+          background: isActive
+            ? themeColor
+            : `linear-gradient(135deg, ${themeColor}88, ${themeColor}44)`,
           color: 'white',
           border: isActive ? `2px solid ${themeColor}` : `1px solid ${themeColor}66`,
           borderRadius: '4px',
