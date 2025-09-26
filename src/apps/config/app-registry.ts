@@ -21,7 +21,7 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
   experiences: {
     game: {
       name: "Flight Simulator",
-      description: "Interactive paragliding flight simulation with physics, weather, and scoring",
+      description: "Interactive paragliding flight simulation",
       entry: "./experiences/game/index.tsx",
       route: "/game",
       category: "experience",
@@ -29,11 +29,11 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       requiresWebGL: true,
       tags: ["interactive", "simulation", "flight", "game"],
       status: "dev",
-      priority: 2
+      priority: 7
     },
     flyzones: {
-      name: "Location Explorer",
-      description: "Explore real paragliding locations in 3D with weather data and site information",
+      name: "Flyzones",
+      description: "Explore flyzing locations in 3D",
       entry: "./experiences/flyzones/index.tsx",
       route: "/flyzones",
       category: "experience",
@@ -41,14 +41,14 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       requiresWebGL: true,
       tags: ["exploration", "locations", "educational", "3D"],
       status: "dev",
-      priority: 3
+      priority: 1
     },
   },
 
   tools: {
     'location-editor': {
-      name: "Location Editor",
-      description: "Tool for creating and editing paragliding flight locations, takeoffs, and landing zones",
+      name: "Flyzones Editor",
+      description: "Tool for creating and editing paragliding flight locations",
       entry: "./tools/location-editor/index.tsx",
       route: "/location-editor",
       category: "tool",
@@ -59,7 +59,7 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
     },
     workshop: {
       name: "Workshop",
-      description: "Development environment for testing and showcasing individual 3D components",
+      description: "Dev environment for testing and showcasing individual 3D components",
       entry: "./tools/workshop/index.tsx",
       route: "/workshop",
       category: "tool",
@@ -92,6 +92,17 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       tags: ["showcase", "static", "visual", "presentation"],
       status: "public",
       priority: 2
+    },
+    famara: {
+      name: "Famara Beach",
+      description: "Natural beauty of Famara beach area without paragliders - pure landscape focus",
+      entry: "./demos/famara/index.tsx",
+      route: "/famara",
+      category: "demo",
+      requiresWebGL: true,
+      tags: ["landscape", "nature", "scenic", "beach"],
+      status: "public",
+      priority: 3
     },
 
     // Workshop Component Demos

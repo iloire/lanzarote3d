@@ -5,6 +5,7 @@ import Animation from "../demos/animation/index";
 import Game from "../experiences/game/game";
 import FlyZones from "../experiences/flyzones/index";
 import PhotoBooth from "../demos/photobooth";
+import Famara from "../demos/famara";
 import LocationEditor from "../tools/location-editor/index";
 
 // Import workshop demos
@@ -31,6 +32,7 @@ const storyModules = {
   game: Game,
   flyzones: FlyZones,
   photobooth: PhotoBooth,
+  famara: Famara,
 
   // Tools
   'location-editor': LocationEditor,
