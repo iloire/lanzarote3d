@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import textureImg from '../../../../../assets/foundation/textures/environment/h-map-lanzarote.png';
 import { StoryOptions } from '../../../shared/types';
+import { getAllThemes, getThemeCategories, getThemeById } from '../../../../foundation/themes';
+import { ThemeEngine } from '../../../../foundation/systems/ThemeEngine';
 
 // Terrain style definitions
 interface TerrainStyle {
@@ -201,6 +203,10 @@ const TERRAIN_STYLES: Record<string, TerrainStyle> = {
   },
 };
 
+// Use themes from our comprehensive theme system
+const ALL_THEMES = getAllThemes();
+const THEME_CATEGORIES = getThemeCategories();
+
 const TerrainWorkshop = {
   load: async (options: StoryOptions) => {
     const { camera, scene, renderer, terrain, water, sky, controls, gui } = options;
@@ -227,6 +233,10 @@ const TerrainWorkshop = {
 
     let currentTerrain: THREE.Mesh | null = null;
     let currentStyle = 'volcanic';
+    let currentTheme = ALL_THEMES[0]; // Start with first theme
+
+    // Apply initial theme to the scene
+    await ThemeEngine.apply(options, currentTheme);
 
     // Load textures
     const loader = new THREE.TextureLoader();
@@ -294,12 +304,71 @@ const TerrainWorkshop = {
       controls.update();
     };
 
-    // Create initial terrain
-    createTerrain(currentStyle);
+    // Function to sync terrain with theme
+    const syncTerrainWithTheme = async (theme: any) => {
+      currentTheme = theme;
+      await ThemeEngine.apply(options, theme);
+
+      // Map theme terrain style to our terrain styles
+      const themeTerrainStyle = theme.terrain?.style || 'volcanic';
+      if (TERRAIN_STYLES[themeTerrainStyle]) {
+        currentStyle = themeTerrainStyle;
+        createTerrain(currentStyle);
+      } else {
+        // Fallback to volcanic if theme terrain style doesn't exist
+        createTerrain(currentStyle);
+      }
+    };
+
+    // Create initial terrain with theme integration
+    await syncTerrainWithTheme(currentTheme);
 
     // GUI Controls
     if (gui) {
       const terrainFolder = gui.addFolder('🌍 Terrain Studio');
+
+      // Theme controls
+      const themeFolder = terrainFolder.addFolder('🎨 Complete Theme System');
+
+      // Theme selector by categories
+      const categoryFolder = themeFolder.addFolder('📂 Browse by Category');
+      THEME_CATEGORIES.forEach(category => {
+        const categoryThemes = ALL_THEMES.filter(theme => theme.category === category);
+        if (categoryThemes.length > 0) {
+          const folder = categoryFolder.addFolder(`${category} (${categoryThemes.length})`);
+          categoryThemes.forEach(theme => {
+            folder.add({
+              apply: async () => {
+                await syncTerrainWithTheme(theme);
+                updateInfo();
+              }
+            }, 'apply').name(`${theme.name}`);
+          });
+        }
+      });
+
+      // Quick theme selector
+      const themeNames = ALL_THEMES.map(theme => theme.id);
+      const themeControl = {
+        theme: currentTheme.id,
+        applyFullTheme: async () => {
+          await syncTerrainWithTheme(currentTheme);
+          updateInfo();
+        }
+      };
+
+      themeFolder
+        .add(themeControl, 'theme', themeNames)
+        .name('🚀 Quick Select')
+        .onChange(async (value: string) => {
+          const theme = getThemeById(value);
+          if (theme) {
+            await syncTerrainWithTheme(theme);
+            updateInfo();
+          }
+        });
+
+      themeFolder.add(themeControl, 'applyFullTheme').name('🌟 Apply Complete Theme');
 
       // Style selector
       const styleNames = Object.keys(TERRAIN_STYLES);
@@ -422,15 +491,35 @@ const TerrainWorkshop = {
       const updateInfo = () => {
         const style = TERRAIN_STYLES[currentStyle];
         infoDiv.innerHTML = `
-          <h3 style="margin: 0 0 10px 0; color: #F64A8A;">🌍 ${style.name}</h3>
-          <p style="margin: 0 0 15px 0; opacity: 0.9; font-size: 13px; line-height: 1.4;">
+          <h3 style="margin: 0 0 10px 0; color: #F64A8A;">🎨 ${currentTheme.name}</h3>
+          <div style="margin-bottom: 8px; font-size: 12px; opacity: 0.9;">
+            <strong>Theme:</strong> ${currentTheme.category || 'general'}
+          </div>
+          <div style="margin-bottom: 8px; font-size: 11px; opacity: 0.8; line-height: 1.3;">
+            ${currentTheme.description}
+          </div>
+          <h4 style="margin: 15px 0 8px 0; color: #F64A8A; font-size: 14px;">🌍 ${style.name}</h4>
+          <p style="margin: 0 0 15px 0; opacity: 0.9; font-size: 12px; line-height: 1.4;">
             ${style.description}
           </p>
           <div style="font-size: 12px; opacity: 0.8; line-height: 1.3;">
             <div>📊 Segments: ${settings.segments.toLocaleString()}</div>
             <div>⛰️ Displacement: ${settings.displacementScale}</div>
             <div>✨ Effects: ${settings.animateVertices ? 'Animated' : 'Static'}</div>
-            <div>🎨 Available Styles: ${Object.keys(TERRAIN_STYLES).length}</div>
+            <div>🎨 Available Themes: ${ALL_THEMES.length}</div>
+          </div>
+          <div style="font-size: 11px; opacity: 0.8; line-height: 1.3; border-top: 1px solid #333; padding-top: 8px; margin-top: 10px;">
+            <div><strong>Current Theme Details:</strong></div>
+            <div>🌅 Time: ${currentTheme.sky.timeOfDay}:00</div>
+            <div>💧 Water: ${currentTheme.water.color}</div>
+            <div>🌍 Terrain: ${currentTheme.terrain.style}</div>
+          </div>
+          <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #333; font-size: 11px; line-height: 1.3;">
+            <div style="color: #F64A8A; font-weight: bold; margin-bottom: 5px;">⌨️ Keyboard Shortcuts:</div>
+            <div>← → (or ↑ ↓): Switch themes</div>
+            <div>1-9: Direct theme selection</div>
+            <div>R: Regenerate terrain</div>
+            <div>T: Apply complete theme</div>
           </div>
         `;
       };
@@ -449,7 +538,78 @@ const TerrainWorkshop = {
         };
       }
 
+      // Enhanced keyboard shortcuts for theme switching
+      const handleKeyPress = async (event: KeyboardEvent) => {
+        const currentIndex = ALL_THEMES.findIndex(theme => theme.id === currentTheme.id);
+
+        switch (event.key) {
+          case 'ArrowLeft':
+          case 'ArrowDown': {
+            // Previous theme
+            event.preventDefault();
+            const prevIndex = (currentIndex - 1 + ALL_THEMES.length) % ALL_THEMES.length;
+            const prevTheme = ALL_THEMES[prevIndex];
+            if (prevTheme) {
+              await syncTerrainWithTheme(prevTheme);
+              updateInfo();
+            }
+            break;
+          }
+          case 'ArrowRight':
+          case 'ArrowUp': {
+            // Next theme
+            event.preventDefault();
+            const nextIndex = (currentIndex + 1) % ALL_THEMES.length;
+            const nextTheme = ALL_THEMES[nextIndex];
+            if (nextTheme) {
+              await syncTerrainWithTheme(nextTheme);
+              updateInfo();
+            }
+            break;
+          }
+          case '1':
+          case '2':
+          case '3':
+          case '4':
+          case '5':
+          case '6':
+          case '7':
+          case '8':
+          case '9': {
+            // Direct theme selection (1-9)
+            event.preventDefault();
+            const themeIndex = parseInt(event.key) - 1;
+            if (themeIndex >= 0 && themeIndex < ALL_THEMES.length) {
+              const selectedTheme = ALL_THEMES[themeIndex];
+              if (selectedTheme) {
+                await syncTerrainWithTheme(selectedTheme);
+                updateInfo();
+              }
+            }
+            break;
+          }
+          case 'r':
+          case 'R':
+            // Regenerate terrain only
+            event.preventDefault();
+            createTerrain(currentStyle);
+            break;
+          case 't':
+          case 'T':
+            // Apply complete theme
+            event.preventDefault();
+            await syncTerrainWithTheme(currentTheme);
+            updateInfo();
+            break;
+        }
+      };
+
+      // Add keyboard event listeners
+      document.addEventListener('keydown', handleKeyPress);
+
       terrainFolder.open();
+      themeFolder.open();
+      categoryFolder.open();
       displacementFolder.open();
       visualFolder.open();
     }
