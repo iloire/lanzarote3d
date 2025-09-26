@@ -184,6 +184,7 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
                 padding: '2px 6px',
                 borderRadius: '2px',
                 lineHeight: '1',
+                zIndex: 10000,
               }}
               title="Close theme selector"
             >
@@ -270,6 +271,7 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
                 borderRadius: '2px',
                 lineHeight: '1',
                 transition: 'color 0.2s ease',
+                zIndex: 10000,
               }}
               title="Close theme selector"
               onMouseEnter={(e) => {
