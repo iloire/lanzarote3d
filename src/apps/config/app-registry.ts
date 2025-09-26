@@ -27,7 +27,7 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       htmlTemplate: "./experiences/game/index.html",
       requiresWebGL: true,
       tags: ["interactive", "simulation", "flight", "game"],
-      status: "experimental",
+      status: "",
       priority: 2
     },
     flyzones: {
