@@ -3,6 +3,7 @@ import Environment from '../../shared/env/environment';
 import { StoryOptions } from '../../shared/types';
 import { THEMES } from '../../../foundation/themes';
 import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';
+import { AppBase, AppConfig } from '../../shared/AppBase';
 
 // Use the natural theme from our theme library
 const FAMARA_THEME = THEMES.natural;
@@ -10,67 +11,154 @@ const FAMARA_THEME = THEMES.natural;
 /**
  * Famara Demo - Based on PhotoBooth but without paragliders
  * Focuses on the natural beauty of Famara beach area
+ *
+ * First app to use the new AppBase architecture!
  */
-const Famara = {
-  load: async (options: StoryOptions) => {
-    const { camera, scene, renderer, terrain, water, controls, sky } = options;
+class FamaraApp extends AppBase {
+  private environment?: Environment;
+  private animationId?: number;
 
-    controls.enabled = true;
+  constructor() {
+    super({
+      name: 'Famara Beach',
+      description: 'Natural beauty of Famara beach area without paragliders - pure landscape focus',
+      requiredComponents: ['scene', 'camera', 'renderer', 'terrain', 'water', 'controls'],
+      scene: {
+        environment: 'lanzarote',
+        lighting: 'dynamic',
+        physics: false,
+        fog: {
+          enabled: true,
+          color: 0xf5f5f5,
+          near: 1000,
+          far: 20000
+        }
+      },
+      performance: {
+        monitoring: true,
+        logIntervalMs: 10000 // Log performance every 10 seconds
+      }
+    });
+  }
 
-    // Apply theme to scene
-    const theme = options.theme || FAMARA_THEME;
-    await ThemeEngine.apply(options, theme);
+  async load(options: StoryOptions): Promise<void> {
+    try {
+      // Initialize core systems from AppBase
+      this.initializeCore(options);
 
-    // Position camera to showcase Famara beach area (no paragliders to focus on)
-    const initialPos = new THREE.Vector3(5800, 1200, 800);
-    const lookAtPos = new THREE.Vector3(6500, 600, -200); // Look towards Famara beach
+      const { camera, scene, renderer, terrain, water, controls } = options;
 
-    // Set camera position and look at target
-    camera.position.copy(initialPos);
-    camera.lookAt(lookAtPos);
-    controls.target.copy(lookAtPos);
-    controls.update();
+      controls.enabled = true;
 
-    // must render before adding env
-    renderer.render(scene, camera);
+      // Apply theme to scene
+      const theme = options.theme || FAMARA_THEME;
+      await ThemeEngine.apply(options, theme);
 
-    // Set up environment using theme
-    const env = new Environment(scene);
-    const weather = env.createWeatherFromTheme(theme);
-    const thermals = env.generateThermals(weather, 0);
+      // Position camera to showcase Famara beach area (no paragliders to focus on)
+      const initialPos = new THREE.Vector3(5800, 1200, 800);
+      const lookAtPos = new THREE.Vector3(6500, 600, -200); // Look towards Famara beach
 
-    // Add environment elements using theme
-    await env.addCloudsFromTheme(thermals, theme);
-    env.addTrees(terrain);
-    env.addHouses(terrain);
-    env.addBoats(water);
+      // Set camera position and look at target
+      camera.position.copy(initialPos);
+      camera.lookAt(lookAtPos);
+      controls.target.copy(lookAtPos);
+      controls.update();
 
-    // Add birds for more natural ambiance
-    const birdPath = [
-      new THREE.Vector3(5000, 1000, 0),
-      new THREE.Vector3(6000, 1100, -500),
-      new THREE.Vector3(7000, 1200, -1000),
-      new THREE.Vector3(8000, 1000, -500),
-      new THREE.Vector3(7000, 900, 0),
-    ];
-    await env.addBirds(birdPath);
-
-    // Add hang glider for variety (different from paragliders)
-    const hangGliderPath = [
-      new THREE.Vector3(6000, 1500, -200),
-      new THREE.Vector3(6200, 1400, -400),
-      new THREE.Vector3(6400, 1300, -600),
-      new THREE.Vector3(6600, 1200, -400),
-      new THREE.Vector3(6400, 1100, -200),
-    ];
-    await env.addHangGlider(hangGliderPath);
-
-    const animate = () => {
+      // must render before adding env
       renderer.render(scene, camera);
-      requestAnimationFrame(animate);
+
+      // Set up environment using theme
+      this.environment = new Environment(scene);
+      const weather = this.environment.createWeatherFromTheme(theme);
+      const thermals = this.environment.generateThermals(weather, 0);
+
+      // Add environment elements using theme
+      await this.environment.addCloudsFromTheme(thermals, theme);
+      this.environment.addTrees(terrain);
+      this.environment.addHouses(terrain);
+      this.environment.addBoats(water);
+
+      // Add birds for more natural ambiance
+      const birdPath = [
+        new THREE.Vector3(5000, 1000, 0),
+        new THREE.Vector3(6000, 1100, -500),
+        new THREE.Vector3(7000, 1200, -1000),
+        new THREE.Vector3(8000, 1000, -500),
+        new THREE.Vector3(7000, 900, 0),
+      ];
+      await this.environment.addBirds(birdPath);
+
+      // Add hang glider for variety (different from paragliders)
+      const hangGliderPath = [
+        new THREE.Vector3(6000, 1500, -200),
+        new THREE.Vector3(6200, 1400, -400),
+        new THREE.Vector3(6400, 1300, -600),
+        new THREE.Vector3(6600, 1200, -400),
+        new THREE.Vector3(6400, 1100, -200),
+      ];
+      await this.environment.addHangGlider(hangGliderPath);
+
+      // Start animation loop
+      this.startAnimationLoop(renderer, scene, camera);
+
+      this.isLoaded = true;
+      console.log(`✅ ${this.config.name} loaded successfully`);
+
+    } catch (error) {
+      this.handleError(error as Error, 'load');
+      throw error;
+    }
+  }
+
+  private startAnimationLoop(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.Camera): void {
+    const animate = () => {
+      try {
+        // Update performance monitoring
+        this.updatePerformance();
+
+        renderer.render(scene, camera);
+        this.animationId = requestAnimationFrame(animate);
+      } catch (error) {
+        this.handleError(error as Error, 'animation loop');
+      }
     };
     animate();
+  }
+
+  public dispose(): void {
+    console.log(`🧹 Disposing ${this.config.name}`);
+
+    // Cancel animation loop
+    if (this.animationId) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = undefined;
+    }
+
+    // Dispose environment resources
+    if (this.environment) {
+      // Environment cleanup would go here if Environment had a dispose method
+      this.environment = undefined;
+    }
+
+    // Call parent dispose
+    super.dispose();
+  }
+}
+
+// Create singleton instance
+const famaraApp = new FamaraApp();
+
+// Export in the expected format for the Stories system
+const Famara = {
+  load: async (options: StoryOptions) => {
+    return famaraApp.load(options);
   },
+  dispose: () => {
+    return famaraApp.dispose();
+  },
+  getAppInfo: () => {
+    return famaraApp.getAppInfo();
+  }
 };
 
 export default Famara;

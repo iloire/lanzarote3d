@@ -1,5 +1,6 @@
 import * as THREE from "three";
-import { SceneManager, PerformanceMonitor } from '../../foundation';
+import { SceneManager } from '../../foundation/systems/scene';
+import { PerformanceMonitor } from '../../foundation/systems/analytics';
 import { StoryOptions } from "./types";
 
 export interface AppConfig {
@@ -41,8 +42,7 @@ export abstract class AppBase {
 
   constructor(config: AppConfig) {
     this.config = config;
-    // Initializing app
-    // Required components configured
+    console.log(`🚀 Initializing app: ${config.name}`);
   }
 
   protected initializeCore(options: StoryOptions): void {
