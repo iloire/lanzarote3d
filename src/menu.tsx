@@ -1,7 +1,8 @@
 import React from 'react';
 import { getAppsByStatus, type AppMetadata } from './apps/config/app-registry';
-import ThemeSelector from './components/ThemeSelector';
 import { themeManager } from './foundation/systems/ThemeManager';
+import { getAllThemes } from './foundation/themes';
+import { Theme } from './foundation/types/Theme';
 
 interface MenuProps {
   showPublic?: boolean;
@@ -19,16 +20,81 @@ class Menu extends React.Component<MenuProps> {
     isMobile: false,
     isMenuOpen: false,
     isMenuVisible: true, // New state for menu visibility
+    currentTheme: null as Theme | null,
+    availableThemes: [] as Theme[],
+    isApplyingTheme: false,
   };
 
   override componentDidMount() {
     this.checkIfMobile();
     window.addEventListener('resize', this.checkIfMobile);
+    this.initializeThemes();
   }
 
   override componentWillUnmount() {
     window.removeEventListener('resize', this.checkIfMobile);
+    if (this.themeChangeListener) {
+      themeManager.removeListener(this.themeChangeListener);
+    }
   }
+
+  themeChangeListener: ((theme: Theme) => void) | null = null;
+
+  initializeThemes = async () => {
+    try {
+      const themes = getAllThemes();
+      const currentTheme = themeManager.getCurrentTheme();
+
+      this.setState({
+        availableThemes: themes,
+        currentTheme: currentTheme,
+      });
+
+      // Listen for theme changes
+      this.themeChangeListener = (theme: Theme) => {
+        this.setState({ currentTheme: theme });
+      };
+      themeManager.addListener(this.themeChangeListener);
+    } catch (error) {
+      console.error('Failed to initialize themes:', error);
+    }
+  };
+
+  handleThemeSelect = async (themeId: string) => {
+    if (this.state.isApplyingTheme) return;
+
+    this.setState({ isApplyingTheme: true });
+
+    try {
+      await themeManager.applyTheme(themeId);
+      // On mobile, close the menu after theme selection
+      if (this.state.isMobile) {
+        this.setState({ isMenuOpen: false });
+      }
+    } catch (error) {
+      console.error('Failed to apply theme:', error);
+    } finally {
+      this.setState({ isApplyingTheme: false });
+    }
+  };
+
+  getThemeColor = (theme: Theme): string => {
+    // Extract predominant color from theme
+    switch (theme.id) {
+      case 'golden':
+        return '#FFD700';
+      case 'arctic':
+        return '#87CEEB';
+      case 'storm':
+        return '#4A4A4A';
+      case 'autumn':
+        return '#CD853F';
+      case 'natural':
+        return '#2196f3';
+      default:
+        return '#4CAF50';
+    }
+  };
 
   checkIfMobile = () => {
     const isMobile = window.innerWidth <= 1024; // Increased threshold for tablets and large phones
@@ -75,6 +141,37 @@ class Menu extends React.Component<MenuProps> {
     // Get selected story from URL
     const params = new URLSearchParams(window.location.search);
     const selectedStory = params.get('story');
+
+    const renderThemeButtons = () => {
+      const { availableThemes, currentTheme, isApplyingTheme } = this.state;
+
+      return availableThemes.map(theme => {
+        const isActive = currentTheme?.id === theme.id;
+        const isDisabled = isApplyingTheme;
+        const themeColor = this.getThemeColor(theme);
+
+        return (
+          <div className="button" key={theme.id}>
+            <button
+              className={isActive ? 'selected' : ''}
+              onClick={() => this.handleThemeSelect(theme.id)}
+              disabled={isDisabled}
+              style={{
+                background: isActive
+                  ? themeColor
+                  : `linear-gradient(135deg, ${themeColor}88, ${themeColor}44)`,
+                color: 'white',
+                border: isActive ? `2px solid ${themeColor}` : `1px solid ${themeColor}66`,
+                opacity: isDisabled ? 0.6 : 1,
+                cursor: isDisabled ? 'not-allowed' : 'pointer',
+              }}
+            >
+              {theme.name}
+            </button>
+          </div>
+        );
+      });
+    };
 
     const renderButtons = (apps: AppMetadata[]) =>
       apps.map(app => {
@@ -125,8 +222,9 @@ class Menu extends React.Component<MenuProps> {
           </div>
 
           <div className={`mobile-menu-content ${isMenuOpen ? 'open' : ''}`}>
-            {/* Theme Selector for Mobile */}
-            <ThemeSelector isMobile={true} onMobileThemeSelect={this.toggleMenu} />
+            {/* Theme Buttons */}
+            <h3>Themes</h3>
+            {renderThemeButtons()}
 
             {showPublic && publicApps.length > 0 && (
               <>
@@ -173,8 +271,9 @@ class Menu extends React.Component<MenuProps> {
         {/* Menu content - conditionally visible */}
         {isMenuVisible && (
           <>
-            {/* Theme Selector for Desktop */}
-            <ThemeSelector isMobile={false} />
+            {/* Theme Buttons */}
+            <h2>Themes</h2>
+            {renderThemeButtons()}
 
             {showPublic && publicApps.length > 0 && (
               <>

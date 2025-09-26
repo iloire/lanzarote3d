@@ -202,7 +202,7 @@ export const THEMES: Record<string, Theme> = {
   natural: {
     id: 'natural',
     name: 'Natural Famara',
-    enabled: true,
+    enabled: false,
     sky: {
       timeOfDay: 13,
       sunIntensity: 2.2,
