@@ -4,6 +4,7 @@ import Helpers from '../../../../foundation/utils/helpers';
 import { StoryOptions } from '../../../shared/types';
 import { THEMES, getAllThemes, getThemeCategories, getThemeById } from '../../../../foundation/themes';
 import { ThemeEngine } from '../../../../foundation/systems/ThemeEngine';
+import { themeManager } from '../../../../foundation/systems/ThemeManager';
 import Environment from '../../../shared/env/environment';
 
 // Use themes from our comprehensive theme system
@@ -23,8 +24,8 @@ const CloudsWorkshop = {
     let currentClouds: THREE.Object3D | null = null;
     let currentTheme = ALL_THEMES[0]; // Start with first theme
 
-    // Apply initial theme to the scene
-    await ThemeEngine.apply(options, currentTheme);
+    // Apply initial theme (theme manager should already be initialized by app.tsx)
+    await themeManager.applyTheme(currentTheme.id);
 
     // Create clouds using theme
     const createClouds = async (theme: any) => {
@@ -70,7 +71,7 @@ const CloudsWorkshop = {
             folder.add({
               apply: async () => {
                 currentTheme = theme;
-                await ThemeEngine.apply(options, theme);
+                await themeManager.applyTheme(theme.id);
                 await createClouds(theme);
                 updateInfo();
               }
@@ -85,7 +86,7 @@ const CloudsWorkshop = {
         theme: currentTheme.id,
         regenerate: () => createClouds(currentTheme),
         applyFullTheme: async () => {
-          await ThemeEngine.apply(options, currentTheme);
+          await themeManager.applyTheme(currentTheme.id);
           await createClouds(currentTheme);
           updateInfo();
         }
@@ -98,7 +99,7 @@ const CloudsWorkshop = {
           const theme = getThemeById(value);
           if (theme) {
             currentTheme = theme;
-            await ThemeEngine.apply(options, theme);
+            await themeManager.applyTheme(theme.id);
             await createClouds(theme);
             updateInfo();
           }
@@ -193,7 +194,7 @@ const CloudsWorkshop = {
             const prevTheme = ALL_THEMES[prevIndex];
             if (prevTheme) {
               currentTheme = prevTheme;
-              await ThemeEngine.apply(options, prevTheme);
+              await themeManager.applyTheme(prevTheme.id);
               await createClouds(prevTheme);
               updateInfo();
             }
@@ -207,7 +208,7 @@ const CloudsWorkshop = {
             const nextTheme = ALL_THEMES[nextIndex];
             if (nextTheme) {
               currentTheme = nextTheme;
-              await ThemeEngine.apply(options, nextTheme);
+              await themeManager.applyTheme(nextTheme.id);
               await createClouds(nextTheme);
               updateInfo();
             }
@@ -229,7 +230,7 @@ const CloudsWorkshop = {
               const selectedTheme = ALL_THEMES[themeIndex];
               if (selectedTheme) {
                 currentTheme = selectedTheme;
-                await ThemeEngine.apply(options, selectedTheme);
+                await themeManager.applyTheme(selectedTheme.id);
                 await createClouds(selectedTheme);
                 updateInfo();
               }
@@ -246,7 +247,7 @@ const CloudsWorkshop = {
           case 'T':
             // Apply complete theme
             event.preventDefault();
-            await ThemeEngine.apply(options, currentTheme);
+            await themeManager.applyTheme(currentTheme.id);
             await createClouds(currentTheme);
             updateInfo();
             break;

@@ -3,6 +3,7 @@ import textureImg from '../../../../../assets/foundation/textures/environment/h-
 import { StoryOptions } from '../../../shared/types';
 import { getAllThemes, getThemeCategories, getThemeById } from '../../../../foundation/themes';
 import { ThemeEngine } from '../../../../foundation/systems/ThemeEngine';
+import { themeManager } from '../../../../foundation/systems/ThemeManager';
 
 // Terrain style definitions
 interface TerrainStyle {
@@ -235,8 +236,8 @@ const TerrainWorkshop = {
     let currentStyle = 'volcanic';
     let currentTheme = ALL_THEMES[0]; // Start with first theme
 
-    // Apply initial theme to the scene
-    await ThemeEngine.apply(options, currentTheme);
+    // Apply initial theme (theme manager should already be initialized by app.tsx)
+    await themeManager.applyTheme(currentTheme.id);
 
     // Load textures
     const loader = new THREE.TextureLoader();
@@ -307,7 +308,7 @@ const TerrainWorkshop = {
     // Function to sync terrain with theme
     const syncTerrainWithTheme = async (theme: any) => {
       currentTheme = theme;
-      await ThemeEngine.apply(options, theme);
+      await themeManager.applyTheme(theme.id);
 
       // Map theme terrain style to our terrain styles
       const themeTerrainStyle = theme.terrain?.style || 'volcanic';
