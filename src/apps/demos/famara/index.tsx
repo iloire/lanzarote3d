@@ -15,8 +15,8 @@ const FAMARA_THEME = THEMES['natural'];
  * First app to use the new AppBase architecture!
  */
 class FamaraApp extends AppBase {
-  private environment?: Environment;
-  private animationId?: number;
+  private environment: Environment | undefined;
+  private animationId: number | undefined;
 
   constructor() {
     super({
@@ -51,7 +51,10 @@ class FamaraApp extends AppBase {
       controls.enabled = true;
 
       // Apply theme to scene
-      const theme = options.theme || FAMARA_THEME;
+      const theme = options.theme ?? FAMARA_THEME;
+      if (!theme) {
+        throw new Error('Theme not available');
+      }
       await ThemeEngine.apply(options, theme);
 
       // Position camera to showcase Famara beach area (no paragliders to focus on)
@@ -125,7 +128,7 @@ class FamaraApp extends AppBase {
     animate();
   }
 
-  public dispose(): void {
+  public override dispose(): void {
     console.log(`🧹 Disposing ${this.config.name}`);
 
     // Cancel animation loop

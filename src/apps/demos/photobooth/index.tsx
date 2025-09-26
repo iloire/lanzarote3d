@@ -14,7 +14,7 @@ import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';
 import { AppBase } from '../../shared/AppBase';
 
 // Use the sunset theme for PhotoBooth's romantic atmosphere
-const PHOTOBOOTH_THEME = THEMES.sunset;
+const PHOTOBOOTH_THEME = THEMES['sunset'];
 
 const tandems = [
   {
@@ -177,8 +177,8 @@ const paragliders: ParagliderConfig[] = [
  * Second app converted to use AppBase architecture
  */
 class PhotoBoothApp extends AppBase {
-  private environment?: Environment;
-  private animationId?: number;
+  private environment: Environment | undefined;
+  private animationId: number | undefined;
   private paragliderMeshes: THREE.Object3D[] = [];
 
   constructor() {
@@ -214,7 +214,10 @@ class PhotoBoothApp extends AppBase {
       controls.enabled = true;
 
       // Apply theme to scene
-      const theme = options.theme || PHOTOBOOTH_THEME;
+      const theme = options.theme ?? PHOTOBOOTH_THEME;
+      if (!theme) {
+        throw new Error('Theme not available');
+      }
       await ThemeEngine.apply(options, theme);
 
       const initialPos = new THREE.Vector3(6200, 970, 175);
@@ -269,6 +272,7 @@ class PhotoBoothApp extends AppBase {
         return mesh;
       } catch (error) {
         this.handleError(error as Error, 'loading regular paraglider');
+        return null;
       }
     });
 
@@ -285,6 +289,7 @@ class PhotoBoothApp extends AppBase {
         return mesh;
       } catch (error) {
         this.handleError(error as Error, 'loading voxel paraglider');
+        return null;
       }
     });
 
@@ -301,6 +306,7 @@ class PhotoBoothApp extends AppBase {
         return mesh;
       } catch (error) {
         this.handleError(error as Error, 'loading tandem');
+        return null;
       }
     });
 
@@ -323,7 +329,7 @@ class PhotoBoothApp extends AppBase {
     animate();
   }
 
-  public dispose(): void {
+  public override dispose(): void {
     console.log(`🧹 Disposing ${this.config.name}`);
 
     // Cancel animation loop
@@ -335,14 +341,18 @@ class PhotoBoothApp extends AppBase {
     // Dispose paraglider meshes
     this.paragliderMeshes.forEach(mesh => {
       // Dispose geometry and materials if they exist
-      if (mesh.geometry) {
-        mesh.geometry.dispose();
-      }
-      if (Array.isArray(mesh.material)) {
-        mesh.material.forEach(material => material.dispose());
-      } else if (mesh.material) {
-        mesh.material.dispose();
-      }
+      mesh.traverse((child) => {
+        if (child instanceof THREE.Mesh) {
+          if (child.geometry) child.geometry.dispose();
+          if (child.material) {
+            if (Array.isArray(child.material)) {
+              child.material.forEach((material: THREE.Material) => material.dispose());
+            } else {
+              child.material.dispose();
+            }
+          }
+        }
+      });
     });
     this.paragliderMeshes.length = 0;
 
