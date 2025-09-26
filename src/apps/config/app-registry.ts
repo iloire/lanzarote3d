@@ -66,7 +66,7 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       category: "tool",
       requiresWebGL: true,
       tags: ["development", "components", "testing", "demo"],
-      status: "public",
+      status: "dev",
       priority: 9
     }
   },
@@ -81,8 +81,7 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       requiresWebGL: true,
       tags: ["cinematic", "automated", "demonstration", "showcase"],
       status: "public",
-      priority: 1,
-      theme: "sunset" // Override global theme with sunset for cinematic effect
+      priority: 1
     },
     photobooth: {
       name: "Famara static",
@@ -139,7 +138,7 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       category: "demo",
       requiresWebGL: true,
       tags: ["voxel", "paraglider", "component"],
-      status: "public",
+      status: "dev",
       priority: 3
     },
 

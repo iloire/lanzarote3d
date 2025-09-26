@@ -50,8 +50,8 @@ class FamaraApp extends AppBase {
       await ThemeEngine.apply(options, theme);
 
       // Position camera to showcase Famara beach area (no paragliders to focus on)
-      const initialPos = new THREE.Vector3(5800, 1200, 800);
-      const lookAtPos = new THREE.Vector3(6500, 600, -200); // Look towards Famara beach
+      const initialPos = new THREE.Vector3(4000, 1400, 3000);
+      const lookAtPos = new THREE.Vector3(6500, 900, -400); // Look towards Famara beach
 
       // Set camera position and look at target
       camera.position.copy(initialPos);

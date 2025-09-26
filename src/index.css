@@ -15,7 +15,8 @@ body {
   top: 3%;
   left: 3%;
   z-index: 999;
-  pointer-events: none; /* Allow orbital controls to work through this area */
+  pointer-events: none;
+  /* Allow orbital controls to work through this area */
 }
 
 .appOptions div.button button {
@@ -25,14 +26,17 @@ body {
   padding: 0.4em 0.7em;
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  font-size: 1em;
+  font-size: 0.80em;
   cursor: pointer;
   margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   transition:
     background 0.2s,
     color 0.2s,
     transform 0.15s;
-  pointer-events: auto; /* Buttons should capture clicks */
+  pointer-events: auto;
+  /* Buttons should capture clicks */
 }
 
 .appOptions div.button button:hover {
@@ -45,8 +49,7 @@ body {
 .appOptions div.button button.selected {
   background: #f64a8a;
   color: #fff;
-  margin-bottom: 0.4em;
-  font-size: 90%;
+
 }
 
 .appOptions div.button {
@@ -81,7 +84,8 @@ body {
 .appOptions.mobile {
   position: relative;
   padding: 0;
-  pointer-events: auto; /* Enable interactions for mobile menu */
+  pointer-events: auto;
+  /* Enable interactions for mobile menu */
 }
 
 .mobile-header {
@@ -113,8 +117,10 @@ body {
   justify-content: space-between;
   width: 30px;
   height: 25px;
-  pointer-events: auto; /* Ensure button is clickable */
-  z-index: 1001; /* Ensure button is above other elements */
+  pointer-events: auto;
+  /* Ensure button is clickable */
+  z-index: 1001;
+  /* Ensure button is above other elements */
 }
 
 .hamburger-line {
@@ -151,12 +157,14 @@ body {
   overflow-y: auto;
   padding: 1em;
   z-index: 999;
-  pointer-events: none; /* Allow controls through when hidden */
+  pointer-events: none;
+  /* Allow controls through when hidden */
 }
 
 .mobile-menu-content.open {
   transform: translateX(0);
-  pointer-events: auto; /* Enable clicks when menu is open */
+  pointer-events: auto;
+  /* Enable clicks when menu is open */
 }
 
 .mobile-menu-content h3 {
@@ -177,6 +185,9 @@ body {
   width: 100%;
   text-align: left;
   padding: 0.8em;
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .mobile-menu-content .description {
@@ -205,9 +216,11 @@ body {
 .points {
   position: absolute;
   top: 20px;
-  right: 20px; /* Move to top-right to avoid main menu overlap */
+  right: 20px;
+  /* Move to top-right to avoid main menu overlap */
   z-index: 1000;
-  pointer-events: none; /* Allow camera controls to work through this area */
+  pointer-events: none;
+  /* Allow camera controls to work through this area */
 }
 
 .points button {
@@ -220,7 +233,8 @@ body {
   border: 1px solid #ccc;
   cursor: pointer;
   display: block;
-  pointer-events: auto; /* Buttons should capture clicks */
+  pointer-events: auto;
+  /* Buttons should capture clicks */
 }
 
 .points button:hover {
@@ -360,8 +374,7 @@ body {
   font-size: 100%;
 }
 
-#game-start-normal {
-}
+#game-start-normal {}
 
 #game-start-strong {
   margin-left: 40px;

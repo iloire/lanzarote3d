@@ -220,10 +220,10 @@ class AnimationApp extends AppBase {
                 ...ORBIT_CONTROLS_PRESETS.closeSubject,
                 // Customize if needed
                 minDistance: 50,
-                maxDistance: 1000,
+                maxDistance: 1500,
                 panBoundary: {
                   center: pgPos,
-                  radius: 300,
+                  radius: 500,
                   verticalScale: 0.5
                 }
               })
