@@ -15,7 +15,8 @@ THREE.Mesh.prototype.raycast = acceleratedRaycast;
 // };
 
 const loadFromBlenderModel = async (manager: THREE.LoadingManager) => {
-  const mesh = await Models.loadSimple(model, manager);
+  const object = await Models.loadSimple(model, manager);
+  const mesh = object as THREE.Mesh;
   mesh.material = new THREE.MeshStandardMaterial({
     // map: await loadTexture(manager),
     wireframe: true,

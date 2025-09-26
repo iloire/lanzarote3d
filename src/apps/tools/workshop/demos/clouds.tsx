@@ -162,16 +162,16 @@ const CloudsWorkshop = {
       // Update info when theme changes - access the controller directly
       const themeController = themeFolder.controllers.find(c => c.property === 'theme');
       if (themeController) {
-        const originalOnChange = themeController.onChange;
-        themeController.onChange = (value: string) => {
-          const result = originalOnChange.call(themeController, value);
+        const originalOnChange = themeController.onChange as any;
+        themeController.onChange = ((value: string) => {
+          const result = originalOnChange ? originalOnChange.call(themeController, value) : null;
           const theme = getThemeById(value);
           if (theme) {
             currentTheme = theme;
             updateInfo();
           }
           return result;
-        };
+        }) as any;
       }
 
       // Enhanced keyboard shortcuts for theme switching

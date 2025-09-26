@@ -83,8 +83,9 @@ const createHalfWing = (options: GliderOptions): HalfWing => {
   );
   const breaksJoinLocation = new THREE.Vector3(-2400, halfWingLength / 1.1, 250);
 
-  for (let n = 0; n < options.numeroCajones; n++) {
-    const cajonWidth = halfWingLength / options.numeroCajones;
+  const numeroCajones = options.numeroCajones || 8;
+  for (let n = 0; n < numeroCajones; n++) {
+    const cajonWidth = halfWingLength / numeroCajones;
     const cajonHeight = 10 + n * 5;
     const deep = 700 + n * 35;
 
@@ -92,7 +93,7 @@ const createHalfWing = (options: GliderOptions): HalfWing => {
 
     const cajon = createCajon(cajonWidth, cajonHeight, deep, mat_wing);
 
-    shape = (shape + (options.numeroCajones - n)) ^ (2 * 13.05);
+    shape = (shape + (numeroCajones - n)) ^ (2 * 13.05);
     cajon.position.set(shape, distanceCajon, 0);
 
     const breakDeep = deep / 10;
@@ -119,7 +120,7 @@ const createHalfWing = (options: GliderOptions): HalfWing => {
     frontCajones.add(frontCajon);
   }
 
-  const band = createBand({ color: 'red', bandLength: options.bandLength });
+  const band = createBand({ color: 'red', bandLength: options.bandLength || 3000 });
   band.position.copy(carabinerLocation);
 
   group.add(band);

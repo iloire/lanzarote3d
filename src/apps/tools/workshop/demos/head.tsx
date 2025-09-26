@@ -58,10 +58,10 @@ const Head = {
                 };
 
                 acc.push({
-                  headType: PilotHeadType[headKey],
-                  helmetType: HelmetType[helmetKey],
+                  headType: (PilotHeadType as any)[headKey],
+                  helmetType: (HelmetType as any)[helmetKey],
                   helmetOptions: baseHelmetOptions,
-                  glassesType: GlassesType[glassesKey],
+                  glassesType: (GlassesType as any)[glassesKey],
                 });
               });
           });
@@ -97,13 +97,13 @@ const Head = {
 
       // Fix the enum value display
       const headTypeName = Object.keys(PilotHeadType).find(
-        key => PilotHeadType[key] === headOptions.headType
+        key => (PilotHeadType as any)[key] === headOptions.headType
       );
       const helmetTypeName = Object.keys(HelmetType).find(
-        key => HelmetType[key] === headOptions.helmetType
+        key => (HelmetType as any)[key] === headOptions.helmetType
       );
       const glassesTypeName = headOptions.glassesType
-        ? Object.keys(GlassesType).find(key => GlassesType[key] === headOptions.glassesType)
+        ? Object.keys(GlassesType).find(key => (GlassesType as any)[key] === headOptions.glassesType)
         : null;
 
       label.innerHTML = `<strong>${headTypeName}</strong><br>helmet:${helmetTypeName}${
