@@ -90,6 +90,7 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
       await themeManager.applyTheme(themeId);
       // Keep modal open so user can try multiple themes easily
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Failed to apply theme:', error);
     } finally {
       this.setState({ isApplying: false });
@@ -156,7 +157,7 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
             marginBottom: '5px',
           }}
         >
-🎨 {currentTheme?.name || 'Default Theme'}
+          🎨 {currentTheme?.name || 'Default Theme'}
         </button>
 
         {isOpen && (
@@ -215,7 +216,7 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
           }}
           title="Change application theme"
         >
-🎨 {currentTheme?.name || 'Default Theme'}
+          🎨 {currentTheme?.name || 'Default Theme'}
         </button>
 
         {isOpen && (
@@ -233,7 +234,6 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
               boxShadow: '0 8px 32px rgba(0,0,0,0.8)',
             }}
           >
-
             {isApplying && (
               <div
                 style={{

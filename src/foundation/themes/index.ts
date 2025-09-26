@@ -244,40 +244,6 @@ export const THEMES: Record<string, Theme> = {
     },
   },
 
-  clearday: {
-    id: 'clearday',
-    name: 'Clear Day',
-    sky: {
-      timeOfDay: 12,
-      sunIntensity: 2.5,
-      fogEnabled: false, // Explicitly disable fog for crystal clear visibility
-    },
-    clouds: {
-      colors: ['#FFFFFF', '#F0F8FF', '#E6F3FF'],
-      density: 0.2,
-      opacity: 0.7,
-    },
-    terrain: {
-      style: 'desert',
-      customMaterial: {
-        color: '#f4a460',
-        emissiveIntensity: 0.2,
-      },
-    },
-    water: {
-      color: '#00bcd4',
-      opacity: 0.95,
-    },
-    weather: {
-      windDirectionDegreesFromNorth: 225,
-      speedMetresPerSecond: 4,
-      lclLevel: 2500,
-    },
-    ambient: {
-      lightingIntensity: 1.2,
-      shadowIntensity: 0.8,
-    },
-  },
 };
 
 // Helper functions for theme management
@@ -286,7 +252,7 @@ export const getThemeById = (id: string): Theme | undefined => {
 };
 
 export const getDefaultTheme = (): Theme => {
-  return THEMES['default'];
+  return THEMES['default'] as Theme;
 };
 
 export const getAllThemes = (): Theme[] => {

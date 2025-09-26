@@ -10,8 +10,8 @@ export interface AutoFlierOptions {
 
 class AutoFlier {
   currentPointIndex: number = 0;
-  path: THREE.Vector3[];
-  mesh: THREE.Mesh;
+  path: THREE.Vector3[] = [];
+  mesh!: THREE.Mesh;
   private speed: number = 1;
   private arrivalThreshold: number = 10;
   private smoothRotation: boolean = true;
@@ -47,17 +47,6 @@ class AutoFlier {
     return this.forwardAxis;
   }
 
-  private getForwardVector(): THREE.Vector3 {
-    switch (this.forwardAxis) {
-      case 'x': return new THREE.Vector3(1, 0, 0);
-      case '-x': return new THREE.Vector3(-1, 0, 0);
-      case 'y': return new THREE.Vector3(0, 1, 0);
-      case '-y': return new THREE.Vector3(0, -1, 0);
-      case 'z': return new THREE.Vector3(0, 0, 1);
-      case '-z': return new THREE.Vector3(0, 0, -1);
-      default: return new THREE.Vector3(0, 0, 1);
-    }
-  }
 
   private orientTowardsTarget(targetPosition: THREE.Vector3) {
     if (!this.mesh) return;
@@ -67,7 +56,6 @@ class AutoFlier {
     if (direction.length() === 0) return;
 
     // Simpler approach: use lookAt but with corrective rotation
-    const upVector = new THREE.Vector3(0, 1, 0);
 
     // Create a temporary object to get the lookAt rotation
     const tempObject = new THREE.Object3D();
@@ -117,6 +105,8 @@ class AutoFlier {
     }
 
     const currentTarget = this.path[this.currentPointIndex];
+    if (!currentTarget) return;
+
     const currentPosition = this.position();
 
     // Calculate movement
@@ -148,7 +138,7 @@ class AutoFlier {
 
   // Get the next target position for lookahead
   getNextTarget(): THREE.Vector3 | null {
-    if (this.path.length === 0) return null;
+    if (this.path.length === 0 || !this.path[this.currentPointIndex]) return null;
     return this.path[this.currentPointIndex].clone();
   }
 
@@ -161,7 +151,7 @@ class AutoFlier {
   // Reset to start of path
   resetPath() {
     this.currentPointIndex = 0;
-    if (this.path.length > 0 && this.mesh) {
+    if (this.path.length > 0 && this.mesh && this.path[0]) {
       this.mesh.position.copy(this.path[0]);
     }
   }
