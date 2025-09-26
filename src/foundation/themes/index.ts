@@ -4,8 +4,6 @@ export const THEMES: Record<string, Theme> = {
   sunset: {
     id: 'sunset',
     name: 'Sunset Romance',
-    description: 'Warm evening colors with romantic pink and golden tones',
-    category: 'atmospheric',
     sky: {
       timeOfDay: 19,
       sunIntensity: 2.3,
@@ -42,8 +40,6 @@ export const THEMES: Record<string, Theme> = {
   golden: {
     id: 'golden',
     name: 'Golden Hour',
-    description: 'Warm golden light perfect for photography and peaceful moments',
-    category: 'atmospheric',
     sky: {
       timeOfDay: 17.5,
       sunIntensity: 2.0,
@@ -80,8 +76,6 @@ export const THEMES: Record<string, Theme> = {
   arctic: {
     id: 'arctic',
     name: 'Arctic Winter',
-    description: 'Cold, crisp environment with icy blue tones and pristine snow',
-    category: 'nature',
     sky: {
       timeOfDay: 14,
       sunIntensity: 1.8,
@@ -119,8 +113,6 @@ export const THEMES: Record<string, Theme> = {
   storm: {
     id: 'storm',
     name: 'Storm Clouds',
-    description: 'Dark and moody atmosphere with dramatic storm clouds',
-    category: 'atmospheric',
     sky: {
       timeOfDay: 15,
       sunIntensity: 1.2,
@@ -158,8 +150,6 @@ export const THEMES: Record<string, Theme> = {
   autumn: {
     id: 'autumn',
     name: 'Autumn Mist',
-    description: 'Warm autumn colors with misty atmosphere',
-    category: 'season',
     sky: {
       timeOfDay: 16,
       sunIntensity: 1.8,
@@ -197,8 +187,6 @@ export const THEMES: Record<string, Theme> = {
   natural: {
     id: 'natural',
     name: 'Natural Famara',
-    description: 'Clean, natural environment perfect for showcasing landscape beauty',
-    category: 'nature',
     sky: {
       timeOfDay: 13,
       sunIntensity: 2.2,
@@ -235,21 +223,12 @@ export const THEMES: Record<string, Theme> = {
 };
 
 // Helper functions for theme management
-export const getThemesByCategory = (category: string): Theme[] => {
-  return Object.values(THEMES).filter(theme => theme.category === category);
-};
-
 export const getThemeById = (id: string): Theme | undefined => {
   return THEMES[id];
 };
 
 export const getAllThemes = (): Theme[] => {
   return Object.values(THEMES);
-};
-
-export const getThemeCategories = (): string[] => {
-  const categories = new Set(Object.values(THEMES).map(theme => theme.category).filter(Boolean));
-  return Array.from(categories) as string[];
 };
 
 export default THEMES;

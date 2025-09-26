@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import textureImg from '../../../../../assets/foundation/textures/environment/h-map-lanzarote.png';
 import { StoryOptions } from '../../../shared/types';
-import { getAllThemes, getThemeCategories, getThemeById } from '../../../../foundation/themes';
+import { getAllThemes, getThemeById } from '../../../../foundation/themes';
 import { ThemeEngine } from '../../../../foundation/systems/ThemeEngine';
 import { themeManager } from '../../../../foundation/systems/ThemeManager';
 
@@ -206,7 +206,6 @@ const TERRAIN_STYLES: Record<string, TerrainStyle> = {
 
 // Use themes from our comprehensive theme system
 const ALL_THEMES = getAllThemes();
-const THEME_CATEGORIES = getThemeCategories();
 
 const TerrainWorkshop = {
   load: async (options: StoryOptions) => {
@@ -331,21 +330,15 @@ const TerrainWorkshop = {
       // Theme controls
       const themeFolder = terrainFolder.addFolder('🎨 Complete Theme System');
 
-      // Theme selector by categories
-      const categoryFolder = themeFolder.addFolder('📂 Browse by Category');
-      THEME_CATEGORIES.forEach(category => {
-        const categoryThemes = ALL_THEMES.filter(theme => theme.category === category);
-        if (categoryThemes.length > 0) {
-          const folder = categoryFolder.addFolder(`${category} (${categoryThemes.length})`);
-          categoryThemes.forEach(theme => {
-            folder.add({
-              apply: async () => {
-                await syncTerrainWithTheme(theme);
-                updateInfo();
-              }
-            }, 'apply').name(`${theme.name}`);
-          });
-        }
+      // Direct theme buttons
+      const themesFolder = themeFolder.addFolder('🎨 All Themes');
+      ALL_THEMES.forEach(theme => {
+        themesFolder.add({
+          apply: async () => {
+            await syncTerrainWithTheme(theme);
+            updateInfo();
+          }
+        }, 'apply').name(`${theme.name}`);
       });
 
       // Quick theme selector
@@ -610,7 +603,7 @@ const TerrainWorkshop = {
 
       terrainFolder.open();
       themeFolder.open();
-      categoryFolder.open();
+      themesFolder.open();
       displacementFolder.open();
       visualFolder.open();
     }

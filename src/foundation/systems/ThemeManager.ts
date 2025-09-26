@@ -135,21 +135,6 @@ class ThemeManager {
     });
   }
 
-  /**
-   * Get theme categories for UI organization
-   */
-  getThemeCategories(): string[] {
-    const themes = this.getAvailableThemes();
-    const categories = new Set(themes.map(theme => theme.category).filter(Boolean));
-    return Array.from(categories) as string[];
-  }
-
-  /**
-   * Get themes by category
-   */
-  getThemesByCategory(category: string): Theme[] {
-    return this.getAvailableThemes().filter(theme => theme.category === category);
-  }
 
   /**
    * Quick apply theme by index (for keyboard shortcuts)

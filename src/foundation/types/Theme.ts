@@ -51,8 +51,6 @@ export interface AmbientTheme {
 export interface Theme {
   id: string;
   name: string;
-  description: string;
-  category?: 'nature' | 'fantasy' | 'sci-fi' | 'atmospheric' | 'season';
 
   // Core environmental components
   sky: SkyTheme;

@@ -10,7 +10,6 @@ interface ThemeSelectorState {
   isOpen: boolean;
   currentTheme: Theme | null;
   availableThemes: Theme[];
-  themeCategories: string[];
   isReady: boolean;
   isApplying: boolean;
 }
@@ -25,7 +24,6 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
       isOpen: false,
       currentTheme: null,
       availableThemes: [],
-      themeCategories: [],
       isReady: false,
       isApplying: false,
     };
@@ -69,7 +67,6 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
       isReady: themeManager.isReady(),
       currentTheme: themeManager.getCurrentTheme(),
       availableThemes: themeManager.getAvailableThemes(),
-      themeCategories: themeManager.getThemeCategories(),
     });
   };
 
@@ -116,25 +113,24 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
           borderRadius: '4px',
           padding: '8px 12px',
           margin: '2px',
-          fontSize: '12px',
+          fontSize: '14px',
           cursor: isDisabled ? 'not-allowed' : 'pointer',
           opacity: isDisabled ? 0.6 : 1,
           minWidth: '120px',
-          textAlign: 'left' as const,
+          textAlign: 'center' as const,
           display: 'block',
           width: '100%',
           transition: 'all 0.2s ease',
+          fontWeight: 'bold',
         }}
-        title={theme.description}
       >
-        <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>{theme.name}</div>
-        <div style={{ fontSize: '10px', opacity: 0.8 }}>{theme.category || 'general'}</div>
+        {theme.name}
       </button>
     );
   };
 
   renderMobileView = () => {
-    const { isOpen, isReady, currentTheme, themeCategories, isApplying } = this.state;
+    const { isOpen, isReady, currentTheme, availableThemes, isApplying } = this.state;
 
     if (!isReady) {
       return (
@@ -180,25 +176,9 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
               </div>
             )}
 
-            {themeCategories.map(category => {
-              const categoryThemes = themeManager.getThemesByCategory(category);
-              return (
-                <div key={category} style={{ marginBottom: '10px' }}>
-                  <div
-                    style={{
-                      color: '#F64A8A',
-                      fontSize: '12px',
-                      fontWeight: 'bold',
-                      marginBottom: '5px',
-                      textTransform: 'uppercase' as const,
-                    }}
-                  >
-                    {category} ({categoryThemes.length})
-                  </div>
-                  {categoryThemes.map(this.renderThemeButton)}
-                </div>
-              );
-            })}
+            <div style={{ display: 'grid', gap: '8px' }}>
+              {availableThemes.map(this.renderThemeButton)}
+            </div>
           </div>
         )}
       </div>
@@ -206,7 +186,7 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
   };
 
   renderDesktopView = () => {
-    const { isOpen, isReady, currentTheme, themeCategories, isApplying } = this.state;
+    const { isOpen, isReady, currentTheme, availableThemes, isApplying } = this.state;
 
     if (!isReady) {
       return (
@@ -251,7 +231,7 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
               borderRadius: '8px',
               padding: '15px',
               minWidth: '280px',
-              maxHeight: '400px',
+              maxHeight: '250px',
               overflowY: 'auto' as const,
               zIndex: 9999,
               boxShadow: '0 8px 32px rgba(0,0,0,0.8)',
@@ -283,40 +263,8 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
               </div>
             )}
 
-            {themeCategories.map(category => {
-              const categoryThemes = themeManager.getThemesByCategory(category);
-              return (
-                <div key={category} style={{ marginBottom: '15px' }}>
-                  <div
-                    style={{
-                      color: '#F64A8A',
-                      fontSize: '11px',
-                      fontWeight: 'bold',
-                      marginBottom: '8px',
-                      textTransform: 'uppercase' as const,
-                      letterSpacing: '0.5px',
-                    }}
-                  >
-                    📂 {category} ({categoryThemes.length})
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '4px' }}>
-                    {categoryThemes.map(this.renderThemeButton)}
-                  </div>
-                </div>
-              );
-            })}
-
-            <div
-              style={{
-                fontSize: '10px',
-                color: '#999',
-                marginTop: '15px',
-                paddingTop: '10px',
-                borderTop: '1px solid #333',
-                textAlign: 'center' as const,
-              }}
-            >
-              💡 Themes change lighting, colors, and atmosphere in real-time
+            <div style={{ display: 'grid', gap: '8px' }}>
+              {availableThemes.map(this.renderThemeButton)}
             </div>
           </div>
         )}

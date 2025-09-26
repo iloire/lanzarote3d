@@ -2,14 +2,13 @@ import * as THREE from 'three';
 import Clouds from '../../../../foundation/components/environment/Clouds';
 import Helpers from '../../../../foundation/utils/helpers';
 import { StoryOptions } from '../../../shared/types';
-import { THEMES, getAllThemes, getThemeCategories, getThemeById } from '../../../../foundation/themes';
+import { THEMES, getAllThemes, getThemeById } from '../../../../foundation/themes';
 import { ThemeEngine } from '../../../../foundation/systems/ThemeEngine';
 import { themeManager } from '../../../../foundation/systems/ThemeManager';
 import Environment from '../../../shared/env/environment';
 
 // Use themes from our comprehensive theme system
 const ALL_THEMES = getAllThemes();
-const THEME_CATEGORIES = getThemeCategories();
 
 const CloudsWorkshop = {
   load: async (options: StoryOptions) => {
@@ -61,23 +60,17 @@ const CloudsWorkshop = {
     if (gui) {
       const themeFolder = gui.addFolder('🎨 Complete Theme System');
 
-      // Theme selector by categories
-      const categoryFolder = themeFolder.addFolder('📂 Browse by Category');
-      THEME_CATEGORIES.forEach(category => {
-        const categoryThemes = ALL_THEMES.filter(theme => theme.category === category);
-        if (categoryThemes.length > 0) {
-          const folder = categoryFolder.addFolder(`${category} (${categoryThemes.length})`);
-          categoryThemes.forEach(theme => {
-            folder.add({
-              apply: async () => {
-                currentTheme = theme;
-                await themeManager.applyTheme(theme.id);
-                await createClouds(theme);
-                updateInfo();
-              }
-            }, 'apply').name(`${theme.name}`);
-          });
-        }
+      // Direct theme buttons
+      const themesFolder = themeFolder.addFolder('🎨 All Themes');
+      ALL_THEMES.forEach(theme => {
+        themesFolder.add({
+          apply: async () => {
+            currentTheme = theme;
+            await themeManager.applyTheme(theme.id);
+            await createClouds(theme);
+            updateInfo();
+          }
+        }, 'apply').name(`${theme.name}`);
       });
 
       // Quick theme selector
@@ -127,12 +120,6 @@ const CloudsWorkshop = {
       const updateInfo = () => {
         infoDiv.innerHTML = `
           <h3 style="margin: 0 0 10px 0; color: #F64A8A;">🎨 ${currentTheme.name}</h3>
-          <div style="margin-bottom: 8px; font-size: 12px; opacity: 0.9;">
-            <strong>Category:</strong> ${currentTheme.category || 'general'}
-          </div>
-          <div style="margin-bottom: 8px; font-size: 11px; opacity: 0.8; line-height: 1.3;">
-            ${currentTheme.description}
-          </div>
           <div style="margin-bottom: 8px;">
             <strong>Cloud Colors:</strong>
           </div>
@@ -151,7 +138,7 @@ const CloudsWorkshop = {
             <div>🌍 Terrain: ${currentTheme.terrain.style}</div>
           </div>
           <div style="font-size: 10px; opacity: 0.7; margin-top: 10px;">
-            Available themes: ${ALL_THEMES.length} across ${THEME_CATEGORIES.length} categories
+            Available themes: ${ALL_THEMES.length}
           </div>
           <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #333; font-size: 11px; line-height: 1.3;">
             <div style="color: #F64A8A; font-weight: bold; margin-bottom: 5px;">⌨️ Keyboard Shortcuts:</div>
@@ -258,7 +245,7 @@ const CloudsWorkshop = {
       document.addEventListener('keydown', handleKeyPress);
 
       themeFolder.open();
-      categoryFolder.open();
+      themesFolder.open();
     }
 
     const animate = () => {
