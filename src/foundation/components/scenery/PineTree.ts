@@ -16,7 +16,7 @@ class PineTree {
     const pineGeometry = new THREE.ConeGeometry(3, 9, 8);
     const pine = new THREE.Mesh(
       pineGeometry,
-      pineMaterials[rndIntBetween(0, pineMaterials.length)]
+      pineMaterials[rndIntBetween(0, pineMaterials.length - 1)]
     );
     pine.position.y = 12;
     group.add(pine);

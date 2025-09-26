@@ -30,7 +30,7 @@ export const addMeshAroundArea = (
   y?: number
 ) => {
   for (let index = 0; index < numberItemsToAdd; index++) {
-    const meshType = meshTypes[rndIntBetween(0, meshTypes.length)];
+    const meshType = meshTypes[rndIntBetween(0, meshTypes.length - 1)];
     let obj;
     if (typeof meshType === "function") {
       obj = meshType();

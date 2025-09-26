@@ -36,6 +36,7 @@ class Clouds {
   constructor(options: CloudOptions) {
     this.options = options;
   }
+
   async load(scale: number, pos: THREE.Vector3): Promise<THREE.Object3D> {
     const group = new THREE.Group();
     const nClouds = random(2, 6);

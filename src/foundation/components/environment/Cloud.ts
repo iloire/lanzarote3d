@@ -36,18 +36,20 @@ const generateCloud = async (options: CloudOptions): Promise<THREE.Object3D> => 
 
   const radius = 40;
   const r = rndBetween;
-  const n = rndIntBetween(3, 8);
+  const nCloudParts = rndIntBetween(3, 8);
   const group = new THREE.Group();
 
   // Randomly decide if this cloud should be monochrome or multi-colored
   const useMonochrome = Math.random() < 0.3; // 30% chance of single-color cloud
   const monochromeIndex = rndIntBetween(0, materials.length - 1);
 
-  for (let i = 0; i < n; i++) {
+  for (let i = 0; i < nCloudParts; i++) {
     // Each cloud part can have a different material for more color variety
     const material = useMonochrome
       ? materials[monochromeIndex]!
       : materials[rndIntBetween(0, materials.length - 1)]!;
+
+    console.log(material)
 
     const scale = r(i * 0.9, i * 1.1);
     const posX = 1.7 * radius * r(-1 * i, i);
