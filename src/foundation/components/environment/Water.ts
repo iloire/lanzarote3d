@@ -95,4 +95,43 @@ export default class Water {
       }
     }
   }
+
+  // Theme support methods
+
+  /**
+   * Apply water theme settings to the water mesh
+   */
+  applyTheme(waterTheme: any) {
+    if (!this.waterMesh || !this.waterMesh.material) return;
+
+    const material = this.waterMesh.material as THREE.MeshLambertMaterial;
+
+    if (waterTheme.color) {
+      material.color = new THREE.Color(waterTheme.color);
+    }
+
+    if (waterTheme.opacity !== undefined) {
+      material.opacity = waterTheme.opacity;
+      material.transparent = waterTheme.opacity < 1.0;
+    }
+
+    material.needsUpdate = true;
+
+    // Handle animation based on theme
+    if (waterTheme.animated !== undefined) {
+      if (waterTheme.animated && !this.isAnimating) {
+        this.isAnimating = true;
+        this.startAnimation();
+      } else if (!waterTheme.animated && this.isAnimating) {
+        this.stop();
+      }
+    }
+  }
+
+  /**
+   * Get current water mesh for external theme application
+   */
+  getMesh(): THREE.Mesh | WaterEffect | null {
+    return this.waterMesh;
+  }
 }

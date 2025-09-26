@@ -235,4 +235,30 @@ export default class Sky extends THREE.Object3D {
   getSunPosition(): THREE.Vector3 {
     return this.sunPosition;
   }
+
+  // Theme support methods
+
+  /**
+   * Apply sky theme settings
+   */
+  applyTheme(skyTheme: any, scene?: THREE.Scene) {
+    if (skyTheme.timeOfDay !== undefined) {
+      this.updateSunPosition(skyTheme.timeOfDay);
+    }
+
+    if (skyTheme.sunIntensity !== undefined) {
+      this.pointLight.intensity = skyTheme.sunIntensity;
+      if (this.directionalLight) {
+        this.directionalLight.intensity = skyTheme.sunIntensity * 0.3;
+      }
+      this.ambientLight.intensity = skyTheme.sunIntensity;
+    }
+
+    // Apply fog if scene is provided
+    if (scene && skyTheme.fogColor && skyTheme.fogDensity !== undefined) {
+      const fogColor = new THREE.Color(skyTheme.fogColor);
+      const fog = new THREE.Fog(fogColor, 1000, Math.min(20000, 20000 / (1 + skyTheme.fogDensity * 100)));
+      scene.fog = fog;
+    }
+  }
 }

@@ -1,13 +1,11 @@
 import * as THREE from 'three';
 import Environment from '../../shared/env/environment';
-import Weather, { WeatherOptions } from '../../../foundation/components/physics/Weather';
 import { StoryOptions } from '../../shared/types';
+import { THEMES } from '../../../foundation/themes';
+import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';
 
-const WEATHER_SETTINGS: WeatherOptions = {
-  windDirectionDegreesFromNorth: 310,
-  speedMetresPerSecond: 18 / 3.6,
-  lclLevel: 1800,
-};
+// Use the natural theme from our theme library
+const FAMARA_THEME = THEMES.natural;
 
 /**
  * Famara Demo - Based on PhotoBooth but without paragliders
@@ -15,9 +13,13 @@ const WEATHER_SETTINGS: WeatherOptions = {
  */
 const Famara = {
   load: async (options: StoryOptions) => {
-    const { camera, scene, renderer, terrain, water, controls } = options;
+    const { camera, scene, renderer, terrain, water, controls, sky } = options;
 
     controls.enabled = true;
+
+    // Apply theme to scene
+    const theme = options.theme || FAMARA_THEME;
+    await ThemeEngine.apply(options, theme);
 
     // Position camera to showcase Famara beach area (no paragliders to focus on)
     const initialPos = new THREE.Vector3(5800, 1200, 800);
@@ -32,16 +34,13 @@ const Famara = {
     // must render before adding env
     renderer.render(scene, camera);
 
-    // Set up environment with more emphasis on natural elements
+    // Set up environment using theme
     const env = new Environment(scene);
-    const weather = new Weather(WEATHER_SETTINGS);
+    const weather = env.createWeatherFromTheme(theme);
     const thermals = env.generateThermals(weather, 0);
 
-    // Use more natural cloud colors for Famara
-    const cloudOptions = { colors: ['#ffffff', '#f0f8ff', '#e6f3ff'] };
-
-    // Add environment elements - more nature focused
-    env.addClouds(thermals, cloudOptions);
+    // Add environment elements using theme
+    await env.addCloudsFromTheme(thermals, theme);
     env.addTrees(terrain);
     env.addHouses(terrain);
     env.addBoats(water);

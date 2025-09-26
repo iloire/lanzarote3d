@@ -13,6 +13,8 @@ import { Hangglider as HangGlider } from "../../../foundation/components/vehicle
 import { addMeshAroundArea } from "./mesh-utils";
 import { generateThermalPair, ThermalGenerationOptions } from "./thermal-utils";
 import { CloudOptions } from "../../../foundation/components/environment";
+import { Theme } from "../../../foundation/types/Theme";
+import { ThemeEngine } from "../../../foundation/systems/ThemeEngine";
 
 class Environment {
   birds!: Birds;
@@ -265,6 +267,40 @@ class Environment {
 
   getThermals(): Thermal[] {
     return this.thermals;
+  }
+
+  // Theme-aware methods
+
+  /**
+   * Add clouds using theme settings
+   */
+  async addCloudsFromTheme(
+    thermals: Thermal[],
+    theme: Theme
+  ): Promise<THREE.Object3D[]> {
+    const cloudOptions = ThemeEngine.getCloudOptionsFromTheme(theme);
+    return this.addClouds(thermals, cloudOptions);
+  }
+
+  /**
+   * Create weather from theme
+   */
+  createWeatherFromTheme(theme: Theme): Weather {
+    return ThemeEngine.createWeatherFromTheme(theme);
+  }
+
+  /**
+   * Apply theme to environment components
+   */
+  async applyTheme(theme: Theme, options?: { terrain?: THREE.Mesh }): Promise<void> {
+    await ThemeEngine.applyToEnvironment(this, theme, options);
+  }
+
+  /**
+   * Get terrain style from theme for use in terrain workshop demos
+   */
+  getTerrainStyleFromTheme(theme: Theme): string {
+    return ThemeEngine.getTerrainStyleFromTheme(theme);
   }
 }
 

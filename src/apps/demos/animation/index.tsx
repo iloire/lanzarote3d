@@ -2,17 +2,15 @@ import * as THREE from 'three';
 import { ParagliderVoxel } from '../../../foundation/components/vehicles';
 import type { ParagliderVoxelOptions } from '../../../foundation/components/vehicles';
 import Environment from '../../shared/env/environment';
-import Weather, { WeatherOptions } from '../../../foundation/components/physics/Weather';
 import adriModel from '../../../../assets/foundation/models/characters/adri.obj';
 import adriTextureImage from '../../../../assets/foundation/models/characters/adri.png';
 import { StoryOptions } from '../../shared/types';
 import { animator } from '../../../foundation/systems/animation/SimpleAnimator';
+import { THEMES } from '../../../foundation/themes';
+import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';
 
-const WEATHER_SETTINGS: WeatherOptions = {
-  windDirectionDegreesFromNorth: 310,
-  speedMetresPerSecond: 18 / 3.6,
-  lclLevel: 1800,
-};
+// Use the golden hour theme for animation demo
+const ANIMATION_THEME = THEMES.golden;
 
 type ParagliderVoxelConfig = {
   pg: ParagliderVoxelOptions;
@@ -42,7 +40,11 @@ const paraglidersVoxel: ParagliderVoxelConfig[] = [
  */
 const Animation = {
   load: async (options: StoryOptions) => {
-    const { camera, scene, renderer, terrain, water, controls } = options;
+    const { camera, scene, renderer, terrain, water, controls, sky } = options;
+
+    // Apply theme to scene
+    const theme = options.theme || ANIMATION_THEME;
+    await ThemeEngine.apply(options, theme);
 
     // Add voxel paragliders
     paraglidersVoxel.forEach(async p => {
@@ -58,11 +60,10 @@ const Animation = {
     renderer.render(scene, camera);
 
     const env = new Environment(scene);
-    const weather = new Weather(WEATHER_SETTINGS);
+    const weather = env.createWeatherFromTheme(theme);
     const thermals = env.generateThermals(weather, 0);
-    const cloudOptions = { colors: ['#F64A8A', '#F987C5', '#DE3163'] };
 
-    env.addClouds(thermals, cloudOptions);
+    await env.addCloudsFromTheme(thermals, theme);
     env.addTrees(terrain);
     env.addHouses(terrain);
     env.addBoats(water);
