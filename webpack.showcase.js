@@ -2,8 +2,14 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 const stories = [
+  // Main experiences
   { name: 'animation', title: 'Lanzarote - Animation', filename: 'index.html' },
   { name: 'photobooth', title: 'Lanzarote - Photo Booth', filename: 'photobooth.html' },
+  { name: 'famara', title: 'Lanzarote - Famara', filename: 'famara.html' },
+  { name: 'game', title: 'Lanzarote - Game', filename: 'game.html' },
+  { name: 'flyzones', title: 'Lanzarote - Fly Zones', filename: 'flyzones.html' },
+
+  // Workshop and demos
   { name: 'workshop', title: 'Lanzarote - Workshop', filename: 'workshop.html' },
   { name: 'clouds', title: 'Lanzarote - Clouds', filename: 'clouds.html' },
   { name: 'night', title: 'Lanzarote - Night', filename: 'night.html' },

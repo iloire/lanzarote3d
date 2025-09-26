@@ -24,6 +24,7 @@ const bundleToStoryMap: Record<string, string> = {
   clouds: 'clouds',
   night: 'night',
   paragliderVoxel: 'paragliderVoxel', // Uses the alias in Stories object
+  famara: 'famara',
   flyzones: 'flyzones',
   game: 'game',
 };
