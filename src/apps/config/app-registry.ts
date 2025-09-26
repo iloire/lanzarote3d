@@ -28,7 +28,7 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       htmlTemplate: "./experiences/game/index.html",
       requiresWebGL: true,
       tags: ["interactive", "simulation", "flight", "game"],
-      status: "",
+      status: "dev",
       priority: 2
     },
     flyzones: {
@@ -58,7 +58,7 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       priority: 2
     },
     workshop: {
-      name: "Component Workshop",
+      name: "Workshop",
       description: "Development environment for testing and showcasing individual 3D components",
       entry: "./tools/workshop/index.tsx",
       route: "/workshop",
@@ -83,7 +83,7 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       priority: 1
     },
     photobooth: {
-      name: "3D Showcase",
+      name: "Photobooth",
       description: "Beautiful static 3D scene showcasing paragliders and environment",
       entry: "./demos/photobooth/index.tsx",
       route: "/photobooth",
@@ -96,7 +96,7 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
 
     // Workshop Component Demos
     clouds: {
-      name: "Clouds Demo",
+      name: "Clouds",
       description: "Interactive cloud system demonstration",
       entry: "./tools/workshop/demos/clouds",
       route: "/clouds",
@@ -107,7 +107,7 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       priority: 2
     },
     night: {
-      name: "Night Mode",
+      name: "Night",
       description: "Night time lighting and atmosphere demo",
       entry: "./tools/workshop/demos/night",
       route: "/night",
@@ -118,7 +118,7 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       priority: 3
     },
     'paraglider-voxel': {
-      name: "Paraglider Voxel",
+      name: "Voxel",
       description: "Voxel-based paraglider component showcase",
       entry: "./tools/workshop/demos/paraglider-voxel",
       route: "/paraglider-voxel",

@@ -70,12 +70,15 @@ const Animation = {
     const pgPos = paraglidersVoxel[0]?.position.clone() || new THREE.Vector3();
     console.log('Paraglider position:', pgPos);
 
-    // Starting position - further away from the paraglider
-    const initialCameraPosition = new THREE.Vector3(6500, 1100, -200);
+    // Starting position - far away on the other side of the island
+    const initialCameraPosition = new THREE.Vector3(3000, 1500, 2000);
 
-    // Final position - closer to the paraglider
+    // Intermediate position - approaching the area quickly
+    const intermediatePosition = new THREE.Vector3(6000, 1200, 500);
+
+    // Final position - slow, careful approach to the paraglider
     const finalCameraPosition = new THREE.Vector3(
-      pgPos.x - 100,  // Closer than before
+      pgPos.x - 100,  // Close to paraglider
       pgPos.y + 50,   // Slightly above
       pgPos.z + 200   // Behind the paraglider
     );
@@ -101,38 +104,58 @@ const Animation = {
     };
     animate();
 
-    // Start the camera animation after a short delay to ensure everything is loaded
+    // Start the dramatic two-phase camera animation
     setTimeout(() => {
-      console.log('Starting simple camera animation...');
-      console.log('From:', camera.position.x.toFixed(1), camera.position.y.toFixed(1), camera.position.z.toFixed(1));
-      console.log('To:', finalCameraPosition.x.toFixed(1), finalCameraPosition.y.toFixed(1), finalCameraPosition.z.toFixed(1));
+      console.log('Starting dramatic camera animation...');
+      console.log('Phase 1: Fast approach from other side of island');
+      console.log('From:', initialCameraPosition.x.toFixed(1), initialCameraPosition.y.toFixed(1), initialCameraPosition.z.toFixed(1));
+      console.log('To intermediate:', intermediatePosition.x.toFixed(1), intermediatePosition.y.toFixed(1), intermediatePosition.z.toFixed(1));
 
       // Store initial positions
-      const startPosition = camera.position.clone();
       const startTarget = controls ? controls.target.clone() : pgPos.clone();
 
-      // Simple, clear animation with no dependencies
-      animator.animate('camera-move', 8000, (progress) => {
-        // Interpolate camera position
-        camera.position.lerpVectors(startPosition, finalCameraPosition, progress);
+      // Phase 1: Fast approach from the other side (4 seconds)
+      animator.animate('camera-phase1', 4000, (progress) => {
+        // Quick movement to intermediate position
+        camera.position.lerpVectors(initialCameraPosition, intermediatePosition, progress);
 
-        // Interpolate look target
+        // Look towards the area but not directly at paraglider yet
+        const lookTarget = new THREE.Vector3().lerpVectors(startTarget, pgPos, progress * 0.5);
         if (controls) {
-          controls.target.lerpVectors(startTarget, pgPos, progress);
+          controls.target.copy(lookTarget);
           controls.update();
         }
 
-        // Debug output every 10%
-        if (Math.floor(progress * 10) !== Math.floor((progress - 0.01) * 10)) {
-          console.log(`Camera animation ${Math.floor(progress * 100)}%:`,
-            camera.position.x.toFixed(1), camera.position.y.toFixed(1), camera.position.z.toFixed(1));
+        // Debug output every 25%
+        if (Math.floor(progress * 4) !== Math.floor((progress - 0.01) * 4)) {
+          console.log(`Phase 1: ${Math.floor(progress * 100)}% - Fast approach`);
         }
       }, () => {
-        // Animation complete
-        if (controls) {
-          controls.enabled = true;
-        }
-        console.log('Camera animation complete!');
+        console.log('Phase 1 complete - Starting slow final approach');
+
+        // Phase 2: Slow, careful approach to paraglider (6 seconds)
+        animator.animate('camera-phase2', 6000, (progress) => {
+          // Slow movement from intermediate to final position
+          camera.position.lerpVectors(intermediatePosition, finalCameraPosition, progress);
+
+          // Gradually focus on the paraglider
+          if (controls) {
+            controls.target.lerpVectors(controls.target, pgPos, progress);
+            controls.update();
+          }
+
+          // Debug output every 16.7% (every second)
+          if (Math.floor(progress * 6) !== Math.floor((progress - 0.01) * 6)) {
+            console.log(`Phase 2: ${Math.floor(progress * 100)}% - Slow approach`,
+              camera.position.x.toFixed(1), camera.position.y.toFixed(1), camera.position.z.toFixed(1));
+          }
+        }, () => {
+          // Animation complete
+          if (controls) {
+            controls.enabled = true;
+          }
+          console.log('Dramatic camera animation complete!');
+        });
       });
     }, 100);
 
