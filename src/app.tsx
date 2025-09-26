@@ -143,6 +143,12 @@ const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAp
       controls.enabled = false;
     }
 
+    // Register main app animations with centralized manager FIRST
+    // This ensures the AnimationManager is running before any stories load
+    AnimationManager.register('main-stats', () => {
+      stats.update();
+    }, 0); // Highest priority (stats first)
+
     const storyOptions: StoryOptions = {
       camera,
       scene,
@@ -160,11 +166,6 @@ const App: React.FC<AppProps> = ({ initialStory, showAppSelection: initialShowAp
     } else {
       console.error(`Story "${initialStory}" not found or doesn't have a load method`);
     }
-
-    // Register main app animations with centralized manager
-    AnimationManager.register('main-stats', () => {
-      stats.update();
-    }, 0); // Highest priority (stats first)
 
     // Rendering complete
   };

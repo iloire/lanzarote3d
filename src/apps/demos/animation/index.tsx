@@ -95,6 +95,11 @@ const Animation = {
       controls.enabled = false; // Disable controls during animation
     }
 
+    // Register animation app with centralized manager first to ensure TWEEN loop is running
+    AnimationManager.register('animation-demo-render', () => {
+      renderer.render(scene, camera);
+    }, 50); // Lower priority than stats but higher than other apps
+
     // Start the camera animation after a short delay to ensure everything is loaded
     setTimeout(() => {
       console.log('Starting camera animation...');
@@ -115,11 +120,6 @@ const Animation = {
         }
       );
     }, 100);
-
-    // Register animation app with centralized manager
-    AnimationManager.register('animation-demo-render', () => {
-      renderer.render(scene, camera);
-    }, 50); // Lower priority than stats but higher than other apps
 
     // Animation app initialized
   }
