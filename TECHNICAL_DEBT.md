@@ -2,6 +2,14 @@
 
 This file tracks technical debt items identified during development.
 
+## Recent Improvements
+
+### App Loading Architecture (2025-09-27)
+✅ **Completed**: Replaced complex "Stories" system with simple app registry-based loading
+- Removed StoryLoader class and complex proxy patterns
+- Simplified to direct `loadApp()` function with app registry lookup
+- Still using switch statement for webpack compatibility - could be further improved with dynamic imports if webpack config allows
+
 ## Identified Issues
 
 ### TypeScript Strict Mode Issues

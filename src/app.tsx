@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import GUI from 'lil-gui';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import * as THREE from 'three';
-import Stories from './apps/shared/index';
+import { loadApp, hasApp } from './apps/shared/index';
 import { CameraController as Camera } from './foundation/systems/scene/CameraController';
 import Menu from './menu';
 import Controls from './foundation/utils/controls';
@@ -154,19 +154,19 @@ const App: React.FC<AppProps> = ({
     // Initialize theme manager for dynamic theme switching
     themeManager.initialize(storyOptions);
 
-    // Call the load method on the selected story
-    if (initialStory && Stories[initialStory] && Stories[initialStory].load) {
-      await Stories[initialStory].load(storyOptions);
+    // Load the selected app
+    if (initialStory && hasApp(initialStory)) {
+      await loadApp(initialStory, storyOptions);
 
-      // If the story applied a theme, capture it in the theme manager
+      // If the app applied a theme, capture it in the theme manager
       if (storyOptions.theme && ThemeEngine.getCurrentTheme()) {
         themeManager.setCurrentTheme(ThemeEngine.getCurrentTheme()!);
       }
 
-      // Apply saved theme after story has loaded (includes environment for cloud colors)
+      // Apply saved theme after app has loaded (includes environment for cloud colors)
       await themeManager.applySavedThemeAfterLoad();
     } else {
-      console.error(`Story "${initialStory}" not found or doesn't have a load method`);
+      console.error(`App "${initialStory}" not found in registry`);
     }
 
     // Rendering complete
