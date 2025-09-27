@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-function getRandomArbitrary(min, max) {
+function getRandomArbitrary(min: number, max: number) {
   return Math.random() * (max - min) + min;
 }
 

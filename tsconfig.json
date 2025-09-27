@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     // Language and Environment
-    "target": "ES2020",
-    "lib": ["ES2020", "DOM", "DOM.Iterable", "WebWorker"],
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable", "WebWorker"],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
@@ -25,7 +25,7 @@
 
     // Type Checking (Progressive Strictness)
     "strict": true,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "strictNullChecks": false,
     "strictFunctionTypes": true,
     "strictBindCallApply": true,
@@ -35,7 +35,7 @@
     "useUnknownInCatchVariables": true,
     "alwaysStrict": true,
     "exactOptionalPropertyTypes": false,
-    "noImplicitOverride": false,
+    "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": false,
     "noUncheckedIndexedAccess": false,
 

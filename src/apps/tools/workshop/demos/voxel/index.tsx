@@ -37,7 +37,7 @@ class VoxelDemoApp extends AppBase {
     });
   }
 
-  async load(options: StoryOptions): Promise<void> {
+  override async load(options: StoryOptions): Promise<void> {
     try {
       // Initialize core systems from AppBase
       this.initializeCore(options);

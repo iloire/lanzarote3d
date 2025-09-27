@@ -29,7 +29,7 @@ class CocoonHarness {
   }
 
   load(): THREE.Object3D {
-    const getSquare = (w, h, z, posX, posY, posZ, color) => {
+    const getSquare = (w: number, h: number, z: number, posX: number, posY: number, posZ: number, color: string) => {
       const suitMat = getColoredMaterial(color);
       const geo = new THREE.BoxGeometry(w, h, z);
       const mesh = new THREE.Mesh(geo, suitMat);

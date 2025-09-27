@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { themeManager } from '../foundation/systems/ThemeManager';
 import { Theme } from '../foundation/types/Theme';
 
@@ -33,7 +33,7 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
     this.themeChangeListener = this.handleThemeChange.bind(this);
   }
 
-  componentDidMount() {
+  override componentDidMount() {
     // Add theme change listener
     themeManager.addListener(this.themeChangeListener);
 
@@ -44,7 +44,7 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
     this.checkThemeManagerReady();
   }
 
-  componentWillUnmount() {
+  override componentWillUnmount() {
     // Remove theme change listener
     themeManager.removeListener(this.themeChangeListener);
   }
@@ -335,7 +335,7 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
     );
   };
 
-  render() {
+  override render() {
     const { isMobile } = this.props;
 
     return isMobile ? this.renderMobileView() : this.renderDesktopView();

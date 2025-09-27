@@ -1,9 +1,8 @@
 import * as THREE from 'three';
-import { Paraglider, ParagliderOptions } from '../../../foundation/components/vehicles';
+import { /* Paraglider, */ ParagliderOptions } from '../../../foundation/components/vehicles';
 import ParagliderVoxel, {
   ParagliderVoxelOptions,
 } from '../../../foundation/components/vehicles/ParagliderVoxel';
-import Tandem from '../../../foundation/components/vehicles/Tandem';
 import { PilotHeadType } from '../../../foundation/components/characters/PilotHead';
 import Environment from '../../shared/env/environment';
 import adriModel from '../../../../assets/foundation/models/characters/adri.obj';
@@ -13,47 +12,6 @@ import { getDefaultTheme } from '../../../foundation/themes';
 import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';
 import { AppBase } from '../../shared/AppBase';
 import { OrbitControlsHelper, ORBIT_CONTROLS_PRESETS } from '../../../foundation/utils/OrbitControlsHelper';
-
-const tandems = [
-  {
-    pg: {
-      glider: {
-        wingColor1: '#c30010',
-        wingColor2: '#b100cd',
-        breakColor: '#ffffff',
-        lineFrontColor: '#ffffff',
-        lineBackColor: '#ffffff',
-        inletsColor: '#333333',
-        numeroCajones: 35,
-      },
-      pilot: {
-        pilot: {
-          head: {
-            headType: PilotHeadType.Default,
-            helmetOptions: {
-              color: '#ffff00',
-              color2: '#cccccc',
-              color3: '#999999',
-            },
-          },
-        },
-        passenger: {
-          head: {
-            headType: PilotHeadType.Default,
-            helmetOptions: {
-              color: '#ffffff',
-              color2: '#cccccc',
-              color3: '#999999',
-            },
-          },
-          suitColor: 'red',
-          suitColor2: 'green',
-        },
-      },
-    },
-    position: new THREE.Vector3(6837, 850, -535),
-  },
-];
 
 type ParagliderVoxelConfig = {
   pg: ParagliderVoxelOptions;
@@ -82,93 +40,6 @@ type ParagliderConfig = {
   pg: ParagliderOptions;
   position: any;
 };
-
-const paragliders: ParagliderConfig[] = [
-  {
-    pg: {
-      glider: {
-        wingColor1: '#c30010',
-        wingColor2: '#b100cd',
-        inletsColor: 'pink',
-        numeroCajones: 35,
-      },
-      pilot: {
-        head: {
-          headType: PilotHeadType.Default,
-          helmetOptions: {
-            color: '#ffff00',
-            color2: '#cccccc',
-            color3: '#999999',
-          },
-        },
-      },
-    },
-    position: new THREE.Vector3(6827, 860, -555),
-  },
-  {
-    pg: {
-      glider: {
-        wingColor1: '#FFA500',
-        wingColor2: '#b100cd',
-        inletsColor: 'white',
-        numeroCajones: 50,
-      },
-      pilot: {
-        head: {
-          headType: PilotHeadType.Default,
-          helmetOptions: {
-            color: '#ffff00',
-            color2: '#cccccc',
-            color3: '#999999',
-          },
-        },
-      },
-    },
-    position: new THREE.Vector3(6727, 780, -555),
-  },
-  {
-    pg: {
-      glider: {
-        wingColor1: '#FFA500',
-        wingColor2: '#b100cd',
-        inletsColor: '#333333',
-        numeroCajones: 40,
-      },
-      pilot: {
-        head: {
-          headType: PilotHeadType.Default,
-          helmetOptions: {
-            color: '#ffff00',
-            color2: '#cccccc',
-            color3: '#999999',
-          },
-        },
-      },
-    },
-    position: new THREE.Vector3(6777, 920, -535),
-  },
-  {
-    pg: {
-      glider: {
-        wingColor1: '#FFA500',
-        wingColor2: '#b100cd',
-        inletsColor: 'pink',
-        numeroCajones: 40,
-      },
-      pilot: {
-        head: {
-          headType: PilotHeadType.Default,
-          helmetOptions: {
-            color: '#ffff00',
-            color2: '#cccccc',
-            color3: '#999999',
-          },
-        },
-      },
-    },
-    position: new THREE.Vector3(6777, 920, -535),
-  },
-];
 
 /**
  * PhotoBooth Demo - Beautiful static 3D scene showcasing paragliders and environment
