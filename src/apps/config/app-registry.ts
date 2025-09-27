@@ -162,6 +162,19 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       priority: 2,
     },
 
+    // Animation Demos
+    boats: {
+      name: 'Boats Animation',
+      description: 'Cinematic animation starting near boats and transitioning to focus on paragliders and clouds',
+      entry: './demos/boats/index.tsx',
+      route: '/boats',
+      category: 'demo',
+      requiresWebGL: true,
+      tags: ['cinematic', 'boats', 'paragliders', 'animation', 'water', 'clouds'],
+      status: 'experimental',
+      priority: 1,
+    },
+
     // Workshop Component Demos
     boat: {
       name: 'Boat',
