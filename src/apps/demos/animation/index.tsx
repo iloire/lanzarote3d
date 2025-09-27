@@ -13,6 +13,7 @@ import {
   OrbitControlsHelper,
   ORBIT_CONTROLS_PRESETS,
 } from '../../../foundation/utils/OrbitControlsHelper';
+import { getAppConfig } from '../../config/app-registry';
 
 type ParagliderVoxelConfig = {
   pg: ParagliderVoxelOptions;
@@ -48,10 +49,12 @@ class AnimationApp extends AppBase {
   private animatorInstance: any | undefined;
 
   constructor() {
+    const appConfig = getAppConfig('animation');
     super({
-      name: 'Animation Demo',
-      description:
-        'Dramatic camera animation showcasing voxel paragliders with golden hour lighting',
+      // Use metadata from app registry
+      name: appConfig?.name || 'Animation Demo',
+      description: appConfig?.description || 'Dramatic camera animation showcasing voxel paragliders with golden hour lighting',
+      // App-specific configuration
       requiredComponents: ['scene', 'camera', 'renderer', 'terrain', 'water', 'controls'],
       scene: {
         environment: 'lanzarote',

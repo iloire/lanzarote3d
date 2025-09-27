@@ -1,7 +1,7 @@
 Implement the following tasks if any is added follwing the instructions described below:
 ---
 TASKS:
-
+- move src/video/* somewhere, as I think it's not used.
 ---
 
 ### Instructions

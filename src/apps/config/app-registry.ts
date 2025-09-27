@@ -73,8 +73,8 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
 
   demos: {
     animation: {
-      name: 'Pechos famara animation',
-      description: 'Automated cinematic flight demonstration showcasing 3D capabilities',
+      name: 'Animation Demo',
+      description: 'Dramatic camera animation showcasing voxel paragliders with golden hour lighting',
       entry: './demos/animation/index.tsx',
       route: '/animation',
       category: 'demo',
@@ -291,6 +291,28 @@ export function getAppsByStatus(
     apps = apps.filter(app => app.category === category);
   }
   return apps.sort((a, b) => (a.priority || 999) - (b.priority || 999));
+}
+
+/**
+ * Get app config by route or key for use in AppBase constructors
+ */
+export function getAppConfig(routeOrKey: string): AppMetadata | null {
+  // First try to find by route
+  const allApps = getAllApps();
+  let app = allApps.find(app => app.route === `/${routeOrKey}` || app.route === routeOrKey);
+
+  // If not found by route, try by key
+  if (!app) {
+    const categories = Object.values(APP_REGISTRY);
+    for (const category of categories) {
+      if (category[routeOrKey]) {
+        app = category[routeOrKey];
+        break;
+      }
+    }
+  }
+
+  return app || null;
 }
 
 /**

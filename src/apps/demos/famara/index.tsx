@@ -8,6 +8,7 @@ import {
   OrbitControlsHelper,
   ORBIT_CONTROLS_PRESETS,
 } from '../../../foundation/utils/OrbitControlsHelper';
+import { getAppConfig } from '../../config/app-registry';
 
 /**
  * Famara Demo - Based on PhotoBooth but without paragliders
@@ -20,9 +21,12 @@ class FamaraApp extends AppBase {
   private animationId: number | undefined;
 
   constructor() {
+    const appConfig = getAppConfig('famara');
     super({
-      name: 'Famara Beach',
-      description: 'Natural beauty of Famara beach area without paragliders - pure landscape focus',
+      // Use metadata from app registry
+      name: appConfig?.name || 'Famara Beach',
+      description: appConfig?.description || 'Natural beauty of Famara beach area without paragliders - pure landscape focus',
+      // App-specific configuration
       requiredComponents: ['scene', 'camera', 'renderer', 'terrain', 'water', 'controls'],
       scene: {
         environment: 'lanzarote',

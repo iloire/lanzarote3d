@@ -12,6 +12,7 @@ import { getDefaultTheme } from '../../../foundation/themes';
 import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';
 import { AppBase } from '../../shared/AppBase';
 import { OrbitControlsHelper, ORBIT_CONTROLS_PRESETS } from '../../../foundation/utils/OrbitControlsHelper';
+import { getAppConfig } from '../../config/app-registry';
 
 type ParagliderVoxelConfig = {
   pg: ParagliderVoxelOptions;
@@ -51,9 +52,12 @@ class PhotoBoothApp extends AppBase {
   private paragliderMeshes: THREE.Object3D[] = [];
 
   constructor() {
+    const appConfig = getAppConfig('photobooth');
     super({
-      name: 'Photobooth',
-      description: 'Beautiful static 3D scene showcasing paragliders and environment',
+      // Use metadata from app registry
+      name: appConfig?.name || 'Photobooth',
+      description: appConfig?.description || 'Beautiful static 3D scene showcasing paragliders and environment',
+      // App-specific configuration
       requiredComponents: ['scene', 'camera', 'renderer', 'terrain', 'water', 'controls'],
       scene: {
         environment: 'lanzarote',
