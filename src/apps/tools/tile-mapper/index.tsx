@@ -19,12 +19,12 @@ class TileMapperApp extends AppBase {
   private selectedTile: { x: number; y: number; zoom: number } | null = null;
   private tileGridContainer: HTMLElement | undefined;
 
-  // Lanzarote island bounds and tile configuration
+  // Current Lanzarote 7x7 tile grid bounds (the EXACT problem area we need to solve!)
   private readonly LANZAROTE_BOUNDS = {
-    north: 29.250,
-    south: 28.606,
-    east: -13.359,
-    west: -13.975
+    north: 29.305561,  // From our current 7x7 mapping
+    south: 28.767659,  // From our current 7x7 mapping
+    east: -13.183594,  // From our current 7x7 mapping
+    west: -13.798828   // From our current 7x7 mapping
   };
 
   private readonly ZOOM_LEVEL = 12;
@@ -37,7 +37,7 @@ class TileMapperApp extends AppBase {
       description: appConfig?.description || 'Interactive satellite tile system debugger and analyzer',
       requiredComponents: ['scene', 'camera', 'renderer'],
       scene: {
-        environment: 'minimal',
+        environment: 'custom',
         lighting: 'static',
         physics: false,
         fog: { enabled: false },
@@ -153,11 +153,24 @@ class TileMapperApp extends AppBase {
         <!-- Header -->
         <div style="margin-bottom: 24px; border-bottom: 2px solid #4a9eff; padding-bottom: 16px;">
           <h1 style="font-size: 28px; font-weight: bold; margin: 0; color: #4a9eff;">
-            🗺️ Satellite Tile Mapper Debugger
+            🗺️ Lanzarote 7×7 Tile Problem Solver
           </h1>
           <p style="margin: 8px 0 0 0; color: #b0b0b0;">
-            Interactive debugging tool for Lanzarote island satellite tiling system
+            Debug and fix our current satellite tile mapping issues for Lanzarote island
           </p>
+        </div>
+
+        <!-- CURRENT PROBLEM ALERT -->
+        <div style="background: rgba(255, 69, 58, 0.15); border: 2px solid #ff453a; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+          <h2 style="margin: 0 0 12px 0; color: #ff453a; display: flex; align-items: center;">
+            ⚠️ CURRENT TILE PROBLEM
+          </h2>
+          <div style="font-size: 14px; line-height: 1.6; color: #ffffff;">
+            <p style="margin: 0 0 8px 0;"><strong>Issue:</strong> We have a 7×7 grid configuration but satellite tiles may not be downloading correctly or atlas generation is failing.</p>
+            <p style="margin: 0 0 8px 0;"><strong>Grid Range:</strong> X: 1891-1897, Y: 1699-1705 (49 tiles total)</p>
+            <p style="margin: 0 0 8px 0;"><strong>Expected Output:</strong> Single 7×7 atlas texture combining all satellite tiles</p>
+            <p style="margin: 0;"><strong>Use this tool to:</strong> Test tile URLs, verify grid coverage, and generate working download commands</p>
+          </div>
         </div>
 
         <!-- Grid Overview -->
@@ -192,9 +205,12 @@ class TileMapperApp extends AppBase {
 
         <!-- Interactive Tile Grid -->
         <div style="background: rgba(74, 158, 255, 0.1); border: 1px solid #4a9eff; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
-          <h3 style="margin: 0 0 16px 0; color: #4a9eff;">🔍 Interactive Tile Grid</h3>
-          <p style="margin: 0 0 12px 0; font-size: 12px; color: #b0b0b0;">
-            Click on any tile to see detailed information, bounds, and test URL availability
+          <h3 style="margin: 0 0 16px 0; color: #4a9eff;">🔍 Current 7×7 Tile Grid (Our Problem!)</h3>
+          <p style="margin: 0 0 8px 0; font-size: 12px; color: #b0b0b0;">
+            This is our EXACT 7×7 grid (X: 1891-1897, Y: 1699-1705). Click any tile to test URL and see actual satellite image.
+          </p>
+          <p style="margin: 0 0 12px 0; font-size: 12px; color: #ff453a;">
+            <strong>Problem:</strong> Some tiles may be missing or atlas generation is failing. Use this grid to debug!
           </p>
           <div id="tile-grid-container" style="
             display: grid;
@@ -288,6 +304,37 @@ done</div>
           </div>
         </div>
 
+        <!-- ATLAS AGGREGATION VISUALIZATION -->
+        <div style="background: rgba(34, 197, 94, 0.1); border: 1px solid #22c55e; border-radius: 8px; padding: 16px; margin-top: 24px;">
+          <h3 style="margin: 0 0 16px 0; color: #22c55e;">🧩 How Our 7×7 Grid Becomes Final Atlas</h3>
+          <p style="margin: 0 0 12px 0; font-size: 13px; color: #b0b0b0;">
+            Each tile (256×256px) combines into a single atlas texture. Here's the current grid arrangement:
+          </p>
+
+          <div style="background: #1a1a2e; border-radius: 8px; padding: 16px; margin: 12px 0;">
+            <h4 style="margin: 0 0 12px 0; color: #22c55e;">📊 Current Atlas Specifications</h4>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; font-size: 12px; font-family: monospace;">
+              <div><strong>Grid Size:</strong> ${gridWidth}×${gridHeight}</div>
+              <div><strong>Total Tiles:</strong> ${gridWidth * gridHeight}</div>
+              <div><strong>Final Atlas:</strong> ${gridWidth * 256}×${gridHeight * 256}px</div>
+              <div><strong>X Range:</strong> 1891-1897</div>
+              <div><strong>Y Range:</strong> 1699-1705</div>
+              <div><strong>File Size:</strong> ~${Math.round((gridWidth * gridHeight * 50) / 1024)} MB</div>
+            </div>
+          </div>
+
+          <div style="background: #1a1a2e; border-radius: 8px; padding: 16px;">
+            <h4 style="margin: 0 0 12px 0; color: #22c55e;">🔧 Atlas Generation Pipeline</h4>
+            <div style="font-size: 12px; line-height: 1.6;">
+              <div style="color: #4a9eff; margin-bottom: 4px;">1. Download individual tiles → tile_X_Y.jpg</div>
+              <div style="color: #4a9eff; margin-bottom: 4px;">2. Arrange in 7×7 grid using ImageMagick montage</div>
+              <div style="color: #4a9eff; margin-bottom: 4px;">3. Generate UV mapping coordinates for Three.js</div>
+              <div style="color: #4a9eff; margin-bottom: 8px;">4. Apply to terrain mesh as single texture</div>
+              <div style="color: #22c55e;"><strong>Expected Result:</strong> lanzarote_satellite_atlas.jpg (1792×1792px)</div>
+            </div>
+          </div>
+        </div>
+
       </div>
     `;
 
@@ -315,34 +362,81 @@ done</div>
 
           cell.style.cssText = `
             aspect-ratio: 1;
-            background: ${tile ? '#4a9eff' : '#333'};
-            border: 1px solid #666;
-            border-radius: 2px;
+            border: 2px solid ${tile ? '#4a9eff' : '#333'};
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
             cursor: ${tile ? 'pointer' : 'default'};
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            color: white;
-            transition: all 0.2s;
-            min-width: 40px;
-            min-height: 40px;
+            background: #1a1a2e;
+            transition: all 0.2s ease;
+            min-width: 60px;
+            min-height: 60px;
           `;
 
           if (tile) {
-            cell.textContent = `${x},${y}`;
-            cell.title = `Tile ${x},${y}\nClick for details`;
+            // Create satellite image background
+            const img = document.createElement('img');
+            img.src = tile.url;
+            img.style.cssText = `
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+              transition: transform 0.2s ease;
+            `;
+
+            // Create overlay with tile coordinates
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+              position: absolute;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background: rgba(0,0,0,0.4);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 9px;
+              font-weight: bold;
+              color: white;
+              text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+              opacity: 0.8;
+              transition: opacity 0.2s ease;
+            `;
+            overlay.textContent = `${x},${y}`;
+
+            // Error handling for failed tile loads
+            img.onerror = () => {
+              cell.style.background = '#f87171';
+              cell.style.borderColor = '#f87171';
+              overlay.innerHTML = `<div style="text-align: center;"><div style="font-size: 14px;">❌</div><div style="font-size: 8px;">${x},${y}</div></div>`;
+              overlay.style.background = 'rgba(248, 113, 113, 0.8)';
+            };
+
+            img.onload = () => {
+              cell.style.borderColor = '#22c55e'; // Green border when loaded successfully
+            };
+
+            cell.appendChild(img);
+            cell.appendChild(overlay);
+            cell.title = `Tile ${x},${y} - Click for full preview`;
 
             cell.addEventListener('mouseenter', () => {
-              cell.style.background = '#6bb6ff';
-              cell.style.transform = 'scale(1.1)';
+              cell.style.transform = 'scale(1.05)';
               cell.style.zIndex = '10';
+              cell.style.borderColor = '#6bb6ff';
+              cell.style.boxShadow = '0 4px 12px rgba(74, 158, 255, 0.4)';
+              overlay.style.opacity = '0.2'; // Make overlay more transparent on hover
+              img.style.transform = 'scale(1.1)';
             });
 
             cell.addEventListener('mouseleave', () => {
-              cell.style.background = '#4a9eff';
               cell.style.transform = 'scale(1)';
               cell.style.zIndex = '1';
+              cell.style.borderColor = img.complete && !img.src.includes('error') ? '#22c55e' : '#4a9eff';
+              cell.style.boxShadow = 'none';
+              overlay.style.opacity = '0.8';
+              img.style.transform = 'scale(1)';
             });
 
             cell.addEventListener('click', () => {
@@ -423,6 +517,28 @@ done</div>
             cursor: pointer;
             font-size: 11px;
           ">🖼️ Open Image</button>
+        </div>
+      </div>
+
+      <!-- LIVE TILE PREVIEW -->
+      <div style="margin-top: 16px;" id="tile-preview-section">
+        <h4 style="margin: 0 0 8px 0; color: #4a9eff;">🖼️ Live Satellite Tile Preview</h4>
+        <div style="background: #1a1a2e; border: 2px solid #4a9eff; border-radius: 8px; padding: 16px; text-align: center;">
+          <div id="tile-image-container" style="margin-bottom: 12px;">
+            ${status === 'available'
+              ? `<img id="tile-preview" src="${tile.url}" style="
+                  max-width: 100%;
+                  max-height: 300px;
+                  border-radius: 4px;
+                  box-shadow: 0 4px 12px rgba(74, 158, 255, 0.3);
+                " onerror="this.parentElement.innerHTML='<div style=\\'color: #f87171; padding: 20px;\\'>❌ Failed to load tile image</div>'"
+                onload="document.getElementById('tile-load-status').innerHTML='✅ Tile loaded successfully!'; document.getElementById('tile-load-status').style.color='#4ade80';">`
+              : '<div style="color: #f87171; padding: 20px;">❌ Tile unavailable - cannot preview</div>'
+            }
+          </div>
+          <div id="tile-load-status" style="color: #4a9eff; font-size: 12px;">
+            ${status === 'available' ? '⏳ Loading satellite image...' : 'Tile not accessible'}
+          </div>
         </div>
       </div>
 
