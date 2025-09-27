@@ -46,10 +46,18 @@ export class FlyzoneMarkers {
       opacity: 0.6,
     }));
 
-    // Selected state material - bright white
+    // Selected state material - bright glowing white
     this.materials.set('selected', new THREE.MeshLambertMaterial({
       color: 0xffffff,
-      emissive: 0x444444,
+      emissive: 0x666666,
+      transparent: true,
+      opacity: 1.0,
+    }));
+
+    // Hover state material - light blue
+    this.materials.set('hover', new THREE.MeshLambertMaterial({
+      color: 0x88ddff,
+      emissive: 0x223344,
       transparent: true,
       opacity: 0.9,
     }));
@@ -362,38 +370,104 @@ export class FlyzoneMarkers {
   }
 
   public selectMarker(id: string): void {
-    // Highlight selected marker
+    // Highlight selected marker with enhanced visual feedback
     const marker = this.markers.get(id);
     if (marker) {
       marker.traverse(child => {
         if (child instanceof THREE.Mesh && child.material !== this.materials.get('selected')) {
           child.userData.originalMaterial = child.material;
           child.material = this.materials.get('selected')!;
+
+          // Add scaling animation for selection feedback
+          const originalScale = child.scale.clone();
+          child.userData.originalScale = originalScale;
+          child.scale.multiplyScalar(1.2); // Make it 20% larger
         }
       });
+
+      // Add a pulsing ring around selected marker
+      if (marker instanceof THREE.Group) {
+        this.addSelectionRing(marker);
+      }
     }
   }
 
+  private addSelectionRing(marker: THREE.Group): void {
+    // Remove existing selection ring
+    const existingRing = marker.getObjectByName('selection-ring');
+    if (existingRing) {
+      marker.remove(existingRing);
+    }
+
+    // Create pulsing ring
+    const ringGeometry = new THREE.RingGeometry(60, 80, 16);
+    const ringMaterial = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.8,
+      side: THREE.DoubleSide,
+    });
+
+    const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+    ring.name = 'selection-ring';
+    ring.rotation.x = -Math.PI / 2; // Lay flat on ground
+    ring.position.y = 5; // Slightly above ground
+
+    // Store animation data
+    ring.userData.animationPhase = 0;
+    ring.userData.pulseSpeed = 0.05;
+
+    marker.add(ring);
+  }
+
   public deselectMarker(id: string): void {
-    // Restore original material
+    // Restore original material and scale
     const marker = this.markers.get(id);
     if (marker) {
       marker.traverse(child => {
         if (child instanceof THREE.Mesh && child.userData.originalMaterial) {
           child.material = child.userData.originalMaterial;
           delete child.userData.originalMaterial;
+
+          // Restore original scale
+          if (child.userData.originalScale) {
+            child.scale.copy(child.userData.originalScale);
+            delete child.userData.originalScale;
+          }
         }
       });
+
+      // Remove selection ring
+      const selectionRing = marker.getObjectByName('selection-ring');
+      if (selectionRing) {
+        marker.remove(selectionRing);
+      }
     }
   }
 
   public update(): void {
-    // Update billboard labels to face camera
+    // Update billboard labels to face camera and animate selection rings
     this.markers.forEach(marker => {
       marker.traverse(child => {
         if (child.userData.billboard && child instanceof THREE.Mesh) {
           // This would require camera reference to implement billboard effect
           // For now, just a placeholder
+        }
+
+        // Animate selection ring
+        if (child.name === 'selection-ring' && child instanceof THREE.Mesh) {
+          child.userData.animationPhase += child.userData.pulseSpeed;
+          const pulse = (Math.sin(child.userData.animationPhase) + 1) * 0.5; // 0 to 1
+
+          // Pulse opacity
+          if (child.material instanceof THREE.Material) {
+            (child.material as any).opacity = 0.3 + pulse * 0.5; // 0.3 to 0.8
+          }
+
+          // Pulse scale
+          const baseScale = 1.0;
+          const scaleMultiplier = baseScale + pulse * 0.2; // 1.0 to 1.2
+          child.scale.setScalar(scaleMultiplier);
         }
       });
     });

@@ -80,6 +80,8 @@ export class FlyzoneEditorUI {
           </div>
         </div>
 
+        ${this.getSelectedItemHTML()}
+
         <div class="panel-section">
           <h3>Mode Settings</h3>
           <div class="mode-settings">
@@ -202,13 +204,167 @@ export class FlyzoneEditorUI {
     }
   }
 
+  private getSelectedItemHTML(): string {
+    if (!this.editorState.selectedItem) {
+      return '';
+    }
+
+    const item = this.editorState.selectedItem;
+    const data = item.data;
+
+    return `
+      <div class="panel-section selected-item">
+        <div class="selected-header">
+          <h3>✏️ Selected ${item.type}</h3>
+          <button class="delete-btn" data-action="delete-selected">🗑️</button>
+        </div>
+
+        <div class="selected-content">
+          <div class="field-group">
+            <label>Title:</label>
+            <input type="text" id="selected-title" value="${data.title || ''}"
+                   placeholder="Enter ${item.type} title" />
+          </div>
+
+          <div class="field-group">
+            <label>Description:</label>
+            <textarea id="selected-description" rows="3"
+                     placeholder="Describe this ${item.type}">${data.description || ''}</textarea>
+          </div>
+
+          ${this.getItemSpecificFields(item)}
+
+          <div class="coordinates-info">
+            <h4>📍 Location</h4>
+            <div class="coord-display">
+              <span>GPS: ${data.gps?.latitude.toFixed(6) || 'N/A'}, ${data.gps?.longitude.toFixed(6) || 'N/A'}</span>
+              <span>Elevation: ${data.elevation || data.position?.y || 'N/A'}m</span>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button class="save-btn" data-action="save-selected">💾 Save Changes</button>
+            <button class="cancel-btn" data-action="deselect">❌ Deselect</button>
+            <button class="focus-btn" data-action="focus-selected">🎯 Focus Camera</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  private getItemSpecificFields(item: any): string {
+    const data = item.data;
+
+    switch (item.type) {
+      case 'takeoff':
+        return `
+          <div class="field-group">
+            <label>Difficulty:</label>
+            <select id="selected-difficulty">
+              <option value="beginner" ${data.safety?.difficulty === 'beginner' ? 'selected' : ''}>Beginner</option>
+              <option value="intermediate" ${data.safety?.difficulty === 'intermediate' ? 'selected' : ''}>Intermediate</option>
+              <option value="advanced" ${data.safety?.difficulty === 'advanced' ? 'selected' : ''}>Advanced</option>
+              <option value="expert" ${data.safety?.difficulty === 'expert' ? 'selected' : ''}>Expert</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label>Walking Time (minutes):</label>
+            <input type="number" id="selected-walking-time" min="0" max="120"
+                   value="${data.access?.walkingTime || 10}" />
+          </div>
+
+          <div class="field-group">
+            <label>Hazards (comma-separated):</label>
+            <input type="text" id="selected-hazards"
+                   value="${data.safety?.hazards?.join(', ') || ''}"
+                   placeholder="power lines, rocks, etc." />
+          </div>
+        `;
+
+      case 'landing':
+        return `
+          <div class="field-group">
+            <label>Landing Type:</label>
+            <select id="selected-landing-type">
+              <option value="primary" ${data.type === 'primary' ? 'selected' : ''}>Primary</option>
+              <option value="secondary" ${data.type === 'secondary' ? 'selected' : ''}>Secondary</option>
+              <option value="emergency" ${data.type === 'emergency' ? 'selected' : ''}>Emergency</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label>Surface Type:</label>
+            <select id="selected-surface">
+              <option value="grass" ${data.surface === 'grass' ? 'selected' : ''}>Grass</option>
+              <option value="sand" ${data.surface === 'sand' ? 'selected' : ''}>Sand</option>
+              <option value="gravel" ${data.surface === 'gravel' ? 'selected' : ''}>Gravel</option>
+              <option value="paved" ${data.surface === 'paved' ? 'selected' : ''}>Paved</option>
+              <option value="mixed" ${data.surface === 'mixed' ? 'selected' : ''}>Mixed</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label>Size (W×L meters):</label>
+            <div class="size-inputs">
+              <input type="number" id="selected-width" value="${data.size?.width || 100}" min="10" max="1000" />
+              <span>×</span>
+              <input type="number" id="selected-length" value="${data.size?.length || 150}" min="10" max="1000" />
+            </div>
+          </div>
+        `;
+
+      case 'phase':
+        return `
+          <div class="field-group">
+            <label>Phase Type:</label>
+            <select id="selected-phase-type">
+              <option value="takeoff" ${data.type === 'takeoff' ? 'selected' : ''}>Takeoff</option>
+              <option value="ridge" ${data.type === 'ridge' ? 'selected' : ''}>Ridge Soaring</option>
+              <option value="thermal" ${data.type === 'thermal' ? 'selected' : ''}>Thermal</option>
+              <option value="approach" ${data.type === 'approach' ? 'selected' : ''}>Approach</option>
+              <option value="landing" ${data.type === 'landing' ? 'selected' : ''}>Landing</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label>Altitude Range (meters):</label>
+            <div class="altitude-inputs">
+              <input type="number" id="selected-alt-min" value="${data.altitudeRange?.min || 0}" />
+              <span>to</span>
+              <input type="number" id="selected-alt-max" value="${data.altitudeRange?.max || 500}" />
+            </div>
+          </div>
+        `;
+
+      default:
+        return '';
+    }
+  }
+
   private getInstructionsHTML(): string {
+    if (this.editorState.selectedItem) {
+      return `
+        <div class="selected-instructions">
+          <h4>✏️ Editing ${this.editorState.selectedItem.type}</h4>
+          <ul>
+            <li>Modify properties in the Selected section above</li>
+            <li>Click "Save Changes" to apply your edits</li>
+            <li>Click "Focus Camera" to center the view on this item</li>
+            <li>Click "Delete" to remove this item</li>
+            <li>Click anywhere else to deselect</li>
+          </ul>
+        </div>
+      `;
+    }
+
     switch (this.editorState.mode.type) {
       case 'select':
         return `
           <ul>
-            <li>Click on markers to select and edit them</li>
-            <li>Use mode buttons to switch tools</li>
+            <li><strong>Click on markers</strong> to select and edit them</li>
+            <li>Selected markers will <strong>glow white with a pulsing ring</strong></li>
+            <li>Use mode buttons to switch to placement tools</li>
             <li>Ctrl+T for takeoff mode</li>
             <li>Ctrl+L for landing mode</li>
             <li>Ctrl+S to save</li>
@@ -309,6 +465,248 @@ export class FlyzoneEditorUI {
           this.onAction('locationChanged');
         }
       });
+    }
+
+    // Selected item editing event handlers
+    this.setupSelectedItemEventListeners();
+  }
+
+  private setupSelectedItemEventListeners(): void {
+    if (!this.container || !this.editorState.selectedItem) return;
+
+    // Delete selected item
+    const deleteBtn = this.container.querySelector('[data-action="delete-selected"]');
+    if (deleteBtn) {
+      deleteBtn.addEventListener('click', () => {
+        this.onAction('deleteSelected', { item: this.editorState.selectedItem });
+      });
+    }
+
+    // Save selected item changes
+    const saveBtn = this.container.querySelector('[data-action="save-selected"]');
+    if (saveBtn) {
+      saveBtn.addEventListener('click', () => {
+        this.saveSelectedItemChanges();
+      });
+    }
+
+    // Deselect item
+    const cancelBtn = this.container.querySelector('[data-action="deselect"]');
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', () => {
+        this.onAction('deselectItem');
+      });
+    }
+
+    // Focus camera on selected item
+    const focusBtn = this.container.querySelector('[data-action="focus-selected"]');
+    if (focusBtn) {
+      focusBtn.addEventListener('click', () => {
+        this.onAction('focusSelected', { item: this.editorState.selectedItem });
+      });
+    }
+
+    // Basic property inputs
+    const titleInput = this.container.querySelector('#selected-title') as HTMLInputElement;
+    const descriptionInput = this.container.querySelector('#selected-description') as HTMLTextAreaElement;
+
+    if (titleInput) {
+      titleInput.addEventListener('input', () => {
+        this.markSelectedItemDirty();
+      });
+    }
+
+    if (descriptionInput) {
+      descriptionInput.addEventListener('input', () => {
+        this.markSelectedItemDirty();
+      });
+    }
+
+    // Item-specific field handlers
+    this.setupItemSpecificEventListeners();
+  }
+
+  private setupItemSpecificEventListeners(): void {
+    if (!this.container || !this.editorState.selectedItem) return;
+
+    const item = this.editorState.selectedItem;
+
+    switch (item.type) {
+      case 'takeoff':
+        this.setupTakeoffEventListeners();
+        break;
+      case 'landing':
+        this.setupLandingEventListeners();
+        break;
+      case 'phase':
+        this.setupPhaseEventListeners();
+        break;
+    }
+  }
+
+  private setupTakeoffEventListeners(): void {
+    const difficultySelect = this.container?.querySelector('#selected-difficulty') as HTMLSelectElement;
+    const walkingTimeInput = this.container?.querySelector('#selected-walking-time') as HTMLInputElement;
+    const hazardsInput = this.container?.querySelector('#selected-hazards') as HTMLInputElement;
+
+    if (difficultySelect) {
+      difficultySelect.addEventListener('change', () => {
+        this.markSelectedItemDirty();
+      });
+    }
+
+    if (walkingTimeInput) {
+      walkingTimeInput.addEventListener('input', () => {
+        this.markSelectedItemDirty();
+      });
+    }
+
+    if (hazardsInput) {
+      hazardsInput.addEventListener('input', () => {
+        this.markSelectedItemDirty();
+      });
+    }
+  }
+
+  private setupLandingEventListeners(): void {
+    const typeSelect = this.container?.querySelector('#selected-landing-type') as HTMLSelectElement;
+    const surfaceSelect = this.container?.querySelector('#selected-surface') as HTMLSelectElement;
+    const widthInput = this.container?.querySelector('#selected-width') as HTMLInputElement;
+    const lengthInput = this.container?.querySelector('#selected-length') as HTMLInputElement;
+
+    if (typeSelect) {
+      typeSelect.addEventListener('change', () => {
+        this.markSelectedItemDirty();
+      });
+    }
+
+    if (surfaceSelect) {
+      surfaceSelect.addEventListener('change', () => {
+        this.markSelectedItemDirty();
+      });
+    }
+
+    if (widthInput) {
+      widthInput.addEventListener('input', () => {
+        this.markSelectedItemDirty();
+      });
+    }
+
+    if (lengthInput) {
+      lengthInput.addEventListener('input', () => {
+        this.markSelectedItemDirty();
+      });
+    }
+  }
+
+  private setupPhaseEventListeners(): void {
+    const phaseTypeSelect = this.container?.querySelector('#selected-phase-type') as HTMLSelectElement;
+    const altMinInput = this.container?.querySelector('#selected-alt-min') as HTMLInputElement;
+    const altMaxInput = this.container?.querySelector('#selected-alt-max') as HTMLInputElement;
+
+    if (phaseTypeSelect) {
+      phaseTypeSelect.addEventListener('change', () => {
+        this.markSelectedItemDirty();
+      });
+    }
+
+    if (altMinInput) {
+      altMinInput.addEventListener('input', () => {
+        this.markSelectedItemDirty();
+      });
+    }
+
+    if (altMaxInput) {
+      altMaxInput.addEventListener('input', () => {
+        this.markSelectedItemDirty();
+      });
+    }
+  }
+
+  private markSelectedItemDirty(): void {
+    if (this.editorState.selectedItem) {
+      this.editorState.selectedItem.isDirty = true;
+      this.onAction('selectedItemChanged');
+    }
+  }
+
+  private saveSelectedItemChanges(): void {
+    if (!this.container || !this.editorState.selectedItem) return;
+
+    const item = this.editorState.selectedItem;
+    const data = item.data;
+
+    // Get basic properties
+    const titleInput = this.container.querySelector('#selected-title') as HTMLInputElement;
+    const descriptionInput = this.container.querySelector('#selected-description') as HTMLTextAreaElement;
+
+    if (titleInput) data.title = titleInput.value;
+    if (descriptionInput) data.description = descriptionInput.value;
+
+    // Get item-specific properties
+    this.saveItemSpecificChanges(item);
+
+    // Mark as clean and notify
+    item.isDirty = false;
+    this.onAction('saveSelectedItem', { item });
+  }
+
+  private saveItemSpecificChanges(item: any): void {
+    if (!this.container) return;
+
+    const data = item.data;
+
+    switch (item.type) {
+      case 'takeoff':
+        const difficultySelect = this.container.querySelector('#selected-difficulty') as HTMLSelectElement;
+        const walkingTimeInput = this.container.querySelector('#selected-walking-time') as HTMLInputElement;
+        const hazardsInput = this.container.querySelector('#selected-hazards') as HTMLInputElement;
+
+        if (difficultySelect) {
+          if (!data.safety) data.safety = {};
+          data.safety.difficulty = difficultySelect.value;
+        }
+
+        if (walkingTimeInput) {
+          if (!data.access) data.access = {};
+          data.access.walkingTime = parseInt(walkingTimeInput.value) || 10;
+        }
+
+        if (hazardsInput) {
+          if (!data.safety) data.safety = {};
+          data.safety.hazards = hazardsInput.value.split(',').map(h => h.trim()).filter(h => h.length > 0);
+        }
+        break;
+
+      case 'landing':
+        const typeSelect = this.container.querySelector('#selected-landing-type') as HTMLSelectElement;
+        const surfaceSelect = this.container.querySelector('#selected-surface') as HTMLSelectElement;
+        const widthInput = this.container.querySelector('#selected-width') as HTMLInputElement;
+        const lengthInput = this.container.querySelector('#selected-length') as HTMLInputElement;
+
+        if (typeSelect) data.type = typeSelect.value;
+        if (surfaceSelect) data.surface = surfaceSelect.value;
+
+        if (widthInput && lengthInput) {
+          if (!data.size) data.size = {};
+          data.size.width = parseInt(widthInput.value) || 100;
+          data.size.length = parseInt(lengthInput.value) || 150;
+        }
+        break;
+
+      case 'phase':
+        const phaseTypeSelect = this.container.querySelector('#selected-phase-type') as HTMLSelectElement;
+        const altMinInput = this.container.querySelector('#selected-alt-min') as HTMLInputElement;
+        const altMaxInput = this.container.querySelector('#selected-alt-max') as HTMLInputElement;
+
+        if (phaseTypeSelect) data.type = phaseTypeSelect.value;
+
+        if (altMinInput && altMaxInput) {
+          if (!data.altitudeRange) data.altitudeRange = {};
+          data.altitudeRange.min = parseInt(altMinInput.value) || 0;
+          data.altitudeRange.max = parseInt(altMaxInput.value) || 500;
+        }
+        break;
     }
   }
 

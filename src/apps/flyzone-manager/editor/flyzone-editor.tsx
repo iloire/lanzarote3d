@@ -49,6 +49,8 @@ class FlyzoneEditorApp extends TerrainBase {
   private mouse: THREE.Vector2 | undefined;
   private isMouseDown = false;
   private terrainMesh: THREE.Mesh | undefined;
+  private camera: THREE.Camera | undefined;
+  private controls: any;
   private eventHandlers: {
     onMouseMove?: (event: MouseEvent) => void;
     onMouseDown?: (event: MouseEvent) => void;
@@ -83,6 +85,10 @@ class FlyzoneEditorApp extends TerrainBase {
       await this.initializeEnvironment(options);
 
       const { camera, scene, renderer, controls, gui, terrain } = options;
+
+      // Store references for later use
+      this.camera = camera;
+      this.controls = controls;
 
       // Initialize API
       await flyzoneAPI.initialize();
@@ -498,6 +504,174 @@ class FlyzoneEditorApp extends TerrainBase {
         this.markers!.deselectMarker(phase.id);
       });
     });
+
+    // Clear selected item from state
+    this.editorState.selectedItem = null;
+    this.editorUI?.refresh();
+  }
+
+  private deleteSelectedItem(item: any): void {
+    if (!item || !this.editorState?.currentLocation || !this.markers) return;
+
+    const location = this.editorState.currentLocation;
+    const confirmed = confirm(`Are you sure you want to delete this ${item.type}?`);
+
+    if (!confirmed) return;
+
+    try {
+      switch (item.type) {
+        case 'takeoff':
+          const takeoffIndex = location.takeoffs.findIndex(t => t.id === item.id);
+          if (takeoffIndex >= 0) {
+            location.takeoffs.splice(takeoffIndex, 1);
+            this.markers.removeMarker(item.id);
+          }
+          break;
+
+        case 'landing':
+          const landingIndex = location.landingZones.findIndex(l => l.id === item.id);
+          if (landingIndex >= 0) {
+            location.landingZones.splice(landingIndex, 1);
+            this.markers.removeMarker(item.id);
+          }
+          break;
+
+        case 'phase':
+          if (location.flyzone.phases[item.id]) {
+            delete location.flyzone.phases[item.id];
+            this.markers.removeMarker(item.id);
+          }
+          break;
+      }
+
+      // Clear selection and mark dirty
+      this.editorState.selectedItem = null;
+      this.markLocationDirty();
+      this.editorUI?.refresh();
+
+      console.log(`Deleted ${item.type}: ${item.data.title || item.id}`);
+    } catch (error) {
+      console.error('Failed to delete item:', error);
+      alert('Failed to delete item. Please try again.');
+    }
+  }
+
+  private saveSelectedItemChanges(item: any): void {
+    if (!item || !this.editorState?.currentLocation) return;
+
+    try {
+      const location = this.editorState.currentLocation;
+
+      // The item data has already been updated by the UI
+      // We just need to ensure it's properly saved in the location structure
+      switch (item.type) {
+        case 'takeoff':
+          const takeoffIndex = location.takeoffs.findIndex(t => t.id === item.id);
+          if (takeoffIndex >= 0) {
+            location.takeoffs[takeoffIndex] = { ...item.data };
+          }
+          break;
+
+        case 'landing':
+          const landingIndex = location.landingZones.findIndex(l => l.id === item.id);
+          if (landingIndex >= 0) {
+            location.landingZones[landingIndex] = { ...item.data };
+          }
+          break;
+
+        case 'phase':
+          if (location.flyzone.phases[item.id]) {
+            location.flyzone.phases[item.id] = { ...item.data };
+          }
+          break;
+      }
+
+      // Mark as saved and update location
+      this.markLocationDirty();
+      this.editorUI?.refresh();
+
+      console.log(`Saved changes to ${item.type}: ${item.data.title || item.id}`);
+    } catch (error) {
+      console.error('Failed to save item changes:', error);
+      alert('Failed to save changes. Please try again.');
+    }
+  }
+
+  private focusOnSelectedItem(item: any): void {
+    if (!item?.data || !this.camera || !this.controls) return;
+
+    try {
+      // Get the position from the item data
+      let position: THREE.Vector3;
+
+      if (item.data.position) {
+        position = new THREE.Vector3(
+          item.data.position.x,
+          item.data.position.y,
+          item.data.position.z
+        );
+      } else if (item.data.gps) {
+        // Simple GPS to world conversion (approximate for Lanzarote)
+        // This is a simplified conversion, actual GPS conversion would require proper projection
+        const lat = item.data.gps.latitude;
+        const lon = item.data.gps.longitude;
+        const x = (lon - 13.5) * 111320 * Math.cos(lat * Math.PI / 180); // Rough conversion
+        const z = -(lat - 29.0) * 111320; // Rough conversion (negative for Three.js Z-axis)
+        position = new THREE.Vector3(x, item.data.elevation || 0, z);
+      } else {
+        console.warn('No position data found for item:', item);
+        return;
+      }
+
+      // Calculate camera position - offset from the target
+      const offset = new THREE.Vector3(300, 200, 300);
+      const cameraPosition = position.clone().add(offset);
+
+      // Animate camera to focus on the item
+      const startPosition = this.camera.position.clone();
+      const startTarget = new THREE.Vector3();
+      if (this.controls.target) {
+        startTarget.copy(this.controls.target);
+      }
+
+      const duration = 1000; // 1 second animation
+      const startTime = Date.now();
+
+      const animateCamera = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = this.easeInOutCubic(progress);
+
+        // Interpolate camera position
+        this.camera!.position.lerpVectors(startPosition, cameraPosition, eased);
+
+        // Interpolate target
+        if (this.controls.target) {
+          this.controls.target.lerpVectors(startTarget, position, eased);
+        }
+
+        this.controls.update();
+
+        if (progress < 1) {
+          requestAnimationFrame(animateCamera);
+        }
+      };
+
+      animateCamera();
+      console.log(`Focused camera on ${item.type}: ${item.data.title || item.id}`);
+    } catch (error) {
+      console.error('Failed to focus on item:', error);
+    }
+  }
+
+  private easeInOutCubic(t: number): number {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  }
+
+  private markLocationDirty(): void {
+    if (this.editorState) {
+      this.editorState.isDirty = true;
+    }
   }
 
   private getCurrentLocationTakeoffCount(): number {
@@ -678,7 +852,24 @@ class FlyzoneEditorApp extends TerrainBase {
       case 'clear':
         this.clearEditor();
         break;
-      // Add more actions as needed
+      case 'deleteSelected':
+        this.deleteSelectedItem(data?.item);
+        break;
+      case 'saveSelectedItem':
+        this.saveSelectedItemChanges(data?.item);
+        break;
+      case 'deselectItem':
+        this.deselectAllMarkers();
+        break;
+      case 'focusSelected':
+        this.focusOnSelectedItem(data?.item);
+        break;
+      case 'selectedItemChanged':
+        this.markLocationDirty();
+        break;
+      case 'locationChanged':
+        this.markLocationDirty();
+        break;
     }
   }
 
