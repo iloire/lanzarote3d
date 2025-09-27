@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lanzarote Tile Comparison Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f0f0f0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .tile-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .tile-card {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+        .tile-card.highlight {
+            border-color: #ff6b6b;
+            background: #fff5f5;
+        }
+        .tile-image {
+            width: 100%;
+            max-width: 256px;
+            height: auto;
+            border: 1px solid #ccc;
+            margin: 10px 0;
+        }
+        .tile-info {
+            font-size: 12px;
+            color: #666;
+            margin: 5px 0;
+        }
+        .atlas-preview {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .atlas-image {
+            max-width: 100%;
+            border: 2px solid #333;
+        }
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+        }
+        .coordinates {
+            font-family: monospace;
+            font-size: 11px;
+            background: #f5f5f5;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .status.good { background: #d4edda; color: #155724; }
+        .status.bad { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛰️ Lanzarote Satellite Tile Comparison Tool</h1>
+
+        <div class="controls">
+            <h3>Instructions:</h3>
+            <ol>
+                <li>Compare each tile below with actual Lanzarote geography</li>
+                <li>Click on tiles to highlight them</li>
+                <li>Use the coordinates to identify which part of Lanzarote each tile represents</li>
+                <li>Tell me which tiles look correct and which need adjustment</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h3>Current 3x3 Tile Grid</h3>
+            <p>This shows the tiles we're currently using (1892-1894, 1702-1704):</p>
+
+            <div class="tile-grid" id="tileGrid">
+                <!-- Row 1 (North) -->
+                <div class="tile-card" onclick="highlightTile(this)" data-x="1892" data-y="1702">
+                    <h4>NW - (1892, 1702)</h4>
+                    <img src="tile_1892_1702.png" alt="Tile 1892,1702" class="tile-image" onerror="this.style.display='none'">
+                    <div class="coordinates">
+                        Approx: 29.1°N, -13.8°W to -13.6°W
+                    </div>
+                    <div class="tile-info">Top-left tile</div>
+                </div>
+
+                <div class="tile-card" onclick="highlightTile(this)" data-x="1893" data-y="1702">
+                    <h4>N - (1893, 1702)</h4>
+                    <img src="tile_1893_1702.png" alt="Tile 1893,1702" class="tile-image" onerror="this.style.display='none'">
+                    <div class="coordinates">
+                        Approx: 29.1°N, -13.6°W to -13.4°W
+                    </div>
+                    <div class="tile-info">Top-center tile</div>
+                </div>
+
+                <div class="tile-card" onclick="highlightTile(this)" data-x="1894" data-y="1702">
+                    <h4>NE - (1894, 1702)</h4>
+                    <img src="tile_1894_1702.png" alt="Tile 1894,1702" class="tile-image" onerror="this.style.display='none'">
+                    <div class="coordinates">
+                        Approx: 29.1°N, -13.4°W to -13.2°W
+                    </div>
+                    <div class="tile-info">Top-right tile</div>
+                </div>
+
+                <!-- Row 2 (Center) -->
+                <div class="tile-card" onclick="highlightTile(this)" data-x="1892" data-y="1703">
+                    <h4>W - (1892, 1703)</h4>
+                    <img src="tile_1892_1703.png" alt="Tile 1892,1703" class="tile-image" onerror="this.style.display='none'">
+                    <div class="coordinates">
+                        Approx: 28.9°N, -13.8°W to -13.6°W
+                    </div>
+                    <div class="tile-info">Center-left tile</div>
+                </div>
+
+                <div class="tile-card tile-card highlight" onclick="highlightTile(this)" data-x="1893" data-y="1703">
+                    <h4>CENTER - (1893, 1703)</h4>
+                    <img src="tile_1893_1703.png" alt="Tile 1893,1703" class="tile-image" onerror="this.style.display='none'">
+                    <div class="coordinates">
+                        Approx: 28.9°N, -13.6°W to -13.4°W
+                    </div>
+                    <div class="tile-info">CENTER (should show main Lanzarote)</div>
+                </div>
+
+                <div class="tile-card" onclick="highlightTile(this)" data-x="1894" data-y="1703">
+                    <h4>E - (1894, 1703)</h4>
+                    <img src="tile_1894_1703.png" alt="Tile 1894,1703" class="tile-image" onerror="this.style.display='none'">
+                    <div class="coordinates">
+                        Approx: 28.9°N, -13.4°W to -13.2°W
+                    </div>
+                    <div class="tile-info">Center-right tile</div>
+                </div>
+
+                <!-- Row 3 (South) -->
+                <div class="tile-card" onclick="highlightTile(this)" data-x="1892" data-y="1704">
+                    <h4>SW - (1892, 1704)</h4>
+                    <img src="tile_1892_1704.png" alt="Tile 1892,1704" class="tile-image" onerror="this.style.display='none'">
+                    <div class="coordinates">
+                        Approx: 28.7°N, -13.8°W to -13.6°W
+                    </div>
+                    <div class="tile-info">Bottom-left tile</div>
+                </div>
+
+                <div class="tile-card" onclick="highlightTile(this)" data-x="1893" data-y="1704">
+                    <h4>S - (1893, 1704)</h4>
+                    <img src="tile_1893_1704.png" alt="Tile 1893,1704" class="tile-image" onerror="this.style.display='none'">
+                    <div class="coordinates">
+                        Approx: 28.7°N, -13.6°W to -13.4°W
+                    </div>
+                    <div class="tile-info">Bottom-center tile</div>
+                </div>
+
+                <div class="tile-card" onclick="highlightTile(this)" data-x="1894" data-y="1704">
+                    <h4>SE - (1894, 1704)</h4>
+                    <img src="tile_1894_1704.png" alt="Tile 1894,1704" class="tile-image" onerror="this.style.display='none'">
+                    <div class="coordinates">
+                        Approx: 28.7°N, -13.4°W to -13.2°W
+                    </div>
+                    <div class="tile-info">Bottom-right tile</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="atlas-preview">
+            <h3>Combined Atlas Preview</h3>
+            <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                <div>
+                    <h4>Original (1892-1894, 1702-1704)</h4>
+                    <img src="lanzarote-satellite-atlas-3x3.jpg" alt="Original Atlas" style="max-width: 400px; border: 2px solid #666;" onerror="this.alt='Atlas not found'">
+                    <p style="font-size: 12px; color: #666;">Mostly ocean in south tiles</p>
+                </div>
+                <div>
+                    <h4>🎯 CORRECTED (1893-1895, 1701-1703)</h4>
+                    <img src="lanzarote-satellite-atlas-corrected.jpg" alt="Corrected Atlas" style="max-width: 400px; border: 3px solid #00ff00;" onerror="this.alt='Corrected Atlas not found'">
+                    <p style="font-size: 12px; color: #00aa00;"><strong>Latest: Based on your feedback - shifted SE</strong></p>
+                </div>
+                <div>
+                    <h4>Shifted (1890-1892, 1700-1702)</h4>
+                    <img src="lanzarote-satellite-atlas-shifted.jpg" alt="Shifted Atlas" style="max-width: 400px; border: 2px solid #ff6b6b;" onerror="this.alt='Shifted Atlas not found'">
+                    <p style="font-size: 12px; color: #ff6b6b;">Test: Too far north and west</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>🆕 NEW: Shifted Tile Grid (1890-1892, 1700-1702)</h3>
+            <p>Testing a grid shifted north and west based on your feedback:</p>
+
+            <div class="tile-grid">
+                <!-- Shifted Row 1 (North) -->
+                <div class="tile-card" onclick="highlightTile(this)" data-x="1890" data-y="1700">
+                    <h4>NEW NW - (1890, 1700)</h4>
+                    <img src="tile_1890_1700_new.png" alt="Tile 1890,1700" class="tile-image" onerror="this.style.display='none'">
+                    <div class="coordinates">
+                        Approx: 29.3°N, -14.0°W to -13.8°W
+                    </div>
+                    <div class="tile-info">Shifted NW</div>
+                </div>
+
+                <div class="tile-card" onclick="highlightTile(this)" data-x="1891" data-y="1700">
+                    <h4>NEW N - (1891, 1700)</h4>
+                    <img src="tile_1891_1700_new.png" alt="Tile 1891,1700" class="tile-image" onerror="this.style.display='none'">
+                    <div class="coordinates">
+                        Approx: 29.3°N, -13.8°W to -13.6°W
+                    </div>
+                    <div class="tile-info">Shifted N</div>
+                </div>
+
+                <div class="tile-card" onclick="highlightTile(this)" data-x="1892" data-y="1700">
+                    <h4>NEW NE - (1892, 1700)</h4>
+                    <img src="tile_1892_1700_new.png" alt="Tile 1892,1700" class="tile-image" onerror="this.style.display='none'">
+                    <div class="coordinates">
+                        Approx: 29.3°N, -13.6°W to -13.4°W
+                    </div>
+                    <div class="tile-info">Shifted NE</div>
+                </div>
+
+                <!-- Shifted Row 2 (Center) -->
+                <div class="tile-card" onclick="highlightTile(this)" data-x="1890" data-y="1701">
+                    <h4>NEW W - (1890, 1701)</h4>
+                    <img src="tile_1890_1701_new.png" alt="Tile 1890,1701" class="tile-image" onerror="this.style.display='none'">
+                    <div class="coordinates">
+                        Approx: 29.1°N, -14.0°W to -13.8°W
+                    </div>
+                    <div class="tile-info">Shifted W</div>
+                </div>
+
+                <div class="tile-card tile-card highlight" onclick="highlightTile(this)" data-x="1891" data-y="1701">
+                    <h4>NEW CENTER - (1891, 1701)</h4>
+                    <img src="tile_1891_1701_new.png" alt="Tile 1891,1701" class="tile-image" onerror="this.style.display='none'">
+                    <div class="coordinates">
+                        Approx: 29.1°N, -13.8°W to -13.6°W
+                    </div>
+                    <div class="tile-info">NEW CENTER (should show main Lanzarote)</div>
+                </div>
+
+                <div class="tile-card" onclick="highlightTile(this)" data-x="1892" data-y="1701">
+                    <h4>NEW E - (1892, 1701)</h4>
+                    <img src="tile_1892_1701_new.png" alt="Tile 1892,1701" class="tile-image" onerror="this.style.display='none'">
+                    <div class="coordinates">
+                        Approx: 29.1°N, -13.6°W to -13.4°W
+                    </div>
+                    <div class="tile-info">Shifted E</div>
+                </div>
+
+                <!-- Shifted Row 3 (South) -->
+                <div class="tile-card" onclick="highlightTile(this)" data-x="1890" data-y="1702">
+                    <h4>NEW SW - (1890, 1702)</h4>
+                    <img src="tile_1890_1702_new.png" alt="Tile 1890,1702" class="tile-image" onerror="this.style.display='none'">
+                    <div class="coordinates">
+                        Approx: 28.9°N, -14.0°W to -13.8°W
+                    </div>
+                    <div class="tile-info">Shifted SW</div>
+                </div>
+
+                <div class="tile-card" onclick="highlightTile(this)" data-x="1891" data-y="1702">
+                    <h4>NEW S - (1891, 1702)</h4>
+                    <img src="tile_1891_1702_new.png" alt="Tile 1891,1702" class="tile-image" onerror="this.style.display='none'">
+                    <div class="coordinates">
+                        Approx: 28.9°N, -13.8°W to -13.6°W
+                    </div>
+                    <div class="tile-info">Shifted S</div>
+                </div>
+
+                <div class="tile-card" onclick="highlightTile(this)" data-x="1892" data-y="1702">
+                    <h4>NEW SE - (1892, 1702)</h4>
+                    <img src="tile_1892_1702_new.png" alt="Tile 1892,1702" class="tile-image" onerror="this.style.display='none'">
+                    <div class="coordinates">
+                        Approx: 28.9°N, -13.6°W to -13.4°W
+                    </div>
+                    <div class="tile-info">Shifted SE</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>🎯 LATEST: Corrected Tile Grid (1893-1895, 1701-1703)</h3>
+            <p><strong>Based on your feedback that "NEW E shows real center north of island" - shifted grid southeast:</strong></p>
+
+            <div class="tile-grid">
+                <!-- Corrected Row 1 (North) -->
+                <div class="tile-card" onclick="highlightTile(this)" data-x="1893" data-y="1701">
+                    <h4>FINAL NW - (1893, 1701)</h4>
+                    <img src="tile_1893_1701_corrected.png" alt="Tile 1893,1701" class="tile-image" onerror="this.style.display='none'">
+                    <div class="coordinates">
+                        Approx: 29.0°N, -13.6°W to -13.4°W
+                    </div>
+                    <div class="tile-info" style="color: #006600;">Should show northern Lanzarote</div>
+                </div>
+
+                <div class="tile-card" onclick="highlightTile(this)" data-x="1894" data-y="1701">
+                    <h4>FINAL N - (1894, 1701)</h4>
+                    <img src="tile_1894_1701_corrected.png" alt="Tile 1894,1701" class="tile-image" onerror="this.style.display='none'">
+                    <div class="coordinates">
+                        Approx: 29.0°N, -13.4°W to -13.2°W
+                    </div>
+                    <div class="tile-info" style="color: #006600;">Should show NE Lanzarote</div>
+                </div>
+
+                <div class="tile-card" onclick="highlightTile(this)" data-x="1895" data-y="1701">
+                    <h4>FINAL NE - (1895, 1701)</h4>
+                    <img src="tile_1895_1701_corrected.png" alt="Tile 1895,1701" class="tile-image" onerror="this.style.display='none'">
+                    <div class="coordinates">
+                        Approx: 29.0°N, -13.2°W to -13.0°W
+                    </div>
+                    <div class="tile-info" style="color: #006600;">Ocean or eastern edge</div>
+                </div>
+
+                <!-- Corrected Row 2 (Center) -->
+                <div class="tile-card" onclick="highlightTile(this)" data-x="1893" data-y="1702">
+                    <h4>FINAL W - (1893, 1702)</h4>
+                    <img src="tile_1893_1702_corrected.png" alt="Tile 1893,1702" class="tile-image" onerror="this.style.display='none'">
+                    <div class="coordinates">
+                        Approx: 28.87°N, -13.6°W to -13.4°W
+                    </div>
+                    <div class="tile-info" style="color: #006600;">Should show western Lanzarote</div>
+                </div>
+
+                <div class="tile-card tile-card highlight" onclick="highlightTile(this)" data-x="1894" data-y="1702">
+                    <h4>FINAL CENTER - (1894, 1702)</h4>
+                    <img src="tile_1894_1702_corrected.png" alt="Tile 1894,1702" class="tile-image" onerror="this.style.display='none'">
+                    <div class="coordinates">
+                        Approx: 28.87°N, -13.4°W to -13.2°W
+                    </div>
+                    <div class="tile-info" style="color: #006600;"><strong>MAIN LANZAROTE CENTER</strong></div>
+                </div>
+
+                <div class="tile-card" onclick="highlightTile(this)" data-x="1895" data-y="1702">
+                    <h4>FINAL E - (1895, 1702)</h4>
+                    <img src="tile_1895_1702_corrected.png" alt="Tile 1895,1702" class="tile-image" onerror="this.style.display='none'">
+                    <div class="coordinates">
+                        Approx: 28.87°N, -13.2°W to -13.0°W
+                    </div>
+                    <div class="tile-info" style="color: #006600;">Eastern Lanzarote or ocean</div>
+                </div>
+
+                <!-- Corrected Row 3 (South) -->
+                <div class="tile-card" onclick="highlightTile(this)" data-x="1893" data-y="1703">
+                    <h4>FINAL SW - (1893, 1703)</h4>
+                    <img src="tile_1893_1703_corrected.png" alt="Tile 1893,1703" class="tile-image" onerror="this.style.display='none'">
+                    <div class="coordinates">
+                        Approx: 28.73°N, -13.6°W to -13.4°W
+                    </div>
+                    <div class="tile-info" style="color: #006600;">Should show southern Lanzarote</div>
+                </div>
+
+                <div class="tile-card" onclick="highlightTile(this)" data-x="1894" data-y="1703">
+                    <h4>FINAL S - (1894, 1703)</h4>
+                    <img src="tile_1894_1703_corrected.png" alt="Tile 1894,1703" class="tile-image" onerror="this.style.display='none'">
+                    <div class="coordinates">
+                        Approx: 28.73°N, -13.4°W to -13.2°W
+                    </div>
+                    <div class="tile-info" style="color: #006600;">Should show SE Lanzarote</div>
+                </div>
+
+                <div class="tile-card" onclick="highlightTile(this)" data-x="1895" data-y="1703">
+                    <h4>FINAL SE - (1895, 1703)</h4>
+                    <img src="tile_1895_1703_corrected.png" alt="Tile 1895,1703" class="tile-image" onerror="this.style.display='none'">
+                    <div class="coordinates">
+                        Approx: 28.73°N, -13.2°W to -13.0°W
+                    </div>
+                    <div class="tile-info" style="color: #006600;">Ocean or southern edge</div>
+                </div>
+            </div>
+
+            <div class="status good">
+                <strong>Coverage Analysis:</strong> This 3x3 grid covers approximately 0.4° latitude × 0.6° longitude, which should encompass most of Lanzarote island (28.86°N to 29.24°N, -13.87°W to -13.43°W).
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>Reference Information</h3>
+            <p><strong>Lanzarote Geographic Bounds:</strong></p>
+            <ul>
+                <li>Northernmost point: ~29.24°N (Punta Fariones)</li>
+                <li>Southernmost point: ~28.86°N (Punta del Papagayo)</li>
+                <li>Westernmost point: ~-13.87°W</li>
+                <li>Easternmost point: ~-13.43°W</li>
+            </ul>
+
+            <div class="status good">
+                <strong>What to look for:</strong> The center tile (1893, 1703) should show the main body of Lanzarote island with volcanic features.
+            </div>
+
+            <div class="status bad">
+                <strong>Current issues:</strong> Visible seams between tiles and potential coordinate misalignment.
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>Feedback</h3>
+            <p>Please tell me:</p>
+            <ol>
+                <li>Which tiles show actual Lanzarote terrain?</li>
+                <li>Which tiles show only ocean?</li>
+                <li>Are there visible seams between any tiles?</li>
+                <li>Does the center tile (1893, 1703) show the main Lanzarote landmass?</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function highlightTile(element) {
+            // Remove highlight from all tiles
+            document.querySelectorAll('.tile-card').forEach(card => {
+                card.classList.remove('highlight');
+            });
+
+            // Highlight clicked tile
+            element.classList.add('highlight');
+
+            // Show info
+            const x = element.dataset.x;
+            const y = element.dataset.y;
+            console.log(`Selected tile: (${x}, ${y})`);
+        }
+    </script>
+</body>
+</html>

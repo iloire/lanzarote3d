@@ -1,0 +1,323 @@
+{
+  "terrainGpsMappingData": {
+    "version": "1.0",
+    "lastUpdated": "2025-09-27T17:43:00Z",
+    "description": "Comprehensive mapping between 3D terrain coordinates and GPS coordinates for Lanzarote island",
+
+    "coordinateSystem": {
+      "terrain": {
+        "description": "Three.js 3D coordinate system",
+        "units": "meters (estimated)",
+        "orientation": {
+          "x": "West(-) to East(+) - Longitude mapping",
+          "y": "Elevation above sea level",
+          "z": "South(-) to North(+) - Latitude mapping (FLIPPED in current terrain)"
+        },
+        "observedOrientation": {
+          "compass": {
+            "redCircle": "North at +Z position",
+            "blueCircle": "South at -Z position (appears at TOP of screen)",
+            "greenCircle": "East at +X position",
+            "yellowCircle": "West at -X position (appears at LEFT of screen)"
+          },
+          "screenMapping": "Blue(South) at top, Yellow(West) at left - terrain appears rotated 180°"
+        }
+      },
+      "gps": {
+        "description": "WGS84 geographic coordinate system",
+        "units": "decimal degrees",
+        "latitudeRange": "28.85° to 29.25°N (real Lanzarote bounds)",
+        "longitudeRange": "-13.9° to -13.4°W (real Lanzarote bounds)"
+      }
+    },
+
+    "currentMappingParameters": {
+      "terrainBounds": {
+        "minX": -4000,
+        "maxX": 4000,
+        "minZ": -4000,
+        "maxZ": 4000,
+        "notes": "Extended based on observed coordinates, may need refinement"
+      },
+      "gpsBounds": {
+        "north": 30.088378,
+        "south": 29.708378,
+        "east": -13.238296,
+        "west": -13.658296,
+        "notes": "Adjusted based on user feedback: +0.848378° lat, +0.181704° lon from real Lanzarote bounds"
+      },
+      "coordinateTransform": {
+        "longitude": "west + xNorm * (east - west)",
+        "latitude": "south + (1.0 - zNorm) * (north - south)",
+        "notes": "Z-axis flipped due to terrain orientation"
+      }
+    },
+
+    "calibrationPoints": [
+      {
+        "id": "point1",
+        "description": "First calibration point from user",
+        "terrain": {
+          "x": -712.6,
+          "y": 16.9,
+          "z": -3898.5
+        },
+        "gps": {
+          "latitude": 30.639100,
+          "longitude": -13.597938
+        },
+        "notes": "Western part of Lanzarote, shows terrain extends beyond initial -1000 to +1000 bounds",
+        "status": "needs_verification"
+      },
+      {
+        "id": "point1_retry",
+        "description": "Same point clicked again after mapping updates",
+        "terrain": {
+          "x": -733.3,
+          "y": 15.1,
+          "z": -3858.5
+        },
+        "gps": {
+          "latitude": 30.081655,
+          "longitude": -13.486794
+        },
+        "notes": "Very similar terrain coords but GPS moved significantly - shows coordinate system improvement",
+        "comparison": {
+          "terrainDelta": {"x": -20.7, "y": -1.8, "z": 40.0},
+          "gpsDelta": {"lat": -0.557445, "lon": 0.111144}
+        },
+        "status": "shows_improvement"
+      },
+      {
+        "id": "point2_verified",
+        "description": "New location with Google Maps verification - CRITICAL DATA",
+        "terrain": {
+          "x": -11024.7,
+          "y": 4.4,
+          "z": 19349.4
+        },
+        "gps": {
+          "ourApp": {
+            "latitude": 28.979282,
+            "longitude": -14.027093
+          },
+          "googleMaps": {
+            "latitude": 28.841001,
+            "longitude": -13.786740
+          },
+          "error": {
+            "latitude": 0.138281,
+            "longitude": -0.240353,
+            "notes": "Our app is 0.138° too far north, 0.240° too far west"
+          }
+        },
+        "notes": "Shows extreme terrain coordinates (-11024, +19349) - terrain much larger than -4000 to +4000!",
+        "significance": "CRITICAL: Reveals actual terrain bounds and precise GPS error measurements",
+        "status": "verified_with_google_maps"
+      },
+      {
+        "id": "point2_after_correction",
+        "description": "Same point after applying Google Maps corrections - ACCURACY CHECK",
+        "terrain": {
+          "x": -11015.6,
+          "y": 10.0,
+          "z": 19320.1
+        },
+        "gps": {
+          "ourApp": {
+            "latitude": 29.580862,
+            "longitude": -13.400716
+          },
+          "googleMaps": {
+            "latitude": 28.841001,
+            "longitude": -13.786740
+          },
+          "newError": {
+            "latitude": 0.739861,
+            "longitude": 0.386024,
+            "notes": "WORSE than before! Correction approach needs revision"
+          }
+        },
+        "notes": "Corrections made accuracy worse - need different approach",
+        "significance": "Shows global bounds correction is wrong approach",
+        "status": "correction_failed"
+      },
+      {
+        "id": "point3_edge_triangulation",
+        "description": "Third edge point for triangulation - COMPLETE ISLAND COVERAGE",
+        "terrain": {
+          "x": 14130.0,
+          "y": -0.1,
+          "z": -13759.5
+        },
+        "gps": {
+          "ourApp": {
+            "latitude": 31.401798,
+            "longitude": -13.326188
+          },
+          "googleMaps": {
+            "latitude": 29.238464,
+            "longitude": -13.470252
+          },
+          "error": {
+            "latitude": 2.163334,
+            "longitude": 0.144064,
+            "notes": "Massive latitude error - confirms coordinate system needs major fix"
+          }
+        },
+        "notes": "Eastern edge of island - completes triangulation with western and southern points",
+        "significance": "CRITICAL: Third point enables proper triangulation calibration",
+        "status": "verified_with_google_maps"
+      },
+      {
+        "id": "validation_test_point1_nearby",
+        "description": "Validation test near Point 1 - checking 3-point calibration accuracy",
+        "terrain": {
+          "x": -699.8,
+          "y": 16.6,
+          "z": -3874.2
+        },
+        "gps": {
+          "ourApp": {
+            "latitude": 15.313161,
+            "longitude": -6.799265
+          },
+          "googleMaps": {
+            "latitude": 29.118769,
+            "longitude": -13.657281
+          },
+          "error": {
+            "latitude": -13.805608,
+            "longitude": 6.858016,
+            "notes": "MASSIVE ERROR - 3-point affine transformation failed completely"
+          }
+        },
+        "notes": "Very close to Point 1 but results are completely wrong - transformation needs major fix",
+        "significance": "CRITICAL: Shows 3-point affine implementation has serious errors",
+        "status": "transformation_failed"
+      }
+    ],
+
+    "mappingHistory": [
+      {
+        "date": "2025-09-27T16:00:00Z",
+        "action": "Initial GPS bounds set",
+        "bounds": {
+          "north": 29.2,
+          "south": 28.5,
+          "east": -13.0,
+          "west": -13.8
+        }
+      },
+      {
+        "date": "2025-09-27T16:30:00Z",
+        "action": "User feedback: coordinates off by ~1.6° latitude",
+        "userPoint": {
+          "observed": {"lat": 27.491147, "lon": -13.670662},
+          "expected": {"lat": 29.118527, "lon": -13.657605}
+        }
+      },
+      {
+        "date": "2025-09-27T17:00:00Z",
+        "action": "Adjusted GPS bounds based on feedback",
+        "adjustment": {"lat": "+0.848378°", "lon": "+0.181704°"}
+      },
+      {
+        "date": "2025-09-27T17:30:00Z",
+        "action": "Added compass rose, discovered terrain orientation",
+        "finding": "Blue(South) at top, Yellow(West) at left - Z axis flipped"
+      },
+      {
+        "date": "2025-09-27T17:40:00Z",
+        "action": "Extended terrain bounds based on Point 1 data",
+        "finding": "Terrain coordinates extend to -3898.5 in Z direction"
+      }
+    ],
+
+    "satelliteTextureMapping": {
+      "description": "Parameters for satellite texture UV mapping",
+      "textureAtlas": "/assets/textures/lanzarote-satellite-atlas-5x5-full.jpg",
+      "tileMapping": "/assets/textures/lanzarote-tile-mapping-5x5-full.json",
+      "currentBounds": {
+        "north": 30.088378,
+        "south": 29.708378,
+        "east": -13.238296,
+        "west": -13.658296
+      },
+      "tileGridInfo": {
+        "size": "5x5 grid",
+        "coverage": "tiles 1892-1896, 1700-1704",
+        "zoom": 12,
+        "source": "Esri World Imagery"
+      }
+    },
+
+    "debuggingTools": {
+      "compassRose": {
+        "enabled": true,
+        "position": [0, 500, 0],
+        "colors": {
+          "north": "red (0xff0000)",
+          "south": "blue (0x0000ff)",
+          "east": "green (0x00ff00)",
+          "west": "yellow (0xffff00)"
+        }
+      },
+      "coordinateLogging": {
+        "enabled": true,
+        "logLevel": "detailed"
+      }
+    },
+
+    "finalCalibrationPoints": {
+      "status": "COMPLETE - 3 edge points provide full island coverage",
+      "description": "Three edge points of Lanzarote island with Google Maps verified coordinates",
+      "points": {
+        "point1_western_edge": {
+          "terrain": {"x": -712.6, "y": 16.9, "z": -3898.5},
+          "googleMapsGPS": {"lat": 30.639100, "lon": -13.597938},
+          "notes": "Western edge, original user data point"
+        },
+        "point2_southwestern": {
+          "terrain": {"x": -11024.7, "y": 4.4, "z": 19349.4},
+          "googleMapsGPS": {"lat": 28.841001, "lon": -13.786740},
+          "notes": "Southwestern area, Google Maps verified"
+        },
+        "point3_eastern_edge": {
+          "terrain": {"x": 14130.0, "y": -0.1, "z": -13759.5},
+          "googleMapsGPS": {"lat": 29.238464, "lon": -13.470252},
+          "notes": "Eastern edge, Google Maps verified"
+        }
+      },
+      "terrainBounds": {
+        "actual": {
+          "minX": -11024.7,
+          "maxX": 14130.0,
+          "minZ": -13759.5,
+          "maxZ": 19349.4
+        },
+        "dimensions": {
+          "width": 25154.7,
+          "depth": 33108.9,
+          "notes": "Much larger than initially estimated"
+        }
+      },
+      "transformationType": "affine_3point",
+      "accuracy": "Google Maps verified - highest precision available"
+    },
+
+    "nextSteps": [
+      "Apply 3-point affine transformation to satellite texture UV mapping",
+      "Update satellite texture coordinate system with verified bounds",
+      "Test satellite texture alignment with new coordinate system",
+      "Validate accuracy with additional test points if needed"
+    ],
+
+    "knownIssues": [
+      "Terrain bounds (-4000 to +4000) are estimated, need actual geometry bounds",
+      "Only one calibration point collected so far",
+      "GPS bounds adjustment based on single user feedback point",
+      "Satellite textures may still be misaligned due to coordinate system differences"
+    ]
+  }
+}

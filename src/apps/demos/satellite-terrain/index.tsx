@@ -166,14 +166,14 @@ class SatelliteTerrainApp extends TerrainBase {
     this.uiContainer.style.cssText = `
       position: fixed;
       top: 20px;
-      left: 20px;
+      right: 20px;
       background: rgba(0, 0, 0, 0.8);
       color: white;
       padding: 15px;
       border-radius: 8px;
       font-family: monospace;
       font-size: 12px;
-      z-index: 1000;
+      z-index: 900;
       max-width: 300px;
       line-height: 1.4;
     `;

@@ -139,15 +139,20 @@ class BoatWorkshopApp extends WorkshopDemoBase {
       const time = Date.now() * 0.001;
 
       this.boats.forEach((boat, index) => {
-        // Different floating patterns for each boat - reduced amplitude
-        const floatOffset = Math.sin(time + index * 0.5) * 8;
-        const bobOffset = Math.cos(time * 1.5 + index * 0.3) * 3;
+        // Realistic ocean wave simulation with multiple wave frequencies
+        const primaryWave = Math.sin(time * 0.8 + index * 0.7) * 12;
+        const secondaryWave = Math.sin(time * 1.3 + index * 1.2) * 6;
+        const tertiaryWave = Math.cos(time * 0.5 + index * 0.4) * 4;
+        const swellWave = Math.sin(time * 0.3 + index * 0.8) * 8;
 
-        boat.position.y = originalPositions[index] + floatOffset + bobOffset;
+        // Combine waves for realistic ocean motion
+        const totalWaveHeight = primaryWave + secondaryWave + tertiaryWave + swellWave;
+        boat.position.y = originalPositions[index] + totalWaveHeight;
 
-        // Small rotation for realistic boat movement
-        boat.rotation.z = Math.sin(time + index * 0.7) * 0.02;
-        boat.rotation.x = Math.cos(time * 0.8 + index * 0.4) * 0.01;
+        // Enhanced realistic boat movement - rolling and pitching like in ocean waves
+        boat.rotation.z = Math.sin(time * 0.9 + index * 0.6) * 0.08; // Roll
+        boat.rotation.x = Math.cos(time * 0.7 + index * 0.5) * 0.05; // Pitch
+        boat.rotation.y += Math.sin(time * 0.4 + index * 0.3) * 0.002; // Slight yaw drift
       });
 
       if (this.isLoaded) {

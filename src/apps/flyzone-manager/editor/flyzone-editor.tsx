@@ -71,6 +71,9 @@ class FlyzoneEditorApp extends TerrainBase {
           enabled: false, // Clear visibility for precise editing
         },
       },
+      terrain: {
+        style: 'satellite', // Use satellite imagery for better geographic reference
+      },
       performance: {
         monitoring: true,
         logIntervalMs: 30000,
@@ -93,11 +96,21 @@ class FlyzoneEditorApp extends TerrainBase {
       // Initialize API
       await flyzoneAPI.initialize();
 
-      // Set initial camera position for editing
-      camera.position.set(5000, 2000, 0);
+      // Set perfect top-down north-facing view for satellite mapping (like satellite-terrain demo)
+      // Position camera VERY high above terrain center, looking straight down
+      const initialPos = new THREE.Vector3(0, 50000, 0);  // VERY high altitude for full island overview
+      const lookAtPos = new THREE.Vector3(0, 0, 0);       // Look at terrain center
+
+      camera.position.copy(initialPos);
+      camera.lookAt(lookAtPos);
 
       // Enable orbital controls for camera movement
       controls.enabled = true;
+      controls.target.copy(lookAtPos);
+      controls.maxDistance = Infinity;   // No maximum zoom out limit
+      controls.minDistance = 100;       // Minimum zoom in limit
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
 
       // Store terrain reference
       this.terrainMesh = terrain;
