@@ -29,7 +29,7 @@ import ParagliderDemo from '../tools/workshop/demos/paraglider';
 import Pilot from '../tools/workshop/demos/pilot';
 import Terrain from '../tools/workshop/demos/terrain';
 import Voxel from '../tools/workshop/demos/voxel/index';
-import Workshop from '../tools/workshop/index';
+import Workshop from '../tools/workshop/demos/workshop';
 
 export type StoryFunction = (options: StoryOptions) => Promise<any>;
 
