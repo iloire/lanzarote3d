@@ -3,7 +3,6 @@ import { StoryOptions } from './types';
 // Export specialized base classes
 export { AppBase } from './AppBase';
 export { WorkshopDemoBase } from './WorkshopDemoBase';
-export { ToolBase } from './ToolBase';
 export { TerrainBase } from './TerrainBase';
 
 // Import core apps

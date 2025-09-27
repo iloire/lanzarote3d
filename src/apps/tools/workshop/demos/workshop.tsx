@@ -5,7 +5,7 @@ import { House, HouseType } from '../../../../foundation/components/scenery';
 import { PineTree } from '../../../../foundation/components/scenery';
 import { PilotHeadType } from '../../../../foundation/components/characters';
 import { StoryOptions } from '../../../shared/types';
-import { ToolBase } from '../../../shared/ToolBase';
+import { WorkshopDemoBase } from '../../../shared/WorkshopDemoBase';
 
 const createLabel = (text: string, position: THREE.Vector3) => {
   const canvas = document.createElement('canvas');
@@ -38,10 +38,9 @@ const createLabel = (text: string, position: THREE.Vector3) => {
 
 /**
  * Workshop App - Component showcase with labels and scene setup
- * Converted to use ToolBase for flexible environment control
+ * Converted to use WorkshopDemoBase for consistent workshop environment
  */
-class WorkshopApp extends ToolBase {
-  private animationId?: number;
+class WorkshopApp extends WorkshopDemoBase {
   private componentMeshes: THREE.Object3D[] = [];
   private labelMeshes: THREE.Mesh[] = [];
 
@@ -49,34 +48,23 @@ class WorkshopApp extends ToolBase {
     super({
       name: 'Workshop',
       description: 'Component showcase displaying various 3D objects with interactive labels',
-      requiredComponents: [
-        'scene',
-        'camera',
-        'renderer',
-        'terrain',
-        'water',
-        'sky',
-        'gui',
-        'controls',
-      ],
-      scene: {
-        environment: 'custom',
-        lighting: 'static',
-        physics: false,
-        fog: {
-          enabled: false, // Workshop focuses on clear component visibility
-        },
+      ground: {
+        create: true,
+        size: { width: 400, height: 300 },
+        color: 0x8fbc8f, // Dark sea green for ground
+        opacity: 0.3
+      },
+      lighting: {
+        sunPosition: 12,
+        showHelpers: true,
       },
     });
   }
 
-  async load(options: StoryOptions): Promise<void> {
+  override async load(options: StoryOptions): Promise<void> {
     try {
-      // Initialize core systems from AppBase
+      // Initialize core systems and clean environment
       this.initializeCore(options);
-
-      // Initialize tool environment (sky + helpers)
-      await this.initializeEnvironment(options);
 
       const { camera, scene, renderer, gui, controls } = options;
 
@@ -85,7 +73,12 @@ class WorkshopApp extends ToolBase {
 
       // Setup camera and animation
       this.setupCamera(camera);
-      this.startAnimationLoop(camera, renderer, scene, controls);
+      this.startAnimationLoop(renderer, scene, camera, controls, () => {
+        // Keep labels facing the camera
+        this.labelMeshes.forEach(label => {
+          label.quaternion.copy(camera.quaternion);
+        });
+      });
 
       this.isLoaded = true;
       console.log(
@@ -258,31 +251,6 @@ class WorkshopApp extends ToolBase {
     camera.lookAt(lookAt);
   }
 
-  private startAnimationLoop(
-    camera: THREE.Camera,
-    renderer: THREE.WebGLRenderer,
-    scene: THREE.Scene,
-    controls: any
-  ): void {
-    const animate = () => {
-      try {
-        // Update performance monitoring
-        this.updatePerformance();
-
-        // Keep labels facing the camera
-        this.labelMeshes.forEach(label => {
-          label.quaternion.copy(camera.quaternion);
-        });
-
-        renderer.render(scene, camera);
-        controls.update();
-        this.animationId = requestAnimationFrame(animate);
-      } catch (error) {
-        this.handleError(error as Error, 'animation loop');
-      }
-    };
-    animate();
-  }
 
   public override dispose(): void {
     console.log(`🧹 Disposing ${this.config.name}`);
