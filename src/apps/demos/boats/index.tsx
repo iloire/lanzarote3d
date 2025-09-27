@@ -196,9 +196,9 @@ class BoatsAnimationApp extends TerrainBase {
         progress => {
           let currentPosition;
 
-          if (progress < 0.4) {
-            // Phase 1: Show boats prominently (first 40% - 3.2 seconds)
-            const phase1Progress = progress / 0.4;
+          if (progress < 0.5) {
+            // Phase 1: Show boats prominently (first 50% - 4.0 seconds)
+            const phase1Progress = progress / 0.5;
             const easedProgress = phase1Progress * phase1Progress * (3 - 2 * phase1Progress);
 
             // Very minimal movement to keep boats in frame
@@ -218,9 +218,9 @@ class BoatsAnimationApp extends TerrainBase {
               controls.target.copy(lookTarget);
               controls.update();
             }
-          } else if (progress < 0.7) {
-            // Phase 2: Slow transition (40-70% - 2.4 seconds)
-            const phase2Progress = (progress - 0.4) / 0.3;
+          } else if (progress < 0.75) {
+            // Phase 2: Slow transition (50-75% - 2.0 seconds)
+            const phase2Progress = (progress - 0.5) / 0.25;
             const easedProgress = phase2Progress * phase2Progress * (3 - 2 * phase2Progress);
 
             currentPosition = new THREE.Vector3().lerpVectors(
@@ -241,8 +241,8 @@ class BoatsAnimationApp extends TerrainBase {
               controls.update();
             }
           } else {
-            // Phase 3: Final approach to paraglider (70-100% - 2.4 seconds)
-            const phase3Progress = (progress - 0.7) / 0.3;
+            // Phase 3: Final approach to paraglider (75-100% - 2.0 seconds)
+            const phase3Progress = (progress - 0.75) / 0.25;
             const easedProgress = 1 - Math.pow(1 - phase3Progress, 2.5);
 
             currentPosition = new THREE.Vector3().lerpVectors(
