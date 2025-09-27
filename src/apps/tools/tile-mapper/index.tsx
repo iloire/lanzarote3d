@@ -1,5 +1,4 @@
-import * as THREE from 'three';
-import { AppBase } from '../../shared/AppBase';
+import { NonRenderingAppBase } from '../../shared/NonRenderingAppBase';
 import { StoryOptions } from '../../shared/types';
 import { getAppConfig } from '../../config/app-registry';
 
@@ -13,7 +12,7 @@ import { getAppConfig } from '../../config/app-registry';
  * - Coverage analysis and boundary verification
  * - Real-time tile preview and status checking
  */
-class TileMapperApp extends AppBase {
+class TileMapperApp extends NonRenderingAppBase {
   private animationId: number | undefined;
   private uiContainer: HTMLElement | undefined;
   private selectedTile: { x: number; y: number; zoom: number } | null = null;
@@ -35,42 +34,17 @@ class TileMapperApp extends AppBase {
     super({
       name: appConfig?.name || 'Tile Mapper Debugger',
       description: appConfig?.description || 'Interactive satellite tile system debugger and analyzer',
-      requiredComponents: ['scene', 'camera', 'renderer'],
-      scene: {
-        environment: 'custom',
-        lighting: 'static',
-        physics: false,
-        fog: { enabled: false },
-      },
-      performance: {
-        monitoring: false,
-        logIntervalMs: 30000,
-      },
+      requiresThreeJS: false, // Pure HTML/DOM app
     });
   }
 
   async load(options: StoryOptions): Promise<void> {
-    const { scene, camera, renderer } = options;
-
-    this.initializeCore(options);
-    await this.init(scene, camera, renderer, options);
-    this.isLoaded = true;
-  }
-
-  async init(
-    scene: THREE.Scene,
-    camera: THREE.Camera,
-    renderer: THREE.WebGLRenderer,
-    options?: StoryOptions
-  ): Promise<void> {
-    // Set up basic scene
-    scene.background = new THREE.Color(0x1a1a2e);
-    camera.position.set(0, 5, 10);
-    camera.lookAt(0, 0, 0);
-
+    // For non-rendering apps, we don't need Three.js components
     this.createTileDebugUI();
+    this.isLoaded = true;
     console.log('🗺️ Tile Mapper Debugger initialized');
   }
+
 
   private lonLatToTileXY(lon: number, lat: number, zoom: number): { x: number; y: number } {
     const x = Math.floor(((lon + 180) / 360) * Math.pow(2, zoom));
@@ -126,20 +100,20 @@ class TileMapperApp extends AppBase {
   }
 
   private createTileDebugUI(): void {
-    this.uiContainer = document.createElement('div');
+    // Use the base class method to create container
+    this.uiContainer = this.createUIContainer();
+    // Apply custom styling specific to tile mapper
     this.uiContainer.style.cssText = `
       position: fixed;
-      top: 20px;
-      right: 20px;
-      width: calc(100% - 240px);
-      height: calc(100% - 40px);
-      background: rgba(26, 26, 46, 0.95);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #1a1a2e 0%, #0f0f23 100%);
       color: #e0e0e0;
       z-index: 1000;
       overflow-y: auto;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
-      border-radius: 8px;
-      border: 1px solid #444;
     `;
 
     const tiles = this.calculateTileGrid();

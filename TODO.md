@@ -1,7 +1,6 @@
 Implement the following tasks if any is added follwing the instructions described below:
 ---
 TASKS:
-- we should probably create a base class for applications that don't have any lighting or rendering any threejs object, like the tile debug dashboard or the title mapper debugger.
 ---
 
 ### Instructions

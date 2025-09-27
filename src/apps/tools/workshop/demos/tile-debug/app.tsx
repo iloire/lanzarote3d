@@ -1,5 +1,4 @@
-import * as THREE from 'three';
-import { AppBase } from '../../../../shared/AppBase';
+import { NonRenderingAppBase } from '../../../../shared/NonRenderingAppBase';
 import { StoryOptions } from '../../../../shared/types';
 import { getAppConfig } from '../../../../config/app-registry';
 
@@ -13,7 +12,7 @@ import { getAppConfig } from '../../../../config/app-registry';
  * - Download process documentation
  * - UV mapping visualization
  */
-class TileDebugApp extends AppBase {
+class TileDebugApp extends NonRenderingAppBase {
   private animationId: number | undefined;
   private uiContainer: HTMLElement | undefined;
 
@@ -22,65 +21,32 @@ class TileDebugApp extends AppBase {
     super({
       name: appConfig?.name || 'Tile Debug Dashboard',
       description: appConfig?.description || 'Debug tool for satellite tile download system',
-      requiredComponents: ['scene', 'camera', 'renderer'],
-      scene: {
-        environment: 'minimal',
-        lighting: 'static',
-        physics: false,
-        fog: { enabled: false },
-      },
-      performance: {
-        monitoring: false,
-        logIntervalMs: 30000,
-      },
+      requiresThreeJS: false, // Pure HTML/DOM app
     });
   }
 
-  async load(options: StoryOptions): Promise<void> {
-    const { scene, camera, renderer } = options;
-
-    // Initialize core AppBase functionality
-    this.initializeCore(options);
-
-    await this.init(scene, camera, renderer, options);
-    this.isLoaded = true;
-  }
-
-  async init(
-    scene: THREE.Scene,
-    camera: THREE.Camera,
-    renderer: THREE.WebGLRenderer,
-    options?: StoryOptions
-  ): Promise<void> {
-
-    // Set up basic scene with black background
-    scene.background = new THREE.Color(0x000000);
-
-    // Position camera for a basic view
-    camera.position.set(0, 5, 10);
-    camera.lookAt(0, 0, 0);
-
-    // Create the debug UI
+  async load(_options: StoryOptions): Promise<void> {
+    // For non-rendering apps, we don't need Three.js components
     this.createDebugUI();
-
+    this.isLoaded = true;
     console.log('🔧 Tile Debug Dashboard initialized');
   }
 
+
   private createDebugUI(): void {
-    // Create UI container positioned to work with standard menu layout
-    this.uiContainer = document.createElement('div');
+    // Use the base class method to create container
+    this.uiContainer = this.createUIContainer();
+    // Apply custom styling specific to tile debug dashboard
     this.uiContainer.style.cssText = `
       position: fixed;
-      top: 20px;
-      right: 20px;
-      width: calc(100% - 240px);
-      height: calc(100% - 40px);
-      background: rgba(248, 250, 252, 0.95);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
       z-index: 1000;
       overflow-y: auto;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      border-radius: 8px;
-      border: 1px solid #e2e8f0;
     `;
 
     // Add the React component content
