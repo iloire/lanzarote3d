@@ -26,13 +26,13 @@ import './styles/ruler.css';
 import { Marker as MarkerHelper } from './markers/markers';
 import { createWindArrowsForTakeoff } from './helpers/wind';
 import './styles/popup.css';
-import { AppBase } from '../../shared/AppBase';
+import { TerrainBase } from '../../shared/TerrainBase';
 
 /**
  * FlyZones App - Flight zone visualization with interactive markers and controls
  * Sixth app converted to use AppBase architecture
  */
-class FlyZonesApp extends AppBase {
+class FlyZonesApp extends TerrainBase {
   private markers: MarkerHelper[] = [];
   private landingMarkers: THREE.Object3D[] = [];
   private landingMarkersVisible = true;
@@ -49,10 +49,10 @@ class FlyZonesApp extends AppBase {
       name: 'FlyZones',
       description:
         'Flight zone visualization with interactive markers, landing spots, and navigation controls',
-      requiredComponents: ['scene', 'camera', 'renderer', 'controls', 'gui'],
+      requiredComponents: ['scene', 'camera', 'renderer', 'controls', 'gui', 'terrain', 'water', 'sky'],
       scene: {
-        environment: 'custom',
-        lighting: 'static',
+        environment: 'lanzarote',
+        lighting: 'dynamic',
         physics: false,
         fog: {
           enabled: false, // Clear visibility for flight zone visualization
@@ -67,10 +67,11 @@ class FlyZonesApp extends AppBase {
 
   async load(options: StoryOptions): Promise<void> {
     try {
-      // Initialize core systems from AppBase
+      // Initialize core systems from TerrainBase
       this.initializeCore(options);
+      await this.initializeEnvironment(options);
 
-      const { camera, scene, renderer, controls, gui } = options;
+      const { camera, scene, renderer, controls, gui, terrain } = options;
 
       // Setup scene components
       this.setupScene(scene);
