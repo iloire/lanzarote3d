@@ -1,269 +1,169 @@
 import * as THREE from 'three';
 import Clouds from '../../../../foundation/components/environment/Clouds';
-import Helpers from '../../../../foundation/utils/helpers';
 import { StoryOptions } from '../../../shared/types';
 import { getAllThemes, getThemeById } from '../../../../foundation/themes';
 import { ThemeEngine } from '../../../../foundation/systems/ThemeEngine';
 import { themeManager } from '../../../../foundation/systems/ThemeManager';
+import { WorkshopDemoBase } from '../../../shared/WorkshopDemoBase';
 
 // Use themes from our comprehensive theme system
 const ALL_THEMES = getAllThemes();
 
-const CloudsWorkshop = {
-  load: async (options: StoryOptions) => {
-    const { camera, scene, renderer, terrain, water, controls, gui } = options;
-    controls.enabled = true;
+/**
+ * Clouds Workshop Demo - Showcases different cloud themes
+ */
+class CloudsWorkshopApp extends WorkshopDemoBase {
+  private currentClouds: THREE.Object3D | null = null;
+  private currentTheme: any;
 
-    terrain.visible = false;
-    water.visible = false;
+  constructor() {
+    super({
+      name: 'Clouds Workshop',
+      description: 'Workshop demo showcasing different cloud themes and weather patterns',
+      ground: {
+        create: true,
+        size: { width: 2000, height: 2000 },
+        color: 0x87ceeb, // Sky blue ground for clouds
+        opacity: 0.2,
+      },
+      lighting: {
+        sunPosition: 14,
+        showHelpers: true,
+      },
+    });
+  }
 
-    Helpers.createHelpers(scene);
+  override async load(options: StoryOptions): Promise<void> {
+    try {
+      // Initialize core systems and clean environment
+      this.initializeCore(options);
 
-    let currentClouds: THREE.Object3D | null = null;
-    let currentTheme = ALL_THEMES[0]; // Start with first theme
+      const { camera, scene, renderer, controls, gui } = options;
 
-    // Apply initial theme (theme manager should already be initialized by app.tsx)
-    if (currentTheme) {
-      await themeManager.applyTheme(currentTheme.id);
-    }
+      this.currentTheme = ALL_THEMES[0]; // Start with first theme
 
-    // Create clouds using theme
-    const createClouds = async (theme: any) => {
-      // Remove existing clouds
-      if (currentClouds) {
-        scene.remove(currentClouds);
-        // Dispose of materials and geometries
-        currentClouds.traverse(child => {
-          if (child instanceof THREE.Mesh) {
-            child.geometry?.dispose();
-            if (Array.isArray(child.material)) {
-              child.material.forEach(material => material.dispose());
-            } else {
-              child.material?.dispose();
-            }
-          }
-        });
+      // Apply initial theme (theme manager should already be initialized by app.tsx)
+      if (this.currentTheme) {
+        await themeManager.applyTheme(this.currentTheme.id);
       }
 
-      const cloudOptions = ThemeEngine.getCloudOptionsFromTheme(theme);
-      const mesh = await new Clouds(cloudOptions).load(1, new THREE.Vector3(0, 0, 0));
-      mesh.scale.set(0.1, 0.1, 0.1);
-      mesh.position.set(0, 0, 0);
-      scene.add(mesh);
-      currentClouds = mesh;
-      return mesh;
+      // Create initial clouds
+      await this.createClouds(scene, this.currentTheme);
+
+      // Setup GUI for theme switching
+      if (gui) {
+        this.setupThemeGUI(gui, scene);
+      }
+
+      // Set camera position for good cloud viewing
+      camera.position.set(290, 30, 230);
+      camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+      // Start animation loop
+      this.startAnimationLoop(renderer, scene, camera, controls);
+
+      this.isLoaded = true;
+      console.log(`✅ ${this.config.name} loaded successfully`);
+    } catch (error) {
+      this.handleError(error as Error, 'load');
+      throw error;
+    }
+  }
+
+  private async createClouds(scene: THREE.Scene, theme: any): Promise<THREE.Object3D> {
+    // Remove existing clouds
+    if (this.currentClouds) {
+      scene.remove(this.currentClouds);
+      // Dispose of materials and geometries
+      this.currentClouds.traverse(child => {
+        if (child instanceof THREE.Mesh) {
+          child.geometry?.dispose();
+          if (Array.isArray(child.material)) {
+            child.material.forEach(material => material.dispose());
+          } else {
+            child.material?.dispose();
+          }
+        }
+      });
+    }
+
+    const cloudOptions = ThemeEngine.getCloudOptionsFromTheme(theme);
+    const mesh = await new Clouds(cloudOptions).load(1, new THREE.Vector3(0, 0, 0));
+    mesh.scale.set(0.1, 0.1, 0.1);
+    mesh.position.set(0, 0, 0);
+    scene.add(mesh);
+    this.currentClouds = mesh;
+    return mesh;
+  }
+
+  private setupThemeGUI(gui: any, scene: THREE.Scene): void {
+    const themeFolder = gui.addFolder('🎨 Cloud Themes');
+
+    // Quick theme selector
+    const themeNames = ALL_THEMES.map(theme => theme.id);
+    const themeControl = {
+      theme: this.currentTheme.id,
+      regenerate: () => this.createClouds(scene, this.currentTheme),
+      applyFullTheme: async () => {
+        await themeManager.applyTheme(this.currentTheme.id);
+        await this.createClouds(scene, this.currentTheme);
+      },
     };
 
-    // Create initial clouds
-    await createClouds(currentTheme);
-
-    // GUI Controls for comprehensive theme switching
-    if (gui) {
-      const themeFolder = gui.addFolder('🎨 Complete Theme System');
-
-      // Direct theme buttons
-      const themesFolder = themeFolder.addFolder('🎨 All Themes');
-      ALL_THEMES.forEach(theme => {
-        themesFolder
-          .add(
-            {
-              apply: async () => {
-                currentTheme = theme;
-                await themeManager.applyTheme(theme.id);
-                await createClouds(theme);
-                updateInfo();
-              },
-            },
-            'apply'
-          )
-          .name(`${theme.name}`);
+    themeFolder
+      .add(themeControl, 'theme', themeNames)
+      .name('🚀 Select Theme')
+      .onChange(async (value: string) => {
+        const theme = getThemeById(value);
+        if (theme) {
+          this.currentTheme = theme;
+          await themeManager.applyTheme(theme.id);
+          await this.createClouds(scene, theme);
+        }
       });
 
-      // Quick theme selector
-      const themeNames = ALL_THEMES.map(theme => theme.id);
-      const themeControl = {
-        theme: currentTheme.id,
-        regenerate: () => createClouds(currentTheme),
-        applyFullTheme: async () => {
-          await themeManager.applyTheme(currentTheme.id);
-          await createClouds(currentTheme);
-          updateInfo();
-        },
-      };
+    themeFolder.add(themeControl, 'applyFullTheme').name('🌟 Apply Complete Theme');
+    themeFolder.add(themeControl, 'regenerate').name('🔄 Regenerate Clouds');
 
-      themeFolder
-        .add(themeControl, 'theme', themeNames)
-        .name('🚀 Quick Select')
-        .onChange(async (value: string) => {
-          const theme = getThemeById(value);
-          if (theme) {
-            currentTheme = theme;
-            await themeManager.applyTheme(theme.id);
-            await createClouds(theme);
-            updateInfo();
+    themeFolder.open();
+  }
+
+  public override dispose(): void {
+    console.log(`🧹 Disposing ${this.config.name}`);
+
+    // Clean up clouds
+    if (this.currentClouds) {
+      this.currentClouds.traverse(child => {
+        if (child instanceof THREE.Mesh) {
+          child.geometry?.dispose();
+          if (Array.isArray(child.material)) {
+            child.material.forEach(material => material.dispose());
+          } else {
+            child.material?.dispose();
           }
-        });
-
-      themeFolder.add(themeControl, 'applyFullTheme').name('🌟 Apply Complete Theme');
-      themeFolder.add(themeControl, 'regenerate').name('🔄 Regenerate Clouds Only');
-
-      // Display current theme info
-      const infoDiv = document.createElement('div');
-      infoDiv.style.cssText = `
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background: rgba(0,0,0,0.8);
-        color: white;
-        padding: 15px;
-        border-radius: 8px;
-        font-family: 'Ubuntu Mono', monospace;
-        font-size: 14px;
-        z-index: 1000;
-        max-width: 300px;
-      `;
-
-      const updateInfo = () => {
-        infoDiv.innerHTML = `
-          <h3 style="margin: 0 0 10px 0; color: #F64A8A;">🎨 ${currentTheme.name}</h3>
-          <div style="margin-bottom: 8px;">
-            <strong>Cloud Colors:</strong>
-          </div>
-          <div style="display: flex; gap: 5px; margin-bottom: 10px;">
-            ${currentTheme.clouds.colors
-              .map(
-                color =>
-                  `<div style="width: 20px; height: 20px; background: ${color}; border: 1px solid #666; border-radius: 3px;" title="${color}"></div>`
-              )
-              .join('')}
-          </div>
-          <div style="font-size: 11px; opacity: 0.8; line-height: 1.3; border-top: 1px solid #333; padding-top: 8px;">
-            <div><strong>Theme Details:</strong></div>
-            <div>🌅 Time: ${currentTheme.sky.timeOfDay}:00</div>
-            <div>💧 Water: ${currentTheme.water.color} (${Math.round(currentTheme.water.opacity * 100)}%)</div>
-            <div>🌍 Terrain: ${currentTheme.terrain.style}</div>
-          </div>
-          <div style="font-size: 10px; opacity: 0.7; margin-top: 10px;">
-            Available themes: ${ALL_THEMES.length}
-          </div>
-          <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #333; font-size: 11px; line-height: 1.3;">
-            <div style="color: #F64A8A; font-weight: bold; margin-bottom: 5px;">⌨️ Keyboard Shortcuts:</div>
-            <div>← → (or ↑ ↓): Switch themes</div>
-            <div>1-9: Direct theme selection</div>
-            <div>R: Regenerate clouds</div>
-            <div>T: Apply complete theme</div>
-          </div>
-        `;
-      };
-
-      updateInfo();
-      document.body.appendChild(infoDiv);
-
-      // Update info when theme changes - access the controller directly
-      const themeController = themeFolder.controllers.find(c => c.property === 'theme');
-      if (themeController) {
-        const originalOnChange = themeController.onChange as any;
-        themeController.onChange = ((value: string) => {
-          const result = originalOnChange ? originalOnChange.call(themeController, value) : null;
-          const theme = getThemeById(value);
-          if (theme) {
-            currentTheme = theme;
-            updateInfo();
-          }
-          return result;
-        }) as any;
-      }
-
-      // Enhanced keyboard shortcuts for theme switching
-      const handleKeyPress = async (event: KeyboardEvent) => {
-        const currentIndex = ALL_THEMES.findIndex(theme => theme.id === currentTheme.id);
-
-        switch (event.key) {
-          case 'ArrowLeft':
-          case 'ArrowDown': {
-            // Previous theme
-            event.preventDefault();
-            const prevIndex = (currentIndex - 1 + ALL_THEMES.length) % ALL_THEMES.length;
-            const prevTheme = ALL_THEMES[prevIndex];
-            if (prevTheme) {
-              currentTheme = prevTheme;
-              await themeManager.applyTheme(prevTheme.id);
-              await createClouds(prevTheme);
-              updateInfo();
-            }
-            break;
-          }
-          case 'ArrowRight':
-          case 'ArrowUp': {
-            // Next theme
-            event.preventDefault();
-            const nextIndex = (currentIndex + 1) % ALL_THEMES.length;
-            const nextTheme = ALL_THEMES[nextIndex];
-            if (nextTheme) {
-              currentTheme = nextTheme;
-              await themeManager.applyTheme(nextTheme.id);
-              await createClouds(nextTheme);
-              updateInfo();
-            }
-            break;
-          }
-          case '1':
-          case '2':
-          case '3':
-          case '4':
-          case '5':
-          case '6':
-          case '7':
-          case '8':
-          case '9': {
-            // Direct theme selection (1-9)
-            event.preventDefault();
-            const themeIndex = parseInt(event.key) - 1;
-            if (themeIndex >= 0 && themeIndex < ALL_THEMES.length) {
-              const selectedTheme = ALL_THEMES[themeIndex];
-              if (selectedTheme) {
-                currentTheme = selectedTheme;
-                await themeManager.applyTheme(selectedTheme.id);
-                await createClouds(selectedTheme);
-                updateInfo();
-              }
-            }
-            break;
-          }
-          case 'r':
-          case 'R':
-            // Regenerate clouds only
-            event.preventDefault();
-            await createClouds(currentTheme);
-            break;
-          case 't':
-          case 'T':
-            // Apply complete theme
-            event.preventDefault();
-            await themeManager.applyTheme(currentTheme.id);
-            await createClouds(currentTheme);
-            updateInfo();
-            break;
         }
-      };
-
-      // Add keyboard event listeners
-      document.addEventListener('keydown', handleKeyPress);
-
-      themeFolder.open();
-      themesFolder.open();
+      });
+      this.currentClouds = null;
     }
 
-    const animate = () => {
-      requestAnimationFrame(animate);
-      renderer.render(scene, camera);
-    };
+    // Call parent dispose
+    super.dispose();
+  }
+}
 
-    // Set camera position for good cloud viewing
-    const lookAt = new THREE.Vector3(0, 0, 0);
-    camera.position.set(290, 30, 230);
-    camera.lookAt(lookAt);
-    animate();
+// Create singleton instance
+const cloudsWorkshopApp = new CloudsWorkshopApp();
+
+// Export in the expected format for the Stories system
+const CloudsWorkshop = {
+  load: async (options: StoryOptions) => {
+    return cloudsWorkshopApp.load(options);
+  },
+  dispose: () => {
+    return cloudsWorkshopApp.dispose();
+  },
+  getAppInfo: () => {
+    return cloudsWorkshopApp.getAppInfo();
   },
 };
 

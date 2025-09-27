@@ -5,6 +5,11 @@ export const getTerrainHeightBelowPosition = (
   terrain: THREE.Mesh,
   _water: THREE.Mesh
 ): number => {
+  // Handle case where terrain is undefined (e.g., in workshop demos)
+  if (!terrain) {
+    return NaN; // No terrain available for collision detection
+  }
+
   const rayVertical = new THREE.Raycaster(
     new THREE.Vector3(pos.x, 100000, pos.z), // big enough value for Y
     new THREE.Vector3(0, -1, 0) // vertical

@@ -1,75 +1,126 @@
+import * as THREE from 'three';
 import Pilot from '../../../../foundation/components/vehicles/Pilot';
 import TandemPilot from '../../../../foundation/components/characters/TandemPilot';
-import Helpers from '../../../../foundation/utils/helpers';
 import { GlassesType, PilotHeadType } from '../../../../foundation/components/characters/PilotHead';
 import { StoryOptions } from '../../../shared/types';
+import { WorkshopDemoBase, WorkshopDemoConfig } from '../../../shared/WorkshopDemoBase';
 
-const PilotWorkshop = {
-  load: async (options: StoryOptions) => {
-    const { camera, scene, renderer, terrain, water, sky, controls } = options;
+/**
+ * Pilot Workshop Demo - Showcases different pilot character types
+ */
+class PilotWorkshopApp extends WorkshopDemoBase {
+  private animationId?: number;
 
-    controls.enabled = true;
+  constructor() {
+    super({
+      name: 'Pilot Workshop',
+      description: 'Workshop demo showcasing different pilot character types and customization options',
+      ground: {
+        create: false, // Don't show ground plane for character showcase
+      },
+      lighting: {
+        sunPosition: 12,
+        showHelpers: true,
+      },
+    });
+  }
 
-    terrain.visible = false;
-    water.visible = false;
+  async load(options: StoryOptions): Promise<void> {
+    try {
+      // Initialize core systems and clean environment
+      this.initializeCore(options);
 
-    Helpers.createHelpers(scene);
+      const { camera, scene, renderer } = options;
 
-    sky.updateSunPosition(12);
-
-    const pilots = [
-      {
-        head: {
-          headType: PilotHeadType.Default,
-          helmetOptions: {
-            color: '#ffff00',
-            color2: '#cccccc',
-            color3: '#999999',
+      const pilots = [
+        {
+          head: {
+            headType: PilotHeadType.Default,
+            helmetOptions: {
+              color: '#ffff00',
+              color2: '#cccccc',
+              color3: '#999999',
+            },
           },
         },
-      },
-      {
-        head: {
-          headType: PilotHeadType.Default,
-          glassesType: GlassesType.SunGlasses1,
+        {
+          head: {
+            headType: PilotHeadType.Default,
+            glassesType: GlassesType.SunGlasses1,
+          },
         },
-      },
-      { head: { headType: PilotHeadType.Warrior } },
-    ];
+        { head: { headType: PilotHeadType.Warrior } },
+      ];
 
-    let x = -1400;
-    pilots.forEach(async options => {
-      const pilot = new Pilot(options);
-      const mesh = await pilot.load();
-      mesh.position.set(x, -300, -500);
-      scene.add(mesh);
-      x += 600;
-    });
+      // Load pilots
+      let x = -1400;
+      for (const pilotOptions of pilots) {
+        const pilot = new Pilot(pilotOptions);
+        const mesh = pilot.load();
+        mesh.position.set(x, -300, -500);
+        scene.add(mesh);
+        x += 600;
+      }
 
-    const tandem = new TandemPilot({
-      pilot: {
-        head: { headType: PilotHeadType.Default },
-        suitColor: 'green',
-        shoesColor: 'black',
-      },
-      passenger: {
-        head: { headType: PilotHeadType.Default },
-        suitColor: 'orange',
-        shoesColor: 'gray',
-      },
-    });
-    const meshTandem = await tandem.load();
-    meshTandem.position.set(-2000, -300, -500);
-    scene.add(meshTandem);
+      // Load tandem pilot
+      const tandem = new TandemPilot({
+        pilot: {
+          head: { headType: PilotHeadType.Default },
+          suitColor: 'green',
+          shoesColor: 'black',
+        },
+        passenger: {
+          head: { headType: PilotHeadType.Default },
+          suitColor: 'orange',
+          shoesColor: 'gray',
+        },
+      });
+      const meshTandem = tandem.load();
+      meshTandem.position.set(-2000, -300, -500);
+      scene.add(meshTandem);
 
-    const animate = () => {
-      requestAnimationFrame(animate);
-      renderer.render(scene, camera);
-    };
+      // Set camera position for character showcase
+      camera.position.set(0, 0, 8000);
+      camera.lookAt(scene.position);
 
-    camera.position.set(0, 0, 8000);
-    camera.lookAt(scene.position);
-    animate();
+      // Start animation loop
+      this.startAnimationLoop(renderer, scene, camera, options.controls);
+
+      this.isLoaded = true;
+      console.log(`✅ ${this.config.name} loaded successfully`);
+    } catch (error) {
+      this.handleError(error as Error, 'load');
+      throw error;
+    }
+  }
+
+  public override dispose(): void {
+    console.log(`🧹 Disposing ${this.config.name}`);
+
+    // Cancel animation loop
+    if (this.animationId) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = undefined;
+    }
+
+    // Call parent dispose
+    super.dispose();
+  }
+}
+
+// Create singleton instance
+const pilotWorkshopApp = new PilotWorkshopApp();
+
+// Export in the expected format for the Stories system
+const PilotWorkshop = {
+  load: async (options: StoryOptions) => {
+    return pilotWorkshopApp.load(options);
+  },
+  dispose: () => {
+    return pilotWorkshopApp.dispose();
+  },
+  getAppInfo: () => {
+    return pilotWorkshopApp.getAppInfo();
   },
 };
 

@@ -69,18 +69,22 @@ export abstract class WorkshopDemoBase extends AppBase {
     options: StoryOptions,
     config?: WorkshopDemoConfig
   ): void {
-    const { scene, terrain, water, sky, controls } = options;
+    const { scene, controls } = options;
 
     // Enable controls
     controls.enabled = true;
 
-    // Hide heavy environment components automatically
-    terrain.visible = false;
-    water.visible = false;
-
-    // Set up lighting
+    // Create sky for lighting
     const sunPosition = config?.lighting?.sunPosition ?? 12;
-    sky.updateSunPosition(sunPosition);
+    if (!options.sky) {
+      const Sky = require('../../foundation/components/environment/Sky').default;
+      const sky = new Sky(19, 3);
+      sky.addToScene(scene);
+      sky.updateSunPosition(sunPosition);
+      options.sky = sky;
+    } else {
+      options.sky.updateSunPosition(sunPosition);
+    }
 
     // Create helpers if requested
     if (config?.lighting?.showHelpers !== false) {
@@ -92,6 +96,8 @@ export abstract class WorkshopDemoBase extends AppBase {
     if (groundConfig?.create !== false) {
       this.createGroundPlane(scene, groundConfig);
     }
+
+    console.log('✅ Workshop demo environment loaded: clean setup (sky + ground)');
   }
 
   private createGroundPlane(

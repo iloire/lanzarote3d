@@ -212,10 +212,17 @@ const TerrainWorkshop = {
     const { camera, scene, renderer, terrain, water, sky, controls, gui } = options;
 
     controls.enabled = true;
-    water.visible = false;
-    terrain.visible = false;
 
-    sky.updateSunPosition(14);
+    // Handle optional environment components gracefully
+    if (water) {
+      water.visible = false;
+    }
+    if (terrain) {
+      terrain.visible = false;
+    }
+    if (sky) {
+      sky.updateSunPosition(14);
+    }
 
     // Default settings
     const settings: TerrainSettings = {
