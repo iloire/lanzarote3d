@@ -67,18 +67,20 @@ class TileDebugApp extends AppBase {
   }
 
   private createDebugUI(): void {
-    // Create UI container
+    // Create UI container positioned to work with standard menu layout
     this.uiContainer = document.createElement('div');
     this.uiContainer.style.cssText = `
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #f8fafc;
+      top: 20px;
+      right: 20px;
+      width: calc(100% - 240px);
+      height: calc(100% - 40px);
+      background: rgba(248, 250, 252, 0.95);
       z-index: 1000;
       overflow-y: auto;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
     `;
 
     // Add the React component content

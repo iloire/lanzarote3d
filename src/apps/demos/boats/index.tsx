@@ -20,13 +20,14 @@ type ParagliderVoxelConfig = {
   position: THREE.Vector3;
 };
 
+// Same paragliders as original animation but positioned to work well with boats camera
 const paraglidersVoxel: ParagliderVoxelConfig[] = [
   {
     pg: {
       glider: {
-        wingColor1: '#00bcd4',
-        wingColor2: '#0097a7',
-        inletsColor: 'lightblue',
+        wingColor1: '#c30010',
+        wingColor2: '#b100cd',
+        inletsColor: 'pink',
         numeroCajones: 35,
       },
       pilot: {
@@ -34,28 +35,13 @@ const paraglidersVoxel: ParagliderVoxelConfig[] = [
         textureFile: adriTextureImage,
       },
     },
-    position: new THREE.Vector3(5500, 850, -800),
-  },
-  {
-    pg: {
-      glider: {
-        wingColor1: '#ff5722',
-        wingColor2: '#d84315',
-        inletsColor: 'orange',
-        numeroCajones: 35,
-      },
-      pilot: {
-        objFile: adriModel,
-        textureFile: adriTextureImage,
-      },
-    },
-    position: new THREE.Vector3(6200, 920, -300),
+    position: new THREE.Vector3(6897, 920, -705),
   },
 ];
 
 /**
- * Boats Animation Demo - Camera starts close to boats, then animates toward paragliders
- * Focus on showing boats partially while emphasizing paragliders and clouds
+ * Boats Animation Demo - Based on original animation but with camera starting near boats
+ * Shows boats partially in frame, then transitions to focus on paragliders and clouds
  */
 class BoatsAnimationApp extends TerrainBase {
   private environment: Environment | undefined;
@@ -63,21 +49,21 @@ class BoatsAnimationApp extends TerrainBase {
   private paragliderMeshes: THREE.Object3D[] = [];
   private animatorInstance: any | undefined;
 
-  // Animation configuration
+  // Animation configuration - slightly longer to allow time to show boats
   private readonly ANIMATION_DURATION_MS = 8000; // 8 seconds total
 
   constructor() {
     const appConfig = getAppConfig('boats');
     super({
       name: appConfig?.name || 'Boats Animation',
-      description: appConfig?.description || 'Animation showcasing boats and paragliders with camera movement from water to sky',
+      description: appConfig?.description || 'Animation starting near boats and transitioning to focus on paragliders and clouds',
       requiredComponents: ['scene', 'camera', 'renderer', 'terrain', 'water', 'controls'],
       scene: {
         environment: 'lanzarote',
         lighting: 'dynamic',
         physics: false,
         fog: {
-          enabled: false,
+          enabled: false, // Fog handled by theme system
         },
       },
       performance: {
@@ -89,48 +75,49 @@ class BoatsAnimationApp extends TerrainBase {
 
   async load(options: StoryOptions): Promise<void> {
     try {
+      // Initialize core systems from TerrainBase
       this.initializeCore(options);
+
+      // Load full environment (island, water, sky) from TerrainBase
       await this.initializeEnvironment(options);
 
       const { camera, scene, renderer, terrain, water, controls } = options;
 
-      // Apply theme to scene
+      // Apply theme to scene (same as original)
       const theme = options.theme ?? getDefaultTheme();
       await ThemeEngine.apply(options, theme);
 
-      // Load voxel paragliders
+      // Load voxel paragliders with proper tracking (same as original)
       await this.loadParagliders(scene);
 
-      // Initial render
+      // must render before adding env
       renderer.render(scene, camera);
 
-      // Set up environment
+      // Set up environment using theme (same as original)
       this.environment = new Environment(scene);
       const weather = this.environment.createWeatherFromTheme(theme);
       const thermals = this.environment.generateThermals(weather, 0.7);
 
-      // Add environment elements with emphasis on boats and clouds
+      // Add environment elements using theme (same as original)
       await this.environment.addCloudsFromTheme(thermals, theme);
       this.environment.addTrees(terrain);
       this.environment.addHouses(terrain);
-
-      // Add boats for better visual variety
-      this.environment.addRandomBoats(water); // Random boat types
+      this.environment.addRandomBoats(water); // Same boats as original
 
       // Make environment available for theme switching
       options.environment = this.environment;
 
-      // Add birds for more dynamic sky
+      // Add birds (same path as original)
       const birdPath = [
-        new THREE.Vector3(4000, 800, -200),
-        new THREE.Vector3(5000, 900, -600),
-        new THREE.Vector3(6000, 1000, -400),
-        new THREE.Vector3(7000, 900, -100),
-        new THREE.Vector3(6500, 800, 200),
+        new THREE.Vector3(5000, 1000, 0),
+        new THREE.Vector3(6000, 1100, -500),
+        new THREE.Vector3(7000, 1200, -1000),
+        new THREE.Vector3(8000, 1000, -500),
+        new THREE.Vector3(7000, 900, 0),
       ];
       await this.environment.addBirds(birdPath);
 
-      // Setup camera animation sequence
+      // Setup camera animation sequence - ONLY DIFFERENCE from original
       this.setupCameraAnimation(camera, controls, renderer, scene);
 
       this.isLoaded = true;
@@ -144,6 +131,7 @@ class BoatsAnimationApp extends TerrainBase {
   }
 
   private async loadParagliders(scene: THREE.Scene): Promise<void> {
+    // Same as original animation
     const voxelPromises = paraglidersVoxel.map(async p => {
       try {
         const paraglider = new ParagliderVoxel(p.pg);
@@ -169,120 +157,129 @@ class BoatsAnimationApp extends TerrainBase {
     renderer: THREE.WebGLRenderer,
     scene: THREE.Scene
   ): void {
-    // Camera positions and target setup
-    const avgPgPos = new THREE.Vector3();
-    paraglidersVoxel.forEach(pg => avgPgPos.add(pg.position));
-    avgPgPos.divideScalar(paraglidersVoxel.length);
+    const pgPos = paraglidersVoxel[0]?.position.clone() || new THREE.Vector3();
 
-    // Starting position - close to water level, showing boats partially
-    // Position near the water, angled to capture boats in foreground
-    const initialCameraPosition = new THREE.Vector3(4800, 120, -1200); // Low, near water
-    const initialTarget = new THREE.Vector3(5200, 400, -600); // Looking toward area between boats and paragliders
+    // MODIFIED CAMERA POSITIONS to start behind boats with boats clearly visible
+    // Starting position - behind boats at water level, boats clearly in frame
+    const initialCameraPosition = new THREE.Vector3(8200, 80, -6200); // Behind boat area, lower
+    const boatCenterPosition = new THREE.Vector3(7900, 30, -5200); // Center of boat area
 
-    // Intermediate position - transitioning toward paragliders
-    const intermediatePosition = new THREE.Vector3(5200, 400, -900);
-    const intermediateTarget = new THREE.Vector3(5800, 600, -500);
+    // Intermediate position - slowly rising and moving toward paraglider area
+    const intermediatePosition = new THREE.Vector3(7200, 400, -3000);
 
-    // Final position - focused on paragliders and clouds
+    // Final position - same as original animation (close to paraglider)
     const finalCameraPosition = new THREE.Vector3(
-      avgPgPos.x - 200,
-      avgPgPos.y + 100,
-      avgPgPos.z + 300
+      pgPos.x - 100,
+      pgPos.y + 50,
+      pgPos.z + 200
     );
 
-    // Set initial camera position
+    // Set initial camera position behind boats looking at them
     camera.position.copy(initialCameraPosition);
-    camera.lookAt(initialTarget);
+    camera.lookAt(boatCenterPosition); // Look directly at boats
 
-    // Setup controls
+    // Ensure controls are set up properly
     if (controls) {
-      controls.target.copy(initialTarget);
+      controls.target.copy(boatCenterPosition);
       controls.update();
-      controls.enabled = false; // Disable during animation
+      controls.enabled = false; // Disable controls during animation
     }
 
-    // Start animation loop
+    // Start animation loop (same as original)
     this.startAnimationLoop(renderer, scene, camera, controls);
 
-    // Start the camera animation sequence
+    // Start the modified camera animation
     setTimeout(() => {
       this.animatorInstance = animator.animate(
         'boats-to-paragliders',
         this.ANIMATION_DURATION_MS,
         progress => {
-          let currentPosition, currentTarget;
+          let currentPosition;
 
-          if (progress < 0.3) {
-            // Phase 1: Show boats prominently (first 30% - 2.4 seconds)
-            const phase1Progress = progress / 0.3;
+          if (progress < 0.4) {
+            // Phase 1: Show boats prominently (first 40% - 3.2 seconds)
+            const phase1Progress = progress / 0.4;
             const easedProgress = phase1Progress * phase1Progress * (3 - 2 * phase1Progress);
 
-            // Gentle movement while keeping boats visible
+            // Very minimal movement to keep boats in frame
             currentPosition = new THREE.Vector3().lerpVectors(
               initialCameraPosition,
               intermediatePosition,
-              easedProgress * 0.5 // Slow movement
+              easedProgress * 0.15 // Even slower initial movement
             );
 
-            currentTarget = new THREE.Vector3().lerpVectors(
-              initialTarget,
-              intermediateTarget,
-              easedProgress * 0.3
+            // Keep looking at boats for longer
+            const lookTarget = new THREE.Vector3().lerpVectors(
+              boatCenterPosition,
+              pgPos,
+              easedProgress * 0.3 // Slower shift in focus
             );
-          } else if (progress < 0.6) {
-            // Phase 2: Transition focus (30-60% - 2.4 seconds)
-            const phase2Progress = (progress - 0.3) / 0.3;
+            if (controls) {
+              controls.target.copy(lookTarget);
+              controls.update();
+            }
+          } else if (progress < 0.7) {
+            // Phase 2: Slow transition (40-70% - 2.4 seconds)
+            const phase2Progress = (progress - 0.4) / 0.3;
             const easedProgress = phase2Progress * phase2Progress * (3 - 2 * phase2Progress);
 
             currentPosition = new THREE.Vector3().lerpVectors(
-              intermediatePosition,
+              new THREE.Vector3().lerpVectors(initialCameraPosition, intermediatePosition, 0.15),
               finalCameraPosition,
-              easedProgress * 0.7
+              easedProgress * 0.6 // Gradual movement
             );
 
-            currentTarget = new THREE.Vector3().lerpVectors(
-              intermediateTarget,
-              avgPgPos,
-              easedProgress
-            );
+            // Slowly shift to paraglider
+            if (controls) {
+              const targetProgress = Math.min(phase2Progress * 0.8, 1.0);
+              const lookTarget = new THREE.Vector3().lerpVectors(
+                controls.target,
+                pgPos,
+                targetProgress * 0.15 // Very gradual focus shift
+              );
+              controls.target.copy(lookTarget);
+              controls.update();
+            }
           } else {
-            // Phase 3: Focus on paragliders and clouds (60-100% - 3.2 seconds)
-            const phase3Progress = (progress - 0.6) / 0.4;
-            const easedProgress = 1 - Math.pow(1 - phase3Progress, 2);
+            // Phase 3: Final approach to paraglider (70-100% - 2.4 seconds)
+            const phase3Progress = (progress - 0.7) / 0.3;
+            const easedProgress = 1 - Math.pow(1 - phase3Progress, 2.5);
 
             currentPosition = new THREE.Vector3().lerpVectors(
-              new THREE.Vector3().lerpVectors(intermediatePosition, finalCameraPosition, 0.7),
+              new THREE.Vector3().lerpVectors(
+                new THREE.Vector3().lerpVectors(initialCameraPosition, intermediatePosition, 0.15),
+                finalCameraPosition,
+                0.6
+              ),
               finalCameraPosition,
               easedProgress
             );
 
-            currentTarget = avgPgPos.clone();
+            // Focus on paraglider
+            if (controls) {
+              controls.target.lerpVectors(controls.target, pgPos, 0.08);
+              controls.update();
+            }
           }
 
           camera.position.copy(currentPosition);
-
-          if (controls) {
-            controls.target.copy(currentTarget);
-            controls.update();
-          }
         },
         () => {
-          // Animation complete - enable user controls
+          // Animation complete - same as original
           if (controls) {
             controls.enabled = true;
 
-            // Set up focused controls on paragliders
             OrbitControlsHelper.focusOnTarget(
               controls,
-              avgPgPos,
-              OrbitControlsHelper.createCenteredLimits(avgPgPos, {
-                ...ORBIT_CONTROLS_PRESETS['aerial'],
-                minDistance: 100,
-                maxDistance: 2000,
+              pgPos,
+              OrbitControlsHelper.createCenteredLimits(pgPos, {
+                ...ORBIT_CONTROLS_PRESETS['closeSubject'],
+                minDistance: 50,
+                maxDistance: 1500,
                 panBoundary: {
-                  center: avgPgPos,
-                  radius: 800,
-                  verticalScale: 0.7,
+                  center: pgPos,
+                  radius: 500,
+                  verticalScale: 0.5,
                 },
               })
             );
@@ -290,7 +287,7 @@ class BoatsAnimationApp extends TerrainBase {
           this.animatorInstance = undefined;
         }
       );
-    }, 200);
+    }, 100);
   }
 
   private startAnimationLoop(
@@ -299,25 +296,26 @@ class BoatsAnimationApp extends TerrainBase {
     camera: THREE.Camera,
     controls: any
   ): void {
+    // Same as original animation
     let startTime = Date.now();
 
     const animate = () => {
       try {
         this.updatePerformance();
 
-        // Gentle floating motion after animation completes
+        // Add gentle floating motion like a cloud (same as original)
+        const time = (Date.now() - startTime) * 0.0005;
+        const floatAmplitude = 2;
+        const floatSpeed = 1.2;
+
         if (this.animatorInstance === undefined) {
-          const time = (Date.now() - startTime) * 0.0003;
-          const floatAmplitude = 1.5;
-          const floatSpeed = 1.0;
-
           const floatY = Math.sin(time * floatSpeed) * floatAmplitude;
-          const floatX = Math.sin(time * floatSpeed * 0.6) * (floatAmplitude * 0.2);
-          const floatZ = Math.cos(time * floatSpeed * 0.4) * (floatAmplitude * 0.15);
+          const floatX = Math.sin(time * floatSpeed * 0.7) * (floatAmplitude * 0.3);
+          const floatZ = Math.cos(time * floatSpeed * 0.5) * (floatAmplitude * 0.2);
 
-          camera.position.y += floatY * 0.015;
-          camera.position.x += floatX * 0.008;
-          camera.position.z += floatZ * 0.008;
+          camera.position.y += floatY * 0.02;
+          camera.position.x += floatX * 0.01;
+          camera.position.z += floatZ * 0.01;
         }
 
         OrbitControlsHelper.update(controls);
@@ -331,6 +329,7 @@ class BoatsAnimationApp extends TerrainBase {
   }
 
   public override dispose(): void {
+    // Same as original animation
     console.log(`🧹 Disposing ${this.config.name}`);
 
     if (this.animationId) {
@@ -342,7 +341,6 @@ class BoatsAnimationApp extends TerrainBase {
       this.animatorInstance = undefined;
     }
 
-    // Dispose paraglider meshes
     this.paragliderMeshes.forEach(mesh => {
       mesh.traverse(child => {
         if (child instanceof THREE.Mesh) {
