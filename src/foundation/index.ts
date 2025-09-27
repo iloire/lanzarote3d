@@ -19,11 +19,3 @@ export * from './utils';
 
 // Type definitions
 export * from './types';
-
-// Foundation metadata
-export const FOUNDATION_VERSION = '3.0.0';
-export const FOUNDATION_NAME = 'Lanzarote3D Foundation';
-
-// Phase completion markers
-export const PHASE_2_COMPLETE = true;
-export const PHASE_3_COMPLETE = true;

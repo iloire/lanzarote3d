@@ -70,7 +70,6 @@ function onDocumentKeyUp(event: KeyboardEvent) {
 export class CameraController extends THREE.PerspectiveCamera {
   mode: CameraMode = CameraMode.FollowTarget;
   target!: Flier;
-  terrain?: THREE.Mesh;
   angle: number = DEFAULT_ANGLE;
   angleY: number = DEFAULT_ANGLE_Y;
   distance: number = DEFAULT_FOLLOW_DISTANCE;
@@ -83,9 +82,8 @@ export class CameraController extends THREE.PerspectiveCamera {
   floatStartTime = performance.now();
   baseY: number = 0;
 
-  constructor(fov: number, aspect: number, near: number, far: number, terrain?: THREE.Mesh) {
+  constructor(fov: number, aspect: number, near: number, far: number) {
     super(fov, aspect, near, far);
-    this.terrain = terrain;
   }
 
   addGui(gui: any) {

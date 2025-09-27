@@ -1,8 +1,6 @@
 Implement the following tasks if any is added follwing the instructions described below:
 ---
 TASKS:
-- do we need terrain field in CameraController?
-- it looks like there is a lot of indirection, coupling and duplication. See the apps/shared/index.ts. Why does that file needs to have a reference to every demo? Suggest other ways.  Maybe using the app-registry?
 ---
 
 ### Instructions
