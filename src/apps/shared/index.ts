@@ -34,6 +34,9 @@ export async function loadApp(appKey: string, options: StoryOptions): Promise<vo
     case 'animation':
       appModule = await import('../demos/animation/index');
       break;
+    case 'boats':
+      appModule = await import('../demos/boats/index');
+      break;
     case 'game':
       appModule = await import('../experiences/game/game');
       break;
