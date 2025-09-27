@@ -90,25 +90,29 @@ class HeadWorkshopApp extends WorkshopDemoBase {
         });
       });
 
-      const x = -800;
+      const x = -1500;
       const z = 0;
       const ITEMS_PER_ROW = 3;
+      const SPACING_X = 1500; // Increased spacing to prevent overlap
+      const SPACING_Z = 1500;
 
       heads.forEach((headOptions, index) => {
         const head = new PilotHead(headOptions);
         const mesh = head.load();
 
-        // Calculate grid position
-        const row = Math.floor(index / ITEMS_PER_ROW);
-        const col = index % ITEMS_PER_ROW;
-        mesh.position.set(x + col * 800, -100, z + row * 1000);
-
-        scene.add(mesh);
-
         // Fix the enum value display
         const headTypeName = Object.keys(PilotHeadType).find(
           key => (PilotHeadType as any)[key] === headOptions.headType
         );
+
+        // Calculate grid position with increased spacing
+        const row = Math.floor(index / ITEMS_PER_ROW);
+        const col = index % ITEMS_PER_ROW;
+        mesh.position.set(x + col * SPACING_X, -100, z + row * SPACING_Z);
+
+        console.log(`Head ${index}: ${headTypeName} at position (${x + col * SPACING_X}, -100, ${z + row * SPACING_Z})`);
+
+        scene.add(mesh);
         const helmetTypeName = Object.keys(HelmetType).find(
           key => (HelmetType as any)[key] === headOptions.helmetType
         );
@@ -143,9 +147,9 @@ class HeadWorkshopApp extends WorkshopDemoBase {
         (mesh as any).updateLabel = updateLabelPosition;
       });
 
-      // Set camera position for head showcase - closer to the reduced number of heads
-      camera.position.set(0, 800, 2500);
-      camera.lookAt(scene.position);
+      // Set camera position for head showcase - adjusted for new spacing
+      camera.position.set(0, 1200, 4000);
+      camera.lookAt(new THREE.Vector3(0, 0, 0));
 
       // Start animation loop with label updates
       this.startAnimationLoop(renderer, scene, camera, controls, () => {
