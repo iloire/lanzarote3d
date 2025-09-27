@@ -1,7 +1,6 @@
 Implement the following tasks if any is added follwing the instructions described below:
 ---
 TASKS:
-- something super weird is happening in the head workshop demo. I see all the heads... but I zooom out and out and end up seeing a render of a huge helmet that is containing all the inner heads
 ---
 
 ### Instructions

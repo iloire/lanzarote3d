@@ -64,39 +64,35 @@ class HeadWorkshopApp extends WorkshopDemoBase {
       // Create container for labels
       this.labelContainer = this.createLabelContainer();
 
-      const heads = Object.keys(PilotHeadType)
-        .filter(key => isNaN(Number(key)))
-        .reduce((acc, headKey) => {
-          // For each head type
-          Object.keys(HelmetType)
-            .filter(key => isNaN(Number(key)))
-            .forEach(helmetKey => {
-              // Add head with helmet and each glasses type
-              Object.keys(GlassesType)
-                .filter(key => isNaN(Number(key)))
-                .forEach(glassesKey => {
-                  // helmet options with professional color palettes
-                  const baseHelmetOptions: HelmetOptions = {
-                    color: getRandomColorFromPalette(),
-                    color2: getRandomColorFromPalette(),
-                    color3: getRandomColorFromPalette(),
-                  };
+      // Create a more reasonable sample - one example per head type with variety
+      const headTypeKeys = Object.keys(PilotHeadType).filter(key => isNaN(Number(key)));
+      const helmetTypeKeys = Object.keys(HelmetType).filter(key => isNaN(Number(key)));
+      const glassesTypeKeys = Object.keys(GlassesType).filter(key => isNaN(Number(key)));
 
-                  acc.push({
-                    headType: (PilotHeadType as any)[headKey],
-                    helmetType: (HelmetType as any)[helmetKey],
-                    helmetOptions: baseHelmetOptions,
-                    glassesType: (GlassesType as any)[glassesKey],
-                  });
-                });
-            });
+      const heads: PilotHeadOptions[] = [];
 
-          return acc;
-        }, [] as PilotHeadOptions[]);
+      // Create one head per head type, with varied helmets and glasses
+      headTypeKeys.forEach((headKey, headIndex) => {
+        const helmetKey = helmetTypeKeys[headIndex % helmetTypeKeys.length];
+        const glassesKey = glassesTypeKeys[headIndex % glassesTypeKeys.length];
 
-      const x = -2000;
+        const baseHelmetOptions: HelmetOptions = {
+          color: getRandomColorFromPalette(),
+          color2: getRandomColorFromPalette(),
+          color3: getRandomColorFromPalette(),
+        };
+
+        heads.push({
+          headType: (PilotHeadType as any)[headKey],
+          helmetType: (HelmetType as any)[helmetKey],
+          helmetOptions: baseHelmetOptions,
+          glassesType: (GlassesType as any)[glassesKey],
+        });
+      });
+
+      const x = -800;
       const z = 0;
-      const ITEMS_PER_ROW = 5;
+      const ITEMS_PER_ROW = 3;
 
       heads.forEach((headOptions, index) => {
         const head = new PilotHead(headOptions);
@@ -147,8 +143,8 @@ class HeadWorkshopApp extends WorkshopDemoBase {
         (mesh as any).updateLabel = updateLabelPosition;
       });
 
-      // Set camera position for head showcase
-      camera.position.set(-5000, 1000, 22000);
+      // Set camera position for head showcase - closer to the reduced number of heads
+      camera.position.set(0, 800, 2500);
       camera.lookAt(scene.position);
 
       // Start animation loop with label updates

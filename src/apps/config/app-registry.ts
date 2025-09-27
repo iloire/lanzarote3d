@@ -73,7 +73,7 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
 
   demos: {
     animation: {
-      name: 'Animation Demo',
+      name: 'Famara animation',
       description: 'Dramatic camera animation showcasing voxel paragliders with golden hour lighting',
       entry: './demos/animation/index.tsx',
       route: '/animation',
@@ -84,7 +84,7 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       priority: 1,
     },
     photobooth: {
-      name: 'Famara static',
+      name: 'Famara',
       description: 'Beautiful static 3D scene showcasing paragliders and environment',
       entry: './demos/photobooth/index.tsx',
       route: '/photobooth',
@@ -102,7 +102,7 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       category: 'demo',
       requiresWebGL: true,
       tags: ['landscape', 'nature', 'scenic', 'beach'],
-      status: 'public',
+      status: 'dev',
       priority: 3,
       theme: 'natural', // Override with natural theme for pure landscape experience
     },
