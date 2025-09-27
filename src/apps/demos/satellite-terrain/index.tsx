@@ -32,6 +32,18 @@ class SatelliteTerrainApp extends TerrainBase {
   private currentThemeIndex = 0;
   private availableThemes: any[] = [];
   private uiContainer: HTMLElement | undefined;
+  private debugUI: HTMLElement | undefined;
+
+  // Debug parameters for texture alignment
+  private debugParams = {
+    offsetX: 0,
+    offsetY: 0,
+    scaleX: 1,
+    scaleY: 1,
+    rotation: 0,
+    flipX: false,
+    flipY: false
+  };
 
   constructor() {
     const appConfig = getAppConfig('satellite-terrain');
@@ -55,26 +67,7 @@ class SatelliteTerrainApp extends TerrainBase {
 
     // Initialize available satellite themes
     this.availableThemes = [
-      {
-        name: 'Basic Satellite',
-        theme: SatelliteThemes.createLanzaroteSatelliteTheme(),
-        description: 'Standard satellite imagery'
-      },
-      {
-        name: 'Enhanced Satellite',
-        theme: SatelliteThemes.createEnhancedSatelliteTheme(),
-        description: 'High-contrast enhanced imagery'
-      },
-      {
-        name: 'Hybrid Satellite',
-        theme: SatelliteThemes.createHybridSatelliteTheme(),
-        description: 'Blended satellite with custom materials'
-      },
-      {
-        name: 'Test Satellite',
-        theme: SatelliteThemes.createTestSatelliteTheme(),
-        description: 'Development/testing theme'
-      },
+      ...SatelliteThemes.getAllThemes(),
       {
         name: 'Default Wireframe',
         theme: getDefaultTheme(),
@@ -93,20 +86,27 @@ class SatelliteTerrainApp extends TerrainBase {
 
       controls.enabled = true;
 
-      // Set optimal camera position for satellite terrain viewing
-      const initialPos = new THREE.Vector3(8000, 4000, 2000);
-      const lookAtPos = new THREE.Vector3(0, 0, 0); // Center of terrain
+      // Set perfect top-down north-facing view for satellite mapping
+      // Position camera VERY high above terrain center, looking straight down
+      const initialPos = new THREE.Vector3(0, 50000, 0);  // VERY high altitude for full island overview
+      const lookAtPos = new THREE.Vector3(0, 0, 0);       // Look at terrain center
 
       camera.position.copy(initialPos);
       camera.lookAt(lookAtPos);
 
-      // Configure controls for terrain exploration
+      // Configure controls with NO BOUNDARIES for free navigation
       OrbitControlsHelper.focusOnTarget(controls, lookAtPos, {
         ...ORBIT_CONTROLS_PRESETS['aerial'],
-        maxDistance: 15000,
-        minDistance: 500,
-        maxPolarAngle: Math.PI * 0.48, // Limit to prevent underground viewing
+        maxDistance: Infinity,   // No maximum zoom out limit
+        minDistance: 100,        // Keep minimum to prevent going underground
+        maxPolarAngle: Math.PI,  // Allow full rotation
+        minPolarAngle: 0,        // Allow full rotation
       });
+
+      console.log('📍 Satellite Terrain: Perfect top-down north-facing view');
+      console.log(`  Camera position: (${initialPos.x}, ${initialPos.y}, ${initialPos.z})`);
+      console.log(`  Looking at: (${lookAtPos.x}, ${lookAtPos.y}, ${lookAtPos.z})`);
+      console.log('🧭 North = +Z direction, perfect for satellite texture mapping');
 
       // Apply initial satellite theme
       const initialTheme = this.availableThemes[0].theme;
@@ -131,6 +131,9 @@ class SatelliteTerrainApp extends TerrainBase {
       // Set up keyboard controls
       this.setupControls(options);
 
+      // Create debug UI for texture alignment
+      this.createDebugUI();
+
       // Start animation loop
       this.startAnimationLoop(renderer, scene, camera, controls);
 
@@ -148,9 +151,9 @@ class SatelliteTerrainApp extends TerrainBase {
     await ThemeEngine.apply(options, theme);
 
     // Additional handling for Island component if needed
-    if (theme.style === 'satellite' && options.terrainInstance) {
+    if (theme.terrain?.style === 'satellite' && options.terrainInstance) {
       try {
-        await options.terrainInstance.applyTheme(theme.terrain || theme);
+        await options.terrainInstance.applyTheme(theme.terrain);
       } catch (error) {
         console.warn('Failed to apply satellite theme to terrain, using fallback:', error);
       }
@@ -193,8 +196,8 @@ class SatelliteTerrainApp extends TerrainBase {
       <div style="margin-bottom: 10px; border-top: 1px solid #555; padding-top: 10px;">
         <strong>Controls:</strong><br>
         ${this.availableThemes.map((theme, index) =>
-          `${index + 1}: ${theme.name}${index === this.currentThemeIndex ? ' ★' : ''}`
-        ).join('<br>')}
+      `${index + 1}: ${theme.name}${index === this.currentThemeIndex ? ' ★' : ''}`
+    ).join('<br>')}
       </div>
       <div style="border-top: 1px solid #555; padding-top: 10px; font-size: 11px; color: #ccc;">
         Mouse: Orbit/Zoom/Pan<br>
@@ -205,9 +208,10 @@ class SatelliteTerrainApp extends TerrainBase {
 
   private setupControls(options: StoryOptions): void {
     const onKeyDown = async (event: KeyboardEvent) => {
-      const key = event.key;
-      const themeIndex = parseInt(key) - 1;
+      const key = event.key.toLowerCase();
+      const themeIndex = parseInt(event.key) - 1;
 
+      // Handle theme switching
       if (themeIndex >= 0 && themeIndex < this.availableThemes.length) {
         this.currentThemeIndex = themeIndex;
         const selectedTheme = this.availableThemes[themeIndex];
@@ -221,10 +225,172 @@ class SatelliteTerrainApp extends TerrainBase {
         } catch (error) {
           console.error(`❌ Failed to apply theme ${selectedTheme.name}:`, error);
         }
+        return;
+      }
+
+      // Handle debug controls
+      const step = 0.1;
+      let updated = false;
+
+      switch (key) {
+        case 'w': // Move North
+          this.debugParams.offsetY += step;
+          updated = true;
+          console.log('🔧 Moved texture North');
+          break;
+        case 's': // Move South
+          this.debugParams.offsetY -= step;
+          updated = true;
+          console.log('🔧 Moved texture South');
+          break;
+        case 'a': // Move West
+          this.debugParams.offsetX -= step;
+          updated = true;
+          console.log('🔧 Moved texture West');
+          break;
+        case 'd': // Move East
+          this.debugParams.offsetX += step;
+          updated = true;
+          console.log('🔧 Moved texture East');
+          break;
+        case 'q': // Scale up
+          this.debugParams.scaleX += 0.1;
+          this.debugParams.scaleY += 0.1;
+          updated = true;
+          console.log('🔧 Scaled texture up');
+          break;
+        case 'e': // Scale down
+          this.debugParams.scaleX = Math.max(0.1, this.debugParams.scaleX - 0.1);
+          this.debugParams.scaleY = Math.max(0.1, this.debugParams.scaleY - 0.1);
+          updated = true;
+          console.log('🔧 Scaled texture down');
+          break;
+        case 'z': // Rotate left
+          this.debugParams.rotation -= 15;
+          updated = true;
+          console.log('🔧 Rotated texture left');
+          break;
+        case 'x': // Rotate right
+          this.debugParams.rotation += 15;
+          updated = true;
+          console.log('🔧 Rotated texture right');
+          break;
+        case 'f': // Flip horizontally
+          this.debugParams.flipX = !this.debugParams.flipX;
+          updated = true;
+          console.log(`🔧 Flipped texture horizontally: ${this.debugParams.flipX ? 'ON' : 'OFF'}`);
+          break;
+        case 'g': // Flip vertically
+          this.debugParams.flipY = !this.debugParams.flipY;
+          updated = true;
+          console.log(`🔧 Flipped texture vertically: ${this.debugParams.flipY ? 'ON' : 'OFF'}`);
+          break;
+        case 'r': // Reset
+          this.debugParams = {
+            offsetX: 0,
+            offsetY: 0,
+            scaleX: 1,
+            scaleY: 1,
+            rotation: 0,
+            flipX: false,
+            flipY: false
+          };
+          updated = true;
+          console.log('🔧 Reset all texture adjustments');
+          break;
+      }
+
+      if (updated) {
+        this.updateDebugUI();
+        await this.reapplyCurrentTexture(options);
       }
     };
 
     window.addEventListener('keydown', onKeyDown);
+  }
+
+  private createDebugUI(): void {
+    this.debugUI = document.createElement('div');
+    this.debugUI.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 12px;
+      z-index: 1000;
+      max-width: 300px;
+    `;
+
+    this.debugUI.innerHTML = `
+      <div style="font-weight: bold; margin-bottom: 10px;">🔧 TEXTURE DEBUG CONTROLS</div>
+      <div style="font-size: 11px; color: #ccc; margin-bottom: 15px;">
+        Use these keys to fix texture alignment:
+      </div>
+
+      <div style="margin-bottom: 8px;"><strong>MOVEMENT:</strong></div>
+      <div style="margin-bottom: 8px; font-size: 11px;">
+        W/S: Move North/South<br>
+        A/D: Move West/East<br>
+        Q/E: Scale up/down<br>
+        R: Reset all adjustments
+      </div>
+
+      <div style="margin-bottom: 8px;"><strong>ROTATION:</strong></div>
+      <div style="margin-bottom: 8px; font-size: 11px;">
+        Z/X: Rotate left/right<br>
+        F: Flip horizontally<br>
+        G: Flip vertically
+      </div>
+
+      <div style="border-top: 1px solid #555; padding-top: 8px; margin-top: 10px;">
+        <div id="debug-values" style="font-size: 10px; color: #aaa;">
+          Offset: (0, 0)<br>
+          Scale: (1, 1)<br>
+          Rotation: 0°<br>
+          Flips: None
+        </div>
+      </div>
+
+      <div style="margin-top: 10px; font-size: 10px; color: #888;">
+        Tell me which adjustments work and I'll hardcode the fix!
+      </div>
+    `;
+
+    document.body.appendChild(this.debugUI);
+    console.log('🔧 Debug UI created - use WASD, QE, ZX, FG, R keys to adjust texture');
+  }
+
+  private updateDebugUI(): void {
+    const debugValues = document.getElementById('debug-values');
+    if (debugValues) {
+      const flips = [];
+      if (this.debugParams.flipX) flips.push('H');
+      if (this.debugParams.flipY) flips.push('V');
+      const flipText = flips.length > 0 ? flips.join('+') : 'None';
+
+      debugValues.innerHTML = `
+        Offset: (${this.debugParams.offsetX.toFixed(2)}, ${this.debugParams.offsetY.toFixed(2)})<br>
+        Scale: (${this.debugParams.scaleX.toFixed(2)}, ${this.debugParams.scaleY.toFixed(2)})<br>
+        Rotation: ${this.debugParams.rotation}°<br>
+        Flips: ${flipText}
+      `;
+    }
+  }
+
+  private async reapplyCurrentTexture(options: StoryOptions): Promise<void> {
+    if (this.currentThemeIndex >= 0 && this.currentThemeIndex < this.availableThemes.length) {
+      const currentTheme = this.availableThemes[this.currentThemeIndex];
+      try {
+        await this.applyThemeWithIslandSupport(options, currentTheme.theme);
+        console.log(`🔧 Reapplied texture with debug params: offset(${this.debugParams.offsetX.toFixed(2)}, ${this.debugParams.offsetY.toFixed(2)}) scale(${this.debugParams.scaleX.toFixed(2)}, ${this.debugParams.scaleY.toFixed(2)}) rotation(${this.debugParams.rotation}°)`);
+      } catch (error) {
+        console.error('❌ Failed to reapply texture:', error);
+      }
+    }
   }
 
   private startAnimationLoop(

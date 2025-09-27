@@ -6,7 +6,8 @@ module.exports = {
   entry: {
     main: "./src/showcase-entry.tsx",
     game: "./src/apps/experiences/game/index.tsx",
-    flyzones: "./src/apps/experiences/flyzones/index.tsx"
+    flyzones: "./src/apps/experiences/flyzones/index.tsx",
+    "tile-debug": "./src/apps/tools/workshop/demos/tile-debug/entry.tsx"
   },
   output: {
     path: path.join(__dirname, "/dist"),
@@ -98,6 +99,12 @@ module.exports = {
       template: path.join(__dirname, "./src/apps/experiences/flyzones/index.html"),
       chunks: ['flyzones'],
       filename: 'flyzones.html'
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(__dirname, "./src/templates/showcase.html"),
+      chunks: ['tile-debug'],
+      filename: 'tile-debug.html',
+      title: 'Lanzarote 3D - Tile Debug Dashboard'
     }),
   ],
 };

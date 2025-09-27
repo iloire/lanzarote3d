@@ -17,6 +17,7 @@ export function generateBundleToStoryMap(): Record<string, string> {
     'flyzones',
     'workshop',
     'location-editor',
+    'tile-debug',
     'night',
     'paragliderVoxel',
     'terrain',

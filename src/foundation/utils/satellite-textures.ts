@@ -81,9 +81,10 @@ export class SatelliteTextureManager {
           texture.wrapS = THREE.ClampToEdgeWrapping;
           texture.wrapT = THREE.ClampToEdgeWrapping;
           texture.magFilter = THREE.LinearFilter;
-          texture.minFilter = THREE.LinearMipmapLinearFilter;
-          texture.generateMipmaps = true;
-          texture.flipY = false; // Important for satellite imagery
+          texture.minFilter = THREE.LinearFilter; // Use linear instead of mipmap to reduce seams
+          texture.generateMipmaps = false; // Disable mipmaps to prevent seaming issues
+          texture.flipY = true; // Try flipping Y for correct orientation
+          texture.colorSpace = THREE.SRGBColorSpace; // Ensure correct color space
           resolve(texture);
         },
         undefined,
@@ -156,7 +157,7 @@ export class SatelliteTextureManager {
   }
 
   /**
-   * Generate UV mapping for terrain mesh based on geographic bounds
+   * Generate UV mapping for terrain mesh using direct coordinate mapping
    */
   generateTerrainUVMapping(
     geometry: THREE.BufferGeometry,
@@ -166,35 +167,59 @@ export class SatelliteTextureManager {
       east: number;
       west: number;
     },
-    tileMapping: TileMapping
+    tileMapping: TileMapping,
+    debugParams?: {
+      offsetX: number;
+      offsetY: number;
+      scaleX: number;
+      scaleY: number;
+      rotation: number;
+      flipX: boolean;
+      flipY: boolean;
+    }
   ): void {
     const positions = geometry.attributes.position;
     const uvArray = new Float32Array(positions.count * 2);
 
-    // Assuming terrain coordinates are in world space
-    // This would need to be adapted based on your specific coordinate system
+    geometry.computeBoundingBox();
+    const bbox = geometry.boundingBox!;
+
+    console.log('🗺️ Simple direct mapping approach');
+    console.log(`Terrain: X(${bbox.min.x.toFixed(2)} to ${bbox.max.x.toFixed(2)}) Z(${bbox.min.z.toFixed(2)} to ${bbox.max.z.toFixed(2)})`);
+    console.log(`Tiles: ${tileMapping.totalBounds.north}°N to ${tileMapping.totalBounds.south}°S, ${tileMapping.totalBounds.east}°E to ${tileMapping.totalBounds.west}°W`);
+
     for (let i = 0; i < positions.count; i++) {
       const x = positions.getX(i);
       const z = positions.getZ(i);
 
-      // Convert world coordinates to geographic coordinates
-      // This is a simplified conversion - you'll need to adapt to your coordinate system
-      const longitude = terrainBounds.west + ((x + 10000) / 20000) * (terrainBounds.east - terrainBounds.west);
-      const latitude = terrainBounds.south + ((z + 10000) / 20000) * (terrainBounds.north - terrainBounds.south);
+      // Normalize terrain coordinates to 0-1
+      const xNorm = (x - bbox.min.x) / (bbox.max.x - bbox.min.x);
+      const zNorm = (z - bbox.min.z) / (bbox.max.z - bbox.min.z);
 
+      // Map directly to geographic bounds
+      const longitude = tileMapping.totalBounds.west + xNorm * (tileMapping.totalBounds.east - tileMapping.totalBounds.west);
+      const latitude = tileMapping.totalBounds.south + zNorm * (tileMapping.totalBounds.north - tileMapping.totalBounds.south);
+
+      // Get UV from tile mapping
       const uvCoords = this.calculateUVCoordinates(latitude, longitude, tileMapping);
 
       if (uvCoords) {
         uvArray[i * 2] = uvCoords.u;
         uvArray[i * 2 + 1] = uvCoords.v;
       } else {
-        // Fallback to simple planar mapping if outside tile bounds
-        uvArray[i * 2] = (x + 10000) / 20000;
-        uvArray[i * 2 + 1] = (z + 10000) / 20000;
+        // Direct UV mapping as fallback
+        uvArray[i * 2] = xNorm;
+        uvArray[i * 2 + 1] = 1.0 - zNorm;
+      }
+
+      if (i < 10) {
+        const uvSuccess = uvCoords ? '✅' : '❌';
+        console.log(`Vertex ${i}: terrain(${x.toFixed(2)},${z.toFixed(2)}) → norm(${xNorm.toFixed(3)},${zNorm.toFixed(3)}) → geo(${latitude.toFixed(4)},${longitude.toFixed(4)}) → UV(${uvArray[i * 2].toFixed(3)},${uvArray[i * 2 + 1].toFixed(3)}) ${uvSuccess}`);
       }
     }
 
     geometry.setAttribute('uv', new THREE.BufferAttribute(uvArray, 2));
+    console.log(`✅ Direct UV mapping complete: ${positions.count} vertices`);
   }
 
   /**
@@ -202,16 +227,16 @@ export class SatelliteTextureManager {
    */
   static createLanzaroteConfig(): StaticSatelliteConfig {
     return {
-      textureAtlas: '/assets/textures/lanzarote-satellite-atlas.jpg',
-      tileMap: '/assets/textures/lanzarote-tile-mapping.json',
-      attribution: '© OpenStreetMap contributors',
-      source: 'openstreetmap',
-      resolution: 10, // 10 meters per pixel
+      textureAtlas: '/assets/textures/lanzarote-satellite-atlas-complete.jpg?v=' + Date.now(),
+      tileMap: '/assets/textures/lanzarote-tile-mapping-complete.json?v=' + Date.now(),
+      attribution: '© Esri, Maxar, Earthstar Geographics',
+      source: 'esri',
+      resolution: 10, // 10 meters per pixel (zoom 12)
       bounds: {
-        north: 29.25,
-        south: 28.85,
-        east: -13.40,
-        west: -13.90
+        north: 29.250,   // Complete grid coverage
+        south: 28.606,   // Complete grid coverage
+        east: -13.526,   // Complete grid coverage
+        west: -13.878    // Complete grid coverage
       }
     };
   }

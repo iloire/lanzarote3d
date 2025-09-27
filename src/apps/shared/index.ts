@@ -103,6 +103,12 @@ export async function loadApp(appKey: string, options: StoryOptions): Promise<vo
     case 'voxel':
       appModule = await import('../tools/workshop/demos/voxel/index');
       break;
+    case 'terrain-gps':
+      appModule = await import('../tools/workshop/demos/terrain-gps/index');
+      break;
+    case 'tile-debug':
+      appModule = await import('../tools/workshop/demos/tile-debug/app');
+      break;
     default:
       throw new Error(`No import mapping found for app '${resolvedKey}' (original: '${appKey}')`);
   }

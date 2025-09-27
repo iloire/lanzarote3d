@@ -298,6 +298,28 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       status: 'dev',
       priority: 19,
     },
+    'terrain-gps': {
+      name: 'Terrain GPS Mapper',
+      description: 'Interactive tool for mapping 3D terrain to GPS coordinates - click to get precise coordinates',
+      entry: './tools/workshop/demos/terrain-gps',
+      route: '/terrain-gps',
+      category: 'demo',
+      requiresWebGL: true,
+      tags: ['terrain', 'gps', 'mapping', 'coordinates', 'interactive', 'tool'],
+      status: 'dev',
+      priority: 20,
+    },
+    'tile-debug': {
+      name: 'Tile Debug Dashboard',
+      description: 'Debug tool showing satellite tile download process, calculations, and atlas creation for terrain mapping',
+      entry: './tools/workshop/demos/tile-debug/app',
+      route: '/tile-debug',
+      category: 'demo',
+      requiresWebGL: true,
+      tags: ['debug', 'tiles', 'satellite', 'mapping', 'documentation', 'tool'],
+      status: 'dev',
+      priority: 21,
+    },
   },
 };
 

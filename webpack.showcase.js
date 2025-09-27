@@ -16,6 +16,7 @@ const showcaseApps = [
   // Tools
   { name: 'workshop', title: 'Lanzarote - Workshop', filename: 'workshop.html' },
   { name: 'location-editor', title: 'Lanzarote - Location Editor', filename: 'location-editor.html' },
+  { name: 'tile-debug', title: 'Lanzarote - Tile Debug', filename: 'tile-debug.html' },
 
   // Demos
   { name: 'night', title: 'Lanzarote - Night', filename: 'night.html' },
@@ -28,9 +29,14 @@ const showcaseApps = [
 // Export for use in other files
 module.exports.showcaseApps = showcaseApps;
 
-// Generate entry points dynamically - all use the same entry file
+// Generate entry points dynamically - most use the same entry file, but some have custom entries
 const entries = showcaseApps.reduce((acc, app) => {
-  acc[app.name] = './src/showcase-entry.tsx';
+  // Custom entry points for specific apps
+  if (app.name === 'tile-debug') {
+    acc[app.name] = './src/apps/tools/workshop/demos/tile-debug/entry.tsx';
+  } else {
+    acc[app.name] = './src/showcase-entry.tsx';
+  }
   return acc;
 }, {});
 

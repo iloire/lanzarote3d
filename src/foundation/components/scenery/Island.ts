@@ -127,10 +127,15 @@ class Island {
     }
 
     try {
+      console.log('Loading satellite texture from:', satelliteConfig.staticConfig.textureAtlas);
+
       // Load satellite texture and tile mapping
       const { texture, tileMapping } = await this.satelliteManager.loadSatelliteTexture(
         satelliteConfig.staticConfig
       );
+
+      console.log('Texture loaded:', texture);
+      console.log('Tile mapping loaded:', tileMapping);
 
       // Generate UV mapping for the terrain geometry
       this.satelliteManager.generateTerrainUVMapping(
@@ -139,13 +144,16 @@ class Island {
         tileMapping
       );
 
+      console.log('UV mapping generated for geometry');
+
       // Create satellite material
       const satelliteMaterial = new THREE.MeshStandardMaterial({
         map: texture,
         roughness: 0.8,
         metalness: 0.1,
-        transparent: satelliteConfig.opacity !== undefined,
+        transparent: satelliteConfig.opacity !== undefined && satelliteConfig.opacity < 1,
         opacity: satelliteConfig.opacity || 1.0,
+        side: THREE.DoubleSide, // Ensure both sides are rendered
       });
 
       // Apply blend mode if specified
@@ -162,6 +170,8 @@ class Island {
       this.mesh.material = satelliteMaterial;
 
       console.log('✅ Satellite texture applied successfully');
+      console.log('Material:', satelliteMaterial);
+      console.log('Texture image:', texture.image);
     } catch (error) {
       console.error('Failed to apply satellite texture:', error);
 
