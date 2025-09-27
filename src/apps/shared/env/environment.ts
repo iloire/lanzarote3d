@@ -7,7 +7,7 @@ import Tree from '../../../foundation/components/scenery/Tree';
 import PineTree from '../../../foundation/components/scenery/PineTree';
 import Stone from '../../../foundation/components/scenery/Stone';
 import House, { HouseType } from '../../../foundation/components/scenery/House';
-import { SmallSailBoat } from '../../../foundation/components/scenery';
+import { SmallSailBoat, FishingBoat, Yacht, SpeedBoat } from '../../../foundation/components/scenery';
 import Birds from '../../../foundation/components/wildlife/Birds';
 import { Hangglider as HangGlider } from '../../../foundation/components/vehicles';
 import { addMeshAroundArea } from './mesh-utils';
@@ -53,12 +53,108 @@ class Environment {
     this.scene.add(hgMesh);
   }
 
-  addBoats(water: THREE.Mesh) {
-    const boat = new SmallSailBoat().load();
-    const scale = 3;
-    boat.scale.set(scale, scale, scale);
-    addMeshAroundArea([boat], new THREE.Vector3(7879, 0, -4445), 5, water, this.scene);
-    addMeshAroundArea([boat], new THREE.Vector3(8279, 0, -6155), 4, water, this.scene);
+  addBoats(water: THREE.Mesh, options?: { randomize?: boolean; types?: string[] }) {
+    const { randomize = true, types = ['SmallSailBoat', 'FishingBoat', 'Yacht', 'SpeedBoat'] } = options || {};
+
+    // Create boats for first area
+    const boats1 = this.createBoatVariety(5, { randomize, types });
+    addMeshAroundArea(boats1, new THREE.Vector3(6879, 0, -5445), 5, water, this.scene);
+
+    // Create boats for second area
+    const boats2 = this.createBoatVariety(4, { randomize, types });
+    addMeshAroundArea(boats2, new THREE.Vector3(8279, 0, -6155), 4, water, this.scene);
+  }
+
+  private createBoatVariety(count: number, options: { randomize: boolean; types: string[] }): (THREE.Mesh | THREE.Group)[] {
+    const { randomize, types } = options;
+    const boats: (THREE.Mesh | THREE.Group)[] = [];
+
+    for (let i = 0; i < count; i++) {
+      let boatType: string;
+
+      if (randomize) {
+        // Pick a random boat type
+        boatType = types[Math.floor(Math.random() * types.length)];
+      } else {
+        // Cycle through types in order
+        boatType = types[i % types.length];
+      }
+
+      const boat = this.createBoatOfType(boatType);
+      if (boat) {
+        boats.push(boat);
+      }
+    }
+
+    return boats;
+  }
+
+  private createBoatOfType(type: string): THREE.Mesh | THREE.Group | null {
+    let boat: any;
+    let boatMesh: THREE.Mesh | THREE.Group;
+    let scale = 3; // Default scale
+
+    switch (type) {
+      case 'SmallSailBoat':
+        boat = new SmallSailBoat();
+        boatMesh = boat.load();
+        scale = 3;
+        break;
+      case 'FishingBoat':
+        boat = new FishingBoat();
+        boatMesh = boat.load();
+        scale = 2.5; // Fishing boats are already larger
+        break;
+      case 'Yacht':
+        boat = new Yacht();
+        boatMesh = boat.load();
+        scale = 2; // Yachts are already quite large
+        break;
+      case 'SpeedBoat':
+        boat = new SpeedBoat();
+        boatMesh = boat.load();
+        scale = 2.8;
+        break;
+      default:
+        console.warn(`Unknown boat type: ${type}`);
+        // Fallback to SmallSailBoat
+        boat = new SmallSailBoat();
+        boatMesh = boat.load();
+        scale = 3;
+    }
+
+    // Apply consistent scaling
+    boatMesh.scale.set(scale, scale, scale);
+
+    // Add some random rotation for variety
+    boatMesh.rotation.y = Math.random() * Math.PI * 2;
+
+    return boatMesh;
+  }
+
+  // Convenience methods for specific boat configurations
+  addRandomBoats(water: THREE.Mesh) {
+    this.addBoats(water, { randomize: true });
+  }
+
+  addMixedBoats(water: THREE.Mesh) {
+    this.addBoats(water, { randomize: false }); // Cycles through types in order
+  }
+
+  addOnlyFishingBoats(water: THREE.Mesh) {
+    this.addBoats(water, { randomize: false, types: ['FishingBoat'] });
+  }
+
+  addOnlyYachts(water: THREE.Mesh) {
+    this.addBoats(water, { randomize: false, types: ['Yacht'] });
+  }
+
+  addOnlySailboats(water: THREE.Mesh) {
+    this.addBoats(water, { randomize: false, types: ['SmallSailBoat'] });
+  }
+
+  addOnlySpeedBoats(water: THREE.Mesh) {
+    this.addBoats(water, { randomize: false, types: ['SpeedBoat'] });
   }
 
   addHouses(terrain: THREE.Mesh) {

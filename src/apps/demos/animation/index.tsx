@@ -103,7 +103,7 @@ class AnimationApp extends TerrainBase {
       await this.environment.addCloudsFromTheme(thermals, theme);
       this.environment.addTrees(terrain);
       this.environment.addHouses(terrain);
-      this.environment.addBoats(water);
+      this.environment.addRandomBoats(water); // Use randomized boat types for variety
 
       // Make environment available for theme switching
       options.environment = this.environment;
