@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Paraglider } from '../../../../../foundation/components/vehicles';
-import { Boat, Tree, Stone } from '../../../../../foundation/components/scenery';
+import { SmallSailBoat, Tree, Stone } from '../../../../../foundation/components/scenery';
 import { House, HouseType } from '../../../../../foundation/components/scenery';
 import { PineTree } from '../../../../../foundation/components/scenery';
 import { PilotHeadType } from '../../../../../foundation/components/characters';
@@ -126,7 +126,7 @@ class WorkshopApp extends WorkshopDemoBase {
 
     // Load boat
     try {
-      const boat = new Boat();
+      const boat = new SmallSailBoat();
       const boatMesh = boat.load(gui);
       boatMesh.position.set(-30, 0, 80);
       scene.add(boatMesh);

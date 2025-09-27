@@ -7,7 +7,7 @@ import Tree from '../../../foundation/components/scenery/Tree';
 import PineTree from '../../../foundation/components/scenery/PineTree';
 import Stone from '../../../foundation/components/scenery/Stone';
 import House, { HouseType } from '../../../foundation/components/scenery/House';
-import Boat from '../../../foundation/components/scenery/Boat';
+import { SmallSailBoat } from '../../../foundation/components/scenery';
 import Birds from '../../../foundation/components/wildlife/Birds';
 import { Hangglider as HangGlider } from '../../../foundation/components/vehicles';
 import { addMeshAroundArea } from './mesh-utils';
@@ -54,7 +54,7 @@ class Environment {
   }
 
   addBoats(water: THREE.Mesh) {
-    const boat = new Boat().load();
+    const boat = new SmallSailBoat().load();
     const scale = 3;
     boat.scale.set(scale, scale, scale);
     addMeshAroundArea([boat], new THREE.Vector3(7879, 0, -4445), 5, water, this.scene);

@@ -4,7 +4,7 @@ import GuiHelper from '../../utils/gui';
 const mat = new THREE.MeshLambertMaterial({ color: 0xffffff });
 const sail_mat = new THREE.MeshLambertMaterial({ color: 0x666666 });
 
-class Boat {
+class SmallSailBoat {
   load(gui?: any): THREE.Mesh {
     const geo = new THREE.BoxGeometry(10, 2, 4); //w, height, depth
     const mesh = new THREE.Mesh(geo, mat);
@@ -16,9 +16,9 @@ class Boat {
     mesh.add(meshSail);
 
     if (gui) {
-      GuiHelper.addLocationGui(gui, 'boat', mesh);
+      GuiHelper.addLocationGui(gui, 'small-sailboat', mesh);
     }
     return mesh;
   }
 }
-export default Boat;
+export default SmallSailBoat;
