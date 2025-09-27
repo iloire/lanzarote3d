@@ -41,7 +41,7 @@ class GliderWorkshopApp extends WorkshopDemoBase {
       const mesh = await glider.load(gui);
       scene.add(mesh);
 
-      camera.position.set(8000, 250, 300);
+      camera.position.set(12000, 1250, 11300);
       camera.lookAt(mesh.position);
 
       this.startAnimationLoop(renderer, scene, camera, controls);

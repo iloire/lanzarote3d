@@ -7,6 +7,16 @@ import Time from '../../utils/time';
 import GuiHelper from '../../utils/gui';
 
 // ============================================================================
+// SUN FLARE CONFIGURATION
+// ============================================================================
+
+/**
+ * Sun flare style configuration
+ * Set to 'realistic' for photographic lens flare or 'cartoon' for vector-like effect
+ */
+const SUN_FLARE_STYLE: 'realistic' | 'cartoon' = 'realistic';
+
+// ============================================================================
 // LIGHTING SYSTEM CONFIGURATION
 // ============================================================================
 
@@ -295,13 +305,30 @@ export default class Sky extends THREE.Object3D {
 
   /**
    * Add lens flare effect to the sun (point light)
+   * Style is configurable via SUN_FLARE_STYLE constant
    */
   private addLensFlareToSun(): void {
+    const lensflare = new Lensflare();
+
+    if (SUN_FLARE_STYLE === 'cartoon') {
+      // Cartoonish/vector-like sun flare
+      this.addCartoonSunFlare(lensflare);
+    } else {
+      // Realistic photographic lens flare
+      this.addRealisticSunFlare(lensflare);
+    }
+
+    this.pointLight.add(lensflare);
+  }
+
+  /**
+   * Add realistic photographic lens flare (original implementation)
+   */
+  private addRealisticSunFlare(lensflare: Lensflare): void {
     const textureLoader = new THREE.TextureLoader();
     const textureFlare0 = textureLoader.load(lensflareTexture0);
     const textureFlare1 = textureLoader.load(lensflareTexture1);
 
-    const lensflare = new Lensflare();
     const flareSize = 600;
 
     // Main flare element (bright center)
@@ -313,8 +340,166 @@ export default class Sky extends THREE.Object3D {
     // Additional flare elements can be added for more complex effects:
     // lensflare.addElement(new LensflareElement(textureFlare1, flareSize, 0.7));
     // lensflare.addElement(new LensflareElement(textureFlare1, flareSize, 0.9));
+  }
 
-    this.pointLight.add(lensflare);
+  /**
+   * Add cartoonish/vector-like lens flare (new implementation)
+   */
+  private addCartoonSunFlare(lensflare: Lensflare): void {
+    // Create cartoonish sun flare textures procedurally
+    const mainFlareTexture = this.createCartoonSunFlareTexture();
+    const rayFlareTexture = this.createCartoonRayFlareTexture();
+    const sparkleTexture = this.createCartoonSparkleTexture();
+
+    // Main sun disk - bright cartoon-style center
+    lensflare.addElement(new LensflareElement(mainFlareTexture, 400, 0, this.pointLight.color));
+
+    // Sun rays - radiating star pattern
+    lensflare.addElement(new LensflareElement(rayFlareTexture, 800, 0, this.pointLight.color.clone().multiplyScalar(0.8)));
+
+    // Sparkle elements at different distances for cartoon magic effect
+    lensflare.addElement(new LensflareElement(sparkleTexture, 150, 0.3, new THREE.Color(0xffff88)));
+    lensflare.addElement(new LensflareElement(sparkleTexture, 120, 0.6, new THREE.Color(0xffaa44)));
+    lensflare.addElement(new LensflareElement(sparkleTexture, 100, 0.8, new THREE.Color(0xff6644)));
+  }
+
+  /**
+   * Create a cartoonish sun flare texture - smooth circular gradient with sharp edges
+   */
+  private createCartoonSunFlareTexture(): THREE.Texture {
+    const size = 256;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const context = canvas.getContext('2d')!;
+
+    const center = size / 2;
+    const maxRadius = size / 2;
+
+    // Create radial gradient for cartoon sun
+    const gradient = context.createRadialGradient(center, center, 0, center, center, maxRadius);
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 1.0)');    // Bright white center
+    gradient.addColorStop(0.3, 'rgba(255, 255, 100, 0.9)');  // Yellow
+    gradient.addColorStop(0.6, 'rgba(255, 200, 50, 0.6)');   // Orange
+    gradient.addColorStop(0.8, 'rgba(255, 150, 0, 0.3)');    // Deep orange
+    gradient.addColorStop(1.0, 'rgba(255, 100, 0, 0.0)');    // Transparent edge
+
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, size, size);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.needsUpdate = true;
+    return texture;
+  }
+
+  /**
+   * Create cartoonish sun rays texture - star pattern with sharp rays
+   */
+  private createCartoonRayFlareTexture(): THREE.Texture {
+    const size = 512;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const context = canvas.getContext('2d')!;
+
+    const center = size / 2;
+    const numRays = 8;
+    const rayLength = size / 2;
+
+    context.fillStyle = 'rgba(0, 0, 0, 0)';
+    context.fillRect(0, 0, size, size);
+
+    // Draw cartoon-style sun rays
+    for (let i = 0; i < numRays; i++) {
+      const angle = (i / numRays) * Math.PI * 2;
+      const rayWidth = Math.PI / (numRays * 1.5); // Ray width
+
+      // Create gradient for each ray
+      const gradient = context.createLinearGradient(
+        center, center,
+        center + Math.cos(angle) * rayLength,
+        center + Math.sin(angle) * rayLength
+      );
+      gradient.addColorStop(0, 'rgba(255, 255, 200, 0.8)');
+      gradient.addColorStop(0.7, 'rgba(255, 200, 100, 0.4)');
+      gradient.addColorStop(1.0, 'rgba(255, 150, 50, 0.0)');
+
+      // Draw ray as triangle
+      context.beginPath();
+      context.moveTo(center, center);
+
+      const startAngle = angle - rayWidth / 2;
+      const endAngle = angle + rayWidth / 2;
+
+      context.lineTo(
+        center + Math.cos(startAngle) * rayLength,
+        center + Math.sin(startAngle) * rayLength
+      );
+      context.lineTo(
+        center + Math.cos(endAngle) * rayLength,
+        center + Math.sin(endAngle) * rayLength
+      );
+
+      context.closePath();
+      context.fillStyle = gradient;
+      context.fill();
+    }
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.needsUpdate = true;
+    return texture;
+  }
+
+  /**
+   * Create cartoonish sparkle texture - simple cross/star shape
+   */
+  private createCartoonSparkleTexture(): THREE.Texture {
+    const size = 64;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const context = canvas.getContext('2d')!;
+
+    const center = size / 2;
+
+    context.fillStyle = 'rgba(0, 0, 0, 0)';
+    context.fillRect(0, 0, size, size);
+
+    // Draw simple four-pointed star
+    context.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+    context.lineWidth = 3;
+    context.lineCap = 'round';
+
+    // Vertical line
+    context.beginPath();
+    context.moveTo(center, 5);
+    context.lineTo(center, size - 5);
+    context.stroke();
+
+    // Horizontal line
+    context.beginPath();
+    context.moveTo(5, center);
+    context.lineTo(size - 5, center);
+    context.stroke();
+
+    // Add small glow effect
+    context.shadowColor = 'rgba(255, 255, 255, 0.8)';
+    context.shadowBlur = 4;
+
+    // Draw again for glow
+    context.beginPath();
+    context.moveTo(center, 8);
+    context.lineTo(center, size - 8);
+    context.stroke();
+
+    context.beginPath();
+    context.moveTo(8, center);
+    context.lineTo(size - 8, center);
+    context.stroke();
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.needsUpdate = true;
+    return texture;
   }
 
   // ============================================================================
