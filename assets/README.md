@@ -25,12 +25,6 @@ Application-specific assets organized by app name.
 - **`/shared`** - Assets shared between multiple apps
   - `/icons` - Icon files used across applications
 
-### `/parachute-low-poly-calebcram`
-Third-party parachute model assets (low-poly version).
-
-### `/pubg-green-parachute`
-Third-party PUBG-style green parachute model assets.
-
 ## Asset Loading Strategies
 
 ### Static Imports (Bundled)

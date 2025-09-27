@@ -2,6 +2,12 @@ Implement the following tasks if any is added follwing the instructions describe
 ---
 TASKS:
 - move src/video/* somewhere, as I think it's not used.
+- find the best way to rende workshop demos without the island component that is included in all applications
+- rename the "night" story to "island" story
+- play with some ideas to use shaders on the water and sky
+- play with some ideas to have a less realistic and more cartoonish/vector like sun glare in the sky
+- make the animation story animation 6secs instead of 8. Actually make it possible define duration in a variable also.
+- we have a House scenery component. Also create an Igloo. Don't forget to showcase it in the workshop
 ---
 
 ### Instructions
