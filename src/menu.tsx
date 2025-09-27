@@ -138,6 +138,9 @@ class Menu extends React.Component<MenuProps> {
     const experimentalApps = getAppsByStatus('experimental');
     const devApps = getAppsByStatus('dev');
 
+    // Get tool apps separately for the Tools section (dev only)
+    const toolApps = getAppsByStatus('dev').filter(app => app.category === 'tool');
+
     // Get selected story from URL
     const params = new URLSearchParams(window.location.search);
     const selectedStory = params.get('story');
@@ -238,10 +241,16 @@ class Menu extends React.Component<MenuProps> {
                 {renderButtons(experimentalApps)}
               </>
             )}
+            {showDev && toolApps.length > 0 && (
+              <>
+                <h3>Tools</h3>
+                {renderButtons(toolApps)}
+              </>
+            )}
             {showDev && devApps.length > 0 && (
               <>
                 <h3>Development</h3>
-                {renderButtons(devApps)}
+                {renderButtons(devApps.filter(app => app.category !== 'tool'))}
               </>
             )}
           </div>
@@ -287,10 +296,16 @@ class Menu extends React.Component<MenuProps> {
                 {renderButtons(experimentalApps)}
               </>
             )}
+            {showDev && toolApps.length > 0 && (
+              <>
+                <h2>Tools</h2>
+                {renderButtons(toolApps)}
+              </>
+            )}
             {showDev && devApps.length > 0 && (
               <>
                 <h2>Development</h2>
-                {renderButtons(devApps)}
+                {renderButtons(devApps.filter(app => app.category !== 'tool'))}
               </>
             )}
           </>

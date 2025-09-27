@@ -2,6 +2,7 @@ Implement the following tasks if any is added follwing the instructions describe
 ---
 TASKS:
 - I want to introduce Next.js so I can make easy deployments in vercel, introduce server side rendering, API supports, Next.js routing, etc.. Do that work in a new branch, test throughly the app after is done, make sure it builds properly and finally commit to that new branch.
+- add a new animation app call "boats". place the camera close to the boats in a way that you can see them partially but focus on the paragliders and the clouds. After a couple of seconds, animate the camera towards the paraglider.
 ---
 
 ### Instructions

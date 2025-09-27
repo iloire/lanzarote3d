@@ -446,7 +446,7 @@ class TerrainGPSMapperApp extends TerrainBase {
     this.uiContainer.style.cssText = `
       position: fixed;
       top: 20px;
-      left: 20px;
+      right: 20px;
       background: rgba(0, 0, 0, 0.9);
       color: white;
       padding: 15px;
