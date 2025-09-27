@@ -108,6 +108,17 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
     },
 
     // Workshop Component Demos
+    boat: {
+      name: 'Boat',
+      description: 'Boat component showcase with various sizes and floating animations',
+      entry: './tools/workshop/demos/boat',
+      route: '/boat',
+      category: 'demo',
+      requiresWebGL: true,
+      tags: ['scenery', 'boat', 'component', 'water'],
+      status: 'dev',
+      priority: 2,
+    },
     clouds: {
       name: 'Clouds',
       description: 'Interactive cloud system demonstration',
@@ -117,7 +128,7 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       requiresWebGL: true,
       tags: ['weather', 'environment', 'effects'],
       status: 'dev',
-      priority: 2,
+      priority: 3,
     },
     island: {
       name: 'Island',

@@ -1,6 +1,8 @@
 Implement the following tasks if any is added follwing the instructions described below:
 ---
 TASKS:
+- create a workshop demo to showcase the boat component
+
 ---
 
 ### Instructions
