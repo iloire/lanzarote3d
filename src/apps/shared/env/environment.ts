@@ -58,11 +58,11 @@ class Environment {
 
     // Create boats for first area
     const boats1 = this.createBoatVariety(5, { randomize, types });
-    addMeshAroundArea(boats1, new THREE.Vector3(6879, 0, -5445), 5, water, this.scene);
+    addMeshAroundArea(boats1, new THREE.Vector3(7879, 0, -5445), 4, water, this.scene);
 
     // Create boats for second area
     const boats2 = this.createBoatVariety(4, { randomize, types });
-    addMeshAroundArea(boats2, new THREE.Vector3(8279, 0, -6155), 4, water, this.scene);
+    addMeshAroundArea(boats2, new THREE.Vector3(8279, 0, -6455), 3, water, this.scene);
   }
 
   private createBoatVariety(count: number, options: { randomize: boolean; types: string[] }): (THREE.Mesh | THREE.Group)[] {
