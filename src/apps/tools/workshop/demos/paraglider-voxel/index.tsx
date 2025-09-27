@@ -54,7 +54,8 @@ class ParagliderVoxelWorkshopApp extends WorkshopDemoBase {
       mesh.scale.set(0.01, 0.01, 0.01);
       scene.add(mesh);
 
-      camera.position.set(8000, 250, 300);
+      // Position camera much closer to the voxel paraglider for detailed view
+      camera.position.set(78, 25, 65); // Much closer - roughly 8 units away
       camera.lookAt(mesh.position);
 
       this.startAnimationLoop(renderer, scene, camera, controls);
