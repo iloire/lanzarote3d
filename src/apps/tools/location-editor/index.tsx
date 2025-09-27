@@ -13,13 +13,13 @@ import {
 import { createEditorUI } from './ui';
 import { setupInteraction } from './interaction';
 import './styles.css'; // Import the CSS
-import { AppBase } from '../../shared/AppBase';
+import { TerrainBase } from '../../shared/TerrainBase';
 
 /**
  * Location Editor App - Interactive location creation and editing tool
  * Seventh app converted to use AppBase architecture
  */
-class LocationEditorApp extends AppBase {
+class LocationEditorApp extends TerrainBase {
   private editorState: EditorState | undefined;
   private labelRenderer: any;
   private animationId: number | undefined;
@@ -33,7 +33,7 @@ class LocationEditorApp extends AppBase {
       name: 'Location Editor',
       description:
         'Interactive tool for creating and editing flight locations with takeoffs, landings, and fly zones',
-      requiredComponents: ['scene', 'camera', 'renderer', 'controls', 'gui', 'terrain'],
+      requiredComponents: ['scene', 'camera', 'renderer', 'controls', 'gui', 'terrain', 'water', 'sky'],
       scene: {
         environment: 'lanzarote',
         lighting: 'dynamic',
@@ -51,8 +51,9 @@ class LocationEditorApp extends AppBase {
 
   async load(options: StoryOptions): Promise<void> {
     try {
-      // Initialize core systems from AppBase
+      // Initialize core systems from TerrainBase
       this.initializeCore(options);
+      await this.initializeEnvironment(options);
 
       const { camera, scene, renderer, controls, gui, terrain } = options;
 
