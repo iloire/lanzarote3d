@@ -90,6 +90,9 @@ class FlyzoneEditorApp extends TerrainBase {
       // Set initial camera position for editing
       camera.position.set(5000, 2000, 0);
 
+      // Enable orbital controls for camera movement
+      controls.enabled = true;
+
       // Store terrain reference
       this.terrainMesh = terrain;
 

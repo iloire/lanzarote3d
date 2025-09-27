@@ -79,6 +79,9 @@ class FlyzoneVisualizerApp extends TerrainBase {
       camera.position.set(8000, 3000, 2000);
       camera.lookAt(6000, 0, -2000); // Look at Famara area
 
+      // Enable orbital controls for camera movement
+      controls.enabled = true;
+
       // Initialize visualizer state
       await this.initializeVisualizerState();
 
