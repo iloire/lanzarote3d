@@ -1,7 +1,7 @@
 Implement the following tasks if any is added follwing the instructions described below:
 ---
 TASKS:
-- the helmet and pilot head demos uses too bright/childish colors. Define palettes of colors that have less contrast and make more sense *like ranges of gray or green) 
+- something super weird is happening in the head workshop demo. I see all the heads... but I zooom out and out and end up seeing a render of a huge helmet that is containing all the inner heads
 ---
 
 ### Instructions

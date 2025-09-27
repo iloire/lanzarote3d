@@ -1,20 +1,21 @@
+import * as THREE from 'three';
 import { StoryOptions } from '../../../../shared/types';
-import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
+import { TerrainBase } from '../../../../shared/TerrainBase';
 
 /**
- * Island Workshop Demo - Simple island view demo
+ * Island Workshop Demo - Simple island view demo with full terrain
  */
-class IslandWorkshopApp extends WorkshopDemoBase {
+class IslandWorkshopApp extends TerrainBase {
+  private animationId: number | undefined;
+
   constructor() {
     super({
       name: 'Island Workshop',
       description: 'Simple workshop demo showcasing island environment view',
-      ground: {
-        create: false,
-      },
-      lighting: {
-        sunPosition: 2,
-        showHelpers: false,
+      requiredComponents: ['sky', 'water', 'terrain'],
+      scene: {
+        environment: 'lanzarote',
+        lighting: 'dynamic',
       },
     });
   }
@@ -22,6 +23,7 @@ class IslandWorkshopApp extends WorkshopDemoBase {
   override async load(options: StoryOptions): Promise<void> {
     try {
       this.initializeCore(options);
+      await this.initializeEnvironment(options);
       const { camera, scene, renderer, controls } = options;
 
       // Set camera to view the island from a distance
@@ -43,8 +45,38 @@ class IslandWorkshopApp extends WorkshopDemoBase {
     }
   }
 
+  private startAnimationLoop(
+    renderer: THREE.WebGLRenderer,
+    scene: THREE.Scene,
+    camera: THREE.Camera,
+    controls: any
+  ): void {
+    const animate = () => {
+      try {
+        // Update performance monitoring
+        this.updatePerformance();
+
+        // Update controls for damping
+        controls.update();
+
+        renderer.render(scene, camera);
+        this.animationId = requestAnimationFrame(animate);
+      } catch (error) {
+        this.handleError(error as Error, 'animation loop');
+      }
+    };
+    animate();
+  }
+
   public override dispose(): void {
     console.log(`🧹 Disposing ${this.config.name}`);
+
+    // Cancel animation loop
+    if (this.animationId) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = undefined;
+    }
+
     super.dispose();
   }
 }

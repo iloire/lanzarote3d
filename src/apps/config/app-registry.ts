@@ -129,7 +129,7 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       tags: ['lighting', 'atmosphere', 'visual', 'island'],
       status: 'public',
       priority: 3,
-      hidden: true
+      hidden: false
     },
     'paraglider-voxel': {
       name: 'Voxel pilot',

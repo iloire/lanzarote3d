@@ -14,7 +14,7 @@ import GuiHelper from '../../utils/gui';
  * Sun flare style configuration
  * Set to 'realistic' for photographic lens flare or 'cartoon' for vector-like effect
  */
-const SUN_FLARE_STYLE: 'realistic' | 'cartoon' = 'realistic';
+const SUN_FLARE_STYLE: 'realistic' | 'cartoon' = 'cartoon';
 
 // ============================================================================
 // LIGHTING SYSTEM CONFIGURATION

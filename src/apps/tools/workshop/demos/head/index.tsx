@@ -11,9 +11,27 @@ import {
 import { StoryOptions } from '../../../../shared/types';
 import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
 
-const toHexColor = (num: number): string => {
-  const hex = num.toString(16);
-  return '#' + '0'.repeat(6 - hex.length) + hex;
+// Professional color palettes with lower contrast and more realistic tones
+const COLOR_PALETTES = {
+  military: [
+    '#4A5D3A', '#3D4E2F', '#556B3D', '#6B7A5B', '#7A8B6C',
+    '#2F3F23', '#5C6B4A', '#8A9B7A', '#3A4B2D', '#4F6040'
+  ],
+  gray: [
+    '#6A6A6A', '#5A5A5A', '#7A7A7A', '#8A8A8A', '#5D5D5D',
+    '#707070', '#757575', '#656565', '#808080', '#606060'
+  ],
+  steel: [
+    '#4A4A52', '#5A5A62', '#525252', '#4F4F57', '#565664',
+    '#464653', '#58586C', '#4C4C59', '#54546B', '#4A4A5F'
+  ]
+};
+
+const getRandomColorFromPalette = (): string => {
+  const paletteNames = Object.keys(COLOR_PALETTES) as (keyof typeof COLOR_PALETTES)[];
+  const randomPalette = paletteNames[Math.floor(Math.random() * paletteNames.length)];
+  const palette = COLOR_PALETTES[randomPalette];
+  return palette[Math.floor(Math.random() * palette.length)];
 };
 
 /**
@@ -57,11 +75,11 @@ class HeadWorkshopApp extends WorkshopDemoBase {
               Object.keys(GlassesType)
                 .filter(key => isNaN(Number(key)))
                 .forEach(glassesKey => {
-                  // helmet options with random colors
+                  // helmet options with professional color palettes
                   const baseHelmetOptions: HelmetOptions = {
-                    color: toHexColor(Math.floor(Math.random() * 16777215)),
-                    color2: toHexColor(Math.floor(Math.random() * 16777215)),
-                    color3: toHexColor(Math.floor(Math.random() * 16777215)),
+                    color: getRandomColorFromPalette(),
+                    color2: getRandomColorFromPalette(),
+                    color3: getRandomColorFromPalette(),
                   };
 
                   acc.push({
@@ -102,9 +120,8 @@ class HeadWorkshopApp extends WorkshopDemoBase {
           ? Object.keys(GlassesType).find(key => (GlassesType as any)[key] === headOptions.glassesType)
           : null;
 
-        const labelText = `${headTypeName}\nHelmet: ${helmetTypeName}${
-          glassesTypeName ? `\nGlasses: ${glassesTypeName}` : ''
-        }`;
+        const labelText = `${headTypeName}\nHelmet: ${helmetTypeName}${glassesTypeName ? `\nGlasses: ${glassesTypeName}` : ''
+          }`;
         const label = this.createStandardLabel(labelText);
 
         if (this.labelContainer) {
@@ -131,7 +148,7 @@ class HeadWorkshopApp extends WorkshopDemoBase {
       });
 
       // Set camera position for head showcase
-      camera.position.set(0, 1000, 8000);
+      camera.position.set(-5000, 1000, 22000);
       camera.lookAt(scene.position);
 
       // Start animation loop with label updates
