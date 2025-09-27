@@ -100,21 +100,10 @@ class TileMapperApp extends NonRenderingAppBase {
   }
 
   private createTileDebugUI(): void {
-    // Use the base class method to create container
+    // Use the base class method to create container (already positioned properly for menu)
     this.uiContainer = this.createUIContainer();
-    // Apply custom styling specific to tile mapper
-    this.uiContainer.style.cssText = `
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, #1a1a2e 0%, #0f0f23 100%);
-      color: #e0e0e0;
-      z-index: 1000;
-      overflow-y: auto;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
-    `;
+    // Add padding for better content layout
+    this.uiContainer.style.padding = '20px';
 
     const tiles = this.calculateTileGrid();
     const tileCount = tiles.length;

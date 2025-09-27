@@ -35,6 +35,7 @@ export abstract class NonRenderingAppBase {
 
   /**
    * Creates and manages a DOM container for the app UI
+   * Positioned to work with existing menu layout (leaves space for menu)
    */
   protected createUIContainer(): HTMLElement {
     // Remove any existing container
@@ -43,15 +44,17 @@ export abstract class NonRenderingAppBase {
     const container = document.createElement('div');
     container.style.cssText = `
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 20px;
+      right: 20px;
+      width: calc(100% - 240px);
+      height: calc(100% - 40px);
       background: linear-gradient(135deg, #1a1a2e 0%, #0f0f23 100%);
       color: white;
       font-family: 'Consolas', 'Monaco', monospace;
       overflow: auto;
       z-index: 1000;
+      border-radius: 8px;
+      border: 1px solid #444;
     `;
     document.body.appendChild(container);
     this.container = container;

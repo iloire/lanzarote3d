@@ -34,20 +34,13 @@ class TileDebugApp extends NonRenderingAppBase {
 
 
   private createDebugUI(): void {
-    // Use the base class method to create container
+    // Use the base class method to create container (already positioned properly for menu)
     this.uiContainer = this.createUIContainer();
-    // Apply custom styling specific to tile debug dashboard
-    this.uiContainer.style.cssText = `
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-      z-index: 1000;
-      overflow-y: auto;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    `;
+    // Apply light theme styling for tile debug dashboard
+    this.uiContainer.style.background = 'rgba(248, 250, 252, 0.95)';
+    this.uiContainer.style.color = '#1f2937';
+    this.uiContainer.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    this.uiContainer.style.border = '1px solid #e2e8f0';
 
     // Add the React component content
     this.uiContainer.innerHTML = `
