@@ -49,6 +49,12 @@ export async function loadApp(appKey: string, options: StoryOptions): Promise<vo
     case 'location-editor':
       appModule = await import('../tools/location-editor/index');
       break;
+    case 'flyzone-editor':
+      appModule = await import('../flyzone-manager/editor/flyzone-editor');
+      break;
+    case 'flyzone-visualizer':
+      appModule = await import('../flyzone-manager/visualizer/flyzone-visualizer');
+      break;
     case 'workshop':
       appModule = await import('../tools/workshop/demos/workshop/index');
       break;
