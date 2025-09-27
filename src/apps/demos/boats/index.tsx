@@ -20,6 +20,60 @@ type ParagliderVoxelConfig = {
   position: THREE.Vector3;
 };
 
+// ==========================================
+// ANIMATION CONFIGURATION - Easy to tweak!
+// ==========================================
+const ANIMATION_CONFIG = {
+  // Timing settings
+  duration: 12000, // Total animation duration in milliseconds
+
+  // Phase timing (as percentages of total duration)
+  phases: {
+    boatFocus: 0.5,    // 50% - First phase showing boats prominently
+    transition: 0.75,  // 75% - End of transition phase
+    // Final phase (paraglider focus) is from 75% to 100%
+  },
+
+  // Camera positions (Three.js Vector3 coordinates)
+  positions: {
+    initial: { x: 8200, y: 80, z: -6200 },      // Behind boats at water level
+    boatCenter: { x: 7900, y: 30, z: -5200 },   // Center of boat area (look target)
+    intermediate: { x: 7200, y: 400, z: -3000 }, // Rising toward paraglider area
+    // Final position is calculated relative to paraglider: pgPos + finalOffset
+    finalOffset: { x: -100, y: 50, z: 200 },    // Offset from paraglider position
+  },
+
+  // Movement speed multipliers (lower = slower movement)
+  speeds: {
+    phase1Movement: 0.05,    // How fast camera moves in phase 1 (boats focus)
+    phase1LookShift: 0.05,   // How fast look target shifts in phase 1
+    phase2Movement: 0.6,     // Movement speed in transition phase
+    phase2Interpolation: 0.15, // Interpolation factor for phase 2 intermediate position
+    phase2LookShift: 0.15,   // Look target shift speed in phase 2
+    phase3LookShift: 0.08,   // Final phase look target adjustment speed
+  },
+
+  // Camera floating effect (after animation completes)
+  floating: {
+    amplitude: 2,      // Floating amplitude
+    speed: 1.2,        // Floating speed multiplier
+    timeMultiplier: 0.0005, // Time scaling for floating calculations
+    dampening: {
+      y: 0.02,         // Y-axis floating dampening
+      x: 0.01,         // X-axis floating dampening
+      z: 0.01,         // Z-axis floating dampening
+    },
+  },
+
+  // Control settings after animation
+  controls: {
+    minDistance: 50,
+    maxDistance: 1500,
+    panRadius: 500,
+    panVerticalScale: 0.5,
+  },
+};
+
 // Same paragliders as original animation but positioned to work well with boats camera
 const paraglidersVoxel: ParagliderVoxelConfig[] = [
   {
@@ -49,8 +103,8 @@ class BoatsAnimationApp extends TerrainBase {
   private paragliderMeshes: THREE.Object3D[] = [];
   private animatorInstance: any | undefined;
 
-  // Animation configuration - slightly longer to allow time to show boats
-  private readonly ANIMATION_DURATION_MS = 12000; // 8 seconds total
+  // Animation configuration - using values from ANIMATION_CONFIG
+  private readonly ANIMATION_DURATION_MS = ANIMATION_CONFIG.duration;
 
   constructor() {
     const appConfig = getAppConfig('boats');
@@ -159,19 +213,17 @@ class BoatsAnimationApp extends TerrainBase {
   ): void {
     const pgPos = paraglidersVoxel[0]?.position.clone() || new THREE.Vector3();
 
-    // MODIFIED CAMERA POSITIONS to start behind boats with boats clearly visible
-    // Starting position - behind boats at water level, boats clearly in frame
-    const initialCameraPosition = new THREE.Vector3(8200, 80, -6200); // Behind boat area, lower
-    const boatCenterPosition = new THREE.Vector3(7900, 30, -5200); // Center of boat area
+    // Camera positions from ANIMATION_CONFIG - easy to tweak!
+    const { positions } = ANIMATION_CONFIG;
+    const initialCameraPosition = new THREE.Vector3(positions.initial.x, positions.initial.y, positions.initial.z);
+    const boatCenterPosition = new THREE.Vector3(positions.boatCenter.x, positions.boatCenter.y, positions.boatCenter.z);
+    const intermediatePosition = new THREE.Vector3(positions.intermediate.x, positions.intermediate.y, positions.intermediate.z);
 
-    // Intermediate position - slowly rising and moving toward paraglider area
-    const intermediatePosition = new THREE.Vector3(7200, 400, -3000);
-
-    // Final position - same as original animation (close to paraglider)
+    // Final position calculated from paraglider position + offset
     const finalCameraPosition = new THREE.Vector3(
-      pgPos.x - 100,
-      pgPos.y + 50,
-      pgPos.z + 200
+      pgPos.x + positions.finalOffset.x,
+      pgPos.y + positions.finalOffset.y,
+      pgPos.z + positions.finalOffset.z
     );
 
     // Set initial camera position behind boats looking at them
@@ -195,69 +247,74 @@ class BoatsAnimationApp extends TerrainBase {
         this.ANIMATION_DURATION_MS,
         progress => {
           let currentPosition;
+          const { phases, speeds } = ANIMATION_CONFIG;
 
-          if (progress < 0.5) {
-            // Phase 1: Show boats prominently (first 50% - 4.0 seconds)
-            const phase1Progress = progress / 0.5;
+          if (progress < phases.boatFocus) {
+            // Phase 1: Show boats prominently (first half of animation)
+            const phase1Progress = progress / phases.boatFocus;
             const easedProgress = phase1Progress * phase1Progress * (3 - 2 * phase1Progress);
 
-            // Very minimal movement to keep boats in frame
+            // Movement using configurable speed
             currentPosition = new THREE.Vector3().lerpVectors(
               initialCameraPosition,
               intermediatePosition,
-              easedProgress * 0.05 // Even slower initial movement
+              easedProgress * speeds.phase1Movement
             );
 
-            // Keep looking at boats for longer
+            // Look target shift using configurable speed
             const lookTarget = new THREE.Vector3().lerpVectors(
               boatCenterPosition,
               pgPos,
-              easedProgress * 0.05 // Slower shift in focus
+              easedProgress * speeds.phase1LookShift
             );
             if (controls) {
               controls.target.copy(lookTarget);
               controls.update();
             }
-          } else if (progress < 0.75) {
-            // Phase 2: Slow transition (50-75% - 2.0 seconds)
-            const phase2Progress = (progress - 0.5) / 0.25;
+          } else if (progress < phases.transition) {
+            // Phase 2: Transition phase (configurable duration)
+            const phase2Start = phases.boatFocus;
+            const phase2Duration = phases.transition - phases.boatFocus;
+            const phase2Progress = (progress - phase2Start) / phase2Duration;
             const easedProgress = phase2Progress * phase2Progress * (3 - 2 * phase2Progress);
 
             currentPosition = new THREE.Vector3().lerpVectors(
-              new THREE.Vector3().lerpVectors(initialCameraPosition, intermediatePosition, 0.15),
+              new THREE.Vector3().lerpVectors(initialCameraPosition, intermediatePosition, speeds.phase2Interpolation),
               finalCameraPosition,
-              easedProgress * 0.6 // Gradual movement
+              easedProgress * speeds.phase2Movement
             );
 
-            // Slowly shift to paraglider
+            // Look target shift using configurable speed
             if (controls) {
               const targetProgress = Math.min(phase2Progress * 0.8, 1.0);
               const lookTarget = new THREE.Vector3().lerpVectors(
                 controls.target,
                 pgPos,
-                targetProgress * 0.15 // Very gradual focus shift
+                targetProgress * speeds.phase2LookShift
               );
               controls.target.copy(lookTarget);
               controls.update();
             }
           } else {
-            // Phase 3: Final approach to paraglider (75-100% - 2.0 seconds)
-            const phase3Progress = (progress - 0.75) / 0.25;
+            // Phase 3: Final approach to paraglider (transition to 100%)
+            const phase3Start = phases.transition;
+            const phase3Duration = 1.0 - phases.transition;
+            const phase3Progress = (progress - phase3Start) / phase3Duration;
             const easedProgress = 1 - Math.pow(1 - phase3Progress, 2.5);
 
             currentPosition = new THREE.Vector3().lerpVectors(
               new THREE.Vector3().lerpVectors(
-                new THREE.Vector3().lerpVectors(initialCameraPosition, intermediatePosition, 0.15),
+                new THREE.Vector3().lerpVectors(initialCameraPosition, intermediatePosition, speeds.phase2Interpolation),
                 finalCameraPosition,
-                0.6
+                speeds.phase2Movement
               ),
               finalCameraPosition,
               easedProgress
             );
 
-            // Focus on paraglider
+            // Focus on paraglider using configurable speed
             if (controls) {
-              controls.target.lerpVectors(controls.target, pgPos, 0.08);
+              controls.target.lerpVectors(controls.target, pgPos, speeds.phase3LookShift);
               controls.update();
             }
           }
@@ -265,7 +322,7 @@ class BoatsAnimationApp extends TerrainBase {
           camera.position.copy(currentPosition);
         },
         () => {
-          // Animation complete - same as original
+          // Animation complete - enable controls with configurable settings
           if (controls) {
             controls.enabled = true;
 
@@ -274,12 +331,12 @@ class BoatsAnimationApp extends TerrainBase {
               pgPos,
               OrbitControlsHelper.createCenteredLimits(pgPos, {
                 ...ORBIT_CONTROLS_PRESETS['closeSubject'],
-                minDistance: 50,
-                maxDistance: 1500,
+                minDistance: ANIMATION_CONFIG.controls.minDistance,
+                maxDistance: ANIMATION_CONFIG.controls.maxDistance,
                 panBoundary: {
                   center: pgPos,
-                  radius: 500,
-                  verticalScale: 0.5,
+                  radius: ANIMATION_CONFIG.controls.panRadius,
+                  verticalScale: ANIMATION_CONFIG.controls.panVerticalScale,
                 },
               })
             );
@@ -303,19 +360,18 @@ class BoatsAnimationApp extends TerrainBase {
       try {
         this.updatePerformance();
 
-        // Add gentle floating motion like a cloud (same as original)
-        const time = (Date.now() - startTime) * 0.0005;
-        const floatAmplitude = 2;
-        const floatSpeed = 1.2;
+        // Camera floating effect using configurable parameters
+        const { floating } = ANIMATION_CONFIG;
+        const time = (Date.now() - startTime) * floating.timeMultiplier;
 
         if (this.animatorInstance === undefined) {
-          const floatY = Math.sin(time * floatSpeed) * floatAmplitude;
-          const floatX = Math.sin(time * floatSpeed * 0.7) * (floatAmplitude * 0.3);
-          const floatZ = Math.cos(time * floatSpeed * 0.5) * (floatAmplitude * 0.2);
+          const floatY = Math.sin(time * floating.speed) * floating.amplitude;
+          const floatX = Math.sin(time * floating.speed * 0.7) * (floating.amplitude * 0.3);
+          const floatZ = Math.cos(time * floating.speed * 0.5) * (floating.amplitude * 0.2);
 
-          camera.position.y += floatY * 0.02;
-          camera.position.x += floatX * 0.01;
-          camera.position.z += floatZ * 0.01;
+          camera.position.y += floatY * floating.dampening.y;
+          camera.position.x += floatX * floating.dampening.x;
+          camera.position.z += floatZ * floating.dampening.z;
         }
 
         OrbitControlsHelper.update(controls);
