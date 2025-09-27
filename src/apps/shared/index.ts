@@ -15,7 +15,8 @@ import Glider from '../tools/workshop/demos/glider';
 import HangGlider from '../tools/workshop/demos/hangglider';
 import Head from '../tools/workshop/demos/head';
 import Helmet from '../tools/workshop/demos/helmet';
-import Night from '../tools/workshop/demos/night';
+import Igloo from '../tools/workshop/demos/igloo';
+import Island from '../tools/workshop/demos/island';
 import ParagliderVoxelDemo from '../tools/workshop/demos/paraglider-voxel';
 import ParagliderDemo from '../tools/workshop/demos/paraglider';
 import Pilot from '../tools/workshop/demos/pilot';
@@ -45,7 +46,8 @@ const storyModules = {
   hangglider: HangGlider,
   head: Head,
   helmet: Helmet,
-  night: Night,
+  igloo: Igloo,
+  island: Island,
   'paraglider-voxel': ParagliderVoxelDemo,
   paraglider: ParagliderDemo,
   pilot: Pilot,

@@ -1,0 +1,3 @@
+- find the best way to render workshop demos without the island component that is included in all applications
+- play with some ideas to use shaders on the water and sky
+- play with some ideas to have a less realistic and more cartoonish/vector like sun glare in the sky

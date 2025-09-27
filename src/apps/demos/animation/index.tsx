@@ -48,6 +48,9 @@ class AnimationApp extends AppBase {
   private paragliderMeshes: THREE.Object3D[] = [];
   private animatorInstance: any | undefined;
 
+  // Animation configuration
+  private readonly ANIMATION_DURATION_MS = 6000; // 6 seconds
+
   constructor() {
     const appConfig = getAppConfig('animation');
     super({
@@ -184,15 +187,15 @@ class AnimationApp extends AppBase {
       // Store initial positions
       const startTarget = controls ? controls.target.clone() : pgPos.clone();
 
-      // Single seamless animation with custom easing (8 seconds total)
+      // Single seamless animation with custom easing (configurable duration)
       this.animatorInstance = animator.animate(
         'camera-seamless',
-        8000,
+        this.ANIMATION_DURATION_MS,
         progress => {
           let currentPosition;
 
           if (progress < 0.35) {
-            // Phase 1: Fast approach (first 35% = 2.8 seconds)
+            // Phase 1: Fast approach (first 35% of total duration)
             const phase1Progress = progress / 0.35; // 0-1 for first phase
             // Use smooth acceleration with gentle end
             const easedProgress = phase1Progress * phase1Progress * (3 - 2 * phase1Progress); // smoothstep

@@ -1,6 +1,6 @@
 import { StoryOptions } from '../../../shared/types';
 
-const Night = {
+const Island = {
   load: async (options: StoryOptions) => {
     const { camera, scene, renderer, sky, controls } = options;
 
@@ -19,4 +19,4 @@ const Night = {
   },
 };
 
-export default Night;
+export default Island;
