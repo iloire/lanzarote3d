@@ -5,7 +5,7 @@ import Sky from '../../foundation/components/environment/Sky';
 import Water from '../../foundation/components/environment/Water';
 import { Island } from '../../foundation/components/scenery/Island';
 
-export interface DemoConfig extends Omit<AppConfig, 'scene'> {
+export interface TerrainConfig extends Omit<AppConfig, 'scene'> {
   scene?: {
     environment?: 'lanzarote' | 'custom';
     lighting?: 'dynamic' | 'static';
@@ -20,17 +20,19 @@ export interface DemoConfig extends Omit<AppConfig, 'scene'> {
 }
 
 /**
- * DemoBase - Specialized base for showcase demonstrations
+ * TerrainBase - Specialized base that injects terrain (island) environment
  *
- * Provides full environment setup for demos like:
- * - Animation demo
- * - Photobooth
- * - Famara landscape
+ * Provides full terrain environment setup for apps that need:
+ * - Island terrain with collision detection
+ * - Water and sky components
+ * - Full Lanzarote environment setup
+ *
+ * Used by demos like Animation, Photobooth, and Famara
  */
-export abstract class DemoBase extends AppBase {
+export abstract class TerrainBase extends AppBase {
   protected loadingManager?: THREE.LoadingManager;
 
-  constructor(config: DemoConfig) {
+  constructor(config: TerrainConfig) {
     // Provide demo-specific defaults
     super({
       ...config,
@@ -86,11 +88,11 @@ export abstract class DemoBase extends AppBase {
     options.terrain = island;
     options.terrainInstance = islandInstance;
 
-    console.log('✅ Demo environment loaded: full Lanzarote setup (no physics)');
+    console.log('✅ Terrain environment loaded: full Lanzarote setup with island terrain');
   }
 
   /**
-   * Demos should call this after initializeCore
+   * Apps that need terrain should call this after initializeCore
    */
   protected async initializeEnvironment(options: StoryOptions): Promise<void> {
     await this.loadEnvironment(options);

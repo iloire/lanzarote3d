@@ -10,7 +10,7 @@ import adriTextureImage from '../../../../assets/foundation/models/characters/ad
 import { StoryOptions } from '../../shared/types';
 import { getDefaultTheme } from '../../../foundation/themes';
 import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';
-import { DemoBase } from '../../shared/DemoBase';
+import { TerrainBase } from '../../shared/TerrainBase';
 import { OrbitControlsHelper, ORBIT_CONTROLS_PRESETS } from '../../../foundation/utils/OrbitControlsHelper';
 import { getAppConfig } from '../../config/app-registry';
 
@@ -46,7 +46,7 @@ type ParagliderConfig = {
  * PhotoBooth Demo - Beautiful static 3D scene showcasing paragliders and environment
  * Second app converted to use AppBase architecture
  */
-class PhotoBoothApp extends DemoBase {
+class PhotoBoothApp extends TerrainBase {
   private environment: Environment | undefined;
   private animationId: number | undefined;
   private paragliderMeshes: THREE.Object3D[] = [];

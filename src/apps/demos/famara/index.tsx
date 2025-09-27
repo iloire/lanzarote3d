@@ -3,7 +3,7 @@ import Environment from '../../shared/env/environment';
 import { StoryOptions } from '../../shared/types';
 import { getDefaultTheme } from '../../../foundation/themes';
 import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';
-import { DemoBase } from '../../shared/DemoBase';
+import { TerrainBase } from '../../shared/TerrainBase';
 import {
   OrbitControlsHelper,
   ORBIT_CONTROLS_PRESETS,
@@ -16,7 +16,7 @@ import { getAppConfig } from '../../config/app-registry';
  *
  * First app to use the new AppBase architecture!
  */
-class FamaraApp extends DemoBase {
+class FamaraApp extends TerrainBase {
   private environment: Environment | undefined;
   private animationId: number | undefined;
 

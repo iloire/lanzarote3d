@@ -4,7 +4,7 @@ import { StoryOptions } from './types';
 export { AppBase } from './AppBase';
 export { WorkshopDemoBase } from './WorkshopDemoBase';
 export { ToolBase } from './ToolBase';
-export { DemoBase } from './DemoBase';
+export { TerrainBase } from './TerrainBase';
 
 // Import core apps
 import Animation from '../demos/animation/index';

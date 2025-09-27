@@ -8,7 +8,7 @@ import { StoryOptions } from '../../shared/types';
 import { animator } from '../../../foundation/systems/animation/SimpleAnimator';
 import { getDefaultTheme } from '../../../foundation/themes';
 import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';
-import { DemoBase } from '../../shared/DemoBase';
+import { TerrainBase } from '../../shared/TerrainBase';
 import {
   OrbitControlsHelper,
   ORBIT_CONTROLS_PRESETS,
@@ -42,7 +42,7 @@ const paraglidersVoxel: ParagliderVoxelConfig[] = [
  * Animation Demo - Restored original animation with voxel paraglider
  * Third app converted to use AppBase architecture
  */
-class AnimationApp extends DemoBase {
+class AnimationApp extends TerrainBase {
   private environment: Environment | undefined;
   private animationId: number | undefined;
   private paragliderMeshes: THREE.Object3D[] = [];
