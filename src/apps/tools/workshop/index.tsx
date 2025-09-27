@@ -1,12 +1,11 @@
 import * as THREE from 'three';
 import { Paraglider } from '../../../foundation/components/vehicles';
-import { Boat, Tree, Stone, Island } from '../../../foundation/components/scenery';
+import { Boat, Tree, Stone } from '../../../foundation/components/scenery';
 import { House, HouseType } from '../../../foundation/components/scenery';
 import { PineTree } from '../../../foundation/components/scenery';
-import Helpers from '../../../foundation/utils/helpers';
 import { PilotHeadType } from '../../../foundation/components/characters';
 import { StoryOptions } from '../../shared/types';
-import { AppBase } from '../../shared/AppBase';
+import { ToolBase } from '../../shared/ToolBase';
 
 const createLabel = (text: string, position: THREE.Vector3) => {
   const canvas = document.createElement('canvas');
@@ -39,9 +38,9 @@ const createLabel = (text: string, position: THREE.Vector3) => {
 
 /**
  * Workshop App - Component showcase with labels and scene setup
- * Fourth app converted to use AppBase architecture
+ * Converted to use ToolBase for flexible environment control
  */
-class WorkshopApp extends AppBase {
+class WorkshopApp extends ToolBase {
   private animationId?: number;
   private componentMeshes: THREE.Object3D[] = [];
   private labelMeshes: THREE.Mesh[] = [];
@@ -68,10 +67,6 @@ class WorkshopApp extends AppBase {
           enabled: false, // Workshop focuses on clear component visibility
         },
       },
-      performance: {
-        monitoring: true,
-        logIntervalMs: 20000, // Log performance every 20 seconds
-      },
     });
   }
 
@@ -80,16 +75,10 @@ class WorkshopApp extends AppBase {
       // Initialize core systems from AppBase
       this.initializeCore(options);
 
-      const { camera, scene, renderer, terrain, water, sky, gui, controls } = options;
+      // Initialize tool environment (sky + helpers)
+      await this.initializeEnvironment(options);
 
-      controls.enabled = true;
-
-      terrain.visible = false;
-      water.visible = false;
-
-      Helpers.createHelpers(scene);
-
-      sky.updateSunPosition(12);
+      const { camera, scene, renderer, gui, controls } = options;
 
       // Load all components with proper tracking
       await this.loadComponents(scene, gui);
@@ -241,20 +230,25 @@ class WorkshopApp extends AppBase {
       }
     }
 
-    // Load island (async loading)
+    // Add a simple ground plane for component showcase
     try {
-      const loadingManager = new THREE.LoadingManager();
-      const islandMesh = await Island.load(loadingManager);
-      islandMesh.position.set(-50, 0, 50);
-      islandMesh.scale.set(0.5, 0.5, 0.5);
-      scene.add(islandMesh);
-      this.componentMeshes.push(islandMesh);
+      const groundGeometry = new THREE.PlaneGeometry(400, 300);
+      const groundMaterial = new THREE.MeshStandardMaterial({
+        color: 0x8fbc8f, // Dark sea green for ground
+        transparent: true,
+        opacity: 0.3
+      });
+      const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+      ground.rotation.x = -Math.PI / 2;
+      ground.position.y = -15;
+      scene.add(ground);
+      this.componentMeshes.push(ground);
 
-      const islandLabel = createLabel('Island', new THREE.Vector3(-50, -10, 50));
-      scene.add(islandLabel);
-      this.labelMeshes.push(islandLabel);
+      const groundLabel = createLabel('Workshop Ground', new THREE.Vector3(0, -10, 0));
+      scene.add(groundLabel);
+      this.labelMeshes.push(groundLabel);
     } catch (error) {
-      this.handleError(error as Error, 'loading island');
+      this.handleError(error as Error, 'creating workshop ground');
     }
   }
 

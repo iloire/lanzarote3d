@@ -8,7 +8,7 @@ import { StoryOptions } from '../../shared/types';
 import { animator } from '../../../foundation/systems/animation/SimpleAnimator';
 import { getDefaultTheme } from '../../../foundation/themes';
 import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';
-import { AppBase } from '../../shared/AppBase';
+import { DemoBase } from '../../shared/DemoBase';
 import {
   OrbitControlsHelper,
   ORBIT_CONTROLS_PRESETS,
@@ -42,7 +42,7 @@ const paraglidersVoxel: ParagliderVoxelConfig[] = [
  * Animation Demo - Restored original animation with voxel paraglider
  * Third app converted to use AppBase architecture
  */
-class AnimationApp extends AppBase {
+class AnimationApp extends DemoBase {
   private environment: Environment | undefined;
   private animationId: number | undefined;
   private paragliderMeshes: THREE.Object3D[] = [];
@@ -76,8 +76,11 @@ class AnimationApp extends AppBase {
 
   async load(options: StoryOptions): Promise<void> {
     try {
-      // Initialize core systems from AppBase
+      // Initialize core systems from DemoBase
       this.initializeCore(options);
+
+      // Load full environment (island, water, sky) from DemoBase
+      await this.initializeEnvironment(options);
 
       const { camera, scene, renderer, terrain, water, controls } = options;
 

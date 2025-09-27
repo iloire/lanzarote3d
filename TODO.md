@@ -1,11 +1,7 @@
 Implement the following tasks if any is added follwing the instructions described below:
 ---
 TASKS:
-- move src/video/* somewhere, as I think it's not used.
-- rename the "night" story to "island" story
-- make the animation story animation 6secs instead of 8. Actually make it possible define duration in a variable also.
-- we have a House scenery component. Also create an Igloo. Don't forget to showcase it in the workshop
-
+- do
 ---
 
 ### Instructions

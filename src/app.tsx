@@ -2,9 +2,6 @@ import React, { useEffect, useState } from 'react';
 import GUI from 'lil-gui';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import * as THREE from 'three';
-import Sky from './foundation/components/environment/Sky';
-import Water from './foundation/components/environment/Water';
-import { Island } from './foundation/components/scenery/Island';
 import Stories from './apps/shared/index';
 import { CameraController as Camera } from './foundation/systems/scene/CameraController';
 import Menu from './menu';
@@ -35,8 +32,6 @@ interface SceneConfig {
     width: number;
     height: number;
   };
-  scale: number;
-  islandPosition: [number, number, number];
   cameraSettings: {
     fov: number;
     near: number;
@@ -49,8 +44,6 @@ const SCENE_CONFIG: SceneConfig = {
     width: window.innerWidth,
     height: window.innerHeight,
   },
-  scale: 20000,
-  islandPosition: [0, -10, 0],
   cameraSettings: {
     fov: 45,
     near: 1,
@@ -94,35 +87,12 @@ const App: React.FC<AppProps> = ({
 
     const scene = new THREE.Scene();
 
-    // Sky setup
-    const sky = new Sky(19, 3);
-    sky.addToScene(scene);
-    sky.addGui(gui);
-
-    // Water setup
-    const water = new Water({ size: 500000 }).load(sky.getSunPosition());
-    scene.add(water);
-
-    // Loading manager
-    const loadingManager = new THREE.LoadingManager();
-    loadingManager.onProgress = (_, loaded, total) => {
-      setLoadingProcess(Math.floor((loaded / total) * 100));
-    };
-
-    // Island setup
-    const islandInstance = new Island();
-    const island = await islandInstance.load(loadingManager);
-    island.scale.set(SCENE_CONFIG.scale, SCENE_CONFIG.scale, SCENE_CONFIG.scale);
-    island.position.set(...SCENE_CONFIG.islandPosition);
-    scene.add(island);
-
-    // Camera setup
+    // Camera setup (no terrain dependency)
     const camera = new Camera(
       SCENE_CONFIG.cameraSettings.fov,
       SCENE_CONFIG.sizes.width / SCENE_CONFIG.sizes.height,
       SCENE_CONFIG.cameraSettings.near,
-      SCENE_CONFIG.cameraSettings.far,
-      island
+      SCENE_CONFIG.cameraSettings.far
     );
     camera.addGui(gui);
     scene.add(camera);
@@ -158,12 +128,9 @@ const App: React.FC<AppProps> = ({
       camera,
       scene,
       renderer,
-      terrain: island,
-      terrainInstance: islandInstance,
-      water,
-      sky,
       gui,
       controls,
+      // Environment components will be loaded by base classes as needed
     };
 
     // Check for app-specific theme override

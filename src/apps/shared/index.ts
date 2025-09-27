@@ -1,5 +1,12 @@
 import { StoryOptions } from './types';
 
+// Export specialized base classes
+export { AppBase } from './AppBase';
+export { WorkshopDemoBase } from './WorkshopDemoBase';
+export { ToolBase } from './ToolBase';
+export { DemoBase } from './DemoBase';
+export { ExperienceBase } from './ExperienceBase';
+
 // Import core apps
 import Animation from '../demos/animation/index';
 import Game from '../experiences/game/game';

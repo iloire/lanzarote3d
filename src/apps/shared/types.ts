@@ -10,12 +10,16 @@ export interface StoryOptions {
   camera: CameraController;
   scene: THREE.Scene;
   renderer: THREE.WebGLRenderer;
-  terrain: THREE.Mesh;
-  terrainInstance?: Island; // Optional Island instance for theme application
-  water: THREE.Mesh;
-  sky: Sky;
   gui: GUI;
   controls: OrbitControls;
+
+  // Environment components - loaded by base classes as needed
+  terrain?: THREE.Mesh;
+  terrainInstance?: Island; // Optional Island instance for theme application
+  water?: THREE.Mesh;
+  sky?: Sky;
+
+  // Optional parameters
   theme?: Theme; // Optional theme parameter
   environment?: any; // Optional Environment instance for theme application
 }

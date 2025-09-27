@@ -3,7 +3,7 @@ import Environment from '../../shared/env/environment';
 import { StoryOptions } from '../../shared/types';
 import { getDefaultTheme } from '../../../foundation/themes';
 import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';
-import { AppBase } from '../../shared/AppBase';
+import { DemoBase } from '../../shared/DemoBase';
 import {
   OrbitControlsHelper,
   ORBIT_CONTROLS_PRESETS,
@@ -16,7 +16,7 @@ import { getAppConfig } from '../../config/app-registry';
  *
  * First app to use the new AppBase architecture!
  */
-class FamaraApp extends AppBase {
+class FamaraApp extends DemoBase {
   private environment: Environment | undefined;
   private animationId: number | undefined;
 
@@ -45,8 +45,11 @@ class FamaraApp extends AppBase {
 
   async load(options: StoryOptions): Promise<void> {
     try {
-      // Initialize core systems from AppBase
+      // Initialize core systems from DemoBase
       this.initializeCore(options);
+
+      // Load full environment (island, water, sky) from DemoBase
+      await this.initializeEnvironment(options);
 
       const { camera, scene, renderer, terrain, water, controls } = options;
 

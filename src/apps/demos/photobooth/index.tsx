@@ -10,7 +10,7 @@ import adriTextureImage from '../../../../assets/foundation/models/characters/ad
 import { StoryOptions } from '../../shared/types';
 import { getDefaultTheme } from '../../../foundation/themes';
 import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';
-import { AppBase } from '../../shared/AppBase';
+import { DemoBase } from '../../shared/DemoBase';
 import { OrbitControlsHelper, ORBIT_CONTROLS_PRESETS } from '../../../foundation/utils/OrbitControlsHelper';
 import { getAppConfig } from '../../config/app-registry';
 
@@ -46,7 +46,7 @@ type ParagliderConfig = {
  * PhotoBooth Demo - Beautiful static 3D scene showcasing paragliders and environment
  * Second app converted to use AppBase architecture
  */
-class PhotoBoothApp extends AppBase {
+class PhotoBoothApp extends DemoBase {
   private environment: Environment | undefined;
   private animationId: number | undefined;
   private paragliderMeshes: THREE.Object3D[] = [];
@@ -76,8 +76,11 @@ class PhotoBoothApp extends AppBase {
 
   async load(options: StoryOptions): Promise<void> {
     try {
-      // Initialize core systems from AppBase
+      // Initialize core systems from DemoBase
       this.initializeCore(options);
+
+      // Load full environment (island, water, sky) from DemoBase
+      await this.initializeEnvironment(options);
 
       const { camera, scene, renderer, terrain, water, controls } = options;
 
