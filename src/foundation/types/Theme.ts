@@ -29,8 +29,39 @@ export interface CloudTheme {
   opacity?: number;
 }
 
+export interface StaticSatelliteConfig {
+  // Pre-downloaded satellite imagery configuration
+  textureAtlas: string; // Path to bundled texture atlas
+  tileMap: string; // Path to tile mapping configuration JSON
+  attribution?: string;
+  source?: 'openstreetmap' | 'esri' | 'custom';
+  resolution?: number; // Meters per pixel
+  bounds: {
+    north: number;
+    south: number;
+    east: number;
+    west: number;
+  };
+}
+
+export interface SatelliteImageryConfig {
+  enabled: boolean;
+  mode: 'static' | 'dynamic'; // Static for pre-downloaded, dynamic for API fetching
+  staticConfig?: StaticSatelliteConfig;
+  blendMode?: 'multiply' | 'overlay' | 'screen' | 'normal';
+  opacity?: number;
+  fallbackToWireframe?: boolean;
+  uvMapping?: {
+    offsetU: number;
+    offsetV: number;
+    scaleU: number;
+    scaleV: number;
+  };
+}
+
 export interface TerrainTheme {
-  style: 'volcanic' | 'arctic' | 'desert' | 'alien' | 'crystal' | 'wireframe' | 'plasma';
+  style: 'volcanic' | 'arctic' | 'desert' | 'alien' | 'crystal' | 'wireframe' | 'plasma' | 'satellite';
+  satelliteImagery?: SatelliteImageryConfig;
   customMaterial?: {
     color?: string;
     emissive?: string;

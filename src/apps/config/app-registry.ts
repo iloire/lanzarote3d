@@ -128,6 +128,17 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       priority: 3,
       theme: 'natural', // Override with natural theme for pure landscape experience
     },
+    'satellite-terrain': {
+      name: 'Satellite Terrain',
+      description: 'Interactive demonstration of satellite imagery on 3D terrain with real-time theme switching',
+      entry: './demos/satellite-terrain/index.tsx',
+      route: '/satellite-terrain',
+      category: 'demo',
+      requiresWebGL: true,
+      tags: ['satellite', 'terrain', 'imagery', 'interactive', 'realistic', 'mapping'],
+      status: 'dev',
+      priority: 2,
+    },
 
     // Workshop Component Demos
     boat: {

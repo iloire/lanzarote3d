@@ -46,6 +46,9 @@ export async function loadApp(appKey: string, options: StoryOptions): Promise<vo
     case 'famara':
       appModule = await import('../demos/famara');
       break;
+    case 'satellite-terrain':
+      appModule = await import('../demos/satellite-terrain');
+      break;
     case 'location-editor':
       appModule = await import('../tools/location-editor/index');
       break;
