@@ -14,7 +14,7 @@ import { addGameEnvironment } from './env';
 import locations from './lanzarote';
 import { WindIndicator } from '../../../foundation/components/physics';
 import { StoryOptions } from '../../shared/types';
-import { AppBase } from '../../shared/AppBase';
+import { TerrainBase } from '../../shared/TerrainBase';
 const KMH_TO_MS = 3.6;
 
 const FOG_ENABLED = true;
@@ -57,7 +57,7 @@ const WEATHER_SETTINGS: WeatherOptions = {
  * Game App - Interactive paragliding simulation with physics and controls
  * Fifth app converted to use AppBase architecture
  */
-class GameApp extends AppBase {
+class GameApp extends TerrainBase {
   private animationId: number | undefined;
   private weather: Weather | undefined;
   private bgMusic: BackgroundSound | undefined;
@@ -103,12 +103,15 @@ class GameApp extends AppBase {
 
   async load(options: StoryOptions): Promise<void> {
     try {
-      // Initialize core systems from AppBase
+      // Initialize core systems from TerrainBase
       this.initializeCore(options);
+
+      // Load full environment (island, water, sky) from TerrainBase
+      await this.initializeEnvironment(options);
 
       const { camera, scene, renderer, terrain, water, sky, gui, controls } = options;
 
-      sky.updateSunPosition(TIME_OF_DAY);
+      sky!.updateSunPosition(TIME_OF_DAY);
 
       // Initialize game systems
       this.weather = new Weather(WEATHER_SETTINGS);
