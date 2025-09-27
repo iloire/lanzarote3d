@@ -1,5 +1,5 @@
 import { StoryOptions } from './types';
-import { APP_REGISTRY } from '../config/app-registry';
+import { APP_REGISTRY, getRouteToStoryMap } from '../config/app-registry';
 
 // Export specialized base classes
 export { AppBase } from './AppBase';
@@ -11,22 +11,26 @@ export { TerrainBase } from './TerrainBase';
  * This replaces the old "Stories" concept with a cleaner approach
  */
 export async function loadApp(appKey: string, options: StoryOptions): Promise<void> {
+  // Handle route aliases (e.g., 'flier' -> 'flier-pg')
+  const routeMap = getRouteToStoryMap();
+  const resolvedKey = routeMap[appKey] || appKey;
+
   // Find the app in the registry
   let app = null;
   for (const category of Object.values(APP_REGISTRY)) {
-    if (category[appKey]) {
-      app = category[appKey];
+    if (category[resolvedKey]) {
+      app = category[resolvedKey];
       break;
     }
   }
 
   if (!app) {
-    throw new Error(`App '${appKey}' not found in registry`);
+    throw new Error(`App '${resolvedKey}' not found in registry`);
   }
 
-  // Dynamic import based on app key - minimal coupling needed for webpack
+  // Dynamic import based on resolved app key - minimal coupling needed for webpack
   let appModule;
-  switch (appKey) {
+  switch (resolvedKey) {
     case 'animation':
       appModule = await import('../demos/animation/index');
       break;
@@ -88,7 +92,7 @@ export async function loadApp(appKey: string, options: StoryOptions): Promise<vo
       appModule = await import('../tools/workshop/demos/voxel/index');
       break;
     default:
-      throw new Error(`No import mapping found for app '${appKey}'`);
+      throw new Error(`No import mapping found for app '${resolvedKey}' (original: '${appKey}')`);
   }
 
   const appInstance = appModule.default;
@@ -99,8 +103,12 @@ export async function loadApp(appKey: string, options: StoryOptions): Promise<vo
  * Check if an app exists in the registry
  */
 export function hasApp(appKey: string): boolean {
+  // Handle route aliases (e.g., 'flier' -> 'flier-pg')
+  const routeMap = getRouteToStoryMap();
+  const resolvedKey = routeMap[appKey] || appKey;
+
   for (const category of Object.values(APP_REGISTRY)) {
-    if (category[appKey]) {
+    if (category[resolvedKey]) {
       return true;
     }
   }
