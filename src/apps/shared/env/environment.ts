@@ -127,6 +127,11 @@ class Environment {
     // Apply consistent scaling
     boatMesh.scale.set(scale, scale, scale);
 
+    // Update floating animation scale multiplier to match boat scale
+    if (boat && typeof boat.setScaleMultiplier === 'function') {
+      boat.setScaleMultiplier(scale);
+    }
+
     // Add some random rotation for variety
     boatMesh.rotation.y = Math.random() * Math.PI * 2;
 
