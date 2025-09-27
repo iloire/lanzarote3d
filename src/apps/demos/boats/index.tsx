@@ -50,7 +50,7 @@ class BoatsAnimationApp extends TerrainBase {
   private animatorInstance: any | undefined;
 
   // Animation configuration - slightly longer to allow time to show boats
-  private readonly ANIMATION_DURATION_MS = 8000; // 8 seconds total
+  private readonly ANIMATION_DURATION_MS = 12000; // 8 seconds total
 
   constructor() {
     const appConfig = getAppConfig('boats');
@@ -205,14 +205,14 @@ class BoatsAnimationApp extends TerrainBase {
             currentPosition = new THREE.Vector3().lerpVectors(
               initialCameraPosition,
               intermediatePosition,
-              easedProgress * 0.15 // Even slower initial movement
+              easedProgress * 0.05 // Even slower initial movement
             );
 
             // Keep looking at boats for longer
             const lookTarget = new THREE.Vector3().lerpVectors(
               boatCenterPosition,
               pgPos,
-              easedProgress * 0.3 // Slower shift in focus
+              easedProgress * 0.05 // Slower shift in focus
             );
             if (controls) {
               controls.target.copy(lookTarget);

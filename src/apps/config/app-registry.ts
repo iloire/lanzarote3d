@@ -113,6 +113,17 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       status: 'dev',
       priority: 11,
     },
+    'tile-mapper': {
+      name: 'Tile Mapper Debugger',
+      description: 'Interactive satellite tile system debugger with grid visualization, URL testing, and coverage analysis',
+      entry: './tools/tile-mapper/index',
+      route: '/tile-mapper',
+      category: 'tool',
+      requiresWebGL: true,
+      tags: ['tile-mapping', 'satellite', 'interactive', 'debugger', 'grid', 'analysis'],
+      status: 'dev',
+      priority: 12,
+    },
   },
 
   demos: {
@@ -171,8 +182,8 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       category: 'demo',
       requiresWebGL: true,
       tags: ['cinematic', 'boats', 'paragliders', 'animation', 'water', 'clouds'],
-      status: 'experimental',
-      priority: 1,
+      status: 'public',
+      priority: 4,
     },
 
     // Workshop Component Demos

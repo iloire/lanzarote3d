@@ -21,6 +21,7 @@ class Environment {
   hg!: HangGlider;
   thermals: Thermal[] = [];
   cloudInstances: Clouds[] = [];
+  boats: any[] = []; // Keep references to boat instances for floating animation
   scene: THREE.Scene;
 
   constructor(scene: THREE.Scene) {
@@ -90,7 +91,7 @@ class Environment {
   }
 
   private createBoatOfType(type: string): THREE.Mesh | THREE.Group | null {
-    let boat: any;
+    let boat: any; // Keep as any since boat classes have their own load() methods
     let boatMesh: THREE.Mesh | THREE.Group;
     let scale = 3; // Default scale
 
@@ -128,6 +129,9 @@ class Environment {
 
     // Add some random rotation for variety
     boatMesh.rotation.y = Math.random() * Math.PI * 2;
+
+    // Store boat instance to keep floating animation alive
+    this.boats.push(boat);
 
     return boatMesh;
   }

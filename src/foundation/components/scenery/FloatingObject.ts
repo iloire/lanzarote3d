@@ -45,23 +45,23 @@ export class FloatingObject {
 
     const time = Date.now() * 0.001;
 
-    // Enhanced ocean wave simulation with more visible movement
-    const primaryWave = Math.sin(time * 0.8 + this.floatingOffset) * 18; // Increased from 12
-    const secondaryWave = Math.sin(time * 1.3 + this.floatingOffset * 1.2) * 9; // Increased from 6
-    const tertiaryWave = Math.cos(time * 0.5 + this.floatingOffset * 0.8) * 6; // Increased from 4
-    const swellWave = Math.sin(time * 0.3 + this.floatingOffset * 1.5) * 12; // Increased from 8
+    // Realistic ocean wave simulation with moderate amplitude
+    const primaryWave = Math.sin(time * 0.8 + this.floatingOffset) * 4; // Reduced to reasonable size
+    const secondaryWave = Math.sin(time * 1.3 + this.floatingOffset * 1.2) * 2; // Reduced amplitude
+    const tertiaryWave = Math.cos(time * 0.5 + this.floatingOffset * 0.8) * 1.5; // Reduced amplitude
+    const swellWave = Math.sin(time * 0.3 + this.floatingOffset * 1.5) * 3; // Reduced amplitude
 
     // Combine waves for realistic ocean motion
     const totalWaveHeight = primaryWave + secondaryWave + tertiaryWave + swellWave;
     this.mesh.position.y = this.originalPosition.y + totalWaveHeight;
 
-    // Enhanced realistic boat movement with more visible motion
-    this.mesh.rotation.z = Math.sin(time * 0.9 + this.floatingOffset * 0.7) * 0.12; // Increased roll
-    this.mesh.rotation.x = Math.cos(time * 0.7 + this.floatingOffset * 0.6) * 0.08; // Increased pitch
+    // Realistic boat movement with subtle motion
+    this.mesh.rotation.z = Math.sin(time * 0.9 + this.floatingOffset * 0.7) * 0.05; // Moderate roll
+    this.mesh.rotation.x = Math.cos(time * 0.7 + this.floatingOffset * 0.6) * 0.03; // Moderate pitch
 
-    // More noticeable yaw drift (preserve original Y rotation)
+    // Subtle yaw drift (preserve original Y rotation)
     const originalY = this.mesh.userData.originalRotationY || 0;
-    this.mesh.rotation.y = originalY + Math.sin(time * 0.4 + this.floatingOffset * 0.4) * 0.04; // Increased yaw
+    this.mesh.rotation.y = originalY + Math.sin(time * 0.4 + this.floatingOffset * 0.4) * 0.02; // Subtle yaw
 
     this.animationId = requestAnimationFrame(this.animate);
   };
