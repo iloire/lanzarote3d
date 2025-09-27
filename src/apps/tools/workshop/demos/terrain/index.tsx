@@ -1,9 +1,9 @@
 import * as THREE from 'three';
-import textureImg from '../../../../../assets/foundation/textures/environment/h-map-lanzarote.png';
-import { StoryOptions } from '../../../shared/types';
-import { getAllThemes, getThemeById } from '../../../../foundation/themes';
-import { ThemeEngine } from '../../../../foundation/systems/ThemeEngine';
-import { themeManager } from '../../../../foundation/systems/ThemeManager';
+import textureImg from '../../../../../../assets/foundation/textures/environment/h-map-lanzarote.png';
+import { StoryOptions } from '../../../../shared/types';
+import { getAllThemes, getThemeById } from '../../../../../foundation/themes';
+import { ThemeEngine } from '../../../../../foundation/systems/ThemeEngine';
+import { themeManager } from '../../../../../foundation/systems/ThemeManager';
 
 // Terrain style definitions
 interface TerrainStyle {

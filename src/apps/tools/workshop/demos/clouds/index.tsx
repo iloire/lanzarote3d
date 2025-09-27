@@ -1,10 +1,10 @@
 import * as THREE from 'three';
-import Clouds from '../../../../foundation/components/environment/Clouds';
-import { StoryOptions } from '../../../shared/types';
-import { getAllThemes, getThemeById } from '../../../../foundation/themes';
-import { ThemeEngine } from '../../../../foundation/systems/ThemeEngine';
-import { themeManager } from '../../../../foundation/systems/ThemeManager';
-import { WorkshopDemoBase } from '../../../shared/WorkshopDemoBase';
+import Clouds from '../../../../../foundation/components/environment/Clouds';
+import { StoryOptions } from '../../../../shared/types';
+import { getAllThemes, getThemeById } from '../../../../../foundation/themes';
+import { ThemeEngine } from '../../../../../foundation/systems/ThemeEngine';
+import { themeManager } from '../../../../../foundation/systems/ThemeManager';
+import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
 
 // Use themes from our comprehensive theme system
 const ALL_THEMES = getAllThemes();

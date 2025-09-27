@@ -1,11 +1,11 @@
 import * as THREE from 'three';
-import { Paraglider } from '../../../../foundation/components/vehicles';
-import { Boat, Tree, Stone } from '../../../../foundation/components/scenery';
-import { House, HouseType } from '../../../../foundation/components/scenery';
-import { PineTree } from '../../../../foundation/components/scenery';
-import { PilotHeadType } from '../../../../foundation/components/characters';
-import { StoryOptions } from '../../../shared/types';
-import { WorkshopDemoBase } from '../../../shared/WorkshopDemoBase';
+import { Paraglider } from '../../../../../foundation/components/vehicles';
+import { Boat, Tree, Stone } from '../../../../../foundation/components/scenery';
+import { House, HouseType } from '../../../../../foundation/components/scenery';
+import { PineTree } from '../../../../../foundation/components/scenery';
+import { PilotHeadType } from '../../../../../foundation/components/characters';
+import { StoryOptions } from '../../../../shared/types';
+import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
 
 const createLabel = (text: string, position: THREE.Vector3) => {
   const canvas = document.createElement('canvas');

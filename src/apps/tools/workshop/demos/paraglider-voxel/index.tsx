@@ -1,8 +1,8 @@
-import ParagliderVoxel from '../../../../foundation/components/vehicles/ParagliderVoxel';
-import adriModel from '../../../../../assets/foundation/models/characters/adri.obj';
-import adriTextureImage from '../../../../../assets/foundation/models/characters/adri.png';
-import { StoryOptions } from '../../../shared/types';
-import { WorkshopDemoBase } from '../../../shared/WorkshopDemoBase';
+import ParagliderVoxel from '../../../../../foundation/components/vehicles/ParagliderVoxel';
+import adriModel from '../../../../../../assets/foundation/models/characters/adri.obj';
+import adriTextureImage from '../../../../../../assets/foundation/models/characters/adri.png';
+import { StoryOptions } from '../../../../shared/types';
+import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
 
 /**
  * Paraglider Voxel Workshop Demo - Showcases voxel-style paraglider components

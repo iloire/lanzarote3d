@@ -1,9 +1,9 @@
 import * as THREE from 'three';
-import { Paraglider } from '../../../../foundation/components/vehicles';
-import Flier, { FlierConstructor } from '../../../../foundation/types/flier';
-import Weather, { WeatherOptions } from '../../../../foundation/components/physics/Weather';
-import { StoryOptions } from '../../../shared/types';
-import { WorkshopDemoBase } from '../../../shared/WorkshopDemoBase';
+import { Paraglider } from '../../../../../foundation/components/vehicles';
+import Flier, { FlierConstructor } from '../../../../../foundation/types/flier';
+import Weather, { WeatherOptions } from '../../../../../foundation/components/physics/Weather';
+import { StoryOptions } from '../../../../shared/types';
+import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
 
 const KMH_TO_MS = 3.6;
 

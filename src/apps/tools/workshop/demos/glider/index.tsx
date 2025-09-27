@@ -1,6 +1,6 @@
-import Glider from '../../../../foundation/components/vehicles/Glider';
-import { StoryOptions } from '../../../shared/types';
-import { WorkshopDemoBase } from '../../../shared/WorkshopDemoBase';
+import Glider from '../../../../../foundation/components/vehicles/Glider';
+import { StoryOptions } from '../../../../shared/types';
+import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
 
 /**
  * Glider Workshop Demo - Showcases glider components

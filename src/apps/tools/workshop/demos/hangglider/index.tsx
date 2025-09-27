@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import HangGlider from '../../../../foundation/components/vehicles/Hangglider';
-import { StoryOptions } from '../../../shared/types';
-import { WorkshopDemoBase } from '../../../shared/WorkshopDemoBase';
+import HangGlider from '../../../../../foundation/components/vehicles/Hangglider';
+import { StoryOptions } from '../../../../shared/types';
+import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
 
 /**
  * Hang Glider Workshop Demo - Showcases hang glider components

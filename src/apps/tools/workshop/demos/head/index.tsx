@@ -3,13 +3,13 @@ import PilotHead, {
   GlassesType,
   PilotHeadType,
   PilotHeadOptions,
-} from '../../../../foundation/components/characters/PilotHead';
+} from '../../../../../foundation/components/characters/PilotHead';
 import {
   HelmetOptions,
   HelmetType,
-} from '../../../../foundation/components/characters/helmets/types';
-import { StoryOptions } from '../../../shared/types';
-import { WorkshopDemoBase } from '../../../shared/WorkshopDemoBase';
+} from '../../../../../foundation/components/characters/helmets/types';
+import { StoryOptions } from '../../../../shared/types';
+import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
 
 const toHexColor = (num: number): string => {
   const hex = num.toString(16);

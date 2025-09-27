@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { Igloo, IglooSize } from '../../../../foundation/components/scenery';
-import { WorkshopDemoBase } from '../../../shared/WorkshopDemoBase';
-import { StoryOptions } from '../../../shared/types';
+import { Igloo, IglooSize } from '../../../../../foundation/components/scenery';
+import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
+import { StoryOptions } from '../../../../shared/types';
 
 /**
  * Igloo Workshop Demo - Showcases Igloo component with different sizes

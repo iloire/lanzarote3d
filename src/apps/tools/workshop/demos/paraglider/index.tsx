@@ -1,8 +1,8 @@
 import * as THREE from 'three';
-import { Paraglider } from '../../../../foundation/components/vehicles';
-import { PilotHeadType } from '../../../../foundation/components/characters/PilotHead';
-import { StoryOptions } from '../../../shared/types';
-import { WorkshopDemoBase } from '../../../shared/WorkshopDemoBase';
+import { Paraglider } from '../../../../../foundation/components/vehicles';
+import { PilotHeadType } from '../../../../../foundation/components/characters/PilotHead';
+import { StoryOptions } from '../../../../shared/types';
+import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
 
 /**
  * Paraglider Workshop Demo - Showcases paraglider wing variations

@@ -1,9 +1,9 @@
 import * as THREE from 'three';
-import Pilot from '../../../../foundation/components/vehicles/Pilot';
-import TandemPilot from '../../../../foundation/components/characters/TandemPilot';
-import { GlassesType, PilotHeadType } from '../../../../foundation/components/characters/PilotHead';
-import { StoryOptions } from '../../../shared/types';
-import { WorkshopDemoBase, WorkshopDemoConfig } from '../../../shared/WorkshopDemoBase';
+import Pilot from '../../../../../foundation/components/vehicles/Pilot';
+import TandemPilot from '../../../../../foundation/components/characters/TandemPilot';
+import { GlassesType, PilotHeadType } from '../../../../../foundation/components/characters/PilotHead';
+import { StoryOptions } from '../../../../shared/types';
+import { WorkshopDemoBase, WorkshopDemoConfig } from '../../../../shared/WorkshopDemoBase';
 
 /**
  * Pilot Workshop Demo - Showcases different pilot character types

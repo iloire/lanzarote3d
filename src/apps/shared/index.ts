@@ -14,20 +14,20 @@ import Famara from '../demos/famara';
 import LocationEditor from '../tools/location-editor/index';
 
 // Import workshop demos
-import Clouds from '../tools/workshop/demos/clouds';
-import FlierPg from '../tools/workshop/demos/flier-pg';
-import Glider from '../tools/workshop/demos/glider';
-import HangGlider from '../tools/workshop/demos/hangglider';
-import Head from '../tools/workshop/demos/head';
-import Helmet from '../tools/workshop/demos/helmet';
-import Igloo from '../tools/workshop/demos/igloo';
-import Island from '../tools/workshop/demos/island';
-import ParagliderVoxelDemo from '../tools/workshop/demos/paraglider-voxel';
-import ParagliderDemo from '../tools/workshop/demos/paraglider';
-import Pilot from '../tools/workshop/demos/pilot';
-import Terrain from '../tools/workshop/demos/terrain';
+import Clouds from '../tools/workshop/demos/clouds/index';
+import FlierPg from '../tools/workshop/demos/flier-pg/index';
+import Glider from '../tools/workshop/demos/glider/index';
+import HangGlider from '../tools/workshop/demos/hangglider/index';
+import Head from '../tools/workshop/demos/head/index';
+import Helmet from '../tools/workshop/demos/helmet/index';
+import Igloo from '../tools/workshop/demos/igloo/index';
+import Island from '../tools/workshop/demos/island/index';
+import ParagliderVoxelDemo from '../tools/workshop/demos/paraglider-voxel/index';
+import ParagliderDemo from '../tools/workshop/demos/paraglider/index';
+import Pilot from '../tools/workshop/demos/pilot/index';
+import Terrain from '../tools/workshop/demos/terrain/index';
 import Voxel from '../tools/workshop/demos/voxel/index';
-import Workshop from '../tools/workshop/demos/workshop';
+import Workshop from '../tools/workshop/demos/workshop/index';
 
 export type StoryFunction = (options: StoryOptions) => Promise<any>;
 

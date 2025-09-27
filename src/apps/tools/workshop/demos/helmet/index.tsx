@@ -2,17 +2,17 @@ import * as THREE from 'three';
 import {
   HelmetOptions,
   HelmetType,
-} from '../../../../foundation/components/characters/helmets/types';
-import { DefaultHelmet } from '../../../../foundation/components/characters/helmets/DefaultHelmet';
-import { FullFaceHelmet } from '../../../../foundation/components/characters/helmets/FullFaceHelmet';
-import { HelmetWithHorns } from '../../../../foundation/components/characters/helmets/HelmetWithHorns';
-import { SpikedHelmet } from '../../../../foundation/components/characters/helmets/SpikedHelmet';
-import { WingedHelmet } from '../../../../foundation/components/characters/helmets/WingedHelmet';
-import { CrownHelmet } from '../../../../foundation/components/characters/helmets/CrownHelmet';
-import { SharkHelmet } from '../../../../foundation/components/characters/helmets/SharkHelmet';
-import { CrystalHelmet } from '../../../../foundation/components/characters/helmets/CrystalHelmet';
-import { WorkshopDemoBase } from '../../../shared/WorkshopDemoBase';
-import { StoryOptions } from '../../../shared/types';
+} from '../../../../../foundation/components/characters/helmets/types';
+import { DefaultHelmet } from '../../../../../foundation/components/characters/helmets/DefaultHelmet';
+import { FullFaceHelmet } from '../../../../../foundation/components/characters/helmets/FullFaceHelmet';
+import { HelmetWithHorns } from '../../../../../foundation/components/characters/helmets/HelmetWithHorns';
+import { SpikedHelmet } from '../../../../../foundation/components/characters/helmets/SpikedHelmet';
+import { WingedHelmet } from '../../../../../foundation/components/characters/helmets/WingedHelmet';
+import { CrownHelmet } from '../../../../../foundation/components/characters/helmets/CrownHelmet';
+import { SharkHelmet } from '../../../../../foundation/components/characters/helmets/SharkHelmet';
+import { CrystalHelmet } from '../../../../../foundation/components/characters/helmets/CrystalHelmet';
+import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
+import { StoryOptions } from '../../../../shared/types';
 
 const toHexColor = (num: number): string => {
   const hex = num.toString(16);
