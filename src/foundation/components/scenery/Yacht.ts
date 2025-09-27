@@ -73,9 +73,8 @@ class Yacht extends FloatingObject {
     radar.position.set(-3, 24, 0);
     yacht.add(radar);
 
-    // Set up floating behavior
+    // Set up floating behavior (automatically starts floating)
     this.setMesh(yacht);
-    this.startFloating();
 
     if (gui) {
       GuiHelper.addLocationGui(gui, 'yacht', yacht);

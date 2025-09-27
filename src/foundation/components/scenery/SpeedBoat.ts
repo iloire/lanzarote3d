@@ -62,9 +62,8 @@ class SpeedBoat extends FloatingObject {
     rightStripe.position.set(0, 1.6, 2);
     speedboat.add(rightStripe);
 
-    // Set up floating behavior
+    // Set up floating behavior (automatically starts floating)
     this.setMesh(speedboat);
-    this.startFloating();
 
     if (gui) {
       GuiHelper.addLocationGui(gui, 'speedboat', speedboat);

@@ -54,9 +54,8 @@ class FishingBoat extends FloatingObject {
     sideWindow.position.set(4, 6, 0);
     boat.add(sideWindow);
 
-    // Set up floating behavior
+    // Set up floating behavior (automatically starts floating)
     this.setMesh(boat);
-    this.startFloating();
 
     if (gui) {
       GuiHelper.addLocationGui(gui, 'fishing-boat', boat);

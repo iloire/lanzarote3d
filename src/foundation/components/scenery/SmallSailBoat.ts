@@ -16,9 +16,8 @@ class SmallSailBoat extends FloatingObject {
     meshSail.position.set(0, 4, 0);
     mesh.add(meshSail);
 
-    // Set up floating behavior
+    // Set up floating behavior (automatically starts floating)
     this.setMesh(mesh);
-    this.startFloating();
 
     if (gui) {
       GuiHelper.addLocationGui(gui, 'small-sailboat', mesh);

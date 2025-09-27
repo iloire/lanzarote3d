@@ -67,11 +67,13 @@ export class FloatingObject {
   };
 
   /**
-   * Set the mesh that should float
+   * Set the mesh that should float and automatically start floating
    */
   protected setMesh(mesh: THREE.Mesh | THREE.Group): void {
     this.mesh = mesh;
     // Store original rotation Y for yaw drift calculation
     this.mesh.userData.originalRotationY = this.mesh.rotation.y;
+    // Automatically start floating when mesh is set
+    this.startFloating();
   }
 }
