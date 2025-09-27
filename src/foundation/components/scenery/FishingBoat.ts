@@ -1,11 +1,12 @@
 import * as THREE from 'three';
 import GuiHelper from '../../utils/gui';
+import { FloatingObject } from './FloatingObject';
 
 const hullMat = new THREE.MeshLambertMaterial({ color: 0x8B4513 }); // Brown hull
 const cabinMat = new THREE.MeshLambertMaterial({ color: 0xFFFFFF }); // White cabin
 const mastMat = new THREE.MeshLambertMaterial({ color: 0x654321 }); // Dark brown mast
 
-class FishingBoat {
+class FishingBoat extends FloatingObject {
   load(gui?: any): THREE.Group {
     const boat = new THREE.Group();
 
@@ -52,6 +53,10 @@ class FishingBoat {
     sideWindow.rotation.y = Math.PI / 2;
     sideWindow.position.set(4, 6, 0);
     boat.add(sideWindow);
+
+    // Set up floating behavior
+    this.setMesh(boat);
+    this.startFloating();
 
     if (gui) {
       GuiHelper.addLocationGui(gui, 'fishing-boat', boat);

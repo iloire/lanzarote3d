@@ -1,11 +1,12 @@
 import * as THREE from 'three';
 import GuiHelper from '../../utils/gui';
+import { FloatingObject } from './FloatingObject';
 
 const hullMat = new THREE.MeshLambertMaterial({ color: 0xF5F5F5 }); // Off-white hull
 const trimMat = new THREE.MeshLambertMaterial({ color: 0x4169E1 }); // Royal blue trim
 const glassMat = new THREE.MeshLambertMaterial({ color: 0x87CEEB, transparent: true, opacity: 0.7 }); // Sky blue glass
 
-class Yacht {
+class Yacht extends FloatingObject {
   load(gui?: any): THREE.Group {
     const yacht = new THREE.Group();
 
@@ -71,6 +72,10 @@ class Yacht {
     const radar = new THREE.Mesh(radarGeo, glassMat);
     radar.position.set(-3, 24, 0);
     yacht.add(radar);
+
+    // Set up floating behavior
+    this.setMesh(yacht);
+    this.startFloating();
 
     if (gui) {
       GuiHelper.addLocationGui(gui, 'yacht', yacht);

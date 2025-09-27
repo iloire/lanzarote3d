@@ -1,11 +1,12 @@
 import * as THREE from 'three';
 import GuiHelper from '../../utils/gui';
+import { FloatingObject } from './FloatingObject';
 
 const hullMat = new THREE.MeshLambertMaterial({ color: 0xFF4500 }); // Orange red hull
 const accentMat = new THREE.MeshLambertMaterial({ color: 0xFFFFFF }); // White accents
 const engineMat = new THREE.MeshLambertMaterial({ color: 0x333333 }); // Dark engine
 
-class SpeedBoat {
+class SpeedBoat extends FloatingObject {
   load(gui?: any): THREE.Group {
     const speedboat = new THREE.Group();
 
@@ -60,6 +61,10 @@ class SpeedBoat {
     const rightStripe = new THREE.Mesh(stripeGeo, accentMat);
     rightStripe.position.set(0, 1.6, 2);
     speedboat.add(rightStripe);
+
+    // Set up floating behavior
+    this.setMesh(speedboat);
+    this.startFloating();
 
     if (gui) {
       GuiHelper.addLocationGui(gui, 'speedboat', speedboat);
