@@ -49,6 +49,12 @@ class FlyzoneEditorApp extends TerrainBase {
   private mouse: THREE.Vector2 | undefined;
   private isMouseDown = false;
   private terrainMesh: THREE.Mesh | undefined;
+  private eventHandlers: {
+    onMouseMove?: (event: MouseEvent) => void;
+    onMouseDown?: (event: MouseEvent) => void;
+    onMouseUp?: (event: MouseEvent) => void;
+    onKeyDown?: (event: KeyboardEvent) => void;
+  } = {};
 
   constructor() {
     super({
@@ -133,7 +139,7 @@ class FlyzoneEditorApp extends TerrainBase {
     this.mouse = new THREE.Vector2();
 
     // Mouse event handlers
-    const onMouseMove = (event: MouseEvent) => {
+    this.eventHandlers.onMouseMove = (event: MouseEvent) => {
       if (!this.mouse) return;
 
       const rect = renderer.domElement.getBoundingClientRect();
@@ -143,22 +149,30 @@ class FlyzoneEditorApp extends TerrainBase {
       this.updateCursor();
     };
 
-    const onMouseDown = (event: MouseEvent) => {
+    this.eventHandlers.onMouseDown = (event: MouseEvent) => {
       if (event.button === 0) { // Left click
         this.isMouseDown = true;
       }
     };
 
-    const onMouseUp = (event: MouseEvent) => {
+    this.eventHandlers.onMouseUp = (event: MouseEvent) => {
       if (event.button === 0 && this.isMouseDown) {
-        this.handleClick(camera, scene);
+        // Handle clicks in all modes
+        const handled = this.handleClick(camera, scene);
+
+        // Prevent camera controls only when in placement modes or when marker was selected
+        if (this.editorState && (this.editorState.mode.type !== 'select' || handled)) {
+          event.stopPropagation();
+          event.preventDefault();
+        }
         this.isMouseDown = false;
       }
     };
 
-    renderer.domElement.addEventListener('mousemove', onMouseMove);
-    renderer.domElement.addEventListener('mousedown', onMouseDown);
-    renderer.domElement.addEventListener('mouseup', onMouseUp);
+    // Add event listeners
+    renderer.domElement.addEventListener('mousemove', this.eventHandlers.onMouseMove);
+    renderer.domElement.addEventListener('mousedown', this.eventHandlers.onMouseDown);
+    renderer.domElement.addEventListener('mouseup', this.eventHandlers.onMouseUp);
   }
 
   private updateCursor(): void {
@@ -168,6 +182,9 @@ class FlyzoneEditorApp extends TerrainBase {
     if (!canvas) return;
 
     switch (this.editorState.mode.type) {
+      case 'select':
+        canvas.style.cursor = 'default'; // Allow normal camera controls
+        break;
       case 'takeoff':
         canvas.style.cursor = 'crosshair';
         break;
@@ -185,32 +202,38 @@ class FlyzoneEditorApp extends TerrainBase {
     }
   }
 
-  private handleClick(camera: THREE.Camera, scene: THREE.Scene): void {
-    if (!this.raycaster || !this.mouse || !this.editorState || !this.terrainMesh) return;
+  private handleClick(camera: THREE.Camera, scene: THREE.Scene): boolean {
+    if (!this.raycaster || !this.mouse || !this.editorState || !this.terrainMesh) return false;
 
     this.raycaster.setFromCamera(this.mouse, camera);
 
-    // Check for terrain intersection
-    const terrainIntersects = this.raycaster.intersectObject(this.terrainMesh, true);
-    if (terrainIntersects.length === 0) return;
-
-    const intersectionPoint = terrainIntersects[0].point;
-    const gps = flyzoneAPI.worldPositionToGPS(intersectionPoint);
-
-    switch (this.editorState.mode.type) {
-      case 'takeoff':
-        this.addTakeoffLocation(intersectionPoint, gps);
-        break;
-      case 'landing':
-        this.addLandingZone(intersectionPoint, gps);
-        break;
-      case 'flyzone':
-        this.addFlightPhase(intersectionPoint, gps);
-        break;
-      case 'select':
-        this.selectItemAtPoint(intersectionPoint);
-        break;
+    // First check for marker selection in all modes
+    if (this.markers && this.trySelectMarker()) {
+      return true; // Marker was selected, event was handled
     }
+
+    // If no marker was selected and we're in a placement mode, handle terrain click
+    if (this.editorState.mode.type !== 'select') {
+      const terrainIntersects = this.raycaster.intersectObject(this.terrainMesh, true);
+      if (terrainIntersects.length === 0) return false;
+
+      const intersectionPoint = terrainIntersects[0].point;
+      const gps = flyzoneAPI.worldPositionToGPS(intersectionPoint);
+
+      switch (this.editorState.mode.type) {
+        case 'takeoff':
+          this.addTakeoffLocation(intersectionPoint, gps);
+          return true;
+        case 'landing':
+          this.addLandingZone(intersectionPoint, gps);
+          return true;
+        case 'flyzone':
+          this.addFlightPhase(intersectionPoint, gps);
+          return true;
+      }
+    }
+
+    return false; // Event was not handled
   }
 
   private addTakeoffLocation(position: THREE.Vector3, gps: GPS): void {
@@ -402,9 +425,76 @@ class FlyzoneEditorApp extends TerrainBase {
     this.editorState.locations.push(newLocation);
   }
 
-  private selectItemAtPoint(position: THREE.Vector3): void {
-    // Implementation for selecting items at click point
-    // This would involve raycasting against markers and UI elements
+  private trySelectMarker(): boolean {
+    if (!this.markers || !this.raycaster || !this.editorState) return false;
+
+    // Get all marker objects for raycasting
+    const markerObjects: THREE.Object3D[] = [];
+    this.markers['markers'].forEach(marker => {
+      markerObjects.push(marker);
+    });
+
+    if (markerObjects.length === 0) return false;
+
+    const intersects = this.raycaster.intersectObjects(markerObjects, true);
+    if (intersects.length > 0) {
+      const clickedObject = intersects[0].object;
+      let markerGroup = clickedObject;
+
+      // Find the marker group by traversing up the parent hierarchy
+      while (markerGroup && !markerGroup.userData.type) {
+        markerGroup = markerGroup.parent!;
+      }
+
+      if (markerGroup && markerGroup.userData) {
+        const { type, id, data } = markerGroup.userData;
+
+        // Deselect all markers first
+        this.deselectAllMarkers();
+
+        // Select the clicked marker
+        if (this.markers) {
+          this.markers.selectMarker(id);
+        }
+
+        // Update editor state
+        this.editorState.selectedItem = {
+          type,
+          id,
+          data,
+        };
+
+        // Update UI
+        this.editorUI?.refresh();
+
+        console.log(`Selected ${type}: ${data.title || data.description || id}`);
+        return true;
+      }
+    }
+
+    // No marker selected, deselect all
+    this.deselectAllMarkers();
+    this.editorState.selectedItem = null;
+    this.editorUI?.refresh();
+
+    return false;
+  }
+
+  private deselectAllMarkers(): void {
+    if (!this.markers || !this.editorState) return;
+
+    // Deselect all existing markers
+    this.editorState.locations.forEach(location => {
+      location.takeoffs.forEach(takeoff => {
+        this.markers!.deselectMarker(takeoff.id);
+      });
+      location.landingZones.forEach(landing => {
+        this.markers!.deselectMarker(landing.id);
+      });
+      Object.values(location.flyzone.phases).forEach(phase => {
+        this.markers!.deselectMarker(phase.id);
+      });
+    });
   }
 
   private getCurrentLocationTakeoffCount(): number {
@@ -535,7 +625,7 @@ class FlyzoneEditorApp extends TerrainBase {
 
   private setupEventHandlers(renderer: THREE.WebGLRenderer): void {
     // Keyboard shortcuts
-    const onKeyDown = (event: KeyboardEvent) => {
+    this.eventHandlers.onKeyDown = (event: KeyboardEvent) => {
       if (!this.editorState) return;
 
       switch (event.key) {
@@ -564,7 +654,7 @@ class FlyzoneEditorApp extends TerrainBase {
       }
     };
 
-    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keydown', this.eventHandlers.onKeyDown);
   }
 
   private onUIAction(action: string, data?: any): void {
@@ -628,6 +718,24 @@ class FlyzoneEditorApp extends TerrainBase {
       this.animationId = undefined;
     }
 
+    // Clean up event handlers
+    const canvas = document.querySelector('canvas');
+    if (canvas) {
+      if (this.eventHandlers.onMouseMove) {
+        canvas.removeEventListener('mousemove', this.eventHandlers.onMouseMove);
+      }
+      if (this.eventHandlers.onMouseDown) {
+        canvas.removeEventListener('mousedown', this.eventHandlers.onMouseDown);
+      }
+      if (this.eventHandlers.onMouseUp) {
+        canvas.removeEventListener('mouseup', this.eventHandlers.onMouseUp);
+      }
+    }
+
+    if (this.eventHandlers.onKeyDown) {
+      window.removeEventListener('keydown', this.eventHandlers.onKeyDown);
+    }
+
     if (this.editorUI) {
       this.editorUI.dispose();
       this.editorUI = undefined;
@@ -642,6 +750,7 @@ class FlyzoneEditorApp extends TerrainBase {
     this.raycaster = undefined;
     this.mouse = undefined;
     this.terrainMesh = undefined;
+    this.eventHandlers = {};
 
     super.dispose();
   }

@@ -136,16 +136,24 @@ class FlyzoneVisualizerApp extends TerrainBase {
 
     const onMouseClick = (event: MouseEvent) => {
       if (event.button === 0) { // Left click
-        this.handleClick(camera, scene);
+        // Try to handle marker selection, but don't prevent camera controls
+        const handled = this.handleClick(camera, scene);
+
+        // Only prevent camera controls if we actually selected something
+        if (handled) {
+          event.stopPropagation();
+          event.preventDefault();
+        }
       }
     };
 
+    // Use normal event listeners (not capture) to allow camera controls to work first
     renderer.domElement.addEventListener('mousemove', onMouseMove);
     renderer.domElement.addEventListener('click', onMouseClick);
   }
 
-  private handleClick(camera: THREE.Camera, scene: THREE.Scene): void {
-    if (!this.raycaster || !this.mouse || !this.visualizerState || !this.markers) return;
+  private handleClick(camera: THREE.Camera, scene: THREE.Scene): boolean {
+    if (!this.raycaster || !this.mouse || !this.visualizerState || !this.markers) return false;
 
     this.raycaster.setFromCamera(this.mouse, camera);
 
@@ -169,8 +177,11 @@ class FlyzoneVisualizerApp extends TerrainBase {
       if (parent && parent.userData.type === 'takeoff') {
         markerData = parent.userData;
         this.selectTakeoffLocation(markerData.data);
+        return true; // We handled a marker selection
       }
     }
+
+    return false; // No marker was selected, allow camera controls
   }
 
   private selectTakeoffLocation(takeoff: any): void {
