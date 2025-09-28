@@ -193,8 +193,8 @@ const App: React.FC<AppProps> = ({
       {showAppSelection && (
         <Menu
           showPublic={typeof showPublic === 'undefined' ? true : showPublic}
-          showDev={typeof showDev === 'undefined' ? true : showDev}
-          showExperiments={typeof showExperiments === 'undefined' ? true : showExperiments}
+          showDev={typeof showDev === 'undefined' ? false : showDev}
+          showExperiments={typeof showExperiments === 'undefined' ? false : showExperiments}
         />
       )}
       <canvas className="webgl" />

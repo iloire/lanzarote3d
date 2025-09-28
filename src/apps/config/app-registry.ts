@@ -180,7 +180,7 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       category: 'demo',
       requiresWebGL: true,
       tags: ['autonomous', 'ai', 'vehicles', 'terrain', 'navigation', 'self-driving'],
-      status: 'experimental',
+      status: 'dev',
       priority: 1,
     },
 

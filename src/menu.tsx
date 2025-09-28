@@ -206,8 +206,8 @@ class Menu extends React.Component<MenuProps> {
 
     const {
       showPublic = true,
-      showExperiments: showExperiments = true,
-      showDev: showDev = true,
+      showExperiments: showExperiments = false, // Default to false - only show in dev
+      showDev: showDev = false, // Default to false - only show in dev
     } = this.props;
     const { isMobile, isMenuOpen, isMenuVisible } = this.state;
 
