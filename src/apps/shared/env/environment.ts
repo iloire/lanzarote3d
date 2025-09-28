@@ -7,7 +7,7 @@ import Tree from '../../../foundation/components/scenery/Tree';
 import PineTree from '../../../foundation/components/scenery/PineTree';
 import Stone from '../../../foundation/components/scenery/Stone';
 import House, { HouseType } from '../../../foundation/components/scenery/House';
-import { SmallSailBoat, FishingBoat, Yacht, SpeedBoat } from '../../../foundation/components/scenery';
+import { SmallSailBoat, FishingBoat, Yacht, SpeedBoat, PatrolBoat } from '../../../foundation/components/scenery';
 import Birds from '../../../foundation/components/wildlife/Birds';
 import { Hangglider as HangGlider } from '../../../foundation/components/vehicles';
 import { addMeshAroundArea } from './mesh-utils';
@@ -116,6 +116,14 @@ class Environment {
         boatMesh = boat.load();
         scale = 2.8;
         break;
+      case 'PatrolBoat':
+        boat = new PatrolBoat({
+          radius: 300,  // Larger movement radius
+          speed: 0.2,   // Slower, more realistic speed
+        });
+        boatMesh = boat.load();
+        scale = 2.5;
+        break;
       default:
         console.warn(`Unknown boat type: ${type}`);
         // Fallback to SmallSailBoat
@@ -139,6 +147,40 @@ class Environment {
     this.boats.push(boat);
 
     return boatMesh;
+  }
+
+  // Convenience method to add a patrol boat
+  addPatrolBoat(water: THREE.Mesh, position?: THREE.Vector3) {
+    const boat = new PatrolBoat({
+      radius: 400,
+      speed: 0.15,
+      floatingScale: 0.8,
+    });
+    const boatMesh = boat.load();
+    const scale = 2.5;
+    boatMesh.scale.set(scale, scale, scale);
+
+    // Update floating animation scale to match boat scale
+    if (boat && typeof boat.setScaleMultiplier === 'function') {
+      boat.setScaleMultiplier(scale);
+    }
+
+    // Position the boat
+    if (position) {
+      boatMesh.position.copy(position);
+    } else {
+      // Default position near the first boat area
+      boatMesh.position.set(7879 + 200, 50, -5445 + 200);
+    }
+
+    // Random initial rotation
+    boatMesh.rotation.y = Math.random() * Math.PI * 2;
+
+    this.scene.add(boatMesh);
+    this.boats.push(boat);
+
+    console.log('Added PatrolBoat at position:', boatMesh.position);
+    return boat;
   }
 
   // Convenience methods for specific boat configurations

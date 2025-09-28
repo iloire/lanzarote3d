@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { SmallSailBoat, FishingBoat, Yacht, SpeedBoat } from '../../../../../foundation/components/scenery';
+import { SmallSailBoat, FishingBoat, Yacht, SpeedBoat, PatrolBoat } from '../../../../../foundation/components/scenery';
 import { StoryOptions } from '../../../../shared/types';
 import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
 
@@ -41,7 +41,7 @@ class BoatWorkshopApp extends WorkshopDemoBase {
       this.startAnimationLoop(renderer, scene, camera, controls);
 
       this.isLoaded = true;
-      console.log(`✅ ${this.config.name} loaded successfully with ${this.boats.length} boats`);
+      console.log(`✅ ${this.config.name} loaded successfully with ${this.boats.length} boats including PatrolBoat with movement`);
     } catch (error) {
       this.handleError(error as Error, 'load');
       throw error;
@@ -85,6 +85,13 @@ class BoatWorkshopApp extends WorkshopDemoBase {
         rotation: new THREE.Vector3(0, -Math.PI / 3, 0),
         name: 'Mini Sailboat'
       },
+      {
+        type: 'PatrolBoat',
+        position: new THREE.Vector3(-150, 50, 0),
+        scale: 2.8,
+        rotation: new THREE.Vector3(0, Math.PI / 8, 0),
+        name: 'Coast Guard Patrol'
+      },
     ];
 
     // Load all boats concurrently
@@ -108,6 +115,10 @@ class BoatWorkshopApp extends WorkshopDemoBase {
           break;
         case 'SpeedBoat':
           boat = new SpeedBoat({ scale: config.scale });
+          boatMesh = await boat.load();
+          break;
+        case 'PatrolBoat':
+          boat = new PatrolBoat({ scale: config.scale });
           boatMesh = await boat.load();
           break;
         default:
