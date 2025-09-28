@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import TandemPilot, { TandemPilotOptions } from '../characters/TandemPilot';
-import Glider, { GliderOptions } from './Glider';
+import LegacyGlider, { GliderOptions } from './Glider';
 
 export type TandemOptions = {
   glider: GliderOptions;
@@ -17,7 +17,7 @@ class Tandem {
   async load(): Promise<THREE.Object3D> {
     const mesh = new THREE.Object3D();
 
-    const glider = new Glider(this.options.glider);
+    const glider = new LegacyGlider(this.options.glider);
 
     const wing = glider.createWing();
     wing.position.y = 2800;

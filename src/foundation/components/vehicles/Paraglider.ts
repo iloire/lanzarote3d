@@ -2,7 +2,7 @@ import * as THREE from 'three';
 // Note: Pilot has been moved to ../characters/PilotComponent
 // This import is kept for backward compatibility with legacy Paraglider
 import Pilot, { PilotOptions } from './Pilot';
-import Glider, { GliderOptions } from './Glider';
+import LegacyGlider, { GliderOptions } from './Glider';
 import GuiHelper from '../../utils/gui';
 import IFlyable from '../../types/IFlyable';
 
@@ -13,7 +13,7 @@ export type ParagliderOptions = {
 
 class LegacyParaglider implements IFlyable {
   mesh!: THREE.Object3D;
-  glider!: Glider;
+  glider!: LegacyGlider;
   pilot!: Pilot;
   pilotMesh!: THREE.Object3D;
   axesHelper!: THREE.AxesHelper;
@@ -69,7 +69,7 @@ class LegacyParaglider implements IFlyable {
   async load(gui?: any): Promise<THREE.Object3D> {
     this.mesh = new THREE.Object3D();
 
-    this.glider = new Glider(this.options.glider);
+    this.glider = new LegacyGlider(this.options.glider);
 
     const wing = await this.glider.load();
     wing.translateY(-300);

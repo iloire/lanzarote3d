@@ -5,11 +5,11 @@ import { ComponentBenchmark } from '../../../../../foundation/systems/ComponentB
 import { Wing } from '../../../../../foundation/components/vehicles/WingComponent';
 import { Paraglider } from '../../../../../foundation/components/vehicles/ParagliderComponent';
 import { Boat } from '../../../../../foundation/components/vehicles/BoatComponent';
-import { GliderComponent } from '../../../../../foundation/components/vehicles/GliderComponent';
+import { Glider } from '../../../../../foundation/components/vehicles/GliderComponent';
 import LegacyWing from '../../../../../foundation/components/vehicles/Wing';
 import ParagliderVoxel from '../../../../../foundation/components/vehicles/ParagliderVoxel';
 import SpeedBoat from '../../../../../foundation/components/scenery/SpeedBoat';
-import Glider from '../../../../../foundation/components/vehicles/Glider';
+import LegacyGlider from '../../../../../foundation/components/vehicles/Glider';
 
 /**
  * Component Benchmark Workshop Demo
@@ -247,13 +247,13 @@ class ComponentBenchmarkWorkshopApp extends WorkshopDemoBase {
 
     try {
       const modernResult = await this.benchmark.benchmarkModernComponent(
-        GliderComponent,
+        Glider,
         { numeroCajones: 40, wingColor1: '#FFA500', showBreakLines: true },
         iterations
       );
 
       const legacyResult = await this.benchmark.benchmarkLegacyComponent(
-        Glider,
+        LegacyGlider,
         { numeroCajones: 40, wingColor1: '#FFA500' },
         iterations
       );
