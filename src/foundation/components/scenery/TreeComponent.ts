@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { SimpleThreeComponent, SimpleComponentOptions } from '../base/SimpleThreeComponent';
+import { ComponentOptions } from '../base/IThreeComponent';
 import { resourceManager } from '../../systems/ResourceManager';
 
 /**
@@ -24,7 +25,7 @@ export interface TreeOptions extends SimpleComponentOptions {
  * - Proper resource cleanup and lifecycle management
  */
 export class TreeComponent extends SimpleThreeComponent {
-  protected treeOptions: Required<TreeOptions>;
+  protected treeOptions: TreeOptions;
 
   constructor(options: TreeOptions = {}) {
     const metadata = {
@@ -63,7 +64,7 @@ export class TreeComponent extends SimpleThreeComponent {
   /**
    * Override to create composite tree object
    */
-  protected async createObject(): THREE.Object3D {
+  protected override async createObject(): Promise<THREE.Object3D> {
     const tree = new THREE.Group();
     tree.name = 'Tree';
 
@@ -201,21 +202,21 @@ export class TreeComponent extends SimpleThreeComponent {
   /**
    * Override geometry key to account for tree-specific parameters
    */
-  protected getGeometryKey(): string {
+  protected override getGeometryKey(): string {
     return `tree_${this.treeOptions.style}_${this.treeOptions.trunkHeight}_${this.treeOptions.crownSize}`;
   }
 
   /**
    * Trees don't use a single material, so we override this
    */
-  protected getMaterialKey(): string {
+  protected override getMaterialKey(): string {
     return `tree_composite_${this.treeOptions.trunkColor}_${this.treeOptions.crownColor}`;
   }
 
   /**
    * Override dispose to release all tree-specific resources
    */
-  dispose(): void {
+  override dispose(): void {
     // Release trunk and crown resources
     const trunkGeometryKey = `trunk_${this.treeOptions.trunkHeight}_${this.treeOptions.trunkRadius}`;
     const crownGeometryKey = `crown_${this.treeOptions.style}_${this.treeOptions.crownSize}`;
@@ -233,14 +234,14 @@ export class TreeComponent extends SimpleThreeComponent {
   /**
    * Create clone with same tree configuration
    */
-  protected createClone(options: TreeOptions): TreeComponent {
-    return new TreeComponent({ ...this.treeOptions, ...options });
+  protected override createClone(options: ComponentOptions): TreeComponent {
+    return new TreeComponent({ ...this.treeOptions, ...options as TreeOptions });
   }
 
   /**
    * Validate tree-specific requirements
    */
-  protected validateComponent(): string[] {
+  protected override validateComponent(): string[] {
     const issues = super.validateComponent();
 
     if (this.treeOptions.trunkHeight <= 0) {
@@ -261,7 +262,7 @@ export class TreeComponent extends SimpleThreeComponent {
   /**
    * Export tree-specific serialization
    */
-  protected serializeComponent(): any {
+  protected override serializeComponent(): any {
     return {
       treeOptions: this.treeOptions
     };

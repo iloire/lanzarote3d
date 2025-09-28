@@ -161,13 +161,18 @@ export interface IThreeComponent extends ComponentLifecycle {
  * Error thrown when component loading fails
  */
 export class ComponentLoadError extends Error {
+  public readonly componentName: string;
+  public override readonly cause?: Error;
+
   constructor(
-    public readonly componentName: string,
+    componentName: string,
     message: string,
-    public readonly cause?: Error
+    cause?: Error
   ) {
     super(`Component '${componentName}' failed to load: ${message}`);
     this.name = 'ComponentLoadError';
+    this.componentName = componentName;
+    this.cause = cause;
   }
 }
 

@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import {
   IThreeComponent,
   ComponentOptions,
-  ComponentLifecycle,
   ComponentMetadata,
   ComponentMetrics,
   ComponentLoadError,
@@ -203,7 +202,7 @@ export abstract class BaseThreeComponent implements IThreeComponent {
   protected abstract createClone(options: ComponentOptions): IThreeComponent;
 
   // Virtual methods that subclasses can override
-  protected updateObject(deltaTime: number): void {
+  protected updateObject(_deltaTime: number): void {
     // Default implementation does nothing
   }
 
@@ -325,11 +324,11 @@ export abstract class BaseThreeComponent implements IThreeComponent {
     return totalMemory;
   }
 
-  // Lifecycle event stubs (can be overridden by subclasses)
-  protected onBeforeLoad?(): void;
-  protected onAfterLoad?(object: THREE.Object3D): void;
-  protected onBeforeDispose?(): void;
-  protected onAfterDispose?(): void;
-  protected onUpdate?(deltaTime: number): void;
-  protected onVisibilityChange?(visible: boolean): void;
+  // Lifecycle event methods (can be overridden by subclasses)
+  public onBeforeLoad?(): void;
+  public onAfterLoad?(object: THREE.Object3D): void;
+  public onBeforeDispose?(): void;
+  public onAfterDispose?(): void;
+  public onUpdate?(deltaTime: number): void;
+  public onVisibilityChange?(visible: boolean): void;
 }

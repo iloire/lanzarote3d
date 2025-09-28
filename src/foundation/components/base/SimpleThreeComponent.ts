@@ -102,7 +102,7 @@ export abstract class SimpleThreeComponent extends BaseThreeComponent {
   /**
    * Override dispose to release shared resources
    */
-  dispose(): void {
+  override dispose(): void {
     // Release references to shared resources
     const geometryKey = this.getGeometryKey();
     const materialKey = this.getMaterialKey();
@@ -116,14 +116,14 @@ export abstract class SimpleThreeComponent extends BaseThreeComponent {
   /**
    * Create clone with same geometry/material sharing
    */
-  protected createClone(options: ComponentOptions): SimpleThreeComponent {
+  protected override createClone(options: ComponentOptions): SimpleThreeComponent {
     return new (this.constructor as any)(options);
   }
 
   /**
    * Validate geometry-specific requirements
    */
-  protected validateComponent(): string[] {
+  protected override validateComponent(): string[] {
     const issues = super.validateComponent();
 
     if (this._object instanceof THREE.Mesh) {

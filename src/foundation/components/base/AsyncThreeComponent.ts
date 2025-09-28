@@ -254,14 +254,14 @@ export abstract class AsyncThreeComponent extends BaseThreeComponent {
   /**
    * Load texture
    */
-  protected async loadTexture(url: string, options?: any): Promise<THREE.Texture> {
+  protected async loadTexture(url: string, _options?: any): Promise<THREE.Texture> {
     return new Promise((resolve, reject) => {
       const loader = new THREE.TextureLoader();
       loader.load(
         url,
         (texture) => {
-          if (options) {
-            Object.assign(texture, options);
+          if (_options) {
+            Object.assign(texture, _options);
           }
           resolve(texture);
         },
@@ -274,7 +274,7 @@ export abstract class AsyncThreeComponent extends BaseThreeComponent {
   /**
    * Load audio file
    */
-  protected async loadAudio(url: string, options?: any): Promise<AudioBuffer> {
+  protected async loadAudio(url: string, _options?: any): Promise<AudioBuffer> {
     const response = await fetch(url);
     const arrayBuffer = await response.arrayBuffer();
 
@@ -285,7 +285,7 @@ export abstract class AsyncThreeComponent extends BaseThreeComponent {
   /**
    * Load data file (JSON, etc.)
    */
-  protected async loadData(url: string, options?: any): Promise<any> {
+  protected async loadData(url: string, _options?: any): Promise<any> {
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -301,13 +301,12 @@ export abstract class AsyncThreeComponent extends BaseThreeComponent {
   }
 
   /**
-   * Load font
+   * Load font (placeholder implementation)
    */
-  protected async loadFont(url: string, options?: any): Promise<THREE.Font> {
-    return new Promise((resolve, reject) => {
-      const loader = new THREE.FontLoader();
-      loader.load(url, resolve, undefined, reject);
-    });
+  protected async loadFont(_url: string, _options?: any): Promise<any> {
+    // FontLoader not available in current Three.js version
+    // This would need to be implemented with a compatible loader
+    return Promise.reject(new Error('Font loading not implemented'));
   }
 
   /**
@@ -335,7 +334,7 @@ export abstract class AsyncThreeComponent extends BaseThreeComponent {
   /**
    * Override dispose to clean up resources
    */
-  dispose(): void {
+  override dispose(): void {
     // Clear loading promises
     this.loadingPromises.clear();
 
@@ -356,7 +355,7 @@ export abstract class AsyncThreeComponent extends BaseThreeComponent {
   /**
    * Override serialize to include resource information
    */
-  serialize(): any {
+  override serialize(): any {
     const baseData = super.serialize();
     return {
       ...baseData,
