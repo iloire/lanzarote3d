@@ -14,6 +14,9 @@ export type { ParagliderOptions as ModernParagliderOptions, FlyingState } from '
 export { BoatComponent, BoatType } from './BoatComponent';
 export type { BoatOptions, BoatMovement } from './BoatComponent';
 
+export { WingComponent } from './WingComponent';
+export type { WingOptions } from './WingComponent';
+
 // Type exports
 export type { VehicleConfig } from '../../types';
 export type { ParagliderOptions } from './Paraglider';
