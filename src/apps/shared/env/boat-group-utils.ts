@@ -10,7 +10,15 @@ export function calculateBoatPositions(
   groupConfig: BoatGroupConfig
 ): THREE.Vector3[] {
   const positions: THREE.Vector3[] = [];
-  const { center, formation, spacing, groupRadius = 100, rowCount = 3, colCount = 3, lineDirection } = groupConfig;
+  const {
+    center,
+    formation,
+    spacing,
+    groupRadius = 100,
+    rowCount = 3,
+    colCount = 3,
+    lineDirection,
+  } = groupConfig;
 
   switch (formation) {
     case 'circle':
@@ -64,9 +72,9 @@ export function calculateBoatPositions(
         const boatsPerDock = Math.min(4, boatCount - boatIndex);
         for (let b = 0; b < boatsPerDock; b++) {
           const dockDirection = new THREE.Vector3(-Math.sin(dockAngle), 0, Math.cos(dockAngle));
-          const boatPosition = dockCenter.clone().add(
-            dockDirection.clone().multiplyScalar((b - boatsPerDock / 2) * spacing * 0.8)
-          );
+          const boatPosition = dockCenter
+            .clone()
+            .add(dockDirection.clone().multiplyScalar((b - boatsPerDock / 2) * spacing * 0.8));
           positions.push(boatPosition);
           boatIndex++;
         }
@@ -113,9 +121,7 @@ export function calculateBoatPositions(
 /**
  * Generate boat configurations for a marina/harbor
  */
-export function generateMarinaBoats(
-  size: 'small' | 'medium' | 'large' = 'medium'
-): BoatConfig[] {
+export function generateMarinaBoats(size: 'small' | 'medium' | 'large' = 'medium'): BoatConfig[] {
   const config = BOAT_GROUP_PRESETS.marina[size];
 
   const boats: BoatConfig[] = [
@@ -124,8 +130,22 @@ export function generateMarinaBoats(
     { type: 'SmallSailBoat', enableMovement: false, scale: 2.8 },
     { type: 'FishingBoat', enableMovement: false, scale: 2.5 },
     // Some moving boats (like boats entering/leaving harbor)
-    { type: 'SmallSailBoat', enableMovement: true, pattern: MovementPattern.RANDOM_DRIFT, speed: 0.05, radius: 60, scale: 3.0 },
-    { type: 'SpeedBoat', enableMovement: true, pattern: MovementPattern.LINEAR, speed: 0.2, radius: 100, scale: 2.8 },
+    {
+      type: 'SmallSailBoat',
+      enableMovement: true,
+      pattern: MovementPattern.RANDOM_DRIFT,
+      speed: 0.05,
+      radius: 60,
+      scale: 3.0,
+    },
+    {
+      type: 'SpeedBoat',
+      enableMovement: true,
+      pattern: MovementPattern.LINEAR,
+      speed: 0.2,
+      radius: 100,
+      scale: 2.8,
+    },
   ];
 
   // Add more boats for larger marinas
@@ -159,8 +179,8 @@ export function generatePatrolFleet(
       colors: {
         hullColor: '#0066CC',
         accentColor: '#FFFFFF',
-        flagColor: '#FF0000'
-      }
+        flagColor: '#FF0000',
+      },
     });
   }
 
@@ -170,9 +190,7 @@ export function generatePatrolFleet(
 /**
  * Generate boat configurations for a racing fleet
  */
-export function generateRacingFleet(
-  size: 'small' | 'medium' | 'large' = 'medium'
-): BoatConfig[] {
+export function generateRacingFleet(size: 'small' | 'medium' | 'large' = 'medium'): BoatConfig[] {
   const config = BOAT_GROUP_PRESETS.racing[size];
   const boats: BoatConfig[] = [];
 
@@ -187,9 +205,12 @@ export function generateRacingFleet(
       speed: 0.8 + Math.random() * 0.6, // Fast racing speeds
       radius: 200 + Math.random() * 100,
       scale: type === 'SpeedBoat' ? 2.6 : 2.9,
-      colors: type === 'SpeedBoat' ? {
-        hullColor: `hsl(${Math.random() * 360}, 70%, 50%)` // Random racing colors
-      } : undefined
+      colors:
+        type === 'SpeedBoat'
+          ? {
+              hullColor: `hsl(${Math.random() * 360}, 70%, 50%)`, // Random racing colors
+            }
+          : undefined,
     });
   }
 
@@ -202,7 +223,10 @@ export function generateRacingFleet(
 export function generateMixedRecreationalBoats(count: number = 8): BoatConfig[] {
   const boats: BoatConfig[] = [];
   const boatTypes: Array<'SmallSailBoat' | 'FishingBoat' | 'Yacht' | 'SpeedBoat'> = [
-    'SmallSailBoat', 'FishingBoat', 'Yacht', 'SpeedBoat'
+    'SmallSailBoat',
+    'FishingBoat',
+    'Yacht',
+    'SpeedBoat',
   ];
 
   for (let i = 0; i < count; i++) {
@@ -212,12 +236,14 @@ export function generateMixedRecreationalBoats(count: number = 8): BoatConfig[] 
     boats.push({
       type,
       enableMovement,
-      pattern: enableMovement ?
-        (Math.random() < 0.5 ? MovementPattern.RANDOM_DRIFT : MovementPattern.CIRCULAR) :
-        undefined,
+      pattern: enableMovement
+        ? Math.random() < 0.5
+          ? MovementPattern.RANDOM_DRIFT
+          : MovementPattern.CIRCULAR
+        : undefined,
       speed: enableMovement ? 0.1 + Math.random() * 0.1 : undefined,
       radius: enableMovement ? 80 + Math.random() * 120 : undefined,
-      scale: 2.4 + Math.random() * 0.6
+      scale: 2.4 + Math.random() * 0.6,
     });
   }
 

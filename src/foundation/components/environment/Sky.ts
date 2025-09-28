@@ -26,16 +26,16 @@ const SUN_FLARE_STYLE: 'realistic' | 'cartoon' = 'cartoon';
  * Higher values = brighter lighting overall
  */
 const LIGHT_INTENSITY_BY_HOUR = {
-  0: 1.8,   // Midnight - dim
-  6: 1.8,   // Dawn - dim
-  10: 2.0,  // Morning - brightening
-  12: 2.2,  // Noon - bright
-  14: 2.5,  // Afternoon - peak brightness
-  16: 2.4,  // Late afternoon - still bright
-  18: 2.2,  // Evening - dimming
-  20: 2.3,  // Sunset - warm lighting (optimized)
-  21: 2.1,  // Night - darker
-  24: 1.8,  // Late night - dim
+  0: 1.8, // Midnight - dim
+  6: 1.8, // Dawn - dim
+  10: 2.0, // Morning - brightening
+  12: 2.2, // Noon - bright
+  14: 2.5, // Afternoon - peak brightness
+  16: 2.4, // Late afternoon - still bright
+  18: 2.2, // Evening - dimming
+  20: 2.3, // Sunset - warm lighting (optimized)
+  21: 2.1, // Night - darker
+  24: 1.8, // Late night - dim
 };
 
 /**
@@ -46,15 +46,15 @@ const LIGHTING_CONFIG = {
   POINT_LIGHT_INTENSITY: 2.1,
 
   // Directional light (main scene lighting) - Primary light for objects and shadows
-  DIRECTIONAL_LIGHT_MULTIPLIER: 2.5,  // Multiply base intensity by this
-  DIRECTIONAL_LIGHT_UPDATE_MULTIPLIER: 2.3,  // For position updates
+  DIRECTIONAL_LIGHT_MULTIPLIER: 2.5, // Multiply base intensity by this
+  DIRECTIONAL_LIGHT_UPDATE_MULTIPLIER: 2.3, // For position updates
 
   // Ambient light - Background illumination (no shadows)
   // Uses base intensity directly (multiplier = 1.0)
 
   // Shadow configuration
-  SHADOW_MAP_SIZE: 2048,  // Default shadow quality
-  SHADOW_CAMERA_SIZE: 10000,  // Shadow area coverage
+  SHADOW_MAP_SIZE: 2048, // Default shadow quality
+  SHADOW_CAMERA_SIZE: 10000, // Shadow area coverage
 };
 
 /**
@@ -62,7 +62,9 @@ const LIGHTING_CONFIG = {
  */
 const calculateLightIntensity = (timeOfDayInHours: number): number => {
   // Find the closest hour values for interpolation
-  const hours = Object.keys(LIGHT_INTENSITY_BY_HOUR).map(Number).sort((a, b) => a - b);
+  const hours = Object.keys(LIGHT_INTENSITY_BY_HOUR)
+    .map(Number)
+    .sort((a, b) => a - b);
 
   for (let i = 0; i < hours.length; i++) {
     const hour = hours[i]!;
@@ -72,8 +74,10 @@ const calculateLightIntensity = (timeOfDayInHours: number): number => {
 
       // Linear interpolation between hours
       const t = (timeOfDayInHours - prevHour) / (nextHour - prevHour);
-      const prevIntensity = LIGHT_INTENSITY_BY_HOUR[prevHour as keyof typeof LIGHT_INTENSITY_BY_HOUR]!;
-      const nextIntensity = LIGHT_INTENSITY_BY_HOUR[nextHour as keyof typeof LIGHT_INTENSITY_BY_HOUR]!;
+      const prevIntensity =
+        LIGHT_INTENSITY_BY_HOUR[prevHour as keyof typeof LIGHT_INTENSITY_BY_HOUR]!;
+      const nextIntensity =
+        LIGHT_INTENSITY_BY_HOUR[nextHour as keyof typeof LIGHT_INTENSITY_BY_HOUR]!;
 
       return prevIntensity + (nextIntensity - prevIntensity) * t;
     }
@@ -108,18 +112,18 @@ const calculateSunPosition = (timeOfDayInHours: number): THREE.Vector3 => {
 // ============================================================================
 
 type SkyOptions = {
-  turbidity: number;      // Atmospheric thickness/haziness (0-10)
-  rayleigh: number;       // Rayleigh scattering (blue sky) (0-4)
+  turbidity: number; // Atmospheric thickness/haziness (0-10)
+  rayleigh: number; // Rayleigh scattering (blue sky) (0-4)
   mieCoefficient: number; // Mie scattering (sun disk) (0-0.1)
   mieDirectionalG: number; // Sun direction influence (0-1)
-  [key: string]: any;     // Allow dynamic property access for Three.js uniforms
+  [key: string]: any; // Allow dynamic property access for Three.js uniforms
 };
 
 const DEFAULT_SKY_OPTIONS: SkyOptions = {
-  turbidity: 0.8,        // Slight haze
-  rayleigh: 0.03,        // Natural blue sky
+  turbidity: 0.8, // Slight haze
+  rayleigh: 0.03, // Natural blue sky
   mieCoefficient: 0.005, // Subtle sun disk
-  mieDirectionalG: 0.8,  // Strong directional lighting
+  mieDirectionalG: 0.8, // Strong directional lighting
 };
 
 // ============================================================================
@@ -141,8 +145,8 @@ export default class Sky extends THREE.Object3D {
   skyOptions: SkyOptions;
 
   // Lighting system - THREE LIGHT SOURCES
-  ambientLight: THREE.AmbientLight;      // 1. Background illumination (no shadows)
-  pointLight: THREE.PointLight;          // 2. Sun light with lens flare (distant)
+  ambientLight: THREE.AmbientLight; // 1. Background illumination (no shadows)
+  pointLight: THREE.PointLight; // 2. Sun light with lens flare (distant)
   directionalLight: THREE.DirectionalLight; // 3. Main scene lighting (shadows)
 
   // Debug helpers
@@ -282,7 +286,8 @@ export default class Sky extends THREE.Object3D {
 
     // Update directional light (main scene lighting)
     this.directionalLight.position.copy(this.sunPosition.clone().multiplyScalar(10000));
-    this.directionalLight.intensity = baseIntensity * LIGHTING_CONFIG.DIRECTIONAL_LIGHT_UPDATE_MULTIPLIER;
+    this.directionalLight.intensity =
+      baseIntensity * LIGHTING_CONFIG.DIRECTIONAL_LIGHT_UPDATE_MULTIPLIER;
 
     // Update ambient light
     this.ambientLight.intensity = baseIntensity;
@@ -356,7 +361,14 @@ export default class Sky extends THREE.Object3D {
     lensflare.addElement(new LensflareElement(mainFlareTexture, 400, 0, this.pointLight.color));
 
     // Sun rays - radiating star pattern
-    lensflare.addElement(new LensflareElement(rayFlareTexture, 800, 0, this.pointLight.color.clone().multiplyScalar(0.8)));
+    lensflare.addElement(
+      new LensflareElement(
+        rayFlareTexture,
+        800,
+        0,
+        this.pointLight.color.clone().multiplyScalar(0.8)
+      )
+    );
 
     // Sparkle elements at different distances for cartoon magic effect
     lensflare.addElement(new LensflareElement(sparkleTexture, 150, 0.3, new THREE.Color(0xffff88)));
@@ -379,11 +391,11 @@ export default class Sky extends THREE.Object3D {
 
     // Create radial gradient for cartoon sun
     const gradient = context.createRadialGradient(center, center, 0, center, center, maxRadius);
-    gradient.addColorStop(0, 'rgba(255, 255, 255, 1.0)');    // Bright white center
-    gradient.addColorStop(0.3, 'rgba(255, 255, 100, 0.9)');  // Yellow
-    gradient.addColorStop(0.6, 'rgba(255, 200, 50, 0.6)');   // Orange
-    gradient.addColorStop(0.8, 'rgba(255, 150, 0, 0.3)');    // Deep orange
-    gradient.addColorStop(1.0, 'rgba(255, 100, 0, 0.0)');    // Transparent edge
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 1.0)'); // Bright white center
+    gradient.addColorStop(0.3, 'rgba(255, 255, 100, 0.9)'); // Yellow
+    gradient.addColorStop(0.6, 'rgba(255, 200, 50, 0.6)'); // Orange
+    gradient.addColorStop(0.8, 'rgba(255, 150, 0, 0.3)'); // Deep orange
+    gradient.addColorStop(1.0, 'rgba(255, 100, 0, 0.0)'); // Transparent edge
 
     context.fillStyle = gradient;
     context.fillRect(0, 0, size, size);
@@ -417,7 +429,8 @@ export default class Sky extends THREE.Object3D {
 
       // Create gradient for each ray
       const gradient = context.createLinearGradient(
-        center, center,
+        center,
+        center,
         center + Math.cos(angle) * rayLength,
         center + Math.sin(angle) * rayLength
       );
@@ -520,14 +533,16 @@ export default class Sky extends THREE.Object3D {
     // Directional light controls
     const directionalFolder = lightingFolder.addFolder('☀️ Directional Light (Main + Shadows)');
     directionalFolder.add(this.directionalLight, 'intensity', 0, 10).name('Intensity').listen();
-    directionalFolder.addColor({ color: this.directionalLight.color.getHex() }, 'color')
+    directionalFolder
+      .addColor({ color: this.directionalLight.color.getHex() }, 'color')
       .onChange((value: number) => this.directionalLight.color.setHex(value));
     directionalFolder.add(this.directionalLight, 'castShadow').name('Cast Shadows');
 
     // Point light controls
     const pointFolder = lightingFolder.addFolder('🔆 Point Light (Sun + Flare)');
     pointFolder.add(this.pointLight, 'intensity', 0, 10).name('Intensity').listen();
-    pointFolder.addColor({ color: this.pointLight.color.getHex() }, 'color')
+    pointFolder
+      .addColor({ color: this.pointLight.color.getHex() }, 'color')
       .onChange((value: number) => this.pointLight.color.setHex(value));
 
     // Sky atmosphere controls
@@ -554,7 +569,8 @@ export default class Sky extends THREE.Object3D {
         if (key === 'rayleigh') max = 4;
         if (key === 'mieCoefficient') max = 0.1;
 
-        skyFolder.add(skyUniforms[key], 'value', 0, max)
+        skyFolder
+          .add(skyUniforms[key], 'value', 0, max)
           .name(key.charAt(0).toUpperCase() + key.slice(1))
           .listen();
       }
@@ -584,7 +600,8 @@ export default class Sky extends THREE.Object3D {
 
       // Only update directional light from sunIntensity if no specific config
       if (!skyTheme.directionalLight?.intensity) {
-        this.directionalLight.intensity = skyTheme.sunIntensity * LIGHTING_CONFIG.DIRECTIONAL_LIGHT_MULTIPLIER;
+        this.directionalLight.intensity =
+          skyTheme.sunIntensity * LIGHTING_CONFIG.DIRECTIONAL_LIGHT_MULTIPLIER;
       }
     }
 

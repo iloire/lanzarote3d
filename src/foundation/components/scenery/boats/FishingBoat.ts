@@ -15,22 +15,25 @@ export interface FishingBoatOptions extends MovableBoatComponentOptions {
  */
 export class FishingBoat extends MovableBoatComponent {
   constructor(options: FishingBoatOptions = {}) {
-    super({
-      name: 'FishingBoat',
-      version: '1.0.0',
-      description: 'Fishing boat with realistic floating animation and optional movement'
-    }, {
-      hullColor: '#8B4513',
-      cabinColor: '#FFFFFF',
-      mastColor: '#654321',
-      scale: 1,
-      // Movement defaults - disabled by default, can be enabled via options
-      enableMovement: false,
-      pattern: MovementPattern.PATROL,
-      speed: 0.4,
-      radius: 120,
-      ...options
-    });
+    super(
+      {
+        name: 'FishingBoat',
+        version: '1.0.0',
+        description: 'Fishing boat with realistic floating animation and optional movement',
+      },
+      {
+        hullColor: '#8B4513',
+        cabinColor: '#FFFFFF',
+        mastColor: '#654321',
+        scale: 1,
+        // Movement defaults - disabled by default, can be enabled via options
+        enableMovement: false,
+        pattern: MovementPattern.PATROL,
+        speed: 0.4,
+        radius: 120,
+        ...options,
+      }
+    );
   }
 
   protected createGeometry(): THREE.BufferGeometry {
@@ -163,7 +166,7 @@ export class FishingBoat extends MovableBoatComponent {
       cabinColor: options.cabinColor,
       mastColor: options.mastColor,
       scale: options.scale,
-      isFloating: this.isFloating()
+      isFloating: this.isFloating(),
     };
   }
 }
@@ -172,7 +175,7 @@ export class FishingBoat extends MovableBoatComponent {
 const FishingBoatLegacy = FishingBoat as any;
 
 // Add legacy load method that returns mesh directly
-FishingBoatLegacy.prototype.load = function(): THREE.Object3D {
+FishingBoatLegacy.prototype.load = function (): THREE.Object3D {
   return this.loadSync();
 };
 

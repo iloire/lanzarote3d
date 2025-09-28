@@ -45,7 +45,9 @@ class ParagliderWorkshopApp extends WorkshopDemoBase {
       // This demo needs terrain for physics, but workshop demos don't load it automatically
       // We need to load terrain if not available
       if (!options.terrain) {
-        console.warn('Terrain required for paraglider physics demo - this demo may not work properly without terrain');
+        console.warn(
+          'Terrain required for paraglider physics demo - this demo may not work properly without terrain'
+        );
       }
 
       const initialCamPos = new THREE.Vector3(6800, 870, -475);
@@ -107,7 +109,6 @@ class ParagliderWorkshopApp extends WorkshopDemoBase {
       throw error;
     }
   }
-
 
   public override dispose(): void {
     console.log(`🧹 Disposing ${this.config.name}`);

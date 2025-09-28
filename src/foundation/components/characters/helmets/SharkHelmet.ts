@@ -71,11 +71,7 @@ export class SharkHelmet extends BaseHelmet {
     for (let i = 0; i < 12; i++) {
       const angle = (i / 12) * Math.PI * 2;
       const tooth = new THREE.Mesh(toothGeo, toothMat);
-      tooth.position.set(
-        Math.cos(angle) * 190,
-        50,
-        Math.sin(angle) * 190
-      );
+      tooth.position.set(Math.cos(angle) * 190, 50, Math.sin(angle) * 190);
       tooth.rotation.z = Math.PI;
       group.add(tooth);
     }

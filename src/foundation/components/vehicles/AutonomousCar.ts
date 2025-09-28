@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 import { Car, CarOptions } from './Car';
-import { TerrainFollowingBehavior, TerrainFollowingOptions, TerrainDrivingMode } from '../../systems/behaviors/TerrainFollowingBehavior';
+import {
+  TerrainFollowingBehavior,
+  TerrainFollowingOptions,
+  TerrainDrivingMode,
+} from '../../systems/behaviors/TerrainFollowingBehavior';
 
 export interface AutonomousCarOptions extends Omit<CarOptions, 'pattern' | 'speed' | 'radius'> {
   // Autonomous driving options
@@ -47,7 +51,7 @@ export class AutonomousCar extends Car {
       autoStartMoving: false,
       autoStartFloating: false,
       faceDirection: true,
-      forwardAxis: 'x'
+      forwardAxis: 'x',
     };
 
     super(carOptions);
@@ -76,13 +80,13 @@ export class AutonomousCar extends Car {
         sampleRadius: this.autonomousOptions.sampleRadius || 50,
         maxSlope: this.autonomousOptions.maxSlope || Math.PI / 6, // 30 degrees
         heightOffset: this.autonomousOptions.heightOffset || 5,
-        smoothingFactor: 0.1
+        smoothingFactor: 0.1,
       },
 
       // Behavior options
       pathUpdateInterval: this.autonomousOptions.pathUpdateInterval || 1000,
       stuckThreshold: this.autonomousOptions.stuckThreshold || 5,
-      reverseProbability: this.autonomousOptions.reverseProbability || 0.3
+      reverseProbability: this.autonomousOptions.reverseProbability || 0.3,
     };
 
     this.terrainBehavior = new TerrainFollowingBehavior(terrainOptions);
@@ -183,7 +187,7 @@ export class AutonomousCar extends Car {
     const targetMaterial = new THREE.MeshBasicMaterial({
       color: 0x00ff00,
       transparent: true,
-      opacity: 0.7
+      opacity: 0.7,
     });
     const targetIndicator = new THREE.Mesh(targetGeometry, targetMaterial);
     targetIndicator.name = 'targetIndicator';
@@ -194,7 +198,7 @@ export class AutonomousCar extends Car {
     const pathMaterial = new THREE.LineBasicMaterial({
       color: 0x0000ff,
       transparent: true,
-      opacity: 0.5
+      opacity: 0.5,
     });
     const pathLine = new THREE.Line(pathGeometry, pathMaterial);
     pathLine.name = 'pathLine';
@@ -220,9 +224,9 @@ export class AutonomousCar extends Car {
         if (targetIndicator) {
           targetIndicator.position.copy(status.currentTarget);
           targetIndicator.material = new THREE.MeshBasicMaterial({
-            color: status.isStuck ? 0xff0000 : (status.isReversing ? 0xffff00 : 0x00ff00),
+            color: status.isStuck ? 0xff0000 : status.isReversing ? 0xffff00 : 0x00ff00,
             transparent: true,
-            opacity: 0.7
+            opacity: 0.7,
           });
         }
 
@@ -231,10 +235,17 @@ export class AutonomousCar extends Car {
         if (pathLine && this.debugGroup.parent) {
           const carPos = this.debugGroup.parent.position;
           const positions = [
-            carPos.x, carPos.y + 5, carPos.z,
-            status.currentTarget.x, status.currentTarget.y + 5, status.currentTarget.z
+            carPos.x,
+            carPos.y + 5,
+            carPos.z,
+            status.currentTarget.x,
+            status.currentTarget.y + 5,
+            status.currentTarget.z,
           ];
-          pathLine.geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+          pathLine.geometry.setAttribute(
+            'position',
+            new THREE.Float32BufferAttribute(positions, 3)
+          );
         }
       }
 
@@ -265,8 +276,8 @@ export class AutonomousCar extends Car {
       autonomous: {
         drivingMode: this.autonomousOptions.drivingMode,
         isActive: this.terrainBehavior?.isActive() || false,
-        navigationStatus
-      }
+        navigationStatus,
+      },
     };
   }
 
@@ -292,7 +303,7 @@ export class AutonomousCar extends Car {
 const AutonomousCarLegacy = AutonomousCar as any;
 
 // Add legacy load method that returns mesh directly and starts driving
-AutonomousCarLegacy.prototype.load = function(): THREE.Object3D {
+AutonomousCarLegacy.prototype.load = function (): THREE.Object3D {
   const car = this.loadSync();
   // Start autonomous driving after legacy load
   this.startAutonomousDriving();

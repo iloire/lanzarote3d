@@ -23,7 +23,7 @@ class LegacyTree extends SimpleThreeComponent {
       name: 'LegacyTree',
       version: '1.0.0',
       description: 'Legacy detailed tree component with complex leaf geometry',
-      tags: ['scenery', 'nature', 'tree', 'legacy', 'detailed']
+      tags: ['scenery', 'nature', 'tree', 'legacy', 'detailed'],
     };
 
     super(metadata, options);
@@ -129,7 +129,7 @@ class LegacyTree extends SimpleThreeComponent {
 const TreeLegacy = LegacyTree as any;
 
 // Add legacy load method that returns group directly
-TreeLegacy.prototype.load = function(): THREE.Object3D {
+TreeLegacy.prototype.load = function (): THREE.Object3D {
   return this.createDetailedTree();
 };
 

@@ -148,7 +148,10 @@ class ThemeManager {
         await ThemeEngine.apply(this.storyOptions!, this.currentTheme);
         this.notifyListeners(this.currentTheme);
       } catch (error) {
-        console.error(`Failed to apply saved theme "${this.currentTheme.name}" after story load:`, error);
+        console.error(
+          `Failed to apply saved theme "${this.currentTheme.name}" after story load:`,
+          error
+        );
       }
     }
   }
@@ -216,7 +219,6 @@ class ThemeManager {
       return null;
     }
   }
-
 
   /**
    * Clear saved theme from localStorage

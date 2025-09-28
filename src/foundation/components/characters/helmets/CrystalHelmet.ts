@@ -92,11 +92,7 @@ export class CrystalHelmet extends BaseHelmet {
     for (let i = 0; i < 16; i++) {
       const angle = (i / 16) * Math.PI * 2;
       const detail = new THREE.Mesh(detailGeo, crystalMat);
-      detail.position.set(
-        Math.cos(angle) * 210,
-        100,
-        Math.sin(angle) * 210
-      );
+      detail.position.set(Math.cos(angle) * 210, 100, Math.sin(angle) * 210);
       detail.scale.set(1, 1.5, 1);
       group.add(detail);
     }

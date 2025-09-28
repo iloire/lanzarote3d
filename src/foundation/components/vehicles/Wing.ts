@@ -19,7 +19,7 @@ export class Wing extends SimpleThreeComponent {
     super({
       name: 'Wing',
       version: '1.0.0',
-      ...options
+      ...options,
     });
   }
 
@@ -38,7 +38,6 @@ export class Wing extends SimpleThreeComponent {
       }
 
       return container;
-
     } catch (error) {
       console.error('❌ Failed to create wing:', error);
       throw error;
@@ -75,12 +74,13 @@ export class Wing extends SimpleThreeComponent {
     // Create wing material
     const wingMaterial = resourceManager.getOrCreateMaterial(
       `wing_material_${options.wingColor || '#00ffff'}`,
-      () => new THREE.MeshPhongMaterial({
-        color: options.wingColor || '#00ffff',
-        transparent: true,
-        opacity: 0.8,
-        side: THREE.DoubleSide
-      })
+      () =>
+        new THREE.MeshPhongMaterial({
+          color: options.wingColor || '#00ffff',
+          transparent: true,
+          opacity: 0.8,
+          side: THREE.DoubleSide,
+        })
     );
 
     // Create wing mesh
@@ -127,12 +127,7 @@ export class Wing extends SimpleThreeComponent {
     return group;
   }
 
-  private createCajon(
-    w: number,
-    h: number,
-    deep: number,
-    material: THREE.Material
-  ): THREE.Mesh {
+  private createCajon(w: number, h: number, deep: number, material: THREE.Material): THREE.Mesh {
     const geometry = resourceManager.getOrCreateGeometry(
       `wing_cajon_${w}_${h}_${deep}`,
       () => new THREE.BoxGeometry(w, h, deep)
@@ -175,7 +170,15 @@ export class Wing extends SimpleThreeComponent {
           const camber = 0.02; // 2% camber
 
           const x = chordPos / chordLength;
-          const yt = 5 * thickness * chordLength * (0.2969 * Math.sqrt(x) - 0.1260 * x - 0.3516 * x * x + 0.2843 * x * x * x - 0.1015 * x * x * x * x);
+          const yt =
+            5 *
+            thickness *
+            chordLength *
+            (0.2969 * Math.sqrt(x) -
+              0.126 * x -
+              0.3516 * x * x +
+              0.2843 * x * x * x -
+              0.1015 * x * x * x * x);
           const yc = camber * chordLength * (x < 0.4 ? 1.4845 * (x - x * x) : 0.2969 * (1.0 - x));
 
           const y = yc + yt * (j > chordSegments / 2 ? -1 : 1);
@@ -284,7 +287,7 @@ export class Wing extends SimpleThreeComponent {
       numeroCajones: options.numeroCajones || 16,
       wingSpan: options.wingSpan,
       hasLeftWing: !!this.leftWing,
-      hasRightWing: !!this.rightWing
+      hasRightWing: !!this.rightWing,
     };
   }
 }

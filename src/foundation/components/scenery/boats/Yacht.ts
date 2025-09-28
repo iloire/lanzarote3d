@@ -15,22 +15,25 @@ export interface YachtOptions extends MovableBoatComponentOptions {
  */
 export class Yacht extends MovableBoatComponent {
   constructor(options: YachtOptions = {}) {
-    super({
-      name: 'Yacht',
-      version: '1.0.0',
-      description: 'Luxury yacht with realistic floating animation and optional movement'
-    }, {
-      hullColor: '#F5F5F5',
-      trimColor: '#4169E1',
-      glassColor: '#87CEEB',
-      scale: 1,
-      // Movement defaults - disabled by default, can be enabled via options
-      enableMovement: false,
-      pattern: MovementPattern.FIGURE_EIGHT,
-      speed: 0.2,
-      radius: 250,
-      ...options
-    });
+    super(
+      {
+        name: 'Yacht',
+        version: '1.0.0',
+        description: 'Luxury yacht with realistic floating animation and optional movement',
+      },
+      {
+        hullColor: '#F5F5F5',
+        trimColor: '#4169E1',
+        glassColor: '#87CEEB',
+        scale: 1,
+        // Movement defaults - disabled by default, can be enabled via options
+        enableMovement: false,
+        pattern: MovementPattern.FIGURE_EIGHT,
+        speed: 0.2,
+        radius: 250,
+        ...options,
+      }
+    );
   }
 
   protected createGeometry(): THREE.BufferGeometry {
@@ -58,11 +61,12 @@ export class Yacht extends MovableBoatComponent {
 
     const glassMaterial = resourceManager.getOrCreateMaterial(
       `yacht_glass_${options.glassColor}`,
-      () => new THREE.MeshLambertMaterial({
-        color: options.glassColor,
-        transparent: true,
-        opacity: 0.7
-      })
+      () =>
+        new THREE.MeshLambertMaterial({
+          color: options.glassColor,
+          transparent: true,
+          opacity: 0.7,
+        })
     );
 
     // Main hull - sleek and long
@@ -191,7 +195,7 @@ export class Yacht extends MovableBoatComponent {
       trimColor: options.trimColor,
       glassColor: options.glassColor,
       scale: options.scale,
-      isFloating: this.isFloating()
+      isFloating: this.isFloating(),
     };
   }
 }
@@ -200,7 +204,7 @@ export class Yacht extends MovableBoatComponent {
 const YachtLegacy = Yacht as any;
 
 // Add legacy load method that returns mesh directly
-YachtLegacy.prototype.load = function(): THREE.Object3D {
+YachtLegacy.prototype.load = function (): THREE.Object3D {
   return this.loadSync();
 };
 

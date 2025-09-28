@@ -49,7 +49,16 @@ class FlyZonesApp extends TerrainBase {
       name: 'FlyZones',
       description:
         'Flight zone visualization with interactive markers, landing spots, and navigation controls',
-      requiredComponents: ['scene', 'camera', 'renderer', 'controls', 'gui', 'terrain', 'water', 'sky'],
+      requiredComponents: [
+        'scene',
+        'camera',
+        'renderer',
+        'controls',
+        'gui',
+        'terrain',
+        'water',
+        'sky',
+      ],
       scene: {
         environment: 'lanzarote',
         lighting: 'dynamic',

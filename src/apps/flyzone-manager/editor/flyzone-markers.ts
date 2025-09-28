@@ -23,50 +23,68 @@ export class FlyzoneMarkers {
 
   private initializeMaterials(): void {
     // Takeoff marker material - green with emission
-    this.materials.set('takeoff', new THREE.MeshLambertMaterial({
-      color: 0x00ff00,
-      emissive: 0x004400,
-      transparent: true,
-      opacity: 0.8,
-    }));
+    this.materials.set(
+      'takeoff',
+      new THREE.MeshLambertMaterial({
+        color: 0x00ff00,
+        emissive: 0x004400,
+        transparent: true,
+        opacity: 0.8,
+      })
+    );
 
     // Landing marker material - blue with emission
-    this.materials.set('landing', new THREE.MeshLambertMaterial({
-      color: 0x0088ff,
-      emissive: 0x002244,
-      transparent: true,
-      opacity: 0.8,
-    }));
+    this.materials.set(
+      'landing',
+      new THREE.MeshLambertMaterial({
+        color: 0x0088ff,
+        emissive: 0x002244,
+        transparent: true,
+        opacity: 0.8,
+      })
+    );
 
     // Flight phase material - yellow/orange
-    this.materials.set('phase', new THREE.MeshLambertMaterial({
-      color: 0xffaa00,
-      emissive: 0x442200,
-      transparent: true,
-      opacity: 0.6,
-    }));
+    this.materials.set(
+      'phase',
+      new THREE.MeshLambertMaterial({
+        color: 0xffaa00,
+        emissive: 0x442200,
+        transparent: true,
+        opacity: 0.6,
+      })
+    );
 
     // Selected state material - bright glowing white
-    this.materials.set('selected', new THREE.MeshLambertMaterial({
-      color: 0xffffff,
-      emissive: 0x666666,
-      transparent: true,
-      opacity: 1.0,
-    }));
+    this.materials.set(
+      'selected',
+      new THREE.MeshLambertMaterial({
+        color: 0xffffff,
+        emissive: 0x666666,
+        transparent: true,
+        opacity: 1.0,
+      })
+    );
 
     // Hover state material - light blue
-    this.materials.set('hover', new THREE.MeshLambertMaterial({
-      color: 0x88ddff,
-      emissive: 0x223344,
-      transparent: true,
-      opacity: 0.9,
-    }));
+    this.materials.set(
+      'hover',
+      new THREE.MeshLambertMaterial({
+        color: 0x88ddff,
+        emissive: 0x223344,
+        transparent: true,
+        opacity: 0.9,
+      })
+    );
 
     // Wind direction material - red
-    this.materials.set('wind', new THREE.MeshLambertMaterial({
-      color: 0xff4444,
-      emissive: 0x220000,
-    }));
+    this.materials.set(
+      'wind',
+      new THREE.MeshLambertMaterial({
+        color: 0xff4444,
+        emissive: 0x220000,
+      })
+    );
   }
 
   public addTakeoffMarker(takeoff: TakeoffLocation): void {
@@ -89,9 +107,9 @@ export class FlyzoneMarkers {
     if (takeoff.windConditions && takeoff.windConditions.length > 0) {
       takeoff.windConditions.forEach((condition, index) => {
         const windArrow = this.createWindDirectionArrow(condition.direction.ideal);
-        windArrow.position.y = 10 + (index * 20);
-        windArrow.position.x = Math.cos(index * Math.PI * 2 / takeoff.windConditions.length) * 40;
-        windArrow.position.z = Math.sin(index * Math.PI * 2 / takeoff.windConditions.length) * 40;
+        windArrow.position.y = 10 + index * 20;
+        windArrow.position.x = Math.cos((index * Math.PI * 2) / takeoff.windConditions.length) * 40;
+        windArrow.position.z = Math.sin((index * Math.PI * 2) / takeoff.windConditions.length) * 40;
         group.add(windArrow);
       });
     }
@@ -107,7 +125,9 @@ export class FlyzoneMarkers {
     this.scene.add(group);
     this.markers.set(takeoff.id, group);
 
-    console.log(`Added takeoff marker: ${takeoff.title} at ${takeoff.position.x}, ${takeoff.position.z}`);
+    console.log(
+      `Added takeoff marker: ${takeoff.title} at ${takeoff.position.x}, ${takeoff.position.z}`
+    );
   }
 
   public addLandingMarker(landing: LandingZone): void {
@@ -166,7 +186,9 @@ export class FlyzoneMarkers {
     this.scene.add(group);
     this.markers.set(landing.id, group);
 
-    console.log(`Added landing marker: ${landing.title} at ${landing.position.x}, ${landing.position.z}`);
+    console.log(
+      `Added landing marker: ${landing.title} at ${landing.position.x}, ${landing.position.z}`
+    );
   }
 
   public addFlightPhaseMarker(phase: FlightPhase): void {
@@ -177,11 +199,14 @@ export class FlyzoneMarkers {
     const { width, height, length } = phase.dimensions;
     const phaseGeometry = new THREE.BoxGeometry(width, height, length);
     const wireframe = new THREE.WireframeGeometry(phaseGeometry);
-    const phaseMesh = new THREE.LineSegments(wireframe, new THREE.LineBasicMaterial({
-      color: 0xffaa00,
-      transparent: true,
-      opacity: 0.6,
-    }));
+    const phaseMesh = new THREE.LineSegments(
+      wireframe,
+      new THREE.LineBasicMaterial({
+        color: 0xffaa00,
+        transparent: true,
+        opacity: 0.6,
+      })
+    );
 
     phaseMesh.position.y = height / 2; // Center vertically
     group.add(phaseMesh);
@@ -212,7 +237,9 @@ export class FlyzoneMarkers {
     this.scene.add(group);
     this.markers.set(phase.id, group);
 
-    console.log(`Added flight phase marker: ${phase.type} at ${phase.position.x}, ${phase.position.z}`);
+    console.log(
+      `Added flight phase marker: ${phase.type} at ${phase.position.x}, ${phase.position.z}`
+    );
   }
 
   private createWindDirectionArrow(direction: number): THREE.Group {
@@ -268,8 +295,8 @@ export class FlyzoneMarkers {
 
     // Position based on direction
     const distance = 60;
-    mesh.position.x = Math.cos(direction * Math.PI / 180) * distance;
-    mesh.position.z = Math.sin(direction * Math.PI / 180) * distance;
+    mesh.position.x = Math.cos((direction * Math.PI) / 180) * distance;
+    mesh.position.z = Math.sin((direction * Math.PI) / 180) * distance;
 
     return mesh;
   }

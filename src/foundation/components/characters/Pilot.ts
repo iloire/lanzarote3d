@@ -19,9 +19,9 @@ export interface PilotOptions extends ComponentOptions {
 }
 
 export interface PilotState {
-  leftBrakePosition: number;   // 0-1
-  rightBrakePosition: number;  // 0-1
-  speedBarPosition: number;    // 0-1
+  leftBrakePosition: number; // 0-1
+  rightBrakePosition: number; // 0-1
+  speedBarPosition: number; // 0-1
   headVisible: boolean;
 }
 
@@ -34,7 +34,7 @@ export class Pilot extends SimpleThreeComponent {
     leftBrakePosition: 0,
     rightBrakePosition: 0,
     speedBarPosition: 0,
-    headVisible: true
+    headVisible: true,
   };
 
   // Constants
@@ -54,7 +54,7 @@ export class Pilot extends SimpleThreeComponent {
       carabinerColor: '#666666',
       carabinerSeparationMM: 300,
       showHead: true,
-      ...options
+      ...options,
     });
   }
 
@@ -75,7 +75,6 @@ export class Pilot extends SimpleThreeComponent {
       container.add(this.body);
 
       return container;
-
     } catch (error) {
       console.error('❌ Failed to create pilot:', error);
       throw error;
@@ -90,7 +89,7 @@ export class Pilot extends SimpleThreeComponent {
         helmetColor: options.helmetColor || '#ffffff',
         skinColor: options.skinColor || '#e0bea5',
         castShadow: this.options.castShadow,
-        receiveShadow: this.options.receiveShadow
+        receiveShadow: this.options.receiveShadow,
       });
 
       return pilotHead.getObject3D() || new THREE.Object3D();
@@ -124,7 +123,7 @@ export class Pilot extends SimpleThreeComponent {
       color1: '#333',
       color2: '#666',
       carabinerColor: options.carabinerColor || '#666666',
-      carabinerSeparationMM: options.carabinerSeparationMM || 300
+      carabinerSeparationMM: options.carabinerSeparationMM || 300,
     });
 
     group.add(harness.load());
@@ -132,16 +131,18 @@ export class Pilot extends SimpleThreeComponent {
     // Create materials with resource sharing
     const suitMaterial = resourceManager.getOrCreateMaterial(
       `pilot_suit_${options.suitColor}`,
-      () => new THREE.MeshPhongMaterial({
-        color: options.suitColor || '#ff0000'
-      })
+      () =>
+        new THREE.MeshPhongMaterial({
+          color: options.suitColor || '#ff0000',
+        })
     );
 
     const skinMaterial = resourceManager.getOrCreateMaterial(
       `pilot_skin_${options.skinColor}`,
-      () => new THREE.MeshPhongMaterial({
-        color: options.skinColor || '#e0bea5'
-      })
+      () =>
+        new THREE.MeshPhongMaterial({
+          color: options.skinColor || '#e0bea5',
+        })
     );
 
     // Create arms
@@ -150,7 +151,11 @@ export class Pilot extends SimpleThreeComponent {
     return group;
   }
 
-  private createArms(group: THREE.Object3D, suitMaterial: THREE.Material, skinMaterial: THREE.Material): void {
+  private createArms(
+    group: THREE.Object3D,
+    suitMaterial: THREE.Material,
+    skinMaterial: THREE.Material
+  ): void {
     // Create shared arm geometry
     const armGeometry = resourceManager.getOrCreateGeometry(
       'pilot_arm',
@@ -222,10 +227,10 @@ export class Pilot extends SimpleThreeComponent {
     this.pilotState.speedBarPosition = Math.max(0, Math.min(1, intensity));
 
     if (this.body) {
-      const scale = 1 + (0.2 * this.pilotState.speedBarPosition);
+      const scale = 1 + 0.2 * this.pilotState.speedBarPosition;
       this.body.scale.z = scale;
       this.body.position.z = 40 * this.pilotState.speedBarPosition;
-      this.body.scale.x = 1 - (0.1 * this.pilotState.speedBarPosition);
+      this.body.scale.x = 1 - 0.1 * this.pilotState.speedBarPosition;
     }
   }
 
@@ -334,11 +339,11 @@ export class Pilot extends SimpleThreeComponent {
         headType: options.headType,
         helmetType: options.helmetType,
         skinColor: options.skinColor,
-        suitColor: options.suitColor
+        suitColor: options.suitColor,
       },
       hasHead: !!this.head,
       hasBody: !!this.body,
-      hasArms: !!(this.armLeft && this.armRight)
+      hasArms: !!(this.armLeft && this.armRight),
     };
   }
 }

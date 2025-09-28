@@ -11,7 +11,7 @@ export enum CharacterType {
   WARRIOR = 'warrior',
   EXPLORER = 'explorer',
   SCIENTIST = 'scientist',
-  ADVENTURER = 'adventurer'
+  ADVENTURER = 'adventurer',
 }
 
 /**
@@ -78,18 +78,18 @@ export class CharacterRegistry {
         thumbnailFile: '/assets/foundation/models/characters/adri/thumbnail.png',
         alternativeTextures: [
           '/assets/foundation/models/characters/adri/adri_winter.png',
-          '/assets/foundation/models/characters/adri/adri_summer.png'
-        ]
+          '/assets/foundation/models/characters/adri/adri_summer.png',
+        ],
       },
       defaultScale: 0.01,
       defaultMaterialOptions: {
         roughness: 0.8,
         metalness: 0.1,
-        side: THREE.DoubleSide
+        side: THREE.DoubleSide,
       },
       tags: ['pilot', 'original', 'voxel'],
       author: 'Lanzarote3D',
-      version: '1.0.0'
+      version: '1.0.0',
     });
 
     // Ivan character
@@ -100,17 +100,17 @@ export class CharacterRegistry {
       assets: {
         objFile: '/assets/foundation/models/characters/ivan/ivan.obj',
         textureFile: '/assets/foundation/models/characters/ivan/ivan.png',
-        thumbnailFile: '/assets/foundation/models/characters/ivan/ivan.png'
+        thumbnailFile: '/assets/foundation/models/characters/ivan/ivan.png',
       },
       defaultScale: 0.01,
       defaultMaterialOptions: {
         roughness: 0.7,
         metalness: 0.15,
-        side: THREE.DoubleSide
+        side: THREE.DoubleSide,
       },
       tags: ['pilot', 'personal', 'ivan', 'voxel'],
       author: 'Lanzarote3D',
-      version: '1.0.0'
+      version: '1.0.0',
     });
 
     // Additional character types with placeholder assets
@@ -121,16 +121,16 @@ export class CharacterRegistry {
       assets: {
         objFile: '/assets/foundation/models/characters/pilot-classic/model.obj',
         textureFile: '/assets/foundation/models/characters/pilot-classic/texture.png',
-        thumbnailFile: '/assets/foundation/models/characters/pilot-classic/thumbnail.png'
+        thumbnailFile: '/assets/foundation/models/characters/pilot-classic/thumbnail.png',
       },
       defaultScale: 0.01,
       defaultMaterialOptions: {
         roughness: 0.7,
-        metalness: 0.2
+        metalness: 0.2,
       },
       tags: ['pilot', 'classic', 'aviator'],
       author: 'Lanzarote3D',
-      version: '1.0.0'
+      version: '1.0.0',
     });
 
     this.registerCharacter({
@@ -140,16 +140,16 @@ export class CharacterRegistry {
       assets: {
         objFile: '/assets/foundation/models/characters/pilot-modern/model.obj',
         textureFile: '/assets/foundation/models/characters/pilot-modern/texture.png',
-        thumbnailFile: '/assets/foundation/models/characters/pilot-modern/thumbnail.png'
+        thumbnailFile: '/assets/foundation/models/characters/pilot-modern/thumbnail.png',
       },
       defaultScale: 0.01,
       defaultMaterialOptions: {
         roughness: 0.5,
-        metalness: 0.4
+        metalness: 0.4,
       },
       tags: ['pilot', 'modern', 'technology'],
       author: 'Lanzarote3D',
-      version: '1.0.0'
+      version: '1.0.0',
     });
 
     this.registerCharacter({
@@ -159,16 +159,16 @@ export class CharacterRegistry {
       assets: {
         objFile: '/assets/foundation/models/characters/warrior/model.obj',
         textureFile: '/assets/foundation/models/characters/warrior/texture.png',
-        thumbnailFile: '/assets/foundation/models/characters/warrior/thumbnail.png'
+        thumbnailFile: '/assets/foundation/models/characters/warrior/thumbnail.png',
       },
       defaultScale: 0.01,
       defaultMaterialOptions: {
         roughness: 0.9,
-        metalness: 0.7
+        metalness: 0.7,
       },
       tags: ['warrior', 'combat', 'armor'],
       author: 'Lanzarote3D',
-      version: '1.0.0'
+      version: '1.0.0',
     });
 
     this.registerCharacter({
@@ -178,16 +178,16 @@ export class CharacterRegistry {
       assets: {
         objFile: '/assets/foundation/models/characters/explorer/model.obj',
         textureFile: '/assets/foundation/models/characters/explorer/texture.png',
-        thumbnailFile: '/assets/foundation/models/characters/explorer/thumbnail.png'
+        thumbnailFile: '/assets/foundation/models/characters/explorer/thumbnail.png',
       },
       defaultScale: 0.01,
       defaultMaterialOptions: {
         roughness: 0.6,
-        metalness: 0.3
+        metalness: 0.3,
       },
       tags: ['explorer', 'adventure', 'gear'],
       author: 'Lanzarote3D',
-      version: '1.0.0'
+      version: '1.0.0',
     });
 
     this.registerCharacter({
@@ -197,16 +197,16 @@ export class CharacterRegistry {
       assets: {
         objFile: '/assets/foundation/models/characters/scientist/model.obj',
         textureFile: '/assets/foundation/models/characters/scientist/texture.png',
-        thumbnailFile: '/assets/foundation/models/characters/scientist/thumbnail.png'
+        thumbnailFile: '/assets/foundation/models/characters/scientist/thumbnail.png',
       },
       defaultScale: 0.01,
       defaultMaterialOptions: {
         roughness: 0.4,
-        metalness: 0.5
+        metalness: 0.5,
       },
       tags: ['scientist', 'research', 'instruments'],
       author: 'Lanzarote3D',
-      version: '1.0.0'
+      version: '1.0.0',
     });
 
     this.registerCharacter({
@@ -216,16 +216,16 @@ export class CharacterRegistry {
       assets: {
         objFile: '/assets/foundation/models/characters/adventurer/model.obj',
         textureFile: '/assets/foundation/models/characters/adventurer/texture.png',
-        thumbnailFile: '/assets/foundation/models/characters/adventurer/thumbnail.png'
+        thumbnailFile: '/assets/foundation/models/characters/adventurer/thumbnail.png',
       },
       defaultScale: 0.01,
       defaultMaterialOptions: {
         roughness: 0.7,
-        metalness: 0.1
+        metalness: 0.1,
       },
       tags: ['adventurer', 'freedom', 'spirit'],
       author: 'Lanzarote3D',
-      version: '1.0.0'
+      version: '1.0.0',
     });
 
     console.log(`📚 Character Registry initialized with ${this.characters.size} characters`);
@@ -257,9 +257,7 @@ export class CharacterRegistry {
    * Get characters by tag
    */
   public getCharactersByTag(tag: string): CharacterDefinition[] {
-    return this.getAllCharacters().filter(char =>
-      char.tags.includes(tag)
-    );
+    return this.getAllCharacters().filter(char => char.tags.includes(tag));
   }
 
   /**
@@ -281,10 +279,11 @@ export class CharacterRegistry {
    */
   public searchCharacters(query: string): CharacterDefinition[] {
     const lowerQuery = query.toLowerCase();
-    return this.getAllCharacters().filter(char =>
-      char.name.toLowerCase().includes(lowerQuery) ||
-      char.description.toLowerCase().includes(lowerQuery) ||
-      char.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
+    return this.getAllCharacters().filter(
+      char =>
+        char.name.toLowerCase().includes(lowerQuery) ||
+        char.description.toLowerCase().includes(lowerQuery) ||
+        char.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
     );
   }
 
@@ -315,7 +314,7 @@ export class CharacterRegistry {
     // Check main assets (in real implementation, you'd check if files exist)
     const assetsToCheck = [
       { path: assets.objFile, name: 'OBJ Model' },
-      { path: assets.textureFile, name: 'Texture' }
+      { path: assets.textureFile, name: 'Texture' },
     ];
 
     if (assets.thumbnailFile) {
@@ -328,7 +327,7 @@ export class CharacterRegistry {
 
     return {
       valid: missingAssets.length === 0,
-      missingAssets
+      missingAssets,
     };
   }
 
@@ -340,7 +339,7 @@ export class CharacterRegistry {
       totalCharacters: this.characters.size,
       characters: Object.fromEntries(this.characters),
       tags: this.getAllTags(),
-      authors: this.getAllAuthors()
+      authors: this.getAllAuthors(),
     };
   }
 
@@ -373,7 +372,10 @@ export class CharacterRegistry {
 export const characterRegistry = CharacterRegistry.getInstance();
 
 // Export utility functions
-export function getCharacterAssetPath(type: CharacterType, assetType: 'obj' | 'texture' | 'thumbnail'): string {
+export function getCharacterAssetPath(
+  type: CharacterType,
+  assetType: 'obj' | 'texture' | 'thumbnail'
+): string {
   const character = characterRegistry.getCharacter(type);
   if (!character) {
     throw new Error(`Character type ${type} not found in registry`);

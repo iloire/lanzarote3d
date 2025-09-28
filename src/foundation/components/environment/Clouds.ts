@@ -62,7 +62,7 @@ class Clouds {
 
     // Since we don't store Cloud instances, we need to traverse the group
     // and update materials directly on the mesh children
-    this.group.traverse((child) => {
+    this.group.traverse(child => {
       if (child instanceof THREE.Mesh && child.material) {
         // Dispose old material
         if (Array.isArray(child.material)) {

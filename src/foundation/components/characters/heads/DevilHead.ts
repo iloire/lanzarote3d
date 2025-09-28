@@ -9,12 +9,12 @@ export class DevilHead extends BaseHead {
       version: '2.0.0',
       description: 'Devil pilot head with horns, fangs, and menacing features',
       author: 'Lanzarote3D',
-      tags: ['character', 'head', 'devil', 'horns', 'evil']
+      tags: ['character', 'head', 'devil', 'horns', 'evil'],
     };
 
     super(metadata, {
       headType: 'devil',
-      ...options
+      ...options,
     });
   }
 

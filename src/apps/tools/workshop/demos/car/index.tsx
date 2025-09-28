@@ -16,7 +16,7 @@ class CarWorkshopApp extends WorkshopDemoBase {
       ground: {
         create: true,
         size: { width: 1200, height: 1000 },
-        color: 0x90EE90, // Light green ground for roads/grass
+        color: 0x90ee90, // Light green ground for roads/grass
         opacity: 0.8,
       },
       lighting: {
@@ -41,7 +41,9 @@ class CarWorkshopApp extends WorkshopDemoBase {
       this.startAnimationLoop(renderer, scene, camera, controls);
 
       this.isLoaded = true;
-      console.log(`✅ ${this.config.name} loaded successfully with ${this.cars.length} cars driving around`);
+      console.log(
+        `✅ ${this.config.name} loaded successfully with ${this.cars.length} cars driving around`
+      );
     } catch (error) {
       this.handleError(error as Error, 'load');
       throw error;
@@ -55,47 +57,47 @@ class CarWorkshopApp extends WorkshopDemoBase {
         roofColor: '#990000',
         position: new THREE.Vector3(-200, 0, -200),
         scale: 3,
-        name: 'Red Sports Car'
+        name: 'Red Sports Car',
       },
       {
         bodyColor: '#0066CC',
         roofColor: '#004499',
         position: new THREE.Vector3(200, 0, -200),
         scale: 2.5,
-        name: 'Blue Sedan'
+        name: 'Blue Sedan',
       },
       {
         bodyColor: '#FFFF00',
         roofColor: '#CCCC00',
         position: new THREE.Vector3(-200, 0, 200),
         scale: 2.8,
-        name: 'Yellow Taxi'
+        name: 'Yellow Taxi',
       },
       {
         bodyColor: '#FFFFFF',
         roofColor: '#DDDDDD',
         position: new THREE.Vector3(200, 0, 200),
         scale: 3.2,
-        name: 'White SUV'
+        name: 'White SUV',
       },
       {
         bodyColor: '#000000',
         roofColor: '#333333',
         position: new THREE.Vector3(0, 0, 0),
         scale: 3.5,
-        name: 'Black Luxury Car'
+        name: 'Black Luxury Car',
       },
     ];
 
     // Load all cars concurrently - cars will start driving automatically
-    const carPromises = carConfigurations.map(async (config) => {
+    const carPromises = carConfigurations.map(async config => {
       const car = new Car({
         bodyColor: config.bodyColor,
         roofColor: config.roofColor,
         scale: config.scale,
         // Let each car drive with slightly different parameters for variety
         radius: 120 + Math.random() * 80,
-        speed: 0.2 + Math.random() * 0.4
+        speed: 0.2 + Math.random() * 0.4,
       });
 
       const carMesh = await car.load();
@@ -133,7 +135,7 @@ class CarWorkshopApp extends WorkshopDemoBase {
     scene.add(vRoadMesh);
 
     // Road center lines
-    const lineMaterial = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
+    const lineMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
     // Horizontal center line
     const hLineGeometry = new THREE.PlaneGeometry(800, 2);

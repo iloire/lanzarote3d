@@ -11,7 +11,10 @@ import { StoryOptions } from '../../shared/types';
 import { getDefaultTheme } from '../../../foundation/themes';
 import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';
 import { TerrainBase } from '../../shared/TerrainBase';
-import { OrbitControlsHelper, ORBIT_CONTROLS_PRESETS } from '../../../foundation/utils/OrbitControlsHelper';
+import {
+  OrbitControlsHelper,
+  ORBIT_CONTROLS_PRESETS,
+} from '../../../foundation/utils/OrbitControlsHelper';
 import { getAppConfig } from '../../config/app-registry';
 
 type ParagliderVoxelConfig = {
@@ -57,7 +60,9 @@ class PhotoBoothApp extends TerrainBase {
     super({
       // Use metadata from app registry
       name: appConfig?.name || 'Photobooth',
-      description: appConfig?.description || 'Beautiful static 3D scene showcasing paragliders and environment',
+      description:
+        appConfig?.description ||
+        'Beautiful static 3D scene showcasing paragliders and environment',
       // App-specific configuration
       requiredComponents: ['scene', 'camera', 'renderer', 'terrain', 'water', 'controls'],
       scene: {
@@ -65,13 +70,13 @@ class PhotoBoothApp extends TerrainBase {
         lighting: 'dynamic',
         physics: false,
         fog: {
-          enabled: false // Fog handled by theme system
-        }
+          enabled: false, // Fog handled by theme system
+        },
       },
       performance: {
         monitoring: true,
-        logIntervalMs: 15000 // Log performance every 15 seconds
-      }
+        logIntervalMs: 15000, // Log performance every 15 seconds
+      },
     });
   }
 
@@ -99,9 +104,7 @@ class PhotoBoothApp extends TerrainBase {
       camera.lookAt(lookAtPos);
 
       // Apply landscape viewing controls for photobooth exploration
-      OrbitControlsHelper.focusOnTarget(controls, lookAtPos,
-        ORBIT_CONTROLS_PRESETS['landscape']
-      );
+      OrbitControlsHelper.focusOnTarget(controls, lookAtPos, ORBIT_CONTROLS_PRESETS['landscape']);
 
       // Load paragliders with proper tracking for disposal
       await this.loadParagliders(scene);
@@ -132,9 +135,12 @@ class PhotoBoothApp extends TerrainBase {
       this.startAnimationLoop(renderer, scene, camera, controls);
 
       this.isLoaded = true;
-      const carStatus = this.showCars ? 'with cars enabled (dev mode)' : 'with cars disabled (production mode)';
-      console.log(`✅ ${this.config.name} loaded successfully with ${this.paragliderMeshes.length} paragliders ${carStatus}`);
-
+      const carStatus = this.showCars
+        ? 'with cars enabled (dev mode)'
+        : 'with cars disabled (production mode)';
+      console.log(
+        `✅ ${this.config.name} loaded successfully with ${this.paragliderMeshes.length} paragliders ${carStatus}`
+      );
     } catch (error) {
       this.handleError(error as Error, 'load');
       throw error;
@@ -181,8 +187,12 @@ class PhotoBoothApp extends TerrainBase {
       // Add cars in the foreground and middle ground for interesting photobooth composition
 
       // Import movement patterns
-      const { MovementPattern } = await import('../../../foundation/systems/behaviors/MovingBehavior');
-      const { TerrainDrivingMode } = await import('../../../foundation/systems/behaviors/TerrainFollowingBehavior');
+      const { MovementPattern } = await import(
+        '../../../foundation/systems/behaviors/MovingBehavior'
+      );
+      const { TerrainDrivingMode } = await import(
+        '../../../foundation/systems/behaviors/TerrainFollowingBehavior'
+      );
 
       // Foreground cars - close to camera for dramatic shots
       const foregroundCars = [
@@ -196,7 +206,7 @@ class PhotoBoothApp extends TerrainBase {
           bodyColor: '#FF4444', // Bright red
           autoStartMoving: true,
           faceDirection: true,
-          forwardAxis: 'x' as const
+          forwardAxis: 'x' as const,
         },
         {
           type: 'AutonomousCar' as const,
@@ -205,22 +215,18 @@ class PhotoBoothApp extends TerrainBase {
           scale: 1,
           bodyColor: '#4444FF', // Bright blue
           drivingMode: TerrainDrivingMode.EXPLORATION,
-          explorationRadius: 200
-        }
+          explorationRadius: 200,
+        },
       ];
 
       // Area 1: Cars around the specified terrain location
-      await this.environment.createCarGroup(
+      await this.environment.createCarGroup(terrain, foregroundCars, {
+        center: new THREE.Vector3(6620.8, 0, -2809.6), // Specified terrain location
+        formation: 'random',
+        spacing: 100,
+        groupRadius: 150,
         terrain,
-        foregroundCars,
-        {
-          center: new THREE.Vector3(6620.8, 0, -2809.6), // Specified terrain location
-          formation: 'random',
-          spacing: 100,
-          groupRadius: 150,
-          terrain
-        }
-      );
+      });
 
       // Area 2: More cars in a circle around the same area
       const middlegroundCars = [
@@ -234,7 +240,7 @@ class PhotoBoothApp extends TerrainBase {
           bodyColor: '#44FF44', // Bright green
           autoStartMoving: true,
           faceDirection: true,
-          forwardAxis: 'x' as const
+          forwardAxis: 'x' as const,
         },
         {
           type: 'Car' as const,
@@ -246,7 +252,7 @@ class PhotoBoothApp extends TerrainBase {
           bodyColor: '#FFFF44', // Bright yellow
           autoStartMoving: true,
           faceDirection: true,
-          forwardAxis: 'x' as const
+          forwardAxis: 'x' as const,
         },
         {
           type: 'AutonomousCar' as const,
@@ -255,30 +261,33 @@ class PhotoBoothApp extends TerrainBase {
           scale: 1,
           bodyColor: '#FF44FF', // Bright magenta
           drivingMode: TerrainDrivingMode.PATROL,
-          explorationRadius: 150
-        }
+          explorationRadius: 150,
+        },
       ];
 
       // Add more cars around the same terrain area
-      await this.environment.createCarGroup(
+      await this.environment.createCarGroup(terrain, middlegroundCars, {
+        center: new THREE.Vector3(6720.8, 0, -2709.6), // Slightly offset from main area
+        formation: 'circle',
+        spacing: 120,
+        groupRadius: 200,
         terrain,
-        middlegroundCars,
-        {
-          center: new THREE.Vector3(6720.8, 0, -2709.6), // Slightly offset from main area
-          formation: 'circle',
-          spacing: 120,
-          groupRadius: 200,
-          terrain
-        }
-      );
+      });
 
-      console.log('✅ Cars added around terrain location (6620.8, 45.1, -2809.6) for photobooth shots');
+      console.log(
+        '✅ Cars added around terrain location (6620.8, 45.1, -2809.6) for photobooth shots'
+      );
     } catch (error) {
       console.warn('⚠️ Failed to add cars to photobooth:', error);
     }
   }
 
-  private startAnimationLoop(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.Camera, controls: any): void {
+  private startAnimationLoop(
+    renderer: THREE.WebGLRenderer,
+    scene: THREE.Scene,
+    camera: THREE.Camera,
+    controls: any
+  ): void {
     const animate = () => {
       try {
         // Update performance monitoring
@@ -313,7 +322,7 @@ class PhotoBoothApp extends TerrainBase {
     // Dispose paraglider meshes
     this.paragliderMeshes.forEach(mesh => {
       // Dispose geometry and materials if they exist
-      mesh.traverse((child) => {
+      mesh.traverse(child => {
         if (child instanceof THREE.Mesh) {
           if (child.geometry) child.geometry.dispose();
           if (child.material) {
@@ -351,7 +360,7 @@ const PhotoBooth = {
   },
   getAppInfo: () => {
     return photoBoothApp.getAppInfo();
-  }
+  },
 };
 
 export default PhotoBooth;

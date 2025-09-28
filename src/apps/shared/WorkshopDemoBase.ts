@@ -43,7 +43,7 @@ export abstract class WorkshopDemoBase extends AppBase {
         'water',
         'sky',
         'controls',
-        ...(config.requiredComponents || [])
+        ...(config.requiredComponents || []),
       ],
       scene: {
         environment: 'custom',
@@ -65,10 +65,7 @@ export abstract class WorkshopDemoBase extends AppBase {
    * Set up clean workshop environment automatically
    * Called from initializeCore - no need to call manually
    */
-  protected setupCleanEnvironment(
-    options: StoryOptions,
-    config?: WorkshopDemoConfig
-  ): void {
+  protected setupCleanEnvironment(options: StoryOptions, config?: WorkshopDemoConfig): void {
     const { scene, controls } = options;
 
     // Enable controls
@@ -100,10 +97,7 @@ export abstract class WorkshopDemoBase extends AppBase {
     console.log('✅ Workshop demo environment loaded: clean setup (sky + ground)');
   }
 
-  private createGroundPlane(
-    scene: THREE.Scene,
-    config?: WorkshopDemoConfig['ground']
-  ): void {
+  private createGroundPlane(scene: THREE.Scene, config?: WorkshopDemoConfig['ground']): void {
     const size = config?.size ?? { width: 1000, height: 1000 };
     const color = config?.color ?? 0x8fbc8f;
     const opacity = config?.opacity ?? 0.3;
@@ -112,7 +106,7 @@ export abstract class WorkshopDemoBase extends AppBase {
     const groundMaterial = new THREE.MeshStandardMaterial({
       color,
       transparent: true,
-      opacity
+      opacity,
     });
 
     this.groundMesh = new THREE.Mesh(groundGeometry, groundMaterial);

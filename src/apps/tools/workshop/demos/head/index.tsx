@@ -11,7 +11,6 @@ import {
 import { StoryOptions } from '../../../../shared/types';
 import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
 
-
 /**
  * Head Workshop Demo - Showcases different pilot head types, helmets and glasses
  */
@@ -21,7 +20,8 @@ class HeadWorkshopApp extends WorkshopDemoBase {
   constructor() {
     super({
       name: 'Head Workshop',
-      description: 'Workshop demo showcasing different pilot head types, helmet variations and glasses',
+      description:
+        'Workshop demo showcasing different pilot head types, helmet variations and glasses',
       ground: {
         create: false, // Don't show ground plane for character showcase
       },
@@ -47,7 +47,9 @@ class HeadWorkshopApp extends WorkshopDemoBase {
       const helmetTypeKeys = Object.keys(HelmetType).filter(key => isNaN(Number(key)));
       const glassesTypeKeys = Object.keys(GlassesType).filter(key => isNaN(Number(key)));
 
-      console.log(`🎭 Creating showcase with ${headTypeKeys.length} head types, ${helmetTypeKeys.length} helmet types, ${glassesTypeKeys.length} glasses types`);
+      console.log(
+        `🎭 Creating showcase with ${headTypeKeys.length} head types, ${helmetTypeKeys.length} helmet types, ${glassesTypeKeys.length} glasses types`
+      );
 
       const heads: PilotHeadOptions[] = [];
 
@@ -98,18 +100,23 @@ class HeadWorkshopApp extends WorkshopDemoBase {
         const col = index % ITEMS_PER_ROW;
         mesh.position.set(x + col * SPACING_X, -100, z + row * SPACING_Z);
 
-        console.log(`Head ${index}: ${headTypeName} at position (${x + col * SPACING_X}, -100, ${z + row * SPACING_Z})`);
+        console.log(
+          `Head ${index}: ${headTypeName} at position (${x + col * SPACING_X}, -100, ${z + row * SPACING_Z})`
+        );
 
         scene.add(mesh);
         const helmetTypeName = Object.keys(HelmetType).find(
           key => (HelmetType as any)[key] === headOptions.helmetType
         );
         const glassesTypeName = headOptions.glassesType
-          ? Object.keys(GlassesType).find(key => (GlassesType as any)[key] === headOptions.glassesType)
+          ? Object.keys(GlassesType).find(
+              key => (GlassesType as any)[key] === headOptions.glassesType
+            )
           : null;
 
-        const labelText = `${headTypeName}\nHelmet: ${helmetTypeName}${glassesTypeName ? `\nGlasses: ${glassesTypeName}` : ''
-          }`;
+        const labelText = `${headTypeName}\nHelmet: ${helmetTypeName}${
+          glassesTypeName ? `\nGlasses: ${glassesTypeName}` : ''
+        }`;
         const label = this.createStandardLabel(labelText);
 
         if (this.labelContainer) {
@@ -209,10 +216,10 @@ class HeadWorkshopApp extends WorkshopDemoBase {
    */
   private getThemedSkinColor(headType: string): string {
     const skinColors = {
-      Default: '#e0bea5',    // Normal skin
-      Warrior: '#d4a574',    // Slightly tanned
-      Skeleton: '#f5f5dc',   // Bone white
-      Devil: '#ff6b6b',      // Reddish skin
+      Default: '#e0bea5', // Normal skin
+      Warrior: '#d4a574', // Slightly tanned
+      Skeleton: '#f5f5dc', // Bone white
+      Devil: '#ff6b6b', // Reddish skin
     };
 
     return skinColors[headType as keyof typeof skinColors] || skinColors.Default;
@@ -223,10 +230,10 @@ class HeadWorkshopApp extends WorkshopDemoBase {
    */
   private getThemedBeardColor(headType: string): string {
     const beardColors = {
-      Default: '#8b4513',    // Saddle brown
-      Warrior: '#8b7355',    // Lighter brown for better contrast
-      Skeleton: '#d3d3d3',   // Light gray
-      Devil: '#5d4037',      // Medium brown instead of very dark
+      Default: '#8b4513', // Saddle brown
+      Warrior: '#8b7355', // Lighter brown for better contrast
+      Skeleton: '#d3d3d3', // Light gray
+      Devil: '#5d4037', // Medium brown instead of very dark
     };
 
     return beardColors[headType as keyof typeof beardColors] || beardColors.Default;
@@ -237,10 +244,10 @@ class HeadWorkshopApp extends WorkshopDemoBase {
    */
   private getThemedEyeColor(headType: string): string {
     const eyeColors = {
-      Default: '#4169e1',    // Royal blue
-      Warrior: '#87ceeb',    // Sky blue (bright and visible)
-      Skeleton: '#00ff00',   // Bright green (eerie)
-      Devil: '#ffff00',      // Yellow (menacing)
+      Default: '#4169e1', // Royal blue
+      Warrior: '#87ceeb', // Sky blue (bright and visible)
+      Skeleton: '#00ff00', // Bright green (eerie)
+      Devil: '#ffff00', // Yellow (menacing)
     };
 
     return eyeColors[headType as keyof typeof eyeColors] || eyeColors.Default;

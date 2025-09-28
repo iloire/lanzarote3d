@@ -1,5 +1,10 @@
 import * as THREE from 'three';
-import { AsyncThreeComponent, ResourceDescriptor, LoadedResource, AsyncLoadCallbacks } from '../base/AsyncThreeComponent';
+import {
+  AsyncThreeComponent,
+  ResourceDescriptor,
+  LoadedResource,
+  AsyncLoadCallbacks,
+} from '../base/AsyncThreeComponent';
 import { ComponentOptions } from '../base/IThreeComponent';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { CharacterType, characterRegistry, CharacterDefinition } from './CharacterRegistry';
@@ -32,7 +37,7 @@ export interface PilotVoxelOptions extends ComponentOptions {
 
   // Character-specific overrides
   useAlternativeTexture?: number; // Index of alternative texture to use
-  useAlternativeModel?: number;   // Index of alternative model to use
+  useAlternativeModel?: number; // Index of alternative model to use
 }
 
 /**
@@ -56,7 +61,7 @@ export class PilotVoxel extends AsyncThreeComponent {
       version: '2.0.0',
       description: 'Voxel-style pilot character component with multi-character support',
       author: 'Lanzarote3D',
-      tags: ['character', 'pilot', 'voxel', 'model', 'async', 'multi-character']
+      tags: ['character', 'pilot', 'voxel', 'model', 'async', 'multi-character'],
     };
 
     super(metadata, options, callbacks);
@@ -71,18 +76,18 @@ export class PilotVoxel extends AsyncThreeComponent {
         roughness: 0.8,
         metalness: 0.1,
         transparent: false,
-        side: THREE.DoubleSide
+        side: THREE.DoubleSide,
       },
       textureOptions: {
         colorSpace: THREE.SRGBColorSpace,
         magFilter: THREE.NearestFilter,
         minFilter: THREE.NearestFilter,
         wrapS: THREE.ClampToEdgeWrapping,
-        wrapT: THREE.ClampToEdgeWrapping
+        wrapT: THREE.ClampToEdgeWrapping,
       },
       castShadow: true,
       receiveShadow: true,
-      ...options
+      ...options,
     };
 
     // Apply character-specific defaults if available
@@ -103,18 +108,22 @@ export class PilotVoxel extends AsyncThreeComponent {
       this.characterDefinition = characterRegistry.getCharacter(options.characterType);
 
       if (!this.characterDefinition) {
-        console.warn(`Character type ${options.characterType} not found in registry, falling back to manual assets`);
+        console.warn(
+          `Character type ${options.characterType} not found in registry, falling back to manual assets`
+        );
         return;
       }
 
-      console.log(`🎭 Using character: ${this.characterDefinition.name} (${this.characterDefinition.id})`);
+      console.log(
+        `🎭 Using character: ${this.characterDefinition.name} (${this.characterDefinition.id})`
+      );
 
       // Set asset paths from character definition
       const assets = this.characterDefinition.assets;
       this.pilotOptions = {
         ...options,
         objFile: this.getSelectedModel(assets),
-        textureFile: this.getSelectedTexture(assets)
+        textureFile: this.getSelectedTexture(assets),
       };
     } else if (options.objFile && options.textureFile) {
       // Use manual asset paths
@@ -129,7 +138,7 @@ export class PilotVoxel extends AsyncThreeComponent {
           ...options,
           characterType: CharacterType.ADRI,
           objFile: assets.objFile,
-          textureFile: assets.textureFile
+          textureFile: assets.textureFile,
         };
       }
     }
@@ -140,7 +149,10 @@ export class PilotVoxel extends AsyncThreeComponent {
    */
   private getSelectedModel(assets: any): string {
     if (this.pilotOptions.useAlternativeModel !== undefined && assets.alternativeModels) {
-      const altIndex = Math.min(this.pilotOptions.useAlternativeModel, assets.alternativeModels.length - 1);
+      const altIndex = Math.min(
+        this.pilotOptions.useAlternativeModel,
+        assets.alternativeModels.length - 1
+      );
       return assets.alternativeModels[altIndex];
     }
     return assets.objFile;
@@ -151,7 +163,10 @@ export class PilotVoxel extends AsyncThreeComponent {
    */
   private getSelectedTexture(assets: any): string {
     if (this.pilotOptions.useAlternativeTexture !== undefined && assets.alternativeTextures) {
-      const altIndex = Math.min(this.pilotOptions.useAlternativeTexture, assets.alternativeTextures.length - 1);
+      const altIndex = Math.min(
+        this.pilotOptions.useAlternativeTexture,
+        assets.alternativeTextures.length - 1
+      );
       return assets.alternativeTextures[altIndex];
     }
     return assets.textureFile;
@@ -172,7 +187,7 @@ export class PilotVoxel extends AsyncThreeComponent {
     if (this.characterDefinition.defaultMaterialOptions) {
       this.pilotOptions.materialOptions = {
         ...this.characterDefinition.defaultMaterialOptions,
-        ...this.pilotOptions.materialOptions
+        ...this.pilotOptions.materialOptions,
       };
     }
   }
@@ -198,21 +213,23 @@ export class PilotVoxel extends AsyncThreeComponent {
         id: 'model',
         type: 'model',
         url: this.pilotOptions.objFile,
-        options: this.pilotOptions.materialOptions
+        options: this.pilotOptions.materialOptions,
       },
       {
         id: 'texture',
         type: 'texture',
         url: this.pilotOptions.textureFile,
-        options: this.pilotOptions.textureOptions
-      }
+        options: this.pilotOptions.textureOptions,
+      },
     ];
   }
 
   /**
    * Create the pilot object from loaded resources
    */
-  protected async createObjectFromResources(resources: Map<string, LoadedResource>): Promise<THREE.Object3D> {
+  protected async createObjectFromResources(
+    resources: Map<string, LoadedResource>
+  ): Promise<THREE.Object3D> {
     const modelResource = resources.get('model');
     const textureResource = resources.get('texture');
 
@@ -253,11 +270,11 @@ export class PilotVoxel extends AsyncThreeComponent {
       const loader = new OBJLoader();
       loader.load(
         url,
-        (object) => {
+        object => {
           resolve(object);
         },
         undefined,
-        (error) => {
+        error => {
           reject(new Error(`Failed to load OBJ model: ${error}`));
         }
       );
@@ -289,7 +306,7 @@ export class PilotVoxel extends AsyncThreeComponent {
       roughness: materialOptions.roughness,
       metalness: materialOptions.metalness,
       transparent: materialOptions.transparent,
-      side: materialOptions.side
+      side: materialOptions.side,
     });
   }
 
@@ -297,7 +314,7 @@ export class PilotVoxel extends AsyncThreeComponent {
    * Apply material to all meshes in the model
    */
   private applyMaterialToModel(object: THREE.Object3D, material: THREE.Material): void {
-    object.traverse((child) => {
+    object.traverse(child => {
       if (child instanceof THREE.Mesh) {
         // Dispose of old material if it exists
         if (child.material) {
@@ -317,7 +334,7 @@ export class PilotVoxel extends AsyncThreeComponent {
    * Configure shadows for the model
    */
   private configureShadows(object: THREE.Object3D): void {
-    object.traverse((child) => {
+    object.traverse(child => {
       if (child instanceof THREE.Mesh) {
         child.castShadow = this.pilotOptions.castShadow;
         child.receiveShadow = this.pilotOptions.receiveShadow;
@@ -352,7 +369,7 @@ export class PilotVoxel extends AsyncThreeComponent {
   protected override getFallbackResources(): Partial<Record<string, any>> {
     return {
       model: this.createFallbackModel(),
-      texture: this.createFallbackTexture()
+      texture: this.createFallbackTexture(),
     };
   }
 
@@ -425,7 +442,10 @@ export class PilotVoxel extends AsyncThreeComponent {
       new URL(this.pilotOptions.objFile, window.location.origin);
     } catch {
       // Check if it's a relative path
-      if (!this.pilotOptions.objFile.startsWith('/') && !this.pilotOptions.objFile.startsWith('./')) {
+      if (
+        !this.pilotOptions.objFile.startsWith('/') &&
+        !this.pilotOptions.objFile.startsWith('./')
+      ) {
         issues.push('objFile must be a valid URL or relative path');
       }
     }
@@ -434,7 +454,10 @@ export class PilotVoxel extends AsyncThreeComponent {
       new URL(this.pilotOptions.textureFile, window.location.origin);
     } catch {
       // Check if it's a relative path
-      if (!this.pilotOptions.textureFile.startsWith('/') && !this.pilotOptions.textureFile.startsWith('./')) {
+      if (
+        !this.pilotOptions.textureFile.startsWith('/') &&
+        !this.pilotOptions.textureFile.startsWith('./')
+      ) {
         issues.push('textureFile must be a valid URL or relative path');
       }
     }
@@ -459,11 +482,11 @@ export class PilotVoxel extends AsyncThreeComponent {
     // Update stored options
     this.pilotOptions.materialOptions = {
       ...this.pilotOptions.materialOptions,
-      ...properties
+      ...properties,
     };
 
     // Apply to existing material
-    object.traverse((child) => {
+    object.traverse(child => {
       if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
         Object.assign(child.material, properties);
         child.material.needsUpdate = true;
@@ -481,11 +504,11 @@ export class PilotVoxel extends AsyncThreeComponent {
     // Update stored options
     this.pilotOptions.textureOptions = {
       ...this.pilotOptions.textureOptions,
-      ...properties
+      ...properties,
     };
 
     // Apply to existing textures
-    object.traverse((child) => {
+    object.traverse(child => {
       if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
         const material = child.material;
         if (material.map) {
@@ -499,14 +522,17 @@ export class PilotVoxel extends AsyncThreeComponent {
   /**
    * Switch to a different character type
    */
-  public async switchCharacter(characterType: CharacterType, options?: Partial<PilotVoxelOptions>): Promise<THREE.Object3D> {
+  public async switchCharacter(
+    characterType: CharacterType,
+    options?: Partial<PilotVoxelOptions>
+  ): Promise<THREE.Object3D> {
     console.log(`🔄 Switching character to: ${characterType}`);
 
     // Update options with new character
     const newOptions: PilotVoxelOptions = {
       ...this.pilotOptions,
       characterType,
-      ...options
+      ...options,
     };
 
     // Dispose current object
@@ -571,8 +597,8 @@ export class PilotVoxel extends AsyncThreeComponent {
       characterDefinition: this.characterDefinition,
       availableAlternatives: {
         textures: this.characterDefinition?.assets.alternativeTextures?.length || 0,
-        models: this.characterDefinition?.assets.alternativeModels?.length || 0
-      }
+        models: this.characterDefinition?.assets.alternativeModels?.length || 0,
+      },
     };
   }
 
@@ -591,7 +617,7 @@ export class PilotVoxel extends AsyncThreeComponent {
 
     const options: PilotVoxelOptions = {
       characterType: randomCharacter.id,
-      ...baseOptions
+      ...baseOptions,
     };
 
     // Randomly select alternative textures if available
@@ -608,10 +634,13 @@ export class PilotVoxel extends AsyncThreeComponent {
    * Clone with different character
    */
   protected override createClone(options: ComponentOptions): PilotVoxel {
-    return new PilotVoxel({
-      ...this.pilotOptions,
-      ...options as PilotVoxelOptions
-    }, this.callbacks);
+    return new PilotVoxel(
+      {
+        ...this.pilotOptions,
+        ...(options as PilotVoxelOptions),
+      },
+      this.callbacks
+    );
   }
 
   /**
@@ -621,7 +650,7 @@ export class PilotVoxel extends AsyncThreeComponent {
     return {
       pilotOptions: this.pilotOptions,
       characterInfo: this.getCharacterInfo(),
-      resourceDescriptors: this.getResourceDescriptors()
+      resourceDescriptors: this.getResourceDescriptors(),
     };
   }
 }

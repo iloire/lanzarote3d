@@ -1,7 +1,14 @@
 import * as THREE from 'three';
 import { SimpleThreeComponent } from './SimpleThreeComponent';
-import { MovingBehavior, MovingBehaviorOptions, MovementPattern } from '../../systems/behaviors/MovingBehavior';
-import { TerrainNavigator, TerrainNavigatorOptions } from '../../systems/behaviors/TerrainNavigator';
+import {
+  MovingBehavior,
+  MovingBehaviorOptions,
+  MovementPattern,
+} from '../../systems/behaviors/MovingBehavior';
+import {
+  TerrainNavigator,
+  TerrainNavigatorOptions,
+} from '../../systems/behaviors/TerrainNavigator';
 import type { ComponentMetadata } from './IThreeComponent';
 
 export interface MovableCarComponentOptions extends MovingBehaviorOptions {
@@ -54,7 +61,7 @@ export abstract class MovableCarComponent extends SimpleThreeComponent {
         waypoints: options.waypoints,
         autoStart: options.autoStartMoving ?? true,
         faceDirection: options.faceDirection ?? true,
-        forwardAxis: options.forwardAxis || 'x'
+        forwardAxis: options.forwardAxis || 'x',
       });
     }
 
@@ -65,7 +72,7 @@ export abstract class MovableCarComponent extends SimpleThreeComponent {
         sampleRadius: options.terrainSampleRadius || 20,
         maxSlope: options.maxSlope || Math.PI / 4, // 45 degrees max slope
         heightOffset: this.heightOffset,
-        smoothingFactor: 0.1
+        smoothingFactor: 0.1,
       } as TerrainNavigatorOptions);
     }
   }
@@ -144,7 +151,8 @@ export abstract class MovableCarComponent extends SimpleThreeComponent {
         const angle = up.angleTo(terrainData.normal);
 
         // Only apply tilt if slope is reasonable (not too steep)
-        if (angle < Math.PI / 6) { // 30 degrees max tilt
+        if (angle < Math.PI / 6) {
+          // 30 degrees max tilt
           const tiltAmount = 0.05; // Subtle tilt effect
           this.currentMesh.rotation.x = THREE.MathUtils.lerp(
             this.currentMesh.rotation.x,
@@ -211,7 +219,7 @@ export abstract class MovableCarComponent extends SimpleThreeComponent {
         sampleRadius: 20,
         maxSlope: Math.PI / 4,
         heightOffset: this.heightOffset,
-        smoothingFactor: 0.1
+        smoothingFactor: 0.1,
       } as TerrainNavigatorOptions);
     }
   }
@@ -239,12 +247,12 @@ export abstract class MovableCarComponent extends SimpleThreeComponent {
         active: this.movingBehavior.isActive(),
         pattern: this.movingBehavior.getPattern(),
         speed: this.movingBehavior.getSpeed(),
-        radius: this.movingBehavior.getRadius()
+        radius: this.movingBehavior.getRadius(),
       },
       terrain: {
         hasNavigator: !!this.terrainNavigator,
-        heightOffset: this.heightOffset
-      }
+        heightOffset: this.heightOffset,
+      },
     };
   }
 

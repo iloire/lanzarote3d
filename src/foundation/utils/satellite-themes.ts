@@ -22,7 +22,7 @@ export class SatelliteThemes {
           color: '#ffffff',
           castShadow: true,
           shadowMapSize: 2048,
-        }
+        },
       },
       clouds: {
         colors: ['#FFFFFF', '#E6F3FF', '#87CEEB'],
@@ -45,7 +45,7 @@ export class SatelliteThemes {
       },
       terrain: {
         style: 'satellite',
-      }
+      },
     };
   }
 
@@ -69,10 +69,10 @@ export class SatelliteThemes {
             offsetU: 0,
             offsetV: 0,
             scaleU: 1,
-            scaleV: 1
-          }
-        }
-      }
+            scaleV: 1,
+          },
+        },
+      },
     };
   }
 
@@ -102,15 +102,15 @@ export class SatelliteThemes {
             offsetU: 0,
             offsetV: 0,
             scaleU: 1.1, // Slightly larger for better coverage
-            scaleV: 1.1
-          }
+            scaleV: 1.1,
+          },
         },
         customMaterial: {
           roughness: 0.7,
           metalness: 0.0,
-          emissiveIntensity: 0.1
-        }
-      }
+          emissiveIntensity: 0.1,
+        },
+      },
     };
   }
 
@@ -141,17 +141,17 @@ export class SatelliteThemes {
             offsetU: 0,
             offsetV: 0,
             scaleU: 1,
-            scaleV: 1
-          }
+            scaleV: 1,
+          },
         },
         customMaterial: {
           color: '#f4f1eb', // Slight warm tint
           roughness: 0.8,
           metalness: 0.1,
           emissive: '#2a1810',
-          emissiveIntensity: 0.05
-        }
-      }
+          emissiveIntensity: 0.05,
+        },
+      },
     };
   }
 
@@ -179,14 +179,14 @@ export class SatelliteThemes {
               north: 29.0,
               south: 28.6,
               east: -13.3,
-              west: -13.7
-            }
+              west: -13.7,
+            },
           },
           blendMode: 'normal',
           opacity: 1.0,
-          fallbackToWireframe: true
-        }
-      }
+          fallbackToWireframe: true,
+        },
+      },
     };
   }
 
@@ -198,23 +198,23 @@ export class SatelliteThemes {
       {
         name: 'Basic Satellite',
         theme: this.createLanzaroteSatelliteTheme(),
-        description: 'Standard satellite imagery with realistic terrain textures'
+        description: 'Standard satellite imagery with realistic terrain textures',
       },
       {
         name: 'Enhanced Satellite',
         theme: this.createEnhancedSatelliteTheme(),
-        description: 'High-contrast satellite imagery with enhanced visual features'
+        description: 'High-contrast satellite imagery with enhanced visual features',
       },
       {
         name: 'Hybrid Satellite',
         theme: this.createHybridSatelliteTheme(),
-        description: 'Blended satellite imagery with custom material properties'
+        description: 'Blended satellite imagery with custom material properties',
       },
       {
         name: 'Test Satellite',
         theme: this.createTestSatelliteTheme(),
-        description: 'Development theme with placeholder textures'
-      }
+        description: 'Development theme with placeholder textures',
+      },
     ];
   }
 
@@ -260,16 +260,16 @@ export class SatelliteThemes {
             offsetU: config.offsetU || 0,
             offsetV: config.offsetV || 0,
             scaleU: config.scaleU || 1,
-            scaleV: config.scaleV || 1
-          }
+            scaleV: config.scaleV || 1,
+          },
         },
         customMaterial: {
           roughness: config.roughness ?? 0.8,
           metalness: config.metalness ?? 0.1,
           color: config.color,
-          emissive: config.emissive
-        }
-      }
+          emissive: config.emissive,
+        },
+      },
     };
   }
 }

@@ -16,7 +16,7 @@ class TruckWorkshopApp extends WorkshopDemoBase {
       ground: {
         create: true,
         size: { width: 1500, height: 1200 },
-        color: 0x8B4513, // Brown ground for construction/industrial area
+        color: 0x8b4513, // Brown ground for construction/industrial area
         opacity: 0.9,
       },
       lighting: {
@@ -41,7 +41,9 @@ class TruckWorkshopApp extends WorkshopDemoBase {
       this.startAnimationLoop(renderer, scene, camera, controls);
 
       this.isLoaded = true;
-      console.log(`✅ ${this.config.name} loaded successfully with ${this.trucks.length} trucks driving around`);
+      console.log(
+        `✅ ${this.config.name} loaded successfully with ${this.trucks.length} trucks driving around`
+      );
     } catch (error) {
       this.handleError(error as Error, 'load');
       throw error;
@@ -55,46 +57,46 @@ class TruckWorkshopApp extends WorkshopDemoBase {
         bedColor: '#004499',
         position: new THREE.Vector3(-300, 0, -300),
         scale: 4,
-        name: 'Blue Work Truck'
+        name: 'Blue Work Truck',
       },
       {
         cabColor: '#CC0000',
         bedColor: '#990000',
         position: new THREE.Vector3(300, 0, -300),
         scale: 3.5,
-        name: 'Red Pickup Truck'
+        name: 'Red Pickup Truck',
       },
       {
         cabColor: '#FFAA00',
         bedColor: '#DD8800',
         position: new THREE.Vector3(-300, 0, 300),
         scale: 4.5,
-        name: 'Orange Construction Truck'
+        name: 'Orange Construction Truck',
       },
       {
         cabColor: '#006600',
         bedColor: '#004400',
         position: new THREE.Vector3(300, 0, 300),
         scale: 3.8,
-        name: 'Green Farm Truck'
+        name: 'Green Farm Truck',
       },
       {
         cabColor: '#FFFFFF',
         bedColor: '#DDDDDD',
         position: new THREE.Vector3(0, 0, 0),
         scale: 5,
-        name: 'White Heavy Duty Truck'
+        name: 'White Heavy Duty Truck',
       },
     ];
 
     // Load all trucks concurrently
-    const truckPromises = truckConfigurations.map(async (config) => {
+    const truckPromises = truckConfigurations.map(async config => {
       const truck = new Truck({
         cabColor: config.cabColor,
         bedColor: config.bedColor,
         scale: config.scale,
         radius: 200 + Math.random() * 150, // Vary the driving radius
-        speed: 0.15 + Math.random() * 0.2,  // Trucks move slower than cars
+        speed: 0.15 + Math.random() * 0.2, // Trucks move slower than cars
       });
 
       const truckMesh = await truck.load();
@@ -103,7 +105,9 @@ class TruckWorkshopApp extends WorkshopDemoBase {
       scene.add(truckMesh);
       this.trucks.push(truckMesh);
 
-      console.log(`Added ${config.name} at position (${config.position.x}, ${config.position.y}, ${config.position.z})`);
+      console.log(
+        `Added ${config.name} at position (${config.position.x}, ${config.position.y}, ${config.position.z})`
+      );
       return truckMesh;
     });
 
@@ -132,7 +136,7 @@ class TruckWorkshopApp extends WorkshopDemoBase {
     scene.add(crossRoadMesh);
 
     // Road markings
-    const lineMaterial = new THREE.MeshBasicMaterial({ color: 0xFFFF00 });
+    const lineMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
 
     // Highway center lines
     const hLineGeometry = new THREE.PlaneGeometry(1200, 3);
@@ -153,7 +157,7 @@ class TruckWorkshopApp extends WorkshopDemoBase {
   }
 
   private createConstructionCones(scene: THREE.Scene): void {
-    const coneMaterial = new THREE.MeshBasicMaterial({ color: 0xFF6600 });
+    const coneMaterial = new THREE.MeshBasicMaterial({ color: 0xff6600 });
     const coneGeometry = new THREE.ConeGeometry(8, 25, 8);
 
     const conePositions = [

@@ -42,14 +42,16 @@ class SatelliteTerrainApp extends TerrainBase {
     scaleY: 1,
     rotation: 0,
     flipX: false,
-    flipY: false
+    flipY: false,
   };
 
   constructor() {
     const appConfig = getAppConfig('satellite-terrain');
     super({
       name: appConfig?.name || 'Satellite Terrain',
-      description: appConfig?.description || 'Interactive demonstration of satellite imagery on 3D terrain with real-time theme switching',
+      description:
+        appConfig?.description ||
+        'Interactive demonstration of satellite imagery on 3D terrain with real-time theme switching',
       requiredComponents: ['scene', 'camera', 'renderer', 'terrain', 'water', 'controls'],
       scene: {
         environment: 'lanzarote',
@@ -71,8 +73,8 @@ class SatelliteTerrainApp extends TerrainBase {
       {
         name: 'Default Wireframe',
         theme: getDefaultTheme(),
-        description: 'Original wireframe terrain'
-      }
+        description: 'Original wireframe terrain',
+      },
     ];
   }
 
@@ -88,8 +90,8 @@ class SatelliteTerrainApp extends TerrainBase {
 
       // Set perfect top-down north-facing view for satellite mapping
       // Position camera VERY high above terrain center, looking straight down
-      const initialPos = new THREE.Vector3(0, 50000, 0);  // VERY high altitude for full island overview
-      const lookAtPos = new THREE.Vector3(0, 0, 0);       // Look at terrain center
+      const initialPos = new THREE.Vector3(0, 50000, 0); // VERY high altitude for full island overview
+      const lookAtPos = new THREE.Vector3(0, 0, 0); // Look at terrain center
 
       camera.position.copy(initialPos);
       camera.lookAt(lookAtPos);
@@ -97,10 +99,10 @@ class SatelliteTerrainApp extends TerrainBase {
       // Configure controls with NO BOUNDARIES for free navigation
       OrbitControlsHelper.focusOnTarget(controls, lookAtPos, {
         ...ORBIT_CONTROLS_PRESETS['aerial'],
-        maxDistance: Infinity,   // No maximum zoom out limit
-        minDistance: 100,        // Keep minimum to prevent going underground
-        maxPolarAngle: Math.PI,  // Allow full rotation
-        minPolarAngle: 0,        // Allow full rotation
+        maxDistance: Infinity, // No maximum zoom out limit
+        minDistance: 100, // Keep minimum to prevent going underground
+        maxPolarAngle: Math.PI, // Allow full rotation
+        minPolarAngle: 0, // Allow full rotation
       });
 
       console.log('📍 Satellite Terrain: Perfect top-down north-facing view');
@@ -195,9 +197,12 @@ class SatelliteTerrainApp extends TerrainBase {
       </div>
       <div style="margin-bottom: 10px; border-top: 1px solid #555; padding-top: 10px;">
         <strong>Controls:</strong><br>
-        ${this.availableThemes.map((theme, index) =>
-      `${index + 1}: ${theme.name}${index === this.currentThemeIndex ? ' ★' : ''}`
-    ).join('<br>')}
+        ${this.availableThemes
+          .map(
+            (theme, index) =>
+              `${index + 1}: ${theme.name}${index === this.currentThemeIndex ? ' ★' : ''}`
+          )
+          .join('<br>')}
       </div>
       <div style="border-top: 1px solid #555; padding-top: 10px; font-size: 11px; color: #ccc;">
         Mouse: Orbit/Zoom/Pan<br>
@@ -293,7 +298,7 @@ class SatelliteTerrainApp extends TerrainBase {
             scaleY: 1,
             rotation: 0,
             flipX: false,
-            flipY: false
+            flipY: false,
           };
           updated = true;
           console.log('🔧 Reset all texture adjustments');
@@ -386,7 +391,9 @@ class SatelliteTerrainApp extends TerrainBase {
       const currentTheme = this.availableThemes[this.currentThemeIndex];
       try {
         await this.applyThemeWithIslandSupport(options, currentTheme.theme);
-        console.log(`🔧 Reapplied texture with debug params: offset(${this.debugParams.offsetX.toFixed(2)}, ${this.debugParams.offsetY.toFixed(2)}) scale(${this.debugParams.scaleX.toFixed(2)}, ${this.debugParams.scaleY.toFixed(2)}) rotation(${this.debugParams.rotation}°)`);
+        console.log(
+          `🔧 Reapplied texture with debug params: offset(${this.debugParams.offsetX.toFixed(2)}, ${this.debugParams.offsetY.toFixed(2)}) scale(${this.debugParams.scaleX.toFixed(2)}, ${this.debugParams.scaleY.toFixed(2)}) rotation(${this.debugParams.rotation}°)`
+        );
       } catch (error) {
         console.error('❌ Failed to reapply texture:', error);
       }

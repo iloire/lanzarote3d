@@ -7,7 +7,6 @@ import { WorkshopDemoBase } from '../../shared/WorkshopDemoBase';
  * Autonomous Driving Demo - Simple car demo
  */
 class AutonomousDrivingApp extends WorkshopDemoBase {
-
   constructor() {
     super({
       name: 'Autonomous Driving Demo',
@@ -15,7 +14,7 @@ class AutonomousDrivingApp extends WorkshopDemoBase {
       ground: {
         create: true,
         size: { width: 500, height: 500 },
-        color: 0x90EE90,
+        color: 0x90ee90,
         opacity: 0.8,
       },
       lighting: {
@@ -34,7 +33,7 @@ class AutonomousDrivingApp extends WorkshopDemoBase {
       const car = new Car({
         bodyColor: '#FF4444',
         roofColor: '#CC0000',
-        scale: 4
+        scale: 4,
       });
 
       const carMesh = await car.load();

@@ -33,7 +33,7 @@ export class Tree extends SimpleThreeComponent {
       version: '2.0.0',
       description: 'Procedural tree component with multiple styles',
       author: 'Lanzarote3D',
-      tags: ['scenery', 'vegetation', 'procedural']
+      tags: ['scenery', 'vegetation', 'procedural'],
     };
 
     super(metadata, options);
@@ -48,7 +48,7 @@ export class Tree extends SimpleThreeComponent {
       style: 'default',
       castShadow: true,
       receiveShadow: true,
-      ...options
+      ...options,
     };
   }
 
@@ -109,7 +109,7 @@ export class Tree extends SimpleThreeComponent {
     const materialKey = `trunk_material_${this.treeOptions.trunkColor}`;
     const material = resourceManager.getMaterial(materialKey, {
       type: 'lambert',
-      color: this.treeOptions.trunkColor
+      color: this.treeOptions.trunkColor,
     });
 
     const trunk = new THREE.Mesh(geometry, material);
@@ -147,7 +147,7 @@ export class Tree extends SimpleThreeComponent {
     const materialKey = `crown_material_${this.treeOptions.crownColor}`;
     const material = resourceManager.getMaterial(materialKey, {
       type: 'lambert',
-      color: this.treeOptions.crownColor
+      color: this.treeOptions.crownColor,
     });
 
     const crown = new THREE.Mesh(geometry, material);
@@ -178,11 +178,7 @@ export class Tree extends SimpleThreeComponent {
    * Create conical pine crown
    */
   private createPineCrown(): THREE.BufferGeometry {
-    return new THREE.ConeGeometry(
-      this.treeOptions.crownSize,
-      this.treeOptions.crownSize * 2,
-      8
-    );
+    return new THREE.ConeGeometry(this.treeOptions.crownSize, this.treeOptions.crownSize * 2, 8);
   }
 
   /**
@@ -235,7 +231,7 @@ export class Tree extends SimpleThreeComponent {
    * Create clone with same tree configuration
    */
   protected override createClone(options: ComponentOptions): Tree {
-    return new Tree({ ...this.treeOptions, ...options as TreeOptions });
+    return new Tree({ ...this.treeOptions, ...(options as TreeOptions) });
   }
 
   /**
@@ -264,7 +260,7 @@ export class Tree extends SimpleThreeComponent {
    */
   protected override serializeComponent(): any {
     return {
-      treeOptions: this.treeOptions
+      treeOptions: this.treeOptions,
     };
   }
 }

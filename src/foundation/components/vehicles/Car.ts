@@ -1,5 +1,8 @@
 import * as THREE from 'three';
-import { MovingFloatingThreeComponent, MovingFloatingComponentOptions } from '../base/MovingFloatingThreeComponent';
+import {
+  MovingFloatingThreeComponent,
+  MovingFloatingComponentOptions,
+} from '../base/MovingFloatingThreeComponent';
 import { resourceManager } from '../../systems/ResourceManager';
 import { MovementPattern } from '../../systems/behaviors/MovingBehavior';
 
@@ -17,27 +20,30 @@ export interface CarOptions extends MovingFloatingComponentOptions {
  */
 export class Car extends MovingFloatingThreeComponent {
   constructor(options: CarOptions = {}) {
-    super({
-      name: 'Car',
-      version: '1.0.0',
-      description: 'Car vehicle with movement and driving capabilities'
-    }, {
-      // Default colors - classic red car
-      bodyColor: '#CC0000',
-      roofColor: '#990000',
-      windowColor: '#87CEEB',
-      wheelColor: '#222222',
-      scale: 1,
-      // Movement defaults
-      pattern: MovementPattern.CIRCULAR,
-      speed: 0.4,
-      radius: 150,
-      autoStartMoving: true,
-      autoStartFloating: false, // Cars don't float!
-      faceDirection: true,
-      forwardAxis: 'x', // Cars move forward in +X direction
-      ...options
-    });
+    super(
+      {
+        name: 'Car',
+        version: '1.0.0',
+        description: 'Car vehicle with movement and driving capabilities',
+      },
+      {
+        // Default colors - classic red car
+        bodyColor: '#CC0000',
+        roofColor: '#990000',
+        windowColor: '#87CEEB',
+        wheelColor: '#222222',
+        scale: 1,
+        // Movement defaults
+        pattern: MovementPattern.CIRCULAR,
+        speed: 0.4,
+        radius: 150,
+        autoStartMoving: true,
+        autoStartFloating: false, // Cars don't float!
+        faceDirection: true,
+        forwardAxis: 'x', // Cars move forward in +X direction
+        ...options,
+      }
+    );
   }
 
   protected createGeometry(): THREE.BufferGeometry {
@@ -65,11 +71,12 @@ export class Car extends MovingFloatingThreeComponent {
 
     const windowMaterial = resourceManager.getOrCreateMaterial(
       `car_window_${options.windowColor}`,
-      () => new THREE.MeshLambertMaterial({
-        color: options.windowColor,
-        transparent: true,
-        opacity: 0.7
-      })
+      () =>
+        new THREE.MeshLambertMaterial({
+          color: options.windowColor,
+          transparent: true,
+          opacity: 0.7,
+        })
     );
 
     const wheelMaterial = resourceManager.getOrCreateMaterial(
@@ -214,7 +221,7 @@ export class Car extends MovingFloatingThreeComponent {
       windowColor: options.windowColor,
       wheelColor: options.wheelColor,
       scale: options.scale,
-      ...this.getMovementInfo()
+      ...this.getMovementInfo(),
     };
   }
 }
@@ -223,7 +230,7 @@ export class Car extends MovingFloatingThreeComponent {
 const CarLegacy = Car as any;
 
 // Add legacy load method that returns mesh directly
-CarLegacy.prototype.load = function(): THREE.Object3D {
+CarLegacy.prototype.load = function (): THREE.Object3D {
   const car = this.loadSync();
   // Start moving after legacy load
   this.startMoving();

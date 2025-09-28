@@ -20,7 +20,10 @@ export class ComponentRegistry {
    * IMPORTANT: This maintains a reference to the actual component instance,
    * not just the mesh, ensuring behaviors like floating animations continue working.
    */
-  async register(component: IThreeComponent, prefix: string = 'component'): Promise<THREE.Object3D> {
+  async register(
+    component: IThreeComponent,
+    prefix: string = 'component'
+  ): Promise<THREE.Object3D> {
     const id = `${prefix}_${this.nextId++}`;
     this.components.set(id, component);
 
@@ -52,8 +55,9 @@ export class ComponentRegistry {
    * Get all components of a specific type
    */
   getComponentsByType<T extends IThreeComponent>(type: new (...args: any[]) => T): T[] {
-    return Array.from(this.components.values())
-      .filter((component): component is T => component instanceof type);
+    return Array.from(this.components.values()).filter(
+      (component): component is T => component instanceof type
+    );
   }
 
   /**
@@ -101,7 +105,7 @@ export class ComponentRegistry {
 
     return {
       totalComponents: this.components.size,
-      byType
+      byType,
     };
   }
 

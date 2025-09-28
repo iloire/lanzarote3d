@@ -164,11 +164,7 @@ export class ComponentLoadError extends Error {
   public readonly componentName: string;
   public override readonly cause?: Error;
 
-  constructor(
-    componentName: string,
-    message: string,
-    cause?: Error
-  ) {
+  constructor(componentName: string, message: string, cause?: Error) {
     super(`Component '${componentName}' failed to load: ${message}`);
     this.name = 'ComponentLoadError';
     this.componentName = componentName;
@@ -190,12 +186,14 @@ export class ComponentDisposedError extends Error {
  * Type guard to check if an object implements IThreeComponent
  */
 export function isThreeComponent(obj: any): obj is IThreeComponent {
-  return obj &&
+  return (
+    obj &&
     typeof obj.load === 'function' &&
     typeof obj.dispose === 'function' &&
     typeof obj.update === 'function' &&
     typeof obj.setVisible === 'function' &&
     typeof obj.getObject === 'function' &&
     typeof obj.metadata === 'object' &&
-    typeof obj.isLoaded === 'boolean';
+    typeof obj.isLoaded === 'boolean'
+  );
 }

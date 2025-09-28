@@ -29,7 +29,7 @@ class PineTree extends SimpleThreeComponent {
       name: 'PineTree',
       version: '1.0.0',
       description: 'Procedural pine tree with trunk and conical foliage',
-      tags: ['scenery', 'nature', 'tree', 'procedural']
+      tags: ['scenery', 'nature', 'tree', 'procedural'],
     };
 
     super(metadata, options);
@@ -56,7 +56,7 @@ class PineTree extends SimpleThreeComponent {
     const pineGroup = new THREE.Group();
 
     // Create foliage (pine cone)
-    const foliage = await super.load() as THREE.Mesh;
+    const foliage = (await super.load()) as THREE.Mesh;
     const foliageMaterial = this.materialVariation
       ? pineMaterials[rndIntBetween(0, pineMaterials.length - 1)]
       : pineMaterials[0];
@@ -104,7 +104,7 @@ class PineTree extends SimpleThreeComponent {
 const PineTreeLegacy = PineTree as any;
 
 // Add legacy load method that returns group directly
-PineTreeLegacy.prototype.load = function(): THREE.Object3D {
+PineTreeLegacy.prototype.load = function (): THREE.Object3D {
   return this.createPineTreeGroup();
 };
 

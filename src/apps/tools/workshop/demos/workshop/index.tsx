@@ -50,7 +50,7 @@ class WorkshopApp extends WorkshopDemoBase {
         create: true,
         size: { width: 400, height: 300 },
         color: 0x8fbc8f, // Dark sea green for ground
-        opacity: 0.3
+        opacity: 0.3,
       },
       lighting: {
         sunPosition: 12,
@@ -132,7 +132,11 @@ class WorkshopApp extends WorkshopDemoBase {
       try {
         const house = new House({ type: config.type });
         const houseMesh = house.load(gui);
-        houseMesh.position.set(config.position[0] ?? 0, config.position[1] ?? 0, config.position[2] ?? 0);
+        houseMesh.position.set(
+          config.position[0] ?? 0,
+          config.position[1] ?? 0,
+          config.position[2] ?? 0
+        );
         scene.add(houseMesh);
         this.componentMeshes.push(houseMesh);
 
@@ -188,7 +192,11 @@ class WorkshopApp extends WorkshopDemoBase {
       try {
         const stone = new Stone();
         const stoneMesh = stone.load();
-        stoneMesh.position.set(config.position[0] ?? 0, config.position[1] ?? 0, config.position[2] ?? 0);
+        stoneMesh.position.set(
+          config.position[0] ?? 0,
+          config.position[1] ?? 0,
+          config.position[2] ?? 0
+        );
         stoneMesh.scale.set(config.scale[0] ?? 1, config.scale[1] ?? 1, config.scale[2] ?? 1);
         scene.add(stoneMesh);
         this.componentMeshes.push(stoneMesh);
@@ -210,7 +218,7 @@ class WorkshopApp extends WorkshopDemoBase {
       const groundMaterial = new THREE.MeshStandardMaterial({
         color: 0x8fbc8f, // Dark sea green for ground
         transparent: true,
-        opacity: 0.3
+        opacity: 0.3,
       });
       const ground = new THREE.Mesh(groundGeometry, groundMaterial);
       ground.rotation.x = -Math.PI / 2;
@@ -231,7 +239,6 @@ class WorkshopApp extends WorkshopDemoBase {
     camera.position.set(600, 300, 300); // Much further away to show all scenery
     camera.lookAt(lookAt);
   }
-
 
   public override dispose(): void {
     console.log(`🧹 Disposing ${this.config.name}`);

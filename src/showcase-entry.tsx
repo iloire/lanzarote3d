@@ -35,7 +35,9 @@ if (rootElement && WebGL.isWebGLAvailable()) {
       initialStory={storyName}
     />
   );
-  console.log(`Loading story: "${storyName}" (query: ${queryStory || 'none'}, bundle: ${bundleName}, script src: ${scriptTag?.src})`);
+  console.log(
+    `Loading story: "${storyName}" (query: ${queryStory || 'none'}, bundle: ${bundleName}, script src: ${scriptTag?.src})`
+  );
   logger.info(`${storyName} story started (query: ${queryStory || 'none'}, bundle: ${bundleName})`);
 } else if (rootElement) {
   const warning = WebGL.getWebGLErrorMessage();

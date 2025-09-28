@@ -9,7 +9,7 @@ import {
   generateConvoy,
   generatePatrolFleet,
   generateTrafficCars,
-  generateMixedCars
+  generateMixedCars,
 } from './car-group-utils';
 
 /**
@@ -53,7 +53,7 @@ export class CarGroupCreator {
           wheelColor: carConfig.wheelColor,
           scale: carConfig.scale,
           faceDirection: carConfig.faceDirection,
-          forwardAxis: carConfig.forwardAxis
+          forwardAxis: carConfig.forwardAxis,
         });
         carMesh = await this.componentRegistry.register(car, 'car');
         break;
@@ -71,7 +71,7 @@ export class CarGroupCreator {
           roofColor: carConfig.roofColor,
           windowColor: carConfig.windowColor,
           wheelColor: carConfig.wheelColor,
-          scale: carConfig.scale
+          scale: carConfig.scale,
         });
         carMesh = await this.componentRegistry.register(car, 'autonomouscar');
         break;
@@ -143,7 +143,7 @@ export class CarGroupCreator {
     const config = {
       small: { spacing: 25, radius: 60 },
       medium: { spacing: 25, radius: 80 },
-      large: { spacing: 25, radius: 120 }
+      large: { spacing: 25, radius: 120 },
     }[size];
 
     return this.createCarGroup(terrain, cars, {
@@ -151,7 +151,7 @@ export class CarGroupCreator {
       formation: 'parking',
       spacing: config.spacing,
       groupRadius: config.radius,
-      terrain
+      terrain,
     });
   }
 
@@ -164,14 +164,14 @@ export class CarGroupCreator {
     size: 'small' | 'medium' | 'large' = 'medium'
   ): Promise<THREE.Object3D[]> {
     const cars = generateConvoy(size);
-    const spacing = size === 'small' ? 40 : (size === 'medium' ? 35 : 30);
+    const spacing = size === 'small' ? 40 : size === 'medium' ? 35 : 30;
 
     return this.createCarGroup(terrain, cars, {
       center,
       formation: 'convoy',
       spacing,
       lineDirection: new THREE.Vector3(1, 0, 0),
-      terrain
+      terrain,
     });
   }
 
@@ -184,14 +184,14 @@ export class CarGroupCreator {
     size: 'single' | 'team' | 'fleet' = 'team'
   ): Promise<THREE.Object3D[]> {
     const cars = generatePatrolFleet(size);
-    const spacing = size === 'single' ? 0 : (size === 'team' ? 50 : 60);
+    const spacing = size === 'single' ? 0 : size === 'team' ? 50 : 60;
 
     return this.createCarGroup(terrain, cars, {
       center,
       formation: size === 'single' ? 'random' : 'line',
       spacing,
       groupRadius: 100,
-      terrain
+      terrain,
     });
   }
 
@@ -204,14 +204,14 @@ export class CarGroupCreator {
     size: 'light' | 'moderate' | 'heavy' = 'moderate'
   ): Promise<THREE.Object3D[]> {
     const cars = generateTrafficCars(size);
-    const spacing = size === 'light' ? 60 : (size === 'moderate' ? 45 : 30);
+    const spacing = size === 'light' ? 60 : size === 'moderate' ? 45 : 30;
 
     return this.createCarGroup(terrain, cars, {
       center,
       formation: 'random',
       spacing,
       groupRadius: 150,
-      terrain
+      terrain,
     });
   }
 
@@ -231,7 +231,7 @@ export class CarGroupCreator {
       formation,
       spacing: 40,
       groupRadius: 120,
-      terrain
+      terrain,
     });
   }
 
@@ -249,7 +249,7 @@ export class CarGroupCreator {
       formation: 'circle',
       spacing: 30,
       groupRadius: radius,
-      terrain
+      terrain,
     });
   }
 
@@ -269,7 +269,7 @@ export class CarGroupCreator {
       spacing,
       rowCount,
       colCount: Math.ceil(cars.length / rowCount),
-      terrain
+      terrain,
     });
   }
 
@@ -297,9 +297,11 @@ export class CarGroupCreator {
         speed: 0.15 + Math.random() * 0.1,
         radius: 300,
         scale: 0.9 + Math.random() * 0.2,
-        bodyColor: ['#FFFFFF', '#000000', '#C0C0C0', '#800000', '#000080'][Math.floor(Math.random() * 5)],
-        drivingMode: isAutonomous ? 'EXPLORATION' as any : undefined,
-        explorationRadius: isAutonomous ? 200 : undefined
+        bodyColor: ['#FFFFFF', '#000000', '#C0C0C0', '#800000', '#000080'][
+          Math.floor(Math.random() * 5)
+        ],
+        drivingMode: isAutonomous ? ('EXPLORATION' as any) : undefined,
+        explorationRadius: isAutonomous ? 200 : undefined,
       });
     }
 
@@ -308,7 +310,7 @@ export class CarGroupCreator {
       formation: 'line',
       spacing,
       lineDirection: direction,
-      terrain
+      terrain,
     });
   }
 }

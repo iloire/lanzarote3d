@@ -17,17 +17,41 @@ import { StoryOptions } from '../../../../shared/types';
 // Professional color palettes with lower contrast and more realistic tones
 const COLOR_PALETTES = {
   military: [
-    '#4A5D3A', '#3D4E2F', '#556B3D', '#6B7A5B', '#7A8B6C',
-    '#2F3F23', '#5C6B4A', '#8A9B7A', '#3A4B2D', '#4F6040'
+    '#4A5D3A',
+    '#3D4E2F',
+    '#556B3D',
+    '#6B7A5B',
+    '#7A8B6C',
+    '#2F3F23',
+    '#5C6B4A',
+    '#8A9B7A',
+    '#3A4B2D',
+    '#4F6040',
   ],
   gray: [
-    '#6A6A6A', '#5A5A5A', '#7A7A7A', '#8A8A8A', '#5D5D5D',
-    '#707070', '#757575', '#656565', '#808080', '#606060'
+    '#6A6A6A',
+    '#5A5A5A',
+    '#7A7A7A',
+    '#8A8A8A',
+    '#5D5D5D',
+    '#707070',
+    '#757575',
+    '#656565',
+    '#808080',
+    '#606060',
   ],
   steel: [
-    '#4A4A52', '#5A5A62', '#525252', '#4F4F57', '#565664',
-    '#464653', '#58586C', '#4C4C59', '#54546B', '#4A4A5F'
-  ]
+    '#4A4A52',
+    '#5A5A62',
+    '#525252',
+    '#4F4F57',
+    '#565664',
+    '#464653',
+    '#58586C',
+    '#4C4C59',
+    '#54546B',
+    '#4A4A5F',
+  ],
 };
 
 const getRandomColorFromPalette = (): string => {
@@ -85,7 +109,9 @@ class HelmetWorkshopApp extends WorkshopDemoBase {
       });
 
       this.isLoaded = true;
-      console.log(`✅ ${this.config.name} loaded successfully with ${this.helmetMeshes.length} helmets`);
+      console.log(
+        `✅ ${this.config.name} loaded successfully with ${this.helmetMeshes.length} helmets`
+      );
     } catch (error) {
       this.handleError(error as Error, 'load');
       throw error;

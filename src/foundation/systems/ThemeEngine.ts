@@ -15,9 +15,7 @@ export class ThemeEngine {
     theme: Theme,
     applicationOptions: ThemeApplicationOptions = {}
   ): Promise<void> {
-    const {
-      skipComponents = [],
-    } = applicationOptions;
+    const { skipComponents = [] } = applicationOptions;
 
     console.log(`Applying theme: ${theme.name}`);
 

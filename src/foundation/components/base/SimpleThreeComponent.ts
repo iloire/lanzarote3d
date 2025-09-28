@@ -34,7 +34,7 @@ export abstract class SimpleThreeComponent extends BaseThreeComponent {
       transparent: this._options.transparent || false,
       opacity: this._options.opacity || 1.0,
       wireframe: this._options.wireframe || false,
-      side: this._options.doubleSided ? THREE.DoubleSide : THREE.FrontSide
+      side: this._options.doubleSided ? THREE.DoubleSide : THREE.FrontSide,
     };
   }
 
@@ -171,5 +171,8 @@ export interface ShadowOptions {
 /**
  * Combined options for simple Three.js components
  */
-export interface SimpleComponentOptions extends ComponentOptions, TransformOptions, MaterialOptions, ShadowOptions {
-}
+export interface SimpleComponentOptions
+  extends ComponentOptions,
+    TransformOptions,
+    MaterialOptions,
+    ShadowOptions {}

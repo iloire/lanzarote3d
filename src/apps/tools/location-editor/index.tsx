@@ -33,7 +33,16 @@ class LocationEditorApp extends TerrainBase {
       name: 'Location Editor',
       description:
         'Interactive tool for creating and editing flight locations with takeoffs, landings, and fly zones',
-      requiredComponents: ['scene', 'camera', 'renderer', 'controls', 'gui', 'terrain', 'water', 'sky'],
+      requiredComponents: [
+        'scene',
+        'camera',
+        'renderer',
+        'controls',
+        'gui',
+        'terrain',
+        'water',
+        'sky',
+      ],
       scene: {
         environment: 'lanzarote',
         lighting: 'dynamic',

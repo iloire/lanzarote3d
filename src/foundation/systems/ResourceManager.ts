@@ -159,7 +159,7 @@ export class ResourceManager {
       size: this.estimateMaterialSize(material),
       lastAccessed: Date.now(),
       referenceCount: 1,
-      type: 'material'
+      type: 'material',
     });
 
     return material;
@@ -168,7 +168,10 @@ export class ResourceManager {
   /**
    * Convenience method: Create or retrieve a shared geometry
    */
-  public getOrCreateGeometry(id: string, generator: () => THREE.BufferGeometry): THREE.BufferGeometry {
+  public getOrCreateGeometry(
+    id: string,
+    generator: () => THREE.BufferGeometry
+  ): THREE.BufferGeometry {
     return this.getGeometry(id, generator);
   }
 
@@ -202,7 +205,7 @@ export class ResourceManager {
       if (entry.referenceCount <= 0) {
         this.cache.set(id, {
           ...entry,
-          lastAccessed: Date.now()
+          lastAccessed: Date.now(),
         });
       }
     }
@@ -222,7 +225,7 @@ export class ResourceManager {
       geometries: 0,
       materials: 0,
       textures: 0,
-      total: 0
+      total: 0,
     };
 
     this.cache.forEach(entry => {
@@ -256,7 +259,7 @@ export class ResourceManager {
       materials,
       textures,
       models,
-      memoryUsage
+      memoryUsage,
     };
   }
 
@@ -268,10 +271,8 @@ export class ResourceManager {
     const itemsToRemove: string[] = [];
 
     this.cache.forEach((entry, id) => {
-      const shouldRemove = force || (
-        entry.referenceCount <= 0 &&
-        (now - entry.lastAccessed) > this.maxIdleTime
-      );
+      const shouldRemove =
+        force || (entry.referenceCount <= 0 && now - entry.lastAccessed > this.maxIdleTime);
 
       if (shouldRemove) {
         itemsToRemove.push(id);
@@ -357,12 +358,12 @@ export class ResourceManager {
 
       loader.load(
         url,
-        (texture) => {
+        texture => {
           clearTimeout(timeoutId);
           resolve(texture);
         },
         undefined,
-        (error) => {
+        error => {
           clearTimeout(timeoutId);
           reject(error);
         }
@@ -380,7 +381,7 @@ export class ResourceManager {
       size,
       lastAccessed: Date.now(),
       referenceCount: 1,
-      type: 'material'
+      type: 'material',
     };
 
     this.cache.set(id, entry);
@@ -396,7 +397,7 @@ export class ResourceManager {
       size,
       lastAccessed: Date.now(),
       referenceCount: 1,
-      type: 'geometry'
+      type: 'geometry',
     };
 
     this.cache.set(id, entry);
@@ -413,7 +414,7 @@ export class ResourceManager {
       lastAccessed: Date.now(),
       referenceCount: 1,
       url,
-      type: 'texture'
+      type: 'texture',
     };
 
     this.cache.set(id, entry);
@@ -425,7 +426,7 @@ export class ResourceManager {
       this.cache.set(id, {
         ...entry,
         referenceCount: Math.max(0, entry.referenceCount + delta),
-        lastAccessed: Date.now()
+        lastAccessed: Date.now(),
       });
     }
   }

@@ -32,13 +32,12 @@ class Igloo extends SimpleThreeComponent {
       name: 'Igloo',
       version: '1.0.0',
       description: 'Procedural igloo component with ice blocks, entrance, and snow details',
-      tags: ['scenery', 'building', 'arctic', 'procedural']
+      tags: ['scenery', 'building', 'arctic', 'procedural'],
     };
 
     // Handle both old (size only) and new (options object) constructor signatures
-    const iglooOptions: IglooOptions = typeof options === 'object' && 'size' in options
-      ? options
-      : { size: options as IglooSize };
+    const iglooOptions: IglooOptions =
+      typeof options === 'object' && 'size' in options ? options : { size: options as IglooSize };
 
     super(metadata, iglooOptions);
     this.size = iglooOptions.size;
@@ -82,7 +81,7 @@ class Igloo extends SimpleThreeComponent {
     for (let row = 0; row < rows; row++) {
       const y = -this.height / 2 + row * blockSize;
       const currentRadius = this.radius * (1 - (row / rows) * 0.3); // Taper toward top
-      const blocksInRow = Math.floor(currentRadius / blockSize * 2);
+      const blocksInRow = Math.floor((currentRadius / blockSize) * 2);
 
       for (let i = 0; i < blocksInRow; i++) {
         const angle = (i / blocksInRow) * Math.PI * 2;
@@ -148,7 +147,7 @@ class Igloo extends SimpleThreeComponent {
     const iglooGroup = new THREE.Group();
 
     // Add main dome (using the base geometry but with proper material)
-    const dome = await super.load() as THREE.Mesh;
+    const dome = (await super.load()) as THREE.Mesh;
     if (dome.material instanceof THREE.Material) {
       dome.material = mat_ice;
     }
@@ -204,7 +203,7 @@ class Igloo extends SimpleThreeComponent {
 const IglooLegacy = Igloo as any;
 
 // Add legacy load method that returns group directly and supports GUI
-IglooLegacy.prototype.load = function(gui?: any): THREE.Object3D {
+IglooLegacy.prototype.load = function (gui?: any): THREE.Object3D {
   const igloo = this.createIglooGroup();
 
   if (gui) {

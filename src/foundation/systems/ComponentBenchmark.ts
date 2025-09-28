@@ -65,7 +65,7 @@ export class ComponentBenchmark {
       cleanupTime: 0,
       avgCleanupTime: 0,
       resourcesShared: 0,
-      errors: []
+      errors: [],
     };
 
     // Force garbage collection if available
@@ -102,7 +102,8 @@ export class ComponentBenchmark {
       // Calculate resource sharing benefits
       const finalResourceStats = resourceManager.getStats();
       result.resourcesShared =
-        (finalResourceStats.geometries - initialResourceStats.geometries) +
+        finalResourceStats.geometries -
+        initialResourceStats.geometries +
         (finalResourceStats.materials - initialResourceStats.materials) +
         (finalResourceStats.textures - initialResourceStats.textures);
 
@@ -119,7 +120,6 @@ export class ComponentBenchmark {
 
       result.cleanupTime = performance.now() - cleanupStart;
       result.avgCleanupTime = result.cleanupTime / iterations;
-
     } catch (error) {
       result.errors.push(error instanceof Error ? error.message : String(error));
     }
@@ -152,7 +152,7 @@ export class ComponentBenchmark {
       cleanupTime: 0,
       avgCleanupTime: 0,
       resourcesShared: 0,
-      errors: []
+      errors: [],
     };
 
     // Force garbage collection if available
@@ -208,7 +208,6 @@ export class ComponentBenchmark {
 
       result.cleanupTime = performance.now() - cleanupStart;
       result.avgCleanupTime = result.cleanupTime / iterations;
-
     } catch (error) {
       result.errors.push(error instanceof Error ? error.message : String(error));
     }
@@ -223,22 +222,32 @@ export class ComponentBenchmark {
    * Compare two benchmark results
    */
   public compareResults(modernResult: BenchmarkResult, legacyResult: BenchmarkResult): void {
-    console.log(`\n📊 Performance Comparison: ${modernResult.componentName} vs ${legacyResult.componentName}`);
+    console.log(
+      `\n📊 Performance Comparison: ${modernResult.componentName} vs ${legacyResult.componentName}`
+    );
     console.log('='.repeat(80));
 
     console.log(`\n🏗️ Creation Performance:`);
     console.log(`  Modern: ${modernResult.avgCreationTime.toFixed(2)}ms per component`);
     console.log(`  Legacy: ${legacyResult.avgCreationTime.toFixed(2)}ms per component`);
 
-    const creationImprovement = ((legacyResult.avgCreationTime - modernResult.avgCreationTime) / legacyResult.avgCreationTime) * 100;
-    console.log(`  Performance: ${creationImprovement > 0 ? '+' : ''}${creationImprovement.toFixed(1)}% ${creationImprovement > 0 ? 'faster' : 'slower'}`);
+    const creationImprovement =
+      ((legacyResult.avgCreationTime - modernResult.avgCreationTime) /
+        legacyResult.avgCreationTime) *
+      100;
+    console.log(
+      `  Performance: ${creationImprovement > 0 ? '+' : ''}${creationImprovement.toFixed(1)}% ${creationImprovement > 0 ? 'faster' : 'slower'}`
+    );
 
     console.log(`\n🧠 Memory Usage:`);
     console.log(`  Modern: ${(modernResult.memoryUsed / 1024 / 1024).toFixed(2)} MB`);
     console.log(`  Legacy: ${(legacyResult.memoryUsed / 1024 / 1024).toFixed(2)} MB`);
 
-    const memoryImprovement = ((legacyResult.memoryUsed - modernResult.memoryUsed) / legacyResult.memoryUsed) * 100;
-    console.log(`  Memory savings: ${memoryImprovement > 0 ? '+' : ''}${memoryImprovement.toFixed(1)}%`);
+    const memoryImprovement =
+      ((legacyResult.memoryUsed - modernResult.memoryUsed) / legacyResult.memoryUsed) * 100;
+    console.log(
+      `  Memory savings: ${memoryImprovement > 0 ? '+' : ''}${memoryImprovement.toFixed(1)}%`
+    );
 
     console.log(`\n🧹 Cleanup Performance:`);
     console.log(`  Modern: ${modernResult.avgCleanupTime.toFixed(2)}ms per component`);
@@ -258,12 +267,14 @@ export class ComponentBenchmark {
   /**
    * Run a comprehensive benchmark suite
    */
-  public async runBenchmarkSuite(testCases: Array<{
-    modern: ComponentConstructor;
-    legacy: ComponentConstructor;
-    options?: any;
-    iterations?: number;
-  }>): Promise<void> {
+  public async runBenchmarkSuite(
+    testCases: Array<{
+      modern: ComponentConstructor;
+      legacy: ComponentConstructor;
+      options?: any;
+      iterations?: number;
+    }>
+  ): Promise<void> {
     console.log('🎯 Starting Component Benchmark Suite');
     console.log('=====================================\n');
 
@@ -285,7 +296,6 @@ export class ComponentBenchmark {
         );
 
         this.compareResults(modernResult, legacyResult);
-
       } catch (error) {
         console.error(`❌ Benchmark failed:`, error);
       }
@@ -329,7 +339,7 @@ export class ComponentBenchmark {
   }
 
   private disposeMesh(object: THREE.Object3D): void {
-    object.traverse((child) => {
+    object.traverse(child => {
       if (child instanceof THREE.Mesh) {
         if (child.geometry) {
           child.geometry.dispose();

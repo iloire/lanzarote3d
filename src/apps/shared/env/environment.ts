@@ -7,7 +7,13 @@ import Tree from '../../../foundation/components/scenery/Tree';
 import PineTree from '../../../foundation/components/scenery/PineTree';
 import Stone from '../../../foundation/components/scenery/Stone';
 import House, { HouseType } from '../../../foundation/components/scenery/House';
-import { SmallSailBoat, FishingBoat, Yacht, SpeedBoat, PatrolBoat } from '../../../foundation/components/scenery';
+import {
+  SmallSailBoat,
+  FishingBoat,
+  Yacht,
+  SpeedBoat,
+  PatrolBoat,
+} from '../../../foundation/components/scenery';
 import { Car } from '../../../foundation/components/vehicles/Car';
 import { AutonomousCar } from '../../../foundation/components/vehicles/AutonomousCar';
 import { MovementPattern } from '../../../foundation/systems/behaviors/MovingBehavior';
@@ -36,13 +42,12 @@ interface BoatTypeWeights {
  * Default weights for boat types (higher = more common)
  */
 const DEFAULT_BOAT_WEIGHTS: BoatTypeWeights = {
-  'SmallSailBoat': 4,    // Most common - recreational sailing
-  'FishingBoat': 3,      // Common - local fishing industry
-  'SpeedBoat': 2,        // Common - recreational water sports
-  'Yacht': 1,            // Less common - luxury vessels
-  'PatrolBoat': 0.8      // Rare but visible - official/security vessels
+  SmallSailBoat: 4, // Most common - recreational sailing
+  FishingBoat: 3, // Common - local fishing industry
+  SpeedBoat: 2, // Common - recreational water sports
+  Yacht: 1, // Less common - luxury vessels
+  PatrolBoat: 0.8, // Rare but visible - official/security vessels
 };
-
 
 class Environment {
   birds!: Birds;
@@ -86,29 +91,41 @@ class Environment {
     this.scene.add(hgMesh);
   }
 
-  async addBoats(water: THREE.Mesh, options?: {
-    randomize?: boolean;
-    types?: string[];
-    weights?: BoatTypeWeights;
-    selectionMode?: 'uniform' | 'weighted';
-  }) {
+  async addBoats(
+    water: THREE.Mesh,
+    options?: {
+      randomize?: boolean;
+      types?: string[];
+      weights?: BoatTypeWeights;
+      selectionMode?: 'uniform' | 'weighted';
+    }
+  ) {
     const {
       randomize = true,
       types = ['SmallSailBoat', 'FishingBoat', 'Yacht', 'SpeedBoat', 'PatrolBoat'],
       weights = DEFAULT_BOAT_WEIGHTS,
-      selectionMode = 'weighted'
+      selectionMode = 'weighted',
     } = options || {};
 
     // Create boats for first area (marina/harbor - more variety)
-    const group1OfBoats = await this.boatGroupCreator.createRecreationalBoats(water, new THREE.Vector3(7879, 0, -5445), 4, 'random');
+    const group1OfBoats = await this.boatGroupCreator.createRecreationalBoats(
+      water,
+      new THREE.Vector3(7879, 0, -5445),
+      4,
+      'random'
+    );
 
     // Create boats for second area (open water - different distribution)
-    const group2OfBoats = await this.boatGroupCreator.createRecreationalBoats(water, new THREE.Vector3(8279, 0, -6455), 3, 'random');
+    const group2OfBoats = await this.boatGroupCreator.createRecreationalBoats(
+      water,
+      new THREE.Vector3(8279, 0, -6455),
+      3,
+      'random'
+    );
 
     // Fix movement origins for all boats after positioning
     this.updateAllBoatMovementOrigins();
   }
-
 
   // Convenience methods for backward compatibility
   async addMixedBoats(water: THREE.Mesh) {
@@ -196,14 +213,25 @@ class Environment {
     count: number = 8,
     formation: 'circle' | 'random' = 'random'
   ): Promise<THREE.Object3D[]> {
-    const meshes = await this.boatGroupCreator.createRecreationalBoats(water, center, count, formation);
+    const meshes = await this.boatGroupCreator.createRecreationalBoats(
+      water,
+      center,
+      count,
+      formation
+    );
     this.updateAllBoatMovementOrigins();
     return meshes;
   }
 
   async addHouses(terrain: THREE.Mesh) {
-    const house = await this.componentRegistry.register(new House({ type: HouseType.Medium }), 'house_medium');
-    const house2 = await this.componentRegistry.register(new House({ type: HouseType.Small }), 'house_small');
+    const house = await this.componentRegistry.register(
+      new House({ type: HouseType.Medium }),
+      'house_medium'
+    );
+    const house2 = await this.componentRegistry.register(
+      new House({ type: HouseType.Small }),
+      'house_small'
+    );
 
     addMeshAroundArea(
       [house2, house],
@@ -381,7 +409,12 @@ class Environment {
     endPoint: THREE.Vector3,
     carCount: number = 5
   ): Promise<THREE.Object3D[]> {
-    const meshes = await this.carGroupCreator.createHighwayTraffic(terrain, startPoint, endPoint, carCount);
+    const meshes = await this.carGroupCreator.createHighwayTraffic(
+      terrain,
+      startPoint,
+      endPoint,
+      carCount
+    );
     this.updateAllCarMovementOrigins();
     return meshes;
   }

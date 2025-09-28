@@ -16,27 +16,30 @@ export interface PatrolBoatOptions extends MovableBoatComponentOptions {
  */
 export class PatrolBoat extends MovableBoatComponent {
   constructor(options: PatrolBoatOptions = {}) {
-    super({
-      name: 'PatrolBoat',
-      version: '1.0.0',
-      description: 'Patrol boat with movement and floating animation'
-    }, {
-      // Default colors - distinctive blue/white coast guard style
-      hullColor: '#0066CC',
-      accentColor: '#FFFFFF',
-      flagColor: '#FF0000',
-      scale: 1,
-      // Movement defaults - ENABLED by default for PatrolBoat
-      enableMovement: true,
-      pattern: MovementPattern.CIRCULAR,
-      speed: 0.2,
-      radius: 400,
-      autoStartMoving: true,
-      autoStartFloating: true,
-      faceDirection: true,
-      forwardAxis: 'x', // Boats have bow pointing in +X direction
-      ...options
-    });
+    super(
+      {
+        name: 'PatrolBoat',
+        version: '1.0.0',
+        description: 'Patrol boat with movement and floating animation',
+      },
+      {
+        // Default colors - distinctive blue/white coast guard style
+        hullColor: '#0066CC',
+        accentColor: '#FFFFFF',
+        flagColor: '#FF0000',
+        scale: 1,
+        // Movement defaults - ENABLED by default for PatrolBoat
+        enableMovement: true,
+        pattern: MovementPattern.CIRCULAR,
+        speed: 0.2,
+        radius: 400,
+        autoStartMoving: true,
+        autoStartFloating: true,
+        faceDirection: true,
+        forwardAxis: 'x', // Boats have bow pointing in +X direction
+        ...options,
+      }
+    );
   }
 
   protected createGeometry(): THREE.BufferGeometry {
@@ -64,10 +67,11 @@ export class PatrolBoat extends MovableBoatComponent {
 
     const flagMaterial = resourceManager.getOrCreateMaterial(
       `patrol_boat_flag_${options.flagColor}`,
-      () => new THREE.MeshLambertMaterial({
-        color: options.flagColor,
-        side: THREE.DoubleSide
-      })
+      () =>
+        new THREE.MeshLambertMaterial({
+          color: options.flagColor,
+          side: THREE.DoubleSide,
+        })
     );
 
     const engineMaterial = resourceManager.getOrCreateMaterial(
@@ -213,7 +217,7 @@ export class PatrolBoat extends MovableBoatComponent {
       accentColor: options.accentColor,
       flagColor: options.flagColor,
       scale: options.scale,
-      ...this.getMovementInfo()
+      ...this.getMovementInfo(),
     };
   }
 }

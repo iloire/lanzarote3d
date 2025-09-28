@@ -15,22 +15,25 @@ export interface SpeedBoatOptions extends MovableBoatComponentOptions {
  */
 export class SpeedBoat extends MovableBoatComponent {
   constructor(options: SpeedBoatOptions = {}) {
-    super({
-      name: 'SpeedBoat',
-      version: '1.0.0',
-      description: 'Speed boat with realistic floating animation and optional movement'
-    }, {
-      hullColor: '#FF4500',
-      accentColor: '#FFFFFF',
-      engineColor: '#333333',
-      scale: 1,
-      // Movement defaults - disabled by default, can be enabled via options
-      enableMovement: false,
-      pattern: MovementPattern.LINEAR,
-      speed: 0.8,
-      radius: 200,
-      ...options
-    });
+    super(
+      {
+        name: 'SpeedBoat',
+        version: '1.0.0',
+        description: 'Speed boat with realistic floating animation and optional movement',
+      },
+      {
+        hullColor: '#FF4500',
+        accentColor: '#FFFFFF',
+        engineColor: '#333333',
+        scale: 1,
+        // Movement defaults - disabled by default, can be enabled via options
+        enableMovement: false,
+        pattern: MovementPattern.LINEAR,
+        speed: 0.8,
+        radius: 200,
+        ...options,
+      }
+    );
   }
 
   protected createGeometry(): THREE.BufferGeometry {
@@ -171,7 +174,7 @@ export class SpeedBoat extends MovableBoatComponent {
       accentColor: options.accentColor,
       engineColor: options.engineColor,
       scale: options.scale,
-      isFloating: this.isFloating()
+      isFloating: this.isFloating(),
     };
   }
 }
@@ -180,7 +183,7 @@ export class SpeedBoat extends MovableBoatComponent {
 const SpeedBoatLegacy = SpeedBoat as any;
 
 // Add legacy load method that returns mesh directly
-SpeedBoatLegacy.prototype.load = function(): THREE.Object3D {
+SpeedBoatLegacy.prototype.load = function (): THREE.Object3D {
   return this.loadSync();
 };
 

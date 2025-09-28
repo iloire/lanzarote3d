@@ -1,7 +1,10 @@
 import * as THREE from 'three';
 import Pilot from '../../../../../foundation/components/vehicles/Pilot';
 import TandemPilot from '../../../../../foundation/components/characters/TandemPilot';
-import { GlassesType, PilotHeadType } from '../../../../../foundation/components/characters/PilotHead';
+import {
+  GlassesType,
+  PilotHeadType,
+} from '../../../../../foundation/components/characters/PilotHead';
 import { StoryOptions } from '../../../../shared/types';
 import { WorkshopDemoBase, WorkshopDemoConfig } from '../../../../shared/WorkshopDemoBase';
 
@@ -9,11 +12,11 @@ import { WorkshopDemoBase, WorkshopDemoConfig } from '../../../../shared/Worksho
  * Pilot Workshop Demo - Showcases different pilot character types
  */
 class PilotWorkshopApp extends WorkshopDemoBase {
-
   constructor() {
     super({
       name: 'Pilot Workshop',
-      description: 'Workshop demo showcasing different pilot character types and customization options',
+      description:
+        'Workshop demo showcasing different pilot character types and customization options',
       ground: {
         create: false, // Don't show ground plane for character showcase
       },

@@ -40,7 +40,7 @@ const ANIMATION_CONFIG = {
 
     // Custom camera positioning (used when position = 'custom')
     customPosition: { x: 7840, y: 24, z: -5100 }, // Camera position
-    customLookAt: { x: 7900, y: 30, z: -5200 },   // Where camera looks (default: boat center)
+    customLookAt: { x: 7900, y: 30, z: -5200 }, // Where camera looks (default: boat center)
   },
 
   // Timing settings
@@ -48,46 +48,46 @@ const ANIMATION_CONFIG = {
 
   // Phase timing (as percentages of total duration)
   phases: {
-    boatFocus: 0.2,    // 50% - First phase showing boats prominently
-    transition: 0.3,  // 75% - End of transition phase
+    boatFocus: 0.2, // 50% - First phase showing boats prominently
+    transition: 0.3, // 75% - End of transition phase
     // Final phase (paraglider focus) is from 75% to 100%
   },
 
   // Camera positions (Three.js Vector3 coordinates)
   positions: {
-    initial: { x: 8200, y: 80, z: -6200 },      // Behind boats at water level
-    boatCenter: { x: 7900, y: 30, z: -5200 },   // Center of boat area (look target)
+    initial: { x: 8200, y: 80, z: -6200 }, // Behind boats at water level
+    boatCenter: { x: 7900, y: 30, z: -5200 }, // Center of boat area (look target)
     intermediate: { x: 7200, y: 400, z: -3000 }, // Rising toward paraglider area
     // Final position is calculated relative to paraglider: pgPos + finalOffset
-    finalOffset: { x: -100, y: 50, z: 200 },    // Offset from paraglider position
+    finalOffset: { x: -100, y: 50, z: 200 }, // Offset from paraglider position
 
     // Static camera positions (used when enableAnimation = false)
     static: {
-      closeUp: { x: 7900, y: 70, z: -5120 },    // Close to boats, slightly elevated
-      overhead: { x: 7900, y: 150, z: -5200 },  // Overhead view of boats
+      closeUp: { x: 7900, y: 70, z: -5120 }, // Close to boats, slightly elevated
+      overhead: { x: 7900, y: 150, z: -5200 }, // Overhead view of boats
       waterLevel: { x: 7900, y: 20, z: -5100 }, // At water level, very close
-    }
+    },
   },
 
   // Movement speed multipliers (lower = slower movement)
   speeds: {
-    phase1Movement: 0.05,    // How fast camera moves in phase 1 (boats focus)
-    phase1LookShift: 0.05,   // How fast look target shifts in phase 1
-    phase2Movement: 0.1,     // Movement speed in transition phase
+    phase1Movement: 0.05, // How fast camera moves in phase 1 (boats focus)
+    phase1LookShift: 0.05, // How fast look target shifts in phase 1
+    phase2Movement: 0.1, // Movement speed in transition phase
     phase2Interpolation: 0.15, // Interpolation factor for phase 2 intermediate position
-    phase2LookShift: 0.15,   // Look target shift speed in phase 2
-    phase3LookShift: 0.08,   // Final phase look target adjustment speed
+    phase2LookShift: 0.15, // Look target shift speed in phase 2
+    phase3LookShift: 0.08, // Final phase look target adjustment speed
   },
 
   // Camera floating effect (after animation completes)
   floating: {
-    amplitude: 0,      // Floating amplitude
-    speed: 1.2,        // Floating speed multiplier
+    amplitude: 0, // Floating amplitude
+    speed: 1.2, // Floating speed multiplier
     timeMultiplier: 0.0005, // Time scaling for floating calculations
     dampening: {
-      y: 0.02,         // Y-axis floating dampening
-      x: 0.01,         // X-axis floating dampening
-      z: 0.01,         // Z-axis floating dampening
+      y: 0.02, // Y-axis floating dampening
+      x: 0.01, // X-axis floating dampening
+      z: 0.01, // Z-axis floating dampening
     },
   },
 
@@ -246,9 +246,21 @@ class BoatsAnimationApp extends TerrainBase {
 
     // Camera positions from ANIMATION_CONFIG - easy to tweak!
     const { positions } = ANIMATION_CONFIG;
-    const initialCameraPosition = new THREE.Vector3(positions.initial.x, positions.initial.y, positions.initial.z);
-    const boatCenterPosition = new THREE.Vector3(positions.boatCenter.x, positions.boatCenter.y, positions.boatCenter.z);
-    const intermediatePosition = new THREE.Vector3(positions.intermediate.x, positions.intermediate.y, positions.intermediate.z);
+    const initialCameraPosition = new THREE.Vector3(
+      positions.initial.x,
+      positions.initial.y,
+      positions.initial.z
+    );
+    const boatCenterPosition = new THREE.Vector3(
+      positions.boatCenter.x,
+      positions.boatCenter.y,
+      positions.boatCenter.z
+    );
+    const intermediatePosition = new THREE.Vector3(
+      positions.intermediate.x,
+      positions.intermediate.y,
+      positions.intermediate.z
+    );
 
     // Final position calculated from paraglider position + offset
     const finalCameraPosition = new THREE.Vector3(
@@ -340,7 +352,11 @@ class BoatsAnimationApp extends TerrainBase {
             const easedProgress = phase2Progress * phase2Progress * (3 - 2 * phase2Progress);
 
             currentPosition = new THREE.Vector3().lerpVectors(
-              new THREE.Vector3().lerpVectors(initialCameraPosition, intermediatePosition, speeds.phase2Interpolation),
+              new THREE.Vector3().lerpVectors(
+                initialCameraPosition,
+                intermediatePosition,
+                speeds.phase2Interpolation
+              ),
               finalCameraPosition,
               easedProgress * speeds.phase2Movement
             );
@@ -365,7 +381,11 @@ class BoatsAnimationApp extends TerrainBase {
 
             currentPosition = new THREE.Vector3().lerpVectors(
               new THREE.Vector3().lerpVectors(
-                new THREE.Vector3().lerpVectors(initialCameraPosition, intermediatePosition, speeds.phase2Interpolation),
+                new THREE.Vector3().lerpVectors(
+                  initialCameraPosition,
+                  intermediatePosition,
+                  speeds.phase2Interpolation
+                ),
                 finalCameraPosition,
                 speeds.phase2Movement
               ),

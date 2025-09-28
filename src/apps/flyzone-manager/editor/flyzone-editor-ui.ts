@@ -422,7 +422,7 @@ export class FlyzoneEditorUI {
 
     // Mode buttons
     this.container.querySelectorAll('.mode-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', e => {
         const mode = (e.currentTarget as HTMLElement).dataset.mode as any;
         this.onAction('modeChange', { type: mode });
         this.refresh();
@@ -431,7 +431,7 @@ export class FlyzoneEditorUI {
 
     // Action buttons
     this.container.querySelectorAll('.action-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', e => {
         const action = (e.currentTarget as HTMLElement).dataset.action;
         this.onAction(action || '');
       });
@@ -440,7 +440,7 @@ export class FlyzoneEditorUI {
     // Phase type selector
     const phaseTypeSelect = this.container.querySelector('#phase-type') as HTMLSelectElement;
     if (phaseTypeSelect) {
-      phaseTypeSelect.addEventListener('change', (e) => {
+      phaseTypeSelect.addEventListener('change', e => {
         const subtype = (e.target as HTMLSelectElement).value;
         this.onAction('modeChange', { ...this.editorState.mode, subtype });
       });
@@ -449,7 +449,7 @@ export class FlyzoneEditorUI {
     // Location property inputs
     const titleInput = this.container.querySelector('#location-title') as HTMLInputElement;
     if (titleInput) {
-      titleInput.addEventListener('input', (e) => {
+      titleInput.addEventListener('input', e => {
         if (this.editorState.currentLocation) {
           this.editorState.currentLocation.title = (e.target as HTMLInputElement).value;
           this.onAction('locationChanged');
@@ -457,9 +457,11 @@ export class FlyzoneEditorUI {
       });
     }
 
-    const descriptionInput = this.container.querySelector('#location-description') as HTMLTextAreaElement;
+    const descriptionInput = this.container.querySelector(
+      '#location-description'
+    ) as HTMLTextAreaElement;
     if (descriptionInput) {
-      descriptionInput.addEventListener('input', (e) => {
+      descriptionInput.addEventListener('input', e => {
         if (this.editorState.currentLocation) {
           this.editorState.currentLocation.description = (e.target as HTMLTextAreaElement).value;
           this.onAction('locationChanged');
@@ -469,7 +471,7 @@ export class FlyzoneEditorUI {
 
     const regionInput = this.container.querySelector('#location-region') as HTMLInputElement;
     if (regionInput) {
-      regionInput.addEventListener('input', (e) => {
+      regionInput.addEventListener('input', e => {
         if (this.editorState.currentLocation) {
           this.editorState.currentLocation.region = (e.target as HTMLInputElement).value;
           this.onAction('locationChanged');
@@ -518,7 +520,9 @@ export class FlyzoneEditorUI {
 
     // Basic property inputs
     const titleInput = this.container.querySelector('#selected-title') as HTMLInputElement;
-    const descriptionInput = this.container.querySelector('#selected-description') as HTMLTextAreaElement;
+    const descriptionInput = this.container.querySelector(
+      '#selected-description'
+    ) as HTMLTextAreaElement;
 
     if (titleInput) {
       titleInput.addEventListener('input', () => {
@@ -555,8 +559,12 @@ export class FlyzoneEditorUI {
   }
 
   private setupTakeoffEventListeners(): void {
-    const difficultySelect = this.container?.querySelector('#selected-difficulty') as HTMLSelectElement;
-    const walkingTimeInput = this.container?.querySelector('#selected-walking-time') as HTMLInputElement;
+    const difficultySelect = this.container?.querySelector(
+      '#selected-difficulty'
+    ) as HTMLSelectElement;
+    const walkingTimeInput = this.container?.querySelector(
+      '#selected-walking-time'
+    ) as HTMLInputElement;
     const hazardsInput = this.container?.querySelector('#selected-hazards') as HTMLInputElement;
 
     if (difficultySelect) {
@@ -610,7 +618,9 @@ export class FlyzoneEditorUI {
   }
 
   private setupPhaseEventListeners(): void {
-    const phaseTypeSelect = this.container?.querySelector('#selected-phase-type') as HTMLSelectElement;
+    const phaseTypeSelect = this.container?.querySelector(
+      '#selected-phase-type'
+    ) as HTMLSelectElement;
     const altMinInput = this.container?.querySelector('#selected-alt-min') as HTMLInputElement;
     const altMaxInput = this.container?.querySelector('#selected-alt-max') as HTMLInputElement;
 
@@ -648,7 +658,9 @@ export class FlyzoneEditorUI {
 
     // Get basic properties
     const titleInput = this.container.querySelector('#selected-title') as HTMLInputElement;
-    const descriptionInput = this.container.querySelector('#selected-description') as HTMLTextAreaElement;
+    const descriptionInput = this.container.querySelector(
+      '#selected-description'
+    ) as HTMLTextAreaElement;
 
     if (titleInput) data.title = titleInput.value;
     if (descriptionInput) data.description = descriptionInput.value;
@@ -668,8 +680,12 @@ export class FlyzoneEditorUI {
 
     switch (item.type) {
       case 'takeoff':
-        const difficultySelect = this.container.querySelector('#selected-difficulty') as HTMLSelectElement;
-        const walkingTimeInput = this.container.querySelector('#selected-walking-time') as HTMLInputElement;
+        const difficultySelect = this.container.querySelector(
+          '#selected-difficulty'
+        ) as HTMLSelectElement;
+        const walkingTimeInput = this.container.querySelector(
+          '#selected-walking-time'
+        ) as HTMLInputElement;
         const hazardsInput = this.container.querySelector('#selected-hazards') as HTMLInputElement;
 
         if (difficultySelect) {
@@ -684,13 +700,20 @@ export class FlyzoneEditorUI {
 
         if (hazardsInput) {
           if (!data.safety) data.safety = {};
-          data.safety.hazards = hazardsInput.value.split(',').map(h => h.trim()).filter(h => h.length > 0);
+          data.safety.hazards = hazardsInput.value
+            .split(',')
+            .map(h => h.trim())
+            .filter(h => h.length > 0);
         }
         break;
 
       case 'landing':
-        const typeSelect = this.container.querySelector('#selected-landing-type') as HTMLSelectElement;
-        const surfaceSelect = this.container.querySelector('#selected-surface') as HTMLSelectElement;
+        const typeSelect = this.container.querySelector(
+          '#selected-landing-type'
+        ) as HTMLSelectElement;
+        const surfaceSelect = this.container.querySelector(
+          '#selected-surface'
+        ) as HTMLSelectElement;
         const widthInput = this.container.querySelector('#selected-width') as HTMLInputElement;
         const lengthInput = this.container.querySelector('#selected-length') as HTMLInputElement;
 
@@ -705,7 +728,9 @@ export class FlyzoneEditorUI {
         break;
 
       case 'phase':
-        const phaseTypeSelect = this.container.querySelector('#selected-phase-type') as HTMLSelectElement;
+        const phaseTypeSelect = this.container.querySelector(
+          '#selected-phase-type'
+        ) as HTMLSelectElement;
         const altMinInput = this.container.querySelector('#selected-alt-min') as HTMLInputElement;
         const altMaxInput = this.container.querySelector('#selected-alt-max') as HTMLInputElement;
 
@@ -749,7 +774,9 @@ export class FlyzoneEditorUI {
       takeoffsEl.textContent = (this.editorState.currentLocation?.takeoffs.length || 0).toString();
     }
     if (landingsEl) {
-      landingsEl.textContent = (this.editorState.currentLocation?.landingZones.length || 0).toString();
+      landingsEl.textContent = (
+        this.editorState.currentLocation?.landingZones.length || 0
+      ).toString();
     }
     if (phasesEl) {
       phasesEl.textContent = this.getFlightPhaseCount().toString();

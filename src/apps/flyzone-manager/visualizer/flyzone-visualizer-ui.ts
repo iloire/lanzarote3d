@@ -132,7 +132,9 @@ export class FlyzoneVisualizerUI {
       `;
     }
 
-    const recommendationsHTML = recommendations.map((rec, index) => `
+    const recommendationsHTML = recommendations
+      .map(
+        (rec, index) => `
       <div class="recommendation-item ${rec === this.visualizerState.selectedRecommendation ? 'selected' : ''}"
            data-recommendation-index="${index}">
         <div class="recommendation-header">
@@ -149,13 +151,19 @@ export class FlyzoneVisualizerUI {
             <span class="speed-score">Speed: ${rec.windMatch.speedScore.toFixed(0)}</span>
           </div>
         </div>
-        ${rec.warnings.length > 0 ? `
+        ${
+          rec.warnings.length > 0
+            ? `
           <div class="warnings">
             ${rec.warnings.map(warning => `<span class="warning">⚠️ ${warning}</span>`).join('')}
           </div>
-        ` : ''}
+        `
+            : ''
+        }
       </div>
-    `).join('');
+    `
+      )
+      .join('');
 
     return `
       <div class="panel-section recommendations">
@@ -251,14 +259,18 @@ export class FlyzoneVisualizerUI {
             </ul>
           </div>
 
-          ${takeoff.safety.hazards.length > 0 ? `
+          ${
+            takeoff.safety.hazards.length > 0
+              ? `
             <div class="hazards">
               <h4>⚠️ Site Hazards</h4>
               <ul>
                 ${takeoff.safety.hazards.map(hazard => `<li>${hazard}</li>`).join('')}
               </ul>
             </div>
-          ` : ''}
+          `
+              : ''
+          }
         </div>
       </div>
     `;
@@ -273,14 +285,18 @@ export class FlyzoneVisualizerUI {
 
     return `
       <div class="panel-section advice">
-        ${analysis.safetyWarnings.length > 0 ? `
+        ${
+          analysis.safetyWarnings.length > 0
+            ? `
           <div class="safety-warnings">
             <h4>🚨 Safety Warnings</h4>
             <ul>
               ${analysis.safetyWarnings.map(warning => `<li class="warning">${warning}</li>`).join('')}
             </ul>
           </div>
-        ` : ''}
+        `
+            : ''
+        }
 
         <div class="general-advice">
           <h4>💡 General Advice</h4>
@@ -304,7 +320,24 @@ export class FlyzoneVisualizerUI {
   }
 
   private getCompassDirection(degrees: number): string {
-    const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+    const directions = [
+      'N',
+      'NNE',
+      'NE',
+      'ENE',
+      'E',
+      'ESE',
+      'SE',
+      'SSE',
+      'S',
+      'SSW',
+      'SW',
+      'WSW',
+      'W',
+      'WNW',
+      'NW',
+      'NNW',
+    ];
     const index = Math.round(degrees / 22.5) % 16;
     return directions[index];
   }
@@ -331,15 +364,19 @@ export class FlyzoneVisualizerUI {
     const analyzeBtn = this.container.querySelector('#analyze-btn');
     if (analyzeBtn) {
       analyzeBtn.addEventListener('click', () => {
-        const windDir = parseInt((this.container!.querySelector('#wind-direction') as HTMLInputElement).value);
-        const windSpeed = parseInt((this.container!.querySelector('#wind-speed') as HTMLInputElement).value);
+        const windDir = parseInt(
+          (this.container!.querySelector('#wind-direction') as HTMLInputElement).value
+        );
+        const windSpeed = parseInt(
+          (this.container!.querySelector('#wind-speed') as HTMLInputElement).value
+        );
         this.onAction('analyzeWeather', { windDirection: windDir, windSpeed: windSpeed });
       });
     }
 
     // Pilot level buttons
     this.container.querySelectorAll('.level-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', e => {
         const level = (e.currentTarget as HTMLElement).dataset.level;
         this.onAction('userLevelChange', { level });
         this.refresh();
@@ -348,7 +385,7 @@ export class FlyzoneVisualizerUI {
 
     // Recommendation items
     this.container.querySelectorAll('.recommendation-item').forEach(item => {
-      item.addEventListener('click', (e) => {
+      item.addEventListener('click', e => {
         const index = parseInt((e.currentTarget as HTMLElement).dataset.recommendationIndex || '0');
         if (this.visualizerState.weatherAnalysis) {
           const recommendation = this.visualizerState.weatherAnalysis.recommendations[index];
@@ -361,7 +398,7 @@ export class FlyzoneVisualizerUI {
     const scoreFilter = this.container.querySelector('#score-filter') as HTMLInputElement;
     const scoreValue = this.container.querySelector('#score-value');
     if (scoreFilter && scoreValue) {
-      scoreFilter.addEventListener('input', (e) => {
+      scoreFilter.addEventListener('input', e => {
         const value = parseInt((e.target as HTMLInputElement).value);
         scoreValue.textContent = value.toString();
         this.onAction('filterChange', { minScore: value });
@@ -374,7 +411,7 @@ export class FlyzoneVisualizerUI {
 
     [windDirInput, windSpeedInput].forEach(input => {
       if (input) {
-        input.addEventListener('keypress', (e) => {
+        input.addEventListener('keypress', e => {
           if (e.key === 'Enter') {
             analyzeBtn?.dispatchEvent(new Event('click'));
           }

@@ -35,14 +35,14 @@ export interface CarConfig {
  * Configuration for car group positioning and behavior
  */
 export interface CarGroupConfig {
-  center: THREE.Vector3;           // Center position for the group
+  center: THREE.Vector3; // Center position for the group
   formation: 'circle' | 'line' | 'grid' | 'random' | 'parking' | 'convoy';
-  spacing: number;                 // Minimum distance between cars
-  groupRadius?: number;            // Overall size of the group (for circle/random)
-  rowCount?: number;              // For grid/parking formation
-  colCount?: number;              // For grid/parking formation
-  lineDirection?: THREE.Vector3;   // Direction for line/convoy formation
-  terrain?: THREE.Mesh;           // Terrain mesh for height calculation and navigation
+  spacing: number; // Minimum distance between cars
+  groupRadius?: number; // Overall size of the group (for circle/random)
+  rowCount?: number; // For grid/parking formation
+  colCount?: number; // For grid/parking formation
+  lineDirection?: THREE.Vector3; // Direction for line/convoy formation
+  terrain?: THREE.Mesh; // Terrain mesh for height calculation and navigation
 }
 
 /**
@@ -78,23 +78,23 @@ export const CAR_GROUP_PRESETS: CarGroupPresets = {
   parking: {
     small: { count: 4, spacing: 25, radius: 60 },
     medium: { count: 8, spacing: 25, radius: 80 },
-    large: { count: 12, spacing: 25, radius: 120 }
+    large: { count: 12, spacing: 25, radius: 120 },
   },
   convoy: {
     small: { count: 3, spacing: 40 },
     medium: { count: 5, spacing: 35 },
-    large: { count: 8, spacing: 30 }
+    large: { count: 8, spacing: 30 },
   },
   patrol: {
     single: { count: 1, spacing: 0 },
     team: { count: 2, spacing: 50 },
-    fleet: { count: 4, spacing: 60 }
+    fleet: { count: 4, spacing: 60 },
   },
   traffic: {
     light: { count: 3, spacing: 60 },
     moderate: { count: 6, spacing: 45 },
-    heavy: { count: 10, spacing: 30 }
-  }
+    heavy: { count: 10, spacing: 30 },
+  },
 };
 
 /**
@@ -108,8 +108,8 @@ export interface CarTypeWeights {
  * Default weights for car types (higher = more common)
  */
 export const DEFAULT_CAR_WEIGHTS: CarTypeWeights = {
-  'Car': 4,           // Most common - regular cars
-  'AutonomousCar': 1  // Less common - autonomous vehicles
+  Car: 4, // Most common - regular cars
+  AutonomousCar: 1, // Less common - autonomous vehicles
 };
 
 /**
@@ -136,5 +136,5 @@ export const CAR_COLOR_PALETTES = {
     { bodyColor: '#556B2F', roofColor: '#3D4F21' }, // Dark Olive Green
     { bodyColor: '#8B4513', roofColor: '#633018' }, // Saddle Brown
     { bodyColor: '#2E8B57', roofColor: '#1F5F3F' }, // Sea Green
-  ]
+  ],
 };

@@ -20,10 +20,10 @@ class TileMapperApp extends NonRenderingAppBase {
 
   // Current Lanzarote 7x7 tile grid bounds (the EXACT problem area we need to solve!)
   private readonly LANZAROTE_BOUNDS = {
-    north: 29.305561,  // From our current 7x7 mapping
-    south: 28.767659,  // From our current 7x7 mapping
-    east: -13.183594,  // From our current 7x7 mapping
-    west: -13.798828   // From our current 7x7 mapping
+    north: 29.305561, // From our current 7x7 mapping
+    south: 28.767659, // From our current 7x7 mapping
+    east: -13.183594, // From our current 7x7 mapping
+    west: -13.798828, // From our current 7x7 mapping
   };
 
   private readonly ZOOM_LEVEL = 12;
@@ -33,7 +33,8 @@ class TileMapperApp extends NonRenderingAppBase {
     const appConfig = getAppConfig('tile-mapper');
     super({
       name: appConfig?.name || 'Tile Mapper Debugger',
-      description: appConfig?.description || 'Interactive satellite tile system debugger and analyzer',
+      description:
+        appConfig?.description || 'Interactive satellite tile system debugger and analyzer',
       requiresThreeJS: false, // Pure HTML/DOM app
     });
   }
@@ -45,10 +46,14 @@ class TileMapperApp extends NonRenderingAppBase {
     console.log('🗺️ Tile Mapper Debugger initialized');
   }
 
-
   private lonLatToTileXY(lon: number, lat: number, zoom: number): { x: number; y: number } {
     const x = Math.floor(((lon + 180) / 360) * Math.pow(2, zoom));
-    const y = Math.floor((1 - Math.log(Math.tan((lat * Math.PI) / 180) + 1 / Math.cos((lat * Math.PI) / 180)) / Math.PI) / 2 * Math.pow(2, zoom));
+    const y = Math.floor(
+      ((1 -
+        Math.log(Math.tan((lat * Math.PI) / 180) + 1 / Math.cos((lat * Math.PI) / 180)) / Math.PI) /
+        2) *
+        Math.pow(2, zoom)
+    );
     return { x, y };
   }
 
@@ -59,7 +64,13 @@ class TileMapperApp extends NonRenderingAppBase {
     return { lon, lat };
   }
 
-  private calculateTileGrid(): Array<{ x: number; y: number; bounds: any; url: string; status: string }> {
+  private calculateTileGrid(): Array<{
+    x: number;
+    y: number;
+    bounds: any;
+    url: string;
+    status: string;
+  }> {
     const { north, south, east, west } = this.LANZAROTE_BOUNDS;
     const zoom = this.ZOOM_LEVEL;
 
@@ -72,7 +83,7 @@ class TileMapperApp extends NonRenderingAppBase {
       for (let y = topLeft.y; y <= bottomRight.y; y++) {
         const tileBounds = {
           topLeft: this.tileXYToLonLat(x, y, zoom),
-          bottomRight: this.tileXYToLonLat(x + 1, y + 1, zoom)
+          bottomRight: this.tileXYToLonLat(x + 1, y + 1, zoom),
         };
 
         const url = `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${zoom}/${y}/${x}`;
@@ -82,7 +93,7 @@ class TileMapperApp extends NonRenderingAppBase {
           y,
           bounds: tileBounds,
           url,
-          status: 'unknown'
+          status: 'unknown',
         });
       }
     }
@@ -307,7 +318,9 @@ done</div>
     document.body.appendChild(this.uiContainer);
   }
 
-  private createInteractiveTileGrid(tiles: Array<{ x: number; y: number; bounds: any; url: string; status: string }>): void {
+  private createInteractiveTileGrid(
+    tiles: Array<{ x: number; y: number; bounds: any; url: string; status: string }>
+  ): void {
     setTimeout(() => {
       const gridContainer = document.getElementById('tile-grid-container');
       if (!gridContainer) return;
@@ -396,7 +409,8 @@ done</div>
             cell.addEventListener('mouseleave', () => {
               cell.style.transform = 'scale(1)';
               cell.style.zIndex = '1';
-              cell.style.borderColor = img.complete && !img.src.includes('error') ? '#22c55e' : '#4a9eff';
+              cell.style.borderColor =
+                img.complete && !img.src.includes('error') ? '#22c55e' : '#4a9eff';
               cell.style.boxShadow = 'none';
               overlay.style.opacity = '0.8';
               img.style.transform = 'scale(1)';
@@ -413,7 +427,13 @@ done</div>
     }, 100);
   }
 
-  private async selectTile(tile: { x: number; y: number; bounds: any; url: string; status: string }): Promise<void> {
+  private async selectTile(tile: {
+    x: number;
+    y: number;
+    bounds: any;
+    url: string;
+    status: string;
+  }): Promise<void> {
     this.selectedTile = { x: tile.x, y: tile.y, zoom: this.ZOOM_LEVEL };
 
     const detailsContainer = document.getElementById('tile-details');
@@ -488,15 +508,16 @@ done</div>
         <h4 style="margin: 0 0 8px 0; color: #4a9eff;">🖼️ Live Satellite Tile Preview</h4>
         <div style="background: #1a1a2e; border: 2px solid #4a9eff; border-radius: 8px; padding: 16px; text-align: center;">
           <div id="tile-image-container" style="margin-bottom: 12px;">
-            ${status === 'available'
-              ? `<img id="tile-preview" src="${tile.url}" style="
+            ${
+              status === 'available'
+                ? `<img id="tile-preview" src="${tile.url}" style="
                   max-width: 100%;
                   max-height: 300px;
                   border-radius: 4px;
                   box-shadow: 0 4px 12px rgba(74, 158, 255, 0.3);
                 " onerror="this.parentElement.innerHTML='<div style=\\'color: #f87171; padding: 20px;\\'>❌ Failed to load tile image</div>'"
                 onload="document.getElementById('tile-load-status').innerHTML='✅ Tile loaded successfully!'; document.getElementById('tile-load-status').style.color='#4ade80';">`
-              : '<div style="color: #f87171; padding: 20px;">❌ Tile unavailable - cannot preview</div>'
+                : '<div style="color: #f87171; padding: 20px;">❌ Tile unavailable - cannot preview</div>'
             }
           </div>
           <div id="tile-load-status" style="color: #4a9eff; font-size: 12px;">

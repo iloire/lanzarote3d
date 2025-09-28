@@ -93,7 +93,8 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
     },
     'terrain-gps': {
       name: 'Terrain GPS Mapper',
-      description: 'Interactive tool for mapping 3D terrain to GPS coordinates - click to get precise coordinates',
+      description:
+        'Interactive tool for mapping 3D terrain to GPS coordinates - click to get precise coordinates',
       entry: './tools/workshop/demos/terrain-gps',
       route: '/terrain-gps',
       category: 'tool',
@@ -104,7 +105,8 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
     },
     'tile-debug': {
       name: 'Tile Debug Dashboard',
-      description: 'Debug tool showing satellite tile download process, calculations, and atlas creation for terrain mapping',
+      description:
+        'Debug tool showing satellite tile download process, calculations, and atlas creation for terrain mapping',
       entry: './tools/workshop/demos/tile-debug/app',
       route: '/tile-debug',
       category: 'tool',
@@ -115,7 +117,8 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
     },
     'tile-mapper': {
       name: 'Tile Mapper Debugger',
-      description: 'Interactive satellite tile system debugger with grid visualization, URL testing, and coverage analysis',
+      description:
+        'Interactive satellite tile system debugger with grid visualization, URL testing, and coverage analysis',
       entry: './tools/tile-mapper/index',
       route: '/tile-mapper',
       category: 'tool',
@@ -129,7 +132,8 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
   demos: {
     animation: {
       name: 'Famara animation',
-      description: 'Dramatic camera animation showcasing voxel paragliders with golden hour lighting',
+      description:
+        'Dramatic camera animation showcasing voxel paragliders with golden hour lighting',
       entry: './demos/animation/index.tsx',
       route: '/animation',
       category: 'demo',
@@ -163,7 +167,8 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
     },
     'satellite-terrain': {
       name: 'Satellite Terrain',
-      description: 'Interactive demonstration of satellite imagery on 3D terrain with real-time theme switching',
+      description:
+        'Interactive demonstration of satellite imagery on 3D terrain with real-time theme switching',
       entry: './demos/satellite-terrain/index.tsx',
       route: '/satellite-terrain',
       category: 'tool',
@@ -174,7 +179,8 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
     },
     'autonomous-driving': {
       name: 'Autonomous Driving',
-      description: 'Self-driving cars navigating 3D terrain with AI-powered navigation and obstacle avoidance',
+      description:
+        'Self-driving cars navigating 3D terrain with AI-powered navigation and obstacle avoidance',
       entry: './demos/autonomous-driving/index.tsx',
       route: '/autonomous-driving',
       category: 'demo',
@@ -187,7 +193,8 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
     // Animation Demos
     boats: {
       name: 'Boats Animation',
-      description: 'Cinematic animation starting near boats and transitioning to focus on paragliders and clouds',
+      description:
+        'Cinematic animation starting near boats and transitioning to focus on paragliders and clouds',
       entry: './demos/boats/index.tsx',
       route: '/boats',
       category: 'demo',
@@ -200,7 +207,8 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
     // Workshop Component Demos
     boat: {
       name: 'Boat',
-      description: 'Boat component showcase with various sizes and realistic ocean wave floating animations',
+      description:
+        'Boat component showcase with various sizes and realistic ocean wave floating animations',
       entry: './tools/workshop/demos/boat',
       route: '/boat',
       category: 'demo',
@@ -222,7 +230,8 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
     },
     truck: {
       name: 'Truck',
-      description: 'Truck vehicle component showcase with various configurations and driving capabilities',
+      description:
+        'Truck vehicle component showcase with various configurations and driving capabilities',
       entry: './tools/workshop/demos/truck',
       route: '/truck',
       category: 'demo',
@@ -252,7 +261,7 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       tags: ['lighting', 'atmosphere', 'visual', 'island'],
       status: 'public',
       priority: 3,
-      hidden: false
+      hidden: false,
     },
     'paraglider-voxel': {
       name: 'Voxel pilot',

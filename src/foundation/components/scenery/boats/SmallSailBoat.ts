@@ -14,21 +14,24 @@ export interface SmallSailBoatOptions extends MovableBoatComponentOptions {
  */
 export class SmallSailBoat extends MovableBoatComponent {
   constructor(options: SmallSailBoatOptions = {}) {
-    super({
-      name: 'SmallSailBoat',
-      version: '1.0.0',
-      description: 'Small sail boat with realistic floating animation and optional movement'
-    }, {
-      hullColor: '#FFFFFF',
-      sailColor: '#666666',
-      scale: 1,
-      // Movement defaults - disabled by default, can be enabled via options
-      enableMovement: false,
-      pattern: MovementPattern.RANDOM_DRIFT,
-      speed: 0.3,
-      radius: 100,
-      ...options
-    });
+    super(
+      {
+        name: 'SmallSailBoat',
+        version: '1.0.0',
+        description: 'Small sail boat with realistic floating animation and optional movement',
+      },
+      {
+        hullColor: '#FFFFFF',
+        sailColor: '#666666',
+        scale: 1,
+        // Movement defaults - disabled by default, can be enabled via options
+        enableMovement: false,
+        pattern: MovementPattern.RANDOM_DRIFT,
+        speed: 0.3,
+        radius: 100,
+        ...options,
+      }
+    );
   }
 
   protected createGeometry(): THREE.BufferGeometry {
@@ -103,7 +106,7 @@ export class SmallSailBoat extends MovableBoatComponent {
       hullColor: options.hullColor,
       sailColor: options.sailColor,
       scale: options.scale,
-      isFloating: this.isFloating()
+      isFloating: this.isFloating(),
     };
   }
 }
@@ -112,7 +115,7 @@ export class SmallSailBoat extends MovableBoatComponent {
 const SmallSailBoatLegacy = SmallSailBoat as any;
 
 // Add legacy load method that returns mesh directly
-SmallSailBoatLegacy.prototype.load = function(): THREE.Object3D {
+SmallSailBoatLegacy.prototype.load = function (): THREE.Object3D {
   return this.loadSync();
 };
 

@@ -45,7 +45,6 @@ const generateCloud = async (options: CloudOptions): Promise<THREE.Object3D> => 
     const material = materials[materialIndex];
     if (!material) continue; // Skip if material not found;
 
-
     const scale = r(i * 0.9, i * 1.1);
     const posX = 1.7 * radius * r(-1 * i, i);
     const posY = 0.3 * radius * r(-1 * i, i);
@@ -161,7 +160,6 @@ class Cloud {
   updateColors(newColors: string[]) {
     if (!this.mesh || !newColors || newColors.length === 0) return;
 
-
     // Create new materials with the new colors
     const newMaterials: THREE.MeshLambertMaterial[] = [];
     newColors.forEach(color => {
@@ -169,7 +167,7 @@ class Cloud {
     });
 
     // Update each cloud part's material
-    this.mesh.children.forEach((child) => {
+    this.mesh.children.forEach(child => {
       if (child instanceof THREE.Mesh) {
         // Dispose old material
         if (Array.isArray(child.material)) {
@@ -183,7 +181,7 @@ class Cloud {
         const newMaterial = newMaterials[materialIndex];
         if (newMaterial) {
           child.material = newMaterial;
-        };
+        }
       }
     });
 

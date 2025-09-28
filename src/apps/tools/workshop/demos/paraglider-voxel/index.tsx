@@ -17,7 +17,8 @@ class ParagliderVoxelWorkshopApp extends WorkshopDemoBase {
   constructor() {
     super({
       name: 'Paraglider Voxel Workshop - Adri vs Ivan',
-      description: 'Workshop demo showcasing voxel-style paraglider components with both Adri and Ivan pilots',
+      description:
+        'Workshop demo showcasing voxel-style paraglider components with both Adri and Ivan pilots',
       ground: {
         create: false,
       },
@@ -42,15 +43,15 @@ class ParagliderVoxelWorkshopApp extends WorkshopDemoBase {
           objFile: adriModel,
           textureFile: adriTextureImage,
           position: { x: -30, y: 0, z: 0 },
-          wingColors: { color1: '#ff4444', color2: '#44ff44' }
+          wingColors: { color1: '#ff4444', color2: '#44ff44' },
         },
         {
           name: 'Ivan',
           objFile: ivanModel,
           textureFile: ivanTextureImage,
           position: { x: 30, y: 0, z: 0 },
-          wingColors: { color1: '#4444ff', color2: '#ff44ff' }
-        }
+          wingColors: { color1: '#4444ff', color2: '#ff44ff' },
+        },
       ];
 
       // Create paragliders for each character
@@ -106,7 +107,9 @@ class ParagliderVoxelWorkshopApp extends WorkshopDemoBase {
       this.startAnimationLoop(renderer, scene, camera, controls);
 
       this.isLoaded = true;
-      console.log(`✅ ${this.config.name} loaded successfully with ${this.paragliders.length} paragliders`);
+      console.log(
+        `✅ ${this.config.name} loaded successfully with ${this.paragliders.length} paragliders`
+      );
     } catch (error) {
       this.handleError(error as Error, 'load');
       throw error;
@@ -117,7 +120,7 @@ class ParagliderVoxelWorkshopApp extends WorkshopDemoBase {
    * Create labels for each character
    */
   private createCharacterLabels(scene: THREE.Scene): void {
-    this.paragliders.forEach((pg) => {
+    this.paragliders.forEach(pg => {
       const label = this.createLabel(
         `${pg.character}\nPilot`,
         pg.mesh.position.clone().add(new THREE.Vector3(0, 15, 0))
@@ -144,7 +147,7 @@ class ParagliderVoxelWorkshopApp extends WorkshopDemoBase {
 
       const lines = text.split('\n');
       lines.forEach((line, index) => {
-        context.fillText(line, canvas.width / 2, 50 + (index * 40));
+        context.fillText(line, canvas.width / 2, 50 + index * 40);
       });
     }
 

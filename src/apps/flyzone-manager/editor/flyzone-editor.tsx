@@ -62,7 +62,16 @@ class FlyzoneEditorApp extends TerrainBase {
     super({
       name: 'Flyzone Editor',
       description: 'Interactive tool for creating and editing flyzone locations with wind analysis',
-      requiredComponents: ['scene', 'camera', 'renderer', 'controls', 'gui', 'terrain', 'water', 'sky'],
+      requiredComponents: [
+        'scene',
+        'camera',
+        'renderer',
+        'controls',
+        'gui',
+        'terrain',
+        'water',
+        'sky',
+      ],
       scene: {
         environment: 'lanzarote',
         lighting: 'dynamic',
@@ -95,8 +104,8 @@ class FlyzoneEditorApp extends TerrainBase {
 
       // Set perfect top-down north-facing view for satellite mapping (like satellite-terrain demo)
       // Position camera VERY high above terrain center, looking straight down
-      const initialPos = new THREE.Vector3(0, 50000, 0);  // VERY high altitude for full island overview
-      const lookAtPos = new THREE.Vector3(0, 0, 0);       // Look at terrain center
+      const initialPos = new THREE.Vector3(0, 50000, 0); // VERY high altitude for full island overview
+      const lookAtPos = new THREE.Vector3(0, 0, 0); // Look at terrain center
 
       camera.position.copy(initialPos);
       camera.lookAt(lookAtPos);
@@ -104,8 +113,8 @@ class FlyzoneEditorApp extends TerrainBase {
       // Enable orbital controls for camera movement
       controls.enabled = true;
       controls.target.copy(lookAtPos);
-      controls.maxDistance = Infinity;   // No maximum zoom out limit
-      controls.minDistance = 100;       // Minimum zoom in limit
+      controls.maxDistance = Infinity; // No maximum zoom out limit
+      controls.minDistance = 100; // Minimum zoom in limit
       controls.enableDamping = true;
       controls.dampingFactor = 0.05;
 
@@ -153,7 +162,11 @@ class FlyzoneEditorApp extends TerrainBase {
     };
   }
 
-  private setupInteraction(renderer: THREE.WebGLRenderer, camera: THREE.Camera, scene: THREE.Scene): void {
+  private setupInteraction(
+    renderer: THREE.WebGLRenderer,
+    camera: THREE.Camera,
+    scene: THREE.Scene
+  ): void {
     this.raycaster = new THREE.Raycaster();
     this.mouse = new THREE.Vector2();
 
@@ -169,7 +182,8 @@ class FlyzoneEditorApp extends TerrainBase {
     };
 
     this.eventHandlers.onMouseDown = (event: MouseEvent) => {
-      if (event.button === 0) { // Left click
+      if (event.button === 0) {
+        // Left click
         this.isMouseDown = true;
       }
     };
@@ -266,13 +280,15 @@ class FlyzoneEditorApp extends TerrainBase {
       position: position.clone(),
       gps,
       elevation: position.y,
-      windConditions: [{
-        id: `wind_${Date.now()}`,
-        direction: { ideal: 0, range: [315, 45] },
-        speed: { min: 10, max: 30, ideal: 20 },
-        rating: 3,
-        description: 'Standard wind conditions',
-      }],
+      windConditions: [
+        {
+          id: `wind_${Date.now()}`,
+          direction: { ideal: 0, range: [315, 45] },
+          speed: { min: 10, max: 30, ideal: 20 },
+          rating: 3,
+          description: 'Standard wind conditions',
+        },
+      ],
       safety: {
         difficulty: 'intermediate',
         hazards: [],
@@ -348,7 +364,9 @@ class FlyzoneEditorApp extends TerrainBase {
     this.markAsDirty();
     this.editorUI?.refresh();
 
-    console.log(`Added landing zone at GPS: ${gps.latitude.toFixed(6)}, ${gps.longitude.toFixed(6)}`);
+    console.log(
+      `Added landing zone at GPS: ${gps.latitude.toFixed(6)}, ${gps.longitude.toFixed(6)}`
+    );
   }
 
   private addFlightPhase(position: THREE.Vector3, gps: GPS): void {
@@ -388,7 +406,9 @@ class FlyzoneEditorApp extends TerrainBase {
     this.markAsDirty();
     this.editorUI?.refresh();
 
-    console.log(`Added ${phaseType} phase at GPS: ${gps.latitude.toFixed(6)}, ${gps.longitude.toFixed(6)}`);
+    console.log(
+      `Added ${phaseType} phase at GPS: ${gps.latitude.toFixed(6)}, ${gps.longitude.toFixed(6)}`
+    );
   }
 
   private createNewLocation(
@@ -625,7 +645,7 @@ class FlyzoneEditorApp extends TerrainBase {
         // This is a simplified conversion, actual GPS conversion would require proper projection
         const lat = item.data.gps.latitude;
         const lon = item.data.gps.longitude;
-        const x = (lon - 13.5) * 111320 * Math.cos(lat * Math.PI / 180); // Rough conversion
+        const x = (lon - 13.5) * 111320 * Math.cos((lat * Math.PI) / 180); // Rough conversion
         const z = -(lat - 29.0) * 111320; // Rough conversion (negative for Three.js Z-axis)
         position = new THREE.Vector3(x, item.data.elevation || 0, z);
       } else {
@@ -762,17 +782,11 @@ class FlyzoneEditorApp extends TerrainBase {
       });
 
     // Save/Load controls
-    editorFolder
-      .add({ save: () => this.saveCurrentLocation() }, 'save')
-      .name('Save Location');
+    editorFolder.add({ save: () => this.saveCurrentLocation() }, 'save').name('Save Location');
 
-    editorFolder
-      .add({ load: () => this.loadLocationDialog() }, 'load')
-      .name('Load Location');
+    editorFolder.add({ load: () => this.loadLocationDialog() }, 'load').name('Load Location');
 
-    editorFolder
-      .add({ clear: () => this.clearEditor() }, 'clear')
-      .name('Clear All');
+    editorFolder.add({ clear: () => this.clearEditor() }, 'clear').name('Clear All');
   }
 
   private async saveCurrentLocation(): Promise<void> {
@@ -925,13 +939,17 @@ class FlyzoneEditorApp extends TerrainBase {
       };
 
       // Convert to JSON string with pretty formatting
-      const jsonString = JSON.stringify(exportData, (key, value) => {
-        // Custom serializer to handle Three.js Vector3 objects
-        if (value && typeof value === 'object' && value.isVector3) {
-          return { x: value.x, y: value.y, z: value.z };
-        }
-        return value;
-      }, 2);
+      const jsonString = JSON.stringify(
+        exportData,
+        (key, value) => {
+          // Custom serializer to handle Three.js Vector3 objects
+          if (value && typeof value === 'object' && value.isVector3) {
+            return { x: value.x, y: value.y, z: value.z };
+          }
+          return value;
+        },
+        2
+      );
 
       // Create and trigger download
       const blob = new Blob([jsonString], { type: 'application/json' });
@@ -972,12 +990,12 @@ class FlyzoneEditorApp extends TerrainBase {
     fileInput.accept = '.json';
     fileInput.style.display = 'none';
 
-    fileInput.onchange = (event) => {
+    fileInput.onchange = event => {
       const file = (event.target as HTMLInputElement).files?.[0];
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = e => {
         try {
           const jsonContent = e.target?.result as string;
           const importData = JSON.parse(jsonContent);
@@ -991,9 +1009,9 @@ class FlyzoneEditorApp extends TerrainBase {
           // Confirm import (this will replace current data)
           const confirmed = confirm(
             'This will replace all current data. Are you sure you want to import this file?\n\n' +
-            `File: ${file.name}\n` +
-            `Export Date: ${importData.metadata?.exportDate || 'Unknown'}\n` +
-            `Locations: ${importData.allLocations?.length || 0}`
+              `File: ${file.name}\n` +
+              `Export Date: ${importData.metadata?.exportDate || 'Unknown'}\n` +
+              `Locations: ${importData.allLocations?.length || 0}`
           );
 
           if (!confirmed) return;
@@ -1008,7 +1026,7 @@ class FlyzoneEditorApp extends TerrainBase {
           alert(`Successfully imported flyzone data from ${file.name}`);
         } catch (error) {
           console.error('Failed to import JSON:', error);
-          alert('Failed to import file. Please check that it\'s a valid JSON file.');
+          alert("Failed to import file. Please check that it's a valid JSON file.");
         }
       };
 
@@ -1026,7 +1044,11 @@ class FlyzoneEditorApp extends TerrainBase {
     if (!data || typeof data !== 'object') return false;
 
     // Check for required top-level properties
-    if (!data.metadata || !data.hasOwnProperty('currentLocation') || !Array.isArray(data.allLocations)) {
+    if (
+      !data.metadata ||
+      !data.hasOwnProperty('currentLocation') ||
+      !Array.isArray(data.allLocations)
+    ) {
       return false;
     }
 

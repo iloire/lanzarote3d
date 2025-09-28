@@ -1,9 +1,15 @@
 import * as THREE from 'three';
 import { FloatingThreeComponent, FloatingComponentOptions } from './FloatingThreeComponent';
-import { MovingBehavior, MovingBehaviorOptions, MovementPattern } from '../../systems/behaviors/MovingBehavior';
+import {
+  MovingBehavior,
+  MovingBehaviorOptions,
+  MovementPattern,
+} from '../../systems/behaviors/MovingBehavior';
 import type { ComponentMetadata } from './IThreeComponent';
 
-export interface MovingFloatingComponentOptions extends FloatingComponentOptions, MovingBehaviorOptions {
+export interface MovingFloatingComponentOptions
+  extends FloatingComponentOptions,
+    MovingBehaviorOptions {
   autoStartMoving?: boolean;
 }
 
@@ -24,7 +30,7 @@ export abstract class MovingFloatingThreeComponent extends FloatingThreeComponen
       bounds: options.bounds,
       waypoints: options.waypoints,
       autoStart: options.autoStartMoving ?? false,
-      faceDirection: options.faceDirection ?? true
+      faceDirection: options.faceDirection ?? true,
     });
   }
 
@@ -90,7 +96,7 @@ export abstract class MovingFloatingThreeComponent extends FloatingThreeComponen
   public getMovementInfo(): Record<string, any> {
     return {
       isFloating: this.isFloating(),
-      isMoving: this.isMoving()
+      isMoving: this.isMoving(),
     };
   }
 

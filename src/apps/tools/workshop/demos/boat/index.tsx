@@ -1,5 +1,11 @@
 import * as THREE from 'three';
-import { SmallSailBoat, FishingBoat, Yacht, SpeedBoat, PatrolBoat } from '../../../../../foundation/components/scenery';
+import {
+  SmallSailBoat,
+  FishingBoat,
+  Yacht,
+  SpeedBoat,
+  PatrolBoat,
+} from '../../../../../foundation/components/scenery';
 import { StoryOptions } from '../../../../shared/types';
 import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
 
@@ -41,7 +47,9 @@ class BoatWorkshopApp extends WorkshopDemoBase {
       this.startAnimationLoop(renderer, scene, camera, controls);
 
       this.isLoaded = true;
-      console.log(`✅ ${this.config.name} loaded successfully with ${this.boats.length} boats including PatrolBoat with movement`);
+      console.log(
+        `✅ ${this.config.name} loaded successfully with ${this.boats.length} boats including PatrolBoat with movement`
+      );
     } catch (error) {
       this.handleError(error as Error, 'load');
       throw error;
@@ -55,47 +63,47 @@ class BoatWorkshopApp extends WorkshopDemoBase {
         position: new THREE.Vector3(-120, 50, -80),
         scale: 4,
         rotation: new THREE.Vector3(0, 0, 0),
-        name: 'Small Sailboat'
+        name: 'Small Sailboat',
       },
       {
         type: 'FishingBoat',
         position: new THREE.Vector3(0, 50, -80),
         scale: 3,
         rotation: new THREE.Vector3(0, Math.PI / 4, 0),
-        name: 'Fishing Boat'
+        name: 'Fishing Boat',
       },
       {
         type: 'Yacht',
         position: new THREE.Vector3(150, 50, -80),
         scale: 2.5,
         rotation: new THREE.Vector3(0, -Math.PI / 6, 0),
-        name: 'Luxury Yacht'
+        name: 'Luxury Yacht',
       },
       {
         type: 'SpeedBoat',
         position: new THREE.Vector3(-60, 50, 80),
         scale: 3.5,
         rotation: new THREE.Vector3(0, Math.PI / 2, 0),
-        name: 'Speed Boat'
+        name: 'Speed Boat',
       },
       {
         type: 'SmallSailBoat',
         position: new THREE.Vector3(90, 50, 80),
         scale: 2.5,
         rotation: new THREE.Vector3(0, -Math.PI / 3, 0),
-        name: 'Mini Sailboat'
+        name: 'Mini Sailboat',
       },
       {
         type: 'PatrolBoat',
         position: new THREE.Vector3(-150, 50, 0),
         scale: 2.8,
         rotation: new THREE.Vector3(0, Math.PI / 8, 0),
-        name: 'Coast Guard Patrol'
+        name: 'Coast Guard Patrol',
       },
     ];
 
     // Load all boats concurrently
-    const boatPromises = boatConfigurations.map(async (config) => {
+    const boatPromises = boatConfigurations.map(async config => {
       let boat: any;
       let boatMesh: THREE.Mesh | THREE.Group;
 
@@ -133,7 +141,9 @@ class BoatWorkshopApp extends WorkshopDemoBase {
       scene.add(boatMesh);
       this.boats.push(boatMesh);
 
-      console.log(`Added ${config.name} at position (${config.position.x}, ${config.position.y}, ${config.position.z})`);
+      console.log(
+        `Added ${config.name} at position (${config.position.x}, ${config.position.y}, ${config.position.z})`
+      );
       return boatMesh;
     });
 
@@ -141,7 +151,6 @@ class BoatWorkshopApp extends WorkshopDemoBase {
 
     // Note: Boats now have built-in floating animation via FloatingThreeComponent base class
   }
-
 
   public override dispose(): void {
     console.log(`🧹 Disposing ${this.config.name}`);

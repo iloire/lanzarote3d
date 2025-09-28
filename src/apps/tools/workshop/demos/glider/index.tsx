@@ -9,7 +9,8 @@ class LegacyGliderWorkshopApp extends WorkshopDemoBase {
   constructor() {
     super({
       name: 'Legacy Glider Workshop',
-      description: 'Workshop demo showcasing legacy glider component with traditional wing configurations',
+      description:
+        'Workshop demo showcasing legacy glider component with traditional wing configurations',
       ground: {
         create: false,
       },

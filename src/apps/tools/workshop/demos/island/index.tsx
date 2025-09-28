@@ -49,7 +49,7 @@ class IslandWorkshopApp extends TerrainBase {
       controls.enableRotate = true;
 
       // Set control boundaries appropriate for the 20000x scaled island
-      controls.minDistance = 500;   // Minimum zoom to prevent going too close
+      controls.minDistance = 500; // Minimum zoom to prevent going too close
       controls.maxDistance = 50000; // Maximum zoom out to keep island visible
 
       // Pan limits to keep camera focused on island area
@@ -94,8 +94,12 @@ class IslandWorkshopApp extends TerrainBase {
       // Camera is at (-21200, 2500, 23000) looking at the island
 
       // Import the MovementPattern enum properly
-      const { MovementPattern } = await import('../../../../../foundation/systems/behaviors/MovingBehavior');
-      const { TerrainDrivingMode } = await import('../../../../../foundation/systems/behaviors/TerrainFollowingBehavior');
+      const { MovementPattern } = await import(
+        '../../../../../foundation/systems/behaviors/MovingBehavior'
+      );
+      const { TerrainDrivingMode } = await import(
+        '../../../../../foundation/systems/behaviors/TerrainFollowingBehavior'
+      );
 
       // Create custom car configs with smaller scales (10% of previous size)
       const largeCars = [
@@ -109,7 +113,7 @@ class IslandWorkshopApp extends TerrainBase {
           bodyColor: '#FF0000',
           autoStartMoving: true,
           faceDirection: true,
-          forwardAxis: 'x' as const
+          forwardAxis: 'x' as const,
         },
         {
           type: 'Car' as const,
@@ -121,7 +125,7 @@ class IslandWorkshopApp extends TerrainBase {
           bodyColor: '#00FF00',
           autoStartMoving: true,
           faceDirection: true,
-          forwardAxis: 'x' as const
+          forwardAxis: 'x' as const,
         },
         {
           type: 'AutonomousCar' as const,
@@ -130,7 +134,7 @@ class IslandWorkshopApp extends TerrainBase {
           scale: 6, // 60 * 0.1 = 6
           bodyColor: '#0000FF',
           drivingMode: TerrainDrivingMode.EXPLORATION,
-          explorationRadius: 3000
+          explorationRadius: 3000,
         },
         {
           type: 'Car' as const,
@@ -142,22 +146,18 @@ class IslandWorkshopApp extends TerrainBase {
           bodyColor: '#FFFF00',
           autoStartMoving: true,
           faceDirection: true,
-          forwardAxis: 'x' as const
-        }
+          forwardAxis: 'x' as const,
+        },
       ];
 
       // Area 1: Visible area closer to camera view
-      await this.environment.createCarGroup(
+      await this.environment.createCarGroup(terrain, largeCars, {
+        center: new THREE.Vector3(-5000, 0, 5000), // Closer to camera view
+        formation: 'random',
+        spacing: 800,
+        groupRadius: 2000,
         terrain,
-        largeCars,
-        {
-          center: new THREE.Vector3(-5000, 0, 5000), // Closer to camera view
-          formation: 'random',
-          spacing: 800,
-          groupRadius: 2000,
-          terrain
-        }
-      );
+      });
 
       // Area 2: Another visible area
       const moreCars = [
@@ -171,7 +171,7 @@ class IslandWorkshopApp extends TerrainBase {
           bodyColor: '#FF00FF',
           autoStartMoving: true,
           faceDirection: true,
-          forwardAxis: 'x' as const
+          forwardAxis: 'x' as const,
         },
         {
           type: 'AutonomousCar' as const,
@@ -180,21 +180,17 @@ class IslandWorkshopApp extends TerrainBase {
           scale: 1,
           bodyColor: '#00FFFF',
           drivingMode: TerrainDrivingMode.PATROL,
-          explorationRadius: 2000
-        }
+          explorationRadius: 2000,
+        },
       ];
 
-      await this.environment.createCarGroup(
+      await this.environment.createCarGroup(terrain, moreCars, {
+        center: new THREE.Vector3(3000, 0, -2000),
+        formation: 'circle',
+        spacing: 1000,
+        groupRadius: 1500,
         terrain,
-        moreCars,
-        {
-          center: new THREE.Vector3(3000, 0, -2000),
-          formation: 'circle',
-          spacing: 1000,
-          groupRadius: 1500,
-          terrain
-        }
-      );
+      });
 
       console.log('✅ Large-scale cars added to island terrain for visibility');
 

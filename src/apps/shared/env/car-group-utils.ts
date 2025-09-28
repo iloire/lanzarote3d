@@ -1,5 +1,10 @@
 import * as THREE from 'three';
-import { CarConfig, CarGroupConfig, CAR_GROUP_PRESETS, CAR_COLOR_PALETTES } from './car-group-types';
+import {
+  CarConfig,
+  CarGroupConfig,
+  CAR_GROUP_PRESETS,
+  CAR_COLOR_PALETTES,
+} from './car-group-types';
 import { MovementPattern } from '../../../foundation/systems/behaviors/MovingBehavior';
 import { TerrainDrivingMode } from '../../../foundation/systems/behaviors/TerrainFollowingBehavior';
 
@@ -11,7 +16,16 @@ export function calculateCarPositions(
   groupConfig: CarGroupConfig
 ): THREE.Vector3[] {
   const positions: THREE.Vector3[] = [];
-  const { center, formation, spacing, groupRadius = 100, rowCount = 3, colCount = 3, lineDirection, terrain } = groupConfig;
+  const {
+    center,
+    formation,
+    spacing,
+    groupRadius = 100,
+    rowCount = 3,
+    colCount = 3,
+    lineDirection,
+    terrain,
+  } = groupConfig;
 
   switch (formation) {
     case 'circle':
@@ -125,10 +139,7 @@ export function calculateCarPositions(
 function getTerrainHeight(x: number, z: number, terrain?: THREE.Mesh): number | null {
   if (!terrain) return null;
 
-  const raycaster = new THREE.Raycaster(
-    new THREE.Vector3(x, 1000, z),
-    new THREE.Vector3(0, -1, 0)
-  );
+  const raycaster = new THREE.Raycaster(new THREE.Vector3(x, 1000, z), new THREE.Vector3(0, -1, 0));
   const intersects = raycaster.intersectObject(terrain);
   return intersects.length > 0 ? intersects[0].point.y : null;
 }
@@ -136,9 +147,7 @@ function getTerrainHeight(x: number, z: number, terrain?: THREE.Mesh): number | 
 /**
  * Generate car configurations for a parking lot
  */
-export function generateParkingLotCars(
-  size: 'small' | 'medium' | 'large' = 'medium'
-): CarConfig[] {
+export function generateParkingLotCars(size: 'small' | 'medium' | 'large' = 'medium'): CarConfig[] {
   const config = CAR_GROUP_PRESETS.parking[size];
   const cars: CarConfig[] = [];
   const colorPalette = CAR_COLOR_PALETTES.standard;
@@ -156,7 +165,7 @@ export function generateParkingLotCars(
       scale: 0.8 + Math.random() * 0.4, // Varied car sizes
       ...colors,
       windowColor: '#87CEEB',
-      wheelColor: '#222222'
+      wheelColor: '#222222',
     });
   }
 
@@ -166,9 +175,7 @@ export function generateParkingLotCars(
 /**
  * Generate car configurations for a convoy
  */
-export function generateConvoy(
-  size: 'small' | 'medium' | 'large' = 'medium'
-): CarConfig[] {
+export function generateConvoy(size: 'small' | 'medium' | 'large' = 'medium'): CarConfig[] {
   const config = CAR_GROUP_PRESETS.convoy[size];
   const cars: CarConfig[] = [];
   const colorPalette = CAR_COLOR_PALETTES.professional;
@@ -190,7 +197,7 @@ export function generateConvoy(
       // Autonomous car specific options
       drivingMode: isLeader ? TerrainDrivingMode.EXPLORATION : undefined,
       explorationRadius: isLeader ? 300 : undefined,
-      showDebugInfo: isLeader ? false : undefined // Set to true for debugging
+      showDebugInfo: isLeader ? false : undefined, // Set to true for debugging
     });
   }
 
@@ -200,9 +207,7 @@ export function generateConvoy(
 /**
  * Generate car configurations for patrol vehicles
  */
-export function generatePatrolFleet(
-  size: 'single' | 'team' | 'fleet' = 'team'
-): CarConfig[] {
+export function generatePatrolFleet(size: 'single' | 'team' | 'fleet' = 'team'): CarConfig[] {
   const config = CAR_GROUP_PRESETS.patrol[size];
   const cars: CarConfig[] = [];
 
@@ -220,7 +225,7 @@ export function generatePatrolFleet(
       wheelColor: '#222222',
       drivingMode: TerrainDrivingMode.PATROL,
       explorationRadius: 200 + Math.random() * 200,
-      showDebugInfo: false // Set to true for debugging
+      showDebugInfo: false, // Set to true for debugging
     });
   }
 
@@ -246,9 +251,11 @@ export function generateTrafficCars(
     cars.push({
       type: isAutonomous ? 'AutonomousCar' : 'Car',
       enableMovement,
-      pattern: enableMovement ?
-        (Math.random() < 0.6 ? MovementPattern.LINEAR : MovementPattern.RANDOM_DRIFT) :
-        undefined,
+      pattern: enableMovement
+        ? Math.random() < 0.6
+          ? MovementPattern.LINEAR
+          : MovementPattern.RANDOM_DRIFT
+        : undefined,
       speed: enableMovement ? 0.08 + Math.random() * 0.12 : undefined,
       radius: enableMovement ? 100 + Math.random() * 150 : undefined,
       scale: 0.7 + Math.random() * 0.6,
@@ -258,7 +265,7 @@ export function generateTrafficCars(
       // Autonomous car specific options
       drivingMode: isAutonomous ? TerrainDrivingMode.EXPLORATION : undefined,
       explorationRadius: isAutonomous ? 250 + Math.random() * 150 : undefined,
-      showDebugInfo: false
+      showDebugInfo: false,
     });
   }
 
@@ -270,7 +277,11 @@ export function generateTrafficCars(
  */
 export function generateMixedCars(count: number = 6): CarConfig[] {
   const cars: CarConfig[] = [];
-  const allPalettes = [CAR_COLOR_PALETTES.standard, CAR_COLOR_PALETTES.vibrant, CAR_COLOR_PALETTES.professional];
+  const allPalettes = [
+    CAR_COLOR_PALETTES.standard,
+    CAR_COLOR_PALETTES.vibrant,
+    CAR_COLOR_PALETTES.professional,
+  ];
 
   for (let i = 0; i < count; i++) {
     const palette = allPalettes[Math.floor(Math.random() * allPalettes.length)];
@@ -281,9 +292,11 @@ export function generateMixedCars(count: number = 6): CarConfig[] {
     cars.push({
       type: isAutonomous ? 'AutonomousCar' : 'Car',
       enableMovement,
-      pattern: enableMovement ?
-        (Math.random() < 0.4 ? MovementPattern.RANDOM_DRIFT : MovementPattern.CIRCULAR) :
-        undefined,
+      pattern: enableMovement
+        ? Math.random() < 0.4
+          ? MovementPattern.RANDOM_DRIFT
+          : MovementPattern.CIRCULAR
+        : undefined,
       speed: enableMovement ? 0.05 + Math.random() * 0.1 : undefined,
       radius: enableMovement ? 80 + Math.random() * 120 : undefined,
       scale: 0.8 + Math.random() * 0.4,
@@ -293,7 +306,7 @@ export function generateMixedCars(count: number = 6): CarConfig[] {
       // Autonomous car specific options
       drivingMode: isAutonomous ? TerrainDrivingMode.EXPLORATION : undefined,
       explorationRadius: isAutonomous ? 200 + Math.random() * 100 : undefined,
-      showDebugInfo: false
+      showDebugInfo: false,
     });
   }
 

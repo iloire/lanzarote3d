@@ -76,7 +76,7 @@ export class SatelliteTextureManager {
       const loader = new THREE.TextureLoader(manager);
       loader.load(
         url,
-        (texture) => {
+        texture => {
           // Configure texture for optimal satellite imagery display
           texture.wrapS = THREE.ClampToEdgeWrapping;
           texture.wrapT = THREE.ClampToEdgeWrapping;
@@ -88,7 +88,7 @@ export class SatelliteTextureManager {
           resolve(texture);
         },
         undefined,
-        (error) => reject(error)
+        error => reject(error)
       );
     });
   }
@@ -185,8 +185,12 @@ export class SatelliteTextureManager {
     const bbox = geometry.boundingBox!;
 
     console.log('🗺️ Simple direct mapping approach');
-    console.log(`Terrain: X(${bbox.min.x.toFixed(2)} to ${bbox.max.x.toFixed(2)}) Z(${bbox.min.z.toFixed(2)} to ${bbox.max.z.toFixed(2)})`);
-    console.log(`Tiles: ${tileMapping.totalBounds.north}°N to ${tileMapping.totalBounds.south}°S, ${tileMapping.totalBounds.east}°E to ${tileMapping.totalBounds.west}°W`);
+    console.log(
+      `Terrain: X(${bbox.min.x.toFixed(2)} to ${bbox.max.x.toFixed(2)}) Z(${bbox.min.z.toFixed(2)} to ${bbox.max.z.toFixed(2)})`
+    );
+    console.log(
+      `Tiles: ${tileMapping.totalBounds.north}°N to ${tileMapping.totalBounds.south}°S, ${tileMapping.totalBounds.east}°E to ${tileMapping.totalBounds.west}°W`
+    );
 
     for (let i = 0; i < positions.count; i++) {
       const x = positions.getX(i);
@@ -197,8 +201,12 @@ export class SatelliteTextureManager {
       const zNorm = (z - bbox.min.z) / (bbox.max.z - bbox.min.z);
 
       // Map directly to geographic bounds
-      const longitude = tileMapping.totalBounds.west + xNorm * (tileMapping.totalBounds.east - tileMapping.totalBounds.west);
-      const latitude = tileMapping.totalBounds.south + zNorm * (tileMapping.totalBounds.north - tileMapping.totalBounds.south);
+      const longitude =
+        tileMapping.totalBounds.west +
+        xNorm * (tileMapping.totalBounds.east - tileMapping.totalBounds.west);
+      const latitude =
+        tileMapping.totalBounds.south +
+        zNorm * (tileMapping.totalBounds.north - tileMapping.totalBounds.south);
 
       // Get UV from tile mapping
       const uvCoords = this.calculateUVCoordinates(latitude, longitude, tileMapping);
@@ -214,7 +222,9 @@ export class SatelliteTextureManager {
 
       if (i < 10) {
         const uvSuccess = uvCoords ? '✅' : '❌';
-        console.log(`Vertex ${i}: terrain(${x.toFixed(2)},${z.toFixed(2)}) → norm(${xNorm.toFixed(3)},${zNorm.toFixed(3)}) → geo(${latitude.toFixed(4)},${longitude.toFixed(4)}) → UV(${uvArray[i * 2].toFixed(3)},${uvArray[i * 2 + 1].toFixed(3)}) ${uvSuccess}`);
+        console.log(
+          `Vertex ${i}: terrain(${x.toFixed(2)},${z.toFixed(2)}) → norm(${xNorm.toFixed(3)},${zNorm.toFixed(3)}) → geo(${latitude.toFixed(4)},${longitude.toFixed(4)}) → UV(${uvArray[i * 2].toFixed(3)},${uvArray[i * 2 + 1].toFixed(3)}) ${uvSuccess}`
+        );
       }
     }
 
@@ -233,11 +243,11 @@ export class SatelliteTextureManager {
       source: 'esri',
       resolution: 10, // 10 meters per pixel (zoom 12)
       bounds: {
-        north: 29.250,   // Complete grid coverage
-        south: 28.606,   // Complete grid coverage
-        east: -13.526,   // Complete grid coverage
-        west: -13.878    // Complete grid coverage
-      }
+        north: 29.25, // Complete grid coverage
+        south: 28.606, // Complete grid coverage
+        east: -13.526, // Complete grid coverage
+        west: -13.878, // Complete grid coverage
+      },
     };
   }
 

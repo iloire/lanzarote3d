@@ -60,7 +60,15 @@ export interface SatelliteImageryConfig {
 }
 
 export interface TerrainTheme {
-  style: 'volcanic' | 'arctic' | 'desert' | 'alien' | 'crystal' | 'wireframe' | 'plasma' | 'satellite';
+  style:
+    | 'volcanic'
+    | 'arctic'
+    | 'desert'
+    | 'alien'
+    | 'crystal'
+    | 'wireframe'
+    | 'plasma'
+    | 'satellite';
   satelliteImagery?: SatelliteImageryConfig;
   customMaterial?: {
     color?: string;
@@ -119,7 +127,9 @@ export interface ThemeApplicationOptions {
   preserveCamera?: boolean;
   animateTransition?: boolean;
   transitionDuration?: number;
-  skipComponents?: Array<'sky' | 'clouds' | 'terrain' | 'water' | 'weather' | 'ambient' | 'environment'>;
+  skipComponents?: Array<
+    'sky' | 'clouds' | 'terrain' | 'water' | 'weather' | 'ambient' | 'environment'
+  >;
 }
 
 export default Theme;

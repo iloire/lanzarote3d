@@ -21,7 +21,7 @@ class Stone extends SimpleThreeComponent {
       name: 'Stone',
       version: '1.0.0',
       description: 'Procedural stone component with dodecahedral geometry',
-      tags: ['scenery', 'nature', 'rock', 'procedural']
+      tags: ['scenery', 'nature', 'rock', 'procedural'],
     };
 
     super(metadata, options);
@@ -47,12 +47,12 @@ class Stone extends SimpleThreeComponent {
       transparent: false,
       opacity: 1.0,
       wireframe: false,
-      side: THREE.FrontSide
+      side: THREE.FrontSide,
     };
   }
 
   public override async load(): Promise<THREE.Object3D> {
-    const stone = await super.load() as THREE.Mesh;
+    const stone = (await super.load()) as THREE.Mesh;
 
     // Apply default stone positioning and rotation
     stone.rotation.set(0, 0, Math.PI / 2);
@@ -80,7 +80,7 @@ class Stone extends SimpleThreeComponent {
 const StoneLegacy = Stone as any;
 
 // Add legacy load method that returns mesh directly
-StoneLegacy.prototype.load = function(): THREE.Object3D {
+StoneLegacy.prototype.load = function (): THREE.Object3D {
   return this.createStone();
 };
 

@@ -43,10 +43,10 @@ class TerrainGPSMapperApp extends TerrainBase {
   // Point 2 error: Our app 0.138° too far north, 0.240° too far west
   // Correction: Subtract 0.138° from latitude, add 0.240° to longitude
   private gpsBounds = {
-    north: 30.088378 - 0.138281,  // 29.950097°N (Google Maps verified correction)
-    south: 29.708378 - 0.138281,  // 29.570097°N (Google Maps verified correction)
-    east: -13.238296 + 0.240353,  // -12.997943°W (Google Maps verified correction)
-    west: -13.658296 + 0.240353   // -13.417943°W (Google Maps verified correction)
+    north: 30.088378 - 0.138281, // 29.950097°N (Google Maps verified correction)
+    south: 29.708378 - 0.138281, // 29.570097°N (Google Maps verified correction)
+    east: -13.238296 + 0.240353, // -12.997943°W (Google Maps verified correction)
+    west: -13.658296 + 0.240353, // -13.417943°W (Google Maps verified correction)
   };
 
   constructor() {
@@ -79,41 +79,53 @@ class TerrainGPSMapperApp extends TerrainBase {
     compassGroup.position.set(0, 500, 0);
 
     // Create directional arrows - 5 times bigger
-    const arrowLength = 1000;  // 5 times bigger: 200 * 5 = 1000
+    const arrowLength = 1000; // 5 times bigger: 200 * 5 = 1000
     const arrowColors = {
-      north: 0xff0000,   // Red for North
-      south: 0x0000ff,   // Blue for South
-      east: 0x00ff00,    // Green for East
-      west: 0xffff00     // Yellow for West
+      north: 0xff0000, // Red for North
+      south: 0x0000ff, // Blue for South
+      east: 0x00ff00, // Green for East
+      west: 0xffff00, // Yellow for West
     };
 
     // Create simple circles for direction indicators - 5 times bigger
-    const circleGeometry = new THREE.SphereGeometry(150, 16, 8);  // 5 times bigger: 30 * 5 = 150
+    const circleGeometry = new THREE.SphereGeometry(150, 16, 8); // 5 times bigger: 30 * 5 = 150
 
     // North circle (positive Z direction)
-    const northCircle = new THREE.Mesh(circleGeometry, new THREE.MeshBasicMaterial({ color: arrowColors.north }));
+    const northCircle = new THREE.Mesh(
+      circleGeometry,
+      new THREE.MeshBasicMaterial({ color: arrowColors.north })
+    );
     northCircle.position.set(0, 0, arrowLength);
     compassGroup.add(northCircle);
 
     // South circle (negative Z direction)
-    const southCircle = new THREE.Mesh(circleGeometry, new THREE.MeshBasicMaterial({ color: arrowColors.south }));
+    const southCircle = new THREE.Mesh(
+      circleGeometry,
+      new THREE.MeshBasicMaterial({ color: arrowColors.south })
+    );
     southCircle.position.set(0, 0, -arrowLength);
     compassGroup.add(southCircle);
 
     // East circle (positive X direction)
-    const eastCircle = new THREE.Mesh(circleGeometry, new THREE.MeshBasicMaterial({ color: arrowColors.east }));
+    const eastCircle = new THREE.Mesh(
+      circleGeometry,
+      new THREE.MeshBasicMaterial({ color: arrowColors.east })
+    );
     eastCircle.position.set(arrowLength, 0, 0);
     compassGroup.add(eastCircle);
 
     // West circle (negative X direction)
-    const westCircle = new THREE.Mesh(circleGeometry, new THREE.MeshBasicMaterial({ color: arrowColors.west }));
+    const westCircle = new THREE.Mesh(
+      circleGeometry,
+      new THREE.MeshBasicMaterial({ color: arrowColors.west })
+    );
     westCircle.position.set(-arrowLength, 0, 0);
     compassGroup.add(westCircle);
 
     // Add connecting lines
     const lineGeometry = new THREE.BufferGeometry().setFromPoints([
       new THREE.Vector3(-arrowLength * 1.2, 0, 0),
-      new THREE.Vector3(arrowLength * 1.2, 0, 0)
+      new THREE.Vector3(arrowLength * 1.2, 0, 0),
     ]);
     const lineMaterial = new THREE.LineBasicMaterial({ color: 0x666666 });
     const horizontalLine = new THREE.Line(lineGeometry, lineMaterial);
@@ -121,7 +133,7 @@ class TerrainGPSMapperApp extends TerrainBase {
 
     const verticalLineGeometry = new THREE.BufferGeometry().setFromPoints([
       new THREE.Vector3(0, 0, -arrowLength * 1.2),
-      new THREE.Vector3(0, 0, arrowLength * 1.2)
+      new THREE.Vector3(0, 0, arrowLength * 1.2),
     ]);
     const verticalLine = new THREE.Line(verticalLineGeometry, lineMaterial);
     compassGroup.add(verticalLine);
@@ -150,8 +162,8 @@ class TerrainGPSMapperApp extends TerrainBase {
 
       // Set up camera for perfect top-down north-facing view
       // Position camera VERY high above terrain center, looking straight down
-      const initialPos = new THREE.Vector3(0, 50000, 0);  // VERY high altitude for full island overview
-      const lookAtPos = new THREE.Vector3(0, 0, 0);       // Look at terrain center
+      const initialPos = new THREE.Vector3(0, 50000, 0); // VERY high altitude for full island overview
+      const lookAtPos = new THREE.Vector3(0, 0, 0); // Look at terrain center
 
       camera.position.copy(initialPos);
       camera.lookAt(lookAtPos);
@@ -159,10 +171,10 @@ class TerrainGPSMapperApp extends TerrainBase {
       // Configure controls with NO BOUNDARIES for free navigation
       OrbitControlsHelper.focusOnTarget(controls, lookAtPos, {
         ...ORBIT_CONTROLS_PRESETS['aerial'],
-        maxDistance: Infinity,   // No maximum zoom out limit
-        minDistance: 100,        // Keep minimum to prevent going underground
-        maxPolarAngle: Math.PI,  // Allow full rotation
-        minPolarAngle: 0,        // Allow full rotation
+        maxDistance: Infinity, // No maximum zoom out limit
+        minDistance: 100, // Keep minimum to prevent going underground
+        maxPolarAngle: Math.PI, // Allow full rotation
+        minPolarAngle: 0, // Allow full rotation
       });
 
       console.log('📍 Camera positioned for north-facing top-down view:');
@@ -196,7 +208,9 @@ class TerrainGPSMapperApp extends TerrainBase {
 
       this.isLoaded = true;
       console.log(`✅ ${this.config.name} loaded successfully`);
-      console.log('🎮 Click on terrain to get GPS coordinates, R to reset view, C to clear markers');
+      console.log(
+        '🎮 Click on terrain to get GPS coordinates, R to reset view, C to clear markers'
+      );
     } catch (error) {
       this.handleError(error as Error, 'load');
       throw error;
@@ -225,8 +239,8 @@ class TerrainGPSMapperApp extends TerrainBase {
         size: {
           width: bbox.max.x - bbox.min.x,
           depth: bbox.max.z - bbox.min.z,
-          height: bbox.max.y - bbox.min.y
-        }
+          height: bbox.max.y - bbox.min.y,
+        },
       });
     }
 
@@ -295,11 +309,11 @@ class TerrainGPSMapperApp extends TerrainBase {
     console.log(`🎯 Terrain Point:`, {
       x: terrainPoint.x.toFixed(2),
       y: terrainPoint.y.toFixed(2),
-      z: terrainPoint.z.toFixed(2)
+      z: terrainPoint.z.toFixed(2),
     });
     console.log(`🌍 GPS Coordinates:`, {
       lat: gpsCoords.lat.toFixed(6),
-      lon: gpsCoords.lon.toFixed(6)
+      lon: gpsCoords.lon.toFixed(6),
     });
   }
 
@@ -308,13 +322,19 @@ class TerrainGPSMapperApp extends TerrainBase {
     // Use the three Google Maps verified points with distance-based weighting
 
     const ref1 = { terrainX: -699.8, terrainZ: -3874.2, lat: 29.118769, lon: -13.657281 }; // Point 1 (Google verified)
-    const ref2 = { terrainX: -11024.7, terrainZ: 19349.4, lat: 28.841001, lon: -13.786740 }; // Point 2 (Google verified)
+    const ref2 = { terrainX: -11024.7, terrainZ: 19349.4, lat: 28.841001, lon: -13.78674 }; // Point 2 (Google verified)
     const ref3 = { terrainX: 14130.0, terrainZ: -13759.5, lat: 29.238464, lon: -13.470252 }; // Point 3 (Google verified)
 
     // Calculate distances from input point to each reference point
-    const dist1 = Math.sqrt(Math.pow(terrainPoint.x - ref1.terrainX, 2) + Math.pow(terrainPoint.z - ref1.terrainZ, 2));
-    const dist2 = Math.sqrt(Math.pow(terrainPoint.x - ref2.terrainX, 2) + Math.pow(terrainPoint.z - ref2.terrainZ, 2));
-    const dist3 = Math.sqrt(Math.pow(terrainPoint.x - ref3.terrainX, 2) + Math.pow(terrainPoint.z - ref3.terrainZ, 2));
+    const dist1 = Math.sqrt(
+      Math.pow(terrainPoint.x - ref1.terrainX, 2) + Math.pow(terrainPoint.z - ref1.terrainZ, 2)
+    );
+    const dist2 = Math.sqrt(
+      Math.pow(terrainPoint.x - ref2.terrainX, 2) + Math.pow(terrainPoint.z - ref2.terrainZ, 2)
+    );
+    const dist3 = Math.sqrt(
+      Math.pow(terrainPoint.x - ref3.terrainX, 2) + Math.pow(terrainPoint.z - ref3.terrainZ, 2)
+    );
 
     // Handle exact matches
     if (dist1 < 50) return { lat: ref1.lat, lon: ref1.lon };
@@ -337,16 +357,16 @@ class TerrainGPSMapperApp extends TerrainBase {
       distances: {
         ref1: dist1.toFixed(1),
         ref2: dist2.toFixed(1),
-        ref3: dist3.toFixed(1)
+        ref3: dist3.toFixed(1),
       },
       weights: {
         ref1: weight1.toFixed(6),
         ref2: weight2.toFixed(6),
         ref3: weight3.toFixed(6),
-        total: totalWeight.toFixed(6)
+        total: totalWeight.toFixed(6),
       },
       calculated: { lat: latitude.toFixed(6), lon: longitude.toFixed(6) },
-      references: [ref1, ref2, ref3]
+      references: [ref1, ref2, ref3],
     });
 
     return { lat: latitude, lon: longitude };
@@ -410,9 +430,11 @@ class TerrainGPSMapperApp extends TerrainBase {
     const data = {
       exportTimestamp: new Date().toISOString(),
       terrainBounds: {
-        minX: -4000, maxX: 4000,
-        minZ: -4000, maxZ: 4000,
-        notes: "Current estimated bounds - need actual geometry bounds"
+        minX: -4000,
+        maxX: 4000,
+        minZ: -4000,
+        maxZ: 4000,
+        notes: 'Current estimated bounds - need actual geometry bounds',
       },
       gpsBounds: this.gpsBounds,
       coordinates: this.coordinateList.map((coord, index) => ({
@@ -420,30 +442,32 @@ class TerrainGPSMapperApp extends TerrainBase {
         terrain: {
           x: coord.terrain.x,
           y: coord.terrain.y,
-          z: coord.terrain.z
+          z: coord.terrain.z,
         },
         gps: {
           latitude: coord.gps.lat,
-          longitude: coord.gps.lon
+          longitude: coord.gps.lon,
         },
         timestamp: new Date().toISOString(),
-        status: "needs_verification"
+        status: 'needs_verification',
       })),
       mappingParameters: {
         coordinateTransform: {
-          longitude: "west + xNorm * (east - west)",
-          latitude: "south + (1.0 - zNorm) * (north - south)",
-          notes: "Z-axis flipped due to terrain orientation"
+          longitude: 'west + xNorm * (east - west)',
+          latitude: 'south + (1.0 - zNorm) * (north - south)',
+          notes: 'Z-axis flipped due to terrain orientation',
         },
-        orientationNotes: "Blue(South) at top, Yellow(West) at left - terrain rotated 180°"
-      }
+        orientationNotes: 'Blue(South) at top, Yellow(West) at left - terrain rotated 180°',
+      },
     };
 
     console.log('📊 Coordinate Mapping Data for lanzarote-terrain-gps-mapping.json:', data);
 
     // Copy to clipboard
     navigator.clipboard.writeText(JSON.stringify(data, null, 2)).then(() => {
-      alert('Coordinate mapping data copied to clipboard!\nPaste this into the calibrationPoints section of lanzarote-terrain-gps-mapping.json');
+      alert(
+        'Coordinate mapping data copied to clipboard!\nPaste this into the calibrationPoints section of lanzarote-terrain-gps-mapping.json'
+      );
     });
   }
 
@@ -492,13 +516,17 @@ class TerrainGPSMapperApp extends TerrainBase {
 
       <div style="margin-bottom: 10px; border-top: 1px solid #555; padding-top: 10px;">
         <strong>Marked Points (${this.coordinateList.length}):</strong><br>
-        ${this.coordinateList.map((coord, i) => `
+        ${this.coordinateList
+          .map(
+            (coord, i) => `
           <div style="font-size: 10px; margin: 5px 0; padding: 5px; background: rgba(255,255,255,0.1); border-radius: 3px;">
             <strong>Point ${i + 1}:</strong><br>
             Terrain: (${coord.terrain.x.toFixed(1)}, ${coord.terrain.y.toFixed(1)}, ${coord.terrain.z.toFixed(1)})<br>
             GPS: ${coord.gps.lat.toFixed(6)}°N, ${coord.gps.lon.toFixed(6)}°W
           </div>
-        `).join('')}
+        `
+          )
+          .join('')}
       </div>
 
       <div style="border-top: 1px solid #555; padding-top: 10px; font-size: 11px; color: #ccc;">

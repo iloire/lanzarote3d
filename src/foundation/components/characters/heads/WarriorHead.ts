@@ -9,12 +9,12 @@ export class WarriorHead extends BaseHead {
       version: '2.0.0',
       description: 'Warrior pilot head with beard and angular features',
       author: 'Lanzarote3D',
-      tags: ['character', 'head', 'warrior', 'beard']
+      tags: ['character', 'head', 'warrior', 'beard'],
     };
 
     super(metadata, {
       headType: 'warrior',
-      ...options
+      ...options,
     });
   }
   /**

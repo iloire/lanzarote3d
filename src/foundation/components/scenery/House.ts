@@ -36,7 +36,7 @@ class House extends SimpleThreeComponent {
       name: 'House',
       version: '1.0.0',
       description: 'Procedural house component with multiple architectural styles',
-      tags: ['scenery', 'building', 'procedural']
+      tags: ['scenery', 'building', 'procedural'],
     };
 
     super(metadata, options);
@@ -44,7 +44,7 @@ class House extends SimpleThreeComponent {
     this.height = this.calculateHeight(options.type);
 
     if (options.scale) {
-      this.height *= (typeof options.scale === 'number' ? options.scale : 1);
+      this.height *= typeof options.scale === 'number' ? options.scale : 1;
     }
   }
 
@@ -96,8 +96,12 @@ class House extends SimpleThreeComponent {
     mesh.add(window3Group);
 
     // Return first two windows for GUI compatibility
-    const window = window1Group.children.find(child => child instanceof THREE.Mesh && child.material !== mat_frame) as THREE.Mesh;
-    const window2 = window2Group.children.find(child => child instanceof THREE.Mesh && child.material !== mat_frame) as THREE.Mesh;
+    const window = window1Group.children.find(
+      child => child instanceof THREE.Mesh && child.material !== mat_frame
+    ) as THREE.Mesh;
+    const window2 = window2Group.children.find(
+      child => child instanceof THREE.Mesh && child.material !== mat_frame
+    ) as THREE.Mesh;
 
     return { window, window2 };
   }
@@ -136,7 +140,7 @@ class House extends SimpleThreeComponent {
   }
 
   public override async load(): Promise<THREE.Object3D> {
-    const houseGroup = await super.load() as THREE.Mesh;
+    const houseGroup = (await super.load()) as THREE.Mesh;
 
     // Set material based on house type
     const baseMaterial = this.type === HouseType.Modern ? mat_modern : mat;
@@ -180,15 +184,20 @@ class House extends SimpleThreeComponent {
     });
   }
 
-  private findWindows(mesh: THREE.Object3D): { window: THREE.Mesh | null; window2: THREE.Mesh | null } {
+  private findWindows(mesh: THREE.Object3D): {
+    window: THREE.Mesh | null;
+    window2: THREE.Mesh | null;
+  } {
     let window: THREE.Mesh | null = null;
     let window2: THREE.Mesh | null = null;
     let windowCount = 0;
 
-    mesh.traverse((child) => {
-      if (child instanceof THREE.Mesh &&
-          child.material !== mat_frame &&
-          (child.material === mat_window || child.material === mat_modern_window)) {
+    mesh.traverse(child => {
+      if (
+        child instanceof THREE.Mesh &&
+        child.material !== mat_frame &&
+        (child.material === mat_window || child.material === mat_modern_window)
+      ) {
         if (windowCount === 0) window = child;
         else if (windowCount === 1) window2 = child;
         windowCount++;
@@ -268,7 +277,15 @@ class House extends SimpleThreeComponent {
     mesh.add(canopy);
   }
 
-  private addGarageDoor(mesh: THREE.Object3D, x: number, y: number, z: number, width: number, height: number, depth: number): void {
+  private addGarageDoor(
+    mesh: THREE.Object3D,
+    x: number,
+    y: number,
+    z: number,
+    width: number,
+    height: number,
+    depth: number
+  ): void {
     const garageDoorGeo = new THREE.BoxGeometry(width, height, depth);
     const garageDoor = new THREE.Mesh(garageDoorGeo, mat_door2);
     garageDoor.position.set(x, y, z);
@@ -288,7 +305,7 @@ class House extends SimpleThreeComponent {
 const HouseLegacy = House as any;
 
 // Add legacy load method that returns mesh directly and supports GUI
-HouseLegacy.prototype.load = function(gui?: any): THREE.Object3D {
+HouseLegacy.prototype.load = function (gui?: any): THREE.Object3D {
   const mesh = this.createHouseMesh();
 
   if (gui) {

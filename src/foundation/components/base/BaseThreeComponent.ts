@@ -5,7 +5,7 @@ import {
   ComponentMetadata,
   ComponentMetrics,
   ComponentLoadError,
-  ComponentDisposedError
+  ComponentDisposedError,
 } from './IThreeComponent';
 
 /**
@@ -89,7 +89,7 @@ export abstract class BaseThreeComponent implements IThreeComponent {
         loadTime,
         vertexCount: this.calculateVertexCount(),
         triangleCount: this.calculateTriangleCount(),
-        textureMemory: this.calculateTextureMemory()
+        textureMemory: this.calculateTextureMemory(),
       };
 
       this.onAfterLoad?.(this._object);
@@ -131,7 +131,7 @@ export abstract class BaseThreeComponent implements IThreeComponent {
 
     this._metrics = {
       ...this._metrics,
-      lastUpdateTime: performance.now()
+      lastUpdateTime: performance.now(),
     };
 
     this.onUpdate?.(deltaTime);
@@ -193,7 +193,7 @@ export abstract class BaseThreeComponent implements IThreeComponent {
       isLoaded: this._isLoaded,
       isVisible: this._isVisible,
       metrics: this._metrics,
-      ...this.serializeComponent()
+      ...this.serializeComponent(),
     };
   }
 
@@ -225,7 +225,7 @@ export abstract class BaseThreeComponent implements IThreeComponent {
 
   // Utility methods for resource management
   protected disposeObject(object: THREE.Object3D): void {
-    object.traverse((child) => {
+    object.traverse(child => {
       if (child instanceof THREE.Mesh) {
         if (child.geometry) {
           child.geometry.dispose();
@@ -263,7 +263,7 @@ export abstract class BaseThreeComponent implements IThreeComponent {
     if (!this._object) return 0;
 
     let count = 0;
-    this._object.traverse((child) => {
+    this._object.traverse(child => {
       if (child instanceof THREE.Mesh && child.geometry) {
         const positionAttribute = child.geometry.getAttribute('position');
         if (positionAttribute) {
@@ -278,7 +278,7 @@ export abstract class BaseThreeComponent implements IThreeComponent {
     if (!this._object) return 0;
 
     let count = 0;
-    this._object.traverse((child) => {
+    this._object.traverse(child => {
       if (child instanceof THREE.Mesh && child.geometry) {
         const indexAttribute = child.geometry.getIndex();
         if (indexAttribute) {
@@ -298,7 +298,7 @@ export abstract class BaseThreeComponent implements IThreeComponent {
     if (!this._object) return 0;
 
     const textures = new Set<THREE.Texture>();
-    this._object.traverse((child) => {
+    this._object.traverse(child => {
       if (child instanceof THREE.Mesh && child.material) {
         const materials = Array.isArray(child.material) ? child.material : [child.material];
         materials.forEach(material => {

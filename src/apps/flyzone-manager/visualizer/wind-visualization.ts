@@ -171,7 +171,7 @@ export class WindVisualization {
             // Scale speed rings based on wind speed
             if (child.userData.speedRing !== undefined) {
               const ringIndex = child.userData.speedRing;
-              const targetScale = speedNormalized > (ringIndex * 0.33) ? 1 : 0.3;
+              const targetScale = speedNormalized > ringIndex * 0.33 ? 1 : 0.3;
               child.scale.setScalar(targetScale);
             }
           }

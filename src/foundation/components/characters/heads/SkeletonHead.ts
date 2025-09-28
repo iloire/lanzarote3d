@@ -9,12 +9,12 @@ export class SkeletonHead extends BaseHead {
       version: '2.0.0',
       description: 'Skeleton pilot head with bone-like appearance and eerie features',
       author: 'Lanzarote3D',
-      tags: ['character', 'head', 'skeleton', 'spooky']
+      tags: ['character', 'head', 'skeleton', 'spooky'],
     };
 
     super(metadata, {
       headType: 'skeleton',
-      ...options
+      ...options,
     });
   }
 

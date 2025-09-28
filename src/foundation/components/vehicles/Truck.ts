@@ -1,5 +1,8 @@
 import * as THREE from 'three';
-import { MovingFloatingThreeComponent, MovingFloatingComponentOptions } from '../base/MovingFloatingThreeComponent';
+import {
+  MovingFloatingThreeComponent,
+  MovingFloatingComponentOptions,
+} from '../base/MovingFloatingThreeComponent';
 import { resourceManager } from '../../systems/ResourceManager';
 import { MovementPattern } from '../../systems/behaviors/MovingBehavior';
 
@@ -17,27 +20,30 @@ export interface TruckOptions extends MovingFloatingComponentOptions {
  */
 export class Truck extends MovingFloatingThreeComponent {
   constructor(options: TruckOptions = {}) {
-    super({
-      name: 'Truck',
-      version: '1.0.0',
-      description: 'Truck vehicle with movement and driving capabilities'
-    }, {
-      // Default colors - classic blue work truck
-      cabColor: '#0066CC',
-      bedColor: '#004499',
-      windowColor: '#87CEEB',
-      wheelColor: '#222222',
-      scale: 1,
-      // Movement defaults - trucks move slower than cars
-      pattern: MovementPattern.PATROL,
-      speed: 0.25,
-      radius: 200,
-      autoStartMoving: true,
-      autoStartFloating: false, // Trucks don't float either!
-      faceDirection: true,
-      forwardAxis: 'x', // Trucks move forward in +X direction
-      ...options
-    });
+    super(
+      {
+        name: 'Truck',
+        version: '1.0.0',
+        description: 'Truck vehicle with movement and driving capabilities',
+      },
+      {
+        // Default colors - classic blue work truck
+        cabColor: '#0066CC',
+        bedColor: '#004499',
+        windowColor: '#87CEEB',
+        wheelColor: '#222222',
+        scale: 1,
+        // Movement defaults - trucks move slower than cars
+        pattern: MovementPattern.PATROL,
+        speed: 0.25,
+        radius: 200,
+        autoStartMoving: true,
+        autoStartFloating: false, // Trucks don't float either!
+        faceDirection: true,
+        forwardAxis: 'x', // Trucks move forward in +X direction
+        ...options,
+      }
+    );
   }
 
   protected createGeometry(): THREE.BufferGeometry {
@@ -65,11 +71,12 @@ export class Truck extends MovingFloatingThreeComponent {
 
     const windowMaterial = resourceManager.getOrCreateMaterial(
       `truck_window_${options.windowColor}`,
-      () => new THREE.MeshLambertMaterial({
-        color: options.windowColor,
-        transparent: true,
-        opacity: 0.7
-      })
+      () =>
+        new THREE.MeshLambertMaterial({
+          color: options.windowColor,
+          transparent: true,
+          opacity: 0.7,
+        })
     );
 
     const wheelMaterial = resourceManager.getOrCreateMaterial(
@@ -264,7 +271,7 @@ export class Truck extends MovingFloatingThreeComponent {
       windowColor: options.windowColor,
       wheelColor: options.wheelColor,
       scale: options.scale,
-      ...this.getMovementInfo()
+      ...this.getMovementInfo(),
     };
   }
 }
@@ -273,7 +280,7 @@ export class Truck extends MovingFloatingThreeComponent {
 const TruckLegacy = Truck as any;
 
 // Add legacy load method that returns mesh directly
-TruckLegacy.prototype.load = function(): THREE.Object3D {
+TruckLegacy.prototype.load = function (): THREE.Object3D {
   const truck = this.loadSync();
   // Start moving after legacy load
   this.startMoving();

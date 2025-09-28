@@ -21,11 +21,7 @@ export class SpikedHelmet extends BaseHelmet {
       const angle = (i / 8) * Math.PI * 2;
       const radius = 220;
       const spike = new THREE.Mesh(spikeGeo, spikeMat);
-      spike.position.set(
-        Math.cos(angle) * radius,
-        250,
-        Math.sin(angle) * radius
-      );
+      spike.position.set(Math.cos(angle) * radius, 250, Math.sin(angle) * radius);
       spike.rotation.z = angle + Math.PI / 2;
       group.add(spike);
     }
@@ -35,11 +31,7 @@ export class SpikedHelmet extends BaseHelmet {
       const angle = (i / 6) * Math.PI * 2;
       const radius = 210;
       const spike = new THREE.Mesh(spikeGeo, spikeMat);
-      spike.position.set(
-        Math.cos(angle) * radius,
-        180,
-        Math.sin(angle) * radius
-      );
+      spike.position.set(Math.cos(angle) * radius, 180, Math.sin(angle) * radius);
       spike.rotation.x = Math.PI / 2;
       spike.rotation.z = angle;
       group.add(spike);

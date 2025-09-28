@@ -6,7 +6,7 @@ export enum TerrainDrivingMode {
   EXPLORATION = 'exploration', // Free exploration avoiding obstacles
   PATROL = 'patrol', // Follow predefined waypoints on terrain
   DESTINATION = 'destination', // Navigate to specific destination
-  FOLLOW_ROADS = 'follow_roads' // Try to follow road-like terrain features
+  FOLLOW_ROADS = 'follow_roads', // Try to follow road-like terrain features
 }
 
 export interface TerrainFollowingOptions extends MovingBehaviorOptions {
@@ -51,7 +51,7 @@ export class TerrainFollowingBehavior extends MovingBehavior {
       ...options,
       pattern: MovementPattern.CIRCULAR, // We'll override the movement logic
       faceDirection: true,
-      forwardAxis: options.forwardAxis || 'x'
+      forwardAxis: options.forwardAxis || 'x',
     });
 
     this.terrainNavigator = new TerrainNavigator(options.terrainNavigator);
@@ -124,7 +124,8 @@ export class TerrainFollowingBehavior extends MovingBehavior {
     }
 
     // Handle stuck situations
-    if (this.stuckTimer > 2.0) { // Stuck for 2 seconds
+    if (this.stuckTimer > 2.0) {
+      // Stuck for 2 seconds
       if (Math.random() < this.reverseProbability) {
         this.isReversing = true;
         this.stuckTimer = 0;
@@ -309,7 +310,7 @@ export class TerrainFollowingBehavior extends MovingBehavior {
       currentTarget: this.currentTarget.clone(),
       isStuck: this.stuckTimer > 1.0,
       isReversing: this.isReversing,
-      terrainStats
+      terrainStats,
     };
   }
 

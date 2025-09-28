@@ -48,7 +48,16 @@ class FlyzoneVisualizerApp extends TerrainBase {
     super({
       name: 'Flyzone Visualizer',
       description: 'Weather-based takeoff recommendations and flyzone visualization',
-      requiredComponents: ['scene', 'camera', 'renderer', 'controls', 'gui', 'terrain', 'water', 'sky'],
+      requiredComponents: [
+        'scene',
+        'camera',
+        'renderer',
+        'controls',
+        'gui',
+        'terrain',
+        'water',
+        'sky',
+      ],
       scene: {
         environment: 'lanzarote',
         lighting: 'dynamic',
@@ -77,8 +86,8 @@ class FlyzoneVisualizerApp extends TerrainBase {
 
       // Set perfect top-down north-facing view for satellite mapping (like satellite-terrain demo)
       // Position camera VERY high above terrain center, looking straight down
-      const initialPos = new THREE.Vector3(0, 50000, 0);  // VERY high altitude for full island overview
-      const lookAtPos = new THREE.Vector3(0, 0, 0);       // Look at terrain center
+      const initialPos = new THREE.Vector3(0, 50000, 0); // VERY high altitude for full island overview
+      const lookAtPos = new THREE.Vector3(0, 0, 0); // Look at terrain center
 
       camera.position.copy(initialPos);
       camera.lookAt(lookAtPos);
@@ -86,8 +95,8 @@ class FlyzoneVisualizerApp extends TerrainBase {
       // Enable orbital controls for camera movement
       controls.enabled = true;
       controls.target.copy(lookAtPos);
-      controls.maxDistance = Infinity;   // No maximum zoom out limit
-      controls.minDistance = 100;       // Minimum zoom in limit
+      controls.maxDistance = Infinity; // No maximum zoom out limit
+      controls.minDistance = 100; // Minimum zoom in limit
       controls.enableDamping = true;
       controls.dampingFactor = 0.05;
 
@@ -98,7 +107,10 @@ class FlyzoneVisualizerApp extends TerrainBase {
       this.setupInteraction(renderer, camera, scene);
 
       // Initialize UI components
-      this.visualizerUI = new FlyzoneVisualizerUI(this.visualizerState!, this.onUIAction.bind(this));
+      this.visualizerUI = new FlyzoneVisualizerUI(
+        this.visualizerState!,
+        this.onUIAction.bind(this)
+      );
       this.markers = new FlyzoneMarkers(scene);
       this.windVisualization = new WindVisualization(scene);
 
@@ -134,7 +146,11 @@ class FlyzoneVisualizerApp extends TerrainBase {
     };
   }
 
-  private setupInteraction(renderer: THREE.WebGLRenderer, camera: THREE.Camera, scene: THREE.Scene): void {
+  private setupInteraction(
+    renderer: THREE.WebGLRenderer,
+    camera: THREE.Camera,
+    scene: THREE.Scene
+  ): void {
     this.raycaster = new THREE.Raycaster();
     this.mouse = new THREE.Vector2();
 
@@ -147,7 +163,8 @@ class FlyzoneVisualizerApp extends TerrainBase {
     };
 
     const onMouseClick = (event: MouseEvent) => {
-      if (event.button === 0) { // Left click
+      if (event.button === 0) {
+        // Left click
         // Try to handle marker selection, but don't prevent camera controls
         const handled = this.handleClick(camera, scene);
 
@@ -324,20 +341,15 @@ class FlyzoneVisualizerApp extends TerrainBase {
     const weatherControls = {
       windDirection: 45,
       windSpeed: 20,
-      analyze: () => this.analyzeWeatherConditions(weatherControls.windDirection, weatherControls.windSpeed),
+      analyze: () =>
+        this.analyzeWeatherConditions(weatherControls.windDirection, weatherControls.windSpeed),
     };
 
-    weatherFolder
-      .add(weatherControls, 'windDirection', 0, 360, 1)
-      .name('Wind Direction (°)');
+    weatherFolder.add(weatherControls, 'windDirection', 0, 360, 1).name('Wind Direction (°)');
 
-    weatherFolder
-      .add(weatherControls, 'windSpeed', 0, 50, 1)
-      .name('Wind Speed (km/h)');
+    weatherFolder.add(weatherControls, 'windSpeed', 0, 50, 1).name('Wind Speed (km/h)');
 
-    weatherFolder
-      .add(weatherControls, 'analyze')
-      .name('Analyze Conditions');
+    weatherFolder.add(weatherControls, 'analyze').name('Analyze Conditions');
 
     // User settings
     const settingsFolder = visualizerFolder.addFolder('Settings');
@@ -380,7 +392,8 @@ class FlyzoneVisualizerApp extends TerrainBase {
       switch (event.key) {
         case 'w':
           if (event.ctrlKey) {
-            this.visualizerState.showWindVisualization = !this.visualizerState.showWindVisualization;
+            this.visualizerState.showWindVisualization =
+              !this.visualizerState.showWindVisualization;
             if (this.windVisualization) {
               this.windVisualization.setVisible(this.visualizerState.showWindVisualization);
             }

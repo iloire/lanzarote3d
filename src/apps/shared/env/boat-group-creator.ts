@@ -1,5 +1,11 @@
 import * as THREE from 'three';
-import { SmallSailBoat, FishingBoat, Yacht, SpeedBoat, PatrolBoat } from '../../../foundation/components/scenery';
+import {
+  SmallSailBoat,
+  FishingBoat,
+  Yacht,
+  SpeedBoat,
+  PatrolBoat,
+} from '../../../foundation/components/scenery';
 import { MovementPattern } from '../../../foundation/systems/behaviors/MovingBehavior';
 import { ComponentRegistry } from '../../../foundation/systems/ComponentRegistry';
 import { BoatConfig, BoatGroupConfig } from './boat-group-types';
@@ -8,7 +14,7 @@ import {
   generateMarinaBoats,
   generatePatrolFleet,
   generateRacingFleet,
-  generateMixedRecreationalBoats
+  generateMixedRecreationalBoats,
 } from './boat-group-utils';
 
 /**
@@ -43,7 +49,7 @@ export class BoatGroupCreator {
           pattern: boatConfig.pattern,
           speed: boatConfig.speed,
           radius: boatConfig.radius,
-          autoStartMoving: boatConfig.enableMovement
+          autoStartMoving: boatConfig.enableMovement,
         });
         boatMesh = await this.componentRegistry.register(boat, 'smallsailboat');
         break;
@@ -54,7 +60,7 @@ export class BoatGroupCreator {
           pattern: boatConfig.pattern,
           speed: boatConfig.speed,
           radius: boatConfig.radius,
-          autoStartMoving: boatConfig.enableMovement
+          autoStartMoving: boatConfig.enableMovement,
         });
         boatMesh = await this.componentRegistry.register(boat, 'fishingboat');
         break;
@@ -65,7 +71,7 @@ export class BoatGroupCreator {
           pattern: boatConfig.pattern,
           speed: boatConfig.speed,
           radius: boatConfig.radius,
-          autoStartMoving: boatConfig.enableMovement
+          autoStartMoving: boatConfig.enableMovement,
         });
         boatMesh = await this.componentRegistry.register(boat, 'yacht');
         break;
@@ -77,7 +83,7 @@ export class BoatGroupCreator {
           speed: boatConfig.speed,
           radius: boatConfig.radius,
           autoStartMoving: boatConfig.enableMovement,
-          ...(boatConfig.colors || {})
+          ...(boatConfig.colors || {}),
         });
         boatMesh = await this.componentRegistry.register(boat, 'speedboat');
         break;
@@ -89,7 +95,7 @@ export class BoatGroupCreator {
           speed: boatConfig.speed,
           radius: boatConfig.radius,
           autoStartMoving: boatConfig.enableMovement,
-          ...(boatConfig.colors || {})
+          ...(boatConfig.colors || {}),
         });
         boatMesh = await this.componentRegistry.register(boat, 'patrolboat');
         break;
@@ -153,14 +159,14 @@ export class BoatGroupCreator {
     const config = {
       small: { spacing: 40, radius: 80 },
       medium: { spacing: 50, radius: 120 },
-      large: { spacing: 60, radius: 180 }
+      large: { spacing: 60, radius: 180 },
     }[size];
 
     return this.createBoatGroup(water, boats, {
       center,
       formation: 'harbor',
       spacing: config.spacing,
-      groupRadius: config.radius
+      groupRadius: config.radius,
     });
   }
 
@@ -173,13 +179,13 @@ export class BoatGroupCreator {
     size: 'single' | 'formation' | 'fleet' = 'formation'
   ): Promise<THREE.Object3D[]> {
     const boats = generatePatrolFleet(size);
-    const spacing = size === 'single' ? 0 : (size === 'formation' ? 80 : 100);
+    const spacing = size === 'single' ? 0 : size === 'formation' ? 80 : 100;
 
     return this.createBoatGroup(water, boats, {
       center,
       formation: 'line',
       spacing,
-      lineDirection: new THREE.Vector3(1, 0, 0)
+      lineDirection: new THREE.Vector3(1, 0, 0),
     });
   }
 
@@ -192,13 +198,13 @@ export class BoatGroupCreator {
     size: 'small' | 'medium' | 'large' = 'medium'
   ): Promise<THREE.Object3D[]> {
     const boats = generateRacingFleet(size);
-    const spacing = size === 'small' ? 30 : (size === 'medium' ? 35 : 40);
+    const spacing = size === 'small' ? 30 : size === 'medium' ? 35 : 40;
 
     return this.createBoatGroup(water, boats, {
       center,
       formation: 'line',
       spacing,
-      lineDirection: new THREE.Vector3(1, 0, 0)
+      lineDirection: new THREE.Vector3(1, 0, 0),
     });
   }
 
@@ -217,7 +223,7 @@ export class BoatGroupCreator {
       center,
       formation,
       spacing: 90,
-      groupRadius: 190
+      groupRadius: 190,
     });
   }
 
@@ -234,7 +240,7 @@ export class BoatGroupCreator {
       center,
       formation: 'circle',
       spacing: 80,
-      groupRadius: radius
+      groupRadius: radius,
     });
   }
 
@@ -253,7 +259,7 @@ export class BoatGroupCreator {
       formation: 'grid',
       spacing,
       rowCount,
-      colCount: Math.ceil(boats.length / rowCount)
+      colCount: Math.ceil(boats.length / rowCount),
     });
   }
 }

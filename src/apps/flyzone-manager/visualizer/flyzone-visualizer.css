@@ -216,7 +216,7 @@
   font-size: 14px;
 }
 
-.filter-controls input[type="range"] {
+.filter-controls input[type='range'] {
   width: 80px;
 }
 
@@ -279,10 +279,18 @@
   color: white;
 }
 
-.score-excellent { background: #00c851; }
-.score-good { background: #ffbb33; }
-.score-marginal { background: #ff8800; }
-.score-poor { background: #ff4444; }
+.score-excellent {
+  background: #00c851;
+}
+.score-good {
+  background: #ffbb33;
+}
+.score-marginal {
+  background: #ff8800;
+}
+.score-poor {
+  background: #ff4444;
+}
 
 .recommendation-details {
   display: flex;
@@ -401,10 +409,18 @@
   color: #333;
 }
 
-.difficulty-beginner { color: #28a745; }
-.difficulty-intermediate { color: #ffc107; }
-.difficulty-advanced { color: #fd7e14; }
-.difficulty-expert { color: #dc3545; }
+.difficulty-beginner {
+  color: #28a745;
+}
+.difficulty-intermediate {
+  color: #ffc107;
+}
+.difficulty-advanced {
+  color: #fd7e14;
+}
+.difficulty-expert {
+  color: #dc3545;
+}
 
 .analysis-scores {
   display: flex;
@@ -467,10 +483,18 @@
   line-height: 1.4;
 }
 
-.reasoning li { color: #333; }
-.hazards li { color: #d63384; }
-.general-advice li { color: #495057; }
-.instructions li { color: #6c757d; }
+.reasoning li {
+  color: #333;
+}
+.hazards li {
+  color: #d63384;
+}
+.general-advice li {
+  color: #495057;
+}
+.instructions li {
+  color: #6c757d;
+}
 
 /* Safety Warnings */
 .safety-warnings {

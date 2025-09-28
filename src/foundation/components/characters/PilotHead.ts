@@ -66,14 +66,14 @@ export class PilotHead extends SimpleThreeComponent {
       version: '2.0.0',
       description: 'Configurable pilot head with multiple types and helmet options',
       author: 'Lanzarote3D',
-      tags: ['character', 'pilot', 'head', 'configurable']
+      tags: ['character', 'pilot', 'head', 'configurable'],
     };
 
     super(metadata, options);
 
     this.headOptions = {
       ...DEFAULT_OPTIONS,
-      ...options
+      ...options,
     };
   }
 
@@ -123,7 +123,7 @@ export class PilotHead extends SimpleThreeComponent {
       eyeColor: this.headOptions.eyeColor,
       glassesColor: this.headOptions.glassesColor,
       castShadow: this.headOptions.castShadow,
-      receiveShadow: this.headOptions.receiveShadow
+      receiveShadow: this.headOptions.receiveShadow,
     };
 
     switch (this.headOptions.headType) {
@@ -144,11 +144,15 @@ export class PilotHead extends SimpleThreeComponent {
    */
   private getHeadTypeString(): string {
     switch (this.headOptions.headType) {
-      case PilotHeadType.Warrior: return 'warrior';
-      case PilotHeadType.Skeleton: return 'skeleton';
-      case PilotHeadType.Devil: return 'devil';
+      case PilotHeadType.Warrior:
+        return 'warrior';
+      case PilotHeadType.Skeleton:
+        return 'skeleton';
+      case PilotHeadType.Devil:
+        return 'devil';
       case PilotHeadType.Default:
-      default: return 'default';
+      default:
+        return 'default';
     }
   }
 

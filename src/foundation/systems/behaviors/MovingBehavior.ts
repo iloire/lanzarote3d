@@ -5,7 +5,7 @@ export enum MovementPattern {
   FIGURE_EIGHT = 'figure8',
   RANDOM_DRIFT = 'random',
   PATROL = 'patrol',
-  LINEAR = 'linear'
+  LINEAR = 'linear',
 }
 
 export interface MovingBehaviorOptions {
@@ -242,7 +242,9 @@ export class MovingBehavior {
     }
 
     // Move towards current waypoint
-    const direction = new THREE.Vector3().subVectors(currentWaypoint, this.mesh!.position).normalize();
+    const direction = new THREE.Vector3()
+      .subVectors(currentWaypoint, this.mesh!.position)
+      .normalize();
     const moveDistance = this.speed * deltaTime * 50;
 
     position.copy(this.mesh!.position);

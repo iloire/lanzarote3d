@@ -12,12 +12,12 @@ export class DefaultHead extends BaseHead {
       version: '2.0.0',
       description: 'Default pilot head with basic facial features',
       author: 'Lanzarote3D',
-      tags: ['character', 'head', 'default']
+      tags: ['character', 'head', 'default'],
     };
 
     super(metadata, {
       headType: 'default',
-      ...options
+      ...options,
     });
   }
 
@@ -61,7 +61,7 @@ export class DefaultHead extends BaseHead {
       const glassesOptions = {
         skinColor: this.headOptions.skinColor,
         glassesColor: this.headOptions.glassesColor,
-        glassesType: this.headOptions.glassesType
+        glassesType: this.headOptions.glassesType,
       };
       return getDefaultGlasses(glassesOptions as any);
     }

@@ -18,13 +18,13 @@ export interface BoatConfig {
  * Configuration for boat group positioning
  */
 export interface BoatGroupConfig {
-  center: THREE.Vector3;           // Center position for the group
+  center: THREE.Vector3; // Center position for the group
   formation: 'circle' | 'line' | 'grid' | 'random' | 'harbor';
-  spacing: number;                 // Minimum distance between boats
-  groupRadius?: number;            // Overall size of the group (for circle/random)
-  rowCount?: number;              // For grid formation
-  colCount?: number;              // For grid formation
-  lineDirection?: THREE.Vector3;   // Direction for line formation
+  spacing: number; // Minimum distance between boats
+  groupRadius?: number; // Overall size of the group (for circle/random)
+  rowCount?: number; // For grid formation
+  colCount?: number; // For grid formation
+  lineDirection?: THREE.Vector3; // Direction for line formation
 }
 
 /**
@@ -55,16 +55,16 @@ export const BOAT_GROUP_PRESETS: BoatGroupPresets = {
   marina: {
     small: { count: 6, spacing: 40, radius: 80 },
     medium: { count: 10, spacing: 50, radius: 120 },
-    large: { count: 15, spacing: 60, radius: 180 }
+    large: { count: 15, spacing: 60, radius: 180 },
   },
   patrol: {
     single: { count: 1, spacing: 0 },
     formation: { count: 3, spacing: 80 },
-    fleet: { count: 5, spacing: 100 }
+    fleet: { count: 5, spacing: 100 },
   },
   racing: {
     small: { count: 4, spacing: 30 },
     medium: { count: 8, spacing: 35 },
-    large: { count: 12, spacing: 40 }
-  }
+    large: { count: 12, spacing: 40 },
+  },
 };

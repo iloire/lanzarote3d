@@ -51,11 +51,7 @@ export class CrownHelmet extends BaseHelmet {
     for (let i = 0; i < 8; i++) {
       const angle = (i / 8) * Math.PI * 2;
       const gem = new THREE.Mesh(gemGeo, gemMat);
-      gem.position.set(
-        Math.cos(angle) * 220,
-        280,
-        Math.sin(angle) * 220
-      );
+      gem.position.set(Math.cos(angle) * 220, 280, Math.sin(angle) * 220);
       group.add(gem);
     }
 

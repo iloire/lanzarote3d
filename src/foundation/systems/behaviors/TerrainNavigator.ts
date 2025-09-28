@@ -28,7 +28,7 @@ export class TerrainNavigator {
       maxSlope: Math.PI / 6, // 30 degrees
       heightOffset: 5,
       smoothingFactor: 0.1,
-      ...options
+      ...options,
     };
   }
 
@@ -94,7 +94,10 @@ export class TerrainNavigator {
    * Sample terrain in multiple directions around a position
    * Returns an array of sample points with height and drivability
    */
-  sampleAround(centerPosition: THREE.Vector3, samples: number = 8): Array<{
+  sampleAround(
+    centerPosition: THREE.Vector3,
+    samples: number = 8
+  ): Array<{
     position: THREE.Vector3;
     height: number | null;
     normal: THREE.Vector3 | null;
@@ -121,7 +124,7 @@ export class TerrainNavigator {
         height,
         normal,
         drivable,
-        angle
+        angle,
       });
     }
 
@@ -132,7 +135,10 @@ export class TerrainNavigator {
    * Find the best direction to move from current position
    * Returns angle in radians (0 = +X direction)
    */
-  findBestDirection(currentPosition: THREE.Vector3, currentDirection: THREE.Vector3): number | null {
+  findBestDirection(
+    currentPosition: THREE.Vector3,
+    currentDirection: THREE.Vector3
+  ): number | null {
     const samples = this.sampleAround(currentPosition, 16);
     const currentHeight = this.getHeightAt(currentPosition);
 

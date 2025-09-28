@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import { SimpleThreeComponent } from './SimpleThreeComponent';
-import { FloatingBehavior, FloatingBehaviorOptions } from '../../systems/behaviors/FloatingBehavior';
+import {
+  FloatingBehavior,
+  FloatingBehaviorOptions,
+} from '../../systems/behaviors/FloatingBehavior';
 import type { ComponentOptions, ComponentMetadata } from './BaseThreeComponent';
 
 export interface FloatingComponentOptions extends ComponentOptions {
@@ -22,7 +25,7 @@ export abstract class FloatingThreeComponent extends SimpleThreeComponent {
     this.floatingBehavior = new FloatingBehavior({
       scaleMultiplier: options.floatingScale || 1,
       autoStart: options.autoStartFloating ?? true,
-      wavePhaseOffset: options.wavePhaseOffset
+      wavePhaseOffset: options.wavePhaseOffset,
     });
   }
 

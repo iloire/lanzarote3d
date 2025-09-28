@@ -152,11 +152,11 @@ const Stories = new Proxy({} as Record<string, any>, {
       return {
         load: async (options: StoryOptions) => {
           return loadApp(prop, options);
-        }
+        },
       };
     }
     return undefined;
-  }
+  },
 });
 
 export default Stories;

@@ -188,8 +188,14 @@ export class FlyzoneAPI {
       const analysis: WeatherAnalysis = {
         currentWeather,
         recommendations,
-        generalAdvice: this.generateGeneralAdvice(currentWeather, request.userLevel || 'intermediate'),
-        safetyWarnings: this.generateSafetyWarnings(currentWeather, request.userLevel || 'intermediate'),
+        generalAdvice: this.generateGeneralAdvice(
+          currentWeather,
+          request.userLevel || 'intermediate'
+        ),
+        safetyWarnings: this.generateSafetyWarnings(
+          currentWeather,
+          request.userLevel || 'intermediate'
+        ),
         timestamp: new Date().toISOString(),
       };
 
@@ -203,13 +209,17 @@ export class FlyzoneAPI {
   /**
    * Convert GPS coordinates to Three.js world position
    */
-  gpsToWorldPosition(gps: { latitude: number; longitude: number; altitude: number }): THREE.Vector3 {
+  gpsToWorldPosition(gps: {
+    latitude: number;
+    longitude: number;
+    altitude: number;
+  }): THREE.Vector3 {
     // Lanzarote reference point (approximate center)
     const LAT_REF = 29.0469; // Lanzarote center latitude
     const LON_REF = -13.5896; // Lanzarote center longitude
 
     // Convert to meters from reference point
-    const x = (gps.longitude - LON_REF) * 111320 * Math.cos(LAT_REF * Math.PI / 180);
+    const x = (gps.longitude - LON_REF) * 111320 * Math.cos((LAT_REF * Math.PI) / 180);
     const z = -(gps.latitude - LAT_REF) * 110540; // Negative Z for correct orientation
     const y = gps.altitude;
 
@@ -219,12 +229,16 @@ export class FlyzoneAPI {
   /**
    * Convert Three.js world position to GPS coordinates
    */
-  worldPositionToGPS(position: THREE.Vector3): { latitude: number; longitude: number; altitude: number } {
+  worldPositionToGPS(position: THREE.Vector3): {
+    latitude: number;
+    longitude: number;
+    altitude: number;
+  } {
     const LAT_REF = 29.0469;
     const LON_REF = -13.5896;
 
-    const latitude = LAT_REF - (position.z / 110540);
-    const longitude = LON_REF + (position.x / (111320 * Math.cos(LAT_REF * Math.PI / 180)));
+    const latitude = LAT_REF - position.z / 110540;
+    const longitude = LON_REF + position.x / (111320 * Math.cos((LAT_REF * Math.PI) / 180));
     const altitude = position.y;
 
     return { latitude, longitude, altitude };
@@ -271,7 +285,10 @@ export class FlyzoneAPI {
 
     // Find best matching wind condition
     for (const condition of windConditions) {
-      const directionScore = this.calculateDirectionScore(weather.windDirection, condition.direction);
+      const directionScore = this.calculateDirectionScore(
+        weather.windDirection,
+        condition.direction
+      );
       const speedScore = this.calculateSpeedScore(weather.windSpeed, condition.speed);
       const overallScore = (directionScore + speedScore) / 2;
 

@@ -39,7 +39,7 @@ export function generateBundleToStoryMap(): Record<string, string> {
     map[app] = app;
 
     // Handle camelCase to kebab-case conversions
-    const camelCase = app.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+    const camelCase = app.replace(/-([a-z])/g, g => g[1].toUpperCase());
     if (camelCase !== app) {
       map[camelCase] = app;
     }

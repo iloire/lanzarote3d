@@ -31,7 +31,7 @@ export abstract class BaseHead extends SimpleThreeComponent {
       glassesColor: 'pink',
       castShadow: true,
       receiveShadow: true,
-      ...options
+      ...options,
     };
   }
 
@@ -42,7 +42,7 @@ export abstract class BaseHead extends SimpleThreeComponent {
       color,
       side: THREE.DoubleSide,
       roughness: 0.8,
-      metalness: 0.1
+      metalness: 0.1,
     }) as THREE.MeshStandardMaterial;
   }
 
@@ -82,7 +82,7 @@ export abstract class BaseHead extends SimpleThreeComponent {
       type: 'standard',
       color: eyeColor,
       emissive: eyeColor,
-      emissiveIntensity: 0.2
+      emissiveIntensity: 0.2,
     });
 
     const eyeGeometry = resourceManager.getGeometry(`eye_geometry_${scale}`, () => {
@@ -107,7 +107,12 @@ export abstract class BaseHead extends SimpleThreeComponent {
   /**
    * Create basic mouth with configurable size and color
    */
-  protected createBasicMouth(width: number = 90, height: number = 60, depth: number = 50, color?: string): THREE.Mesh {
+  protected createBasicMouth(
+    width: number = 90,
+    height: number = 60,
+    depth: number = 50,
+    color?: string
+  ): THREE.Mesh {
     const skinColor = color || this.headOptions.skinColor || '#e0bea5';
     const skinMat = this.getColoredMaterial(skinColor);
     const mouthGeo = new THREE.BoxGeometry(width, height, depth);
@@ -121,7 +126,12 @@ export abstract class BaseHead extends SimpleThreeComponent {
   /**
    * Create basic nose with configurable size and color
    */
-  protected createBasicNose(width: number = 35, height: number = 50, depth: number = 50, color?: string): THREE.Mesh {
+  protected createBasicNose(
+    width: number = 35,
+    height: number = 50,
+    depth: number = 50,
+    color?: string
+  ): THREE.Mesh {
     const skinColor = color || this.headOptions.skinColor || '#e0bea5';
     const skinMat = this.getColoredMaterial(skinColor);
     const noseGeo = new THREE.BoxGeometry(width, height, depth);
@@ -135,7 +145,12 @@ export abstract class BaseHead extends SimpleThreeComponent {
   /**
    * Create a basic head mesh with configurable dimensions
    */
-  protected createBasicHeadMesh(width: number = 300, height: number = 350, depth: number = 280, color?: string): THREE.Mesh {
+  protected createBasicHeadMesh(
+    width: number = 300,
+    height: number = 350,
+    depth: number = 280,
+    color?: string
+  ): THREE.Mesh {
     const skinColor = color || this.headOptions.skinColor || '#e0bea5';
     const skinMat = this.getColoredMaterial(skinColor);
     const headGeo = new THREE.BoxGeometry(width, height, depth);

@@ -83,7 +83,9 @@ export abstract class AsyncThreeComponent extends BaseThreeComponent {
    * Create the Three.js object using loaded resources
    * Must be implemented by subclasses
    */
-  protected abstract createObjectFromResources(resources: Map<string, LoadedResource>): Promise<THREE.Object3D>;
+  protected abstract createObjectFromResources(
+    resources: Map<string, LoadedResource>
+  ): Promise<THREE.Object3D>;
 
   /**
    * Get fallback resources for failed loads
@@ -123,7 +125,7 @@ export abstract class AsyncThreeComponent extends BaseThreeComponent {
         totalResources,
         loadedResources: loadedCount,
         currentResource,
-        progress: loadedCount / totalResources
+        progress: loadedCount / totalResources,
       };
       this.callbacks?.onProgress?.(progress);
     };
@@ -131,7 +133,7 @@ export abstract class AsyncThreeComponent extends BaseThreeComponent {
     updateProgress();
 
     // Load resources concurrently
-    const loadPromises = descriptors.map(async (descriptor) => {
+    const loadPromises = descriptors.map(async descriptor => {
       try {
         updateProgress(descriptor.id);
 
@@ -156,7 +158,7 @@ export abstract class AsyncThreeComponent extends BaseThreeComponent {
             type: descriptor.type,
             data: fallbacks[descriptor.id],
             url: 'fallback',
-            loadTime: 0
+            loadTime: 0,
           };
           this.resources.set(descriptor.id, fallbackResource);
           loadedCount++;
@@ -185,7 +187,7 @@ export abstract class AsyncThreeComponent extends BaseThreeComponent {
         type: descriptor.type,
         data,
         url: descriptor.url,
-        loadTime: performance.now() - startTime
+        loadTime: performance.now() - startTime,
       };
     }
 
@@ -202,7 +204,7 @@ export abstract class AsyncThreeComponent extends BaseThreeComponent {
         type: descriptor.type,
         data,
         url: descriptor.url,
-        loadTime
+        loadTime,
       };
 
       return resource;
@@ -259,7 +261,7 @@ export abstract class AsyncThreeComponent extends BaseThreeComponent {
       const loader = new THREE.TextureLoader();
       loader.load(
         url,
-        (texture) => {
+        texture => {
           if (_options) {
             Object.assign(texture, _options);
           }
@@ -363,8 +365,8 @@ export abstract class AsyncThreeComponent extends BaseThreeComponent {
         id,
         type: resource.type,
         url: resource.url,
-        loadTime: resource.loadTime
-      }))
+        loadTime: resource.loadTime,
+      })),
     };
   }
 }
