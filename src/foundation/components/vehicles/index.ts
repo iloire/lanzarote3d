@@ -7,8 +7,6 @@ import LegacyGlider from './Glider';
 import LegacyWing from './Wing';
 
 // Modern vehicle components
-export { Paraglider } from './ParagliderComponent';
-export type { ParagliderOptions, FlyingState } from './ParagliderComponent';
 
 export { Boat, BoatType } from './BoatComponent';
 export type { BoatOptions, BoatMovement } from './BoatComponent';

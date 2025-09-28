@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Paraglider } from '../../../../../foundation/components/vehicles';
+import { LegacyParaglider as Paraglider } from '../../../../../foundation/components/vehicles';
 import { SmallSailBoat, Tree, Stone } from '../../../../../foundation/components/scenery';
 import { House, HouseType } from '../../../../../foundation/components/scenery';
 import { PineTree } from '../../../../../foundation/components/scenery';
