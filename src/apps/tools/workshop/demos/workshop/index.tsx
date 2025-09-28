@@ -93,12 +93,12 @@ class WorkshopApp extends WorkshopDemoBase {
     try {
       const igloo = new Igloo(IglooSize.Medium);
       const iglooMesh = igloo.load();
-      iglooMesh.position.set(-20, 0, 0);
-      iglooMesh.scale.set(2, 2, 2);
+      iglooMesh.position.set(0, 0, -60);
+      iglooMesh.scale.set(0.8, 0.8, 0.8);
       scene.add(iglooMesh);
       this.componentMeshes.push(iglooMesh);
 
-      const iglooLabel = createLabel('Igloo', new THREE.Vector3(-20, -10, 0));
+      const iglooLabel = createLabel('Igloo', new THREE.Vector3(0, -10, -60));
       scene.add(iglooLabel);
       this.labelMeshes.push(iglooLabel);
     } catch (error) {
@@ -109,11 +109,11 @@ class WorkshopApp extends WorkshopDemoBase {
     try {
       const boat = new SmallSailBoat();
       const boatMesh = boat.load(); // Legacy API doesn't take gui parameter
-      boatMesh.position.set(-30, 0, 80);
+      boatMesh.position.set(-60, 0, 120);
       scene.add(boatMesh);
       this.componentMeshes.push(boatMesh);
 
-      const boatLabel = createLabel('Boat', new THREE.Vector3(-30, -10, 80));
+      const boatLabel = createLabel('Boat', new THREE.Vector3(-60, -10, 120));
       scene.add(boatLabel);
       this.labelMeshes.push(boatLabel);
     } catch (error) {
@@ -122,10 +122,10 @@ class WorkshopApp extends WorkshopDemoBase {
 
     // Load houses
     const houseConfigs = [
-      { type: HouseType.Small, position: [0, 0, 0], label: 'Small House' },
-      { type: HouseType.Medium, position: [0, 0, 30], label: 'Medium House' },
-      { type: HouseType.Large, position: [0, 0, 60], label: 'Large House' },
-      { type: HouseType.Modern, position: [0, 0, 90], label: 'Modern House' },
+      { type: HouseType.Small, position: [80, 0, 0], label: 'Small House' },
+      { type: HouseType.Medium, position: [80, 0, 50], label: 'Medium House' },
+      { type: HouseType.Large, position: [80, 0, 100], label: 'Large House' },
+      { type: HouseType.Modern, position: [80, 0, 150], label: 'Modern House' },
     ];
 
     for (const config of houseConfigs) {
@@ -152,11 +152,11 @@ class WorkshopApp extends WorkshopDemoBase {
       const pineTree = new PineTree();
       const pineTreeMesh = pineTree.load();
       pineTreeMesh.scale.set(3, 3, 3);
-      pineTreeMesh.position.set(30, 0, 120);
+      pineTreeMesh.position.set(160, 0, 0);
       scene.add(pineTreeMesh);
       this.componentMeshes.push(pineTreeMesh);
 
-      const pineLabel = createLabel('Pine Tree', new THREE.Vector3(30, -10, 120));
+      const pineLabel = createLabel('Pine Tree', new THREE.Vector3(160, -10, 0));
       scene.add(pineLabel);
       this.labelMeshes.push(pineLabel);
     } catch (error) {
@@ -167,11 +167,11 @@ class WorkshopApp extends WorkshopDemoBase {
       const tree = new Tree();
       const treeMesh = tree.load();
       treeMesh.scale.set(2, 2, 2);
-      treeMesh.position.set(60, 0, 120);
+      treeMesh.position.set(160, 0, 80);
       scene.add(treeMesh);
       this.componentMeshes.push(treeMesh);
 
-      const treeLabel = createLabel('Tree', new THREE.Vector3(60, -10, 120));
+      const treeLabel = createLabel('Tree', new THREE.Vector3(160, -10, 80));
       scene.add(treeLabel);
       this.labelMeshes.push(treeLabel);
     } catch (error) {
@@ -180,8 +180,8 @@ class WorkshopApp extends WorkshopDemoBase {
 
     // Load stones
     const stoneConfigs = [
-      { position: [100, 0, 30], scale: [2, 2, 2], label: 'Stone' },
-      { position: [130, 0, 60], scale: [1.5, 3, 1.5], label: 'Tall Stone' },
+      { position: [240, 0, 20], scale: [2, 2, 2], label: 'Stone' },
+      { position: [240, 0, 100], scale: [1.5, 3, 1.5], label: 'Tall Stone' },
     ];
 
     for (const config of stoneConfigs) {
@@ -206,7 +206,7 @@ class WorkshopApp extends WorkshopDemoBase {
 
     // Add a simple ground plane for component showcase
     try {
-      const groundGeometry = new THREE.PlaneGeometry(400, 300);
+      const groundGeometry = new THREE.PlaneGeometry(600, 400);
       const groundMaterial = new THREE.MeshStandardMaterial({
         color: 0x8fbc8f, // Dark sea green for ground
         transparent: true,
@@ -227,8 +227,8 @@ class WorkshopApp extends WorkshopDemoBase {
   }
 
   private setupCamera(camera: THREE.Camera): void {
-    const lookAt = new THREE.Vector3(40, 0, 60); // Center point between all spread-out components
-    camera.position.set(400, 200, -150); // Much further away to show all scenery
+    const lookAt = new THREE.Vector3(120, 0, 75); // Center point between all spread-out components
+    camera.position.set(600, 300, 300); // Much further away to show all scenery
     camera.lookAt(lookAt);
   }
 
