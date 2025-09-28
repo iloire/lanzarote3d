@@ -161,11 +161,18 @@ class NewGliderWorkshopApp extends WorkshopDemoBase {
           }, 'releaseBrakes').name('Release All Brakes');
 
           // Component info
-          const info = glider.getInfo();
-          const infoFolder = gliderFolder.addFolder('Component Info');
-          infoFolder.add(info, 'name').name('Name').listen();
-          infoFolder.add(info, 'version').name('Version').listen();
-          infoFolder.add(info, 'numeroCajones').name('Cells').listen();
+          const info = glider.getInfo ? glider.getInfo() : {
+            name: config.name,
+            version: '1.0.0',
+            numeroCajones: config.options.numeroCajones
+          };
+
+          if (info) {
+            const infoFolder = gliderFolder.addFolder('Component Info');
+            if (info.name) infoFolder.add(info, 'name').name('Name').listen();
+            if (info.version) infoFolder.add(info, 'version').name('Version').listen();
+            if (info.numeroCajones) infoFolder.add(info, 'numeroCajones').name('Cells').listen();
+          }
 
           gliderFolder.open();
         }
