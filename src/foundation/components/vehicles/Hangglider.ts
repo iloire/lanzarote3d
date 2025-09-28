@@ -34,7 +34,7 @@ class HangGliderModel extends AutoFlier {
 
     // pilot
     this.pilot = new LegacyPilot(DEFAULT_OPTIONS);
-    const pilotMesh = this.pilot.load();
+    const pilotMesh = await this.pilot.load();
     const pilotScale = 0.03;
     pilotMesh.scale.set(pilotScale, pilotScale, pilotScale);
     pilotMesh.position.x = -5;

@@ -25,7 +25,7 @@ class Tandem {
     mesh.add(wing);
 
     const pilot = new TandemPilot(this.options.pilot);
-    const pilotMesh = pilot.load();
+    const pilotMesh = await pilot.load();
 
     pilotMesh.position.x = 17;
     pilotMesh.position.z = -0.4;

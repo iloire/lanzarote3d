@@ -77,7 +77,7 @@ class LegacyParaglider implements IFlyable {
     this.mesh.add(wing);
 
     this.pilot = new Pilot(this.options.pilot);
-    this.pilotMesh = this.pilot.load();
+    this.pilotMesh = await this.pilot.load();
 
     this.pilotMesh.position.x = 17;
     this.pilotMesh.position.z = -0.4;
