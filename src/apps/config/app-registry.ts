@@ -256,17 +256,6 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       status: 'dev',
       priority: 11,
     },
-    'new-glider': {
-      name: 'NewGlider',
-      description: 'Modern NewGlider component demo with enhanced features, resource management, and dynamic controls',
-      entry: './tools/workshop/demos/new-glider',
-      route: '/new-glider',
-      category: 'demo',
-      requiresWebGL: true,
-      tags: ['glider', 'modern', 'component', 'enhanced'],
-      status: 'dev',
-      priority: 10,
-    },
     hangglider: {
       name: 'Hang Glider',
       description: 'Hang glider component demo',

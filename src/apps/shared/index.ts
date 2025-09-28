@@ -76,9 +76,6 @@ export async function loadApp(appKey: string, options: StoryOptions): Promise<vo
     case 'legacy-glider':
       appModule = await import('../tools/workshop/demos/glider/index');
       break;
-    case 'new-glider':
-      appModule = await import('../tools/workshop/demos/new-glider/index');
-      break;
     case 'hangglider':
       appModule = await import('../tools/workshop/demos/hangglider/index');
       break;

@@ -8,14 +8,8 @@ import HangGliderWing from './HangGliderWing';
 
 // Modern vehicle components
 
-export { Boat, BoatType } from './Boat';
-export type { BoatOptions, BoatMovement } from './Boat';
-
 export { Wing } from './Wing';
 export type { WingOptions } from './Wing';
-
-export { NewGlider } from './GliderComponent';
-export type { GliderOptions as ModernGliderOptions, GliderState } from './GliderComponent';
 
 // Type exports
 export type { VehicleConfig } from '../../types';
