@@ -74,7 +74,7 @@ class PilotWorkshopApp extends WorkshopDemoBase {
           shoesColor: 'gray',
         },
       });
-      const meshTandem = tandem.load();
+      const meshTandem = await tandem.load();
       meshTandem.position.set(-2000, -300, -500);
       scene.add(meshTandem);
 
