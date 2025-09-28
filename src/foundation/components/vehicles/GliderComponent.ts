@@ -61,6 +61,11 @@ export class NewGlider extends SimpleThreeComponent {
     });
   }
 
+  protected createGeometry(): THREE.BufferGeometry {
+    // Return a simple placeholder geometry as the actual glider is created in createSyncContent
+    return new THREE.BoxGeometry(1, 1, 1);
+  }
+
   protected createSyncContent(): THREE.Object3D {
     const container = new THREE.Object3D();
     container.name = 'GliderContainer';
