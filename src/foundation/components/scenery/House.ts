@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import GuiHelper from '../../utils/gui';
+import { SimpleThreeComponent, SimpleComponentOptions } from '../base/SimpleThreeComponent';
+import { ComponentMetadata } from '../base/IThreeComponent';
 
 const getColorMaterial = (color: number) => {
   return new THREE.MeshPhongMaterial({ color });
@@ -21,157 +23,283 @@ export enum HouseType {
   Modern,
 }
 
-class House {
-  height: number = 20;
+export interface HouseOptions extends SimpleComponentOptions {
   type: HouseType;
+}
 
-  constructor(type: HouseType) {
-    this.type = type;
-    // Adjust height based on house type
-    if (type === HouseType.Large) {
-      this.height = 30;
-    } else if (type === HouseType.Modern) {
-      this.height = 25;
+class House extends SimpleThreeComponent {
+  private height: number = 20;
+  private type: HouseType;
+
+  constructor(options: HouseOptions = { type: HouseType.Small }) {
+    const metadata: ComponentMetadata = {
+      name: 'House',
+      version: '1.0.0',
+      description: 'Procedural house component with multiple architectural styles',
+      tags: ['scenery', 'building', 'procedural']
+    };
+
+    super(metadata, options);
+    this.type = options.type;
+    this.height = this.calculateHeight(options.type);
+
+    if (options.scale) {
+      this.height *= (typeof options.scale === 'number' ? options.scale : 1);
     }
   }
 
-  private addBasicWindows(mesh: THREE.Mesh) {
-    // Window with frame
+  protected createGeometry(): THREE.BufferGeometry {
+    return new THREE.BoxGeometry(20, this.height, 20);
+  }
+
+  private calculateHeight(type: HouseType): number {
+    switch (type) {
+      case HouseType.Large:
+        return 30;
+      case HouseType.Modern:
+        return 25;
+      case HouseType.Medium:
+      case HouseType.Small:
+      default:
+        return 20;
+    }
+  }
+
+  private createWindow(x: number, y: number, z: number): THREE.Group {
+    const windowGroup = new THREE.Group();
+
+    // Create window
     const windowGeo = new THREE.BoxGeometry(4, 4, 4);
     const window = new THREE.Mesh(
       windowGeo,
       this.type === HouseType.Modern ? mat_modern_window : mat_window
     );
-    window.position.set(9, 4, 4);
+    window.position.set(x, y, z);
 
-    // Add frame around window
+    // Create frame
     const frameGeo = new THREE.BoxGeometry(5, 5, 4.5);
     const frame = new THREE.Mesh(frameGeo, mat_frame);
     frame.position.copy(window.position);
-    mesh.add(frame);
 
-    const window2 = window.clone();
-    const frame2 = frame.clone();
-    window2.position.set(9, 4, -4);
-    frame2.position.copy(window2.position);
-    mesh.add(frame2);
+    windowGroup.add(frame);
+    windowGroup.add(window);
+    return windowGroup;
+  }
 
-    const window3 = window.clone();
-    const frame3 = frame.clone();
-    window3.position.set(0, 4, 9);
-    frame3.position.copy(window3.position);
-    mesh.add(frame3);
-    mesh.add(window);
-    mesh.add(window2);
-    mesh.add(window3);
+  private addBasicWindows(mesh: THREE.Object3D): { window: THREE.Mesh; window2: THREE.Mesh } {
+    const window1Group = this.createWindow(9, 4, 4);
+    const window2Group = this.createWindow(9, 4, -4);
+    const window3Group = this.createWindow(0, 4, 9);
+
+    mesh.add(window1Group);
+    mesh.add(window2Group);
+    mesh.add(window3Group);
+
+    // Return first two windows for GUI compatibility
+    const window = window1Group.children.find(child => child instanceof THREE.Mesh && child.material !== mat_frame) as THREE.Mesh;
+    const window2 = window2Group.children.find(child => child instanceof THREE.Mesh && child.material !== mat_frame) as THREE.Mesh;
+
     return { window, window2 };
   }
 
-  load(gui?: any): THREE.Mesh {
-    const geo = new THREE.BoxGeometry(20, this.height, 20);
-    const mesh = new THREE.Mesh(geo, this.type === HouseType.Modern ? mat_modern : mat);
-
+  private createRoof(mesh: THREE.Object3D): void {
     if (this.type !== HouseType.Modern) {
-      // Add traditional roof
+      // Traditional pyramidal roof
       const roofGeo = new THREE.ConeGeometry(15, 10, 4);
       const roof = new THREE.Mesh(roofGeo, mat_roof);
       roof.position.set(0, this.height / 2 + 3, 0);
       roof.rotation.y = Math.PI / 4;
       mesh.add(roof);
     } else {
-      // Add flat modern roof with slight overhang
+      // Modern flat roof with overhang
       const flatRoofGeo = new THREE.BoxGeometry(22, 1, 22);
       const flatRoof = new THREE.Mesh(flatRoofGeo, mat_modern);
       flatRoof.position.set(0, this.height / 2 + 0.5, 0);
       mesh.add(flatRoof);
     }
+  }
 
-    const { window, window2 } = this.addBasicWindows(mesh);
-
-    // Add door based on house type
+  private createDoor(mesh: THREE.Object3D): void {
     const doorGeo = new THREE.BoxGeometry(6, 8, 6);
     const door = new THREE.Mesh(
       doorGeo,
       this.type === HouseType.Modern ? mat_modern_window : mat_door
     );
     door.position.set(8, -5, 0);
-    mesh.add(door);
 
-    // Add door frame
     const doorFrameGeo = new THREE.BoxGeometry(7, 9, 6.5);
     const doorFrame = new THREE.Mesh(doorFrameGeo, mat_frame);
     doorFrame.position.copy(door.position);
+
     mesh.add(doorFrame);
+    mesh.add(door);
+  }
 
-    if (this.type === HouseType.Medium) {
-      const geo2 = new THREE.BoxGeometry(15, this.height - 9, 30);
-      const mesh2 = new THREE.Mesh(geo2, mat);
-      mesh2.position.set(0, -5, 10);
-      mesh.add(mesh2);
+  public override async load(): Promise<THREE.Object3D> {
+    const houseGroup = await super.load() as THREE.Mesh;
 
-      // Add extension roof
-      const roofGeo2 = new THREE.ConeGeometry(12, 8, 4);
-      const roof2 = new THREE.Mesh(roofGeo2, mat_roof);
-      roof2.position.set(0, (this.height - 9) / 2 - 1, 10);
-      roof2.rotation.y = Math.PI / 4;
-      mesh.add(roof2);
-
-      const garageDoorGeo = new THREE.BoxGeometry(6, 8, 8);
-      const garageDoor = new THREE.Mesh(garageDoorGeo, mat_door2);
-      garageDoor.position.set(5, -7, 18);
-      mesh.add(garageDoor);
-
-      const garageDoorFrameGeo = new THREE.BoxGeometry(7, 9, 8.5);
-      const garageDoorFrame = new THREE.Mesh(garageDoorFrameGeo, mat_frame);
-      garageDoorFrame.position.copy(garageDoor.position);
-      mesh.add(garageDoorFrame);
-    } else if (this.type === HouseType.Large) {
-      // Add garage similar to medium house
-      const garageGeo = new THREE.BoxGeometry(15, this.height - 15, 20);
-      const garage = new THREE.Mesh(garageGeo, mat);
-      garage.position.set(-10, -7.5, 0);
-      mesh.add(garage);
-
-      const garageDoorGeo = new THREE.BoxGeometry(8, 10, 8);
-      const garageDoor = new THREE.Mesh(garageDoorGeo, mat_door2);
-      garageDoor.position.set(-15, -7, 0);
-      mesh.add(garageDoor);
-
-      const garageDoorFrameGeo = new THREE.BoxGeometry(9, 11, 8.5);
-      const garageDoorFrame = new THREE.Mesh(garageDoorFrameGeo, mat_frame);
-      garageDoorFrame.position.copy(garageDoor.position);
-      mesh.add(garageDoorFrame);
-    } else if (this.type === HouseType.Modern) {
-      // Add large panoramic windows
-      const panoramicWindowGeo = new THREE.BoxGeometry(12, 8, 0.5);
-      const panoramicWindow = new THREE.Mesh(panoramicWindowGeo, mat_modern_window);
-      panoramicWindow.position.set(0, 2, 10);
-      mesh.add(panoramicWindow);
-
-      const panoramicFrame = new THREE.Mesh(new THREE.BoxGeometry(13, 9, 1), mat_frame);
-      panoramicFrame.position.copy(panoramicWindow.position);
-      mesh.add(panoramicFrame);
-
-      // Add decorative vertical element
-      const pillarGeo = new THREE.BoxGeometry(1, this.height, 1);
-      const pillar = new THREE.Mesh(pillarGeo, mat_frame);
-      pillar.position.set(-9, 0, 9);
-      mesh.add(pillar);
-
-      // Add canopy over door
-      const canopyGeo = new THREE.BoxGeometry(8, 0.5, 4);
-      const canopy = new THREE.Mesh(canopyGeo, mat_modern);
-      canopy.position.set(8, 2, 0);
-      mesh.add(canopy);
+    // Set material based on house type
+    const baseMaterial = this.type === HouseType.Modern ? mat_modern : mat;
+    if (houseGroup.material instanceof THREE.Material) {
+      houseGroup.material = baseMaterial;
     }
 
-    if (gui) {
-      GuiHelper.addLocationGui(gui, 'window', window);
-      GuiHelper.addLocationGui(gui, 'window2', window2);
-    }
+    // Add architectural features
+    this.createRoof(houseGroup);
+    const { window, window2 } = this.addBasicWindows(houseGroup);
+    this.createDoor(houseGroup);
+    this.addTypeSpecificFeatures(houseGroup);
+
+    return houseGroup;
+  }
+
+  private createHouseMesh(): THREE.Mesh {
+    const geo = this.createGeometry();
+    const baseMaterial = this.type === HouseType.Modern ? mat_modern : mat;
+    const mesh = new THREE.Mesh(geo, baseMaterial);
+
+    // Add architectural features
+    this.createRoof(mesh);
+    this.addBasicWindows(mesh);
+    this.createDoor(mesh);
+    this.addTypeSpecificFeatures(mesh);
 
     return mesh;
   }
+
+  public loadWithGui(gui?: any): Promise<THREE.Object3D> {
+    return this.load().then(mesh => {
+      if (gui) {
+        const { window, window2 } = this.findWindows(mesh);
+        if (window && window2) {
+          GuiHelper.addLocationGui(gui, 'window', window);
+          GuiHelper.addLocationGui(gui, 'window2', window2);
+        }
+      }
+      return mesh;
+    });
+  }
+
+  private findWindows(mesh: THREE.Object3D): { window: THREE.Mesh | null; window2: THREE.Mesh | null } {
+    let window: THREE.Mesh | null = null;
+    let window2: THREE.Mesh | null = null;
+    let windowCount = 0;
+
+    mesh.traverse((child) => {
+      if (child instanceof THREE.Mesh &&
+          child.material !== mat_frame &&
+          (child.material === mat_window || child.material === mat_modern_window)) {
+        if (windowCount === 0) window = child;
+        else if (windowCount === 1) window2 = child;
+        windowCount++;
+      }
+    });
+
+    return { window, window2 };
+  }
+
+  private addTypeSpecificFeatures(mesh: THREE.Object3D): void {
+    switch (this.type) {
+      case HouseType.Medium:
+        this.addMediumHouseFeatures(mesh);
+        break;
+      case HouseType.Large:
+        this.addLargeHouseFeatures(mesh);
+        break;
+      case HouseType.Modern:
+        this.addModernHouseFeatures(mesh);
+        break;
+      default:
+        // Small house has no additional features
+        break;
+    }
+  }
+
+  private addMediumHouseFeatures(mesh: THREE.Object3D): void {
+    // Add extension
+    const extensionGeo = new THREE.BoxGeometry(15, this.height - 9, 30);
+    const extension = new THREE.Mesh(extensionGeo, mat);
+    extension.position.set(0, -5, 10);
+    mesh.add(extension);
+
+    // Add extension roof
+    const roofGeo = new THREE.ConeGeometry(12, 8, 4);
+    const roof = new THREE.Mesh(roofGeo, mat_roof);
+    roof.position.set(0, (this.height - 9) / 2 - 1, 10);
+    roof.rotation.y = Math.PI / 4;
+    mesh.add(roof);
+
+    // Add garage door
+    this.addGarageDoor(mesh, 5, -7, 18, 6, 8, 8);
+  }
+
+  private addLargeHouseFeatures(mesh: THREE.Object3D): void {
+    // Add garage
+    const garageGeo = new THREE.BoxGeometry(15, this.height - 15, 20);
+    const garage = new THREE.Mesh(garageGeo, mat);
+    garage.position.set(-10, -7.5, 0);
+    mesh.add(garage);
+
+    // Add garage door
+    this.addGarageDoor(mesh, -15, -7, 0, 8, 10, 8);
+  }
+
+  private addModernHouseFeatures(mesh: THREE.Object3D): void {
+    // Add panoramic windows
+    const panoramicWindowGeo = new THREE.BoxGeometry(12, 8, 0.5);
+    const panoramicWindow = new THREE.Mesh(panoramicWindowGeo, mat_modern_window);
+    panoramicWindow.position.set(0, 2, 10);
+    mesh.add(panoramicWindow);
+
+    const panoramicFrame = new THREE.Mesh(new THREE.BoxGeometry(13, 9, 1), mat_frame);
+    panoramicFrame.position.copy(panoramicWindow.position);
+    mesh.add(panoramicFrame);
+
+    // Add decorative pillar
+    const pillarGeo = new THREE.BoxGeometry(1, this.height, 1);
+    const pillar = new THREE.Mesh(pillarGeo, mat_frame);
+    pillar.position.set(-9, 0, 9);
+    mesh.add(pillar);
+
+    // Add canopy over door
+    const canopyGeo = new THREE.BoxGeometry(8, 0.5, 4);
+    const canopy = new THREE.Mesh(canopyGeo, mat_modern);
+    canopy.position.set(8, 2, 0);
+    mesh.add(canopy);
+  }
+
+  private addGarageDoor(mesh: THREE.Object3D, x: number, y: number, z: number, width: number, height: number, depth: number): void {
+    const garageDoorGeo = new THREE.BoxGeometry(width, height, depth);
+    const garageDoor = new THREE.Mesh(garageDoorGeo, mat_door2);
+    garageDoor.position.set(x, y, z);
+    mesh.add(garageDoor);
+
+    const frameWidth = width + 1;
+    const frameHeight = height + 1;
+    const frameDepth = depth + 0.5;
+    const garageDoorFrameGeo = new THREE.BoxGeometry(frameWidth, frameHeight, frameDepth);
+    const garageDoorFrame = new THREE.Mesh(garageDoorFrameGeo, mat_frame);
+    garageDoorFrame.position.copy(garageDoor.position);
+    mesh.add(garageDoorFrame);
+  }
 }
 
-export default House;
+// Legacy compatibility layer for synchronous API
+const HouseLegacy = House as any;
+
+// Add legacy load method that returns mesh directly and supports GUI
+HouseLegacy.prototype.load = function(gui?: any): THREE.Object3D {
+  const mesh = this.createHouseMesh();
+
+  if (gui) {
+    const { window, window2 } = this.findWindows(mesh);
+    if (window && window2) {
+      GuiHelper.addLocationGui(gui, 'window', window);
+      GuiHelper.addLocationGui(gui, 'window2', window2);
+    }
+  }
+
+  return mesh;
+};
+
+export default HouseLegacy;

@@ -130,7 +130,7 @@ class WorkshopApp extends WorkshopDemoBase {
 
     for (const config of houseConfigs) {
       try {
-        const house = new House(config.type);
+        const house = new House({ type: config.type });
         const houseMesh = house.load(gui);
         houseMesh.position.set(config.position[0] ?? 0, config.position[1] ?? 0, config.position[2] ?? 0);
         scene.add(houseMesh);
