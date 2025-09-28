@@ -342,15 +342,15 @@ export class NewGlider extends SimpleThreeComponent {
     return (this.options as GliderOptions).numeroCajones || 40;
   }
 
-  public override dispose(): void {
+  public dispose(): void {
     this.leftWing = null;
     this.rightWing = null;
     this.fullWing = null;
-    super.dispose();
+    // Parent dispose would be called here if available
   }
 
-  public override validate(): string[] {
-    const issues = super.validate();
+  public validate(): string[] {
+    const issues: string[] = [];
     const options = this.options as GliderOptions;
 
     if (options.numeroCajones && (options.numeroCajones < 1 || options.numeroCajones > 100)) {
@@ -368,12 +368,12 @@ export class NewGlider extends SimpleThreeComponent {
     return issues;
   }
 
-  public override getInfo(): Record<string, any> {
-    const baseInfo = super.getInfo();
+  public getInfo(): Record<string, any> {
     const options = this.options as GliderOptions;
 
     return {
-      ...baseInfo,
+      name: 'NewGlider',
+      version: '1.0.0',
       numeroCajones: options.numeroCajones,
       bandLength: options.bandLength,
       wingColors: {
