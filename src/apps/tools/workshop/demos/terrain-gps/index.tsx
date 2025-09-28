@@ -31,6 +31,8 @@ class TerrainGPSMapperApp extends TerrainBase {
   private mouse: THREE.Vector2;
   private markers: THREE.Group;
   private uiContainer: HTMLElement | undefined;
+  private camera: THREE.Camera | undefined;
+  private controls: any | undefined;
   private coordinateList: Array<{
     terrain: THREE.Vector3;
     gps: { lat: number; lon: number };
@@ -139,6 +141,10 @@ class TerrainGPSMapperApp extends TerrainBase {
       await this.initializeEnvironment(options);
 
       const { camera, scene, renderer, terrain, controls } = options;
+
+      // Store camera and controls for later use
+      this.camera = camera;
+      this.controls = controls;
 
       controls.enabled = true;
 
@@ -373,13 +379,13 @@ class TerrainGPSMapperApp extends TerrainBase {
   }
 
   private resetCameraView(): void {
-    if (!this.sceneManager?.camera || !this.sceneManager?.controls) {
+    if (!this.camera || !this.controls) {
       console.warn('⚠️ Camera or controls not available for reset');
       return;
     }
 
-    const camera = this.sceneManager.camera;
-    const controls = this.sceneManager.controls;
+    const camera = this.camera;
+    const controls = this.controls;
 
     // Reset to perfect top-down north-facing view
     const resetPos = new THREE.Vector3(0, 50000, 0);

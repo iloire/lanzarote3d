@@ -57,9 +57,6 @@ class FlyzoneVisualizerApp extends TerrainBase {
           enabled: false, // Clear visibility for analysis
         },
       },
-      terrain: {
-        style: 'satellite', // Use satellite imagery for better geographic reference
-      },
       performance: {
         monitoring: true,
         logIntervalMs: 30000,
