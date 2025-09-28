@@ -96,9 +96,10 @@ class HeadWorkshopApp extends WorkshopDemoBase {
       const SPACING_X = 1500; // Increased spacing to prevent overlap
       const SPACING_Z = 1500;
 
-      heads.forEach((headOptions, index) => {
+      // Load all heads asynchronously
+      const headPromises = heads.map(async (headOptions, index) => {
         const head = new PilotHead(headOptions);
-        const mesh = head.load();
+        const mesh = await head.load();
 
         // Fix the enum value display
         const headTypeName = Object.keys(PilotHeadType).find(
@@ -146,6 +147,9 @@ class HeadWorkshopApp extends WorkshopDemoBase {
         // Store update function on the mesh for later use
         (mesh as any).updateLabel = updateLabelPosition;
       });
+
+      // Wait for all heads to load
+      await Promise.all(headPromises);
 
       // Set camera position for head showcase - adjusted for new spacing
       camera.position.set(0, 1200, 4000);
