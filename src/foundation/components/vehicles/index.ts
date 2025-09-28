@@ -16,7 +16,7 @@ export type { BoatOptions, BoatMovement } from './BoatComponent';
 export { Wing } from './WingComponent';
 export type { WingOptions } from './WingComponent';
 
-export { GliderComponent } from './GliderComponent';
+export { Glider } from './GliderComponent';
 export type { GliderOptions as ModernGliderOptions, GliderState } from './GliderComponent';
 
 // Type exports

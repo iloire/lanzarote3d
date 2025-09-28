@@ -27,7 +27,7 @@ interface HalfWing {
   wingBreakSystem: THREE.Object3D;
 }
 
-export class GliderComponent extends SimpleThreeComponent {
+export class Glider extends SimpleThreeComponent {
   private leftWing: HalfWing | null = null;
   private rightWing: HalfWing | null = null;
   private fullWing: THREE.Object3D | null = null;
@@ -45,7 +45,7 @@ export class GliderComponent extends SimpleThreeComponent {
 
   constructor(options: GliderOptions = {}) {
     super({
-      name: 'GliderComponent',
+      name: 'Glider',
       version: '1.0.0',
       wingColor1: '#FFA500',
       wingColor2: '#b100cd',
@@ -54,8 +54,8 @@ export class GliderComponent extends SimpleThreeComponent {
       lineBackColor: '#ffffff',
       inletsColor: '#333333',
       numeroCajones: 40,
-      carabinersSeparationMM: GliderComponent.DEFAULT_CARABINERS_SEPARATION,
-      bandLength: GliderComponent.DEFAULT_BAND_LENGTH,
+      carabinersSeparationMM: Glider.DEFAULT_CARABINERS_SEPARATION,
+      bandLength: Glider.DEFAULT_BAND_LENGTH,
       showBreakLines: true,
       ...options
     });
@@ -94,12 +94,12 @@ export class GliderComponent extends SimpleThreeComponent {
       wingBreakSystem: this.leftWing.wingBreakSystem.clone()
     };
     this.rightWing.wing.scale.y = -1;
-    this.rightWing.wing.translateY(GliderComponent.HALF_WING_LENGTH * 2);
+    this.rightWing.wing.translateY(Glider.HALF_WING_LENGTH * 2);
     wing.add(this.rightWing.wing);
 
     // Position the complete wing
-    wing.translateZ(-1 * GliderComponent.HALF_WING_LENGTH);
-    wing.translateY(3000 + (options.bandLength || GliderComponent.DEFAULT_BAND_LENGTH));
+    wing.translateZ(-1 * Glider.HALF_WING_LENGTH);
+    wing.translateY(3000 + (options.bandLength || Glider.DEFAULT_BAND_LENGTH));
 
     return wing;
   }
@@ -155,21 +155,21 @@ export class GliderComponent extends SimpleThreeComponent {
     // Calculate key positions
     const carabinerLocation = new THREE.Vector3(
       -3000,
-      GliderComponent.HALF_WING_LENGTH - (options.carabinersSeparationMM || GliderComponent.DEFAULT_CARABINERS_SEPARATION) / 2,
+      Glider.HALF_WING_LENGTH - (options.carabinersSeparationMM || Glider.DEFAULT_CARABINERS_SEPARATION) / 2,
       0
     );
 
     const handsLocation = new THREE.Vector3(
       -3100,
-      GliderComponent.HALF_WING_LENGTH - (options.carabinersSeparationMM || GliderComponent.DEFAULT_CARABINERS_SEPARATION) / 2,
+      Glider.HALF_WING_LENGTH - (options.carabinersSeparationMM || Glider.DEFAULT_CARABINERS_SEPARATION) / 2,
       120
     );
 
-    const breaksJoinLocation = new THREE.Vector3(-2400, GliderComponent.HALF_WING_LENGTH / 1.1, 250);
+    const breaksJoinLocation = new THREE.Vector3(-2400, Glider.HALF_WING_LENGTH / 1.1, 250);
 
     // Create cajones (wing cells)
     for (let n = 0; n < numeroCajones; n++) {
-      const cajonWidth = GliderComponent.HALF_WING_LENGTH / numeroCajones;
+      const cajonWidth = Glider.HALF_WING_LENGTH / numeroCajones;
       const cajonHeight = 10 + n * 5;
       const deep = 700 + n * 35;
 
@@ -259,7 +259,7 @@ export class GliderComponent extends SimpleThreeComponent {
   }
 
   private createBand(options: GliderOptions): THREE.Object3D {
-    const bandLength = options.bandLength || GliderComponent.DEFAULT_BAND_LENGTH;
+    const bandLength = options.bandLength || Glider.DEFAULT_BAND_LENGTH;
     const bandMaterial = resourceManager.getOrCreateMaterial(
       'glider_band_red',
       () => new THREE.MeshPhongMaterial({ color: 'red' })
@@ -269,8 +269,8 @@ export class GliderComponent extends SimpleThreeComponent {
     group.name = 'Band';
 
     const geometry = resourceManager.getOrCreateGeometry(
-      `glider_band_${GliderComponent.BAND_WIDTH}_${bandLength}`,
-      () => new THREE.BoxGeometry(GliderComponent.BAND_WIDTH, bandLength, 7)
+      `glider_band_${Glider.BAND_WIDTH}_${bandLength}`,
+      () => new THREE.BoxGeometry(Glider.BAND_WIDTH, bandLength, 7)
     );
 
     const band = new THREE.Mesh(geometry, bandMaterial);
@@ -383,3 +383,6 @@ export class GliderComponent extends SimpleThreeComponent {
     };
   }
 }
+
+// Legacy export for backward compatibility
+export const GliderComponent = Glider;
