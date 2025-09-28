@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import { SmallSailBoat, Tree, Stone } from '../../../../../foundation/components/scenery';
 import { House, HouseType } from '../../../../../foundation/components/scenery/buildings';
-import { PineTree, PalmTree, Igloo, IglooSize } from '../../../../../foundation/components/scenery';
-import { CottageLegacy as Cottage, VillaLegacy as Villa, TownhouseLegacy as Townhouse, SkyscraperLegacy as Skyscraper, BarnLegacy as Barn, DesertHouseLegacy as DesertHouse } from '../../../../../foundation/components/scenery';
+import { PineTree, PalmTree, Igloo, IglooSize, Pool, SaguaroCactus, BarrelCactus, PricklyPearCactus, OrganPipeCactus } from '../../../../../foundation/components/scenery';
+import { CottageLegacy as Cottage, VillaLegacy as Villa, TownhouseLegacy as Townhouse, SkyscraperLegacy as Skyscraper, BarnLegacy as Barn, DesertHouseLegacy as DesertHouse, DomeLegacy as Dome, DesertHouseWithPoolLegacy as DesertHouseWithPool } from '../../../../../foundation/components/scenery';
 import { StoryOptions } from '../../../../shared/types';
 import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
 
@@ -157,9 +157,11 @@ class WorkshopApp extends WorkshopDemoBase {
       { type: 'Cottage', position: [-60, 0, 0], scale: 0.8, label: 'Cottage' },
       { type: 'Villa', position: [-60, 0, 80], scale: 0.6, label: 'Villa' },
       { type: 'Townhouse', position: [-60, 0, 160], scale: 0.8, label: 'Townhouse' },
-      { type: 'Skyscraper', position: [-120, 0, 0], scale: 0.4, label: 'Skyscraper' },
+      { type: 'Skyscraper', position: [-120, 0, 0], scale: 4.0, label: 'Skyscraper' },
       { type: 'Barn', position: [-120, 0, 80], scale: 0.6, label: 'Barn' },
       { type: 'DesertHouse', position: [-120, 0, 160], scale: 0.8, label: 'Desert House' },
+      { type: 'Dome', position: [300, 0, 0], scale: 0.8, label: 'Dome' },
+      { type: 'DesertHouseWithPool', position: [300, 0, 80], scale: 0.6, label: 'Desert House + Pool' },
     ];
 
     for (const config of buildingConfigs) {
@@ -184,6 +186,12 @@ class WorkshopApp extends WorkshopDemoBase {
             break;
           case 'DesertHouse':
             building = new DesertHouse({ scale: config.scale });
+            break;
+          case 'Dome':
+            building = new Dome({ scale: config.scale });
+            break;
+          case 'DesertHouseWithPool':
+            building = new DesertHouseWithPool({ scale: config.scale });
             break;
           default:
             continue;
@@ -285,9 +293,74 @@ class WorkshopApp extends WorkshopDemoBase {
       }
     }
 
+    // Load standalone Pool
+    try {
+      const pool = new Pool();
+      const poolMesh = pool.load();
+      poolMesh.position.set(380, 0, 0);
+      poolMesh.scale.set(0.8, 0.8, 0.8);
+      scene.add(poolMesh);
+      this.componentMeshes.push(poolMesh);
+
+      const poolLabel = createLabel('Pool', new THREE.Vector3(380, -10, 0));
+      scene.add(poolLabel);
+      this.labelMeshes.push(poolLabel);
+    } catch (error) {
+      this.handleError(error as Error, 'loading pool');
+    }
+
+    // Load cactus types
+    const cactusConfigs = [
+      { type: 'Saguaro', position: [450, 0, 0], scale: 0.6, label: 'Saguaro Cactus' },
+      { type: 'Barrel', position: [450, 0, 80], scale: 1.0, label: 'Barrel Cactus' },
+      { type: 'PricklyPear', position: [450, 0, 160], scale: 0.8, label: 'Prickly Pear' },
+      { type: 'OrganPipe', position: [520, 0, 40], scale: 0.7, label: 'Organ Pipe Cactus' },
+    ];
+
+    for (const config of cactusConfigs) {
+      try {
+        let cactus;
+
+        switch (config.type) {
+          case 'Saguaro':
+            cactus = new SaguaroCactus({ scale: config.scale });
+            break;
+          case 'Barrel':
+            cactus = new BarrelCactus({ scale: config.scale });
+            break;
+          case 'PricklyPear':
+            cactus = new PricklyPearCactus({ scale: config.scale });
+            break;
+          case 'OrganPipe':
+            cactus = new OrganPipeCactus({ scale: config.scale });
+            break;
+          default:
+            continue;
+        }
+
+        const cactusMesh = cactus.load();
+        cactusMesh.position.set(
+          config.position[0] ?? 0,
+          config.position[1] ?? 0,
+          config.position[2] ?? 0
+        );
+        scene.add(cactusMesh);
+        this.componentMeshes.push(cactusMesh);
+
+        const cactusLabel = createLabel(
+          config.label,
+          new THREE.Vector3(config.position[0], -10, config.position[2])
+        );
+        scene.add(cactusLabel);
+        this.labelMeshes.push(cactusLabel);
+      } catch (error) {
+        this.handleError(error as Error, `loading ${config.label}`);
+      }
+    }
+
     // Add a simple ground plane for component showcase
     try {
-      const groundGeometry = new THREE.PlaneGeometry(600, 400);
+      const groundGeometry = new THREE.PlaneGeometry(800, 500);
       const groundMaterial = new THREE.MeshStandardMaterial({
         color: 0x8fbc8f, // Dark sea green for ground
         transparent: true,
@@ -308,8 +381,8 @@ class WorkshopApp extends WorkshopDemoBase {
   }
 
   private setupCamera(camera: THREE.Camera): void {
-    const lookAt = new THREE.Vector3(0, 0, 75); // Center point between all spread-out components including new buildings
-    camera.position.set(700, 400, 400); // Much further away to show all scenery including new buildings
+    const lookAt = new THREE.Vector3(200, 0, 80); // Center point between all spread-out components including new buildings and cacti
+    camera.position.set(900, 500, 600); // Much further away to show all scenery including new buildings and cacti
     camera.lookAt(lookAt);
   }
 

@@ -1,7 +1,7 @@
 Implement the following tasks if any is added follwing the instructions described below:
 ---
 TASKS:
-- add also a Dome structure to buildings. The dome Im thinking about is a Dome with glass panels where people can sleep inside. It's usually a bit more than half sphere of about 8 metres radius.
+
 ---
 
 ### Instructions

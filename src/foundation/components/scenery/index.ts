@@ -7,6 +7,12 @@ export { default as PalmTree } from './PalmTree';
 export { default as Pool } from './Pool';
 export { default as Stone } from './Stone';
 
+// Cactus Components
+export { default as SaguaroCactus } from './SaguaroCactus';
+export { default as BarrelCactus } from './BarrelCactus';
+export { default as PricklyPearCactus } from './PricklyPearCactus';
+export { default as OrganPipeCactus } from './OrganPipeCactus';
+
 // Boat Components (organized in boats subfolder)
 export * from './boats';
 
