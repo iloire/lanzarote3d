@@ -46,7 +46,7 @@ export interface PilotVoxelOptions extends ComponentOptions {
  * - Performance monitoring and validation
  * - Complete lifecycle management
  */
-export class PilotVoxelComponent extends AsyncThreeComponent {
+export class PilotVoxel extends AsyncThreeComponent {
   protected pilotOptions: PilotVoxelOptions;
   protected characterDefinition?: CharacterDefinition;
 
@@ -586,7 +586,7 @@ export class PilotVoxelComponent extends AsyncThreeComponent {
   /**
    * Create a random character variant
    */
-  public static createRandomCharacter(baseOptions?: Partial<PilotVoxelOptions>): PilotVoxelComponent {
+  public static createRandomCharacter(baseOptions?: Partial<PilotVoxelOptions>): PilotVoxel {
     const randomCharacter = characterRegistry.getRandomCharacter();
 
     const options: PilotVoxelOptions = {
@@ -601,14 +601,14 @@ export class PilotVoxelComponent extends AsyncThreeComponent {
       );
     }
 
-    return new PilotVoxelComponent(options);
+    return new PilotVoxel(options);
   }
 
   /**
    * Clone with different character
    */
-  protected override createClone(options: ComponentOptions): PilotVoxelComponent {
-    return new PilotVoxelComponent({
+  protected override createClone(options: ComponentOptions): PilotVoxel {
+    return new PilotVoxel({
       ...this.pilotOptions,
       ...options as PilotVoxelOptions
     }, this.callbacks);
@@ -625,3 +625,6 @@ export class PilotVoxelComponent extends AsyncThreeComponent {
     };
   }
 }
+
+// Legacy export for backward compatibility
+export const PilotVoxelComponent = PilotVoxel;

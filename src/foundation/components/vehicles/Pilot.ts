@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import PilotHead, { PilotHeadOptions, PilotHeadType } from '../characters/PilotHead';
+import LegacyPilotHead, { PilotHeadOptions, PilotHeadType } from '../characters/PilotHead';
 import CocoonHarness from '../characters/CocoonHarness';
 import { HelmetType } from '../characters/helmets/types';
 
@@ -37,7 +37,7 @@ const getColoredMaterial = (color: string) => {
 };
 
 const getHead = (options: PilotHeadOptions): THREE.Group => {
-  const pilotHead = new PilotHead(options);
+  const pilotHead = new LegacyPilotHead(options);
   return pilotHead.load();
 };
 

@@ -43,7 +43,7 @@ const DEFAULT_OPTIONS = {
   },
 };
 
-class PilotHead {
+class LegacyPilotHead {
   private options: PilotHeadOptions;
 
   constructor(options: PilotHeadOptions) {
@@ -68,4 +68,4 @@ class PilotHead {
   }
 }
 
-export default PilotHead;
+export default LegacyPilotHead;

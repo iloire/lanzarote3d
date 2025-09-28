@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import PilotVoxel, { PilotVoxelOptions } from '../characters/PilotVoxel';
+import LegacyPilotVoxel, { PilotVoxelOptions } from '../characters/PilotVoxel';
 import Glider, { GliderOptions } from './Glider';
 import GuiHelper from '../../utils/gui';
 import IFlyable from '../../types/IFlyable';
@@ -12,7 +12,7 @@ export type ParagliderVoxelOptions = {
 class ParagliderVoxel implements IFlyable {
   mesh: THREE.Object3D;
   glider: Glider;
-  pilot: PilotVoxel;
+  pilot: LegacyPilotVoxel;
   pilotMesh!: THREE.Object3D;
   axesHelper!: THREE.AxesHelper;
   options: ParagliderVoxelOptions;
@@ -64,7 +64,7 @@ class ParagliderVoxel implements IFlyable {
     wing.translateX(300);
     this.mesh.add(wing);
 
-    this.pilot = new PilotVoxel(this.options.pilot);
+    this.pilot = new LegacyPilotVoxel(this.options.pilot);
     this.pilotMesh = await this.pilot.load();
 
     this.pilotMesh.position.x = 350;

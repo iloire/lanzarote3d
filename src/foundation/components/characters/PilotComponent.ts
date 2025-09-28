@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { SimpleThreeComponent } from '../base/SimpleThreeComponent';
 import { resourceManager } from '../../systems/ResourceManager';
-import { PilotHeadComponent, PilotHeadType, HelmetType } from './PilotHeadComponent';
+import { PilotHead, PilotHeadType, HelmetType } from './PilotHeadComponent';
 import CocoonHarness from './CocoonHarness';
 import type { ComponentOptions } from '../base/BaseThreeComponent';
 
@@ -84,7 +84,7 @@ export class Pilot extends SimpleThreeComponent {
 
   private createHead(options: PilotOptions): THREE.Object3D {
     try {
-      const pilotHead = new PilotHeadComponent({
+      const pilotHead = new PilotHead({
         headType: options.headType || PilotHeadType.Default,
         helmetType: options.helmetType || HelmetType.Default,
         helmetColor: options.helmetColor || '#ffffff',

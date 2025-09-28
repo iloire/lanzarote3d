@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import PilotHead, { PilotHeadOptions } from './PilotHead';
+import LegacyPilotHead, { PilotHeadOptions } from './PilotHead';
 // Temporary: Keep using legacy Pilot types for backward compatibility
 // TODO: Migrate to PilotComponentOptions from './PilotComponent'
 import { PilotOptions } from '../vehicles/Pilot';
@@ -12,7 +12,7 @@ const getColoredMaterial = (color: string) => {
 };
 
 const getHead = (options: PilotHeadOptions): THREE.Group => {
-  const pilotHead = new PilotHead(options);
+  const pilotHead = new LegacyPilotHead(options);
   return pilotHead.load();
 };
 

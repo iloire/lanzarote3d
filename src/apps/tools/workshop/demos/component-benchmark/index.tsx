@@ -2,11 +2,11 @@ import * as THREE from 'three';
 import { StoryOptions } from '../../../../shared/types';
 import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
 import { ComponentBenchmark } from '../../../../../foundation/systems/ComponentBenchmark';
-import { WingComponent } from '../../../../../foundation/components/vehicles/WingComponent';
+import { Wing } from '../../../../../foundation/components/vehicles/WingComponent';
 import { Paraglider } from '../../../../../foundation/components/vehicles/ParagliderComponent';
-import { BoatComponent } from '../../../../../foundation/components/vehicles/BoatComponent';
+import { Boat } from '../../../../../foundation/components/vehicles/BoatComponent';
 import { GliderComponent } from '../../../../../foundation/components/vehicles/GliderComponent';
-import Wing from '../../../../../foundation/components/vehicles/Wing';
+import LegacyWing from '../../../../../foundation/components/vehicles/Wing';
 import ParagliderVoxel from '../../../../../foundation/components/vehicles/ParagliderVoxel';
 import SpeedBoat from '../../../../../foundation/components/scenery/SpeedBoat';
 import Glider from '../../../../../foundation/components/vehicles/Glider';
@@ -185,13 +185,13 @@ class ComponentBenchmarkWorkshopApp extends WorkshopDemoBase {
       await this.showWingExample();
 
       const modernResult = await this.benchmark.benchmarkModernComponent(
-        WingComponent,
+        Wing,
         { wingType: 'hangglider', numeroCajones: 16 },
         iterations
       );
 
       const legacyResult = await this.benchmark.benchmarkLegacyComponent(
-        Wing,
+        LegacyWing,
         {},
         iterations
       );
@@ -208,7 +208,7 @@ class ComponentBenchmarkWorkshopApp extends WorkshopDemoBase {
 
   private async showWingExample(): Promise<void> {
     // Create and display a sample wing component for visual reference
-    const wingComponent = new WingComponent({
+    const wingComponent = new Wing({
       wingType: 'hangglider',
       numeroCajones: 16,
       wingColor: '#00ffff'
@@ -306,7 +306,7 @@ class ComponentBenchmarkWorkshopApp extends WorkshopDemoBase {
 
     try {
       const modernResult = await this.benchmark.benchmarkModernComponent(
-        BoatComponent,
+        Boat,
         { boatType: 'speedboat', enableFloating: false },
         iterations
       );

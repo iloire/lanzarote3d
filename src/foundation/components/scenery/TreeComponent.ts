@@ -24,7 +24,7 @@ export interface TreeOptions extends SimpleComponentOptions {
  * - Multiple tree styles (default, pine, palm)
  * - Proper resource cleanup and lifecycle management
  */
-export class TreeComponent extends SimpleThreeComponent {
+export class Tree extends SimpleThreeComponent {
   protected treeOptions: TreeOptions;
 
   constructor(options: TreeOptions = {}) {
@@ -234,8 +234,8 @@ export class TreeComponent extends SimpleThreeComponent {
   /**
    * Create clone with same tree configuration
    */
-  protected override createClone(options: ComponentOptions): TreeComponent {
-    return new TreeComponent({ ...this.treeOptions, ...options as TreeOptions });
+  protected override createClone(options: ComponentOptions): Tree {
+    return new Tree({ ...this.treeOptions, ...options as TreeOptions });
   }
 
   /**
@@ -268,3 +268,6 @@ export class TreeComponent extends SimpleThreeComponent {
     };
   }
 }
+
+// Legacy export for backward compatibility
+export const TreeComponent = Tree;

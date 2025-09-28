@@ -57,12 +57,12 @@ Factory pattern providing:
 ### Basic Component Creation
 
 ```typescript
-import { TreeComponent } from './scenery/TreeComponent';
+import { Tree } from './scenery/TreeComponent';
 import { componentFactory } from './factory/ComponentFactory';
 
 // Register component
 componentFactory.register('tree', {
-  constructor: TreeComponent,
+  constructor: Tree,
   metadata: {
     name: 'Tree',
     version: '2.0.0',
@@ -112,7 +112,7 @@ console.log(`Memory usage: ${stats.memoryUsage.total / 1024 / 1024} MB`);
 
 ```typescript
 // Load component
-const component = new TreeComponent(options);
+const component = new Tree(options);
 const object = await component.load();
 
 // Update each frame
@@ -196,7 +196,7 @@ class NewTree extends SimpleThreeComponent {
 
 ### Scenery
 - Trees, rocks, buildings, natural features
-- Example: `TreeComponent`, `HouseComponent`
+- Example: `Tree`, `House`
 
 ### Vehicles
 - Paragliders, boats, aircraft
@@ -259,7 +259,7 @@ foundation/components/
 ├── examples/               # Usage examples and demos
 │   └── ComponentArchitectureExample.ts # Complete example
 ├── scenery/               # Scene objects (trees, rocks, buildings)
-│   └── TreeComponent.ts   # Example refactored component
+│   └── TreeComponent.ts   # Example refactored component (Tree class)
 ├── vehicles/              # Moving objects (boats, aircraft)
 ├── characters/            # People and animals
 ├── environment/           # Sky, water, weather

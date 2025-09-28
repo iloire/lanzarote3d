@@ -6,7 +6,7 @@ export type PilotVoxelOptions = {
   textureFile: string;
 };
 
-class PilotVoxel {
+class LegacyPilotVoxel {
   options: PilotVoxelOptions;
 
   constructor(options: PilotVoxelOptions) {
@@ -40,4 +40,4 @@ class PilotVoxel {
   }
 }
 
-export default PilotVoxel;
+export default LegacyPilotVoxel;

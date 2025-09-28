@@ -25,7 +25,7 @@ export interface BoatMovement {
   isMoving: boolean;
 }
 
-export class BoatComponent extends AsyncThreeComponent {
+export class Boat extends AsyncThreeComponent {
   private floatingOffset = Math.random() * Math.PI * 2;
   private originalPosition = new THREE.Vector3();
   private animationId: number | null = null;
@@ -43,7 +43,7 @@ export class BoatComponent extends AsyncThreeComponent {
 
   constructor(options: BoatOptions = {}) {
     super({
-      name: 'BoatComponent',
+      name: 'Boat',
       version: '1.0.0',
       ...options
     });
@@ -358,3 +358,6 @@ export class BoatComponent extends AsyncThreeComponent {
     };
   }
 }
+
+// Legacy export for backward compatibility
+export const BoatComponent = Boat;

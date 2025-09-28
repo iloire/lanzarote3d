@@ -11,13 +11,13 @@ export interface WingOptions extends ComponentOptions {
   wingType?: 'hangglider' | 'paraglider';
 }
 
-export class WingComponent extends SimpleThreeComponent {
+export class Wing extends SimpleThreeComponent {
   private leftWing: THREE.Object3D | null = null;
   private rightWing: THREE.Object3D | null = null;
 
   constructor(options: WingOptions = {}) {
     super({
-      name: 'WingComponent',
+      name: 'Wing',
       version: '1.0.0',
       ...options
     });
@@ -288,3 +288,6 @@ export class WingComponent extends SimpleThreeComponent {
     };
   }
 }
+
+// Legacy export for backward compatibility
+export const WingComponent = Wing;

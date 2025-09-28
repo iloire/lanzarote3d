@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { AsyncThreeComponent } from '../base/AsyncThreeComponent';
-import { PilotVoxelComponent } from '../characters/PilotVoxelComponent';
+import { PilotVoxel } from '../characters/PilotVoxelComponent';
 import { CharacterType } from '../characters/CharacterRegistry';
 import { resourceManager } from '../../systems/ResourceManager';
 import type { ComponentOptions } from '../base/BaseThreeComponent';
@@ -27,7 +27,7 @@ export interface FlyingState {
 }
 
 export class Paraglider extends AsyncThreeComponent {
-  private pilot: PilotVoxelComponent | null = null;
+  private pilot: PilotVoxel | null = null;
   private wing: THREE.Object3D | null = null;
   private axesHelper: THREE.AxesHelper | null = null;
   private flyingState: FlyingState = {
@@ -62,7 +62,7 @@ export class Paraglider extends AsyncThreeComponent {
       }
 
       // Create pilot
-      this.pilot = new PilotVoxelComponent({
+      this.pilot = new PilotVoxel({
         characterType: options.characterType || CharacterType.ADRI,
         scale: 0.01,
         castShadow: options.castShadow,
@@ -256,7 +256,7 @@ export class Paraglider extends AsyncThreeComponent {
       this.pilot.dispose();
 
       // Create new pilot
-      this.pilot = new PilotVoxelComponent({
+      this.pilot = new PilotVoxel({
         characterType,
         scale: 0.01,
         castShadow: this.options.castShadow,
@@ -280,7 +280,7 @@ export class Paraglider extends AsyncThreeComponent {
     return { ...this.flyingState };
   }
 
-  public getPilot(): PilotVoxelComponent | null {
+  public getPilot(): PilotVoxel | null {
     return this.pilot;
   }
 

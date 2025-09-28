@@ -10,10 +10,10 @@ import Wing from './Wing';
 export { Paraglider } from './ParagliderComponent';
 export type { ParagliderOptions, FlyingState } from './ParagliderComponent';
 
-export { BoatComponent, BoatType } from './BoatComponent';
+export { Boat, BoatType } from './BoatComponent';
 export type { BoatOptions, BoatMovement } from './BoatComponent';
 
-export { WingComponent } from './WingComponent';
+export { Wing } from './WingComponent';
 export type { WingOptions } from './WingComponent';
 
 export { GliderComponent } from './GliderComponent';

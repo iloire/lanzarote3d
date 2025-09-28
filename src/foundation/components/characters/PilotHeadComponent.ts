@@ -63,7 +63,7 @@ export interface PilotHeadOptions extends SimpleComponentOptions {
  * - Proper component lifecycle management
  * - Color customization for all features
  */
-export class PilotHeadComponent extends SimpleThreeComponent {
+export class PilotHead extends SimpleThreeComponent {
   protected headOptions: PilotHeadOptions;
 
   constructor(options: PilotHeadOptions = {}) {
@@ -449,8 +449,8 @@ export class PilotHeadComponent extends SimpleThreeComponent {
   /**
    * Create clone with same head configuration
    */
-  protected override createClone(options: ComponentOptions): PilotHeadComponent {
-    return new PilotHeadComponent({ ...this.headOptions, ...options as PilotHeadOptions });
+  protected override createClone(options: ComponentOptions): PilotHead {
+    return new PilotHead({ ...this.headOptions, ...options as PilotHeadOptions });
   }
 
   /**
@@ -483,3 +483,6 @@ export class PilotHeadComponent extends SimpleThreeComponent {
     };
   }
 }
+
+// Legacy export for backward compatibility
+export const PilotHeadComponent = PilotHead;
