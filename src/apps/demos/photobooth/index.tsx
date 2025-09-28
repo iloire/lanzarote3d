@@ -50,6 +50,7 @@ class PhotoBoothApp extends TerrainBase {
   private environment: Environment | undefined;
   private animationId: number | undefined;
   private paragliderMeshes: THREE.Object3D[] = [];
+  private showCars: boolean = process.env.NODE_ENV === 'development'; // Show cars only in development mode
 
   constructor() {
     const appConfig = getAppConfig('photobooth');
@@ -119,6 +120,11 @@ class PhotoBoothApp extends TerrainBase {
       this.environment.addHouses(terrain);
       this.environment.addBoats(water);
 
+      // Add cars close to the camera position for photobooth (development mode only)
+      if (terrain && this.showCars) {
+        await this.addCarsNearCamera(terrain);
+      }
+
       // Make environment available for theme switching
       options.environment = this.environment;
 
@@ -126,12 +132,21 @@ class PhotoBoothApp extends TerrainBase {
       this.startAnimationLoop(renderer, scene, camera, controls);
 
       this.isLoaded = true;
-      console.log(`✅ ${this.config.name} loaded successfully with ${this.paragliderMeshes.length} paragliders`);
+      const carStatus = this.showCars ? 'with cars enabled (dev mode)' : 'with cars disabled (production mode)';
+      console.log(`✅ ${this.config.name} loaded successfully with ${this.paragliderMeshes.length} paragliders ${carStatus}`);
 
     } catch (error) {
       this.handleError(error as Error, 'load');
       throw error;
     }
+  }
+
+  /**
+   * Enable or disable cars in the photobooth demo
+   */
+  public setCarsEnabled(enabled: boolean): void {
+    this.showCars = enabled;
+    console.log(`🚗 Cars ${enabled ? 'enabled' : 'disabled'} for ${this.config.name}`);
   }
 
   private async loadParagliders(scene: THREE.Scene): Promise<void> {
@@ -155,11 +170,124 @@ class PhotoBoothApp extends TerrainBase {
     await Promise.all([...voxelPromises]);
   }
 
+  /**
+   * Add cars near the camera position for better photobooth shots
+   */
+  private async addCarsNearCamera(terrain: THREE.Mesh): Promise<void> {
+    if (!this.environment) return;
+
+    try {
+      // Camera starts at (6200, 970, 175) looking at paraglider around (6897, 920, -705)
+      // Add cars in the foreground and middle ground for interesting photobooth composition
+
+      // Import movement patterns
+      const { MovementPattern } = await import('../../../foundation/systems/behaviors/MovingBehavior');
+      const { TerrainDrivingMode } = await import('../../../foundation/systems/behaviors/TerrainFollowingBehavior');
+
+      // Foreground cars - close to camera for dramatic shots
+      const foregroundCars = [
+        {
+          type: 'Car' as const,
+          enableMovement: true,
+          pattern: MovementPattern.CIRCULAR,
+          speed: 0.1,
+          radius: 150,
+          scale: 1,
+          bodyColor: '#FF4444', // Bright red
+          autoStartMoving: true,
+          faceDirection: true,
+          forwardAxis: 'x' as const
+        },
+        {
+          type: 'AutonomousCar' as const,
+          enableMovement: true,
+          speed: 0.08,
+          scale: 1,
+          bodyColor: '#4444FF', // Bright blue
+          drivingMode: TerrainDrivingMode.EXPLORATION,
+          explorationRadius: 200
+        }
+      ];
+
+      // Area 1: Cars around the specified terrain location
+      await this.environment.createCarGroup(
+        terrain,
+        foregroundCars,
+        {
+          center: new THREE.Vector3(6620.8, 0, -2809.6), // Specified terrain location
+          formation: 'random',
+          spacing: 100,
+          groupRadius: 150,
+          terrain
+        }
+      );
+
+      // Area 2: More cars in a circle around the same area
+      const middlegroundCars = [
+        {
+          type: 'Car' as const,
+          enableMovement: true,
+          pattern: MovementPattern.LINEAR,
+          speed: 0.06,
+          radius: 200,
+          scale: 1,
+          bodyColor: '#44FF44', // Bright green
+          autoStartMoving: true,
+          faceDirection: true,
+          forwardAxis: 'x' as const
+        },
+        {
+          type: 'Car' as const,
+          enableMovement: true,
+          pattern: MovementPattern.RANDOM_DRIFT,
+          speed: 0.05,
+          radius: 180,
+          scale: 1,
+          bodyColor: '#FFFF44', // Bright yellow
+          autoStartMoving: true,
+          faceDirection: true,
+          forwardAxis: 'x' as const
+        },
+        {
+          type: 'AutonomousCar' as const,
+          enableMovement: true,
+          speed: 0.04,
+          scale: 1,
+          bodyColor: '#FF44FF', // Bright magenta
+          drivingMode: TerrainDrivingMode.PATROL,
+          explorationRadius: 150
+        }
+      ];
+
+      // Add more cars around the same terrain area
+      await this.environment.createCarGroup(
+        terrain,
+        middlegroundCars,
+        {
+          center: new THREE.Vector3(6720.8, 0, -2709.6), // Slightly offset from main area
+          formation: 'circle',
+          spacing: 120,
+          groupRadius: 200,
+          terrain
+        }
+      );
+
+      console.log('✅ Cars added around terrain location (6620.8, 45.1, -2809.6) for photobooth shots');
+    } catch (error) {
+      console.warn('⚠️ Failed to add cars to photobooth:', error);
+    }
+  }
+
   private startAnimationLoop(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.Camera, controls: any): void {
     const animate = () => {
       try {
         // Update performance monitoring
         this.updatePerformance();
+
+        // Update environment (cars, boats, etc.)
+        if (this.environment) {
+          this.environment.update(0.016); // Assuming ~60fps
+        }
 
         // Update controls for damping
         OrbitControlsHelper.update(controls);

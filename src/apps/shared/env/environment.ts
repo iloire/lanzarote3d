@@ -8,6 +8,8 @@ import PineTree from '../../../foundation/components/scenery/PineTree';
 import Stone from '../../../foundation/components/scenery/Stone';
 import House, { HouseType } from '../../../foundation/components/scenery/House';
 import { SmallSailBoat, FishingBoat, Yacht, SpeedBoat, PatrolBoat } from '../../../foundation/components/scenery';
+import { Car } from '../../../foundation/components/vehicles/Car';
+import { AutonomousCar } from '../../../foundation/components/vehicles/AutonomousCar';
 import { MovementPattern } from '../../../foundation/systems/behaviors/MovingBehavior';
 import Birds from '../../../foundation/components/wildlife/Birds';
 import { Hangglider as HangGlider } from '../../../foundation/components/vehicles';
@@ -20,6 +22,8 @@ import { IThreeComponent } from '../../../foundation/components/base/IThreeCompo
 import { ComponentRegistry } from '../../../foundation/systems/ComponentRegistry';
 import { BoatGroupCreator } from './boat-group-creator';
 import { BoatConfig, BoatGroupConfig } from './boat-group-types';
+import { CarGroupCreator } from './car-group-creator';
+import { CarConfig, CarGroupConfig } from './car-group-types';
 
 /**
  * Boat type weights for realistic marine distribution
@@ -47,11 +51,13 @@ class Environment {
   cloudInstances: Clouds[] = [];
   private componentRegistry: ComponentRegistry = new ComponentRegistry();
   private boatGroupCreator: BoatGroupCreator;
+  private carGroupCreator: CarGroupCreator;
   scene: THREE.Scene;
 
   constructor(scene: THREE.Scene) {
     this.scene = scene;
     this.boatGroupCreator = new BoatGroupCreator(scene, this.componentRegistry);
+    this.carGroupCreator = new CarGroupCreator(scene, this.componentRegistry);
   }
 
   updateWrapSpeed(wrapSpeed: number) {
@@ -283,6 +289,103 @@ class Environment {
     addMeshAroundArea([tree], new THREE.Vector3(5600, 0, 705), 100, terrain, this.scene, 40, 5);
   }
 
+  // ==========================================
+  // CAR GROUP CREATION SYSTEM
+  // ==========================================
+
+  /**
+   * Create a group of cars with precise control over types, positions, and movement
+   */
+  async createCarGroup(
+    terrain: THREE.Mesh,
+    cars: CarConfig[],
+    groupConfig: CarGroupConfig
+  ): Promise<THREE.Object3D[]> {
+    const meshes = await this.carGroupCreator.createCarGroup(terrain, cars, groupConfig);
+    this.updateAllCarMovementOrigins();
+    return meshes;
+  }
+
+  /**
+   * Create a parking lot with mixed car types
+   */
+  async createParkingLot(
+    terrain: THREE.Mesh,
+    center: THREE.Vector3,
+    size: 'small' | 'medium' | 'large' = 'medium'
+  ): Promise<THREE.Object3D[]> {
+    const meshes = await this.carGroupCreator.createParkingLot(terrain, center, size);
+    this.updateAllCarMovementOrigins();
+    return meshes;
+  }
+
+  /**
+   * Create a convoy with coordinated movement
+   */
+  async createConvoy(
+    terrain: THREE.Mesh,
+    center: THREE.Vector3,
+    size: 'small' | 'medium' | 'large' = 'medium'
+  ): Promise<THREE.Object3D[]> {
+    const meshes = await this.carGroupCreator.createConvoy(terrain, center, size);
+    this.updateAllCarMovementOrigins();
+    return meshes;
+  }
+
+  /**
+   * Create a patrol fleet with autonomous vehicles
+   */
+  async createCarPatrolFleet(
+    terrain: THREE.Mesh,
+    center: THREE.Vector3,
+    size: 'single' | 'team' | 'fleet' = 'team'
+  ): Promise<THREE.Object3D[]> {
+    const meshes = await this.carGroupCreator.createPatrolFleet(terrain, center, size);
+    this.updateAllCarMovementOrigins();
+    return meshes;
+  }
+
+  /**
+   * Create traffic simulation with mixed car types
+   */
+  async createTrafficFlow(
+    terrain: THREE.Mesh,
+    center: THREE.Vector3,
+    size: 'light' | 'moderate' | 'heavy' = 'moderate'
+  ): Promise<THREE.Object3D[]> {
+    const meshes = await this.carGroupCreator.createTrafficFlow(terrain, center, size);
+    this.updateAllCarMovementOrigins();
+    return meshes;
+  }
+
+  /**
+   * Create mixed recreational cars
+   */
+  async createMixedCars(
+    terrain: THREE.Mesh,
+    center: THREE.Vector3,
+    count: number = 6,
+    formation: 'circle' | 'random' | 'grid' = 'random'
+  ): Promise<THREE.Object3D[]> {
+    const meshes = await this.carGroupCreator.createMixedCars(terrain, center, count, formation);
+    this.updateAllCarMovementOrigins();
+    return meshes;
+  }
+
+  /**
+   * Create highway traffic between two points
+   */
+  async createHighwayTraffic(
+    terrain: THREE.Mesh,
+    startPoint: THREE.Vector3,
+    endPoint: THREE.Vector3,
+    carCount: number = 5
+  ): Promise<THREE.Object3D[]> {
+    const meshes = await this.carGroupCreator.createHighwayTraffic(terrain, startPoint, endPoint, carCount);
+    this.updateAllCarMovementOrigins();
+    return meshes;
+  }
+
   addThermals(weather: Weather, opacity: number = 0.05): Thermal[] {
     const thermals = this.generateThermals(weather, opacity);
     thermals.forEach(t => {
@@ -446,6 +549,19 @@ class Environment {
       if (component && typeof (component as any).updateMovementOrigin === 'function') {
         (component as any).updateMovementOrigin();
         console.log(`Updated movement origin for component: ${id}`);
+      }
+    });
+  }
+
+  /**
+   * Update movement origins for all cars after they've been positioned
+   */
+  private updateAllCarMovementOrigins(): void {
+    this.componentRegistry.getAllComponents().forEach((component, id) => {
+      // Check if component has movement behavior (Car, AutonomousCar, etc.)
+      if (component && typeof (component as any).updateMovementOrigin === 'function') {
+        (component as any).updateMovementOrigin();
+        console.log(`Updated movement origin for car component: ${id}`);
       }
     });
   }

@@ -87,14 +87,15 @@ class CarWorkshopApp extends WorkshopDemoBase {
       },
     ];
 
-    // Load all cars concurrently
+    // Load all cars concurrently - cars will start driving automatically
     const carPromises = carConfigurations.map(async (config) => {
       const car = new Car({
         bodyColor: config.bodyColor,
         roofColor: config.roofColor,
         scale: config.scale,
-        radius: 150 + Math.random() * 100, // Vary the driving radius
-        speed: 0.3 + Math.random() * 0.3,   // Vary the driving speed
+        // Let each car drive with slightly different parameters for variety
+        radius: 120 + Math.random() * 80,
+        speed: 0.2 + Math.random() * 0.4
       });
 
       const carMesh = await car.load();
@@ -103,7 +104,7 @@ class CarWorkshopApp extends WorkshopDemoBase {
       scene.add(carMesh);
       this.cars.push(carMesh);
 
-      console.log(`Added ${config.name} at position (${config.position.x}, ${config.position.y}, ${config.position.z})`);
+      console.log(`Added ${config.name} - driving automatically`);
       return carMesh;
     });
 
