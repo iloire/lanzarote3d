@@ -11,28 +11,6 @@ import {
 import { StoryOptions } from '../../../../shared/types';
 import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
 
-// Professional color palettes with lower contrast and more realistic tones
-const COLOR_PALETTES = {
-  military: [
-    '#4A5D3A', '#3D4E2F', '#556B3D', '#6B7A5B', '#7A8B6C',
-    '#2F3F23', '#5C6B4A', '#8A9B7A', '#3A4B2D', '#4F6040'
-  ],
-  gray: [
-    '#6A6A6A', '#5A5A5A', '#7A7A7A', '#8A8A8A', '#5D5D5D',
-    '#707070', '#757575', '#656565', '#808080', '#606060'
-  ],
-  steel: [
-    '#4A4A52', '#5A5A62', '#525252', '#4F4F57', '#565664',
-    '#464653', '#58586C', '#4C4C59', '#54546B', '#4A4A5F'
-  ]
-};
-
-const getRandomColorFromPalette = (): string => {
-  const paletteNames = Object.keys(COLOR_PALETTES) as (keyof typeof COLOR_PALETTES)[];
-  const randomPalette = paletteNames[Math.floor(Math.random() * paletteNames.length)];
-  const palette = COLOR_PALETTES[randomPalette];
-  return palette[Math.floor(Math.random() * palette.length)];
-};
 
 /**
  * Head Workshop Demo - Showcases different pilot head types, helmets and glasses
@@ -64,37 +42,46 @@ class HeadWorkshopApp extends WorkshopDemoBase {
       // Create container for labels
       this.labelContainer = this.createLabelContainer();
 
-      // Create a more reasonable sample - one example per head type with variety
+      // Comprehensive showcase: Show all head types with different helmet and glasses combinations
       const headTypeKeys = Object.keys(PilotHeadType).filter(key => isNaN(Number(key)));
       const helmetTypeKeys = Object.keys(HelmetType).filter(key => isNaN(Number(key)));
       const glassesTypeKeys = Object.keys(GlassesType).filter(key => isNaN(Number(key)));
 
+      console.log(`🎭 Creating showcase with ${headTypeKeys.length} head types, ${helmetTypeKeys.length} helmet types, ${glassesTypeKeys.length} glasses types`);
+
       const heads: PilotHeadOptions[] = [];
 
-      // Create one head per head type, with varied helmets and glasses
+      // Create a comprehensive showcase - each head type with multiple helmet/glasses combinations
       headTypeKeys.forEach((headKey, headIndex) => {
-        const helmetKey = helmetTypeKeys[headIndex % helmetTypeKeys.length];
-        const glassesKey = glassesTypeKeys[headIndex % glassesTypeKeys.length];
+        // Create 3 variants per head type to show different helmet/glasses combinations
+        for (let variant = 0; variant < 3; variant++) {
+          const helmetIndex = (headIndex * 3 + variant) % helmetTypeKeys.length;
+          const glassesIndex = (headIndex * 2 + variant) % glassesTypeKeys.length;
 
-        const baseHelmetOptions: HelmetOptions = {
-          color: getRandomColorFromPalette(),
-          color2: getRandomColorFromPalette(),
-          color3: getRandomColorFromPalette(),
-        };
+          const helmetKey = helmetTypeKeys[helmetIndex];
+          const glassesKey = glassesTypeKeys[glassesIndex];
 
-        heads.push({
-          headType: (PilotHeadType as any)[headKey],
-          helmetType: (HelmetType as any)[helmetKey],
-          helmetOptions: baseHelmetOptions,
-          glassesType: (GlassesType as any)[glassesKey],
-        });
+          // Create themed color schemes based on head type
+          const baseHelmetOptions: HelmetOptions = this.getThemedHelmetOptions(headKey, variant);
+
+          heads.push({
+            headType: (PilotHeadType as any)[headKey],
+            helmetType: (HelmetType as any)[helmetKey],
+            helmetOptions: baseHelmetOptions,
+            glassesType: (GlassesType as any)[glassesKey],
+            skinColor: this.getThemedSkinColor(headKey),
+            beardColor: this.getThemedBeardColor(headKey),
+            eyeColor: this.getThemedEyeColor(headKey),
+            glassesColor: this.getThemedGlassesColor(variant),
+          });
+        }
       });
 
-      const x = -1500;
-      const z = 0;
-      const ITEMS_PER_ROW = 3;
-      const SPACING_X = 1500; // Increased spacing to prevent overlap
-      const SPACING_Z = 1500;
+      const x = -2000;
+      const z = -1000;
+      const ITEMS_PER_ROW = 4; // Increased to accommodate more heads
+      const SPACING_X = 1200; // Adjusted for better fit
+      const SPACING_Z = 1200;
 
       // Load all heads asynchronously
       const headPromises = heads.map(async (headOptions, index) => {
@@ -184,6 +171,87 @@ class HeadWorkshopApp extends WorkshopDemoBase {
 
     // Call parent dispose
     super.dispose();
+  }
+
+  /**
+   * Get themed helmet options based on head type and variant
+   */
+  private getThemedHelmetOptions(headType: string, variant: number): HelmetOptions {
+    const colorSchemes = {
+      Default: [
+        { color: '#FFD700', color2: '#FFFFFF', color3: '#C0C0C0' }, // Gold/White/Silver
+        { color: '#FF6B6B', color2: '#4ECDC4', color3: '#45B7D1' }, // Red/Teal/Blue
+        { color: '#96CEB4', color2: '#FFEAA7', color3: '#DDA0DD' }, // Green/Yellow/Purple
+      ],
+      Warrior: [
+        { color: '#D2691E', color2: '#F4A460', color3: '#FFD700' }, // Orange/Sandy/Gold (brighter)
+        { color: '#4682B4', color2: '#87CEEB', color3: '#B0E0E6' }, // Steel Blue/Sky Blue/Powder Blue
+        { color: '#CD5C5C', color2: '#F08080', color3: '#FFA07A' }, // Indian Red/Light Coral/Light Salmon
+      ],
+      Skeleton: [
+        { color: '#F5F5DC', color2: '#E6E6FA', color3: '#D3D3D3' }, // Beige/Lavender/Light Gray
+        { color: '#2F2F2F', color2: '#696969', color3: '#A9A9A9' }, // Dark Gray/Dim Gray/Dark Gray
+        { color: '#4B0082', color2: '#8A2BE2', color3: '#9370DB' }, // Indigo/Blue Violet/Medium Purple
+      ],
+      Devil: [
+        { color: '#8B0000', color2: '#FF0000', color3: '#FF4500' }, // Dark Red/Red/Orange Red
+        { color: '#2F2F2F', color2: '#696969', color3: '#FF6347' }, // Dark Gray/Dim Gray/Tomato
+        { color: '#800080', color2: '#FF1493', color3: '#FF69B4' }, // Purple/Deep Pink/Hot Pink
+      ],
+    };
+
+    const schemes = colorSchemes[headType as keyof typeof colorSchemes] || colorSchemes.Default;
+    return schemes[variant % schemes.length];
+  }
+
+  /**
+   * Get themed skin color based on head type
+   */
+  private getThemedSkinColor(headType: string): string {
+    const skinColors = {
+      Default: '#e0bea5',    // Normal skin
+      Warrior: '#d4a574',    // Slightly tanned
+      Skeleton: '#f5f5dc',   // Bone white
+      Devil: '#ff6b6b',      // Reddish skin
+    };
+
+    return skinColors[headType as keyof typeof skinColors] || skinColors.Default;
+  }
+
+  /**
+   * Get themed beard color based on head type
+   */
+  private getThemedBeardColor(headType: string): string {
+    const beardColors = {
+      Default: '#8b4513',    // Saddle brown
+      Warrior: '#8b7355',    // Lighter brown for better contrast
+      Skeleton: '#d3d3d3',   // Light gray
+      Devil: '#5d4037',      // Medium brown instead of very dark
+    };
+
+    return beardColors[headType as keyof typeof beardColors] || beardColors.Default;
+  }
+
+  /**
+   * Get themed eye color based on head type
+   */
+  private getThemedEyeColor(headType: string): string {
+    const eyeColors = {
+      Default: '#4169e1',    // Royal blue
+      Warrior: '#87ceeb',    // Sky blue (bright and visible)
+      Skeleton: '#00ff00',   // Bright green (eerie)
+      Devil: '#ffff00',      // Yellow (menacing)
+    };
+
+    return eyeColors[headType as keyof typeof eyeColors] || eyeColors.Default;
+  }
+
+  /**
+   * Get themed glasses color based on variant
+   */
+  private getThemedGlassesColor(variant: number): string {
+    const glassesColors = ['#ff69b4', '#00bfff', '#ffd700', '#98fb98', '#dda0dd'];
+    return glassesColors[variant % glassesColors.length];
   }
 }
 
