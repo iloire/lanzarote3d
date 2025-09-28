@@ -6,7 +6,7 @@ import { Wing } from '../../../../../foundation/components/vehicles/Wing';
 import { LegacyParaglider } from '../../../../../foundation/components/vehicles';
 import { Boat } from '../../../../../foundation/components/vehicles/Boat';
 import { Glider } from '../../../../../foundation/components/vehicles/GliderComponent';
-import LegacyWing from '../../../../../foundation/components/vehicles/LegacyWing';
+import HangGliderWing from '../../../../../foundation/components/vehicles/HangGliderWing';
 import ParagliderVoxel from '../../../../../foundation/components/vehicles/ParagliderVoxel';
 import SpeedBoat from '../../../../../foundation/components/scenery/SpeedBoat';
 import LegacyGlider from '../../../../../foundation/components/vehicles/Glider';
@@ -191,7 +191,7 @@ class ComponentBenchmarkWorkshopApp extends WorkshopDemoBase {
       );
 
       const legacyResult = await this.benchmark.benchmarkLegacyComponent(
-        LegacyWing,
+        HangGliderWing,
         {},
         iterations
       );

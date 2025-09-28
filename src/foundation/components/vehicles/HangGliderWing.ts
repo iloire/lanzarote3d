@@ -44,7 +44,7 @@ const createHalfWing = (scale?: THREE.Vector3): HalfWing => {
   return { wing: group };
 };
 
-class LegacyWing {
+class HangGliderWing {
   leftWing!: HalfWing;
   rightWing!: HalfWing;
 
@@ -68,4 +68,4 @@ class LegacyWing {
   }
 }
 
-export default LegacyWing;
+export default HangGliderWing;

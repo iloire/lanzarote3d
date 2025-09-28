@@ -4,7 +4,7 @@ import Hangglider from './Hangglider';
 import ParagliderVoxel from './ParagliderVoxel';
 import Tandem from './Tandem';
 import LegacyGlider from './Glider';
-import LegacyWing from './LegacyWing';
+import HangGliderWing from './HangGliderWing';
 
 // Modern vehicle components
 
@@ -23,4 +23,4 @@ export type { ParagliderVoxelOptions } from './ParagliderVoxel';
 // Note: Pilot moved to characters folder - import from '../characters' instead
 
 // Legacy component exports
-export { LegacyParaglider, Hangglider, ParagliderVoxel, Tandem, LegacyGlider, LegacyWing };
+export { LegacyParaglider, Hangglider, ParagliderVoxel, Tandem, LegacyGlider, HangGliderWing };
