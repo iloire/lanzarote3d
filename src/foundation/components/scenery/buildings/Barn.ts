@@ -233,7 +233,7 @@ const BarnLegacy = Barn as any;
 
 // Add legacy load method that returns mesh directly
 BarnLegacy.prototype.load = function (): THREE.Object3D {
-  return this.loadSync();
+  return this.createSyncContent();
 };
 
 export default BarnLegacy;

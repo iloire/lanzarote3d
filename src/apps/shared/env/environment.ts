@@ -6,7 +6,7 @@ import { rndIntBetween } from '../../../foundation/utils/math';
 import Tree from '../../../foundation/components/scenery/Tree';
 import PineTree from '../../../foundation/components/scenery/PineTree';
 import Stone from '../../../foundation/components/scenery/Stone';
-import House, { HouseType } from '../../../foundation/components/scenery/House';
+import House, { HouseType } from '../../../foundation/components/scenery/buildings/House';
 import {
   SmallSailBoat,
   FishingBoat,

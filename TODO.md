@@ -1,6 +1,7 @@
 Implement the following tasks if any is added follwing the instructions described below:
 ---
 TASKS:
+- add a palmtree class in scenery, don't forget to add it to workshop showcase app.
 ---
 
 ### Instructions

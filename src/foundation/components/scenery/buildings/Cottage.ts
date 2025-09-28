@@ -202,7 +202,7 @@ const CottageLegacy = Cottage as any;
 
 // Add legacy load method that returns mesh directly
 CottageLegacy.prototype.load = function (): THREE.Object3D {
-  return this.loadSync();
+  return this.createSyncContent();
 };
 
 export default CottageLegacy;

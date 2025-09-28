@@ -250,7 +250,7 @@ const SkyscraperLegacy = Skyscraper as any;
 
 // Add legacy load method that returns mesh directly
 SkyscraperLegacy.prototype.load = function (): THREE.Object3D {
-  return this.loadSync();
+  return this.createSyncContent();
 };
 
 export default SkyscraperLegacy;

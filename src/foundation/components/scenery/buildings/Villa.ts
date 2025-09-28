@@ -246,7 +246,7 @@ const VillaLegacy = Villa as any;
 
 // Add legacy load method that returns mesh directly
 VillaLegacy.prototype.load = function (): THREE.Object3D {
-  return this.loadSync();
+  return this.createSyncContent();
 };
 
 export default VillaLegacy;

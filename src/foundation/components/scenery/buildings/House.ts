@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import GuiHelper from '../../utils/gui';
-import { SimpleThreeComponent, SimpleComponentOptions } from '../base/SimpleThreeComponent';
-import { ComponentMetadata } from '../base/IThreeComponent';
+import GuiHelper from '../../../utils/gui';
+import { SimpleThreeComponent, SimpleComponentOptions } from '../../base/SimpleThreeComponent';
+import { ComponentMetadata } from '../../base/IThreeComponent';
 
 const getColorMaterial = (color: number) => {
   return new THREE.MeshPhongMaterial({ color });

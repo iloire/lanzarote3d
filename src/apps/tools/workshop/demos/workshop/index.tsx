@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import { SmallSailBoat, Tree, Stone } from '../../../../../foundation/components/scenery';
-import { House, HouseType } from '../../../../../foundation/components/scenery';
+import { House, HouseType } from '../../../../../foundation/components/scenery/buildings';
 import { PineTree, Igloo, IglooSize } from '../../../../../foundation/components/scenery';
-import { CottageLegacy as Cottage, VillaLegacy as Villa, TownhouseLegacy as Townhouse, SkyscraperLegacy as Skyscraper, BarnLegacy as Barn } from '../../../../../foundation/components/scenery';
+import { CottageLegacy as Cottage, VillaLegacy as Villa, TownhouseLegacy as Townhouse, SkyscraperLegacy as Skyscraper, BarnLegacy as Barn, DesertHouseLegacy as DesertHouse } from '../../../../../foundation/components/scenery';
 import { StoryOptions } from '../../../../shared/types';
 import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
 
@@ -159,6 +159,7 @@ class WorkshopApp extends WorkshopDemoBase {
       { type: 'Townhouse', position: [-60, 0, 160], scale: 0.8, label: 'Townhouse' },
       { type: 'Skyscraper', position: [-120, 0, 0], scale: 0.4, label: 'Skyscraper' },
       { type: 'Barn', position: [-120, 0, 80], scale: 0.6, label: 'Barn' },
+      { type: 'DesertHouse', position: [-120, 0, 160], scale: 0.8, label: 'Desert House' },
     ];
 
     for (const config of buildingConfigs) {
@@ -180,6 +181,9 @@ class WorkshopApp extends WorkshopDemoBase {
             break;
           case 'Barn':
             building = new Barn({ scale: config.scale });
+            break;
+          case 'DesertHouse':
+            building = new DesertHouse({ scale: config.scale });
             break;
           default:
             continue;
