@@ -94,7 +94,7 @@ class NewGliderWorkshopApp extends WorkshopDemoBase {
         console.log(`NewGlider ${index}: ${config.name} at position (${config.position.x}, ${config.position.y}, ${config.position.z})`);
 
         // Create label
-        const labelText = `${config.name}\\nCells: ${config.options.numeroCajones}\\nBand: ${config.options.bandLength}mm`;
+        const labelText = `${config.name}\nCells: ${config.options.numeroCajones}\nBand: ${config.options.bandLength}mm`;
         const label = this.createStandardLabel(labelText);
 
         if (this.labelContainer) {
@@ -113,7 +113,7 @@ class NewGliderWorkshopApp extends WorkshopDemoBase {
           const x = (vector.x * 0.5 + 0.5) * window.innerWidth;
           const y = (-vector.y * 0.5 + 0.5) * window.innerHeight;
 
-          label.style.transform = \`translate(-50%, -50%) translate(\${x}px,\${y}px)\`;
+          label.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
         };
 
         // Store update function on the mesh for later use
@@ -121,7 +121,7 @@ class NewGliderWorkshopApp extends WorkshopDemoBase {
 
         // Add GUI controls for this glider if it's the center one
         if (index === 1 && gui) {
-          const gliderFolder = gui.addFolder(\`\${config.name} Controls\`);
+          const gliderFolder = gui.addFolder(`${config.name} Controls`);
 
           // Brake controls
           const brakeControls = {
@@ -146,7 +146,7 @@ class NewGliderWorkshopApp extends WorkshopDemoBase {
             .name('Speed Bar')
             .onChange((value: number) => {
               // Speed bar implementation would go here
-              console.log(\`Speed bar: \${value}\`);
+              console.log(`Speed bar: ${value}`);
             });
 
           // Release all brakes button
@@ -191,7 +191,7 @@ class NewGliderWorkshopApp extends WorkshopDemoBase {
       });
 
       this.isLoaded = true;
-      console.log(\`✅ \${this.config.name} loaded successfully\`);
+      console.log(`✅ ${this.config.name} loaded successfully`);
     } catch (error) {
       this.handleError(error as Error, 'load');
       throw error;
@@ -199,7 +199,7 @@ class NewGliderWorkshopApp extends WorkshopDemoBase {
   }
 
   public override dispose(): void {
-    console.log(\`🧹 Disposing \${this.config.name}\`);
+    console.log(`🧹 Disposing ${this.config.name}`);
 
     // Remove label container
     if (this.labelContainer) {
