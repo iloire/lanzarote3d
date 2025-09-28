@@ -11,6 +11,9 @@ import Wing from './Wing';
 export { ParagliderComponent } from './ParagliderComponent';
 export type { ParagliderOptions as ModernParagliderOptions, FlyingState } from './ParagliderComponent';
 
+export { BoatComponent, BoatType } from './BoatComponent';
+export type { BoatOptions, BoatMovement } from './BoatComponent';
+
 // Type exports
 export type { VehicleConfig } from '../../types';
 export type { ParagliderOptions } from './Paraglider';
