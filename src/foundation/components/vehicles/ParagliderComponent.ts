@@ -26,7 +26,7 @@ export interface FlyingState {
   isFlying: boolean;
 }
 
-export class ParagliderComponent extends AsyncThreeComponent {
+export class Paraglider extends AsyncThreeComponent {
   private pilot: PilotVoxelComponent | null = null;
   private wing: THREE.Object3D | null = null;
   private axesHelper: THREE.AxesHelper | null = null;
@@ -42,7 +42,7 @@ export class ParagliderComponent extends AsyncThreeComponent {
 
   constructor(options: ParagliderOptions = {}) {
     super({
-      name: 'ParagliderComponent',
+      name: 'Paraglider',
       version: '1.0.0',
       ...options
     });

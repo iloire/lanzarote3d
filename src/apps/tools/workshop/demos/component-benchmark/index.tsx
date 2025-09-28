@@ -3,7 +3,7 @@ import { StoryOptions } from '../../../../shared/types';
 import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
 import { ComponentBenchmark } from '../../../../../foundation/systems/ComponentBenchmark';
 import { WingComponent } from '../../../../../foundation/components/vehicles/WingComponent';
-import { ParagliderComponent } from '../../../../../foundation/components/vehicles/ParagliderComponent';
+import { Paraglider } from '../../../../../foundation/components/vehicles/ParagliderComponent';
 import { BoatComponent } from '../../../../../foundation/components/vehicles/BoatComponent';
 import { GliderComponent } from '../../../../../foundation/components/vehicles/GliderComponent';
 import Wing from '../../../../../foundation/components/vehicles/Wing';
@@ -275,7 +275,7 @@ class ComponentBenchmarkWorkshopApp extends WorkshopDemoBase {
 
     try {
       const modernResult = await this.benchmark.benchmarkModernComponent(
-        ParagliderComponent,
+        Paraglider,
         { numeroCajones: 30, showAxesHelper: false },
         iterations
       );

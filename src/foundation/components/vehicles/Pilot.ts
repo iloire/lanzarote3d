@@ -20,7 +20,7 @@ const DEFAULT_OPTIONS = {
   carabinerColor: '#666666',
 };
 
-export type PilotOptions = {
+export type LegacyPilotOptions = {
   head?: PilotHeadOptions;
   skinColor?: string;
   suitColor?: string;
@@ -48,9 +48,9 @@ class LegacyPilot {
   armLeft!: THREE.Mesh;
   body!: THREE.Mesh;
   head!: THREE.Group;
-  options: PilotOptions;
+  options: LegacyPilotOptions;
 
-  constructor(options: PilotOptions) {
+  constructor(options: LegacyPilotOptions) {
     this.options = {
       ...DEFAULT_OPTIONS,
       ...options,
