@@ -24,15 +24,38 @@ export class DefaultHead extends BaseHead {
   protected createHeadGroup(): THREE.Group {
     const group = new THREE.Group();
 
-    const skinMat = this.getColoredMaterial(this.headOptions.skinColor!);
-    const headGeo = new THREE.BoxGeometry(300, 350, 280);
-    const head = new THREE.Mesh(headGeo, skinMat);
+    // Create main head mesh
+    const head = this.createMainHead();
     group.add(head);
 
+    // Add helmet
     group.add(this.getHelmet());
 
+    // Add glasses
+    head.add(this.createGlasses());
+
+    // Add facial features
+    head.add(this.createMouth());
+    head.add(this.createLip());
+
+    return group;
+  }
+
+  /**
+   * Create the main head mesh
+   */
+  private createMainHead(): THREE.Mesh {
+    const skinMat = this.getColoredMaterial(this.headOptions.skinColor!);
+    const headGeo = new THREE.BoxGeometry(300, 350, 280);
+    return new THREE.Mesh(headGeo, skinMat);
+  }
+
+  /**
+   * Create glasses based on type
+   */
+  private createGlasses(): THREE.Group {
     if (this.headOptions.glassesType === GlassesType.SunGlasses1) {
-      head.add(getSunGlasses1());
+      return getSunGlasses1();
     } else {
       // Convert HeadOptions to PilotHeadOptions for glasses compatibility
       const glassesOptions = {
@@ -40,26 +63,29 @@ export class DefaultHead extends BaseHead {
         glassesColor: this.headOptions.glassesColor,
         glassesType: this.headOptions.glassesType
       };
-      head.add(getDefaultGlasses(glassesOptions as any));
+      return getDefaultGlasses(glassesOptions as any);
     }
+  }
 
-    //mouth
+  /**
+   * Create mouth feature
+   */
+  private createMouth(): THREE.Mesh {
+    const skinMat = this.getColoredMaterial(this.headOptions.skinColor!);
     const mouthGeo = new THREE.BoxGeometry(90, 60, 50);
     const mouth = new THREE.Mesh(mouthGeo, skinMat);
-    mouth.position.x = 0;
-    mouth.position.z = 155;
-    mouth.position.y = -130;
-    head.add(mouth);
+    mouth.position.set(0, -130, 155);
+    return mouth;
+  }
 
-    //lip
+  /**
+   * Create lip feature
+   */
+  private createLip(): THREE.Mesh {
     const lipMat = this.getColoredMaterial('#333');
     const lipGeo = new THREE.BoxGeometry(40, 20, 50);
     const lip = new THREE.Mesh(lipGeo, lipMat);
-    lip.position.x = 0;
-    lip.position.z = 162;
-    lip.position.y = -120;
-    head.add(lip);
-
-    return group;
+    lip.position.set(0, -120, 162);
+    return lip;
   }
 }

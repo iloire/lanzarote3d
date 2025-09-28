@@ -17,7 +17,10 @@ export class WarriorHead extends BaseHead {
       ...options
     });
   }
-  private addBeard(): THREE.Group {
+  /**
+   * Create warrior beard with complex extruded geometry
+   */
+  private createBeard(): THREE.Group {
     const group = new THREE.Group();
     const material = new THREE.MeshPhongMaterial({
       color: this.headOptions.beardColor,
@@ -73,7 +76,10 @@ export class WarriorHead extends BaseHead {
     return group;
   }
 
-  private addMustache(): THREE.Group {
+  /**
+   * Create warrior mustache
+   */
+  private createMustache(): THREE.Group {
     const group = new THREE.Group();
     const material = new THREE.MeshPhongMaterial({
       color: 0xcc613d,
@@ -97,40 +103,89 @@ export class WarriorHead extends BaseHead {
 
   protected createHeadGroup(): THREE.Group {
     const group = new THREE.Group();
-    const skinMat = this.getColoredMaterial(this.headOptions.skinColor!);
-    const headGeo = new THREE.BoxGeometry(1.5, 1.5, 1.2);
-    const head = new THREE.Mesh(headGeo, skinMat);
 
-    const browGeo = new THREE.BoxGeometry(1.5, 0.5, 0.5);
-    const brow = new THREE.Mesh(browGeo, skinMat);
+    // Create main head features
+    const head = this.createMainHead();
+    const brow = this.createBrow();
+    const nose = this.createNose();
 
-    const noseGeo = new THREE.BoxGeometry(0.35, 0.5, 0.5);
-    const nose = new THREE.Mesh(noseGeo, skinMat);
-
+    // Add all components
     group.add(head);
     group.add(brow);
     group.add(nose);
-    group.add(this.addBeard());
-    group.add(this.addMustache());
+    group.add(this.createBeard());
+    group.add(this.createMustache());
 
-    head.castShadow = true;
-    head.receiveShadow = true;
-    brow.castShadow = true;
-    nose.castShadow = true;
+    // Configure shadows
+    this.configureShadows([head, brow, nose]);
 
+    // Position features
+    this.positionFeatures(head, brow, nose);
+
+    // Add helmet
+    group.add(this.createHelmet());
+
+    // Scale the entire head
+    group.scale.set(200, 200, 200);
+
+    return group;
+  }
+
+  /**
+   * Create the main warrior head mesh (more angular than default)
+   */
+  private createMainHead(): THREE.Mesh {
+    const skinMat = this.getColoredMaterial(this.headOptions.skinColor!);
+    const headGeo = new THREE.BoxGeometry(1.5, 1.5, 1.2);
+    return new THREE.Mesh(headGeo, skinMat);
+  }
+
+  /**
+   * Create prominent brow for warrior appearance
+   */
+  private createBrow(): THREE.Mesh {
+    const skinMat = this.getColoredMaterial(this.headOptions.skinColor!);
+    const browGeo = new THREE.BoxGeometry(1.5, 0.5, 0.5);
+    return new THREE.Mesh(browGeo, skinMat);
+  }
+
+  /**
+   * Create warrior nose
+   */
+  private createNose(): THREE.Mesh {
+    const skinMat = this.getColoredMaterial(this.headOptions.skinColor!);
+    const noseGeo = new THREE.BoxGeometry(0.35, 0.5, 0.5);
+    return new THREE.Mesh(noseGeo, skinMat);
+  }
+
+  /**
+   * Configure shadow properties for mesh array
+   */
+  private configureShadows(meshes: THREE.Mesh[]): void {
+    meshes.forEach(mesh => {
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+    });
+  }
+
+  /**
+   * Position all facial features
+   */
+  private positionFeatures(head: THREE.Mesh, brow: THREE.Mesh, nose: THREE.Mesh): void {
     head.position.set(0, 2, 0);
     brow.position.set(0, 2.43, 0.46);
     nose.position.set(0, 2.05, 0.54);
-
     brow.rotation.x = 130;
+  }
 
+  /**
+   * Create and position warrior helmet
+   */
+  private createHelmet(): THREE.Group {
     const helmet = this.getHelmet();
     helmet.scale.set(0.006, 0.006, 0.006);
     helmet.translateY(2.2);
     helmet.translateZ(-0.3);
-    group.add(helmet);
-    group.scale.set(200, 200, 200);
-
-    return group;
+    return helmet;
   }
 }
