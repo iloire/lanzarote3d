@@ -52,6 +52,9 @@ export async function loadApp(appKey: string, options: StoryOptions): Promise<vo
     case 'satellite-terrain':
       appModule = await import('../demos/satellite-terrain');
       break;
+    case 'autonomous-driving':
+      appModule = await import('../demos/autonomous-driving/index');
+      break;
     case 'location-editor':
       appModule = await import('../tools/location-editor/index');
       break;

@@ -166,11 +166,22 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       description: 'Interactive demonstration of satellite imagery on 3D terrain with real-time theme switching',
       entry: './demos/satellite-terrain/index.tsx',
       route: '/satellite-terrain',
-      category: 'demo',
+      category: 'tool',
       requiresWebGL: true,
       tags: ['satellite', 'terrain', 'imagery', 'interactive', 'realistic', 'mapping'],
       status: 'dev',
       priority: 2,
+    },
+    'autonomous-driving': {
+      name: 'Autonomous Driving',
+      description: 'Self-driving cars navigating 3D terrain with AI-powered navigation and obstacle avoidance',
+      entry: './demos/autonomous-driving/index.tsx',
+      route: '/autonomous-driving',
+      category: 'demo',
+      requiresWebGL: true,
+      tags: ['autonomous', 'ai', 'vehicles', 'terrain', 'navigation', 'self-driving'],
+      status: 'experimental',
+      priority: 1,
     },
 
     // Animation Demos
