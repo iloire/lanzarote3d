@@ -4,7 +4,7 @@ import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
 import { ComponentBenchmark } from '../../../../../foundation/systems/ComponentBenchmark';
 import { Wing } from '../../../../../foundation/components/vehicles/WingComponent';
 import { LegacyParaglider } from '../../../../../foundation/components/vehicles';
-import { Boat } from '../../../../../foundation/components/vehicles/BoatComponent';
+import { Boat } from '../../../../../foundation/components/vehicles/Boat';
 import { Glider } from '../../../../../foundation/components/vehicles/GliderComponent';
 import LegacyWing from '../../../../../foundation/components/vehicles/Wing';
 import ParagliderVoxel from '../../../../../foundation/components/vehicles/ParagliderVoxel';

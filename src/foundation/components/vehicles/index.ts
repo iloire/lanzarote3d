@@ -8,8 +8,8 @@ import LegacyWing from './Wing';
 
 // Modern vehicle components
 
-export { Boat, BoatType } from './BoatComponent';
-export type { BoatOptions, BoatMovement } from './BoatComponent';
+export { Boat, BoatType } from './Boat';
+export type { BoatOptions, BoatMovement } from './Boat';
 
 export { Wing } from './WingComponent';
 export type { WingOptions } from './WingComponent';
