@@ -87,9 +87,6 @@ class FamaraApp extends TerrainBase {
       this.environment.addHouses(terrain);
       this.environment.addBoats(water);
 
-      // Add patrol boat with movement for dynamic water activity
-      this.environment.addPatrolBoat(water, new THREE.Vector3(7500, 50, -5800));
-
       // Make environment available for theme switching
       options.environment = this.environment;
 

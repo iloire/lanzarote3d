@@ -19,7 +19,7 @@ export class FloatingBehavior {
   private scaleMultiplier: number;
 
   constructor(options: FloatingBehaviorOptions = {}) {
-    this.scaleMultiplier = options.scaleMultiplier || 1;
+    this.scaleMultiplier = options.scaleMultiplier || 0.5;
     this.floatingOffset = options.wavePhaseOffset || Math.random() * Math.PI * 2;
   }
 
@@ -81,23 +81,23 @@ export class FloatingBehavior {
 
     const time = Date.now() * 0.001;
 
-    // Realistic ocean wave simulation with scale-adjusted amplitude (increased for visibility)
-    const primaryWave = Math.sin(time * 0.8 + this.floatingOffset) * 12 * this.scaleMultiplier;
-    const secondaryWave = Math.sin(time * 1.3 + this.floatingOffset * 1.2) * 6 * this.scaleMultiplier;
-    const tertiaryWave = Math.cos(time * 0.5 + this.floatingOffset * 0.8) * 4.5 * this.scaleMultiplier;
-    const swellWave = Math.sin(time * 0.3 + this.floatingOffset * 1.5) * 9 * this.scaleMultiplier;
+    // Realistic ocean wave simulation with gentle amplitude but faster frequencies
+    const primaryWave = Math.sin(time * 1.2 + this.floatingOffset) * 3 * this.scaleMultiplier;
+    const secondaryWave = Math.sin(time * 1.8 + this.floatingOffset * 1.2) * 1.5 * this.scaleMultiplier;
+    const tertiaryWave = Math.cos(time * 0.8 + this.floatingOffset * 0.8) * 1 * this.scaleMultiplier;
+    const swellWave = Math.sin(time * 0.6 + this.floatingOffset * 1.5) * 2 * this.scaleMultiplier;
 
     // Combine waves for realistic ocean motion
     const totalWaveHeight = primaryWave + secondaryWave + tertiaryWave + swellWave;
     this.mesh.position.y = this.originalPosition.y + totalWaveHeight;
 
-    // Realistic boat movement with scale-adjusted motion
-    this.mesh.rotation.z = Math.sin(time * 0.9 + this.floatingOffset * 0.7) * 0.05 * this.scaleMultiplier;
-    this.mesh.rotation.x = Math.cos(time * 0.7 + this.floatingOffset * 0.6) * 0.03 * this.scaleMultiplier;
+    // Gentle boat movement with faster frequencies
+    this.mesh.rotation.z = Math.sin(time * 1.1 + this.floatingOffset * 0.7) * 0.025 * this.scaleMultiplier;
+    this.mesh.rotation.x = Math.cos(time * 0.9 + this.floatingOffset * 0.6) * 0.015 * this.scaleMultiplier;
 
     // Subtle yaw drift (preserve original Y rotation)
     const originalY = this.mesh.userData.originalRotationY || 0;
-    this.mesh.rotation.y = originalY + Math.sin(time * 0.4 + this.floatingOffset * 0.4) * 0.02 * this.scaleMultiplier;
+    this.mesh.rotation.y = originalY + Math.sin(time * 0.7 + this.floatingOffset * 0.4) * 0.01 * this.scaleMultiplier;
 
     this.animationId = requestAnimationFrame(this.animate);
   };

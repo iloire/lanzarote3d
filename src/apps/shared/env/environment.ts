@@ -32,35 +32,12 @@ interface BoatTypeWeights {
  * Default weights for boat types (higher = more common)
  */
 const DEFAULT_BOAT_WEIGHTS: BoatTypeWeights = {
-  'SmallSailBoat': 3,    // Most common - recreational sailing
-  'FishingBoat': 2,      // Common - local fishing industry
+  'SmallSailBoat': 4,    // Most common - recreational sailing
+  'FishingBoat': 3,      // Common - local fishing industry
   'SpeedBoat': 2,        // Common - recreational water sports
   'Yacht': 1,            // Less common - luxury vessels
   'PatrolBoat': 0.8      // Rare but visible - official/security vessels
 };
-
-/**
- * Utility function for weighted random selection
- */
-function selectWeightedRandom<T>(items: T[], weights: number[]): T {
-  if (items.length !== weights.length) {
-    throw new Error('Items and weights arrays must have the same length');
-  }
-
-  const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
-  const randomValue = Math.random() * totalWeight;
-
-  let currentWeight = 0;
-  for (let i = 0; i < items.length; i++) {
-    currentWeight += weights[i];
-    if (randomValue <= currentWeight) {
-      return items[i];
-    }
-  }
-
-  // Fallback to last item (should never reach here with valid weights)
-  return items[items.length - 1];
-}
 
 
 class Environment {
@@ -117,44 +94,13 @@ class Environment {
     } = options || {};
 
     // Create boats for first area (marina/harbor - more variety)
-    const group1OfBoats = await this.boatGroupCreator.createRecreationalBoats(water, new THREE.Vector3(7879, 0, -5445), 8, 'random');
+    const group1OfBoats = await this.boatGroupCreator.createRecreationalBoats(water, new THREE.Vector3(7879, 0, -5445), 4, 'random');
 
     // Create boats for second area (open water - different distribution)
-    const group2OfBoats = await this.boatGroupCreator.createRecreationalBoats(water, new THREE.Vector3(8279, 0, -6455), 7, 'random');
+    const group2OfBoats = await this.boatGroupCreator.createRecreationalBoats(water, new THREE.Vector3(8279, 0, -6455), 3, 'random');
 
     // Fix movement origins for all boats after positioning
     this.updateAllBoatMovementOrigins();
-  }
-
-
-  // Convenience method to add a patrol boat
-  async addPatrolBoat(water: THREE.Mesh, position?: THREE.Vector3) {
-    const boat = new PatrolBoat({
-      radius: 400,
-      speed: 0.15,
-      floatingScale: 0.8,
-    });
-    const boatMesh = await this.componentRegistry.register(boat, 'patrolboat');
-    const scale = 2.5;
-    boatMesh.scale.set(scale, scale, scale);
-
-    // Scale multiplier is handled automatically by the base component
-
-    // Position the boat
-    if (position) {
-      boatMesh.position.copy(position);
-    } else {
-      // Default position near the first boat area
-      boatMesh.position.set(7879 + 200, 50, -5445 + 200);
-    }
-
-    // Random initial rotation
-    boatMesh.rotation.y = Math.random() * Math.PI * 2;
-
-    this.scene.add(boatMesh);
-
-    console.log('Added PatrolBoat at position:', boatMesh.position);
-    return boat;
   }
 
 
@@ -165,10 +111,6 @@ class Environment {
 
   async addRandomBoats(water: THREE.Mesh) {
     await this.addBoats(water, { randomize: true });
-  }
-
-  async addOnlyFishingBoats(water: THREE.Mesh) {
-    await this.addBoats(water, { randomize: false, types: ['FishingBoat'] });
   }
 
   async addOnlyYachts(water: THREE.Mesh) {

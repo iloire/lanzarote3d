@@ -124,8 +124,8 @@ export function generateMarinaBoats(
     { type: 'SmallSailBoat', enableMovement: false, scale: 2.8 },
     { type: 'FishingBoat', enableMovement: false, scale: 2.5 },
     // Some moving boats (like boats entering/leaving harbor)
-    { type: 'SmallSailBoat', enableMovement: true, pattern: MovementPattern.RANDOM_DRIFT, speed: 0.3, radius: 60, scale: 3.0 },
-    { type: 'SpeedBoat', enableMovement: true, pattern: MovementPattern.LINEAR, speed: 0.6, radius: 100, scale: 2.8 },
+    { type: 'SmallSailBoat', enableMovement: true, pattern: MovementPattern.RANDOM_DRIFT, speed: 0.05, radius: 60, scale: 3.0 },
+    { type: 'SpeedBoat', enableMovement: true, pattern: MovementPattern.LINEAR, speed: 0.2, radius: 100, scale: 2.8 },
   ];
 
   // Add more boats for larger marinas
@@ -215,7 +215,7 @@ export function generateMixedRecreationalBoats(count: number = 8): BoatConfig[] 
       pattern: enableMovement ?
         (Math.random() < 0.5 ? MovementPattern.RANDOM_DRIFT : MovementPattern.CIRCULAR) :
         undefined,
-      speed: enableMovement ? 0.2 + Math.random() * 0.4 : undefined,
+      speed: enableMovement ? 0.1 + Math.random() * 0.1 : undefined,
       radius: enableMovement ? 80 + Math.random() * 120 : undefined,
       scale: 2.4 + Math.random() * 0.6
     });

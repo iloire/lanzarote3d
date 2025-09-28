@@ -216,8 +216,8 @@ export class BoatGroupCreator {
     return this.createBoatGroup(water, boats, {
       center,
       formation,
-      spacing: 60,
-      groupRadius: 150
+      spacing: 90,
+      groupRadius: 190
     });
   }
 
@@ -233,7 +233,7 @@ export class BoatGroupCreator {
     return this.createBoatGroup(water, boats, {
       center,
       formation: 'circle',
-      spacing: 50,
+      spacing: 80,
       groupRadius: radius
     });
   }
