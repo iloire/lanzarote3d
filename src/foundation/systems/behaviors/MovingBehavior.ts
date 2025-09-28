@@ -16,6 +16,7 @@ export interface MovingBehaviorOptions {
   waypoints?: THREE.Vector3[];
   autoStart?: boolean;
   faceDirection?: boolean;
+  forwardAxis?: 'x' | 'z'; // Which axis the object faces forward in (default: 'z')
 }
 
 /**
@@ -35,6 +36,7 @@ export class MovingBehavior {
   private bounds: { min: THREE.Vector3; max: THREE.Vector3 } | null;
   private waypoints: THREE.Vector3[];
   private faceDirection: boolean;
+  private forwardAxis: 'x' | 'z';
 
   // Movement state
   private time = 0;
@@ -50,6 +52,7 @@ export class MovingBehavior {
     this.bounds = options.bounds || null;
     this.waypoints = options.waypoints || [];
     this.faceDirection = options.faceDirection ?? true;
+    this.forwardAxis = options.forwardAxis ?? 'z';
   }
 
   /**
@@ -160,7 +163,16 @@ export class MovingBehavior {
     // Face movement direction if enabled
     if (this.faceDirection && this.mesh.position.distanceTo(newPosition) > 0.1) {
       const direction = new THREE.Vector3().subVectors(newPosition, this.mesh.position).normalize();
-      const angle = Math.atan2(direction.x, direction.z);
+      let angle: number;
+
+      if (this.forwardAxis === 'x') {
+        // For objects with forward direction in +X axis (like boats)
+        angle = Math.atan2(direction.x, direction.z) - Math.PI / 2;
+      } else {
+        // For objects with forward direction in +Z axis (standard)
+        angle = Math.atan2(direction.x, direction.z);
+      }
+
       this.mesh.rotation.y = angle;
     }
 

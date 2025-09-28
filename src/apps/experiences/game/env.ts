@@ -23,6 +23,9 @@ export const addGameEnvironment = (
   env.addHouses(terrain);
   env.addBoats(water);
 
+  // Add a dedicated patrol boat with movement for the main scene
+  env.addPatrolBoat(water, new THREE.Vector3(8500, 50, -5200));
+
   if (BIRDS) {
     const birdsPath = [
       { x: 7500, y: 1090, z: -1068 },

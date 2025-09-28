@@ -33,6 +33,7 @@ export class PatrolBoat extends MovingFloatingThreeComponent {
       autoStartMoving: true,
       autoStartFloating: true,
       faceDirection: true,
+      forwardAxis: 'x', // Boats have bow pointing in +X direction
       ...options
     });
   }
