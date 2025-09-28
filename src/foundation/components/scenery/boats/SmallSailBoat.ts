@@ -102,5 +102,12 @@ export class SmallSailBoat extends FloatingThreeComponent {
   }
 }
 
-// Legacy export for backward compatibility
-export default SmallSailBoat;
+// Legacy export for backward compatibility with old synchronous API
+const SmallSailBoatLegacy = SmallSailBoat as any;
+
+// Add legacy load method that returns mesh directly
+SmallSailBoatLegacy.prototype.load = function(): THREE.Object3D {
+  return this.loadSync();
+};
+
+export default SmallSailBoatLegacy;

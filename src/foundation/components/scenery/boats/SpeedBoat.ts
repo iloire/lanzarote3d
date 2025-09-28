@@ -170,5 +170,12 @@ export class SpeedBoat extends FloatingThreeComponent {
   }
 }
 
-// Legacy export for backward compatibility
-export default SpeedBoat;
+// Legacy export for backward compatibility with old synchronous API
+const SpeedBoatLegacy = SpeedBoat as any;
+
+// Add legacy load method that returns mesh directly
+SpeedBoatLegacy.prototype.load = function(): THREE.Object3D {
+  return this.loadSync();
+};
+
+export default SpeedBoatLegacy;

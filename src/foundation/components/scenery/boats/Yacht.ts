@@ -190,5 +190,12 @@ export class Yacht extends FloatingThreeComponent {
   }
 }
 
-// Legacy export for backward compatibility
-export default Yacht;
+// Legacy export for backward compatibility with old synchronous API
+const YachtLegacy = Yacht as any;
+
+// Add legacy load method that returns mesh directly
+YachtLegacy.prototype.load = function(): THREE.Object3D {
+  return this.loadSync();
+};
+
+export default YachtLegacy;

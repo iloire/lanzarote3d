@@ -39,6 +39,24 @@ export abstract class FloatingThreeComponent extends SimpleThreeComponent {
     return object;
   }
 
+  /**
+   * Load the component synchronously for backward compatibility
+   * This is a legacy method - prefer using load() for new code
+   */
+  public loadSync(): THREE.Object3D {
+    // Call the protected method through the regular load process
+    const content = (this as any).createSyncContent();
+
+    // Integrate floating behavior
+    this.floatingBehavior.attachTo(content);
+
+    if ((this.options as FloatingComponentOptions).autoStartFloating ?? true) {
+      this.floatingBehavior.start();
+    }
+
+    return content;
+  }
+
   // Floating control methods
   public startFloating(): void {
     this.floatingBehavior.start();
@@ -50,6 +68,14 @@ export abstract class FloatingThreeComponent extends SimpleThreeComponent {
 
   public setFloatingScale(scale: number): void {
     this.floatingBehavior.setScale(scale);
+  }
+
+  /**
+   * Legacy compatibility method
+   * @deprecated Use setFloatingScale instead
+   */
+  public setScaleMultiplier(scale: number): void {
+    this.setFloatingScale(scale);
   }
 
   public isFloating(): boolean {
