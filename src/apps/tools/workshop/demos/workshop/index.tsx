@@ -1,9 +1,7 @@
 import * as THREE from 'three';
-import { Paraglider } from '../../../../../foundation/components/vehicles';
 import { SmallSailBoat, Tree, Stone } from '../../../../../foundation/components/scenery';
 import { House, HouseType } from '../../../../../foundation/components/scenery';
-import { PineTree } from '../../../../../foundation/components/scenery';
-import { LegacyPilotHeadType as PilotHeadType } from '../../../../../foundation/components/characters';
+import { PineTree, Igloo, IglooSize } from '../../../../../foundation/components/scenery';
 import { StoryOptions } from '../../../../shared/types';
 import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
 
@@ -91,43 +89,26 @@ class WorkshopApp extends WorkshopDemoBase {
   }
 
   private async loadComponents(scene: THREE.Scene, gui: any): Promise<void> {
-    // Load paraglider
-    const gliderOptions = {
-      wingColor1: '#c30010',
-      wingColor2: '#b100cd',
-      inletsColor: '#333333',
-      numeroCajones: 40,
-    };
-
-    const pilotOptions = {
-      head: {
-        headType: PilotHeadType.Default,
-        helmetOptions: {
-          color: '#ffffff',
-          color2: '#cccccc',
-          color3: '#999999',
-        },
-      },
-    };
-
+    // Load igloo
     try {
-      const paraglider = new Paraglider({
-        glider: gliderOptions,
-        pilot: pilotOptions,
-      });
-      const mesh = await paraglider.load(gui);
-      mesh.position.set(-20, 0, 0);
-      mesh.scale.set(0.01, 0.01, 0.01);
-      scene.add(mesh);
-      this.componentMeshes.push(mesh);
+      const igloo = new Igloo(IglooSize.Medium);
+      const iglooMesh = igloo.load();
+      iglooMesh.position.set(-20, 0, 0);
+      iglooMesh.scale.set(2, 2, 2);
+      scene.add(iglooMesh);
+      this.componentMeshes.push(iglooMesh);
+
+      const iglooLabel = createLabel('Igloo', new THREE.Vector3(-20, -10, 0));
+      scene.add(iglooLabel);
+      this.labelMeshes.push(iglooLabel);
     } catch (error) {
-      this.handleError(error as Error, 'loading paraglider');
+      this.handleError(error as Error, 'loading igloo');
     }
 
     // Load boat
     try {
       const boat = new SmallSailBoat();
-      const boatMesh = boat.load(gui);
+      const boatMesh = boat.load(); // Legacy API doesn't take gui parameter
       boatMesh.position.set(-30, 0, 80);
       scene.add(boatMesh);
       this.componentMeshes.push(boatMesh);
