@@ -3,7 +3,7 @@ import { Paraglider } from '../../../../../foundation/components/vehicles';
 import { SmallSailBoat, Tree, Stone } from '../../../../../foundation/components/scenery';
 import { House, HouseType } from '../../../../../foundation/components/scenery';
 import { PineTree } from '../../../../../foundation/components/scenery';
-import { PilotHeadType } from '../../../../../foundation/components/characters';
+import { LegacyPilotHeadType as PilotHeadType } from '../../../../../foundation/components/characters';
 import { StoryOptions } from '../../../../shared/types';
 import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
 
