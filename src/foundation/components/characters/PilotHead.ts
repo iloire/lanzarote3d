@@ -8,6 +8,9 @@ import { DevilHead } from './heads/DevilHead';
 import { HeadOptions } from './heads/BaseHead';
 import { HelmetType, HelmetOptions } from './helmets/types';
 
+// Re-export helmet types for external use
+export { HelmetType, HelmetOptions } from './helmets/types';
+
 export enum PilotHeadType {
   Default,
   Warrior,
