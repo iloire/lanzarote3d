@@ -1,11 +1,48 @@
 // inspired in: https://codepen.io/yitliu/pen/gOaPxRX
 import * as THREE from 'three';
+import { SimpleThreeComponent, SimpleComponentOptions } from '../base/SimpleThreeComponent';
+import { ComponentMetadata } from '../base/IThreeComponent';
+
 var mat_grey = new THREE.MeshLambertMaterial({ color: 0xf3f2f7 });
 var mat_yellow = new THREE.MeshLambertMaterial({ color: 0xfeb42b });
 var mat_green = new THREE.MeshLambertMaterial({ color: 0xb2d2a4 });
 
-class Tree {
-  load(): THREE.Object3D {
+export interface LegacyTreeOptions extends SimpleComponentOptions {
+  trunkColor?: number;
+  crownColor?: number;
+  leafColor?: number;
+}
+
+class LegacyTree extends SimpleThreeComponent {
+  private trunkColor: number = 0xf3f2f7;
+  private crownColor: number = 0xb2d2a4;
+  private leafColor: number = 0xfeb42b;
+
+  constructor(options: LegacyTreeOptions = {}) {
+    const metadata: ComponentMetadata = {
+      name: 'LegacyTree',
+      version: '1.0.0',
+      description: 'Legacy detailed tree component with complex leaf geometry',
+      tags: ['scenery', 'nature', 'tree', 'legacy', 'detailed']
+    };
+
+    super(metadata, options);
+
+    this.trunkColor = options.trunkColor || 0xf3f2f7;
+    this.crownColor = options.crownColor || 0xb2d2a4;
+    this.leafColor = options.leafColor || 0xfeb42b;
+  }
+
+  protected createGeometry(): THREE.BufferGeometry {
+    // Return trunk geometry as the primary geometry
+    return new THREE.IcosahedronGeometry(9, 0);
+  }
+
+  public override async load(): Promise<THREE.Object3D> {
+    return this.createDetailedTree();
+  }
+
+  private createDetailedTree(): THREE.Object3D {
     const tree = new THREE.Group();
     const pi = Math.PI;
 
@@ -88,4 +125,12 @@ class Tree {
   }
 }
 
-export default Tree;
+// Legacy compatibility layer for synchronous API
+const TreeLegacy = LegacyTree as any;
+
+// Add legacy load method that returns group directly
+TreeLegacy.prototype.load = function(): THREE.Object3D {
+  return this.createDetailedTree();
+};
+
+export default TreeLegacy;
