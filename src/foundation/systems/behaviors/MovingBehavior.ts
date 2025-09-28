@@ -120,6 +120,18 @@ export class MovingBehavior {
   }
 
   /**
+   * Update the original position (useful when object is repositioned after attachment)
+   */
+  public updateOriginalPosition(): void {
+    if (this.mesh) {
+      this.originalPosition.copy(this.mesh.position);
+      if (this.pattern === MovementPattern.RANDOM_DRIFT) {
+        this.randomTarget.copy(this.originalPosition);
+      }
+    }
+  }
+
+  /**
    * Dispose of the movement behavior
    */
   public dispose(): void {

@@ -1,8 +1,9 @@
 import * as THREE from 'three';
-import { FloatingThreeComponent, FloatingComponentOptions } from '../../base/FloatingThreeComponent';
+import { MovableBoatComponent, MovableBoatComponentOptions } from '../../base/MovableBoatComponent';
 import { resourceManager } from '../../../systems/ResourceManager';
+import { MovementPattern } from '../../../systems/behaviors/MovingBehavior';
 
-export interface YachtOptions extends FloatingComponentOptions {
+export interface YachtOptions extends MovableBoatComponentOptions {
   hullColor?: string;
   trimColor?: string;
   glassColor?: string;
@@ -10,19 +11,24 @@ export interface YachtOptions extends FloatingComponentOptions {
 }
 
 /**
- * Modern yacht component with realistic floating animation
+ * Modern yacht component with realistic floating animation and optional movement
  */
-export class Yacht extends FloatingThreeComponent {
+export class Yacht extends MovableBoatComponent {
   constructor(options: YachtOptions = {}) {
     super({
       name: 'Yacht',
       version: '1.0.0',
-      description: 'Luxury yacht with realistic floating animation and detailed structure'
+      description: 'Luxury yacht with realistic floating animation and optional movement'
     }, {
       hullColor: '#F5F5F5',
       trimColor: '#4169E1',
       glassColor: '#87CEEB',
       scale: 1,
+      // Movement defaults - disabled by default, can be enabled via options
+      enableMovement: false,
+      pattern: MovementPattern.FIGURE_EIGHT,
+      speed: 0.2,
+      radius: 250,
       ...options
     });
   }

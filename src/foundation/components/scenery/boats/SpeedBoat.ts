@@ -1,8 +1,9 @@
 import * as THREE from 'three';
-import { FloatingThreeComponent, FloatingComponentOptions } from '../../base/FloatingThreeComponent';
+import { MovableBoatComponent, MovableBoatComponentOptions } from '../../base/MovableBoatComponent';
 import { resourceManager } from '../../../systems/ResourceManager';
+import { MovementPattern } from '../../../systems/behaviors/MovingBehavior';
 
-export interface SpeedBoatOptions extends FloatingComponentOptions {
+export interface SpeedBoatOptions extends MovableBoatComponentOptions {
   hullColor?: string;
   accentColor?: string;
   engineColor?: string;
@@ -10,19 +11,24 @@ export interface SpeedBoatOptions extends FloatingComponentOptions {
 }
 
 /**
- * Modern speed boat component with realistic floating animation
+ * Modern speed boat component with realistic floating animation and optional movement
  */
-export class SpeedBoat extends FloatingThreeComponent {
+export class SpeedBoat extends MovableBoatComponent {
   constructor(options: SpeedBoatOptions = {}) {
     super({
       name: 'SpeedBoat',
       version: '1.0.0',
-      description: 'Speed boat with realistic floating animation and racing design'
+      description: 'Speed boat with realistic floating animation and optional movement'
     }, {
       hullColor: '#FF4500',
       accentColor: '#FFFFFF',
       engineColor: '#333333',
       scale: 1,
+      // Movement defaults - disabled by default, can be enabled via options
+      enableMovement: false,
+      pattern: MovementPattern.LINEAR,
+      speed: 0.8,
+      radius: 200,
       ...options
     });
   }

@@ -81,11 +81,11 @@ export class FloatingBehavior {
 
     const time = Date.now() * 0.001;
 
-    // Realistic ocean wave simulation with scale-adjusted amplitude
-    const primaryWave = Math.sin(time * 0.8 + this.floatingOffset) * 4 * this.scaleMultiplier;
-    const secondaryWave = Math.sin(time * 1.3 + this.floatingOffset * 1.2) * 2 * this.scaleMultiplier;
-    const tertiaryWave = Math.cos(time * 0.5 + this.floatingOffset * 0.8) * 1.5 * this.scaleMultiplier;
-    const swellWave = Math.sin(time * 0.3 + this.floatingOffset * 1.5) * 3 * this.scaleMultiplier;
+    // Realistic ocean wave simulation with scale-adjusted amplitude (increased for visibility)
+    const primaryWave = Math.sin(time * 0.8 + this.floatingOffset) * 12 * this.scaleMultiplier;
+    const secondaryWave = Math.sin(time * 1.3 + this.floatingOffset * 1.2) * 6 * this.scaleMultiplier;
+    const tertiaryWave = Math.cos(time * 0.5 + this.floatingOffset * 0.8) * 4.5 * this.scaleMultiplier;
+    const swellWave = Math.sin(time * 0.3 + this.floatingOffset * 1.5) * 9 * this.scaleMultiplier;
 
     // Combine waves for realistic ocean motion
     const totalWaveHeight = primaryWave + secondaryWave + tertiaryWave + swellWave;

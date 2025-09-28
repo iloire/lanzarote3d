@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { FloatingThreeComponent, FloatingComponentOptions } from './FloatingThreeComponent';
 import { MovingBehavior, MovingBehaviorOptions, MovementPattern } from '../../systems/behaviors/MovingBehavior';
-import type { ComponentMetadata } from './BaseThreeComponent';
+import type { ComponentMetadata } from './IThreeComponent';
 
 export interface MovingFloatingComponentOptions extends FloatingComponentOptions, MovingBehaviorOptions {
   autoStartMoving?: boolean;
@@ -76,6 +76,10 @@ export abstract class MovingFloatingThreeComponent extends FloatingThreeComponen
 
   public setWaypoints(waypoints: THREE.Vector3[]): void {
     this.movingBehavior.setWaypoints(waypoints);
+  }
+
+  public updateMovementOrigin(): void {
+    this.movingBehavior.updateOriginalPosition();
   }
 
   public isMoving(): boolean {

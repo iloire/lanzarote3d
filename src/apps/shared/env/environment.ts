@@ -8,6 +8,7 @@ import PineTree from '../../../foundation/components/scenery/PineTree';
 import Stone from '../../../foundation/components/scenery/Stone';
 import House, { HouseType } from '../../../foundation/components/scenery/House';
 import { SmallSailBoat, FishingBoat, Yacht, SpeedBoat, PatrolBoat } from '../../../foundation/components/scenery';
+import { MovementPattern } from '../../../foundation/systems/behaviors/MovingBehavior';
 import Birds from '../../../foundation/components/wildlife/Birds';
 import { Hangglider as HangGlider } from '../../../foundation/components/vehicles';
 import { addMeshAroundArea } from './mesh-utils';
@@ -16,90 +17,51 @@ import { CloudOptions } from '../../../foundation/components/environment';
 import { Theme } from '../../../foundation/types/Theme';
 import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';
 import { IThreeComponent } from '../../../foundation/components/base/IThreeComponent';
+import { ComponentRegistry } from '../../../foundation/systems/ComponentRegistry';
+import { BoatGroupCreator } from './boat-group-creator';
+import { BoatConfig, BoatGroupConfig } from './boat-group-types';
 
 /**
- * Component registry for managing all Three.js component instances
+ * Boat type weights for realistic marine distribution
  */
-class ComponentRegistry {
-  private components: Map<string, IThreeComponent> = new Map();
-  private meshToComponentId: Map<THREE.Object3D, string> = new Map();
-  private nextId: number = 0;
-
-  /**
-   * Register a component and return its mesh
-   */
-  async register(component: IThreeComponent, prefix: string = 'component'): Promise<THREE.Object3D> {
-    const id = `${prefix}_${this.nextId++}`;
-    this.components.set(id, component);
-
-    const mesh = await component.load();
-    this.meshToComponentId.set(mesh, id);
-
-    return mesh;
-  }
-
-  /**
-   * Get component by ID
-   */
-  getComponent(id: string): IThreeComponent | undefined {
-    return this.components.get(id);
-  }
-
-  /**
-   * Get component by mesh
-   */
-  getComponentByMesh(mesh: THREE.Object3D): IThreeComponent | undefined {
-    const id = this.meshToComponentId.get(mesh);
-    return id ? this.components.get(id) : undefined;
-  }
-
-  /**
-   * Get all components of a specific type
-   */
-  getComponentsByType<T extends IThreeComponent>(type: new (...args: any[]) => T): T[] {
-    return Array.from(this.components.values())
-      .filter((component): component is T => component instanceof type);
-  }
-
-  /**
-   * Update all registered components
-   */
-  update(deltaTime: number): void {
-    this.components.forEach(component => {
-      if (component.update) {
-        component.update(deltaTime);
-      }
-    });
-  }
-
-  /**
-   * Dispose all components and clear registry
-   */
-  dispose(): void {
-    this.components.forEach(component => {
-      component.dispose();
-    });
-    this.components.clear();
-    this.meshToComponentId.clear();
-  }
-
-  /**
-   * Get statistics about registered components
-   */
-  getStats(): { totalComponents: number; byType: Record<string, number> } {
-    const byType: Record<string, number> = {};
-
-    this.components.forEach(component => {
-      const typeName = component.metadata.name;
-      byType[typeName] = (byType[typeName] || 0) + 1;
-    });
-
-    return {
-      totalComponents: this.components.size,
-      byType
-    };
-  }
+interface BoatTypeWeights {
+  [boatType: string]: number;
 }
+
+/**
+ * Default weights for boat types (higher = more common)
+ */
+const DEFAULT_BOAT_WEIGHTS: BoatTypeWeights = {
+  'SmallSailBoat': 3,    // Most common - recreational sailing
+  'FishingBoat': 2,      // Common - local fishing industry
+  'SpeedBoat': 2,        // Common - recreational water sports
+  'Yacht': 1,            // Less common - luxury vessels
+  'PatrolBoat': 0.8      // Rare but visible - official/security vessels
+};
+
+/**
+ * Utility function for weighted random selection
+ */
+function selectWeightedRandom<T>(items: T[], weights: number[]): T {
+  if (items.length !== weights.length) {
+    throw new Error('Items and weights arrays must have the same length');
+  }
+
+  const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+  const randomValue = Math.random() * totalWeight;
+
+  let currentWeight = 0;
+  for (let i = 0; i < items.length; i++) {
+    currentWeight += weights[i];
+    if (randomValue <= currentWeight) {
+      return items[i];
+    }
+  }
+
+  // Fallback to last item (should never reach here with valid weights)
+  return items[items.length - 1];
+}
+
 
 class Environment {
   birds!: Birds;
@@ -107,10 +69,12 @@ class Environment {
   thermals: Thermal[] = [];
   cloudInstances: Clouds[] = [];
   private componentRegistry: ComponentRegistry = new ComponentRegistry();
+  private boatGroupCreator: BoatGroupCreator;
   scene: THREE.Scene;
 
   constructor(scene: THREE.Scene) {
     this.scene = scene;
+    this.boatGroupCreator = new BoatGroupCreator(scene, this.componentRegistry);
   }
 
   updateWrapSpeed(wrapSpeed: number) {
@@ -139,99 +103,29 @@ class Environment {
     this.scene.add(hgMesh);
   }
 
-  async addBoats(water: THREE.Mesh, options?: { randomize?: boolean; types?: string[] }) {
-    const { randomize = true, types = ['SmallSailBoat', 'FishingBoat', 'Yacht', 'SpeedBoat'] } = options || {};
+  async addBoats(water: THREE.Mesh, options?: {
+    randomize?: boolean;
+    types?: string[];
+    weights?: BoatTypeWeights;
+    selectionMode?: 'uniform' | 'weighted';
+  }) {
+    const {
+      randomize = true,
+      types = ['SmallSailBoat', 'FishingBoat', 'Yacht', 'SpeedBoat', 'PatrolBoat'],
+      weights = DEFAULT_BOAT_WEIGHTS,
+      selectionMode = 'weighted'
+    } = options || {};
 
-    // Create boats for first area
-    const boats1 = await this.createBoatVariety(5, { randomize, types });
-    addMeshAroundArea(boats1, new THREE.Vector3(7879, 0, -5445), 4, water, this.scene);
+    // Create boats for first area (marina/harbor - more variety)
+    const group1OfBoats = await this.boatGroupCreator.createRecreationalBoats(water, new THREE.Vector3(7879, 0, -5445), 8, 'random');
 
-    // Create boats for second area
-    const boats2 = await this.createBoatVariety(4, { randomize, types });
-    addMeshAroundArea(boats2, new THREE.Vector3(8279, 0, -6455), 3, water, this.scene);
+    // Create boats for second area (open water - different distribution)
+    const group2OfBoats = await this.boatGroupCreator.createRecreationalBoats(water, new THREE.Vector3(8279, 0, -6455), 7, 'random');
+
+    // Fix movement origins for all boats after positioning
+    this.updateAllBoatMovementOrigins();
   }
 
-  private async createBoatVariety(count: number, options: { randomize: boolean; types: string[] }): Promise<THREE.Object3D[]> {
-    const { randomize, types } = options;
-    const boats: THREE.Object3D[] = [];
-
-    for (let i = 0; i < count; i++) {
-      let boatType: string;
-
-      if (randomize) {
-        // Pick a random boat type
-        boatType = types[Math.floor(Math.random() * types.length)];
-      } else {
-        // Cycle through types in order
-        boatType = types[i % types.length];
-      }
-
-      const boat = await this.createBoatOfType(boatType);
-      if (boat) {
-        boats.push(boat);
-      }
-    }
-
-    return boats;
-  }
-
-  private async createBoatOfType(type: string): Promise<THREE.Object3D | null> {
-    let boat: any; // Keep as any since boat classes have their own load() methods
-    let boatMesh: THREE.Object3D;
-    let scale = 3; // Default scale
-
-    switch (type) {
-      case 'SmallSailBoat':
-        boat = new SmallSailBoat();
-        boatMesh = await this.componentRegistry.register(boat, 'smallsailboat');
-        scale = 3;
-        break;
-      case 'FishingBoat':
-        boat = new FishingBoat();
-        boatMesh = await this.componentRegistry.register(boat, 'fishingboat');
-        scale = 2.5; // Fishing boats are already larger
-        break;
-      case 'Yacht':
-        boat = new Yacht();
-        boatMesh = await this.componentRegistry.register(boat, 'yacht');
-        scale = 2; // Yachts are already quite large
-        break;
-      case 'SpeedBoat':
-        boat = new SpeedBoat();
-        boatMesh = await this.componentRegistry.register(boat, 'speedboat');
-        scale = 2.8;
-        break;
-      case 'PatrolBoat':
-        boat = new PatrolBoat({
-          radius: 300,  // Larger movement radius
-          speed: 0.2,   // Slower, more realistic speed
-        });
-        boatMesh = await this.componentRegistry.register(boat, 'patrolboat');
-        scale = 2.5;
-        break;
-      default:
-        console.warn(`Unknown boat type: ${type}`);
-        // Fallback to SmallSailBoat
-        boat = new SmallSailBoat();
-        boatMesh = await this.componentRegistry.register(boat, 'smallsailboat');
-        scale = 3;
-    }
-
-    // Apply consistent scaling
-    boatMesh.scale.set(scale, scale, scale);
-
-    // Update floating animation scale multiplier to match boat scale
-    if (boat && typeof boat.setScaleMultiplier === 'function') {
-      boat.setScaleMultiplier(scale);
-    }
-
-    // Add some random rotation for variety
-    boatMesh.rotation.y = Math.random() * Math.PI * 2;
-
-    // Component is now managed by registry - no need to store separately
-
-    return boatMesh;
-  }
 
   // Convenience method to add a patrol boat
   async addPatrolBoat(water: THREE.Mesh, position?: THREE.Vector3) {
@@ -244,10 +138,7 @@ class Environment {
     const scale = 2.5;
     boatMesh.scale.set(scale, scale, scale);
 
-    // Update floating animation scale to match boat scale
-    if (boat && typeof boat.setScaleMultiplier === 'function') {
-      boat.setScaleMultiplier(scale);
-    }
+    // Scale multiplier is handled automatically by the base component
 
     // Position the boat
     if (position) {
@@ -266,13 +157,14 @@ class Environment {
     return boat;
   }
 
-  // Convenience methods for specific boat configurations
-  async addRandomBoats(water: THREE.Mesh) {
-    await this.addBoats(water, { randomize: true });
-  }
 
+  // Convenience methods for backward compatibility
   async addMixedBoats(water: THREE.Mesh) {
     await this.addBoats(water, { randomize: false }); // Cycles through types in order
+  }
+
+  async addRandomBoats(water: THREE.Mesh) {
+    await this.addBoats(water, { randomize: true });
   }
 
   async addOnlyFishingBoats(water: THREE.Mesh) {
@@ -289,6 +181,76 @@ class Environment {
 
   async addOnlySpeedBoats(water: THREE.Mesh) {
     await this.addBoats(water, { randomize: false, types: ['SpeedBoat'] });
+  }
+
+  // ==========================================
+  // BOAT GROUP CREATION SYSTEM
+  // ==========================================
+
+  /**
+   * Create a group of boats with precise control over types, positions, and movement
+   */
+  async createBoatGroup(
+    water: THREE.Mesh,
+    boats: BoatConfig[],
+    groupConfig: BoatGroupConfig
+  ): Promise<THREE.Object3D[]> {
+    const meshes = await this.boatGroupCreator.createBoatGroup(water, boats, groupConfig);
+    this.updateAllBoatMovementOrigins();
+    return meshes;
+  }
+
+  /**
+   * Create a marina/harbor formation with mixed boat types
+   */
+  async createMarina(
+    water: THREE.Mesh,
+    center: THREE.Vector3,
+    size: 'small' | 'medium' | 'large' = 'medium'
+  ): Promise<THREE.Object3D[]> {
+    const meshes = await this.boatGroupCreator.createMarina(water, center, size);
+    this.updateAllBoatMovementOrigins();
+    return meshes;
+  }
+
+  /**
+   * Create a patrol fleet with coordinated movement
+   */
+  async createPatrolFleet(
+    water: THREE.Mesh,
+    center: THREE.Vector3,
+    size: 'single' | 'formation' | 'fleet' = 'formation'
+  ): Promise<THREE.Object3D[]> {
+    const meshes = await this.boatGroupCreator.createPatrolFleet(water, center, size);
+    this.updateAllBoatMovementOrigins();
+    return meshes;
+  }
+
+  /**
+   * Create a racing formation with speed boats
+   */
+  async createRacingFleet(
+    water: THREE.Mesh,
+    center: THREE.Vector3,
+    size: 'small' | 'medium' | 'large' = 'medium'
+  ): Promise<THREE.Object3D[]> {
+    const meshes = await this.boatGroupCreator.createRacingFleet(water, center, size);
+    this.updateAllBoatMovementOrigins();
+    return meshes;
+  }
+
+  /**
+   * Create recreational boats with mixed types and movement
+   */
+  async createRecreationalBoats(
+    water: THREE.Mesh,
+    center: THREE.Vector3,
+    count: number = 8,
+    formation: 'circle' | 'random' = 'random'
+  ): Promise<THREE.Object3D[]> {
+    const meshes = await this.boatGroupCreator.createRecreationalBoats(water, center, count, formation);
+    this.updateAllBoatMovementOrigins();
+    return meshes;
   }
 
   async addHouses(terrain: THREE.Mesh) {
@@ -531,6 +493,19 @@ class Environment {
    */
   update(deltaTime: number): void {
     this.componentRegistry.update(deltaTime);
+  }
+
+  /**
+   * Update movement origins for all boats after they've been positioned
+   */
+  private updateAllBoatMovementOrigins(): void {
+    this.componentRegistry.getAllComponents().forEach((component, id) => {
+      // Check if component has movement behavior (PatrolBoat, etc.)
+      if (component && typeof (component as any).updateMovementOrigin === 'function') {
+        (component as any).updateMovementOrigin();
+        console.log(`Updated movement origin for component: ${id}`);
+      }
+    });
   }
 
   /**

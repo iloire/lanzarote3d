@@ -1,26 +1,32 @@
 import * as THREE from 'three';
-import { FloatingThreeComponent, FloatingComponentOptions } from '../../base/FloatingThreeComponent';
+import { MovableBoatComponent, MovableBoatComponentOptions } from '../../base/MovableBoatComponent';
 import { resourceManager } from '../../../systems/ResourceManager';
+import { MovementPattern } from '../../../systems/behaviors/MovingBehavior';
 
-export interface SmallSailBoatOptions extends FloatingComponentOptions {
+export interface SmallSailBoatOptions extends MovableBoatComponentOptions {
   hullColor?: string;
   sailColor?: string;
   scale?: number;
 }
 
 /**
- * Modern small sail boat component with realistic floating animation
+ * Modern small sail boat component with realistic floating animation and optional movement
  */
-export class SmallSailBoat extends FloatingThreeComponent {
+export class SmallSailBoat extends MovableBoatComponent {
   constructor(options: SmallSailBoatOptions = {}) {
     super({
       name: 'SmallSailBoat',
       version: '1.0.0',
-      description: 'Small sail boat with realistic floating animation'
+      description: 'Small sail boat with realistic floating animation and optional movement'
     }, {
       hullColor: '#FFFFFF',
       sailColor: '#666666',
       scale: 1,
+      // Movement defaults - disabled by default, can be enabled via options
+      enableMovement: false,
+      pattern: MovementPattern.RANDOM_DRIFT,
+      speed: 0.3,
+      radius: 100,
       ...options
     });
   }

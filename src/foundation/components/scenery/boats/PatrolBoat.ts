@@ -1,9 +1,9 @@
 import * as THREE from 'three';
-import { MovingFloatingThreeComponent, MovingFloatingComponentOptions } from '../../base/MovingFloatingThreeComponent';
+import { MovableBoatComponent, MovableBoatComponentOptions } from '../../base/MovableBoatComponent';
 import { resourceManager } from '../../../systems/ResourceManager';
 import { MovementPattern } from '../../../systems/behaviors/MovingBehavior';
 
-export interface PatrolBoatOptions extends MovingFloatingComponentOptions {
+export interface PatrolBoatOptions extends MovableBoatComponentOptions {
   hullColor?: string;
   accentColor?: string;
   flagColor?: string;
@@ -14,7 +14,7 @@ export interface PatrolBoatOptions extends MovingFloatingComponentOptions {
  * Patrol boat that moves around while floating
  * Based on SpeedBoat design with added flag for identification
  */
-export class PatrolBoat extends MovingFloatingThreeComponent {
+export class PatrolBoat extends MovableBoatComponent {
   constructor(options: PatrolBoatOptions = {}) {
     super({
       name: 'PatrolBoat',
@@ -26,7 +26,8 @@ export class PatrolBoat extends MovingFloatingThreeComponent {
       accentColor: '#FFFFFF',
       flagColor: '#FF0000',
       scale: 1,
-      // Movement defaults
+      // Movement defaults - ENABLED by default for PatrolBoat
+      enableMovement: true,
       pattern: MovementPattern.CIRCULAR,
       speed: 0.2,
       radius: 400,

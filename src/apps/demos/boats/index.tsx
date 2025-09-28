@@ -23,7 +23,26 @@ type ParagliderVoxelConfig = {
 // ==========================================
 // ANIMATION CONFIGURATION - Easy to tweak!
 // ==========================================
+// To disable animation and use static camera:
+// 1. Set enableAnimation: false
+// 2. Choose staticMode.position: 'closeUp', 'overhead', 'waterLevel', or 'custom'
+// 3. If using 'custom', set customPosition and customLookAt coordinates
+// 4. Set staticMode.enableControls: true to allow manual camera navigation
 const ANIMATION_CONFIG = {
+  // Enable/disable camera animation
+  enableAnimation: false, // Set to false for static camera positioned close to boats
+
+  // Static camera configuration (used when enableAnimation = false)
+  staticMode: {
+    // Choose preset position or use 'custom' for manual positioning
+    position: 'custom' as 'closeUp' | 'overhead' | 'waterLevel' | 'custom',
+    enableControls: true, // Allow user to manually navigate with orbit controls
+
+    // Custom camera positioning (used when position = 'custom')
+    customPosition: { x: 7840, y: 24, z: -5100 }, // Camera position
+    customLookAt: { x: 7900, y: 30, z: -5200 },   // Where camera looks (default: boat center)
+  },
+
   // Timing settings
   duration: 18000, // Total animation duration in milliseconds
 
@@ -41,6 +60,13 @@ const ANIMATION_CONFIG = {
     intermediate: { x: 7200, y: 400, z: -3000 }, // Rising toward paraglider area
     // Final position is calculated relative to paraglider: pgPos + finalOffset
     finalOffset: { x: -100, y: 50, z: 200 },    // Offset from paraglider position
+
+    // Static camera positions (used when enableAnimation = false)
+    static: {
+      closeUp: { x: 7900, y: 70, z: -5120 },    // Close to boats, slightly elevated
+      overhead: { x: 7900, y: 150, z: -5200 },  // Overhead view of boats
+      waterLevel: { x: 7900, y: 20, z: -5100 }, // At water level, very close
+    }
   },
 
   // Movement speed multipliers (lower = slower movement)
@@ -55,7 +81,7 @@ const ANIMATION_CONFIG = {
 
   // Camera floating effect (after animation completes)
   floating: {
-    amplitude: 2,      // Floating amplitude
+    amplitude: 0,      // Floating amplitude
     speed: 1.2,        // Floating speed multiplier
     timeMultiplier: 0.0005, // Time scaling for floating calculations
     dampening: {
@@ -159,7 +185,9 @@ class BoatsAnimationApp extends TerrainBase {
       await this.environment.addCloudsFromTheme(thermals, theme);
       this.environment.addTrees(terrain);
       this.environment.addHouses(terrain);
+      console.log('Adding boats to the scene...');
       this.environment.addMixedBoats(water); // Same boats as original
+      console.log('Boats added. Component stats:', this.environment.getComponentStats());
 
       // Make environment available for theme switching
       options.environment = this.environment;
@@ -229,7 +257,37 @@ class BoatsAnimationApp extends TerrainBase {
       pgPos.z + positions.finalOffset.z
     );
 
-    // Set initial camera position behind boats looking at them
+    // Check if animation is enabled
+    if (!ANIMATION_CONFIG.enableAnimation) {
+      // Static mode - position camera using configured position
+      let cameraPos, lookAtPos;
+
+      if (ANIMATION_CONFIG.staticMode.position === 'custom') {
+        // Use custom positioning
+        cameraPos = ANIMATION_CONFIG.staticMode.customPosition;
+        lookAtPos = ANIMATION_CONFIG.staticMode.customLookAt;
+      } else {
+        // Use preset static position
+        const staticPos = ANIMATION_CONFIG.positions.static[ANIMATION_CONFIG.staticMode.position];
+        cameraPos = staticPos;
+        lookAtPos = boatCenterPosition;
+      }
+
+      camera.position.set(cameraPos.x, cameraPos.y, cameraPos.z);
+      camera.lookAt(lookAtPos.x, lookAtPos.y, lookAtPos.z);
+
+      if (controls) {
+        controls.target.set(lookAtPos.x, lookAtPos.y, lookAtPos.z);
+        controls.update();
+        controls.enabled = ANIMATION_CONFIG.staticMode.enableControls; // Enable/disable controls based on config
+      }
+
+      // Start animation loop for static scene
+      this.startAnimationLoop(renderer, scene, camera, controls);
+      return; // Exit without starting camera animation
+    }
+
+    // Animation mode - set initial camera position behind boats looking at them
     camera.position.copy(initialCameraPosition);
     camera.lookAt(boatCenterPosition); // Look directly at boats
 
@@ -366,6 +424,13 @@ class BoatsAnimationApp extends TerrainBase {
         // Camera floating effect using configurable parameters
         const { floating } = ANIMATION_CONFIG;
         const time = (Date.now() - startTime) * floating.timeMultiplier;
+
+        // Update environment components (boats, etc.)
+        if (this.environment) {
+          const deltaTime = 0.016; // Assume 60fps for deltaTime
+          this.environment.update(deltaTime);
+          // Environment updates are working - debug logs removed
+        }
 
         if (this.animatorInstance === undefined) {
           const floatY = Math.sin(time * floating.speed) * floating.amplitude;
