@@ -8,3 +8,6 @@ export { default as Stone } from './Stone';
 
 // Boat Components (organized in boats subfolder)
 export * from './boats';
+
+// Building Components (organized in buildings subfolder)
+export * from './buildings';

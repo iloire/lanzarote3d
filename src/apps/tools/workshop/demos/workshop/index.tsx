@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { SmallSailBoat, Tree, Stone } from '../../../../../foundation/components/scenery';
 import { House, HouseType } from '../../../../../foundation/components/scenery';
 import { PineTree, Igloo, IglooSize } from '../../../../../foundation/components/scenery';
+import { CottageLegacy as Cottage, VillaLegacy as Villa, TownhouseLegacy as Townhouse, SkyscraperLegacy as Skyscraper, BarnLegacy as Barn } from '../../../../../foundation/components/scenery';
 import { StoryOptions } from '../../../../shared/types';
 import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
 
@@ -151,6 +152,59 @@ class WorkshopApp extends WorkshopDemoBase {
       }
     }
 
+    // Load new building types
+    const buildingConfigs = [
+      { type: 'Cottage', position: [-60, 0, 0], scale: 0.8, label: 'Cottage' },
+      { type: 'Villa', position: [-60, 0, 80], scale: 0.6, label: 'Villa' },
+      { type: 'Townhouse', position: [-60, 0, 160], scale: 0.8, label: 'Townhouse' },
+      { type: 'Skyscraper', position: [-120, 0, 0], scale: 0.4, label: 'Skyscraper' },
+      { type: 'Barn', position: [-120, 0, 80], scale: 0.6, label: 'Barn' },
+    ];
+
+    for (const config of buildingConfigs) {
+      try {
+        let building;
+
+        switch (config.type) {
+          case 'Cottage':
+            building = new Cottage({ scale: config.scale });
+            break;
+          case 'Villa':
+            building = new Villa({ scale: config.scale });
+            break;
+          case 'Townhouse':
+            building = new Townhouse({ scale: config.scale });
+            break;
+          case 'Skyscraper':
+            building = new Skyscraper({ scale: config.scale, floors: 15 });
+            break;
+          case 'Barn':
+            building = new Barn({ scale: config.scale });
+            break;
+          default:
+            continue;
+        }
+
+        const buildingMesh = building.load();
+        buildingMesh.position.set(
+          config.position[0] ?? 0,
+          config.position[1] ?? 0,
+          config.position[2] ?? 0
+        );
+        scene.add(buildingMesh);
+        this.componentMeshes.push(buildingMesh);
+
+        const buildingLabel = createLabel(
+          config.label,
+          new THREE.Vector3(config.position[0], -10, config.position[2])
+        );
+        scene.add(buildingLabel);
+        this.labelMeshes.push(buildingLabel);
+      } catch (error) {
+        this.handleError(error as Error, `loading ${config.label}`);
+      }
+    }
+
     // Load trees
     try {
       const pineTree = new PineTree();
@@ -235,8 +289,8 @@ class WorkshopApp extends WorkshopDemoBase {
   }
 
   private setupCamera(camera: THREE.Camera): void {
-    const lookAt = new THREE.Vector3(120, 0, 75); // Center point between all spread-out components
-    camera.position.set(600, 300, 300); // Much further away to show all scenery
+    const lookAt = new THREE.Vector3(0, 0, 75); // Center point between all spread-out components including new buildings
+    camera.position.set(700, 400, 400); // Much further away to show all scenery including new buildings
     camera.lookAt(lookAt);
   }
 
