@@ -112,6 +112,7 @@ type SkyOptions = {
   rayleigh: number;       // Rayleigh scattering (blue sky) (0-4)
   mieCoefficient: number; // Mie scattering (sun disk) (0-0.1)
   mieDirectionalG: number; // Sun direction influence (0-1)
+  [key: string]: any;     // Allow dynamic property access for Three.js uniforms
 };
 
 const DEFAULT_SKY_OPTIONS: SkyOptions = {

@@ -457,7 +457,7 @@ const TerrainWorkshop = {
       visualFolder
         .add(settings, 'fogDensity', 0, 0.005)
         .name('Fog Density (Read-only - controlled by theme)')
-        .onChange(value => {
+        .onChange((value: number) => {
           // Note: Fog density is controlled by ThemeEngine
           console.log('Fog density setting changed but not applied - controlled by theme system');
         });

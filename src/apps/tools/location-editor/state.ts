@@ -798,7 +798,7 @@ export const saveToLocalStorage = (state: EditorState): void => {
             z: t.position.z,
           },
           // Remove the marker reference as it can't be serialized
-          marker: null,
+          marker: null as any,
         })),
         landingSpots: location.landingSpots.map(l => ({
           ...l,
@@ -808,7 +808,7 @@ export const saveToLocalStorage = (state: EditorState): void => {
             z: l.position.z,
           },
           // Remove the marker reference as it can't be serialized
-          marker: null,
+          marker: null as any,
         })),
         flyzone: {
           phases: Object.keys(location.flyzone.phases).reduce(
@@ -823,13 +823,13 @@ export const saveToLocalStorage = (state: EditorState): void => {
                   z: phase.position.z,
                 },
                 // Remove the object reference as it can't be serialized
-                object: null,
+                object: null as any,
               };
               return acc;
             },
             {} as Record<string, any>
           ),
-          object: null,
+          object: null as any,
         },
       })),
       currentLocationIndex: state.currentLocationIndex,

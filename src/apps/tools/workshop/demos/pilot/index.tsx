@@ -9,7 +9,6 @@ import { WorkshopDemoBase, WorkshopDemoConfig } from '../../../../shared/Worksho
  * Pilot Workshop Demo - Showcases different pilot character types
  */
 class PilotWorkshopApp extends WorkshopDemoBase {
-  private animationId?: number;
 
   constructor() {
     super({

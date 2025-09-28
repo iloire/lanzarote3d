@@ -321,7 +321,7 @@ const TileDebugPage: React.FC = () => {
                 }}
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
-                  e.currentTarget.nextElementSibling.style.display = 'block';
+                  (e.currentTarget.nextElementSibling as HTMLElement)!.style.display = 'block';
                 }}
               />
               <div style={{ display: 'none', padding: '20px', backgroundColor: '#fed7d7', color: '#c53030', borderRadius: '8px' }}>

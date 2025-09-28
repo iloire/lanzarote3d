@@ -37,7 +37,7 @@ class Thermal {
   constructor(
     dimensions: ThermalDimensions,
     initialPosition: THREE.Vector3,
-    opacity,
+    opacity: number,
     isMainThermal: boolean,
     isSuperThermal: boolean
   ) {

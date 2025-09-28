@@ -22,10 +22,13 @@ class FamaraApp extends TerrainBase {
 
   constructor() {
     const appConfig = getAppConfig('famara');
+    if (!appConfig) {
+      throw new Error('Famara app not found in registry');
+    }
     super({
       // Use metadata from app registry
-      name: appConfig?.name || 'Famara Beach',
-      description: appConfig?.description || 'Natural beauty of Famara beach area without paragliders - pure landscape focus',
+      name: appConfig.name,
+      description: appConfig.description,
       // App-specific configuration
       requiredComponents: ['scene', 'camera', 'renderer', 'terrain', 'water', 'controls'],
       scene: {

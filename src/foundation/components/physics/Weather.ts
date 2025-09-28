@@ -78,7 +78,7 @@ class Weather extends THREE.EventDispatcher<WeatherEventMap> {
     ).multiplyScalar(multiplier * this.options.speedMetresPerSecond);
   }
 
-  addGui(gui) {
+  addGui(gui: any) {
     const weatherGui = gui.addFolder('Weather');
     weatherGui.add(this.options, 'windDirectionDegreesFromNorth', 0, 360).listen();
     weatherGui.add(this.options, 'speedMetresPerSecond', 0, 60).listen();

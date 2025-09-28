@@ -199,7 +199,7 @@ class VoxelDemoApp extends AppBase {
     animate();
   }
 
-  public dispose(): void {
+  public override dispose(): void {
     console.log(`🧹 Disposing ${this.config.name}`);
 
     // Cancel animation loop

@@ -108,9 +108,12 @@ class BoatsAnimationApp extends TerrainBase {
 
   constructor() {
     const appConfig = getAppConfig('boats');
+    if (!appConfig) {
+      throw new Error('Boats app not found in registry');
+    }
     super({
-      name: appConfig?.name || 'Boats Animation',
-      description: appConfig?.description || 'Animation starting near boats and transitioning to focus on paragliders and clouds',
+      name: appConfig.name,
+      description: appConfig.description,
       requiredComponents: ['scene', 'camera', 'renderer', 'terrain', 'water', 'controls'],
       scene: {
         environment: 'lanzarote',

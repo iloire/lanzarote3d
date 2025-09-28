@@ -53,10 +53,13 @@ class AnimationApp extends TerrainBase {
 
   constructor() {
     const appConfig = getAppConfig('animation');
+    if (!appConfig) {
+      throw new Error('Animation app not found in registry');
+    }
     super({
       // Use metadata from app registry
-      name: appConfig?.name || 'Animation Demo',
-      description: appConfig?.description || 'Dramatic camera animation showcasing voxel paragliders with golden hour lighting',
+      name: appConfig.name,
+      description: appConfig.description,
       // App-specific configuration
       requiredComponents: ['scene', 'camera', 'renderer', 'terrain', 'water', 'controls'],
       scene: {
