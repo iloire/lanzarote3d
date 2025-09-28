@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import GuiHelper from '../../utils/gui';
+import { SimpleThreeComponent, SimpleComponentOptions } from '../base/SimpleThreeComponent';
+import { ComponentMetadata } from '../base/IThreeComponent';
 
 const getColorMaterial = (color: number) => {
   return new THREE.MeshPhongMaterial({ color });
@@ -16,24 +18,63 @@ export enum IglooSize {
   Large,
 }
 
-class Igloo {
-  radius: number = 15;
-  height: number = 12;
+export interface IglooOptions extends SimpleComponentOptions {
   size: IglooSize;
+}
 
-  constructor(size: IglooSize) {
-    this.size = size;
-    // Adjust dimensions based on igloo size
-    if (size === IglooSize.Medium) {
-      this.radius = 20;
-      this.height = 16;
-    } else if (size === IglooSize.Large) {
-      this.radius = 25;
-      this.height = 20;
+class Igloo extends SimpleThreeComponent {
+  private radius: number = 15;
+  private height: number = 12;
+  private size: IglooSize;
+
+  constructor(options: IglooOptions | IglooSize = IglooSize.Small) {
+    const metadata: ComponentMetadata = {
+      name: 'Igloo',
+      version: '1.0.0',
+      description: 'Procedural igloo component with ice blocks, entrance, and snow details',
+      tags: ['scenery', 'building', 'arctic', 'procedural']
+    };
+
+    // Handle both old (size only) and new (options object) constructor signatures
+    const iglooOptions: IglooOptions = typeof options === 'object' && 'size' in options
+      ? options
+      : { size: options as IglooSize };
+
+    super(metadata, iglooOptions);
+    this.size = iglooOptions.size;
+    this.calculateDimensions(iglooOptions.size);
+
+    if (iglooOptions.scale) {
+      const scaleFactor = typeof iglooOptions.scale === 'number' ? iglooOptions.scale : 1;
+      this.radius *= scaleFactor;
+      this.height *= scaleFactor;
     }
   }
 
-  private addIceBlocks(mesh: THREE.Group) {
+  protected createGeometry(): THREE.BufferGeometry {
+    // Create the main dome geometry
+    return new THREE.SphereGeometry(this.radius, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2);
+  }
+
+  private calculateDimensions(size: IglooSize): void {
+    switch (size) {
+      case IglooSize.Medium:
+        this.radius = 20;
+        this.height = 16;
+        break;
+      case IglooSize.Large:
+        this.radius = 25;
+        this.height = 20;
+        break;
+      case IglooSize.Small:
+      default:
+        this.radius = 15;
+        this.height = 12;
+        break;
+    }
+  }
+
+  private addIceBlocks(mesh: THREE.Object3D): void {
     // Add ice block texture by creating small cube details
     const blockSize = this.radius / 8;
     const rows = Math.floor(this.height / blockSize);
@@ -59,7 +100,7 @@ class Igloo {
     }
   }
 
-  private addEntrance(mesh: THREE.Group) {
+  private addEntrance(mesh: THREE.Object3D): void {
     // Create tunnel entrance
     const tunnelGeo = new THREE.CylinderGeometry(3, 4, 8, 8);
     const tunnel = new THREE.Mesh(tunnelGeo, mat_entrance);
@@ -75,7 +116,7 @@ class Igloo {
     mesh.add(arch);
   }
 
-  private addSnowDetails(mesh: THREE.Group) {
+  private addSnowDetails(mesh: THREE.Object3D): void {
     // Add snow patches around the base
     for (let i = 0; i < 8; i++) {
       const angle = (i / 8) * Math.PI * 2;
@@ -103,36 +144,74 @@ class Igloo {
     }
   }
 
-  load(gui?: any): THREE.Group {
+  public override async load(): Promise<THREE.Object3D> {
+    const iglooGroup = new THREE.Group();
+
+    // Add main dome (using the base geometry but with proper material)
+    const dome = await super.load() as THREE.Mesh;
+    if (dome.material instanceof THREE.Material) {
+      dome.material = mat_ice;
+    }
+    dome.position.y = -this.height / 2;
+    iglooGroup.add(dome);
+
+    // Add architectural features
+    this.addIceBlocks(iglooGroup);
+    this.addEntrance(iglooGroup);
+    this.addSnowDetails(iglooGroup);
+    this.addChimney(iglooGroup);
+
+    return iglooGroup;
+  }
+
+  private createIglooGroup(): THREE.Group {
     const group = new THREE.Group();
 
     // Main dome structure
-    const domeGeo = new THREE.SphereGeometry(this.radius, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2);
+    const domeGeo = this.createGeometry();
     const dome = new THREE.Mesh(domeGeo, mat_ice);
     dome.position.y = -this.height / 2;
     group.add(dome);
 
-    // Add ice block details
+    // Add architectural features
     this.addIceBlocks(group);
-
-    // Add entrance tunnel
     this.addEntrance(group);
-
-    // Add snow and ice details
     this.addSnowDetails(group);
+    this.addChimney(group);
 
+    return group;
+  }
+
+  public loadWithGui(gui?: any): Promise<THREE.Object3D> {
+    return this.load().then(igloo => {
+      if (gui) {
+        GuiHelper.addLocationGui(gui, 'Igloo', igloo);
+      }
+      return igloo;
+    });
+  }
+
+  private addChimney(mesh: THREE.Object3D): void {
     // Add chimney hole (small opening at top)
     const holeGeo = new THREE.CylinderGeometry(1, 1.5, 2, 8);
     const hole = new THREE.Mesh(holeGeo, mat_entrance);
     hole.position.set(0, this.height / 4, 0);
-    group.add(hole);
-
-    if (gui) {
-      GuiHelper.addLocationGui(gui, 'Igloo', group);
-    }
-
-    return group;
+    mesh.add(hole);
   }
 }
 
-export default Igloo;
+// Legacy compatibility layer for synchronous API
+const IglooLegacy = Igloo as any;
+
+// Add legacy load method that returns group directly and supports GUI
+IglooLegacy.prototype.load = function(gui?: any): THREE.Object3D {
+  const igloo = this.createIglooGroup();
+
+  if (gui) {
+    GuiHelper.addLocationGui(gui, 'Igloo', igloo);
+  }
+
+  return igloo;
+};
+
+export default IglooLegacy;
