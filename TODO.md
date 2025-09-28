@@ -1,6 +1,10 @@
 Implement the following tasks if any is added follwing the instructions described below:
 ---
 TASKS:
+- remove skyscraper from codebase
+- better organize and distribute space across workshop demo components, less space between each other.
+- pool needs to have blue water.
+- add a bed inside the Dome.
 
 ---
 

@@ -4,6 +4,9 @@ export { default as Igloo, IglooSize } from './Igloo';
 export { default as Tree } from './Tree';
 export { default as PineTree } from './PineTree';
 export { default as PalmTree } from './PalmTree';
+export { default as CoconutPalm } from './CoconutPalm';
+export { default as DatePalm } from './DatePalm';
+export { default as FanPalm } from './FanPalm';
 export { default as Pool } from './Pool';
 export { default as Stone } from './Stone';
 

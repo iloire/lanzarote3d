@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import { SmallSailBoat, Tree, Stone } from '../../../../../foundation/components/scenery';
 import { House, HouseType } from '../../../../../foundation/components/scenery/buildings';
-import { PineTree, PalmTree, Igloo, IglooSize, Pool, SaguaroCactus, BarrelCactus, PricklyPearCactus, OrganPipeCactus } from '../../../../../foundation/components/scenery';
-import { CottageLegacy as Cottage, VillaLegacy as Villa, TownhouseLegacy as Townhouse, SkyscraperLegacy as Skyscraper, BarnLegacy as Barn, DesertHouseLegacy as DesertHouse, DomeLegacy as Dome, DesertHouseWithPoolLegacy as DesertHouseWithPool } from '../../../../../foundation/components/scenery';
+import { PineTree, PalmTree, CoconutPalm, DatePalm, FanPalm, Igloo, IglooSize, Pool, SaguaroCactus, BarrelCactus, PricklyPearCactus, OrganPipeCactus } from '../../../../../foundation/components/scenery';
+import { CottageLegacy as Cottage, VillaLegacy as Villa, TownhouseLegacy as Townhouse, BarnLegacy as Barn, DesertHouseLegacy as DesertHouse, DomeLegacy as Dome, DesertHouseWithPoolLegacy as DesertHouseWithPool } from '../../../../../foundation/components/scenery';
 import { StoryOptions } from '../../../../shared/types';
 import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
 
@@ -48,7 +48,7 @@ class WorkshopApp extends WorkshopDemoBase {
       name: 'Workshop',
       description: 'Component showcase displaying various 3D objects with interactive labels',
       ground: {
-        create: true,
+        create: false,
         size: { width: 400, height: 300 },
         color: 0x8fbc8f, // Dark sea green for ground
         opacity: 0.3,
@@ -109,7 +109,7 @@ class WorkshopApp extends WorkshopDemoBase {
     // Load boat
     try {
       const boat = new SmallSailBoat();
-      const boatMesh = boat.load(); // Legacy API doesn't take gui parameter
+      const boatMesh = await boat.load(); // Handle async loading
       boatMesh.position.set(-60, 0, 120);
       scene.add(boatMesh);
       this.componentMeshes.push(boatMesh);
@@ -121,12 +121,12 @@ class WorkshopApp extends WorkshopDemoBase {
       this.handleError(error as Error, 'loading boat');
     }
 
-    // Load houses
+    // Load houses - organized with better spacing
     const houseConfigs = [
-      { type: HouseType.Small, position: [80, 0, 0], label: 'Small House' },
-      { type: HouseType.Medium, position: [80, 0, 50], label: 'Medium House' },
-      { type: HouseType.Large, position: [80, 0, 100], label: 'Large House' },
-      { type: HouseType.Modern, position: [80, 0, 150], label: 'Modern House' },
+      { type: HouseType.Small, position: [50, 0, 0], label: 'Small House' },
+      { type: HouseType.Medium, position: [50, 0, 30], label: 'Medium House' },
+      { type: HouseType.Large, position: [50, 0, 60], label: 'Large House' },
+      { type: HouseType.Modern, position: [80, 0, 20], label: 'Modern House' },
     ];
 
     for (const config of houseConfigs) {
@@ -152,16 +152,15 @@ class WorkshopApp extends WorkshopDemoBase {
       }
     }
 
-    // Load new building types
+    // Load new building types - organized grid with better spacing
     const buildingConfigs = [
-      { type: 'Cottage', position: [-60, 0, 0], scale: 0.8, label: 'Cottage' },
-      { type: 'Villa', position: [-60, 0, 80], scale: 0.6, label: 'Villa' },
-      { type: 'Townhouse', position: [-60, 0, 160], scale: 0.8, label: 'Townhouse' },
-      { type: 'Skyscraper', position: [-120, 0, 0], scale: 4.0, label: 'Skyscraper' },
-      { type: 'Barn', position: [-120, 0, 80], scale: 0.6, label: 'Barn' },
-      { type: 'DesertHouse', position: [-120, 0, 160], scale: 0.8, label: 'Desert House' },
-      { type: 'Dome', position: [300, 0, 0], scale: 0.8, label: 'Dome' },
-      { type: 'DesertHouseWithPool', position: [300, 0, 80], scale: 0.6, label: 'Desert House + Pool' },
+      { type: 'Cottage', position: [-50, 0, 0], scale: 0.8, label: 'Cottage' },
+      { type: 'Villa', position: [-50, 0, 40], scale: 0.6, label: 'Villa' },
+      { type: 'Townhouse', position: [-50, 0, 80], scale: 0.8, label: 'Townhouse' },
+      { type: 'Barn', position: [-100, 0, 0], scale: 0.6, label: 'Barn' },
+      { type: 'DesertHouse', position: [-100, 0, 40], scale: 0.8, label: 'Desert House' },
+      { type: 'Dome', position: [-100, 0, 80], scale: 0.8, label: 'Dome' },
+      { type: 'DesertHouseWithPool', position: [-150, 0, 20], scale: 0.6, label: 'Desert House + Pool' },
     ];
 
     for (const config of buildingConfigs) {
@@ -177,9 +176,6 @@ class WorkshopApp extends WorkshopDemoBase {
             break;
           case 'Townhouse':
             building = new Townhouse({ scale: config.scale });
-            break;
-          case 'Skyscraper':
-            building = new Skyscraper({ scale: config.scale, floors: 15 });
             break;
           case 'Barn':
             building = new Barn({ scale: config.scale });
@@ -217,56 +213,44 @@ class WorkshopApp extends WorkshopDemoBase {
       }
     }
 
-    // Load trees
-    try {
-      const pineTree = new PineTree();
-      const pineTreeMesh = pineTree.load();
-      pineTreeMesh.scale.set(3, 3, 3);
-      pineTreeMesh.position.set(160, 0, 0);
-      scene.add(pineTreeMesh);
-      this.componentMeshes.push(pineTreeMesh);
+    // Load trees - organized grid with better spacing
+    const treeConfigs = [
+      { type: 'Pine', position: [120, 0, 0], scale: 2.5, label: 'Pine Tree', component: PineTree },
+      { type: 'Tree', position: [120, 0, 30], scale: 2, label: 'Tree', component: Tree },
+      { type: 'Palm', position: [120, 0, 60], scale: 2, label: 'Palm Tree', component: PalmTree },
+      { type: 'Coconut', position: [160, 0, 0], scale: 2, label: 'Coconut Palm', component: CoconutPalm },
+      { type: 'Date', position: [160, 0, 30], scale: 2, label: 'Date Palm', component: DatePalm },
+      { type: 'Fan', position: [160, 0, 60], scale: 1.5, label: 'Fan Palm', component: FanPalm },
+    ];
 
-      const pineLabel = createLabel('Pine Tree', new THREE.Vector3(160, -10, 0));
-      scene.add(pineLabel);
-      this.labelMeshes.push(pineLabel);
-    } catch (error) {
-      this.handleError(error as Error, 'loading pine tree');
+    for (const config of treeConfigs) {
+      try {
+        const tree = new config.component();
+        const treeMesh = tree.load();
+        treeMesh.scale.set(config.scale, config.scale, config.scale);
+        treeMesh.position.set(
+          config.position[0] ?? 0,
+          config.position[1] ?? 0,
+          config.position[2] ?? 0
+        );
+        scene.add(treeMesh);
+        this.componentMeshes.push(treeMesh);
+
+        const treeLabel = createLabel(
+          config.label,
+          new THREE.Vector3(config.position[0], -10, config.position[2])
+        );
+        scene.add(treeLabel);
+        this.labelMeshes.push(treeLabel);
+      } catch (error) {
+        this.handleError(error as Error, `loading ${config.label}`);
+      }
     }
 
-    try {
-      const tree = new Tree();
-      const treeMesh = tree.load();
-      treeMesh.scale.set(2, 2, 2);
-      treeMesh.position.set(160, 0, 80);
-      scene.add(treeMesh);
-      this.componentMeshes.push(treeMesh);
-
-      const treeLabel = createLabel('Tree', new THREE.Vector3(160, -10, 80));
-      scene.add(treeLabel);
-      this.labelMeshes.push(treeLabel);
-    } catch (error) {
-      this.handleError(error as Error, 'loading tree');
-    }
-
-    try {
-      const palmTree = new PalmTree();
-      const palmTreeMesh = palmTree.load();
-      palmTreeMesh.scale.set(2, 2, 2);
-      palmTreeMesh.position.set(160, 0, 160);
-      scene.add(palmTreeMesh);
-      this.componentMeshes.push(palmTreeMesh);
-
-      const palmLabel = createLabel('Palm Tree', new THREE.Vector3(160, -10, 160));
-      scene.add(palmLabel);
-      this.labelMeshes.push(palmLabel);
-    } catch (error) {
-      this.handleError(error as Error, 'loading palm tree');
-    }
-
-    // Load stones
+    // Load stones - organized with better spacing
     const stoneConfigs = [
-      { position: [240, 0, 20], scale: [2, 2, 2], label: 'Stone' },
-      { position: [240, 0, 100], scale: [1.5, 3, 1.5], label: 'Tall Stone' },
+      { position: [200, 0, 0], scale: [2, 2, 2], label: 'Stone' },
+      { position: [200, 0, 30], scale: [1.5, 3, 1.5], label: 'Tall Stone' },
     ];
 
     for (const config of stoneConfigs) {
@@ -297,24 +281,24 @@ class WorkshopApp extends WorkshopDemoBase {
     try {
       const pool = new Pool();
       const poolMesh = pool.load();
-      poolMesh.position.set(380, 0, 0);
+      poolMesh.position.set(320, 0, 30);
       poolMesh.scale.set(0.8, 0.8, 0.8);
       scene.add(poolMesh);
       this.componentMeshes.push(poolMesh);
 
-      const poolLabel = createLabel('Pool', new THREE.Vector3(380, -10, 0));
+      const poolLabel = createLabel('Pool', new THREE.Vector3(320, -10, 30));
       scene.add(poolLabel);
       this.labelMeshes.push(poolLabel);
     } catch (error) {
       this.handleError(error as Error, 'loading pool');
     }
 
-    // Load cactus types
+    // Load cactus types - organized with better spacing
     const cactusConfigs = [
-      { type: 'Saguaro', position: [450, 0, 0], scale: 0.6, label: 'Saguaro Cactus' },
-      { type: 'Barrel', position: [450, 0, 80], scale: 1.0, label: 'Barrel Cactus' },
-      { type: 'PricklyPear', position: [450, 0, 160], scale: 0.8, label: 'Prickly Pear' },
-      { type: 'OrganPipe', position: [520, 0, 40], scale: 0.7, label: 'Organ Pipe Cactus' },
+      { type: 'Saguaro', position: [240, 0, 0], scale: 0.6, label: 'Saguaro Cactus' },
+      { type: 'Barrel', position: [240, 0, 30], scale: 1.0, label: 'Barrel Cactus' },
+      { type: 'PricklyPear', position: [240, 0, 60], scale: 0.8, label: 'Prickly Pear' },
+      { type: 'OrganPipe', position: [280, 0, 20], scale: 0.7, label: 'Organ Pipe Cactus' },
     ];
 
     for (const config of cactusConfigs) {
@@ -360,7 +344,7 @@ class WorkshopApp extends WorkshopDemoBase {
 
     // Add a simple ground plane for component showcase
     try {
-      const groundGeometry = new THREE.PlaneGeometry(800, 500);
+      const groundGeometry = new THREE.PlaneGeometry(500, 200);
       const groundMaterial = new THREE.MeshStandardMaterial({
         color: 0x8fbc8f, // Dark sea green for ground
         transparent: true,
@@ -381,8 +365,8 @@ class WorkshopApp extends WorkshopDemoBase {
   }
 
   private setupCamera(camera: THREE.Camera): void {
-    const lookAt = new THREE.Vector3(200, 0, 80); // Center point between all spread-out components including new buildings and cacti
-    camera.position.set(900, 500, 600); // Much further away to show all scenery including new buildings and cacti
+    const lookAt = new THREE.Vector3(100, 0, 40); // Center point for reorganized compact layout
+    camera.position.set(400, 200, 300); // Closer position for better view of organized components
     camera.lookAt(lookAt);
   }
 

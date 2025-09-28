@@ -277,6 +277,59 @@ export class Dome extends SimpleThreeComponent {
     vent.castShadow = this.options.castShadow ?? true;
     dome.add(vent);
 
+    // Add bed inside dome for sleeping
+    const bedFrameGeometry = resourceManager.getOrCreateGeometry(
+      'dome_bed_frame',
+      () => new THREE.BoxGeometry(4, 0.8, 6)
+    );
+
+    const bedMaterial = resourceManager.getOrCreateMaterial(
+      'dome_bed',
+      () => new THREE.MeshLambertMaterial({ color: '#8B4513' }) // Brown wood frame
+    );
+
+    const bedFrame = new THREE.Mesh(bedFrameGeometry, bedMaterial);
+    bedFrame.position.set(0, 0.4, 0);
+    bedFrame.castShadow = this.options.castShadow ?? true;
+    bedFrame.receiveShadow = this.options.receiveShadow ?? true;
+    dome.add(bedFrame);
+
+    // Add mattress
+    const mattressGeometry = resourceManager.getOrCreateGeometry(
+      'dome_mattress',
+      () => new THREE.BoxGeometry(3.8, 0.5, 5.8)
+    );
+
+    const mattressMaterial = resourceManager.getOrCreateMaterial(
+      'dome_mattress',
+      () => new THREE.MeshLambertMaterial({ color: '#FFFFFF' }) // White mattress
+    );
+
+    const mattress = new THREE.Mesh(mattressGeometry, mattressMaterial);
+    mattress.position.set(0, 1.05, 0);
+    mattress.castShadow = this.options.castShadow ?? true;
+    mattress.receiveShadow = this.options.receiveShadow ?? true;
+    dome.add(mattress);
+
+    // Add pillows
+    for (let i = 0; i < 2; i++) {
+      const pillowGeometry = resourceManager.getOrCreateGeometry(
+        `dome_pillow_${i}`,
+        () => new THREE.BoxGeometry(1, 0.3, 1.5)
+      );
+
+      const pillowMaterial = resourceManager.getOrCreateMaterial(
+        'dome_pillow',
+        () => new THREE.MeshLambertMaterial({ color: '#F0F8FF' }) // Alice blue
+      );
+
+      const pillow = new THREE.Mesh(pillowGeometry, pillowMaterial);
+      pillow.position.set((i - 0.5) * 1.5, 1.45, -2);
+      pillow.castShadow = this.options.castShadow ?? true;
+      pillow.receiveShadow = this.options.receiveShadow ?? true;
+      dome.add(pillow);
+    }
+
     // Apply scale
     if (scale !== 1) {
       dome.scale.setScalar(scale);
