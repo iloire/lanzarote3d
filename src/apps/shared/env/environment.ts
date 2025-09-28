@@ -15,13 +15,98 @@ import { generateThermalPair, ThermalGenerationOptions } from './thermal-utils';
 import { CloudOptions } from '../../../foundation/components/environment';
 import { Theme } from '../../../foundation/types/Theme';
 import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';
+import { IThreeComponent } from '../../../foundation/components/base/IThreeComponent';
+
+/**
+ * Component registry for managing all Three.js component instances
+ */
+class ComponentRegistry {
+  private components: Map<string, IThreeComponent> = new Map();
+  private meshToComponentId: Map<THREE.Object3D, string> = new Map();
+  private nextId: number = 0;
+
+  /**
+   * Register a component and return its mesh
+   */
+  async register(component: IThreeComponent, prefix: string = 'component'): Promise<THREE.Object3D> {
+    const id = `${prefix}_${this.nextId++}`;
+    this.components.set(id, component);
+
+    const mesh = await component.load();
+    this.meshToComponentId.set(mesh, id);
+
+    return mesh;
+  }
+
+  /**
+   * Get component by ID
+   */
+  getComponent(id: string): IThreeComponent | undefined {
+    return this.components.get(id);
+  }
+
+  /**
+   * Get component by mesh
+   */
+  getComponentByMesh(mesh: THREE.Object3D): IThreeComponent | undefined {
+    const id = this.meshToComponentId.get(mesh);
+    return id ? this.components.get(id) : undefined;
+  }
+
+  /**
+   * Get all components of a specific type
+   */
+  getComponentsByType<T extends IThreeComponent>(type: new (...args: any[]) => T): T[] {
+    return Array.from(this.components.values())
+      .filter((component): component is T => component instanceof type);
+  }
+
+  /**
+   * Update all registered components
+   */
+  update(deltaTime: number): void {
+    this.components.forEach(component => {
+      if (component.update) {
+        component.update(deltaTime);
+      }
+    });
+  }
+
+  /**
+   * Dispose all components and clear registry
+   */
+  dispose(): void {
+    this.components.forEach(component => {
+      component.dispose();
+    });
+    this.components.clear();
+    this.meshToComponentId.clear();
+  }
+
+  /**
+   * Get statistics about registered components
+   */
+  getStats(): { totalComponents: number; byType: Record<string, number> } {
+    const byType: Record<string, number> = {};
+
+    this.components.forEach(component => {
+      const typeName = component.metadata.name;
+      byType[typeName] = (byType[typeName] || 0) + 1;
+    });
+
+    return {
+      totalComponents: this.components.size,
+      byType
+    };
+  }
+}
 
 class Environment {
   birds!: Birds;
   hg!: HangGlider;
   thermals: Thermal[] = [];
   cloudInstances: Clouds[] = [];
-  boats: any[] = []; // Keep references to boat instances for floating animation
+  private componentRegistry: ComponentRegistry = new ComponentRegistry();
   scene: THREE.Scene;
 
   constructor(scene: THREE.Scene) {
@@ -54,21 +139,21 @@ class Environment {
     this.scene.add(hgMesh);
   }
 
-  addBoats(water: THREE.Mesh, options?: { randomize?: boolean; types?: string[] }) {
+  async addBoats(water: THREE.Mesh, options?: { randomize?: boolean; types?: string[] }) {
     const { randomize = true, types = ['SmallSailBoat', 'FishingBoat', 'Yacht', 'SpeedBoat'] } = options || {};
 
     // Create boats for first area
-    const boats1 = this.createBoatVariety(5, { randomize, types });
+    const boats1 = await this.createBoatVariety(5, { randomize, types });
     addMeshAroundArea(boats1, new THREE.Vector3(7879, 0, -5445), 4, water, this.scene);
 
     // Create boats for second area
-    const boats2 = this.createBoatVariety(4, { randomize, types });
+    const boats2 = await this.createBoatVariety(4, { randomize, types });
     addMeshAroundArea(boats2, new THREE.Vector3(8279, 0, -6455), 3, water, this.scene);
   }
 
-  private createBoatVariety(count: number, options: { randomize: boolean; types: string[] }): (THREE.Mesh | THREE.Group)[] {
+  private async createBoatVariety(count: number, options: { randomize: boolean; types: string[] }): Promise<THREE.Object3D[]> {
     const { randomize, types } = options;
-    const boats: (THREE.Mesh | THREE.Group)[] = [];
+    const boats: THREE.Object3D[] = [];
 
     for (let i = 0; i < count; i++) {
       let boatType: string;
@@ -81,7 +166,7 @@ class Environment {
         boatType = types[i % types.length];
       }
 
-      const boat = this.createBoatOfType(boatType);
+      const boat = await this.createBoatOfType(boatType);
       if (boat) {
         boats.push(boat);
       }
@@ -90,30 +175,30 @@ class Environment {
     return boats;
   }
 
-  private createBoatOfType(type: string): THREE.Mesh | THREE.Group | null {
+  private async createBoatOfType(type: string): Promise<THREE.Object3D | null> {
     let boat: any; // Keep as any since boat classes have their own load() methods
-    let boatMesh: THREE.Mesh | THREE.Group;
+    let boatMesh: THREE.Object3D;
     let scale = 3; // Default scale
 
     switch (type) {
       case 'SmallSailBoat':
         boat = new SmallSailBoat();
-        boatMesh = boat.load();
+        boatMesh = await this.componentRegistry.register(boat, 'smallsailboat');
         scale = 3;
         break;
       case 'FishingBoat':
         boat = new FishingBoat();
-        boatMesh = boat.load();
+        boatMesh = await this.componentRegistry.register(boat, 'fishingboat');
         scale = 2.5; // Fishing boats are already larger
         break;
       case 'Yacht':
         boat = new Yacht();
-        boatMesh = boat.load();
+        boatMesh = await this.componentRegistry.register(boat, 'yacht');
         scale = 2; // Yachts are already quite large
         break;
       case 'SpeedBoat':
         boat = new SpeedBoat();
-        boatMesh = boat.load();
+        boatMesh = await this.componentRegistry.register(boat, 'speedboat');
         scale = 2.8;
         break;
       case 'PatrolBoat':
@@ -121,14 +206,14 @@ class Environment {
           radius: 300,  // Larger movement radius
           speed: 0.2,   // Slower, more realistic speed
         });
-        boatMesh = boat.load();
+        boatMesh = await this.componentRegistry.register(boat, 'patrolboat');
         scale = 2.5;
         break;
       default:
         console.warn(`Unknown boat type: ${type}`);
         // Fallback to SmallSailBoat
         boat = new SmallSailBoat();
-        boatMesh = boat.load();
+        boatMesh = await this.componentRegistry.register(boat, 'smallsailboat');
         scale = 3;
     }
 
@@ -143,20 +228,19 @@ class Environment {
     // Add some random rotation for variety
     boatMesh.rotation.y = Math.random() * Math.PI * 2;
 
-    // Store boat instance to keep floating animation alive
-    this.boats.push(boat);
+    // Component is now managed by registry - no need to store separately
 
     return boatMesh;
   }
 
   // Convenience method to add a patrol boat
-  addPatrolBoat(water: THREE.Mesh, position?: THREE.Vector3) {
+  async addPatrolBoat(water: THREE.Mesh, position?: THREE.Vector3) {
     const boat = new PatrolBoat({
       radius: 400,
       speed: 0.15,
       floatingScale: 0.8,
     });
-    const boatMesh = boat.load();
+    const boatMesh = await this.componentRegistry.register(boat, 'patrolboat');
     const scale = 2.5;
     boatMesh.scale.set(scale, scale, scale);
 
@@ -177,40 +261,39 @@ class Environment {
     boatMesh.rotation.y = Math.random() * Math.PI * 2;
 
     this.scene.add(boatMesh);
-    this.boats.push(boat);
 
     console.log('Added PatrolBoat at position:', boatMesh.position);
     return boat;
   }
 
   // Convenience methods for specific boat configurations
-  addRandomBoats(water: THREE.Mesh) {
-    this.addBoats(water, { randomize: true });
+  async addRandomBoats(water: THREE.Mesh) {
+    await this.addBoats(water, { randomize: true });
   }
 
-  addMixedBoats(water: THREE.Mesh) {
-    this.addBoats(water, { randomize: false }); // Cycles through types in order
+  async addMixedBoats(water: THREE.Mesh) {
+    await this.addBoats(water, { randomize: false }); // Cycles through types in order
   }
 
-  addOnlyFishingBoats(water: THREE.Mesh) {
-    this.addBoats(water, { randomize: false, types: ['FishingBoat'] });
+  async addOnlyFishingBoats(water: THREE.Mesh) {
+    await this.addBoats(water, { randomize: false, types: ['FishingBoat'] });
   }
 
-  addOnlyYachts(water: THREE.Mesh) {
-    this.addBoats(water, { randomize: false, types: ['Yacht'] });
+  async addOnlyYachts(water: THREE.Mesh) {
+    await this.addBoats(water, { randomize: false, types: ['Yacht'] });
   }
 
-  addOnlySailboats(water: THREE.Mesh) {
-    this.addBoats(water, { randomize: false, types: ['SmallSailBoat'] });
+  async addOnlySailboats(water: THREE.Mesh) {
+    await this.addBoats(water, { randomize: false, types: ['SmallSailBoat'] });
   }
 
-  addOnlySpeedBoats(water: THREE.Mesh) {
-    this.addBoats(water, { randomize: false, types: ['SpeedBoat'] });
+  async addOnlySpeedBoats(water: THREE.Mesh) {
+    await this.addBoats(water, { randomize: false, types: ['SpeedBoat'] });
   }
 
-  addHouses(terrain: THREE.Mesh) {
-    const house = new House(HouseType.Medium).load();
-    const house2 = new House(HouseType.Small).load();
+  async addHouses(terrain: THREE.Mesh) {
+    const house = await this.componentRegistry.register(new House({ type: HouseType.Medium }), 'house_medium');
+    const house2 = await this.componentRegistry.register(new House({ type: HouseType.Small }), 'house_small');
 
     addMeshAroundArea(
       [house2, house],
@@ -263,24 +346,22 @@ class Environment {
     );
   }
 
-  addStones(terrain: THREE.Mesh) {
-    const stone = new Stone().load();
+  async addStones(terrain: THREE.Mesh) {
+    const stone = await this.componentRegistry.register(new Stone({}), 'stone');
     const scale = 1;
     stone.scale.set(scale, scale, scale);
     const pos = new THREE.Vector3(6879, 600, -545);
     addMeshAroundArea([stone], pos, 100, terrain, this.scene, 200, 2);
   }
 
-  addPines(terrain: THREE.Mesh) {
+  async addPines(terrain: THREE.Mesh) {
+    // Pre-create a pine tree and use it for the area
+    const pineTree = await this.componentRegistry.register(new PineTree({}), 'pinetree');
+    const scalePineTree = 10;
+    pineTree.scale.set(scalePineTree, scalePineTree, scalePineTree);
+
     addMeshAroundArea(
-      [
-        () => {
-          const pineTree = new PineTree().load();
-          const scalePineTree = 10;
-          pineTree.scale.set(scalePineTree, scalePineTree, scalePineTree);
-          return pineTree;
-        },
-      ],
+      [pineTree],
       new THREE.Vector3(8379, 0, -2145),
       100,
       terrain,
@@ -290,8 +371,8 @@ class Environment {
     );
   }
 
-  addTrees(terrain: THREE.Mesh, scale: number = 2) {
-    const tree = new Tree().load();
+  async addTrees(terrain: THREE.Mesh, scale: number = 2) {
+    const tree = await this.componentRegistry.register(new Tree({}), 'tree');
     tree.scale.set(scale, scale, scale);
     addMeshAroundArea([tree], new THREE.Vector3(6879, 0, -545), 100, terrain, this.scene, 100, 5);
     addMeshAroundArea([tree], new THREE.Vector3(8879, 0, -2245), 100, terrain, this.scene, 100, 5);
@@ -443,6 +524,61 @@ class Environment {
    */
   getTerrainStyleFromTheme(theme: Theme): string {
     return ThemeEngine.getTerrainStyleFromTheme(theme);
+  }
+
+  /**
+   * Update all managed components
+   */
+  update(deltaTime: number): void {
+    this.componentRegistry.update(deltaTime);
+  }
+
+  /**
+   * Get component registry for external access
+   */
+  getComponentRegistry(): ComponentRegistry {
+    return this.componentRegistry;
+  }
+
+  /**
+   * Get statistics about managed components
+   */
+  getComponentStats(): { totalComponents: number; byType: Record<string, number> } {
+    return this.componentRegistry.getStats();
+  }
+
+  /**
+   * Dispose all managed components and clean up environment
+   */
+  dispose(): void {
+    // Dispose all registered components
+    this.componentRegistry.dispose();
+
+    // Clean up other environment objects
+    this.thermals.forEach(thermal => {
+      if (thermal && typeof (thermal as any).dispose === 'function') {
+        (thermal as any).dispose();
+      }
+    });
+    this.thermals.length = 0;
+
+    this.cloudInstances.forEach(cloud => {
+      if (cloud && typeof (cloud as any).dispose === 'function') {
+        (cloud as any).dispose();
+      }
+    });
+    this.cloudInstances.length = 0;
+
+    // Dispose birds and hang glider if they exist
+    if (this.birds && this.birds.dispose) {
+      this.birds.dispose();
+    }
+
+    if (this.hg && this.hg.dispose) {
+      this.hg.dispose();
+    }
+
+    console.log('Environment disposed with all components cleaned up');
   }
 }
 
