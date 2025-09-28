@@ -27,9 +27,9 @@ export class PatrolBoat extends MovingFloatingThreeComponent {
       flagColor: '#FF0000',
       scale: 1,
       // Movement defaults
-      pattern: MovementPattern.RANDOM_DRIFT,
-      speed: 0.3,
-      radius: 200,
+      pattern: MovementPattern.CIRCULAR,
+      speed: 0.2,
+      radius: 400,
       autoStartMoving: true,
       autoStartFloating: true,
       faceDirection: true,
@@ -221,7 +221,7 @@ export class PatrolBoat extends MovingFloatingThreeComponent {
 const PatrolBoatLegacy = PatrolBoat as any;
 
 // Add legacy load method that returns mesh directly
-PatrolBoatLegacy.prototype.load = function(): THREE.Object3D {
+PatrolBoatLegacy.prototype.load = function (): THREE.Object3D {
   const boat = this.loadSync();
   // Start moving after legacy load
   this.startMoving();

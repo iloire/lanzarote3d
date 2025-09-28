@@ -166,7 +166,8 @@ export class MovingBehavior {
       let angle: number;
 
       if (this.forwardAxis === 'x') {
-        // For objects with forward direction in +X axis (like boats)
+        // For objects with forward direction in +X axis (like cars, boats)
+        // We need to rotate the standard calculation by 90 degrees
         angle = Math.atan2(direction.x, direction.z) - Math.PI / 2;
       } else {
         // For objects with forward direction in +Z axis (standard)

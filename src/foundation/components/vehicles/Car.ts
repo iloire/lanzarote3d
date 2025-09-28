@@ -139,26 +139,26 @@ export class Car extends MovingFloatingThreeComponent {
     // Front wheels
     const frontLeftWheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
     frontLeftWheel.position.set(6, 0, 6);
-    frontLeftWheel.rotation.z = Math.PI / 2;
+    frontLeftWheel.rotation.x = Math.PI / 2;
     frontLeftWheel.castShadow = this.options.castShadow ?? true;
     car.add(frontLeftWheel);
 
     const frontRightWheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
     frontRightWheel.position.set(6, 0, -6);
-    frontRightWheel.rotation.z = Math.PI / 2;
+    frontRightWheel.rotation.x = Math.PI / 2;
     frontRightWheel.castShadow = this.options.castShadow ?? true;
     car.add(frontRightWheel);
 
     // Rear wheels
     const rearLeftWheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
     rearLeftWheel.position.set(-6, 0, 6);
-    rearLeftWheel.rotation.z = Math.PI / 2;
+    rearLeftWheel.rotation.x = Math.PI / 2;
     rearLeftWheel.castShadow = this.options.castShadow ?? true;
     car.add(rearLeftWheel);
 
     const rearRightWheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
     rearRightWheel.position.set(-6, 0, -6);
-    rearRightWheel.rotation.z = Math.PI / 2;
+    rearRightWheel.rotation.x = Math.PI / 2;
     rearRightWheel.castShadow = this.options.castShadow ?? true;
     car.add(rearRightWheel);
 

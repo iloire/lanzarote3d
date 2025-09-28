@@ -25,12 +25,12 @@ type ParagliderVoxelConfig = {
 // ==========================================
 const ANIMATION_CONFIG = {
   // Timing settings
-  duration: 12000, // Total animation duration in milliseconds
+  duration: 18000, // Total animation duration in milliseconds
 
   // Phase timing (as percentages of total duration)
   phases: {
-    boatFocus: 0.5,    // 50% - First phase showing boats prominently
-    transition: 0.75,  // 75% - End of transition phase
+    boatFocus: 0.2,    // 50% - First phase showing boats prominently
+    transition: 0.3,  // 75% - End of transition phase
     // Final phase (paraglider focus) is from 75% to 100%
   },
 
@@ -47,7 +47,7 @@ const ANIMATION_CONFIG = {
   speeds: {
     phase1Movement: 0.05,    // How fast camera moves in phase 1 (boats focus)
     phase1LookShift: 0.05,   // How fast look target shifts in phase 1
-    phase2Movement: 0.6,     // Movement speed in transition phase
+    phase2Movement: 0.1,     // Movement speed in transition phase
     phase2Interpolation: 0.15, // Interpolation factor for phase 2 intermediate position
     phase2LookShift: 0.15,   // Look target shift speed in phase 2
     phase3LookShift: 0.08,   // Final phase look target adjustment speed

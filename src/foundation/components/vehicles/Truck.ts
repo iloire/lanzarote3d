@@ -163,38 +163,38 @@ export class Truck extends MovingFloatingThreeComponent {
     // Front wheels
     const frontLeftWheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
     frontLeftWheel.position.set(8, 0, 7.5);
-    frontLeftWheel.rotation.z = Math.PI / 2;
+    frontLeftWheel.rotation.x = Math.PI / 2;
     frontLeftWheel.castShadow = this.options.castShadow ?? true;
     truck.add(frontLeftWheel);
 
     const frontRightWheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
     frontRightWheel.position.set(8, 0, -7.5);
-    frontRightWheel.rotation.z = Math.PI / 2;
+    frontRightWheel.rotation.x = Math.PI / 2;
     frontRightWheel.castShadow = this.options.castShadow ?? true;
     truck.add(frontRightWheel);
 
     // Rear wheels (dual wheels for trucks)
     const rearLeftWheel1 = new THREE.Mesh(wheelGeometry, wheelMaterial);
     rearLeftWheel1.position.set(-8, 0, 8);
-    rearLeftWheel1.rotation.z = Math.PI / 2;
+    rearLeftWheel1.rotation.x = Math.PI / 2;
     rearLeftWheel1.castShadow = this.options.castShadow ?? true;
     truck.add(rearLeftWheel1);
 
     const rearLeftWheel2 = new THREE.Mesh(wheelGeometry, wheelMaterial);
     rearLeftWheel2.position.set(-8, 0, 6);
-    rearLeftWheel2.rotation.z = Math.PI / 2;
+    rearLeftWheel2.rotation.x = Math.PI / 2;
     rearLeftWheel2.castShadow = this.options.castShadow ?? true;
     truck.add(rearLeftWheel2);
 
     const rearRightWheel1 = new THREE.Mesh(wheelGeometry, wheelMaterial);
     rearRightWheel1.position.set(-8, 0, -8);
-    rearRightWheel1.rotation.z = Math.PI / 2;
+    rearRightWheel1.rotation.x = Math.PI / 2;
     rearRightWheel1.castShadow = this.options.castShadow ?? true;
     truck.add(rearRightWheel1);
 
     const rearRightWheel2 = new THREE.Mesh(wheelGeometry, wheelMaterial);
     rearRightWheel2.position.set(-8, 0, -6);
-    rearRightWheel2.rotation.z = Math.PI / 2;
+    rearRightWheel2.rotation.x = Math.PI / 2;
     rearRightWheel2.castShadow = this.options.castShadow ?? true;
     truck.add(rearRightWheel2);
 

@@ -42,7 +42,6 @@ export default class Water {
    * Apply water theme settings to the water mesh
    */
   applyTheme(waterTheme: any) {
-    console.log('==== watertheme');
     if (!this.waterMesh || !this.waterMesh.material) return;
 
     const material = this.waterMesh.material as THREE.MeshLambertMaterial;

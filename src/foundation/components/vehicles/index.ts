@@ -19,6 +19,9 @@ export type { CarOptions } from './Car';
 export { Truck } from './Truck';
 export type { TruckOptions } from './Truck';
 
+export { AutonomousCar } from './AutonomousCar';
+export type { AutonomousCarOptions } from './AutonomousCar';
+
 // Type exports
 export type { VehicleConfig } from '../../types';
 export type { ParagliderVoxelOptions } from './ParagliderVoxel';
