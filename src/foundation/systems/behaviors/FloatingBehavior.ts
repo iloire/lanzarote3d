@@ -1,20 +1,41 @@
 import * as THREE from 'three';
 
+export interface FloatingBehaviorOptions {
+  scaleMultiplier?: number;
+  autoStart?: boolean;
+  wavePhaseOffset?: number;
+}
+
 /**
- * Base class for objects that float on water with realistic wave motion
+ * Reusable floating behavior system for objects that should float on water
+ * with realistic wave motion simulation
  */
-export class FloatingObject {
-  protected mesh: THREE.Mesh | THREE.Group | null = null;
-  protected originalPosition: THREE.Vector3 = new THREE.Vector3();
-  protected animationId: number | null = null;
-  protected isFloating = false;
-  protected floatingOffset = Math.random() * Math.PI * 2; // Randomize wave phase
-  protected scaleMultiplier = 1; // Scale factor for floating amplitudes
+export class FloatingBehavior {
+  private mesh: THREE.Object3D | null = null;
+  private originalPosition: THREE.Vector3 = new THREE.Vector3();
+  private animationId: number | null = null;
+  private isFloating = false;
+  private floatingOffset: number;
+  private scaleMultiplier: number;
+
+  constructor(options: FloatingBehaviorOptions = {}) {
+    this.scaleMultiplier = options.scaleMultiplier || 1;
+    this.floatingOffset = options.wavePhaseOffset || Math.random() * Math.PI * 2;
+  }
 
   /**
-   * Start the floating animation for this object
+   * Attach floating behavior to a Three.js object
    */
-  public startFloating(): void {
+  public attachTo(object: THREE.Object3D): void {
+    this.mesh = object;
+    // Store original rotation Y for yaw drift calculation
+    this.mesh.userData.originalRotationY = this.mesh.rotation.y;
+  }
+
+  /**
+   * Start the floating animation
+   */
+  public start(): void {
     if (!this.mesh || this.isFloating) return;
 
     this.originalPosition.copy(this.mesh.position);
@@ -25,7 +46,7 @@ export class FloatingObject {
   /**
    * Stop the floating animation
    */
-  public stopFloating(): void {
+  public stop(): void {
     this.isFloating = false;
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
@@ -36,15 +57,22 @@ export class FloatingObject {
   /**
    * Update the scale multiplier for floating amplitudes
    */
-  public setScaleMultiplier(scale: number): void {
+  public setScale(scale: number): void {
     this.scaleMultiplier = scale;
   }
 
   /**
-   * Dispose of the floating object
+   * Get current floating state
+   */
+  public isActive(): boolean {
+    return this.isFloating;
+  }
+
+  /**
+   * Dispose of the floating behavior
    */
   public dispose(): void {
-    this.stopFloating();
+    this.stop();
     this.mesh = null;
   }
 
@@ -73,15 +101,4 @@ export class FloatingObject {
 
     this.animationId = requestAnimationFrame(this.animate);
   };
-
-  /**
-   * Set the mesh that should float and automatically start floating
-   */
-  protected setMesh(mesh: THREE.Mesh | THREE.Group): void {
-    this.mesh = mesh;
-    // Store original rotation Y for yaw drift calculation
-    this.mesh.userData.originalRotationY = this.mesh.rotation.y;
-    // Automatically start floating when mesh is set
-    this.startFloating();
-  }
 }

@@ -140,6 +140,39 @@ export class ResourceManager {
   }
 
   /**
+   * Convenience method: Create or retrieve a shared material with simple options
+   */
+  public getOrCreateMaterial(id: string, generator: () => THREE.Material): THREE.Material {
+    if (this.materialPool.has(id)) {
+      const material = this.materialPool.get(id)!;
+      this.updateReferenceCount(id, 1);
+      return material;
+    }
+
+    const material = generator();
+    this.materialPool.set(id, material);
+
+    // Store in cache for tracking
+    this.cache.set(id, {
+      id,
+      data: material,
+      size: this.estimateMaterialSize(material),
+      lastAccessed: Date.now(),
+      referenceCount: 1,
+      type: 'material'
+    });
+
+    return material;
+  }
+
+  /**
+   * Convenience method: Create or retrieve a shared geometry
+   */
+  public getOrCreateGeometry(id: string, generator: () => THREE.BufferGeometry): THREE.BufferGeometry {
+    return this.getGeometry(id, generator);
+  }
+
+  /**
    * Load and cache texture
    */
   public async getTexture(url: string, options?: ResourceOptions): Promise<THREE.Texture> {
