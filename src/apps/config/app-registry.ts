@@ -124,6 +124,17 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       status: 'dev',
       priority: 12,
     },
+    'component-benchmark': {
+      name: 'Component Benchmark',
+      description: 'Performance comparison tool for legacy vs modern Three.js components - test memory usage, creation speed, and resource sharing',
+      entry: './tools/workshop/demos/component-benchmark',
+      route: '/component-benchmark',
+      category: 'tool',
+      requiresWebGL: true,
+      tags: ['performance', 'benchmark', 'components', 'optimization', 'testing', 'development'],
+      status: 'dev',
+      priority: 13,
+    },
   },
 
   demos: {
