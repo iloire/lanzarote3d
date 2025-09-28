@@ -1,8 +1,24 @@
 import * as THREE from 'three';
-import { BaseHead } from './BaseHead';
+import { BaseHead, HeadOptions } from './BaseHead';
+import { ComponentMetadata } from '../../base/IThreeComponent';
 
 export class DevilHead extends BaseHead {
-  load(): THREE.Group {
+  constructor(options: HeadOptions = {}) {
+    const metadata: ComponentMetadata = {
+      name: 'DevilHead',
+      version: '2.0.0',
+      description: 'Devil pilot head with horns, fangs, and menacing features',
+      author: 'Lanzarote3D',
+      tags: ['character', 'head', 'devil', 'horns', 'evil']
+    };
+
+    super(metadata, {
+      headType: 'devil',
+      ...options
+    });
+  }
+
+  protected createHeadGroup(): THREE.Group {
     const group = new THREE.Group();
     const skinMaterial = this.getColoredMaterial('#ff4444');
     const hornMaterial = this.getColoredMaterial('#333333');

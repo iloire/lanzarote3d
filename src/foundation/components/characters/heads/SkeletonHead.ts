@@ -1,8 +1,24 @@
 import * as THREE from 'three';
-import { BaseHead } from './BaseHead';
+import { BaseHead, HeadOptions } from './BaseHead';
+import { ComponentMetadata } from '../../base/IThreeComponent';
 
 export class SkeletonHead extends BaseHead {
-  load(): THREE.Group {
+  constructor(options: HeadOptions = {}) {
+    const metadata: ComponentMetadata = {
+      name: 'SkeletonHead',
+      version: '2.0.0',
+      description: 'Skeleton pilot head with bone-like appearance and eerie features',
+      author: 'Lanzarote3D',
+      tags: ['character', 'head', 'skeleton', 'spooky']
+    };
+
+    super(metadata, {
+      headType: 'skeleton',
+      ...options
+    });
+  }
+
+  protected createHeadGroup(): THREE.Group {
     const group = new THREE.Group();
     const boneMaterial = this.getColoredMaterial('#e8e8e8'); // Off-white color for bones
     const eyeSocketMaterial = this.getColoredMaterial('#1a1a1a'); // Darker black for depth
@@ -35,6 +51,11 @@ export class SkeletonHead extends BaseHead {
     const leftPupil = new THREE.Mesh(leftPupilGeo, pupilMaterial);
     leftPupil.position.set(-0.35, 2.2, 0.65);
 
+    // Right floating pupil
+    const rightPupilGeo = new THREE.SphereGeometry(0.1, 8, 8);
+    const rightPupil = new THREE.Mesh(rightPupilGeo, pupilMaterial);
+    rightPupil.position.set(0.35, 2.2, 0.65);
+
     // Right eye socket layers
     const rightEyeSocket = new THREE.Mesh(eyeSocketGeo, eyeSocketMaterial);
     const rightEyeSocketBack = new THREE.Mesh(eyeSocketBackGeo, this.getColoredMaterial('#000000'));
@@ -65,6 +86,8 @@ export class SkeletonHead extends BaseHead {
     group.add(rightEyeSocket);
     group.add(leftEyeSocketBack);
     group.add(rightEyeSocketBack);
+    group.add(leftPupil);
+    group.add(rightPupil);
     group.add(noseHole);
     group.add(noseHoleInner);
     group.add(teethGroup);

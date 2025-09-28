@@ -1,24 +1,46 @@
 import * as THREE from 'three';
-import { BaseHead } from './BaseHead';
+import { BaseHead, HeadOptions } from './BaseHead';
+import { ComponentMetadata } from '../../base/IThreeComponent';
 import { GlassesType } from '../PilotHead';
 import getDefaultGlasses from '../glasses/default';
 import getSunGlasses1 from '../glasses/sunglasses1';
 
 export class DefaultHead extends BaseHead {
-  load(): THREE.Group {
+  constructor(options: HeadOptions = {}) {
+    const metadata: ComponentMetadata = {
+      name: 'DefaultHead',
+      version: '2.0.0',
+      description: 'Default pilot head with basic facial features',
+      author: 'Lanzarote3D',
+      tags: ['character', 'head', 'default']
+    };
+
+    super(metadata, {
+      headType: 'default',
+      ...options
+    });
+  }
+
+  protected createHeadGroup(): THREE.Group {
     const group = new THREE.Group();
 
-    const skinMat = this.getColoredMaterial(this.options.skinColor);
+    const skinMat = this.getColoredMaterial(this.headOptions.skinColor!);
     const headGeo = new THREE.BoxGeometry(300, 350, 280);
     const head = new THREE.Mesh(headGeo, skinMat);
     group.add(head);
 
     group.add(this.getHelmet());
 
-    if (this.options.glassesType === GlassesType.SunGlasses1) {
+    if (this.headOptions.glassesType === GlassesType.SunGlasses1) {
       head.add(getSunGlasses1());
     } else {
-      head.add(getDefaultGlasses(this.options));
+      // Convert HeadOptions to PilotHeadOptions for glasses compatibility
+      const glassesOptions = {
+        skinColor: this.headOptions.skinColor,
+        glassesColor: this.headOptions.glassesColor,
+        glassesType: this.headOptions.glassesType
+      };
+      head.add(getDefaultGlasses(glassesOptions as any));
     }
 
     //mouth

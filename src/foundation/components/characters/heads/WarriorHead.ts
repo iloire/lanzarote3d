@@ -1,11 +1,26 @@
 import * as THREE from 'three';
-import { BaseHead } from './BaseHead';
+import { BaseHead, HeadOptions } from './BaseHead';
+import { ComponentMetadata } from '../../base/IThreeComponent';
 
 export class WarriorHead extends BaseHead {
+  constructor(options: HeadOptions = {}) {
+    const metadata: ComponentMetadata = {
+      name: 'WarriorHead',
+      version: '2.0.0',
+      description: 'Warrior pilot head with beard and angular features',
+      author: 'Lanzarote3D',
+      tags: ['character', 'head', 'warrior', 'beard']
+    };
+
+    super(metadata, {
+      headType: 'warrior',
+      ...options
+    });
+  }
   private addBeard(): THREE.Group {
     const group = new THREE.Group();
     const material = new THREE.MeshPhongMaterial({
-      color: this.options.beardColor,
+      color: this.headOptions.beardColor,
       flatShading: true,
     });
 
@@ -80,9 +95,9 @@ export class WarriorHead extends BaseHead {
     return group;
   }
 
-  load(): THREE.Group {
+  protected createHeadGroup(): THREE.Group {
     const group = new THREE.Group();
-    const skinMat = this.getColoredMaterial(this.options.skinColor);
+    const skinMat = this.getColoredMaterial(this.headOptions.skinColor!);
     const headGeo = new THREE.BoxGeometry(1.5, 1.5, 1.2);
     const head = new THREE.Mesh(headGeo, skinMat);
 
