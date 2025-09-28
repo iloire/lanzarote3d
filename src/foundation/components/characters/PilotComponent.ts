@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { SimpleThreeComponent } from '../base/SimpleThreeComponent';
 import { resourceManager } from '../../systems/ResourceManager';
-import { PilotHead, PilotHeadType, HelmetType } from './PilotHeadComponent';
+import { PilotHead, PilotHeadType, HelmetType } from './PilotHead';
 import CocoonHarness from './CocoonHarness';
 import type { ComponentOptions } from '../base/BaseThreeComponent';
 

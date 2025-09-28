@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import LegacyPilotHead, { PilotHeadOptions } from './PilotHead';
+import PilotHead, { PilotHeadOptions } from './PilotHead';
 // Temporary: Keep using legacy Pilot types for backward compatibility
 // TODO: Migrate to PilotComponentOptions from './PilotComponent'
 import { PilotOptions } from '../vehicles/Pilot';
@@ -11,9 +11,9 @@ const getColoredMaterial = (color: string) => {
   });
 };
 
-const getHead = (options: PilotHeadOptions): THREE.Group => {
-  const pilotHead = new LegacyPilotHead(options);
-  return pilotHead.load();
+const getHead = async (options: PilotHeadOptions): Promise<THREE.Group> => {
+  const pilotHead = new PilotHead(options);
+  return await pilotHead.load();
 };
 
 export type TandemPilotOptions = {
@@ -132,18 +132,18 @@ class TandemPilot {
     return group;
   }
 
-  load(): THREE.Object3D {
+  async load(): Promise<THREE.Object3D> {
     const group = new THREE.Group();
 
     const groupPilot = new THREE.Group();
-    const headPilot = getHead(this.options.pilot.head);
+    const headPilot = await getHead(this.options.pilot.head);
     const bodyPilot = this.getBody(this.options.pilot, -0.3);
     groupPilot.add(headPilot);
     groupPilot.add(bodyPilot);
     group.add(groupPilot);
 
     const groupPassenger = new THREE.Group();
-    const headPassenger = getHead(this.options.passenger.head);
+    const headPassenger = await getHead(this.options.passenger.head);
     const bodyPassenger = this.getBody(this.options.passenger, -2.8);
     groupPassenger.add(headPassenger);
     groupPassenger.add(bodyPassenger);

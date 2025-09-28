@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import LegacyPilotHead, { PilotHeadOptions, PilotHeadType } from '../characters/PilotHead';
+import PilotHead, { PilotHeadOptions, PilotHeadType } from '../characters/PilotHead';
 import CocoonHarness from '../characters/CocoonHarness';
 import { HelmetType } from '../characters/helmets/types';
 
@@ -36,9 +36,9 @@ const getColoredMaterial = (color: string) => {
   });
 };
 
-const getHead = (options: PilotHeadOptions): THREE.Group => {
-  const pilotHead = new LegacyPilotHead(options);
-  return pilotHead.load();
+const getHead = async (options: PilotHeadOptions): Promise<THREE.Group> => {
+  const pilotHead = new PilotHead(options);
+  return await pilotHead.load();
 };
 
 const BREAK_Y_MOVE = 180; //mm
@@ -115,9 +115,9 @@ class LegacyPilot {
     return group;
   }
 
-  load(): THREE.Object3D {
+  async load(): Promise<THREE.Object3D> {
     const group = new THREE.Group();
-    this.head = getHead((this.options.head || { headType: 'helmet' }) as PilotHeadOptions);
+    this.head = await getHead((this.options.head || { headType: 'helmet' }) as PilotHeadOptions);
     group.add(this.head);
     group.add(this.getBody());
     return group;
