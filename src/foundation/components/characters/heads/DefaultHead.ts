@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { BaseHead } from './BaseHead';
-import { GlassesType } from '../../PilotHead';
+import { GlassesType } from '../PilotHead';
 import getDefaultGlasses from '../glasses/default';
 import getSunGlasses1 from '../glasses/sunglasses1';
 

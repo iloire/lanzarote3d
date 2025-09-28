@@ -5,8 +5,8 @@ import ParagliderVoxel, {
 } from '../../../foundation/components/vehicles/ParagliderVoxel';
 import { PilotHeadType } from '../../../foundation/components/characters/PilotHead';
 import Environment from '../../shared/env/environment';
-import adriModel from '../../../../assets/foundation/models/characters/adri.obj';
-import adriTextureImage from '../../../../assets/foundation/models/characters/adri.png';
+import adriModel from '../../../../assets/foundation/models/characters/adri/adri.obj';
+import adriTextureImage from '../../../../assets/foundation/models/characters/adri/adri.png';
 import { StoryOptions } from '../../shared/types';
 import { getDefaultTheme } from '../../../foundation/themes';
 import { ThemeEngine } from '../../../foundation/systems/ThemeEngine';

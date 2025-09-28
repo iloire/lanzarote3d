@@ -1,8 +1,8 @@
 import * as THREE from 'three';
-import { DefaultHead } from './parts/heads/DefaultHead';
-import { WarriorHead } from './parts/heads/WarriorHead';
-import { SkeletonHead } from './parts/heads/SkeletonHead';
-import { DevilHead } from './parts/heads/DevilHead';
+import { DefaultHead } from './heads/DefaultHead';
+import { WarriorHead } from './heads/WarriorHead';
+import { SkeletonHead } from './heads/SkeletonHead';
+import { DevilHead } from './heads/DevilHead';
 import { HelmetType, HelmetOptions } from './helmets/types';
 
 export enum PilotHeadType {

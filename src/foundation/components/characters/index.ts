@@ -7,6 +7,22 @@ export {
 } from './PilotHeadComponent';
 export type { PilotHeadOptions } from './PilotHeadComponent';
 
+export {
+  PilotVoxelComponent
+} from './PilotVoxelComponent';
+export type { PilotVoxelOptions } from './PilotVoxelComponent';
+
+export {
+  CharacterType,
+  characterRegistry,
+  getCharacterAssetPath,
+  createCharacterFolder
+} from './CharacterRegistry';
+export type {
+  CharacterDefinition,
+  CharacterAssets
+} from './CharacterRegistry';
+
 // Legacy character components (will be gradually replaced)
 export { default as PilotVoxel } from './PilotVoxel';
 export { default as TandemPilot } from './TandemPilot';

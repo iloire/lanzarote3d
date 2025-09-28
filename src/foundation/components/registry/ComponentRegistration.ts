@@ -1,6 +1,8 @@
 import { componentFactory, ComponentRegistry } from '../factory/ComponentFactory';
 import { TreeComponent } from '../scenery/TreeComponent';
 import { PilotHeadComponent } from '../characters/PilotHeadComponent';
+import { PilotVoxelComponent } from '../characters/PilotVoxelComponent';
+import { CharacterType } from '../characters/CharacterRegistry';
 
 /**
  * Central component registration system
@@ -61,6 +63,25 @@ export function registerCharacterComponents() {
       glassesType: 'default',
       skinColor: 0xe0bea5,
       helmetColor: 0xffff00,
+      castShadow: true,
+      receiveShadow: true
+    },
+    category: 'characters'
+  });
+
+  // Register PilotVoxelComponent
+  componentFactory.register('pilotVoxel', {
+    constructor: PilotVoxelComponent,
+    metadata: {
+      name: 'PilotVoxel',
+      version: '3.0.0',
+      description: 'Multi-character voxel pilot component with OBJ model loading',
+      author: 'Lanzarote3D',
+      tags: ['character', 'pilot', 'voxel', 'model', 'async', 'multi-character']
+    },
+    defaultOptions: {
+      characterType: CharacterType.ADRI,
+      scale: 0.01,
       castShadow: true,
       receiveShadow: true
     },
