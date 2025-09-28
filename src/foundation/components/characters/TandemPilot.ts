@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import PilotHead, { PilotHeadOptions } from './PilotHead';
+// Temporary: Keep using legacy Pilot types for backward compatibility
+// TODO: Migrate to PilotComponentOptions from './PilotComponent'
 import { PilotOptions } from '../vehicles/Pilot';
 
 const getColoredMaterial = (color: string) => {

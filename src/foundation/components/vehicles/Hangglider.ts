@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import { Pilot } from './';
+// TODO: Migrate to PilotComponent from '../characters/PilotComponent' when updating Hangglider architecture
+import Pilot from './Pilot';
 import Wing from './Wing';
 import GuiHelper from '../../utils/gui';
 import AutoFlier from '../../types/auto-flier';

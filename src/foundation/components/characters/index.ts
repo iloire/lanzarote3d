@@ -13,6 +13,11 @@ export {
 export type { PilotVoxelOptions } from './PilotVoxelComponent';
 
 export {
+  PilotComponent
+} from './PilotComponent';
+export type { PilotComponentOptions, PilotState } from './PilotComponent';
+
+export {
   CharacterType,
   characterRegistry,
   getCharacterAssetPath,

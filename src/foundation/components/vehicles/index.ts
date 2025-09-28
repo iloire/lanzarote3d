@@ -1,6 +1,5 @@
 // Vehicle components exports
 import Paraglider from './Paraglider';
-import Pilot from './Pilot';
 import Hangglider from './Hangglider';
 import ParagliderVoxel from './ParagliderVoxel';
 import Tandem from './Tandem';
@@ -24,7 +23,7 @@ export type { GliderOptions as ModernGliderOptions, GliderState } from './Glider
 export type { VehicleConfig } from '../../types';
 export type { ParagliderOptions } from './Paraglider';
 export type { ParagliderVoxelOptions } from './ParagliderVoxel';
-export type { PilotOptions } from './Pilot';
+// Note: Pilot moved to characters folder - import from '../characters' instead
 
 // Legacy component exports
-export { Paraglider, Pilot, Hangglider, ParagliderVoxel, Tandem, Glider, Wing };
+export { Paraglider, Hangglider, ParagliderVoxel, Tandem, Glider, Wing };
