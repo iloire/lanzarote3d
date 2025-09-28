@@ -25,4 +25,4 @@ export type { ParagliderVoxelOptions } from './ParagliderVoxel';
 // Note: Pilot moved to characters folder - import from '../characters' instead
 
 // Legacy component exports
-export { Paraglider, Hangglider, ParagliderVoxel, Tandem, LegacyGlider, HangGliderWing, Car, Truck };
+export { Paraglider, Hangglider, ParagliderVoxel, Tandem, LegacyGlider, HangGliderWing };

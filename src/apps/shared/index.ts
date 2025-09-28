@@ -85,8 +85,11 @@ export async function loadApp(appKey: string, options: StoryOptions): Promise<vo
     case 'helmet':
       appModule = await import('../tools/workshop/demos/helmet/index');
       break;
-    case 'igloo':
-      appModule = await import('../tools/workshop/demos/igloo/index');
+    case 'car':
+      appModule = await import('../tools/workshop/demos/car/index');
+      break;
+    case 'truck':
+      appModule = await import('../tools/workshop/demos/truck/index');
       break;
     case 'island':
       appModule = await import('../tools/workshop/demos/island/index');
