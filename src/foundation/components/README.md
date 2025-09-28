@@ -204,7 +204,7 @@ class NewTree extends SimpleThreeComponent {
 
 ### Characters
 - Pilots, people, animals
-- Example: `PilotComponent`, `BirdComponent`
+- Example: `Pilot`, `BirdComponent`
 
 ### Environment
 - Sky, water, clouds, weather effects

@@ -1,7 +1,8 @@
 Implement the following tasks if any is added follwing the instructions described below:
 ---
 TASKS:
-
+- remove the igloo workshop showcase, and remove it from the menu/app-registry
+- I want to create two new vehicles: Car and Truck. So create those two classes and their respective showcases. Have in mind we may want to make those vehicles to drive around a certain area.
 ---
 
 ### Instructions

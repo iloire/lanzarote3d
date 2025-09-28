@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-// TODO: Migrate to modern Pilot from '../characters/PilotComponent' when updating Hangglider architecture
+// TODO: Migrate to modern Pilot from '../characters/Pilot' when updating Hangglider architecture
 import LegacyPilot from './Pilot';
 import HangGliderWing from './HangGliderWing';
 import GuiHelper from '../../utils/gui';
