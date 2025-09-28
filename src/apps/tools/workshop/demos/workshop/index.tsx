@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { SmallSailBoat, Tree, Stone } from '../../../../../foundation/components/scenery';
 import { House, HouseType } from '../../../../../foundation/components/scenery/buildings';
-import { PineTree, Igloo, IglooSize } from '../../../../../foundation/components/scenery';
+import { PineTree, PalmTree, Igloo, IglooSize } from '../../../../../foundation/components/scenery';
 import { CottageLegacy as Cottage, VillaLegacy as Villa, TownhouseLegacy as Townhouse, SkyscraperLegacy as Skyscraper, BarnLegacy as Barn, DesertHouseLegacy as DesertHouse } from '../../../../../foundation/components/scenery';
 import { StoryOptions } from '../../../../shared/types';
 import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
@@ -238,6 +238,21 @@ class WorkshopApp extends WorkshopDemoBase {
       this.labelMeshes.push(treeLabel);
     } catch (error) {
       this.handleError(error as Error, 'loading tree');
+    }
+
+    try {
+      const palmTree = new PalmTree();
+      const palmTreeMesh = palmTree.load();
+      palmTreeMesh.scale.set(2, 2, 2);
+      palmTreeMesh.position.set(160, 0, 160);
+      scene.add(palmTreeMesh);
+      this.componentMeshes.push(palmTreeMesh);
+
+      const palmLabel = createLabel('Palm Tree', new THREE.Vector3(160, -10, 160));
+      scene.add(palmLabel);
+      this.labelMeshes.push(palmLabel);
+    } catch (error) {
+      this.handleError(error as Error, 'loading palm tree');
     }
 
     // Load stones

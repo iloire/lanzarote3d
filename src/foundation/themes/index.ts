@@ -111,7 +111,7 @@ export const THEMES: Record<string, Theme> = {
   storm: {
     id: 'storm',
     name: 'Storm Clouds',
-    enabled: true,
+    enabled: false,
     sky: {
       timeOfDay: 15,
       sunIntensity: 1.2,
