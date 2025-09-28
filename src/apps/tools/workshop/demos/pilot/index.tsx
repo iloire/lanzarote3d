@@ -55,7 +55,7 @@ class PilotWorkshopApp extends WorkshopDemoBase {
       let x = -1400;
       for (const pilotOptions of pilots) {
         const pilot = new Pilot(pilotOptions);
-        const mesh = pilot.load();
+        const mesh = await pilot.load();
         mesh.position.set(x, -300, -500);
         scene.add(mesh);
         x += 600;
