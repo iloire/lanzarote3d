@@ -4,15 +4,15 @@ import Hangglider from './Hangglider';
 import ParagliderVoxel from './ParagliderVoxel';
 import Tandem from './Tandem';
 import LegacyGlider from './Glider';
-import LegacyWing from './Wing';
+import LegacyWing from './LegacyWing';
 
 // Modern vehicle components
 
 export { Boat, BoatType } from './Boat';
 export type { BoatOptions, BoatMovement } from './Boat';
 
-export { Wing } from './WingComponent';
-export type { WingOptions } from './WingComponent';
+export { Wing } from './Wing';
+export type { WingOptions } from './Wing';
 
 export { Glider } from './GliderComponent';
 export type { GliderOptions as ModernGliderOptions, GliderState } from './GliderComponent';

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import LegacyPilotVoxel, { PilotVoxelOptions } from '../characters/PilotVoxel';
+import LegacyPilotVoxel, { PilotVoxelOptions } from '../characters/LegacyPilotVoxel';
 import LegacyGlider, { GliderOptions } from './Glider';
 import GuiHelper from '../../utils/gui';
 import IFlyable from '../../types/IFlyable';

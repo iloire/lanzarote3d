@@ -9,8 +9,8 @@ export type { PilotHeadOptions } from './PilotHead';
 
 export {
   PilotVoxel
-} from './PilotVoxelComponent';
-export type { PilotVoxelOptions } from './PilotVoxelComponent';
+} from './PilotVoxel';
+export type { PilotVoxelOptions } from './PilotVoxel';
 
 export {
   Pilot
@@ -29,7 +29,7 @@ export type {
 } from './CharacterRegistry';
 
 // Legacy character components (will be gradually replaced)
-export { default as LegacyPilotVoxel } from './PilotVoxel';
+export { default as LegacyPilotVoxel } from './LegacyPilotVoxel';
 export { default as TandemPilot } from './TandemPilot';
 export { default as CocoonHarness } from './CocoonHarness';
 
