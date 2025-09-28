@@ -3,13 +3,13 @@ import { StoryOptions } from '../../../../shared/types';
 import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
 
 /**
- * Glider Workshop Demo - Showcases glider components
+ * Legacy Glider Workshop Demo - Showcases the legacy glider component
  */
-class GliderWorkshopApp extends WorkshopDemoBase {
+class LegacyGliderWorkshopApp extends WorkshopDemoBase {
   constructor() {
     super({
-      name: 'Glider Workshop',
-      description: 'Workshop demo showcasing glider wing configurations',
+      name: 'Legacy Glider Workshop',
+      description: 'Workshop demo showcasing legacy glider component with traditional wing configurations',
       ground: {
         create: false,
       },
@@ -60,18 +60,18 @@ class GliderWorkshopApp extends WorkshopDemoBase {
   }
 }
 
-const gliderWorkshopApp = new GliderWorkshopApp();
+const legacyGliderWorkshopApp = new LegacyGliderWorkshopApp();
 
-const GliderWorkshop = {
+const LegacyGliderWorkshop = {
   load: async (options: StoryOptions) => {
-    return gliderWorkshopApp.load(options);
+    return legacyGliderWorkshopApp.load(options);
   },
   dispose: () => {
-    return gliderWorkshopApp.dispose();
+    return legacyGliderWorkshopApp.dispose();
   },
   getAppInfo: () => {
-    return gliderWorkshopApp.getAppInfo();
+    return legacyGliderWorkshopApp.getAppInfo();
   },
 };
 
-export default GliderWorkshop;
+export default LegacyGliderWorkshop;
