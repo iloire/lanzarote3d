@@ -384,5 +384,8 @@ export class NewGlider extends SimpleThreeComponent {
   }
 }
 
+// Named export for NewGlider
+export { NewGlider };
+
 // Legacy export for backward compatibility
 export const GliderComponent = NewGlider;
