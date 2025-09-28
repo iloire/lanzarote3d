@@ -841,6 +841,18 @@ class FlyzoneEditorApp extends TerrainBase {
             this.saveCurrentLocation();
           }
           break;
+        case 'e':
+          if (event.ctrlKey && event.shiftKey) {
+            event.preventDefault();
+            this.exportToJSON();
+          }
+          break;
+        case 'i':
+          if (event.ctrlKey && event.shiftKey) {
+            event.preventDefault();
+            this.importFromJSON();
+          }
+          break;
       }
     };
 
@@ -861,6 +873,12 @@ class FlyzoneEditorApp extends TerrainBase {
         break;
       case 'load':
         this.loadLocationDialog();
+        break;
+      case 'export-json':
+        this.exportToJSON();
+        break;
+      case 'import-json':
+        this.importFromJSON();
         break;
       case 'clear':
         this.clearEditor();
@@ -883,6 +901,259 @@ class FlyzoneEditorApp extends TerrainBase {
       case 'locationChanged':
         this.markLocationDirty();
         break;
+    }
+  }
+
+  private exportToJSON(): void {
+    if (!this.editorState) {
+      alert('No editor state to export');
+      return;
+    }
+
+    try {
+      // Create export data with current location and all locations
+      const exportData = {
+        metadata: {
+          exportDate: new Date().toISOString(),
+          version: '1.0',
+          tool: 'Flyzone Editor',
+          description: 'Flyzone location data export',
+        },
+        currentLocation: this.editorState.currentLocation,
+        allLocations: this.editorState.locations,
+        editorSettings: {
+          mode: this.editorState.mode,
+          isDirty: this.editorState.isDirty,
+        },
+      };
+
+      // Convert to JSON string with pretty formatting
+      const jsonString = JSON.stringify(exportData, (key, value) => {
+        // Custom serializer to handle Three.js Vector3 objects
+        if (value && typeof value === 'object' && value.isVector3) {
+          return { x: value.x, y: value.y, z: value.z };
+        }
+        return value;
+      }, 2);
+
+      // Create and trigger download
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+
+      // Generate filename with timestamp
+      const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+      const filename = `flyzone-data-${timestamp}.json`;
+
+      link.href = url;
+      link.download = filename;
+      link.style.display = 'none';
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      URL.revokeObjectURL(url);
+
+      console.log(`✅ Exported flyzone data to ${filename}`);
+      alert(`Successfully exported flyzone data to ${filename}`);
+    } catch (error) {
+      console.error('Failed to export JSON:', error);
+      alert('Failed to export data. Please check the console for details.');
+    }
+  }
+
+  private importFromJSON(): void {
+    if (!this.editorState || !this.markers) {
+      alert('Editor not ready for import');
+      return;
+    }
+
+    // Create file input element
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.json';
+    fileInput.style.display = 'none';
+
+    fileInput.onchange = (event) => {
+      const file = (event.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const jsonContent = e.target?.result as string;
+          const importData = JSON.parse(jsonContent);
+
+          // Validate import data structure
+          if (!this.validateImportData(importData)) {
+            alert('Invalid file format. Please select a valid flyzone data export file.');
+            return;
+          }
+
+          // Confirm import (this will replace current data)
+          const confirmed = confirm(
+            'This will replace all current data. Are you sure you want to import this file?\n\n' +
+            `File: ${file.name}\n` +
+            `Export Date: ${importData.metadata?.exportDate || 'Unknown'}\n` +
+            `Locations: ${importData.allLocations?.length || 0}`
+          );
+
+          if (!confirmed) return;
+
+          // Clear current data
+          this.clearEditor();
+
+          // Import the data
+          this.processImportData(importData);
+
+          console.log(`✅ Imported flyzone data from ${file.name}`);
+          alert(`Successfully imported flyzone data from ${file.name}`);
+        } catch (error) {
+          console.error('Failed to import JSON:', error);
+          alert('Failed to import file. Please check that it\'s a valid JSON file.');
+        }
+      };
+
+      reader.readAsText(file);
+    };
+
+    // Trigger file selection
+    document.body.appendChild(fileInput);
+    fileInput.click();
+    document.body.removeChild(fileInput);
+  }
+
+  private validateImportData(data: any): boolean {
+    // Basic structure validation
+    if (!data || typeof data !== 'object') return false;
+
+    // Check for required top-level properties
+    if (!data.metadata || !data.hasOwnProperty('currentLocation') || !Array.isArray(data.allLocations)) {
+      return false;
+    }
+
+    // Validate metadata
+    if (!data.metadata.exportDate || !data.metadata.version) {
+      return false;
+    }
+
+    // Validate locations array structure (basic check)
+    if (data.allLocations.length > 0) {
+      const sampleLocation = data.allLocations[0];
+      if (!sampleLocation.id || !sampleLocation.title || !sampleLocation.gps) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  private processImportData(importData: any): void {
+    if (!this.editorState || !this.markers) return;
+
+    try {
+      // Restore locations
+      this.editorState.locations = importData.allLocations.map((location: any) => {
+        // Convert plain objects back to Vector3 where needed
+        if (location.position && typeof location.position === 'object') {
+          location.position = new THREE.Vector3(
+            location.position.x,
+            location.position.y,
+            location.position.z
+          );
+        }
+
+        // Convert takeoff positions
+        if (location.takeoffs) {
+          location.takeoffs.forEach((takeoff: any) => {
+            if (takeoff.position && typeof takeoff.position === 'object') {
+              takeoff.position = new THREE.Vector3(
+                takeoff.position.x,
+                takeoff.position.y,
+                takeoff.position.z
+              );
+            }
+          });
+        }
+
+        // Convert landing zone positions
+        if (location.landingZones) {
+          location.landingZones.forEach((landing: any) => {
+            if (landing.position && typeof landing.position === 'object') {
+              landing.position = new THREE.Vector3(
+                landing.position.x,
+                landing.position.y,
+                landing.position.z
+              );
+            }
+          });
+        }
+
+        // Convert flyzone phase positions
+        if (location.flyzone && location.flyzone.phases) {
+          Object.values(location.flyzone.phases).forEach((phase: any) => {
+            if (phase.position && typeof phase.position === 'object') {
+              phase.position = new THREE.Vector3(
+                phase.position.x,
+                phase.position.y,
+                phase.position.z
+              );
+            }
+          });
+        }
+
+        return location;
+      });
+
+      // Restore current location
+      if (importData.currentLocation) {
+        const currentLocation = importData.currentLocation;
+
+        // Convert current location position
+        if (currentLocation.position && typeof currentLocation.position === 'object') {
+          currentLocation.position = new THREE.Vector3(
+            currentLocation.position.x,
+            currentLocation.position.y,
+            currentLocation.position.z
+          );
+        }
+
+        this.editorState.currentLocation = currentLocation;
+      }
+
+      // Restore editor settings
+      if (importData.editorSettings) {
+        this.editorState.mode = importData.editorSettings.mode || { type: 'select' };
+        this.editorState.isDirty = importData.editorSettings.isDirty || false;
+      }
+
+      // Add visual markers for all imported locations
+      this.editorState.locations.forEach(location => {
+        // Add takeoff markers
+        location.takeoffs.forEach(takeoff => {
+          this.markers!.addTakeoffMarker(takeoff);
+        });
+
+        // Add landing markers
+        location.landingZones.forEach(landing => {
+          this.markers!.addLandingMarker(landing);
+        });
+
+        // Add flight phase markers
+        Object.values(location.flyzone.phases).forEach(phase => {
+          this.markers!.addFlightPhaseMarker(phase);
+        });
+      });
+
+      // Update UI and cursor
+      this.updateCursor();
+      this.editorUI?.refresh();
+
+      console.log(`Imported ${this.editorState.locations.length} locations`);
+    } catch (error) {
+      console.error('Error processing import data:', error);
+      throw error;
     }
   }
 

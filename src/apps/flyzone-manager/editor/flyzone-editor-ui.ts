@@ -65,6 +65,14 @@ export class FlyzoneEditorUI {
             <span class="icon">📂</span>
             Load
           </button>
+          <button class="action-btn" data-action="export-json">
+            <span class="icon">📤</span>
+            Export JSON
+          </button>
+          <button class="action-btn" data-action="import-json">
+            <span class="icon">📥</span>
+            Import JSON
+          </button>
           <button class="action-btn" data-action="clear">
             <span class="icon">🗑️</span>
             Clear
@@ -368,6 +376,8 @@ export class FlyzoneEditorUI {
             <li>Ctrl+T for takeoff mode</li>
             <li>Ctrl+L for landing mode</li>
             <li>Ctrl+S to save</li>
+            <li>Ctrl+Shift+E to export JSON</li>
+            <li>Ctrl+Shift+I to import JSON</li>
           </ul>
         `;
       case 'takeoff':
