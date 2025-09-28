@@ -5,7 +5,7 @@ import { ComponentBenchmark } from '../../../../../foundation/systems/ComponentB
 import { Wing } from '../../../../../foundation/components/vehicles/Wing';
 import { LegacyParaglider } from '../../../../../foundation/components/vehicles';
 import { Boat } from '../../../../../foundation/components/vehicles/Boat';
-import { Glider } from '../../../../../foundation/components/vehicles/GliderComponent';
+import { NewGlider } from '../../../../../foundation/components/vehicles/GliderComponent';
 import HangGliderWing from '../../../../../foundation/components/vehicles/HangGliderWing';
 import ParagliderVoxel from '../../../../../foundation/components/vehicles/ParagliderVoxel';
 import SpeedBoat from '../../../../../foundation/components/scenery/SpeedBoat';
@@ -247,7 +247,7 @@ class ComponentBenchmarkWorkshopApp extends WorkshopDemoBase {
 
     try {
       const modernResult = await this.benchmark.benchmarkModernComponent(
-        Glider,
+        NewGlider,
         { numeroCajones: 40, wingColor1: '#FFA500', showBreakLines: true },
         iterations
       );
