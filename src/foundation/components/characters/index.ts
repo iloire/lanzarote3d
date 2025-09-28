@@ -13,9 +13,9 @@ export {
 export type { PilotVoxelOptions } from './PilotVoxelComponent';
 
 export {
-  PilotComponent
+  Pilot
 } from './PilotComponent';
-export type { PilotComponentOptions, PilotState } from './PilotComponent';
+export type { PilotComponentOptions as PilotOptions, PilotState } from './PilotComponent';
 
 export {
   CharacterType,

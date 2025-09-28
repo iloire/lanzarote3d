@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-// TODO: Migrate to PilotComponent from '../characters/PilotComponent' when updating Hangglider architecture
-import Pilot from './Pilot';
+// TODO: Migrate to modern Pilot from '../characters/PilotComponent' when updating Hangglider architecture
+import LegacyPilot from './Pilot';
 import Wing from './Wing';
 import GuiHelper from '../../utils/gui';
 import AutoFlier from '../../types/auto-flier';
@@ -20,7 +20,7 @@ const DEFAULT_OPTIONS = {
 
 class HangGliderModel extends AutoFlier {
   wing!: Wing;
-  pilot!: Pilot;
+  pilot!: LegacyPilot;
 
   async load(path: THREE.Vector3[], gui?: any): Promise<THREE.Mesh> {
     this.path = path;
@@ -33,7 +33,7 @@ class HangGliderModel extends AutoFlier {
     wingMesh.position.x = -40;
 
     // pilot
-    this.pilot = new Pilot(DEFAULT_OPTIONS);
+    this.pilot = new LegacyPilot(DEFAULT_OPTIONS);
     const pilotMesh = this.pilot.load();
     const pilotScale = 0.03;
     pilotMesh.scale.set(pilotScale, pilotScale, pilotScale);

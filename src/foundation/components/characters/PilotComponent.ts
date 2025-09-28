@@ -5,7 +5,7 @@ import { PilotHeadComponent, PilotHeadType, HelmetType } from './PilotHeadCompon
 import CocoonHarness from './CocoonHarness';
 import type { ComponentOptions } from '../base/BaseThreeComponent';
 
-export interface PilotComponentOptions extends ComponentOptions {
+export interface PilotOptions extends ComponentOptions {
   headType?: PilotHeadType;
   helmetType?: HelmetType;
   helmetColor?: string;
@@ -25,7 +25,7 @@ export interface PilotState {
   headVisible: boolean;
 }
 
-export class PilotComponent extends SimpleThreeComponent {
+export class Pilot extends SimpleThreeComponent {
   private armRight: THREE.Mesh | null = null;
   private armLeft: THREE.Mesh | null = null;
   private body: THREE.Object3D | null = null;
@@ -40,9 +40,9 @@ export class PilotComponent extends SimpleThreeComponent {
   // Constants
   private static readonly BREAK_Y_MOVE = 180; // mm
 
-  constructor(options: PilotComponentOptions = {}) {
+  constructor(options: PilotOptions = {}) {
     super({
-      name: 'PilotComponent',
+      name: 'Pilot',
       version: '1.0.0',
       headType: PilotHeadType.Default,
       helmetType: HelmetType.Default,
@@ -62,7 +62,7 @@ export class PilotComponent extends SimpleThreeComponent {
     const container = new THREE.Object3D();
     container.name = 'PilotContainer';
 
-    const options = this.options as PilotComponentOptions;
+    const options = this.options as PilotOptions;
 
     try {
       // Create pilot head
@@ -82,7 +82,7 @@ export class PilotComponent extends SimpleThreeComponent {
     }
   }
 
-  private createHead(options: PilotComponentOptions): THREE.Object3D {
+  private createHead(options: PilotOptions): THREE.Object3D {
     try {
       const pilotHead = new PilotHeadComponent({
         headType: options.headType || PilotHeadType.Default,
@@ -115,7 +115,7 @@ export class PilotComponent extends SimpleThreeComponent {
     }
   }
 
-  private createBody(options: PilotComponentOptions): THREE.Object3D {
+  private createBody(options: PilotOptions): THREE.Object3D {
     const group = new THREE.Object3D();
     group.name = 'PilotBody';
 
@@ -243,7 +243,7 @@ export class PilotComponent extends SimpleThreeComponent {
     this.pilotState.leftBrakePosition = Math.max(0, Math.min(1, intensity));
 
     if (this.armLeft) {
-      this.armLeft.position.y = -PilotComponent.BREAK_Y_MOVE * this.pilotState.leftBrakePosition;
+      this.armLeft.position.y = -Pilot.BREAK_Y_MOVE * this.pilotState.leftBrakePosition;
     }
   }
 
@@ -259,7 +259,7 @@ export class PilotComponent extends SimpleThreeComponent {
     this.pilotState.rightBrakePosition = Math.max(0, Math.min(1, intensity));
 
     if (this.armRight) {
-      this.armRight.position.y = -PilotComponent.BREAK_Y_MOVE * this.pilotState.rightBrakePosition;
+      this.armRight.position.y = -Pilot.BREAK_Y_MOVE * this.pilotState.rightBrakePosition;
     }
   }
 
@@ -325,7 +325,7 @@ export class PilotComponent extends SimpleThreeComponent {
 
   public override getInfo(): Record<string, any> {
     const baseInfo = super.getInfo();
-    const options = this.options as PilotComponentOptions;
+    const options = this.options as PilotOptions;
 
     return {
       ...baseInfo,

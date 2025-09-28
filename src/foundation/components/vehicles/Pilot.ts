@@ -43,7 +43,7 @@ const getHead = (options: PilotHeadOptions): THREE.Group => {
 
 const BREAK_Y_MOVE = 180; //mm
 
-class Pilot {
+class LegacyPilot {
   armRight!: THREE.Mesh;
   armLeft!: THREE.Mesh;
   body!: THREE.Mesh;
@@ -153,4 +153,4 @@ class Pilot {
   }
 }
 
-export default Pilot;
+export default LegacyPilot;
