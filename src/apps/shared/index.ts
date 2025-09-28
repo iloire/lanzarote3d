@@ -115,9 +115,6 @@ export async function loadApp(appKey: string, options: StoryOptions): Promise<vo
     case 'tile-mapper':
       appModule = await import('../tools/tile-mapper/index');
       break;
-    case 'component-benchmark':
-      appModule = await import('../tools/workshop/demos/component-benchmark/index');
-      break;
     default:
       throw new Error(`No import mapping found for app '${resolvedKey}' (original: '${appKey}')`);
   }

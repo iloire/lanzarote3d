@@ -11,7 +11,7 @@ export type ParagliderOptions = {
   pilot: PilotOptions;
 };
 
-class LegacyParaglider implements IFlyable {
+class Paraglider implements IFlyable {
   mesh!: THREE.Object3D;
   glider!: LegacyGlider;
   pilot!: Pilot;
@@ -97,4 +97,4 @@ class LegacyParaglider implements IFlyable {
   }
 }
 
-export default LegacyParaglider;
+export default Paraglider;

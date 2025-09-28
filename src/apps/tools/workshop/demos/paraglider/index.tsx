@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { LegacyParaglider as Paraglider } from '../../../../../foundation/components/vehicles';
+import { Paraglider } from '../../../../../foundation/components/vehicles';
 import { PilotHeadType } from '../../../../../foundation/components/characters/PilotHead';
 import { StoryOptions } from '../../../../shared/types';
 import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';

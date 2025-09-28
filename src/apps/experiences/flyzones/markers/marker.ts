@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { animator } from '../../../../foundation/systems/animation/SimpleAnimator';
 import { MarkerType } from '../helpers/types';
 import { PIN_COLORS, PIN_SIZES, PIN_FADE_DURATION } from '../config/marker-config';
-import { LegacyParaglider as Paraglider } from '../../../../foundation/components/vehicles';
+import { Paraglider } from '../../../../foundation/components/vehicles';
 import { PilotHeadType } from '../../../../foundation/components/characters/PilotHead';
 import { createLabel } from '../helpers/popup';
 import { CSS2DObject, CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
