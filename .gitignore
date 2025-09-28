@@ -6,3 +6,4 @@ built/*
 *.d.ts.map
 .DS_Store
 TODO.md
+.next

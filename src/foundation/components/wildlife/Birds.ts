@@ -65,9 +65,6 @@ class Birds extends AutoFlier {
       });
     }
 
-    console.log(
-      `🐦 Birds loaded with ${path.length} waypoints, forward axis: ${this.getForwardAxis()}`
-    );
     return this.mesh;
   }
 

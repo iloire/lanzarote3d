@@ -2,7 +2,31 @@
 
 This document tracks technical debt and issues that need to be addressed for improved code quality, performance, and maintainability.
 
-## High Priority
+## Recent Improvements (2025-09-27)
+
+### ✅ App Loading Architecture
+**Completed**: Replaced complex "Stories" system with simple app registry-based loading
+- Removed StoryLoader class and complex proxy patterns
+- Simplified to direct `loadApp()` function with app registry lookup
+- Still using switch statement for webpack compatibility - could be further improved with dynamic imports if webpack config allows
+
+### ✅ App Architecture Standardization
+**Completed**: All 8 applications converted to unified AppBase architecture
+- Standardized lifecycle management, performance monitoring, error handling, and resource cleanup
+- Fixed inconsistent patterns across demos, experiences, and tools
+- Implemented proper dispose() methods with event listener cleanup
+
+### ✅ Animation System Simplification
+**Completed**: Replaced complex animation system with SimpleAnimator
+- Self-contained, no external dependencies, transparent operation, easy to debug
+- Fixed previous AnimationManager → TWEEN → Animations utility complexity
+
+### ✅ Animation Loop Management
+**Completed**: Centralized animation loop management across all applications
+- Fixed multiple competing animation loops
+- Standardized rendering patterns in AppBase architecture
+
+## High Priority Issues
 
 ### Multiple Render Loops - Memory Leak Risk
 **Status**: ⚠️ Critical Issue
@@ -16,16 +40,54 @@ This document tracks technical debt and issues that need to be addressed for imp
 - `src/foundation/components/environment/Cloud.ts` - Uses expensive Date.now() in loop
 **Solution**: Implement centralized render loop manager with proper cleanup
 
-### TypeScript Type Safety Violations
+### TypeScript Strict Mode Violations
 **Status**: ⚠️ Needs Attention
 **Files**: 20+ instances across codebase
-**Issue**: Excessive use of `any` type reduces type safety and IDE support
-**Impact**: Runtime errors, poor developer experience, harder debugging
-**Files Affected**:
-- `src/apps/demos/animation/index.tsx:19` - `position: any`
-- `src/apps/demos/photobooth/index.tsx` - Multiple `any` usages
-- `src/foundation/utils/models.ts` - Model loading with `any`
-**Solution**: Replace with proper TypeScript interfaces
+**Issue**: TypeScript strict mode violations and excessive use of `any` type
+**Impact**: Runtime errors, poor developer experience, harder debugging, reduced type safety
+
+**Files Requiring Fixes**:
+
+1. **src/apps/experiences/flyzones/markers/markers.ts:7**
+   - Property 'type' will overwrite the base property in 'Object3D'
+   - Need to add initializer or declare modifier
+
+2. **src/apps/tools/location-editor/state.ts**
+   - Multiple implicit 'any' types on lines 801, 811, 832
+   - Object literal properties need proper typing
+
+3. **src/apps/tools/workshop/demos/helmet/index.tsx**
+   - Element access without index signature on lines 83, 142
+   - HelmetType enum needs index signature or better type safety
+
+4. **src/apps/tools/workshop/demos/pilot/index.tsx**
+   - Class inheritance issue with private 'animationId' property (line 11)
+   - Missing override modifier (line 12)
+
+5. **src/apps/tools/workshop/demos/terrain/index.tsx**
+   - Implicit 'any' type parameter on line 460
+
+6. **src/apps/tools/workshop/demos/voxel/index.tsx**
+   - Missing override modifier on dispose method (line 202)
+
+7. **src/foundation/components/environment/Sky.ts:171**
+   - Element access without index signature on SkyOptions
+
+8. **src/foundation/systems/scene/CameraController.ts**
+   - Uses deprecated 'event.which' property (lines 37, 54)
+   - Should use 'event.code' or 'event.key' instead
+
+9. **Multiple Physics Components**
+   - src/foundation/components/physics/Thermal.ts:40 - implicit 'any' parameter
+   - src/foundation/components/physics/Weather.ts:81 - implicit 'any' parameter
+   - src/foundation/components/physics/WindIndicator.ts:15 - implicit 'any' parameter
+
+10. **Additional Type Safety Issues**:
+    - `src/apps/demos/animation/index.tsx:19` - `position: any`
+    - `src/apps/demos/photobooth/index.tsx` - Multiple `any` usages
+    - `src/foundation/utils/models.ts` - Model loading with `any`
+
+**Solution**: Replace with proper TypeScript interfaces and fix strict mode violations
 
 ### Production Debug Code
 **Status**: ⚠️ Should be removed
@@ -37,37 +99,7 @@ This document tracks technical debt and issues that need to be addressed for imp
 - `src/apps/experiences/flyzones/navigation/camera.ts` - Debug output
 **Solution**: Replace with proper logging utility or remove
 
-### Inconsistent Animation Loop Management
-**Status**: ✅ Fixed
-**Files**: `src/app.tsx`, `src/apps/demos/animation/index.tsx`, `src/apps/experiences/game/game.tsx`, `src/apps/experiences/flyzones/animation/loop.ts`
-**Issue**: Multiple competing animation loops. Main app has its own loop, individual apps create their own loops.
-**Impact**: Performance, potential conflicts, duplicate rendering
-**Solution**: ✅ Implemented AppBase architecture with standardized animation loop management across all 8 applications
-
-### Animation System Complexity (Architectural Improvement)
-**Status**: ✅ Improved
-**Files**: `src/foundation/systems/animation/SimpleAnimator.ts`, `src/apps/demos/animation/index.tsx`
-**Issue**: Previous animation system was too complex with hidden dependencies (AnimationManager → TWEEN → Animations utility) making debugging difficult
-**Impact**: Hard to debug animation issues, timing problems, mixed responsibilities
-**Solution**: ✅ Created SimpleAnimator - self-contained, no external dependencies, transparent operation, easy to debug
-
-### App Architecture Inconsistency
-**Status**: ✅ Fixed
-**Files**: All 8 applications converted to AppBase
-**Issue**: Applications used inconsistent patterns (simple objects vs class-based), no standardized error handling, resource management, or performance monitoring
-**Impact**: Inconsistent developer experience, potential memory leaks, no visibility into performance issues
-**Files Affected**:
-- ✅ `src/apps/demos/famara/index.tsx` - Converted to AppBase
-- ✅ `src/apps/demos/photobooth/index.tsx` - Converted to AppBase
-- ✅ `src/apps/demos/animation/index.tsx` - Converted to AppBase
-- ✅ `src/apps/tools/workshop/index.tsx` - Converted to AppBase
-- ✅ `src/apps/experiences/game/game.tsx` - Converted to AppBase
-- ✅ `src/apps/experiences/flyzones/index.tsx` - Converted to AppBase
-- ✅ `src/apps/tools/location-editor/index.tsx` - Converted to AppBase
-- ✅ `src/apps/tools/workshop/demos/voxel/index.tsx` - Converted to AppBase
-**Solution**: ✅ Implemented unified AppBase architecture with standardized lifecycle management, performance monitoring, error handling, and resource cleanup
-
-## Medium Priority
+## Medium Priority Issues
 
 ### Testing Infrastructure Gap
 **Status**: ⚠️ Critical Gap
@@ -86,6 +118,13 @@ This document tracks technical debt and issues that need to be addressed for imp
 **Issue**: Audio loading failures could be handled more gracefully
 **Impact**: User experience when audio fails to load
 
+### Hardcoded Scene Configuration
+**Status**: Identified
+**Files**: `src/app.tsx`
+**Issue**: Scene configuration is hardcoded in SCENE_CONFIG constant
+**Impact**: Flexibility, different environments
+**Solution**: Make configurable via environment or app registry
+
 ### Event Listener Memory Leaks
 **Status**: ✅ Significantly Improved
 **Files**: All AppBase applications now have proper cleanup
@@ -96,14 +135,7 @@ This document tracks technical debt and issues that need to be addressed for imp
 - Multiple window resize listeners - ✅ Now tracked and cleaned up in dispose() methods
 **Solution**: ✅ AppBase architecture ensures all event listeners are properly cleaned up via standardized dispose() methods
 
-### Hardcoded Scene Configuration
-**Status**: Identified
-**Files**: `src/app.tsx`
-**Issue**: Scene configuration is hardcoded in SCENE_CONFIG constant
-**Impact**: Flexibility, different environments
-**Solution**: Make configurable via environment or app registry
-
-## Low Priority
+## Low Priority Issues
 
 ### Mixed Component Patterns
 **Status**: Identified
@@ -126,6 +158,28 @@ This document tracks technical debt and issues that need to be addressed for imp
 **Impact**: Excludes users with disabilities, potential legal compliance issues
 **Solution**: Implement WCAG 2.1 compliance with proper semantic HTML and ARIA
 
+## Priority Levels
+
+**High Priority**:
+- Multiple render loops (memory leak risk)
+- TypeScript strict mode violations
+- CameraController deprecated API usage
+- Location editor implicit any types
+- Production debug code cleanup
+
+**Medium Priority**:
+- Testing infrastructure gap
+- Audio error handling
+- Workshop demo type safety issues
+- Foundation component parameter typing
+- Hardcoded scene configuration
+
+**Low Priority**:
+- Override modifier warnings
+- Mixed component patterns
+- Bundle size optimization
+- Accessibility compliance
+
 ---
 
 ## Suggested Next Areas of Improvement
@@ -134,7 +188,7 @@ This document tracks technical debt and issues that need to be addressed for imp
 1. **Render Loop Centralization** - Fix memory leaks in component animations
 2. **Type Safety Audit** - Replace all `any` types with proper interfaces
 3. **Production Debug Cleanup** - Remove console.log statements from production code
-4. **Event Listener Audit** - Ensure proper cleanup for all event listeners
+4. **Deprecated API Updates** - Fix CameraController event.which usage
 
 ### Phase 2: Developer Experience (High Impact, High Effort)
 5. **Testing Infrastructure** - Implement comprehensive test suite (Jest + RTL + E2E)
@@ -168,17 +222,6 @@ src/apps/
 ├── experiences/      # Full interactive experiences (2 apps)
 ├── shared/           # Shared utilities & AppBase
 └── tools/            # Development/authoring tools (2 apps)
-```
-
-**Proposed Alternative** (Not Recommended):
-```
-src/apps/
-├── config/
-├── shared/
-└── applications/     # NEW grouping level
-    ├── demos/
-    ├── experiences/
-    └── tools/
 ```
 
 **Decision**: Keep current structure

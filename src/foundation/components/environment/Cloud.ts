@@ -41,11 +41,10 @@ const generateCloud = async (options: CloudOptions): Promise<THREE.Object3D> => 
 
   for (let i = 0; i < nCloudParts; i++) {
     // Each cloud part can have a different material for more color variety
-    const material = useMonochrome
-      ? materials[monochromeIndex]!
-      : materials[rndIntBetween(0, materials.length - 1)]!;
+    const materialIndex = useMonochrome ? monochromeIndex : rndIntBetween(0, materials.length - 1);
+    const material = materials[materialIndex];
+    if (!material) continue; // Skip if material not found;
 
-    console.log(material);
 
     const scale = r(i * 0.9, i * 1.1);
     const posX = 1.7 * radius * r(-1 * i, i);
@@ -130,15 +129,18 @@ class Cloud {
   }
 
   private startAnimation() {
-    const animateLoop = () => {
+    const startTime = performance.now();
+    const randomOffset = Math.random() * 1000;
+
+    const animateLoop = (currentTime: number) => {
       if (!this.isAnimating || !this.mesh) return;
 
-      const timer = (Date.now() + Math.random() * 1000) * 0.0001;
-      this.mesh.position.y = this.mesh.position.y + Math.sin(timer) * 0.1;
+      const elapsed = (currentTime - startTime + randomOffset) * 0.0001;
+      this.mesh.position.y = this.mesh.position.y + Math.sin(elapsed) * 0.1;
 
       this.animationId = requestAnimationFrame(animateLoop);
     };
-    animateLoop();
+    this.animationId = requestAnimationFrame(animateLoop);
   }
 
   stop() {
@@ -159,7 +161,6 @@ class Cloud {
   updateColors(newColors: string[]) {
     if (!this.mesh || !newColors || newColors.length === 0) return;
 
-    console.log('Updating cloud colors:', newColors);
 
     // Create new materials with the new colors
     const newMaterials: THREE.MeshLambertMaterial[] = [];
@@ -179,7 +180,10 @@ class Cloud {
 
         // Apply new material (random selection from new colors)
         const materialIndex = Math.floor(Math.random() * newMaterials.length);
-        child.material = newMaterials[materialIndex]!;
+        const newMaterial = newMaterials[materialIndex];
+        if (newMaterial) {
+          child.material = newMaterial;
+        };
       }
     });
 

@@ -34,7 +34,7 @@ enum KeyCodes {
 }
 
 function onDocumentKeyDown(event: KeyboardEvent) {
-  const keyCode = event.which;
+  const keyCode = event.keyCode || event.which; // Fallback for compatibility
   if (keyCode === KeyCodes.left) {
     isLeftViewing = true;
   } else if (keyCode === KeyCodes.right) {
@@ -51,7 +51,7 @@ function onDocumentKeyDown(event: KeyboardEvent) {
 }
 
 function onDocumentKeyUp(event: KeyboardEvent) {
-  const keyCode = event.which;
+  const keyCode = event.keyCode || event.which; // Fallback for compatibility
   if (keyCode === KeyCodes.left) {
     isLeftViewing = false;
   } else if (keyCode === KeyCodes.right) {
