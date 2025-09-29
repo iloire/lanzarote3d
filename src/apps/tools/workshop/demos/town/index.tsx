@@ -198,20 +198,37 @@ class TownWorkshop extends WorkshopDemoBase {
    * Toggle between low-poly and high-detail modes
    */
   private async toggleLowPolyMode(): Promise<void> {
+    const startTime = performance.now();
+
     this.isLowPoly = !this.isLowPoly;
     this.performanceSettings.lowPoly = this.isLowPoly;
 
     console.log(`🔄 Switching to ${this.isLowPoly ? 'Low-Poly' : 'High-Detail'} mode...`);
 
-    // Update button state immediately for responsiveness
-    this.updateOnScreenDisplay();
+    // Update button to show loading state
+    this.toggleButton.textContent = '⏳ Rebuilding...';
+    this.toggleButton.disabled = true;
 
     try {
+      // Force garbage collection hint (if available)
+      if ((window as any).gc) {
+        (window as any).gc();
+      }
+
       await this.recreateNeighborhoods();
       this.updatePolygonCount();
-      this.updateOnScreenDisplay();
+
+      const endTime = performance.now();
+      const switchTime = Math.round(endTime - startTime);
+
+      console.log(`✅ Mode switch completed in ${switchTime}ms`);
+
     } catch (error) {
       console.error('❌ Error toggling low-poly mode:', error);
+    } finally {
+      // Re-enable button and update display
+      this.toggleButton.disabled = false;
+      this.updateOnScreenDisplay();
     }
   }
 
@@ -329,18 +346,22 @@ class TownWorkshop extends WorkshopDemoBase {
   }
 
   /**
-   * Clear all existing neighborhood meshes and labels
+   * Clear all existing neighborhood meshes and labels with proper memory cleanup
    */
   private clearNeighborhoods(): void {
-    // Remove meshes from scene
+    console.log(`🧹 Clearing ${this.neighborhoodMeshes.length} neighborhood objects and ${this.labelMeshes.length} labels`);
+
+    // Properly dispose neighborhood meshes
     this.neighborhoodMeshes.forEach(mesh => {
+      this.disposeObject3D(mesh);
       if (mesh.parent) {
         mesh.parent.remove(mesh);
       }
     });
 
-    // Remove labels from scene
+    // Properly dispose label meshes
     this.labelMeshes.forEach(label => {
+      this.disposeObject3D(label);
       if (label.parent) {
         label.parent.remove(label);
       }
@@ -349,6 +370,55 @@ class TownWorkshop extends WorkshopDemoBase {
     // Clear arrays
     this.neighborhoodMeshes.length = 0;
     this.labelMeshes.length = 0;
+
+    console.log('✅ Neighborhood cleanup completed');
+  }
+
+  /**
+   * Recursively dispose of Three.js objects to prevent memory leaks
+   */
+  private disposeObject3D(obj: THREE.Object3D): void {
+    // Recursively dispose children first
+    obj.children.forEach(child => {
+      this.disposeObject3D(child);
+    });
+
+    // Dispose of mesh-specific resources
+    if (obj instanceof THREE.Mesh) {
+      // Dispose geometry
+      if (obj.geometry) {
+        obj.geometry.dispose();
+      }
+
+      // Dispose materials
+      if (obj.material) {
+        if (Array.isArray(obj.material)) {
+          obj.material.forEach(material => {
+            this.disposeMaterial(material);
+          });
+        } else {
+          this.disposeMaterial(obj.material);
+        }
+      }
+    }
+
+    // Clear any user data or custom properties
+    obj.userData = {};
+  }
+
+  /**
+   * Safely dispose of Three.js materials
+   */
+  private disposeMaterial(material: THREE.Material): void {
+    // Dispose of textures
+    Object.values(material).forEach(value => {
+      if (value && typeof value === 'object' && 'dispose' in value) {
+        (value as any).dispose();
+      }
+    });
+
+    // Dispose the material itself
+    material.dispose();
   }
 
   private async loadNeighborhoods(scene: THREE.Scene, gui: any): Promise<void> {
@@ -670,34 +740,8 @@ class TownWorkshop extends WorkshopDemoBase {
       this.animationId = 0;
     }
 
-    // Dispose neighborhood meshes
-    this.neighborhoodMeshes.forEach(obj => {
-      const mesh = obj as THREE.Mesh;
-      if (mesh.geometry) {
-        mesh.geometry.dispose();
-      }
-      if (Array.isArray(mesh.material)) {
-        mesh.material.forEach(material => material.dispose());
-      } else if (mesh.material) {
-        mesh.material.dispose();
-      }
-    });
-    this.neighborhoodMeshes.length = 0;
-
-    // Dispose label meshes
-    this.labelMeshes.forEach(label => {
-      if (label.geometry) {
-        label.geometry.dispose();
-      }
-      if (label.material) {
-        if (Array.isArray(label.material)) {
-          label.material.forEach(mat => mat.dispose());
-        } else {
-          label.material.dispose();
-        }
-      }
-    });
-    this.labelMeshes.length = 0;
+    // Use proper cleanup method for neighborhood meshes
+    this.clearNeighborhoods();
 
     // Dispose component registry
     if (this.componentRegistry) {
