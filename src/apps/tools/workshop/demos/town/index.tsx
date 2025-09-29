@@ -46,6 +46,8 @@ class TownWorkshop extends WorkshopDemoBase {
   private currentScene!: THREE.Scene;
   private currentGui: any;
   private isLowPoly: boolean = false;
+  private toggleButton!: HTMLButtonElement;
+  private performanceDisplay!: HTMLDivElement;
   private performanceSettings = {
     lowPoly: false,
     polygonCount: 0,
@@ -76,6 +78,16 @@ class TownWorkshop extends WorkshopDemoBase {
 
       const { camera, scene, renderer, gui, controls } = options;
 
+      console.log('🐛 Town demo received options:', {
+        hasCamera: !!camera,
+        hasScene: !!scene,
+        hasRenderer: !!renderer,
+        hasGui: !!gui,
+        hasControls: !!controls,
+        guiType: typeof gui,
+        gui
+      });
+
       // Store references for reconstruction
       this.currentScene = scene;
       this.currentGui = gui;
@@ -86,6 +98,9 @@ class TownWorkshop extends WorkshopDemoBase {
 
       // Setup performance controls
       this.setupPerformanceControls(gui);
+
+      // Setup on-screen HTML controls
+      this.setupOnScreenControls();
 
       // Load all neighborhoods with proper tracking
       await this.loadNeighborhoods(scene, gui);
@@ -110,13 +125,137 @@ class TownWorkshop extends WorkshopDemoBase {
   }
 
   /**
+   * Setup on-screen HTML controls for easy access
+   */
+  private setupOnScreenControls(): void {
+    // Create container for controls
+    const controlsContainer = document.createElement('div');
+    controlsContainer.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      font-family: Arial, sans-serif;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 15px;
+      border-radius: 10px;
+      color: white;
+      min-width: 200px;
+      backdrop-filter: blur(5px);
+    `;
+
+    // Create toggle button
+    this.toggleButton = document.createElement('button');
+    this.toggleButton.textContent = '🏗️ High Detail Mode';
+    this.toggleButton.style.cssText = `
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      background: linear-gradient(45deg, #4CAF50, #45a049);
+      color: white;
+      cursor: pointer;
+      margin-bottom: 10px;
+      transition: all 0.3s ease;
+    `;
+
+    this.toggleButton.addEventListener('mouseenter', () => {
+      this.toggleButton.style.transform = 'scale(1.05)';
+    });
+
+    this.toggleButton.addEventListener('mouseleave', () => {
+      this.toggleButton.style.transform = 'scale(1)';
+    });
+
+    this.toggleButton.addEventListener('click', async () => {
+      await this.toggleLowPolyMode();
+    });
+
+    // Create performance display
+    this.performanceDisplay = document.createElement('div');
+    this.performanceDisplay.style.cssText = `
+      font-size: 12px;
+      color: #ccc;
+      line-height: 1.4;
+    `;
+
+    // Add elements to container
+    controlsContainer.appendChild(this.toggleButton);
+    controlsContainer.appendChild(this.performanceDisplay);
+
+    // Add to page
+    document.body.appendChild(controlsContainer);
+
+    // Initial update
+    this.updateOnScreenDisplay();
+
+    console.log('✅ On-screen controls created successfully');
+  }
+
+  /**
+   * Toggle between low-poly and high-detail modes
+   */
+  private async toggleLowPolyMode(): Promise<void> {
+    this.isLowPoly = !this.isLowPoly;
+    this.performanceSettings.lowPoly = this.isLowPoly;
+
+    console.log(`🔄 Switching to ${this.isLowPoly ? 'Low-Poly' : 'High-Detail'} mode...`);
+
+    // Update button state immediately for responsiveness
+    this.updateOnScreenDisplay();
+
+    try {
+      await this.recreateNeighborhoods();
+      this.updatePolygonCount();
+      this.updateOnScreenDisplay();
+    } catch (error) {
+      console.error('❌ Error toggling low-poly mode:', error);
+    }
+  }
+
+  /**
+   * Update on-screen display with current state
+   */
+  private updateOnScreenDisplay(): void {
+    // Update button text and style
+    if (this.isLowPoly) {
+      this.toggleButton.textContent = '⚡ Low-Poly Mode';
+      this.toggleButton.style.background = 'linear-gradient(45deg, #FF9800, #F57C00)';
+    } else {
+      this.toggleButton.textContent = '🏗️ High Detail Mode';
+      this.toggleButton.style.background = 'linear-gradient(45deg, #4CAF50, #45a049)';
+    }
+
+    // Update performance display
+    const polygonText = this.performanceSettings.polygonCount > 0
+      ? this.performanceSettings.polygonCount.toLocaleString()
+      : 'Calculating...';
+
+    this.performanceDisplay.innerHTML = `
+      <div><strong>Mode:</strong> ${this.isLowPoly ? 'Performance' : 'Quality'}</div>
+      <div><strong>Polygons:</strong> ${polygonText}</div>
+      <div><strong>Neighborhoods:</strong> ${this.neighborhoodMeshes.length > 0 ? '5' : 'Loading...'}</div>
+      <div style="margin-top: 8px; font-size: 11px; color: #aaa;">Click button to toggle modes</div>
+    `;
+  }
+
+  /**
    * Setup performance controls and monitoring
    */
   private setupPerformanceControls(gui: any): void {
-    if (!gui) return;
+    console.log('🐛 Setting up performance controls, GUI:', gui);
+
+    if (!gui) {
+      console.warn('⚠️ No GUI provided to setupPerformanceControls');
+      return;
+    }
 
     const performanceFolder = gui.addFolder('Performance Settings');
     performanceFolder.open();
+
+    console.log('✅ Performance folder created successfully');
 
     // Low-poly toggle
     performanceFolder
@@ -166,6 +305,11 @@ class TownWorkshop extends WorkshopDemoBase {
 
     this.performanceSettings.polygonCount = Math.floor(totalPolygons);
     console.log(`📊 Total polygons: ${this.performanceSettings.polygonCount.toLocaleString()}`);
+
+    // Update on-screen display if available
+    if (this.performanceDisplay) {
+      this.updateOnScreenDisplay();
+    }
   }
 
   /**
@@ -514,6 +658,11 @@ class TownWorkshop extends WorkshopDemoBase {
 
   public override dispose(): void {
     console.log(`🧹 Disposing ${this.config.name}`);
+
+    // Remove on-screen controls
+    if (this.toggleButton && this.toggleButton.parentElement) {
+      this.toggleButton.parentElement.remove();
+    }
 
     // Cancel animation loop
     if (this.animationId) {
