@@ -146,7 +146,7 @@ class FlyingBehaviorTestApp extends WorkshopDemoBase {
 
         // Create and attach flying behavior
         this.flyingBehavior = new FlyingBehavior({
-          pattern: FlightPattern.FREE_ROAM,
+          pattern: FlightPattern.CIRCULAR,
           speed: 16.0, // Increased speed for better testing
           turnSpeed: 3.0, // Increased turn speed for more responsive avoidance
           flightRadius: 45, // Adjusted for much wider wall spacing (50 units to walls)

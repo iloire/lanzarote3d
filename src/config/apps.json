@@ -65,8 +65,8 @@
     "animation": {
       "name": "Famara animation",
       "description": "Dramatic camera animation showcasing voxel paragliders with golden hour lighting",
-      "entry": "./applications/animation/index.tsx",
-      "route": "/animation",
+      "entry": "./applications/famara-animation/index.tsx",
+      "route": "/famara-animation",
       "category": "demo",
       "requiresWebGL": true,
       "visibility": "public",
