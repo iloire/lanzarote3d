@@ -328,12 +328,31 @@ export class HouseGroupCreator {
   }
 
   private addBarrelCactus(position: THREE.Vector3): void {
+    console.log(`🌵 Creating BarrelCactus with lowPoly: ${this.lowPoly}`);
     const cactus = new BarrelCactus({
       scale: 0.4 + Math.random() * 0.3,
       lowPoly: this.lowPoly
     });
     const cactusMesh = cactus.createSyncContent();
     cactusMesh.position.copy(position);
+
+    // Count polygons for debugging
+    let polygons = 0;
+    cactusMesh.traverse(child => {
+      if (child instanceof THREE.Mesh && child.geometry) {
+        const geometry = child.geometry;
+        if (geometry.index !== null) {
+          polygons += geometry.index.count / 3;
+        } else {
+          const positionAttribute = geometry.getAttribute('position');
+          if (positionAttribute) {
+            polygons += positionAttribute.count / 3;
+          }
+        }
+      }
+    });
+    console.log(`🌵 BarrelCactus created with ${Math.floor(polygons)} polygons (lowPoly: ${this.lowPoly})`);
+
     this.scene.add(cactusMesh);
     this.createdObjects.push(cactusMesh);
   }
