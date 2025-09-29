@@ -14,6 +14,9 @@ body {
   position: absolute;
   top: 3%;
   left: 3%;
+  max-height: 90vh; /* Limit height to 90% of viewport */
+  overflow-y: auto; /* Enable vertical scrolling */
+  padding-right: 10px; /* Add some padding for scrollbar */
   z-index: 999;
   pointer-events: none;
   /* Allow orbital controls to work through this area */
@@ -23,10 +26,10 @@ body {
   background: #222;
   color: #f5f5f5;
   border: none;
-  padding: 0.4em 0.7em;
+  padding: 0.35em 0.6em; /* Reduced padding for more compact layout */
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  font-size: 0.8em;
+  font-size: 0.75em; /* Slightly reduced font size */
   cursor: pointer;
   margin: 0;
   text-transform: uppercase;
@@ -54,7 +57,7 @@ body {
 .appOptions div.button {
   display: flex;
   align-items: center;
-  margin-bottom: 0.2em;
+  margin-bottom: 0.15em; /* Reduced from 0.2em for more compact layout */
   width: fit-content;
 }
 
@@ -77,6 +80,26 @@ body {
 .appOptions h2 {
   text-transform: uppercase;
   color: #fff;
+}
+
+/* Custom scrollbar styling for the menu */
+.appOptions::-webkit-scrollbar {
+  width: 6px;
+}
+
+.appOptions::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.appOptions::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+  transition: background 0.2s;
+}
+
+.appOptions::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
 }
 
 /* Mobile Menu Styles */
