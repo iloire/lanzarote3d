@@ -239,7 +239,7 @@ class TownWorkshop extends WorkshopDemoBase {
   /**
    * Update on-screen display with current state
    */
-  private updateOnScreenDisplay(): void {
+  private updateOnScreenDisplay(housePolygons?: number, roadPolygons?: number): void {
     // Update button text and style
     if (this.isLowPoly) {
       this.toggleButton.textContent = '⚡ Low-Poly Mode';
@@ -249,14 +249,26 @@ class TownWorkshop extends WorkshopDemoBase {
       this.toggleButton.style.background = 'linear-gradient(45deg, #4CAF50, #45a049)';
     }
 
-    // Update performance display
-    const polygonText = this.performanceSettings.polygonCount > 0
-      ? this.performanceSettings.polygonCount.toLocaleString()
-      : 'Calculating...';
+    // Update performance display with breakdown if available
+    let polygonInfo = '';
+    if (housePolygons !== undefined && roadPolygons !== undefined) {
+      const total = housePolygons + roadPolygons;
+      const housePercent = Math.round((housePolygons / total) * 100);
+      polygonInfo = `
+        <div><strong>Total Polygons:</strong> ${total.toLocaleString()}</div>
+        <div style="font-size: 11px; color: #ccc;">Houses: ${housePolygons.toLocaleString()} (${housePercent}%)</div>
+        <div style="font-size: 11px; color: #ccc;">Roads: ${roadPolygons.toLocaleString()} (${100-housePercent}%)</div>
+      `;
+    } else {
+      const polygonText = this.performanceSettings.polygonCount > 0
+        ? this.performanceSettings.polygonCount.toLocaleString()
+        : 'Calculating...';
+      polygonInfo = `<div><strong>Polygons:</strong> ${polygonText}</div>`;
+    }
 
     this.performanceDisplay.innerHTML = `
       <div><strong>Mode:</strong> ${this.isLowPoly ? 'Performance' : 'Quality'}</div>
-      <div><strong>Polygons:</strong> ${polygonText}</div>
+      ${polygonInfo}
       <div><strong>Neighborhoods:</strong> ${this.neighborhoodMeshes.length > 0 ? '9' : 'Loading...'}</div>
       <div style="margin-top: 8px; font-size: 11px; color: #aaa;">Click button to toggle modes</div>
     `;
@@ -306,48 +318,51 @@ class TownWorkshop extends WorkshopDemoBase {
    * Count total polygons in all neighborhood meshes and roads
    */
   private updatePolygonCount(): void {
-    let totalPolygons = 0;
+    let housePolygons = 0;
+    let roadPolygons = 0;
 
-    // Count neighborhood polygons
+    // Count neighborhood polygons (houses, landscaping)
     this.neighborhoodMeshes.forEach(obj => {
       obj.traverse(child => {
         if (child instanceof THREE.Mesh && child.geometry) {
           const geometry = child.geometry;
           if (geometry.index !== null) {
-            totalPolygons += geometry.index.count / 3;
+            housePolygons += geometry.index.count / 3;
           } else {
             const positionAttribute = geometry.getAttribute('position');
             if (positionAttribute) {
-              totalPolygons += positionAttribute.count / 3;
+              housePolygons += positionAttribute.count / 3;
             }
           }
         }
       });
     });
 
-    // Count road polygons
+    // Count road polygons (infrastructure that doesn't change)
     this.roadMeshes.forEach(obj => {
       obj.traverse(child => {
         if (child instanceof THREE.Mesh && child.geometry) {
           const geometry = child.geometry;
           if (geometry.index !== null) {
-            totalPolygons += geometry.index.count / 3;
+            roadPolygons += geometry.index.count / 3;
           } else {
             const positionAttribute = geometry.getAttribute('position');
             if (positionAttribute) {
-              totalPolygons += positionAttribute.count / 3;
+              roadPolygons += positionAttribute.count / 3;
             }
           }
         }
       });
     });
 
+    const totalPolygons = housePolygons + roadPolygons;
     this.performanceSettings.polygonCount = Math.floor(totalPolygons);
-    console.log(`📊 Total polygons: ${this.performanceSettings.polygonCount.toLocaleString()} (${this.neighborhoodMeshes.length} neighborhoods + ${this.roadMeshes.length} roads)`);
+
+    console.log(`📊 Polygon breakdown: Houses: ${Math.floor(housePolygons).toLocaleString()}, Roads: ${Math.floor(roadPolygons).toLocaleString()}, Total: ${this.performanceSettings.polygonCount.toLocaleString()}`);
 
     // Update on-screen display if available
     if (this.performanceDisplay) {
-      this.updateOnScreenDisplay();
+      this.updateOnScreenDisplay(Math.floor(housePolygons), Math.floor(roadPolygons));
     }
   }
 

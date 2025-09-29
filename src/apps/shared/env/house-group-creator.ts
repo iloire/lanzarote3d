@@ -108,7 +108,7 @@ export class HouseGroupCreator {
     try {
       switch (houseConfig.type) {
         case 'House':
-          console.log(`🐛 Creating House with lowPoly: ${this.lowPoly}`);
+          console.log(`✅ Creating House with lowPoly: ${this.lowPoly}`);
           house = new House({
             type: houseConfig.houseType || HouseType.Medium,
             lowPoly: this.lowPoly,
@@ -118,7 +118,7 @@ export class HouseGroupCreator {
           break;
 
         case 'Villa':
-          console.log(`🐛 Creating Villa with lowPoly: ${this.lowPoly}`);
+          console.log(`✅ Creating Villa with lowPoly: ${this.lowPoly}`);
           house = new Villa({
             scale: scale,
             lowPoly: this.lowPoly,

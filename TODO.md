@@ -1,7 +1,7 @@
 Implement the following tasks if any is added following the instructions described below:
 ---
 TASKS:
-(No pending tasks - all tasks have been completed)
+- something is off in the town showcase because switching form high poly to low poly barely reduces the poly count (and if feels still slow), while differences between the low poly and normal version of each particular model are like orders of magnitude different in some cases. please review the whole thing.
 ---
 
 ### Instructions
