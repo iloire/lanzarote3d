@@ -168,10 +168,10 @@ export class HouseGroupCreator {
           break;
 
         case 'DesertHouseWithPool':
-          console.log(`🐛 Creating DesertHouseWithPool with lowPoly: ${this.lowPoly} (not yet implemented)`);
+          console.log(`✅ Creating DesertHouseWithPool with lowPoly: ${this.lowPoly}`);
           house = new DesertHouseWithPool({
             scale: scale,
-            // lowPoly: this.lowPoly, // TODO: Implement lowPoly for DesertHouseWithPool
+            lowPoly: this.lowPoly,
             ...(houseConfig.colors || {}),
           });
           houseMesh = house.load();

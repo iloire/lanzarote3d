@@ -1,6 +1,7 @@
 Implement the following tasks if any is added follwing the instructions described below:
 ---
 TASKS:
+- add 4 more neighboardhoods to town now that we have lowpoly mode. start in low poly mode
 - suggest how to fix the mess and duplication in /Users/ivan/code/lanzarote3d/src/apps/shared/index.ts. Do we really need the concept of Stories any more? probably not.
 ---
 
