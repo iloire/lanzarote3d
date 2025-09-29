@@ -33,10 +33,18 @@ import {
 export class HouseGroupCreator {
   private scene: THREE.Scene;
   private componentRegistry: ComponentRegistry;
+  private lowPoly: boolean = false;
 
   constructor(scene: THREE.Scene, componentRegistry: ComponentRegistry) {
     this.scene = scene;
     this.componentRegistry = componentRegistry;
+  }
+
+  /**
+   * Set low-poly mode for all future house creation
+   */
+  setLowPolyMode(lowPoly: boolean): void {
+    this.lowPoly = lowPoly;
   }
 
   /**
@@ -56,6 +64,7 @@ export class HouseGroupCreator {
         case 'House':
           house = new House({
             type: houseConfig.houseType || HouseType.Medium,
+            lowPoly: this.lowPoly,
             ...(houseConfig.colors || {}),
           });
           houseMesh = house.load();
@@ -64,6 +73,7 @@ export class HouseGroupCreator {
         case 'Villa':
           house = new Villa({
             scale: scale,
+            lowPoly: this.lowPoly,
             ...(houseConfig.colors || {}),
           });
           houseMesh = house.load();

@@ -43,6 +43,14 @@ class TownWorkshop extends WorkshopDemoBase {
   private labelMeshes: THREE.Mesh[] = [];
   private houseGroupCreator!: HouseGroupCreator;
   private componentRegistry!: ComponentRegistry;
+  private currentScene!: THREE.Scene;
+  private currentGui: any;
+  private isLowPoly: boolean = false;
+  private performanceSettings = {
+    lowPoly: false,
+    polygonCount: 0,
+    lastRenderTime: 0,
+  };
 
   constructor() {
     super({
@@ -68,9 +76,16 @@ class TownWorkshop extends WorkshopDemoBase {
 
       const { camera, scene, renderer, gui, controls } = options;
 
+      // Store references for reconstruction
+      this.currentScene = scene;
+      this.currentGui = gui;
+
       // Initialize component registry and house group creator
       this.componentRegistry = new ComponentRegistry();
       this.houseGroupCreator = new HouseGroupCreator(scene, this.componentRegistry);
+
+      // Setup performance controls
+      this.setupPerformanceControls(gui);
 
       // Load all neighborhoods with proper tracking
       await this.loadNeighborhoods(scene, gui);
@@ -92,6 +107,104 @@ class TownWorkshop extends WorkshopDemoBase {
       this.handleError(error as Error, 'load');
       throw error;
     }
+  }
+
+  /**
+   * Setup performance controls and monitoring
+   */
+  private setupPerformanceControls(gui: any): void {
+    if (!gui) return;
+
+    const performanceFolder = gui.addFolder('Performance Settings');
+    performanceFolder.open();
+
+    // Low-poly toggle
+    performanceFolder
+      .add(this.performanceSettings, 'lowPoly')
+      .name('Low-Poly Mode')
+      .onChange(async (value: boolean) => {
+        this.isLowPoly = value;
+        console.log(`🔄 Switching to ${value ? 'Low-Poly' : 'High-Detail'} mode...`);
+        await this.recreateNeighborhoods();
+        this.updatePolygonCount();
+      });
+
+    // Polygon count display (read-only)
+    performanceFolder
+      .add(this.performanceSettings, 'polygonCount')
+      .name('Total Polygons')
+      .listen();
+
+    // Render time display (read-only)
+    performanceFolder
+      .add(this.performanceSettings, 'lastRenderTime')
+      .name('Last Frame (ms)')
+      .listen();
+  }
+
+  /**
+   * Count total polygons in all neighborhood meshes
+   */
+  private updatePolygonCount(): void {
+    let totalPolygons = 0;
+
+    this.neighborhoodMeshes.forEach(obj => {
+      obj.traverse(child => {
+        if (child instanceof THREE.Mesh && child.geometry) {
+          const geometry = child.geometry;
+          if (geometry.index !== null) {
+            totalPolygons += geometry.index.count / 3;
+          } else {
+            const positionAttribute = geometry.getAttribute('position');
+            if (positionAttribute) {
+              totalPolygons += positionAttribute.count / 3;
+            }
+          }
+        }
+      });
+    });
+
+    this.performanceSettings.polygonCount = Math.floor(totalPolygons);
+    console.log(`📊 Total polygons: ${this.performanceSettings.polygonCount.toLocaleString()}`);
+  }
+
+  /**
+   * Recreate all neighborhoods with current settings
+   */
+  private async recreateNeighborhoods(): Promise<void> {
+    // Clear existing neighborhoods
+    this.clearNeighborhoods();
+
+    // Update house group creator with current low-poly setting
+    this.houseGroupCreator.setLowPolyMode(this.isLowPoly);
+
+    // Recreate with current low-poly setting
+    await this.loadNeighborhoods(this.currentScene, this.currentGui);
+
+    console.log(`✅ Neighborhoods recreated in ${this.isLowPoly ? 'Low-Poly' : 'High-Detail'} mode`);
+  }
+
+  /**
+   * Clear all existing neighborhood meshes and labels
+   */
+  private clearNeighborhoods(): void {
+    // Remove meshes from scene
+    this.neighborhoodMeshes.forEach(mesh => {
+      if (mesh.parent) {
+        mesh.parent.remove(mesh);
+      }
+    });
+
+    // Remove labels from scene
+    this.labelMeshes.forEach(label => {
+      if (label.parent) {
+        label.parent.remove(label);
+      }
+    });
+
+    // Clear arrays
+    this.neighborhoodMeshes.length = 0;
+    this.labelMeshes.length = 0;
   }
 
   private async loadNeighborhoods(scene: THREE.Scene, gui: any): Promise<void> {
@@ -246,6 +359,9 @@ class TownWorkshop extends WorkshopDemoBase {
 
     // Add roads and infrastructure
     this.createRoads(scene);
+
+    // Update polygon count after loading all neighborhoods
+    this.updatePolygonCount();
   }
 
   /**
