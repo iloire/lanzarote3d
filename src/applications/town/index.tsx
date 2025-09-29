@@ -3,36 +3,10 @@ import { StoryOptions } from '../../shared/types';
 import { WorkshopDemoBase } from '../../shared/WorkshopDemoBase';
 import { HouseGroupCreator } from '../../shared/env/house-group-creator';
 import { ComponentRegistry } from '../../foundation/systems/ComponentRegistry';
-import { DEFAULT_VARIATION, NeighborhoodVariation } from '../../shared/env/house-group-types';
-
-const createLabel = (text: string, position: THREE.Vector3) => {
-  const canvas = document.createElement('canvas');
-  const context = canvas.getContext('2d');
-  canvas.width = 512;
-  canvas.height = 128;
-
-  if (context) {
-    context.fillStyle = 'rgba(0, 0, 0, 0.8)';
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    context.font = 'bold 36px Arial';
-    context.fillStyle = '#ffffff';
-    context.textAlign = 'center';
-    context.fillText(text, canvas.width / 2, canvas.height / 2 + 12);
-  }
-
-  const texture = new THREE.CanvasTexture(canvas);
-  const material = new THREE.MeshBasicMaterial({
-    map: texture,
-    transparent: true,
-    side: THREE.DoubleSide,
-    depthTest: false,
-  });
-  const geometry = new THREE.PlaneGeometry(20, 5);
-  const mesh = new THREE.Mesh(geometry, material);
-  mesh.position.copy(position);
-  mesh.position.y = 50;
-  return mesh;
-};
+import { createLabel } from './label-utils';
+import { TOWN_NEIGHBORHOODS, NeighborhoodConfig } from './neighborhoods-data';
+import { PerformanceUI, PerformanceSettings, PolygonBreakdown } from './performance-ui';
+import { disposeObject3D, disposeObjects } from './disposal-utils';
 
 /**
  * Town Workshop - Showcase of neighborhood generation using HouseGroupCreator
@@ -47,9 +21,8 @@ class TownWorkshop extends WorkshopDemoBase {
   private currentScene!: THREE.Scene;
   private currentGui: any;
   private isLowPoly: boolean = true; // Start in low-poly mode by default
-  private toggleButton!: HTMLButtonElement;
-  private performanceDisplay!: HTMLDivElement;
-  private performanceSettings = {
+  private performanceUI!: PerformanceUI;
+  private performanceSettings: PerformanceSettings = {
     lowPoly: true, // Start in low-poly mode by default
     polygonCount: 0,
     lastRenderTime: 0,
@@ -104,10 +77,14 @@ class TownWorkshop extends WorkshopDemoBase {
       this.setupPerformanceControls(gui);
 
       // Setup on-screen HTML controls
-      this.setupOnScreenControls();
+      this.performanceUI = new PerformanceUI(
+        this.performanceSettings,
+        () => this.neighborhoodMeshes.length
+      );
+      this.performanceUI.initialize(() => this.toggleLowPolyMode());
 
       // Load all neighborhoods with proper tracking
-      await this.loadNeighborhoods(scene, gui);
+      await this.loadNeighborhoods(scene);
 
       // Setup camera and animation
       this.setupCamera(camera);
@@ -128,75 +105,6 @@ class TownWorkshop extends WorkshopDemoBase {
     }
   }
 
-  /**
-   * Setup on-screen HTML controls for easy access
-   */
-  private setupOnScreenControls(): void {
-    // Create container for controls
-    const controlsContainer = document.createElement('div');
-    controlsContainer.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 1000;
-      font-family: Arial, sans-serif;
-      background: rgba(0, 0, 0, 0.8);
-      padding: 15px;
-      border-radius: 10px;
-      color: white;
-      min-width: 200px;
-      backdrop-filter: blur(5px);
-    `;
-
-    // Create toggle button
-    this.toggleButton = document.createElement('button');
-    this.toggleButton.textContent = '🏗️ High Detail Mode';
-    this.toggleButton.style.cssText = `
-      width: 100%;
-      padding: 10px;
-      font-size: 14px;
-      font-weight: bold;
-      border: none;
-      border-radius: 5px;
-      background: linear-gradient(45deg, #4CAF50, #45a049);
-      color: white;
-      cursor: pointer;
-      margin-bottom: 10px;
-      transition: all 0.3s ease;
-    `;
-
-    this.toggleButton.addEventListener('mouseenter', () => {
-      this.toggleButton.style.transform = 'scale(1.05)';
-    });
-
-    this.toggleButton.addEventListener('mouseleave', () => {
-      this.toggleButton.style.transform = 'scale(1)';
-    });
-
-    this.toggleButton.addEventListener('click', async () => {
-      await this.toggleLowPolyMode();
-    });
-
-    // Create performance display
-    this.performanceDisplay = document.createElement('div');
-    this.performanceDisplay.style.cssText = `
-      font-size: 12px;
-      color: #ccc;
-      line-height: 1.4;
-    `;
-
-    // Add elements to container
-    controlsContainer.appendChild(this.toggleButton);
-    controlsContainer.appendChild(this.performanceDisplay);
-
-    // Add to page
-    document.body.appendChild(controlsContainer);
-
-    // Initial update
-    this.updateOnScreenDisplay();
-
-    console.log('✅ On-screen controls created successfully');
-  }
 
   /**
    * Toggle between low-poly and high-detail modes
@@ -209,9 +117,8 @@ class TownWorkshop extends WorkshopDemoBase {
 
     console.log(`🔄 Switching to ${this.isLowPoly ? 'Low-Poly' : 'High-Detail'} mode...`);
 
-    // Update button to show loading state
-    this.toggleButton.textContent = '⏳ Rebuilding...';
-    this.toggleButton.disabled = true;
+    // Update UI to show loading state
+    this.performanceUI.setLoading(true);
 
     try {
       // Force garbage collection hint (if available)
@@ -231,67 +138,10 @@ class TownWorkshop extends WorkshopDemoBase {
       console.error('❌ Error toggling low-poly mode:', error);
     } finally {
       // Re-enable button and update display
-      this.toggleButton.disabled = false;
-      this.updateOnScreenDisplay();
+      this.performanceUI.setLoading(false);
     }
   }
 
-  /**
-   * Update on-screen display with current state
-   */
-  private updateOnScreenDisplay(polygonCounts?: any): void {
-    // Update button text and style
-    if (this.isLowPoly) {
-      this.toggleButton.textContent = '⚡ Low-Poly Mode';
-      this.toggleButton.style.background = 'linear-gradient(45deg, #FF9800, #F57C00)';
-    } else {
-      this.toggleButton.textContent = '🏗️ High Detail Mode';
-      this.toggleButton.style.background = 'linear-gradient(45deg, #4CAF50, #45a049)';
-    }
-
-    // Update performance display with detailed breakdown if available
-    let polygonInfo = '';
-    if (polygonCounts) {
-      const totalPolygons = Object.values(polygonCounts).reduce((sum: number, count: any) => sum + count, 0);
-
-      // Calculate percentages
-      const percentages = {
-        houses: ((polygonCounts.houses / totalPolygons) * 100).toFixed(1),
-        cacti: ((polygonCounts.cacti / totalPolygons) * 100).toFixed(1),
-        stones: ((polygonCounts.stones / totalPolygons) * 100).toFixed(1),
-        pools: ((polygonCounts.pools / totalPolygons) * 100).toFixed(1),
-        roads: ((polygonCounts.roads / totalPolygons) * 100).toFixed(1),
-        other: ((polygonCounts.other / totalPolygons) * 100).toFixed(1)
-      };
-
-      polygonInfo = `
-        <div><strong>Total Polygons:</strong> ${Math.floor(totalPolygons).toLocaleString()}</div>
-        <div style="margin-top: 8px; font-size: 11px; color: #ddd; border-top: 1px solid #333; padding-top: 6px;">
-          <div style="margin-bottom: 3px; font-weight: bold;">📊 Breakdown:</div>
-          <div>🏠 Houses: ${Math.floor(polygonCounts.houses).toLocaleString()} (${percentages.houses}%)</div>
-          <div>🌵 Cacti: ${Math.floor(polygonCounts.cacti).toLocaleString()} (${percentages.cacti}%)</div>
-          <div>🪨 Stones: ${Math.floor(polygonCounts.stones).toLocaleString()} (${percentages.stones}%)</div>
-          <div>🏊 Pools: ${Math.floor(polygonCounts.pools).toLocaleString()} (${percentages.pools}%)</div>
-          <div>🛣️ Roads: ${Math.floor(polygonCounts.roads).toLocaleString()} (${percentages.roads}%)</div>
-          <div>❓ Other: ${Math.floor(polygonCounts.other).toLocaleString()} (${percentages.other}%)</div>
-        </div>
-      `;
-    } else {
-      const polygonText = this.performanceSettings.polygonCount > 0
-        ? this.performanceSettings.polygonCount.toLocaleString()
-        : 'Calculating...';
-      polygonInfo = `<div><strong>Polygons:</strong> ${polygonText}</div>`;
-    }
-
-    this.performanceDisplay.innerHTML = `
-      <div style="background: rgba(0,0,0,0.9); color: white; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 12px; line-height: 1.4; min-width: 240px;">
-        <div><strong>Mode:</strong> ${this.isLowPoly ? 'Performance' : 'Quality'}</div>
-        ${polygonInfo}
-        <div><strong>Neighborhoods:</strong> ${this.neighborhoodMeshes.length > 0 ? '27' : 'Loading...'}</div>
-        <div style="margin-top: 6px; font-size: 10px; color: #aaa;">Click button to toggle modes</div>
-      </div>
-    `;
-  }
 
   /**
    * Setup performance controls and monitoring
@@ -431,8 +281,8 @@ class TownWorkshop extends WorkshopDemoBase {
     console.log(`  📊 TOTAL: ${this.performanceSettings.polygonCount.toLocaleString()} polygons`);
 
     // Update on-screen display if available
-    if (this.performanceDisplay) {
-      this.updateOnScreenDisplay(polygonCounts);
+    if (this.performanceUI) {
+      this.performanceUI.updateDisplay(polygonCounts as PolygonBreakdown);
     }
   }
 
@@ -453,7 +303,7 @@ class TownWorkshop extends WorkshopDemoBase {
     this.houseGroupCreator.setLowPolyMode(this.isLowPoly);
 
     // Recreate with current low-poly setting
-    await this.loadNeighborhoods(this.currentScene, this.currentGui);
+    await this.loadNeighborhoods(this.currentScene);
 
     console.log(`✅ Neighborhoods recreated in ${this.isLowPoly ? 'Low-Poly' : 'High-Detail'} mode`);
   }
@@ -464,29 +314,14 @@ class TownWorkshop extends WorkshopDemoBase {
   private clearNeighborhoods(): void {
     console.log(`🧹 Clearing ${this.neighborhoodMeshes.length} neighborhood objects, ${this.labelMeshes.length} labels, and ${this.roadMeshes.length} roads`);
 
-    // Properly dispose neighborhood meshes
-    this.neighborhoodMeshes.forEach(mesh => {
-      this.disposeObject3D(mesh);
-      if (mesh.parent) {
-        mesh.parent.remove(mesh);
-      }
-    });
+    // Properly dispose neighborhood meshes using imported utility
+    disposeObjects(this.neighborhoodMeshes);
 
-    // Properly dispose label meshes
-    this.labelMeshes.forEach(label => {
-      this.disposeObject3D(label);
-      if (label.parent) {
-        label.parent.remove(label);
-      }
-    });
+    // Properly dispose label meshes using imported utility
+    disposeObjects(this.labelMeshes);
 
-    // Properly dispose road meshes
-    this.roadMeshes.forEach(road => {
-      this.disposeObject3D(road);
-      if (road.parent) {
-        road.parent.remove(road);
-      }
-    });
+    // Properly dispose road meshes using imported utility
+    disposeObjects(this.roadMeshes);
 
     // Clear arrays
     this.neighborhoodMeshes.length = 0;
@@ -496,276 +331,10 @@ class TownWorkshop extends WorkshopDemoBase {
     console.log('✅ Neighborhood cleanup completed');
   }
 
-  /**
-   * Recursively dispose of Three.js objects to prevent memory leaks
-   */
-  private disposeObject3D(obj: THREE.Object3D): void {
-    // Recursively dispose children first
-    obj.children.forEach(child => {
-      this.disposeObject3D(child);
-    });
 
-    // Dispose of mesh-specific resources
-    if (obj instanceof THREE.Mesh) {
-      // Dispose geometry
-      if (obj.geometry) {
-        obj.geometry.dispose();
-      }
-
-      // Dispose materials
-      if (obj.material) {
-        if (Array.isArray(obj.material)) {
-          obj.material.forEach(material => {
-            this.disposeMaterial(material);
-          });
-        } else {
-          this.disposeMaterial(obj.material);
-        }
-      }
-    }
-
-    // Clear any user data or custom properties
-    obj.userData = {};
-  }
-
-  /**
-   * Safely dispose of Three.js materials
-   */
-  private disposeMaterial(material: THREE.Material): void {
-    // Dispose of textures and other disposable properties
-    Object.values(material).forEach(value => {
-      if (value && typeof value === 'object' && 'dispose' in value && typeof (value as any).dispose === 'function') {
-        try {
-          (value as any).dispose();
-        } catch (error) {
-          console.warn('Error disposing material property:', error);
-        }
-      }
-    });
-
-    // Dispose the material itself
-    try {
-      material.dispose();
-    } catch (error) {
-      console.warn('Error disposing material:', error);
-    }
-  }
-
-  private async loadNeighborhoods(scene: THREE.Scene, gui: any): Promise<void> {
-    // Define neighborhood configurations - 17 neighborhoods showcasing different formations
-    // Positioned strategically across the expanded 2400x2000 ground area
-    const neighborhoods: Array<{
-      name: string;
-      center: THREE.Vector3;
-      type: 'suburban' | 'urban' | 'rural' | 'cul-de-sac' | 'street' | 'grid' | 'luxury' | 'random';
-      size?: 'small' | 'medium' | 'large';
-      density?: 'compact' | 'dense' | 'downtown';
-      style?: 'farmstead' | 'village' | 'scattered';
-      houses?: number;
-      variation: NeighborhoodVariation;
-    }> = [
-      {
-        name: 'Suburban District',
-        center: new THREE.Vector3(-600, 0, -150),
-        type: 'suburban',
-        size: 'medium',
-        variation: DEFAULT_VARIATION,
-      },
-      {
-        name: 'Urban Center',
-        center: new THREE.Vector3(550, 0, -120),
-        type: 'urban',
-        density: 'dense',
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.1 },
-      },
-      {
-        name: 'Cul-de-Sac Community',
-        center: new THREE.Vector3(-550, 0, 150),
-        type: 'cul-de-sac',
-        houses: 8,
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.4 },
-      },
-      {
-        name: 'Luxury Estates',
-        center: new THREE.Vector3(600, 0, 180),
-        type: 'luxury',
-        houses: 6,
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.8 },
-      },
-      {
-        name: 'Village Green',
-        center: new THREE.Vector3(-200, 0, 80),
-        type: 'rural',
-        style: 'village',
-        houses: 10,
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.3 },
-      },
-      {
-        name: 'Industrial District',
-        center: new THREE.Vector3(-650, 0, 400),
-        type: 'grid',
-        houses: 12,
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.1 },
-      },
-      {
-        name: 'Riverside Commons',
-        center: new THREE.Vector3(200, 0, -350),
-        type: 'street',
-        houses: 14,
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.5 },
-      },
-      {
-        name: 'Farm Community',
-        center: new THREE.Vector3(650, 0, 400),
-        type: 'rural',
-        style: 'farmstead',
-        houses: 8,
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.2 },
-      },
-      {
-        name: 'Metro Heights',
-        center: new THREE.Vector3(-150, 0, -350),
-        type: 'urban',
-        density: 'downtown',
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.05 },
-      },
-      // Phase 1: New neighborhood types
-      {
-        name: 'Tech Campus',
-        center: new THREE.Vector3(0, 0, 700),
-        type: 'grid',
-        houses: 12,
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.2 },
-      },
-      {
-        name: 'Historic District',
-        center: new THREE.Vector3(-300, 0, -700),
-        type: 'street',
-        houses: 10,
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.6 },
-      },
-      {
-        name: 'Waterfront Villas',
-        center: new THREE.Vector3(400, 0, 700),
-        type: 'luxury',
-        houses: 8,
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.9 },
-      },
-      {
-        name: 'Student Housing',
-        center: new THREE.Vector3(0, 0, -700),
-        type: 'urban',
-        density: 'dense',
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.1 },
-      },
-      // Phase 2: Strategic gap fillers
-      {
-        name: 'Mountain View Estates',
-        center: new THREE.Vector3(-900, 0, -300),
-        type: 'rural',
-        style: 'scattered',
-        houses: 6,
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.7 },
-      },
-      {
-        name: 'Commercial District',
-        center: new THREE.Vector3(900, 0, -200),
-        type: 'grid',
-        houses: 15,
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.15 },
-      },
-      {
-        name: 'Eco Village',
-        center: new THREE.Vector3(-400, 0, 800),
-        type: 'rural',
-        style: 'village',
-        houses: 8,
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.3 },
-      },
-      {
-        name: 'Senior Community',
-        center: new THREE.Vector3(300, 0, 500),
-        type: 'suburban',
-        size: 'small',
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.4 },
-      },
-      // Phase 3: Fill empty spaces within current boundaries
-      {
-        name: 'Central Plaza',
-        center: new THREE.Vector3(0, 0, 300),
-        type: 'cul-de-sac',
-        houses: 6,
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.5 },
-      },
-      {
-        name: 'Midtown Residences',
-        center: new THREE.Vector3(100, 0, 100),
-        type: 'street',
-        houses: 10,
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.3 },
-      },
-      {
-        name: 'Artisan Quarter',
-        center: new THREE.Vector3(-100, 0, -100),
-        type: 'suburban',
-        size: 'small',
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.6 },
-      },
-      {
-        name: 'East Gardens',
-        center: new THREE.Vector3(750, 0, 100),
-        type: 'luxury',
-        houses: 5,
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.8 },
-      },
-      {
-        name: 'Heritage Homes',
-        center: new THREE.Vector3(-700, 0, 100),
-        type: 'rural',
-        style: 'village',
-        houses: 7,
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.4 },
-      },
-      {
-        name: 'Southside Commons',
-        center: new THREE.Vector3(0, 0, -450),
-        type: 'grid',
-        houses: 9,
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.2 },
-      },
-      {
-        name: 'Desert Oaks',
-        center: new THREE.Vector3(-300, 0, 300),
-        type: 'cul-de-sac',
-        houses: 8,
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.4 },
-      },
-      {
-        name: 'Sunrise Estates',
-        center: new THREE.Vector3(500, 0, -50),
-        type: 'suburban',
-        size: 'medium',
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.6 },
-      },
-      {
-        name: 'Westside Village',
-        center: new THREE.Vector3(-500, 0, -50),
-        type: 'street',
-        houses: 8,
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.3 },
-      },
-      {
-        name: 'Canyon View',
-        center: new THREE.Vector3(200, 0, 200),
-        type: 'rural',
-        style: 'scattered',
-        houses: 5,
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.7 },
-      },
-    ];
-
-    // Create each neighborhood
-    for (const config of neighborhoods) {
+  private async loadNeighborhoods(scene: THREE.Scene): Promise<void> {
+    // Create each neighborhood using imported configuration
+    for (const config of TOWN_NEIGHBORHOODS) {
       try {
         let houses: THREE.Object3D[] = [];
 
@@ -1028,9 +597,9 @@ class TownWorkshop extends WorkshopDemoBase {
   public override dispose(): void {
     console.log(`🧹 Disposing ${this.config.name}`);
 
-    // Remove on-screen controls
-    if (this.toggleButton && this.toggleButton.parentElement) {
-      this.toggleButton.parentElement.remove();
+    // Remove on-screen controls using PerformanceUI
+    if (this.performanceUI) {
+      this.performanceUI.dispose();
     }
 
     // Cancel animation loop
