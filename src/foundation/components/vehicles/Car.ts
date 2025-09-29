@@ -1,12 +1,12 @@
 import * as THREE from 'three';
 import {
-  MovingFloatingThreeComponent,
-  MovingFloatingComponentOptions,
-} from '../base/MovingFloatingThreeComponent';
+  MovableCarComponent,
+  MovableCarComponentOptions,
+} from '../base/MovableCarComponent';
 import { resourceManager } from '../../systems/ResourceManager';
 import { MovementPattern } from '../../systems/behaviors/MovingBehavior';
 
-export interface CarOptions extends MovingFloatingComponentOptions {
+export interface CarOptions extends MovableCarComponentOptions {
   bodyColor?: string;
   roofColor?: string;
   windowColor?: string;
@@ -16,9 +16,9 @@ export interface CarOptions extends MovingFloatingComponentOptions {
 
 /**
  * Car vehicle that can drive around with customizable colors
- * Based on MovingFloatingThreeComponent for movement capabilities but without floating
+ * Based on MovableCarComponent for proper ground-based movement
  */
-export class Car extends MovingFloatingThreeComponent {
+export class Car extends MovableCarComponent {
   constructor(options: CarOptions = {}) {
     super(
       {
@@ -37,8 +37,8 @@ export class Car extends MovingFloatingThreeComponent {
         pattern: MovementPattern.CIRCULAR,
         speed: 0.4,
         radius: 150,
+        enableMovement: true,
         autoStartMoving: true,
-        autoStartFloating: false, // Cars don't float!
         faceDirection: true,
         forwardAxis: 'x', // Cars move forward in +X direction
         ...options,
@@ -51,7 +51,12 @@ export class Car extends MovingFloatingThreeComponent {
     return new THREE.BoxGeometry(1, 1, 1);
   }
 
-  protected createSyncContent(): THREE.Object3D {
+  protected override async createObject(): Promise<THREE.Object3D> {
+    // Use the procedural car geometry creation
+    return this.createCarGeometry();
+  }
+
+  private createCarGeometry(): THREE.Object3D {
     const car = new THREE.Group();
     car.name = 'Car';
 
@@ -193,6 +198,22 @@ export class Car extends MovingFloatingThreeComponent {
     // Apply scale
     if (scale !== 1) {
       car.scale.setScalar(scale);
+    }
+
+    return car;
+  }
+
+  /**
+   * Load the component synchronously for backward compatibility
+   */
+  public override loadSync(): THREE.Object3D {
+    const car = this.createCarGeometry();
+    this._object = car;
+    this._isLoaded = true;
+
+    // Start moving if enabled
+    if ((this.options as CarOptions).enableMovement && ((this.options as CarOptions).autoStartMoving ?? true)) {
+      this.startMoving();
     }
 
     return car;

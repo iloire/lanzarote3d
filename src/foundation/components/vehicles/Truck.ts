@@ -1,12 +1,12 @@
 import * as THREE from 'three';
 import {
-  MovingFloatingThreeComponent,
-  MovingFloatingComponentOptions,
-} from '../base/MovingFloatingThreeComponent';
+  MovableCarComponent,
+  MovableCarComponentOptions,
+} from '../base/MovableCarComponent';
 import { resourceManager } from '../../systems/ResourceManager';
 import { MovementPattern } from '../../systems/behaviors/MovingBehavior';
 
-export interface TruckOptions extends MovingFloatingComponentOptions {
+export interface TruckOptions extends MovableCarComponentOptions {
   cabColor?: string;
   bedColor?: string;
   windowColor?: string;
@@ -16,9 +16,9 @@ export interface TruckOptions extends MovingFloatingComponentOptions {
 
 /**
  * Truck vehicle that can drive around with customizable colors
- * Larger than a car with a cargo bed, based on MovingFloatingThreeComponent
+ * Larger than a car with a cargo bed, based on MovableCarComponent
  */
-export class Truck extends MovingFloatingThreeComponent {
+export class Truck extends MovableCarComponent {
   constructor(options: TruckOptions = {}) {
     super(
       {
@@ -37,8 +37,8 @@ export class Truck extends MovingFloatingThreeComponent {
         pattern: MovementPattern.PATROL,
         speed: 0.25,
         radius: 200,
+        enableMovement: true,
         autoStartMoving: true,
-        autoStartFloating: false, // Trucks don't float either!
         faceDirection: true,
         forwardAxis: 'x', // Trucks move forward in +X direction
         ...options,
@@ -47,11 +47,17 @@ export class Truck extends MovingFloatingThreeComponent {
   }
 
   protected createGeometry(): THREE.BufferGeometry {
-    // Return placeholder - actual geometry created in createSyncContent
+    // Trucks use complex procedural geometry, not a simple BufferGeometry
+    // Return a placeholder - actual geometry is created in the override createObject method
     return new THREE.BoxGeometry(1, 1, 1);
   }
 
-  protected createSyncContent(): THREE.Object3D {
+  protected override async createObject(): Promise<THREE.Object3D> {
+    // Use the procedural truck geometry creation
+    return this.createTruckGeometry();
+  }
+
+  private createTruckGeometry(): THREE.Object3D {
     const truck = new THREE.Group();
     truck.name = 'Truck';
 
@@ -243,6 +249,22 @@ export class Truck extends MovingFloatingThreeComponent {
     // Apply scale
     if (scale !== 1) {
       truck.scale.setScalar(scale);
+    }
+
+    return truck;
+  }
+
+  /**
+   * Load the component synchronously for backward compatibility
+   */
+  public override loadSync(): THREE.Object3D {
+    const truck = this.createTruckGeometry();
+    this._object = truck;
+    this._isLoaded = true;
+
+    // Start moving if enabled
+    if ((this.options as TruckOptions).enableMovement && ((this.options as TruckOptions).autoStartMoving ?? true)) {
+      this.startMoving();
     }
 
     return truck;

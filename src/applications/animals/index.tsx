@@ -34,10 +34,10 @@ class AnimalsApp extends WorkshopDemoBase {
       // Initialize core systems
       this.initializeCore(options);
 
-      const { camera, scene, renderer, gui, controls } = options;
+      // Set up clean workshop environment with specified ground and lighting
+      this.setupCleanEnvironment(options);
 
-      // Set up lighting for bird display
-      this.setupLighting(scene);
+      const { camera, scene, renderer, gui, controls } = options;
 
       // Set up camera position for bird viewing
       this.setupCamera(camera, controls);
@@ -59,24 +59,6 @@ class AnimalsApp extends WorkshopDemoBase {
     }
   }
 
-  private setupLighting(scene: THREE.Scene): void {
-    // Ambient light for overall illumination
-    const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
-    scene.add(ambientLight);
-
-    // Directional light to highlight bird features
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.set(10, 10, 5);
-    directionalLight.castShadow = true;
-    directionalLight.shadow.mapSize.width = 2048;
-    directionalLight.shadow.mapSize.height = 2048;
-    scene.add(directionalLight);
-
-    // Additional fill light from the opposite side
-    const fillLight = new THREE.DirectionalLight(0x87CEEB, 0.3); // Sky blue
-    fillLight.position.set(-5, 5, -5);
-    scene.add(fillLight);
-  }
 
   private setupCamera(camera: THREE.PerspectiveCamera, controls: any): void {
     // Position camera closer for better bird viewing
@@ -107,12 +89,6 @@ class AnimalsApp extends WorkshopDemoBase {
     const crowMesh = this.crow.getMesh();
     if (crowMesh) {
       crowMesh.position.set(-4, 2, 0);
-      // Temporarily enable wireframe for debugging
-      crowMesh.traverse((child) => {
-        if (child instanceof THREE.Mesh) {
-          child.material.wireframe = true;
-        }
-      });
       scene.add(crowMesh);
       console.log('✅ Crow added to scene at position (-4, 2, 0)');
     } else {

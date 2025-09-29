@@ -48,8 +48,8 @@ export class AutonomousCar extends Car {
       wheelColor: options.wheelColor || '#222222',
       scale: options.scale || 1,
       // Disable the base movement system - we'll use terrain following
+      enableMovement: false,
       autoStartMoving: false,
-      autoStartFloating: false,
       faceDirection: true,
       forwardAxis: 'x',
     };
@@ -151,7 +151,7 @@ export class AutonomousCar extends Car {
   /**
    * Set the terrain for navigation
    */
-  setTerrain(terrain: THREE.Mesh): void {
+  override setTerrain(terrain: THREE.Mesh): void {
     if (this.terrainBehavior) {
       this.terrainBehavior.setTerrain(terrain);
     }

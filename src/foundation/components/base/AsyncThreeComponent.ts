@@ -5,7 +5,7 @@ import { ComponentOptions, ComponentMetadata } from './IThreeComponent';
 /**
  * Resource types that can be loaded asynchronously
  */
-export type ResourceType = 'model' | 'texture' | 'audio' | 'data' | 'font';
+export type ResourceType = 'model' | 'texture';
 
 /**
  * Resource descriptor for async loading
@@ -222,33 +222,39 @@ export abstract class AsyncThreeComponent extends BaseThreeComponent {
         return this.loadModel(descriptor.url, descriptor.options);
       case 'texture':
         return this.loadTexture(descriptor.url, descriptor.options);
-      case 'audio':
-        return this.loadAudio(descriptor.url, descriptor.options);
-      case 'data':
-        return this.loadData(descriptor.url, descriptor.options);
-      case 'font':
-        return this.loadFont(descriptor.url, descriptor.options);
       default:
         throw new Error(`Unsupported resource type: ${descriptor.type}`);
     }
   }
 
   /**
-   * Load 3D model (OBJ, GLTF, etc.)
+   * Load 3D model (GLTF, GLB, OBJ, etc.)
    */
   protected async loadModel(url: string, options?: any): Promise<THREE.Object3D> {
-    // This would integrate with your existing model loaders
-    // For now, return a placeholder
     return new Promise((resolve, reject) => {
-      // Use appropriate loader based on file extension
       const extension = url.split('.').pop()?.toLowerCase();
 
-      if (extension === 'obj') {
-        // Use OBJ loader
-        const loader = new THREE.ObjectLoader();
-        loader.load(url, resolve, undefined, reject);
-      } else {
-        reject(new Error(`Unsupported model format: ${extension}`));
+      switch (extension) {
+        case 'gltf':
+        case 'glb': {
+          // GLTF/GLB files - most common format
+          // Note: This requires GLTFLoader to be imported separately
+          // For now, return a simple box as placeholder until GLTFLoader is available
+          const geometry = new THREE.BoxGeometry(1, 1, 1);
+          const material = new THREE.MeshStandardMaterial({ color: 0x999999 });
+          const mesh = new THREE.Mesh(geometry, material);
+          mesh.name = `placeholder-${url.split('/').pop()}`;
+          resolve(mesh);
+          break;
+        }
+        case 'obj': {
+          // OBJ files
+          const loader = new THREE.ObjectLoader();
+          loader.load(url, resolve, undefined, reject);
+          break;
+        }
+        default:
+          reject(new Error(`Unsupported model format: ${extension}. Supported formats: gltf, glb, obj`));
       }
     });
   }
@@ -273,43 +279,6 @@ export abstract class AsyncThreeComponent extends BaseThreeComponent {
     });
   }
 
-  /**
-   * Load audio file
-   */
-  protected async loadAudio(url: string, _options?: any): Promise<AudioBuffer> {
-    const response = await fetch(url);
-    const arrayBuffer = await response.arrayBuffer();
-
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-    return audioContext.decodeAudioData(arrayBuffer);
-  }
-
-  /**
-   * Load data file (JSON, etc.)
-   */
-  protected async loadData(url: string, _options?: any): Promise<any> {
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      throw new Error(`Failed to load data: ${response.statusText}`);
-    }
-
-    const contentType = response.headers.get('content-type');
-    if (contentType?.includes('application/json')) {
-      return response.json();
-    } else {
-      return response.text();
-    }
-  }
-
-  /**
-   * Load font (placeholder implementation)
-   */
-  protected async loadFont(_url: string, _options?: any): Promise<any> {
-    // FontLoader not available in current Three.js version
-    // This would need to be implemented with a compatible loader
-    return Promise.reject(new Error('Font loading not implemented'));
-  }
 
   /**
    * Get a loaded resource by ID
