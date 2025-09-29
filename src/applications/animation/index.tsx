@@ -14,6 +14,7 @@ import {
   ORBIT_CONTROLS_PRESETS,
 } from '../../foundation/utils/OrbitControlsHelper';
 import { getAppConfig } from '../../config/app-registry';
+import { FlyingBehavior, FlightPattern } from '../../foundation/systems/behaviors/FlyingBehavior';
 
 type ParagliderVoxelConfig = {
   pg: ParagliderVoxelOptions;
@@ -47,6 +48,7 @@ class AnimationApp extends TerrainBase {
   private animationId: number | undefined;
   private paragliderMeshes: THREE.Object3D[] = [];
   private animatorInstance: any | undefined;
+  private flyingBehavior: FlyingBehavior | undefined;
 
   // Animation configuration
   private readonly ANIMATION_DURATION_MS = 6000; // 6 seconds
@@ -151,6 +153,36 @@ class AnimationApp extends TerrainBase {
     });
 
     await Promise.all(voxelPromises);
+
+    // Set up flying behavior for the first paraglider
+    if (this.paragliderMeshes.length > 0) {
+      const paragliderMesh = this.paragliderMeshes[0];
+      const centerPoint = paragliderMesh.position.clone();
+
+      // Create flying behavior with cinematic settings
+      this.flyingBehavior = new FlyingBehavior({
+        pattern: FlightPattern.CIRCULAR,
+        speed: 8.0, // Faster for dramatic effect
+        turnSpeed: 0.8,
+        flightRadius: 150, // Large radius for cinematic movement
+        minHeight: centerPoint.y - 50,
+        maxHeight: centerPoint.y + 100,
+        centerPoint: centerPoint,
+        faceDirection: true,
+        forwardAxis: 'z', // Voxel paraglider faces forward in Z direction
+      });
+
+      // Attach to paraglider mesh
+      this.flyingBehavior.attachTo(paragliderMesh);
+
+      // Start flying behavior after animation completes
+      setTimeout(() => {
+        if (this.flyingBehavior) {
+          this.flyingBehavior.start();
+          console.log('🪂 Flying behavior started for paraglider');
+        }
+      }, this.ANIMATION_DURATION_MS + 1000); // Start 1 second after animation ends
+    }
   }
 
   private setupCameraAnimation(
@@ -321,6 +353,12 @@ class AnimationApp extends TerrainBase {
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
       this.animationId = undefined;
+    }
+
+    // Stop flying behavior
+    if (this.flyingBehavior) {
+      this.flyingBehavior.dispose();
+      this.flyingBehavior = undefined;
     }
 
     // Stop animator if running
