@@ -93,16 +93,6 @@
       "priority": 3,
       "theme": "artic"
     },
-    "boats-animation": {
-      "name": "Boats Animation",
-      "description": "Cinematic animation starting near boats and transitioning to focus on paragliders and clouds",
-      "entry": "./applications/boats-animation/index.tsx",
-      "route": "/boats-animation",
-      "category": "demo",
-      "requiresWebGL": true,
-      "visibility": "public",
-      "priority": 4
-    },
     "boats": {
       "name": "Boats Workshop",
       "description": "Multiple boat types showcase with variations",
