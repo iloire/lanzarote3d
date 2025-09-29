@@ -46,11 +46,11 @@ class TownWorkshop extends WorkshopDemoBase {
   private componentRegistry!: ComponentRegistry;
   private currentScene!: THREE.Scene;
   private currentGui: any;
-  private isLowPoly: boolean = false;
+  private isLowPoly: boolean = true; // Start in low-poly mode by default
   private toggleButton!: HTMLButtonElement;
   private performanceDisplay!: HTMLDivElement;
   private performanceSettings = {
-    lowPoly: false,
+    lowPoly: true, // Start in low-poly mode by default
     polygonCount: 0,
     lastRenderTime: 0,
   };
@@ -96,6 +96,9 @@ class TownWorkshop extends WorkshopDemoBase {
       // Initialize component registry and house group creator
       this.componentRegistry = new ComponentRegistry();
       this.houseGroupCreator = new HouseGroupCreator(scene, this.componentRegistry);
+
+      // Set initial low-poly mode
+      this.houseGroupCreator.setLowPolyMode(this.isLowPoly);
 
       // Setup performance controls
       this.setupPerformanceControls(gui);
@@ -254,7 +257,7 @@ class TownWorkshop extends WorkshopDemoBase {
     this.performanceDisplay.innerHTML = `
       <div><strong>Mode:</strong> ${this.isLowPoly ? 'Performance' : 'Quality'}</div>
       <div><strong>Polygons:</strong> ${polygonText}</div>
-      <div><strong>Neighborhoods:</strong> ${this.neighborhoodMeshes.length > 0 ? '5' : 'Loading...'}</div>
+      <div><strong>Neighborhoods:</strong> ${this.neighborhoodMeshes.length > 0 ? '9' : 'Loading...'}</div>
       <div style="margin-top: 8px; font-size: 11px; color: #aaa;">Click button to toggle modes</div>
     `;
   }
@@ -464,7 +467,7 @@ class TownWorkshop extends WorkshopDemoBase {
   }
 
   private async loadNeighborhoods(scene: THREE.Scene, gui: any): Promise<void> {
-    // Define neighborhood configurations - reduced from 9 to 5 neighborhoods for better performance
+    // Define neighborhood configurations - 9 neighborhoods showcasing different formations
     // Positioned away from roads (roads are at x=-400,0,400 and z=0)
     const neighborhoods: Array<{
       name: string;
@@ -511,6 +514,35 @@ class TownWorkshop extends WorkshopDemoBase {
         style: 'village',
         houses: 10,
         variation: { ...DEFAULT_VARIATION, poolChance: 0.3 },
+      },
+      {
+        name: 'Industrial District',
+        center: new THREE.Vector3(-650, 0, 400),
+        type: 'grid',
+        houses: 12,
+        variation: { ...DEFAULT_VARIATION, poolChance: 0.1 },
+      },
+      {
+        name: 'Riverside Commons',
+        center: new THREE.Vector3(200, 0, -350),
+        type: 'street',
+        houses: 14,
+        variation: { ...DEFAULT_VARIATION, poolChance: 0.5 },
+      },
+      {
+        name: 'Farm Community',
+        center: new THREE.Vector3(650, 0, 400),
+        type: 'rural',
+        style: 'farmstead',
+        houses: 8,
+        variation: { ...DEFAULT_VARIATION, poolChance: 0.2 },
+      },
+      {
+        name: 'Metro Heights',
+        center: new THREE.Vector3(-150, 0, -350),
+        type: 'urban',
+        density: 'downtown',
+        variation: { ...DEFAULT_VARIATION, poolChance: 0.05 },
       },
     ];
 
