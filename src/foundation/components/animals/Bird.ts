@@ -1,8 +1,6 @@
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { SimpleThreeComponent, SimpleComponentOptions } from '../base/SimpleThreeComponent';
 import { ComponentMetadata } from '../base/IThreeComponent';
-import birdModelUrl from '../../../../assets/foundation/models/environment/birds.glb';
 
 export interface BirdOptions extends SimpleComponentOptions {
   wingSpan?: number;
@@ -41,7 +39,8 @@ export abstract class Bird extends SimpleThreeComponent {
     // First call the parent load to get the base object
     this._object = await super.load();
 
-    await this.loadBirdModel();
+    // Create procedural bird geometry directly
+    this.createProceduralBird();
     this.setupWingAnimation();
 
     return this._object;
@@ -52,68 +51,104 @@ export abstract class Bird extends SimpleThreeComponent {
     return new THREE.BoxGeometry(1, 0.5, 2);
   }
 
-  private async loadBirdModel(): Promise<void> {
-    const loader = new GLTFLoader();
+  private createProceduralBird(): void {
+    // Create procedural bird geometry using Three.js shapes
+    const group = new THREE.Group();
+    group.name = `${this._metadata.name}_ProceduralBird`;
 
-    try {
-      console.log(`Loading bird model from: ${birdModelUrl}`);
-      const gltf = await new Promise<any>((resolve, reject) => {
-        loader.load(birdModelUrl, resolve, undefined, reject);
-      });
+    // Scale and position the model
+    const scale = this.getModelScale();
+    group.scale.setScalar(scale);
 
-      this.birdModel = gltf.scene;
-      console.log(`✅ Bird model loaded successfully for ${this._metadata.name}`);
+    // Body (ellipsoid) - main body shape, more streamlined
+    const bodyGeometry = new THREE.SphereGeometry(0.4, 16, 12);
+    bodyGeometry.scale(1.2, 0.8, 1.8); // More realistic bird proportions
+    const bodyMaterial = new THREE.MeshStandardMaterial({
+      color: this.getSpeciesColor(),
+      metalness: 0.1,
+      roughness: 0.7
+    });
+    const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+    body.position.set(0, 0, 0);
+    group.add(body);
 
-      // Scale and position the model
-      const scale = this.getModelScale();
-      this.birdModel.scale.setScalar(scale);
+    // Wings - more wing-like shape with better proportions
+    const wingShape = new THREE.Shape();
+    wingShape.moveTo(0, 0);
+    wingShape.quadraticCurveTo(0.8, 0.3, 1.4, 0);
+    wingShape.quadraticCurveTo(1.2, -0.2, 0.8, -0.4);
+    wingShape.quadraticCurveTo(0.4, -0.3, 0, 0);
 
-      // Apply species-specific coloring
-      this.applySpeciesColoring(this.birdModel);
-
-      // Find wing meshes for animation
-      this.findWingMeshes(this.birdModel);
-
-      // Add to the main mesh
-      if (this._object) {
-        this._object.add(this.birdModel);
-
-        // Debug: log model info
-        const boundingBox = new THREE.Box3().setFromObject(this.birdModel);
-        const size = boundingBox.getSize(new THREE.Vector3());
-        console.log(`✅ Bird model added to scene for ${this._metadata.name}`);
-        console.log(`📏 Model size: ${size.x.toFixed(2)} x ${size.y.toFixed(2)} x ${size.z.toFixed(2)}`);
-        console.log(`📦 Scale: ${this.birdModel.scale.x.toFixed(2)}`);
-      }
-
-    } catch (error) {
-      console.error('Failed to load bird model:', error);
-      // Fallback to procedural geometry
-      console.log(`🔧 Creating fallback geometry for ${this._metadata.name}`);
-      this.createFallbackGeometry();
-    }
-  }
-
-  private findWingMeshes(model: THREE.Group): void {
-    model.traverse((child) => {
-      if (child.name.toLowerCase().includes('wing_left') || child.name.toLowerCase().includes('left_wing')) {
-        this.leftWing = child;
-      } else if (child.name.toLowerCase().includes('wing_right') || child.name.toLowerCase().includes('right_wing')) {
-        this.rightWing = child;
-      } else if (child.name.toLowerCase().includes('body') || child.name.toLowerCase().includes('torso')) {
-        this.bodyMesh = child;
-      }
+    const wingGeometry = new THREE.ShapeGeometry(wingShape);
+    const wingMaterial = new THREE.MeshStandardMaterial({
+      color: this.getSpeciesColor(),
+      side: THREE.DoubleSide,
+      metalness: 0.1,
+      roughness: 0.8
     });
 
-    // If specific wing names not found, use first two mesh children as wings
-    if (!this.leftWing || !this.rightWing) {
-      const meshChildren = model.children.filter(child => child instanceof THREE.Mesh);
-      if (meshChildren.length >= 2) {
-        this.leftWing = meshChildren[0];
-        this.rightWing = meshChildren[1];
-      }
+    this.leftWing = new THREE.Mesh(wingGeometry, wingMaterial);
+    this.leftWing.position.set(-0.6, 0.1, -0.2);
+    this.leftWing.rotation.set(0, 0, Math.PI / 8);
+    this.leftWing.userData.originalRotation = this.leftWing.rotation.clone();
+    group.add(this.leftWing);
+
+    this.rightWing = new THREE.Mesh(wingGeometry, wingMaterial);
+    this.rightWing.position.set(0.6, 0.1, -0.2);
+    this.rightWing.rotation.set(0, Math.PI, -Math.PI / 8);
+    this.rightWing.userData.originalRotation = this.rightWing.rotation.clone();
+    group.add(this.rightWing);
+
+    // Tail - fan-shaped for better appearance
+    const tailGeometry = new THREE.ConeGeometry(0.3, 1.0, 8);
+    const tail = new THREE.Mesh(tailGeometry, bodyMaterial);
+    tail.position.set(0, 0, -1.0);
+    tail.rotation.x = Math.PI / 2;
+    tail.scale.set(1, 0.3, 1); // Flatten for fan shape
+    group.add(tail);
+
+    // Head - slightly smaller and better positioned
+    const headGeometry = new THREE.SphereGeometry(0.2, 12, 10);
+    headGeometry.scale(1, 1, 1.1); // Slightly elongated
+    const head = new THREE.Mesh(headGeometry, bodyMaterial);
+    head.position.set(0, 0.15, 0.65);
+    group.add(head);
+
+    // Beak - species-specific later, but better proportions
+    const beakGeometry = new THREE.ConeGeometry(0.04, 0.25, 8);
+    const beakMaterial = new THREE.MeshStandardMaterial({
+      color: 0xD2691E, // Saddle brown - more natural
+      metalness: 0.2,
+      roughness: 0.6
+    });
+    const beak = new THREE.Mesh(beakGeometry, beakMaterial);
+    beak.position.set(0, 0.05, 0.85);
+    beak.rotation.x = -Math.PI / 2;
+    group.add(beak);
+
+    // Eyes for more character
+    const eyeGeometry = new THREE.SphereGeometry(0.03, 8, 6);
+    const eyeMaterial = new THREE.MeshStandardMaterial({
+      color: 0x000000,
+      metalness: 0,
+      roughness: 0.3
+    });
+
+    const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+    leftEye.position.set(-0.12, 0.18, 0.7);
+    group.add(leftEye);
+
+    const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+    rightEye.position.set(0.12, 0.18, 0.7);
+    group.add(rightEye);
+
+    this.birdModel = group;
+    if (this._object) {
+      this._object.add(this.birdModel);
+      console.log(`✅ Enhanced procedural bird created for ${this._metadata.name}`);
     }
   }
+
 
   private setupWingAnimation(): void {
     if (!this.leftWing || !this.rightWing) {
@@ -126,54 +161,6 @@ export abstract class Bird extends SimpleThreeComponent {
     this.rightWing.userData.originalRotation = this.rightWing.rotation.clone();
   }
 
-  private createFallbackGeometry(): void {
-    // Create simple procedural bird shape if GLB fails to load
-    const group = new THREE.Group();
-
-    // Body (ellipsoid)
-    const bodyGeometry = new THREE.SphereGeometry(0.3, 16, 8);
-    bodyGeometry.scale(1, 0.6, 2); // Elongate for bird body
-    const bodyMaterial = new THREE.MeshStandardMaterial({
-      color: this.getSpeciesColor(),
-      metalness: 0.1,
-      roughness: 0.8
-    });
-    const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-    group.add(body);
-
-    // Wings
-    const wingGeometry = new THREE.PlaneGeometry(1.2, 0.6);
-    const wingMaterial = new THREE.MeshStandardMaterial({
-      color: this.getSpeciesColor(),
-      side: THREE.DoubleSide,
-      metalness: 0.1,
-      roughness: 0.9
-    });
-
-    this.leftWing = new THREE.Mesh(wingGeometry, wingMaterial);
-    this.leftWing.position.set(-0.8, 0, 0);
-    this.leftWing.rotation.z = Math.PI / 6;
-    this.leftWing.userData.originalRotation = this.leftWing.rotation.clone();
-    group.add(this.leftWing);
-
-    this.rightWing = new THREE.Mesh(wingGeometry, wingMaterial);
-    this.rightWing.position.set(0.8, 0, 0);
-    this.rightWing.rotation.z = -Math.PI / 6;
-    this.rightWing.userData.originalRotation = this.rightWing.rotation.clone();
-    group.add(this.rightWing);
-
-    // Tail
-    const tailGeometry = new THREE.ConeGeometry(0.2, 0.8, 6);
-    const tail = new THREE.Mesh(tailGeometry, bodyMaterial);
-    tail.position.set(0, 0, -1.2);
-    tail.rotation.x = Math.PI / 2;
-    group.add(tail);
-
-    this.birdModel = group;
-    if (this._object) {
-      this._object.add(this.birdModel);
-    }
-  }
 
   // Abstract methods to be implemented by species
   protected abstract getModelScale(): number;

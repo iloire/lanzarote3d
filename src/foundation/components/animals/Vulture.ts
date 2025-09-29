@@ -34,7 +34,7 @@ export class Vulture extends Bird {
   }
 
   protected getSpeciesColor(): number {
-    return 0x2F2F2F; // Dark gray
+    return 0x808080; // Medium gray for better visibility
   }
 
   protected applySpeciesColoring(model: THREE.Group): void {

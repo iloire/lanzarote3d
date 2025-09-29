@@ -34,7 +34,7 @@ export class Crow extends Bird {
   }
 
   protected getSpeciesColor(): number {
-    return 0x1a1a1a; // Very dark gray/black
+    return 0x404040; // Lighter gray for better visibility
   }
 
   protected applySpeciesColoring(model: THREE.Group): void {
