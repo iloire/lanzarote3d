@@ -328,7 +328,10 @@ export class HouseGroupCreator {
   }
 
   private addBarrelCactus(position: THREE.Vector3): void {
-    const cactus = new BarrelCactus({ scale: 0.4 + Math.random() * 0.3 });
+    const cactus = new BarrelCactus({
+      scale: 0.4 + Math.random() * 0.3,
+      lowPoly: this.lowPoly
+    });
     const cactusMesh = cactus.createSyncContent();
     cactusMesh.position.copy(position);
     this.scene.add(cactusMesh);
@@ -336,7 +339,10 @@ export class HouseGroupCreator {
   }
 
   private addPricklyPearCactus(position: THREE.Vector3): void {
-    const cactus = new PricklyPearCactus({ scale: 0.3 + Math.random() * 0.4 });
+    const cactus = new PricklyPearCactus({
+      scale: 0.3 + Math.random() * 0.4,
+      lowPoly: this.lowPoly
+    });
     const cactusMesh = cactus.createSyncContent();
     cactusMesh.position.copy(position);
     this.scene.add(cactusMesh);
@@ -344,7 +350,10 @@ export class HouseGroupCreator {
   }
 
   private addSaguaroCactus(position: THREE.Vector3): void {
-    const cactus = new SaguaroCactus({ scale: 0.2 + Math.random() * 0.3 });
+    const cactus = new SaguaroCactus({
+      scale: 0.2 + Math.random() * 0.3,
+      lowPoly: this.lowPoly
+    });
     const cactusMesh = cactus.createSyncContent();
     cactusMesh.position.copy(position);
     this.scene.add(cactusMesh);
@@ -352,7 +361,10 @@ export class HouseGroupCreator {
   }
 
   private addOrganPipeCactus(position: THREE.Vector3): void {
-    const cactus = new OrganPipeCactus({ scale: 0.3 + Math.random() * 0.3 });
+    const cactus = new OrganPipeCactus({
+      scale: 0.3 + Math.random() * 0.3,
+      lowPoly: this.lowPoly
+    });
     const cactusMesh = cactus.createSyncContent();
     cactusMesh.position.copy(position);
     this.scene.add(cactusMesh);

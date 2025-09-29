@@ -239,12 +239,22 @@ class WorkshopApp extends WorkshopDemoBase {
       this.handleError(error as Error, 'loading pool');
     }
 
-    // Load cactus types - evenly distributed
-    const cactusConfigs = [
-      { type: 'Saguaro', position: [-60, 0, -60], scale: 0.6, label: 'Saguaro Cactus' },
-      { type: 'Barrel', position: [0, 0, -60], scale: 1.0, label: 'Barrel Cactus' },
-      { type: 'PricklyPear', position: [60, 0, -60], scale: 0.8, label: 'Prickly Pear' },
-      { type: 'OrganPipe', position: [120, 0, -60], scale: 0.7, label: 'Organ Pipe Cactus' },
+    // Load cactus types - high poly and low poly versions side by side
+    const cactusConfigs: Array<{
+      type: 'Saguaro' | 'Barrel' | 'PricklyPear' | 'OrganPipe';
+      position: [number, number, number];
+      scale: number;
+      label: string;
+      lowPoly: boolean;
+    }> = [
+      { type: 'Saguaro', position: [-80, 0, -60], scale: 0.6, label: 'Saguaro (High)', lowPoly: false },
+      { type: 'Saguaro', position: [-40, 0, -60], scale: 0.6, label: 'Saguaro (Low)', lowPoly: true },
+      { type: 'Barrel', position: [-20, 0, -60], scale: 1.0, label: 'Barrel (High)', lowPoly: false },
+      { type: 'Barrel', position: [20, 0, -60], scale: 1.0, label: 'Barrel (Low)', lowPoly: true },
+      { type: 'PricklyPear', position: [40, 0, -60], scale: 0.8, label: 'Prickly (High)', lowPoly: false },
+      { type: 'PricklyPear', position: [80, 0, -60], scale: 0.8, label: 'Prickly (Low)', lowPoly: true },
+      { type: 'OrganPipe', position: [100, 0, -60], scale: 0.7, label: 'Organ (High)', lowPoly: false },
+      { type: 'OrganPipe', position: [140, 0, -60], scale: 0.7, label: 'Organ (Low)', lowPoly: true },
     ];
 
     for (const config of cactusConfigs) {
@@ -253,16 +263,16 @@ class WorkshopApp extends WorkshopDemoBase {
 
         switch (config.type) {
           case 'Saguaro':
-            cactus = new SaguaroCactus({ scale: config.scale });
+            cactus = new SaguaroCactus({ scale: config.scale, lowPoly: config.lowPoly });
             break;
           case 'Barrel':
-            cactus = new BarrelCactus({ scale: config.scale });
+            cactus = new BarrelCactus({ scale: config.scale, lowPoly: config.lowPoly });
             break;
           case 'PricklyPear':
-            cactus = new PricklyPearCactus({ scale: config.scale });
+            cactus = new PricklyPearCactus({ scale: config.scale, lowPoly: config.lowPoly });
             break;
           case 'OrganPipe':
-            cactus = new OrganPipeCactus({ scale: config.scale });
+            cactus = new OrganPipeCactus({ scale: config.scale, lowPoly: config.lowPoly });
             break;
           default:
             continue;
