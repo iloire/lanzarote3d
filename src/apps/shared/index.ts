@@ -7,99 +7,25 @@ export { WorkshopDemoBase } from './WorkshopDemoBase';
 export { TerrainBase } from './TerrainBase';
 
 /**
- * Build a dynamic import function from app metadata
- * This ensures webpack can statically analyze the imports
+ * Dynamic import wrapper that webpack can analyze
+ * Uses a single dynamic import with computed path
  */
-function createImportFunction(app: AppMetadata): () => Promise<any> {
-  // Extract the relative path from the entry field
-  // Entry format: "./experiences/game/index.tsx" or "./tools/workshop/demos/tile-debug/app"
-  const entryPath = app.entry
-    .replace(/^\.\//, '../')  // Replace ./ with ../
-    .replace(/\.(tsx?|jsx?)$/, ''); // Remove file extension
+async function dynamicImportApp(path: string): Promise<any> {
+  // Webpack needs at least a partial static string to determine the chunk boundaries
+  // We use conditional imports based on the path prefix to help webpack optimize
 
-  // Use a switch statement for webpack static analysis
-  // This is required for webpack to bundle the chunks correctly
-  switch (entryPath) {
-    // Experiences
-    case '../experiences/game/index':
-    case '../experiences/game/game':
-      return () => import('../experiences/game/game');
-    case '../experiences/flyzones/index':
-      return () => import('../experiences/flyzones/index');
-
-    // Demos
-    case '../demos/animation/index':
-      return () => import('../demos/animation/index');
-    case '../demos/boats/index':
-      return () => import('../demos/boats/index');
-    case '../demos/famara2/index':
-    case '../demos/famara2':
-      return () => import('../demos/famara2');
-    case '../demos/famara/index':
-    case '../demos/famara':
-      return () => import('../demos/famara');
-    case '../demos/satellite-terrain/index':
-    case '../demos/satellite-terrain':
-      return () => import('../demos/satellite-terrain');
-    case '../demos/autonomous-driving/index':
-      return () => import('../demos/autonomous-driving/index');
-
-    // Tools
-    case '../tools/location-editor/index':
-      return () => import('../tools/location-editor/index');
-    case '../tools/tile-mapper/index':
-      return () => import('../tools/tile-mapper/index');
-    case '../tools/workshop/index':
-      return () => import('../tools/workshop/demos/workshop/index');
-
-    // Workshop Demos (from tools category in apps.json)
-    case '../tools/workshop/demos/tile-debug/app':
-      return () => import('../tools/workshop/demos/tile-debug/app');
-    case '../tools/workshop/demos/boat/index':
-      return () => import('../tools/workshop/demos/boat/index');
-    case '../tools/workshop/demos/clouds/index':
-      return () => import('../tools/workshop/demos/clouds/index');
-    case '../tools/workshop/demos/flier-pg/index':
-      return () => import('../tools/workshop/demos/flier-pg/index');
-    case '../tools/workshop/demos/glider/index':
-      return () => import('../tools/workshop/demos/glider/index');
-    case '../tools/workshop/demos/hangglider/index':
-      return () => import('../tools/workshop/demos/hangglider/index');
-    case '../tools/workshop/demos/head/index':
-      return () => import('../tools/workshop/demos/head/index');
-    case '../tools/workshop/demos/helmet/index':
-      return () => import('../tools/workshop/demos/helmet/index');
-    case '../tools/workshop/demos/car/index':
-      return () => import('../tools/workshop/demos/car/index');
-    case '../tools/workshop/demos/truck/index':
-      return () => import('../tools/workshop/demos/truck/index');
-    case '../tools/workshop/demos/island/index':
-      return () => import('../tools/workshop/demos/island/index');
-    case '../tools/workshop/demos/paraglider-voxel/index':
-      return () => import('../tools/workshop/demos/paraglider-voxel/index');
-    case '../tools/workshop/demos/paraglider/index':
-      return () => import('../tools/workshop/demos/paraglider/index');
-    case '../tools/workshop/demos/pilot/index':
-      return () => import('../tools/workshop/demos/pilot/index');
-    case '../tools/workshop/demos/terrain/index':
-      return () => import('../tools/workshop/demos/terrain/index');
-    case '../tools/workshop/demos/town/index':
-      return () => import('../tools/workshop/demos/town/index');
-    case '../tools/workshop/demos/houses/index':
-      return () => import('../tools/workshop/demos/houses/index');
-    case '../tools/workshop/demos/voxel/index':
-      return () => import('../tools/workshop/demos/voxel/index');
-    case '../tools/workshop/demos/terrain-gps/index':
-      return () => import('../tools/workshop/demos/terrain-gps/index');
-
-    // Flyzone Manager
-    case '../flyzone-manager/editor/flyzone-editor':
-      return () => import('../flyzone-manager/editor/flyzone-editor');
-    case '../flyzone-manager/visualizer/flyzone-visualizer':
-      return () => import('../flyzone-manager/visualizer/flyzone-visualizer');
-
-    default:
-      throw new Error(`No import mapping for entry path: ${entryPath} (from app: ${app.name})`);
+  if (path.startsWith('../experiences/')) {
+    return import(/* webpackChunkName: "experiences" */ `../experiences/${path.slice(15)}`);
+  } else if (path.startsWith('../demos/')) {
+    return import(/* webpackChunkName: "demos" */ `../demos/${path.slice(9)}`);
+  } else if (path.startsWith('../tools/workshop/demos/')) {
+    return import(/* webpackChunkName: "workshop" */ `../tools/workshop/demos/${path.slice(24)}`);
+  } else if (path.startsWith('../tools/')) {
+    return import(/* webpackChunkName: "tools" */ `../tools/${path.slice(9)}`);
+  } else if (path.startsWith('../flyzone-manager/')) {
+    return import(/* webpackChunkName: "flyzone" */ `../flyzone-manager/${path.slice(19)}`);
+  } else {
+    throw new Error(`Unknown import path pattern: ${path}`);
   }
 }
 
@@ -124,12 +50,25 @@ export async function loadApp(appKey: string, options: StoryOptions): Promise<vo
     throw new Error(`App '${resolvedKey}' not found in registry`);
   }
 
-  // Get the import function for this app
-  const importFn = createImportFunction(app);
+  // Extract the relative path from the entry field
+  // Entry format: "./experiences/game/index.tsx" or "./tools/workshop/demos/tile-debug/app"
+  const entryPath = app.entry
+    .replace(/^\.\//, '../')  // Replace ./ with ../
+    .replace(/\.(tsx?|jsx?)$/, ''); // Remove file extension
+
+  // Special case handling for known mismatches
+  let importPath = entryPath;
+
+  // Handle specific cases where the actual file differs from entry
+  if (entryPath === '../experiences/game/index') {
+    importPath = '../experiences/game/game';
+  } else if (entryPath === '../tools/workshop/index') {
+    importPath = '../tools/workshop/demos/workshop/index';
+  }
 
   let appModule;
   try {
-    appModule = await importFn();
+    appModule = await dynamicImportApp(importPath);
   } catch (error) {
     throw new Error(`Failed to load app '${resolvedKey}': ${error}`);
   }
