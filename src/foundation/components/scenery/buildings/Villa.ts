@@ -114,6 +114,7 @@ export class Villa extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(30, 20, 25)
     );
     const mainBody = new THREE.Mesh(mainBodyGeometry, wallMaterial);
+    mainBody.position.set(0, 10, 0); // Position so bottom is at y=0 (ground level)
     mainBody.castShadow = this.options.castShadow ?? true;
     mainBody.receiveShadow = this.options.receiveShadow ?? true;
     villa.add(mainBody);
@@ -124,7 +125,7 @@ export class Villa extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(20, 16, 20)
     );
     const leftWing = new THREE.Mesh(leftWingGeometry, wallMaterial);
-    leftWing.position.set(-25, -2, 0);
+    leftWing.position.set(-25, 8, 0); // Adjusted for ground level positioning
     leftWing.castShadow = this.options.castShadow ?? true;
     leftWing.receiveShadow = this.options.receiveShadow ?? true;
     villa.add(leftWing);
@@ -135,7 +136,7 @@ export class Villa extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(20, 16, 20)
     );
     const rightWing = new THREE.Mesh(rightWingGeometry, wallMaterial);
-    rightWing.position.set(25, -2, 0);
+    rightWing.position.set(25, 8, 0); // Adjusted for ground level positioning
     rightWing.castShadow = this.options.castShadow ?? true;
     rightWing.receiveShadow = this.options.receiveShadow ?? true;
     villa.add(rightWing);
@@ -146,7 +147,7 @@ export class Villa extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(32, 1, 27)
     );
     const mainRoof = new THREE.Mesh(mainRoofGeometry, roofMaterial);
-    mainRoof.position.set(0, 10.5, 0);
+    mainRoof.position.set(0, 20.5, 0); // Adjusted for main body repositioning
     mainRoof.castShadow = this.options.castShadow ?? true;
     villa.add(mainRoof);
 
@@ -155,12 +156,12 @@ export class Villa extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(22, 1, 22)
     );
     const leftRoof = new THREE.Mesh(leftRoofGeometry, roofMaterial);
-    leftRoof.position.set(-25, 8.5, 0);
+    leftRoof.position.set(-25, 16.5, 0); // Adjusted for wing repositioning
     leftRoof.castShadow = this.options.castShadow ?? true;
     villa.add(leftRoof);
 
     const rightRoof = new THREE.Mesh(leftRoofGeometry, roofMaterial);
-    rightRoof.position.set(25, 8.5, 0);
+    rightRoof.position.set(25, 16.5, 0); // Adjusted for wing repositioning
     rightRoof.castShadow = this.options.castShadow ?? true;
     villa.add(rightRoof);
 
@@ -172,7 +173,7 @@ export class Villa extends SimpleThreeComponent {
 
     for (let i = 0; i < 4; i++) {
       const column = new THREE.Mesh(columnGeometry, accentMaterial);
-      column.position.set(-6 + i * 4, 0, 12.5);
+      column.position.set(-6 + i * 4, 10, 12.5); // Adjusted for main body repositioning
       column.castShadow = this.options.castShadow ?? true;
       villa.add(column);
     }
@@ -183,7 +184,7 @@ export class Villa extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(20, 8, 0.5)
     );
     const frontWindow = new THREE.Mesh(panoramicWindowGeometry, windowMaterial);
-    frontWindow.position.set(0, 2, 12.75);
+    frontWindow.position.set(0, 12, 12.75); // Adjusted for main body repositioning
     villa.add(frontWindow);
 
     // Window frames
@@ -192,7 +193,7 @@ export class Villa extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(21, 9, 1)
     );
     const frontFrame = new THREE.Mesh(panoramicFrameGeometry, frameMaterial);
-    frontFrame.position.set(0, 2, 12.5);
+    frontFrame.position.set(0, 12, 12.5); // Adjusted for main body repositioning
     villa.add(frontFrame);
 
     // Side windows for wings
@@ -203,22 +204,22 @@ export class Villa extends SimpleThreeComponent {
 
     // Left wing windows
     const leftFrontWindow = new THREE.Mesh(sideWindowGeometry, windowMaterial);
-    leftFrontWindow.position.set(-25, 2, 10.25);
+    leftFrontWindow.position.set(-25, 10, 10.25); // Adjusted for wing repositioning
     villa.add(leftFrontWindow);
 
     const leftSideWindow = new THREE.Mesh(sideWindowGeometry, windowMaterial);
     leftSideWindow.rotation.y = Math.PI / 2;
-    leftSideWindow.position.set(-35.25, 2, 0);
+    leftSideWindow.position.set(-35.25, 10, 0); // Adjusted for wing repositioning
     villa.add(leftSideWindow);
 
     // Right wing windows
     const rightFrontWindow = new THREE.Mesh(sideWindowGeometry, windowMaterial);
-    rightFrontWindow.position.set(25, 2, 10.25);
+    rightFrontWindow.position.set(25, 10, 10.25); // Adjusted for wing repositioning
     villa.add(rightFrontWindow);
 
     const rightSideWindow = new THREE.Mesh(sideWindowGeometry, windowMaterial);
     rightSideWindow.rotation.y = Math.PI / 2;
-    rightSideWindow.position.set(35.25, 2, 0);
+    rightSideWindow.position.set(35.25, 10, 0); // Adjusted for wing repositioning
     villa.add(rightSideWindow);
 
     // Swimming pool (decorative)
@@ -231,7 +232,7 @@ export class Villa extends SimpleThreeComponent {
       () => new THREE.MeshLambertMaterial({ color: '#0077BE', transparent: true, opacity: 0.8 })
     );
     const pool = new THREE.Mesh(poolGeometry, poolMaterial);
-    pool.position.set(0, -9.5, -20);
+    pool.position.set(0, 0.5, -20); // Adjusted for ground level positioning
     villa.add(pool);
 
     // Garden terrace
@@ -240,7 +241,7 @@ export class Villa extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(40, 1, 15)
     );
     const terrace = new THREE.Mesh(terraceGeometry, accentMaterial);
-    terrace.position.set(0, -9.5, 20);
+    terrace.position.set(0, 0.5, 20); // Adjusted for ground level positioning
     villa.add(terrace);
 
     // Apply scale
