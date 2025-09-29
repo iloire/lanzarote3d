@@ -87,9 +87,9 @@ class House extends SimpleThreeComponent {
   }
 
   private addBasicWindows(mesh: THREE.Object3D): { window: THREE.Mesh; window2: THREE.Mesh } {
-    const window1Group = this.createWindow(9, 4, 4);
-    const window2Group = this.createWindow(9, 4, -4);
-    const window3Group = this.createWindow(0, 4, 9);
+    const window1Group = this.createWindow(9, this.height / 2 + 4, 4); // Adjusted for ground level positioning
+    const window2Group = this.createWindow(9, this.height / 2 + 4, -4); // Adjusted for ground level positioning
+    const window3Group = this.createWindow(0, this.height / 2 + 4, 9); // Adjusted for ground level positioning
 
     mesh.add(window1Group);
     mesh.add(window2Group);
@@ -111,13 +111,13 @@ class House extends SimpleThreeComponent {
       // Flat traditional roof with slight slope (much flatter than cone)
       const roofGeo = new THREE.BoxGeometry(22, 2, 22);
       const roof = new THREE.Mesh(roofGeo, mat_roof);
-      roof.position.set(0, this.height / 2 + 1, 0);
+      roof.position.set(0, this.height + 1, 0); // Adjusted for ground level positioning
       mesh.add(roof);
     } else {
       // Modern flat roof with overhang
       const flatRoofGeo = new THREE.BoxGeometry(22, 1, 22);
       const flatRoof = new THREE.Mesh(flatRoofGeo, mat_modern);
-      flatRoof.position.set(0, this.height / 2 + 0.5, 0);
+      flatRoof.position.set(0, this.height + 0.5, 0); // Adjusted for ground level positioning
       mesh.add(flatRoof);
     }
   }
@@ -128,7 +128,7 @@ class House extends SimpleThreeComponent {
       doorGeo,
       this.type === HouseType.Modern ? mat_modern_window : mat_door
     );
-    door.position.set(8, -5, 0);
+    door.position.set(8, this.height / 2 - 5, 0); // Adjusted for ground level positioning
 
     const doorFrameGeo = new THREE.BoxGeometry(7, 9, 6.5);
     const doorFrame = new THREE.Mesh(doorFrameGeo, mat_frame);
@@ -140,6 +140,9 @@ class House extends SimpleThreeComponent {
 
   public override async load(): Promise<THREE.Object3D> {
     const houseGroup = (await super.load()) as THREE.Mesh;
+
+    // Position main body so bottom is at ground level
+    houseGroup.position.set(0, this.height / 2, 0);
 
     // Set material based on house type
     const baseMaterial = this.type === HouseType.Modern ? mat_modern : mat;
@@ -160,6 +163,9 @@ class House extends SimpleThreeComponent {
     const geo = this.createGeometry();
     const baseMaterial = this.type === HouseType.Modern ? mat_modern : mat;
     const mesh = new THREE.Mesh(geo, baseMaterial);
+
+    // Position main body so bottom is at ground level
+    mesh.position.set(0, this.height / 2, 0);
 
     // Add architectural features
     this.createRoof(mesh);
@@ -227,35 +233,35 @@ class House extends SimpleThreeComponent {
     // Add extension
     const extensionGeo = new THREE.BoxGeometry(15, this.height - 9, 30);
     const extension = new THREE.Mesh(extensionGeo, mat);
-    extension.position.set(0, -5, 10);
+    extension.position.set(0, (this.height - 9) / 2, 10); // Adjusted for ground level positioning
     mesh.add(extension);
 
     // Add extension flat roof
     const roofGeo = new THREE.BoxGeometry(18, 2, 18);
     const roof = new THREE.Mesh(roofGeo, mat_roof);
-    roof.position.set(0, (this.height - 9) / 2 + 1, 10);
+    roof.position.set(0, this.height - 9 + 1, 10); // Adjusted for ground level positioning
     mesh.add(roof);
 
     // Add garage door
-    this.addGarageDoor(mesh, 5, -7, 18, 6, 8, 8);
+    this.addGarageDoor(mesh, 5, this.height / 2 - 7, 18, 6, 8, 8); // Adjusted for ground level positioning
   }
 
   private addLargeHouseFeatures(mesh: THREE.Object3D): void {
     // Add garage
     const garageGeo = new THREE.BoxGeometry(15, this.height - 15, 20);
     const garage = new THREE.Mesh(garageGeo, mat);
-    garage.position.set(-10, -7.5, 0);
+    garage.position.set(-10, (this.height - 15) / 2, 0); // Adjusted for ground level positioning
     mesh.add(garage);
 
     // Add garage door
-    this.addGarageDoor(mesh, -15, -7, 0, 8, 10, 8);
+    this.addGarageDoor(mesh, -15, this.height / 2 - 7, 0, 8, 10, 8); // Adjusted for ground level positioning
   }
 
   private addModernHouseFeatures(mesh: THREE.Object3D): void {
     // Add panoramic windows
     const panoramicWindowGeo = new THREE.BoxGeometry(12, 8, 0.5);
     const panoramicWindow = new THREE.Mesh(panoramicWindowGeo, mat_modern_window);
-    panoramicWindow.position.set(0, 2, 10);
+    panoramicWindow.position.set(0, this.height / 2 + 2, 10); // Adjusted for ground level positioning
     mesh.add(panoramicWindow);
 
     const panoramicFrame = new THREE.Mesh(new THREE.BoxGeometry(13, 9, 1), mat_frame);
@@ -265,13 +271,13 @@ class House extends SimpleThreeComponent {
     // Add decorative pillar
     const pillarGeo = new THREE.BoxGeometry(1, this.height, 1);
     const pillar = new THREE.Mesh(pillarGeo, mat_frame);
-    pillar.position.set(-9, 0, 9);
+    pillar.position.set(-9, this.height / 2, 9); // Adjusted for ground level positioning
     mesh.add(pillar);
 
     // Add canopy over door
     const canopyGeo = new THREE.BoxGeometry(8, 0.5, 4);
     const canopy = new THREE.Mesh(canopyGeo, mat_modern);
-    canopy.position.set(8, 2, 0);
+    canopy.position.set(8, this.height / 2 + 2, 0); // Adjusted for ground level positioning
     mesh.add(canopy);
   }
 
