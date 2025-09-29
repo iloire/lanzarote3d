@@ -4,6 +4,24 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 
 ## [1.2.1] - 2025-09-29 14:30 UTC
 
+### Added
+- **FlyingBehavior System**: Complete autonomous flight behavior system
+  - Advanced obstacle avoidance using distance-based force calculations
+  - Boundary detection with progressive return forces to prevent area escape
+  - Terrain height awareness using raycasting for minimum altitude maintenance
+  - Multiple flight patterns: FREE_ROAM, CIRCULAR, FIGURE_EIGHT, PERCH_AND_FLY
+  - Smooth direction changes with configurable turn speed and orientation
+  - Built-in animation loop with proper disposal and lifecycle management
+  - Alternative to path-based AutoFlier with dynamic environmental awareness
+
+#### New Applications
+- **Flying Behavior Test** (`/flying-behavior-test`): Comprehensive test environment
+  - Hangglider with autonomous flight demonstration
+  - Strategic wall obstacle placement for avoidance testing
+  - Real-time GUI controls for behavior parameter adjustment
+  - Flight state debugging and logging capabilities
+  - Registered in apps.json configuration system
+
 ### Enhanced
 - **Animals Showcase**: Complete procedural bird geometry implementation
   - Replaced GLB model loading with Three.js shape-based bird creation
@@ -12,6 +30,13 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Fixed "black squares" issue in animals showcase
   - Removed unused GLB loading methods and dependencies
   - Wing animation now works with procedural geometry shapes
+
+### Refactored
+- **Showcase Configuration**: Removed outdated indirection layer
+  - Eliminated showcase-config.ts with hardcoded app mappings
+  - Updated showcase-entry.tsx to use direct bundle name resolution
+  - Simplified story name resolution without configuration duplication
+  - Maintains same functionality with reduced code complexity
 
 ## [1.2.0] - 2025-01-27 15:30 UTC
 

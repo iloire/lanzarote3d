@@ -96,16 +96,16 @@ class FlyingBehaviorTestApp extends WorkshopDemoBase {
 
     const wallGeometry = new THREE.BoxGeometry(2, 15, 2);
 
-    // Position walls around the flight area
+    // Position walls around the flight area with more spacing
     const wallPositions = [
-      { x: 15, z: 15 },   // Front right
-      { x: -15, z: 15 },  // Front left
-      { x: 15, z: -15 },  // Back right
-      { x: -15, z: -15 }, // Back left
-      { x: 0, z: 20 },    // North wall
-      { x: 0, z: -20 },   // South wall
-      { x: 20, z: 0 },    // East wall
-      { x: -20, z: 0 }    // West wall
+      { x: 18, z: 18 },   // Front right
+      { x: -18, z: 18 },  // Front left
+      { x: 18, z: -18 },  // Back right
+      { x: -18, z: -18 }, // Back left
+      { x: 0, z: 25 },    // North wall
+      { x: 0, z: -25 },   // South wall
+      { x: 25, z: 0 },    // East wall
+      { x: -25, z: 0 }    // West wall
     ];
 
     wallPositions.forEach((pos, index) => {
@@ -147,13 +147,13 @@ class FlyingBehaviorTestApp extends WorkshopDemoBase {
         // Create and attach flying behavior
         this.flyingBehavior = new FlyingBehavior({
           pattern: FlightPattern.FREE_ROAM,
-          speed: 3.0,
-          turnSpeed: 2.0,
-          flightRadius: 18, // Stay within the walls
-          returnDistance: 25, // Force return before hitting outer walls
+          speed: 6.0, // Increased speed for better testing
+          turnSpeed: 3.0, // Increased turn speed for more responsive avoidance
+          flightRadius: 22, // Adjusted for wider wall spacing
+          returnDistance: 30, // Adjusted for outer wall positions
           minHeight: 5,
           maxHeight: 20,
-          obstacleAvoidanceDistance: 8,
+          obstacleAvoidanceDistance: 10, // Increased for better wall avoidance
           centerPoint: new THREE.Vector3(0, 0, 0),
           autoStart: true,
           faceDirection: true,
@@ -188,9 +188,9 @@ class FlyingBehaviorTestApp extends WorkshopDemoBase {
 
     if (this.flyingBehavior) {
       const params = {
-        speed: 3.0,
-        turnSpeed: 2.0,
-        flightRadius: 18,
+        speed: 6.0,
+        turnSpeed: 3.0,
+        flightRadius: 22,
         pattern: 'FREE_ROAM',
         start: () => this.flyingBehavior?.start(),
         stop: () => this.flyingBehavior?.stop(),
