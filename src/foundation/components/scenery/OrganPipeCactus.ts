@@ -102,7 +102,7 @@ export class OrganPipeCactus extends SimpleThreeComponent {
         const pipeSegment = new THREE.Mesh(pipeGeometry, cactusMaterial);
         pipeSegment.position.set(
           pipe.x,
-          i * segmentHeight + segmentHeight/2,
+          i * segmentHeight + segmentHeight/2, // Already positioned correctly for ground level
           pipe.z
         );
         pipeSegment.castShadow = this.options.castShadow ?? true;

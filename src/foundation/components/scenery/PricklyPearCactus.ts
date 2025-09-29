@@ -84,7 +84,7 @@ export class PricklyPearCactus extends SimpleThreeComponent {
     const basePadGeometry = createPadGeometry(3, 4);
     const basePad = new THREE.Mesh(basePadGeometry, padMaterial);
     basePad.rotation.x = Math.PI / 2;
-    basePad.position.y = 2;
+    basePad.position.y = 0.25; // Position so bottom sits at ground level
     basePad.castShadow = this.options.castShadow ?? true;
     basePad.receiveShadow = this.options.receiveShadow ?? true;
     cactus.add(basePad);
@@ -94,16 +94,16 @@ export class PricklyPearCactus extends SimpleThreeComponent {
 
     // Add additional pads branching off
     const padConfigs = [
-      { parent: basePad, x: 1.2, y: 2, angle: 0.3, width: 2.5, height: 3 },
-      { parent: basePad, x: -1.2, y: 2, angle: -0.3, width: 2.5, height: 3 },
-      { parent: basePad, x: 0, y: 3, angle: 0, width: 2, height: 2.5 },
-      { parent: basePad, x: 1, y: -1.5, angle: 0.5, width: 2, height: 2.5 },
-      { parent: basePad, x: -1, y: -1.5, angle: -0.5, width: 2, height: 2.5 },
-      { parent: basePad, x: 0.8, y: 4, angle: 0.2, width: 1.8, height: 2.2 },
-      { parent: basePad, x: -0.8, y: 4, angle: -0.2, width: 1.8, height: 2.2 },
-      { parent: basePad, x: 1.5, y: 0, angle: 0.7, width: 1.5, height: 2 },
-      { parent: basePad, x: -1.5, y: 0, angle: -0.7, width: 1.5, height: 2 },
-      { parent: basePad, x: 0, y: -3, angle: 0, width: 2, height: 2.5 }
+      { parent: basePad, x: 1.2, y: 0.25, angle: 0.3, width: 2.5, height: 3 }, // Adjusted for ground level
+      { parent: basePad, x: -1.2, y: 0.25, angle: -0.3, width: 2.5, height: 3 }, // Adjusted for ground level
+      { parent: basePad, x: 0, y: 1.25, angle: 0, width: 2, height: 2.5 }, // Adjusted for ground level
+      { parent: basePad, x: 1, y: -1.25, angle: 0.5, width: 2, height: 2.5 }, // Adjusted for ground level
+      { parent: basePad, x: -1, y: -1.25, angle: -0.5, width: 2, height: 2.5 }, // Adjusted for ground level
+      { parent: basePad, x: 0.8, y: 2.25, angle: 0.2, width: 1.8, height: 2.2 }, // Adjusted for ground level
+      { parent: basePad, x: -0.8, y: 2.25, angle: -0.2, width: 1.8, height: 2.2 }, // Adjusted for ground level
+      { parent: basePad, x: 1.5, y: -1.75, angle: 0.7, width: 1.5, height: 2 }, // Adjusted for ground level
+      { parent: basePad, x: -1.5, y: -1.75, angle: -0.7, width: 1.5, height: 2 }, // Adjusted for ground level
+      { parent: basePad, x: 0, y: -2.75, angle: 0, width: 2, height: 2.5 } // Adjusted for ground level
     ];
 
     for (let i = 0; i < padCount && i < padConfigs.length; i++) {
@@ -153,7 +153,7 @@ export class PricklyPearCactus extends SimpleThreeComponent {
       babyPad.rotation.x = Math.PI / 2;
       babyPad.position.set(
         Math.cos(angle) * 4,
-        0.5,
+        0.25, // Adjusted for ground level positioning
         Math.sin(angle) * 4
       );
       babyPad.scale.set(0.7, 0.7, 0.7);

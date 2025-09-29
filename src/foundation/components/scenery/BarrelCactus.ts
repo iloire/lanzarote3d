@@ -78,6 +78,7 @@ export class BarrelCactus extends SimpleThreeComponent {
     );
 
     const body = new THREE.Mesh(bodyGeometry, cactusMaterial);
+    body.position.y = 2.1; // Position so bottom sits at ground level (radius * 0.7)
     body.castShadow = this.options.castShadow ?? true;
     body.receiveShadow = this.options.receiveShadow ?? true;
     cactus.add(body);
@@ -95,7 +96,7 @@ export class BarrelCactus extends SimpleThreeComponent {
       const rib = new THREE.Mesh(ribGeometry, cactusMaterial);
       rib.position.set(
         Math.cos(angle) * 3.1,
-        0,
+        2.1, // Adjusted for ground level positioning
         Math.sin(angle) * 3.1
       );
       rib.rotation.y = angle;
@@ -112,7 +113,7 @@ export class BarrelCactus extends SimpleThreeComponent {
         const spine = new THREE.Mesh(spineGeometry, spineMaterial);
         spine.position.set(
           Math.cos(angle) * 3.2,
-          j * 0.5,
+          2.1 + j * 0.5, // Adjusted for ground level positioning
           Math.sin(angle) * 3.2
         );
         spine.rotation.z = angle + Math.PI / 2;
@@ -135,7 +136,7 @@ export class BarrelCactus extends SimpleThreeComponent {
       const flower = new THREE.Mesh(petalGeometry, flowerMaterial);
       flower.position.set(
         Math.cos(angle) * 1.5,
-        2.2,
+        4.3, // Adjusted for ground level positioning
         Math.sin(angle) * 1.5
       );
       flower.rotation.z = angle * 0.3;
@@ -171,7 +172,7 @@ export class BarrelCactus extends SimpleThreeComponent {
 
       groundSpine.position.set(
         Math.cos(angle) * distance,
-        -2,
+        0.1, // Adjusted for ground level positioning
         Math.sin(angle) * distance
       );
       groundSpine.rotation.z = Math.random() * Math.PI;

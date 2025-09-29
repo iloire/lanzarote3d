@@ -70,7 +70,7 @@ export class SaguaroCactus extends SimpleThreeComponent {
       );
 
       const segment = new THREE.Mesh(segmentGeometry, cactusMaterial);
-      segment.position.y = i * segmentHeight - trunkHeight/2 + segmentHeight/2;
+      segment.position.y = i * segmentHeight + segmentHeight/2; // Adjusted for ground level positioning
       segment.castShadow = this.options.castShadow ?? true;
       segment.receiveShadow = this.options.receiveShadow ?? true;
       cactus.add(segment);
@@ -140,7 +140,7 @@ export class SaguaroCactus extends SimpleThreeComponent {
       elbow.position.x = arm.side * horizontalLength;
       armGroup.add(elbow);
 
-      armGroup.position.y = trunkHeight * arm.height - trunkHeight/2;
+      armGroup.position.y = trunkHeight * arm.height; // Adjusted for ground level positioning
       armGroup.rotation.y = arm.angle;
       armGroup.castShadow = this.options.castShadow ?? true;
       cactus.add(armGroup);
@@ -155,7 +155,7 @@ export class SaguaroCactus extends SimpleThreeComponent {
       );
 
       const spine = new THREE.Mesh(spineGeometry, spineMaterial);
-      const y = (Math.random() - 0.5) * trunkHeight;
+      const y = Math.random() * trunkHeight; // Adjusted for ground level positioning
       const angle = Math.random() * Math.PI * 2;
       const radius = 1.2 + Math.random() * 0.3;
 
@@ -185,7 +185,7 @@ export class SaguaroCactus extends SimpleThreeComponent {
       const angle = (i / 3) * Math.PI * 2;
       flower.position.set(
         Math.cos(angle) * 0.8,
-        trunkHeight / 2 + 0.5,
+        trunkHeight + 0.5, // Adjusted for ground level positioning
         Math.sin(angle) * 0.8
       );
       cactus.add(flower);
