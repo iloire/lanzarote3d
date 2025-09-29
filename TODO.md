@@ -2,7 +2,6 @@ Implement the following tasks if any is added following the instructions describ
 ---
 TASKS:
 - do we need showcase-config.ts? We want to remove all that indirection and duplication
-- go through all the base files located in the /Users/ivan/code/lanzarote3d/src/foundation/components/base and analyze and document their use. See if all of them are needed or we can refactor or remove some for efficiency and code readability and mantenability
 ---
 
 ### Instructions
