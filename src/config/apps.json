@@ -194,7 +194,7 @@
       "priority": 20
     },
     "flier-pg": {
-      "name": "Paraglider Workshop",
+      "name": "flier pg",
       "description": "Workshop demo showcasing paraglider physics simulation with weather system",
       "entry": "./applications/flier-pg/index.tsx",
       "route": "/flier-pg",

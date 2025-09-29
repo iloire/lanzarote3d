@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { ParagliderVoxel } from '../../foundation/components/vehicles';
 import type { ParagliderVoxelOptions } from '../../foundation/components/vehicles';
+import HangGlider from '../../foundation/components/vehicles/Hangglider';
 import Environment from '../../shared/env/environment';
 import adriModel from '../../../assets/foundation/models/characters/adri/adri.obj';
 import adriTextureImage from '../../../assets/foundation/models/characters/adri/adri.png';
@@ -39,6 +40,22 @@ const paraglidersVoxel: ParagliderVoxelConfig[] = [
   },
 ];
 
+// Visibility flags for easy toggling
+const SHOW_HANGGLIDER = true; // Set to false to hide hangglider
+
+// Hangglider configuration
+const hanggliderConfig = {
+  position: new THREE.Vector3(6800, 950, -500), // Slightly offset from paraglider
+  scale: 1.0,
+  path: [
+    new THREE.Vector3(6800, 950, -500),
+    new THREE.Vector3(6900, 1000, -600),
+    new THREE.Vector3(7000, 1050, -700),
+    new THREE.Vector3(6900, 1000, -800),
+    new THREE.Vector3(6800, 950, -700),
+  ],
+};
+
 /**
  * Animation Demo - Restored original animation with voxel paraglider
  * Third app converted to use AppBase architecture
@@ -47,8 +64,10 @@ class AnimationApp extends TerrainBase {
   private environment: Environment | undefined;
   private animationId: number | undefined;
   private paragliderMeshes: THREE.Object3D[] = [];
+  private hanggliderMesh: THREE.Object3D | undefined;
   private animatorInstance: any | undefined;
   private flyingBehavior: FlyingBehavior | undefined;
+  private hanggliderFlyingBehavior: FlyingBehavior | undefined;
 
   // Animation configuration
   private readonly ANIMATION_DURATION_MS = 6000; // 6 seconds
@@ -95,6 +114,11 @@ class AnimationApp extends TerrainBase {
 
       // Load voxel paragliders with proper tracking
       await this.loadParagliders(scene);
+
+      // Load hangglider if enabled
+      if (SHOW_HANGGLIDER) {
+        await this.loadHangglider(scene);
+      }
 
       // must render before adding env
       renderer.render(scene, camera);
@@ -160,28 +184,76 @@ class AnimationApp extends TerrainBase {
       const centerPoint = paragliderMesh.position.clone();
 
       // Create flying behavior with cinematic settings
-      this.flyingBehavior = new FlyingBehavior({
-        pattern: FlightPattern.CIRCULAR,
-        speed: 0,
-        turnSpeed: 0.8,
-        flightRadius: 150, // Large radius for cinematic movement
-        minHeight: centerPoint.y - 50,
-        maxHeight: centerPoint.y + 100,
-        centerPoint: centerPoint,
-        faceDirection: true,
-        forwardAxis: 'z', // Voxel paraglider faces forward in Z direction
-      });
+      // this.flyingBehavior = new FlyingBehavior({
+      //   pattern: FlightPattern.CIRCULAR,
+      //   speed: 0,
+      //   turnSpeed: 0.8,
+      //   flightRadius: 150, // Large radius for cinematic movement
+      //   minHeight: centerPoint.y - 50,
+      //   maxHeight: centerPoint.y + 100,
+      //   centerPoint: centerPoint,
+      //   faceDirection: true,
+      //   forwardAxis: 'z', // Voxel paraglider faces forward in Z direction
+      // });
 
       // Attach to paraglider mesh
-      this.flyingBehavior.attachTo(paragliderMesh);
+      // this.flyingBehavior.attachTo(paragliderMesh);
+
+      // Start flying behavior after animation completes
+      // setTimeout(() => {
+      //   if (this.flyingBehavior) {
+      //     this.flyingBehavior.start();
+      //     console.log('🪂 Flying behavior started for paraglider');
+      //   }
+      // }, this.ANIMATION_DURATION_MS + 1000); // Start 1 second after animation ends
+    }
+  }
+
+  private async loadHangglider(scene: THREE.Scene): Promise<void> {
+    try {
+      const hangglider = new HangGlider();
+      const mesh = await hangglider.load(hanggliderConfig.path);
+
+      // Position and scale the hangglider
+      mesh.position.copy(hanggliderConfig.position);
+      const scale = hanggliderConfig.scale;
+      mesh.scale.set(scale, scale, scale);
+
+      scene.add(mesh);
+      this.hanggliderMesh = mesh;
+
+      // Set up flying behavior for hangglider
+      const centerPoint = hanggliderConfig.position.clone();
+
+      this.hanggliderFlyingBehavior = new FlyingBehavior({
+        pattern: FlightPattern.FREE_ROAM,
+        speed: 16.0, // Increased speed for better testing
+        turnSpeed: 3.0, // Increased turn speed for more responsive avoidance
+        flightRadius: 45, // Adjusted for much wider wall spacing (50 units to walls)
+        returnDistance: 55, // Adjusted for outer wall positions (beyond 50 unit walls)
+        minHeight: 5,
+        maxHeight: 25, // Increased max height since walls are now 30 units tall
+        obstacleAvoidanceDistance: 15, // Increased avoidance distance for taller walls
+        centerPoint: new THREE.Vector3(0, 0, 0),
+        autoStart: true,
+        faceDirection: true,
+        forwardAxis: 'x' // Updated to match hangglider's new orientation after 270° rotation
+      });
+
+      // Attach to hangglider mesh
+      this.hanggliderFlyingBehavior.attachTo(mesh);
 
       // Start flying behavior after animation completes
       setTimeout(() => {
-        if (this.flyingBehavior) {
-          this.flyingBehavior.start();
-          console.log('🪂 Flying behavior started for paraglider');
+        if (this.hanggliderFlyingBehavior) {
+          this.hanggliderFlyingBehavior.start();
+          console.log('🪂 Flying behavior started for hangglider');
         }
-      }, this.ANIMATION_DURATION_MS + 1000); // Start 1 second after animation ends
+      }, this.ANIMATION_DURATION_MS + 2000); // Start 2 seconds after animation ends
+
+      console.log('✅ Hangglider loaded successfully with flying behavior');
+    } catch (error) {
+      this.handleError(error as Error, 'loading hangglider');
     }
   }
 
@@ -361,6 +433,12 @@ class AnimationApp extends TerrainBase {
       this.flyingBehavior = undefined;
     }
 
+    // Stop hangglider flying behavior
+    if (this.hanggliderFlyingBehavior) {
+      this.hanggliderFlyingBehavior.dispose();
+      this.hanggliderFlyingBehavior = undefined;
+    }
+
     // Stop animator if running
     if (this.animatorInstance) {
       // Stop any ongoing animations
@@ -386,6 +464,23 @@ class AnimationApp extends TerrainBase {
       });
     });
     this.paragliderMeshes.length = 0;
+
+    // Dispose hangglider mesh
+    if (this.hanggliderMesh) {
+      this.hanggliderMesh.traverse(child => {
+        if (child instanceof THREE.Mesh) {
+          if (child.geometry) child.geometry.dispose();
+          if (child.material) {
+            if (Array.isArray(child.material)) {
+              child.material.forEach((material: THREE.Material) => material.dispose());
+            } else {
+              child.material.dispose();
+            }
+          }
+        }
+      });
+      this.hanggliderMesh = undefined;
+    }
 
     // Dispose environment resources
     if (this.environment) {
