@@ -20,6 +20,7 @@ export interface FlyingBehaviorOptions {
   autoStart?: boolean;
   faceDirection?: boolean;
   forwardAxis?: 'x' | 'y' | 'z' | '-x' | '-y' | '-z';
+  debugVectors?: boolean; // Show velocity and forward direction vectors
 }
 
 /**
@@ -44,6 +45,11 @@ export class FlyingBehavior {
   protected centerPoint: THREE.Vector3;
   protected faceDirection: boolean;
   protected forwardAxis: 'x' | 'y' | 'z' | '-x' | '-y' | '-z';
+  protected debugVectors: boolean;
+
+  // Debug visualization
+  private velocityArrow?: THREE.ArrowHelper;
+  private forwardArrow?: THREE.ArrowHelper;
 
   // Flight state
   protected currentVelocity: THREE.Vector3 = new THREE.Vector3();
@@ -67,6 +73,7 @@ export class FlyingBehavior {
     this.centerPoint = options.centerPoint ? options.centerPoint.clone() : new THREE.Vector3(0, 0, 0);
     this.faceDirection = options.faceDirection !== false;
     this.forwardAxis = options.forwardAxis || 'z';
+    this.debugVectors = options.debugVectors || false;
 
     // Initialize with random direction
     this.targetDirection.set(
@@ -86,6 +93,9 @@ export class FlyingBehavior {
       this.mesh.position.copy(this.centerPoint);
       this.mesh.position.y += this.minHeight;
     }
+
+    // Create debug arrows if enabled
+    this.createDebugArrows();
   }
 
   /**
@@ -177,6 +187,9 @@ export class FlyingBehavior {
     if (this.faceDirection) {
       this.orientToDirection(this.targetDirection);
     }
+
+    // Update debug arrows if enabled
+    this.updateDebugArrows();
   }
 
   /**
@@ -317,17 +330,13 @@ export class FlyingBehavior {
   private orientToDirection(direction: THREE.Vector3): void {
     if (!this.mesh || direction.length() === 0) return;
 
-    // Create horizontal-only direction (ignore Y component for stability)
-    const horizontalDirection = direction.clone();
-    horizontalDirection.y = 0; // Remove vertical component
+    // Use the full 3D direction for more natural aircraft orientation
+    const normalizedDirection = direction.clone().normalize();
 
-    if (horizontalDirection.length() === 0) return; // Avoid pure vertical movement
-    horizontalDirection.normalize();
+    // Create target position for lookAt
+    const targetPosition = this.mesh.position.clone().add(normalizedDirection);
 
-    // Create target position for lookAt using only horizontal direction
-    const targetPosition = this.mesh.position.clone().add(horizontalDirection);
-
-    // Create a temporary object to get the lookAt rotation (horizontal only)
+    // Create a temporary object to get the lookAt rotation
     const tempObject = new THREE.Object3D();
     tempObject.position.copy(this.mesh.position);
     tempObject.lookAt(targetPosition);
@@ -358,14 +367,133 @@ export class FlyingBehavior {
     const correctionQuaternion = new THREE.Quaternion().setFromEuler(correction);
     const finalQuaternion = tempObject.quaternion.clone().multiply(correctionQuaternion);
 
-    // Extract only the Y-axis rotation to maintain horizontal stability
+    // Allow natural aircraft orientation including pitch and roll for realism
     const euler = new THREE.Euler().setFromQuaternion(finalQuaternion);
-    euler.x = 0; // Remove pitch rotation
-    euler.z = 0; // Remove roll rotation
-    const horizontalQuaternion = new THREE.Quaternion().setFromEuler(euler);
 
-    // Smooth rotation (horizontal only)
-    this.mesh.quaternion.slerp(horizontalQuaternion, this.turnSpeed * 0.1);
+    // Limit extreme rotations for stability but allow some banking
+    euler.x = Math.max(-Math.PI / 6, Math.min(Math.PI / 6, euler.x)); // Limit pitch to ±30°
+    euler.z = Math.max(-Math.PI / 8, Math.min(Math.PI / 8, euler.z)); // Limit roll to ±22.5°
+
+    const stableQuaternion = new THREE.Quaternion().setFromEuler(euler);
+
+    // Increase rotation speed for more responsive turning
+    const rotationSpeed = Math.min(this.turnSpeed * 0.3, 0.15); // Cap maximum rotation speed
+
+    // Debug logging (can be removed later)
+    if (Math.random() < 0.01) { // Log 1% of the time to avoid spam
+      console.log('🔄 FlyingBehavior orientation:', {
+        direction: normalizedDirection.toArray(),
+        currentRotation: this.mesh.rotation.toArray(),
+        targetRotation: euler.toArray(),
+        rotationSpeed
+      });
+    }
+
+    // Smooth rotation with increased responsiveness
+    this.mesh.quaternion.slerp(stableQuaternion, rotationSpeed);
+  }
+
+  /**
+   * Create debug arrows to visualize velocity and forward direction
+   */
+  private createDebugArrows(): void {
+    if (!this.debugVectors || !this.mesh) return;
+
+    // Create velocity arrow (red) - shows where the object is moving
+    const velocityDirection = new THREE.Vector3(1, 0, 0);
+    this.velocityArrow = new THREE.ArrowHelper(
+      velocityDirection,
+      this.mesh.position,
+      20, // length
+      0xff0000, // red color
+      8, // head length
+      4 // head width
+    );
+    this.velocityArrow.name = 'VelocityVector';
+
+    // Create forward direction arrow (blue) - shows where the object is facing
+    const forwardDirection = this.getForwardDirectionVector();
+    this.forwardArrow = new THREE.ArrowHelper(
+      forwardDirection,
+      this.mesh.position,
+      15, // slightly shorter length
+      0x0000ff, // blue color
+      6, // head length
+      3 // head width
+    );
+    this.forwardArrow.name = 'ForwardVector';
+
+    // Add arrows to the scene (assuming mesh has a parent)
+    if (this.mesh.parent) {
+      this.mesh.parent.add(this.velocityArrow);
+      this.mesh.parent.add(this.forwardArrow);
+    }
+  }
+
+  /**
+   * Update debug arrows to show current velocity and forward direction
+   */
+  private updateDebugArrows(): void {
+    if (!this.debugVectors || !this.mesh || !this.velocityArrow || !this.forwardArrow) return;
+
+    // Update velocity arrow (red) - normalized velocity direction
+    const velocityDirection = this.currentVelocity.clone().normalize();
+    if (velocityDirection.length() > 0) {
+      this.velocityArrow.setDirection(velocityDirection);
+    }
+    this.velocityArrow.position.copy(this.mesh.position);
+
+    // Update forward direction arrow (blue) - where the object is facing
+    const forwardDirection = this.getForwardDirectionVector();
+    this.forwardArrow.setDirection(forwardDirection);
+    this.forwardArrow.position.copy(this.mesh.position);
+  }
+
+  /**
+   * Get the forward direction vector based on the object's current orientation and forwardAxis
+   */
+  private getForwardDirectionVector(): THREE.Vector3 {
+    if (!this.mesh) return new THREE.Vector3(0, 0, 1);
+
+    // Create the base forward vector based on forwardAxis
+    let baseForward = new THREE.Vector3();
+    switch (this.forwardAxis) {
+      case 'x':
+        baseForward.set(1, 0, 0);
+        break;
+      case '-x':
+        baseForward.set(-1, 0, 0);
+        break;
+      case 'y':
+        baseForward.set(0, 1, 0);
+        break;
+      case '-y':
+        baseForward.set(0, -1, 0);
+        break;
+      case 'z':
+        baseForward.set(0, 0, 1);
+        break;
+      case '-z':
+        baseForward.set(0, 0, -1);
+        break;
+    }
+
+    // Apply the object's current rotation to the forward vector
+    return baseForward.applyQuaternion(this.mesh.quaternion).normalize();
+  }
+
+  /**
+   * Remove debug arrows from the scene
+   */
+  private removeDebugArrows(): void {
+    if (this.velocityArrow && this.velocityArrow.parent) {
+      this.velocityArrow.parent.remove(this.velocityArrow);
+      this.velocityArrow = undefined;
+    }
+    if (this.forwardArrow && this.forwardArrow.parent) {
+      this.forwardArrow.parent.remove(this.forwardArrow);
+      this.forwardArrow = undefined;
+    }
   }
 
   /**
@@ -373,6 +501,7 @@ export class FlyingBehavior {
    */
   public dispose(): void {
     this.stop();
+    this.removeDebugArrows();
     this.mesh = null;
     this.obstacles.length = 0;
     this.terrain = null;

@@ -82,18 +82,8 @@
       "visibility": "public",
       "priority": 4
     },
-    "famara2": {
-      "name": "Famara",
-      "description": "Beautiful static 3D scene showcasing paragliders and environment",
-      "entry": "./applications/famara2/index.tsx",
-      "route": "/famara2",
-      "category": "demo",
-      "requiresWebGL": true,
-      "visibility": "public",
-      "priority": 2
-    },
     "famara": {
-      "name": "Famara Beach",
+      "name": "Famara static",
       "description": "Natural beauty of Famara beach area without paragliders - pure landscape focus",
       "entry": "./applications/famara/index.tsx",
       "route": "/famara",
@@ -213,11 +203,11 @@
       "visibility": "private",
       "priority": 22
     },
-    "autonomous-driving": {
-      "name": "Autonomous Driving",
-      "description": "Autonomous driving simulation demo",
-      "entry": "./applications/autonomous-driving/index.tsx",
-      "route": "/autonomous-driving",
+    "cars": {
+      "name": "Cars",
+      "description": "Cars",
+      "entry": "./applications/cars/index.tsx",
+      "route": "/cars",
       "category": "demo",
       "requiresWebGL": true,
       "visibility": "private",

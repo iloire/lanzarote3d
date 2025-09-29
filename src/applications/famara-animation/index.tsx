@@ -227,12 +227,12 @@ class AnimationApp extends TerrainBase {
 
       this.hanggliderFlyingBehavior = new FlyingBehavior({
         pattern: FlightPattern.FREE_ROAM,
-        speed: 16.0, // Increased speed for better testing
-        turnSpeed: 3.0, // Increased turn speed for more responsive avoidance
+        speed: 1.0, // Increased speed for better testing
+        turnSpeed: 7.0, // Increased turn speed for more responsive avoidance
         flightRadius: 45, // Adjusted for much wider wall spacing (50 units to walls)
         returnDistance: 55, // Adjusted for outer wall positions (beyond 50 unit walls)
         minHeight: 5,
-        maxHeight: 25, // Increased max height since walls are now 30 units tall
+        maxHeight: 2225,
         obstacleAvoidanceDistance: 15, // Increased avoidance distance for taller walls
         centerPoint: new THREE.Vector3(0, 0, 0),
         autoStart: true,

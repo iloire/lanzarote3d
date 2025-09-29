@@ -153,11 +153,12 @@ class FlyingBehaviorTestApp extends WorkshopDemoBase {
           returnDistance: 55, // Adjusted for outer wall positions (beyond 50 unit walls)
           minHeight: 5,
           maxHeight: 25, // Increased max height since walls are now 30 units tall
-          obstacleAvoidanceDistance: 15, // Increased avoidance distance for taller walls
+          obstacleAvoidanceDistance: 25, // Increased avoidance distance for taller walls
           centerPoint: new THREE.Vector3(0, 0, 0),
           autoStart: true,
           faceDirection: true,
-          forwardAxis: 'x' // Updated to match hangglider's new orientation after 270° rotation
+          forwardAxis: 'x', // Updated to match hangglider's new orientation after 270° rotation
+          debugVectors: true // Enable visual debug helpers for velocity and forward direction
         });
 
         this.flyingBehavior.attachTo(hanggliderMesh);
