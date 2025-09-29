@@ -35,8 +35,8 @@ export class PatrolBoat extends MovableBoatComponent {
         radius: 400,
         autoStartMoving: true,
         autoStartFloating: true,
-        faceDirection: true,
-        forwardAxis: 'z', // Boats have bow pointing in +Z direction after rotation
+        faceDirection: false,
+        forwardAxis: 'x', // Boats have bow pointing in +Z direction after rotation
         ...options,
       }
     );

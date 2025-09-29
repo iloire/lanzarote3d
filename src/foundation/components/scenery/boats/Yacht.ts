@@ -27,10 +27,12 @@ export class Yacht extends MovableBoatComponent {
         glassColor: '#87CEEB',
         scale: 1,
         // Movement defaults - disabled by default, can be enabled via options
-        enableMovement: false,
-        pattern: MovementPattern.FIGURE_EIGHT,
-        speed: 0.2,
+        enableMovement: true,
+        pattern: MovementPattern.CIRCULAR,
+        speed: 0.1,
         radius: 250,
+        forwardAxis: 'x', // Boats have bow pointing in +Z direction after rotation
+        faceDirection: false, // FORWARD pattern handles its own rotation
         ...options,
       }
     );

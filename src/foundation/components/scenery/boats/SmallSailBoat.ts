@@ -25,10 +25,12 @@ export class SmallSailBoat extends MovableBoatComponent {
         sailColor: '#666666',
         scale: 1,
         // Movement defaults - disabled by default, can be enabled via options
-        enableMovement: false,
-        pattern: MovementPattern.RANDOM_DRIFT,
-        speed: 0.3,
-        radius: 100,
+        enableMovement: true,
+        pattern: MovementPattern.CIRCULAR,
+        speed: 0.08,
+        radius: 150,
+        forwardAxis: 'z', // Boats have bow pointing in +Z direction after rotation
+        faceDirection: true, // FORWARD pattern handles its own rotation
         ...options,
       }
     );

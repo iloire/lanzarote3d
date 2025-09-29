@@ -27,10 +27,12 @@ export class SpeedBoat extends MovableBoatComponent {
         engineColor: '#333333',
         scale: 1,
         // Movement defaults - disabled by default, can be enabled via options
-        enableMovement: false,
-        pattern: MovementPattern.LINEAR,
-        speed: 0.8,
-        radius: 200,
+        enableMovement: true,
+        pattern: MovementPattern.CIRCULAR,
+        speed: 0.15,
+        radius: 300,
+        forwardAxis: 'x', // Boats have bow pointing in +Z direction after rotation
+        faceDirection: false, // FORWARD pattern handles its own rotation
         ...options,
       }
     );

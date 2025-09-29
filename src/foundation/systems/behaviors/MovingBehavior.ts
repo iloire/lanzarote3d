@@ -6,6 +6,7 @@ export enum MovementPattern {
   RANDOM_DRIFT = 'random',
   PATROL = 'patrol',
   LINEAR = 'linear',
+  FORWARD = 'forward',
 }
 
 export interface MovingBehaviorOptions {
@@ -199,6 +200,9 @@ export class MovingBehavior {
       case MovementPattern.LINEAR:
         this.calculateLinearMovement(newPosition);
         break;
+      case MovementPattern.FORWARD:
+        this.calculateForwardMovement(newPosition, deltaTime);
+        break;
     }
 
     // Apply bounds if specified
@@ -231,8 +235,20 @@ export class MovingBehavior {
   };
 
   private calculateCircularMovement(position: THREE.Vector3): void {
-    position.x = this.originalPosition.x + Math.cos(this.time) * this.radius;
-    position.z = this.originalPosition.z + Math.sin(this.time) * this.radius;
+    // Calculate circular movement with radius perpendicular to the forward axis
+    // This creates proper turning motion instead of sideways sliding
+
+    if (this.forwardAxis === 'x') {
+      // For objects facing +X, radius should be perpendicular (along Z-axis)
+      // This makes the object turn while moving forward
+      position.x = this.originalPosition.x + Math.sin(this.time) * this.radius; // Forward/backward motion
+      position.z = this.originalPosition.z + Math.cos(this.time) * this.radius; // Left/right turning radius
+    } else {
+      // For objects facing +Z (like rotated boats), radius should be perpendicular (along X-axis)
+      // This makes the boat turn while moving forward
+      position.x = this.originalPosition.x + Math.cos(this.time) * this.radius; // Left/right turning radius
+      position.z = this.originalPosition.z + Math.sin(this.time) * this.radius; // Forward/backward motion
+    }
   }
 
   private calculateFigureEightMovement(position: THREE.Vector3): void {
@@ -287,9 +303,52 @@ export class MovingBehavior {
   }
 
   private calculateLinearMovement(position: THREE.Vector3): void {
-    // Simple back and forth movement
+    // Simple back and forth movement along the forward axis
     const offset = Math.sin(this.time) * this.radius;
-    position.x = this.originalPosition.x + offset;
-    position.z = this.originalPosition.z;
+
+    if (this.forwardAxis === 'x') {
+      // Move along X-axis for objects facing +X
+      position.x = this.originalPosition.x + offset;
+      position.z = this.originalPosition.z;
+    } else {
+      // Move along Z-axis for objects facing +Z (like rotated boats)
+      position.x = this.originalPosition.x;
+      position.z = this.originalPosition.z + offset;
+    }
+  }
+
+  private calculateForwardMovement(position: THREE.Vector3, deltaTime: number): void {
+    // Realistic forward movement - boat moves forward in its current facing direction
+    // and occasionally changes direction gradually
+
+    if (!this.mesh) {
+      position.copy(this.originalPosition);
+      return;
+    }
+
+    // Get current facing direction from mesh rotation
+    const direction = new THREE.Vector3();
+    if (this.forwardAxis === 'x') {
+      direction.set(1, 0, 0);
+    } else {
+      direction.set(0, 0, 1);
+    }
+
+    // Apply the mesh's rotation to get actual forward direction
+    direction.applyEuler(this.mesh.rotation);
+
+    // Move forward at constant speed
+    const moveDistance = this.speed * deltaTime * 60; // Adjust for frame rate
+    const currentPos = this.mesh.position.clone();
+    currentPos.add(direction.multiplyScalar(moveDistance));
+
+    // Occasionally change direction slightly (turn)
+    const turnChance = deltaTime * 0.5; // Turn probability per second
+    if (Math.random() < turnChance) {
+      const turnAngle = (Math.random() - 0.5) * 0.3; // Small random turn (-0.15 to +0.15 radians)
+      this.mesh.rotation.y += turnAngle;
+    }
+
+    position.copy(currentPos);
   }
 }
