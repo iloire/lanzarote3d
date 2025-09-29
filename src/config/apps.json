@@ -163,6 +163,26 @@
       "requiresWebGL": true,
       "status": "dev",
       "priority": 20
+    },
+    "flier-pg": {
+      "name": "Paraglider Workshop",
+      "description": "Workshop demo showcasing paraglider physics simulation with weather system",
+      "entry": "./applications/flier-pg/index.tsx",
+      "route": "/flier-pg",
+      "category": "demo",
+      "requiresWebGL": true,
+      "status": "dev",
+      "priority": 21
+    },
+    "animals": {
+      "name": "Animals",
+      "description": "Showcase of bird species with realistic wing animations including Crow, Eagle, and Vulture",
+      "entry": "./applications/animals/index.tsx",
+      "route": "/animals",
+      "category": "demo",
+      "requiresWebGL": true,
+      "status": "dev",
+      "priority": 22
     }
   },
   "showcase": {
@@ -182,7 +202,9 @@
         "glider",
         "pilot",
         "game",
-        "flyzones"
+        "flyzones",
+        "flier-pg",
+        "animals"
       ]
     },
     "order": {
@@ -201,7 +223,9 @@
       "town": 13,
       "houses": 14,
       "glider": 15,
-      "pilot": 16
+      "pilot": 16,
+      "flier-pg": 17,
+      "animals": 18
     },
     "filenameOverrides": {
       "animation": "index.html",
