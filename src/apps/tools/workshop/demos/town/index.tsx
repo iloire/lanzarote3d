@@ -41,6 +41,7 @@ const createLabel = (text: string, position: THREE.Vector3) => {
 class TownWorkshop extends WorkshopDemoBase {
   private neighborhoodMeshes: THREE.Object3D[] = [];
   private labelMeshes: THREE.Mesh[] = [];
+  private roadMeshes: THREE.Object3D[] = []; // Track roads separately
   private houseGroupCreator!: HouseGroupCreator;
   private componentRegistry!: ComponentRegistry;
   private currentScene!: THREE.Scene;
@@ -299,11 +300,12 @@ class TownWorkshop extends WorkshopDemoBase {
   }
 
   /**
-   * Count total polygons in all neighborhood meshes
+   * Count total polygons in all neighborhood meshes and roads
    */
   private updatePolygonCount(): void {
     let totalPolygons = 0;
 
+    // Count neighborhood polygons
     this.neighborhoodMeshes.forEach(obj => {
       obj.traverse(child => {
         if (child instanceof THREE.Mesh && child.geometry) {
@@ -320,8 +322,25 @@ class TownWorkshop extends WorkshopDemoBase {
       });
     });
 
+    // Count road polygons
+    this.roadMeshes.forEach(obj => {
+      obj.traverse(child => {
+        if (child instanceof THREE.Mesh && child.geometry) {
+          const geometry = child.geometry;
+          if (geometry.index !== null) {
+            totalPolygons += geometry.index.count / 3;
+          } else {
+            const positionAttribute = geometry.getAttribute('position');
+            if (positionAttribute) {
+              totalPolygons += positionAttribute.count / 3;
+            }
+          }
+        }
+      });
+    });
+
     this.performanceSettings.polygonCount = Math.floor(totalPolygons);
-    console.log(`📊 Total polygons: ${this.performanceSettings.polygonCount.toLocaleString()}`);
+    console.log(`📊 Total polygons: ${this.performanceSettings.polygonCount.toLocaleString()} (${this.neighborhoodMeshes.length} neighborhoods + ${this.roadMeshes.length} roads)`);
 
     // Update on-screen display if available
     if (this.performanceDisplay) {
@@ -337,6 +356,7 @@ class TownWorkshop extends WorkshopDemoBase {
     this.clearNeighborhoods();
 
     // Update house group creator with current low-poly setting
+    console.log(`🐛 Setting HouseGroupCreator to lowPoly: ${this.isLowPoly}`);
     this.houseGroupCreator.setLowPolyMode(this.isLowPoly);
 
     // Recreate with current low-poly setting
@@ -349,7 +369,7 @@ class TownWorkshop extends WorkshopDemoBase {
    * Clear all existing neighborhood meshes and labels with proper memory cleanup
    */
   private clearNeighborhoods(): void {
-    console.log(`🧹 Clearing ${this.neighborhoodMeshes.length} neighborhood objects and ${this.labelMeshes.length} labels`);
+    console.log(`🧹 Clearing ${this.neighborhoodMeshes.length} neighborhood objects, ${this.labelMeshes.length} labels, and ${this.roadMeshes.length} roads`);
 
     // Properly dispose neighborhood meshes
     this.neighborhoodMeshes.forEach(mesh => {
@@ -367,9 +387,18 @@ class TownWorkshop extends WorkshopDemoBase {
       }
     });
 
+    // Properly dispose road meshes
+    this.roadMeshes.forEach(road => {
+      this.disposeObject3D(road);
+      if (road.parent) {
+        road.parent.remove(road);
+      }
+    });
+
     // Clear arrays
     this.neighborhoodMeshes.length = 0;
     this.labelMeshes.length = 0;
+    this.roadMeshes.length = 0;
 
     console.log('✅ Neighborhood cleanup completed');
   }
@@ -410,15 +439,23 @@ class TownWorkshop extends WorkshopDemoBase {
    * Safely dispose of Three.js materials
    */
   private disposeMaterial(material: THREE.Material): void {
-    // Dispose of textures
+    // Dispose of textures and other disposable properties
     Object.values(material).forEach(value => {
-      if (value && typeof value === 'object' && 'dispose' in value) {
-        (value as any).dispose();
+      if (value && typeof value === 'object' && 'dispose' in value && typeof (value as any).dispose === 'function') {
+        try {
+          (value as any).dispose();
+        } catch (error) {
+          console.warn('Error disposing material property:', error);
+        }
       }
     });
 
     // Dispose the material itself
-    material.dispose();
+    try {
+      material.dispose();
+    } catch (error) {
+      console.warn('Error disposing material:', error);
+    }
   }
 
   private async loadNeighborhoods(scene: THREE.Scene, gui: any): Promise<void> {
@@ -705,6 +742,14 @@ class TownWorkshop extends WorkshopDemoBase {
       roughness: 0.9,
     });
 
+    // Road markings are now handled above with proper tracking
+
+    // Track roads separately so they can be properly disposed
+    this.roadMeshes.push(mainRoad, leftRoad, centerRoad, rightRoad);
+
+    // Also add road markings to tracking
+    const markings: THREE.Mesh[] = [];
+
     // Dashed lines for main road
     for (let i = -15; i <= 15; i++) {
       if (i % 2 === 0) continue; // Create dashed effect
@@ -715,9 +760,11 @@ class TownWorkshop extends WorkshopDemoBase {
       marking.rotation.x = -Math.PI / 2;
       marking.position.set(i * 50, 0.11, 0);
       scene.add(marking);
+      markings.push(marking);
     }
 
-    this.neighborhoodMeshes.push(mainRoad, leftRoad, centerRoad, rightRoad);
+    // Add markings to road tracking
+    this.roadMeshes.push(...markings);
   }
 
   private setupCamera(camera: THREE.Camera): void {

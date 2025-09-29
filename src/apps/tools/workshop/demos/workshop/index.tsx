@@ -1,8 +1,6 @@
 import * as THREE from 'three';
 import { Tree, Stone } from '../../../../../foundation/components/scenery';
-import { House, HouseType } from '../../../../../foundation/components/scenery/buildings';
 import { PineTree, PalmTree, CoconutPalm, DatePalm, FanPalm, Igloo, IglooSize, Pool, SaguaroCactus, BarrelCactus, PricklyPearCactus, OrganPipeCactus } from '../../../../../foundation/components/scenery';
-import { VillaLegacy as Villa, TownhouseLegacy as Townhouse, BarnLegacy as Barn, DesertHouseLegacy as DesertHouse, DomeLegacy as Dome, DesertHouseWithPoolLegacy as DesertHouseWithPool } from '../../../../../foundation/components/scenery';
 import { StoryOptions } from '../../../../shared/types';
 import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
 
@@ -139,128 +137,31 @@ class WorkshopApp extends WorkshopDemoBase {
     try {
       const igloo = new Igloo(IglooSize.Medium);
       const iglooMesh = igloo.load();
-      iglooMesh.position.set(0, -15, -60);
+      iglooMesh.position.set(-120, -15, 0);
       iglooMesh.scale.set(0.8, 0.8, 0.8);
       scene.add(iglooMesh);
       this.componentMeshes.push(iglooMesh);
 
       const iglooPolygons = countPolygons(iglooMesh);
-      const iglooLabel = createLabel('Igloo', new THREE.Vector3(0, -10, -60), iglooPolygons);
+      const iglooLabel = createLabel('Igloo', new THREE.Vector3(-120, -10, 0), iglooPolygons);
       scene.add(iglooLabel);
       this.labelMeshes.push(iglooLabel);
     } catch (error) {
       this.handleError(error as Error, 'loading igloo');
     }
 
-    // Load houses - organized with better spacing to avoid overlapping
-    const houseConfigs = [
-      { type: HouseType.Small, position: [50, 0, -20], label: 'Small House' },
-      { type: HouseType.Medium, position: [50, 0, 20], label: 'Medium House' },
-      { type: HouseType.Large, position: [50, 0, 60], label: 'Large House' },
-      { type: HouseType.Modern, position: [90, 0, 20], label: 'Modern House' },
-      // Low-poly version for comparison
-      { type: HouseType.Medium, position: [130, 0, 20], label: 'Medium House (Low-Poly)', lowPoly: true },
-    ];
+    // Houses have been moved to dedicated /houses showcase
 
-    for (const config of houseConfigs) {
-      try {
-        const house = new House({
-          type: config.type,
-          lowPoly: (config as any).lowPoly || false
-        });
-        const houseMesh = house.load(gui);
-        houseMesh.position.set(
-          config.position[0] ?? 0,
-          -15, // Ground level
-          config.position[2] ?? 0
-        );
-        scene.add(houseMesh);
-        this.componentMeshes.push(houseMesh);
+    // Houses have been moved to dedicated /houses showcase
 
-        const housePolygons = countPolygons(houseMesh);
-        const houseLabel = createLabel(
-          config.label,
-          new THREE.Vector3(config.position[0], -10, config.position[2]),
-          housePolygons
-        );
-        scene.add(houseLabel);
-        this.labelMeshes.push(houseLabel);
-      } catch (error) {
-        this.handleError(error as Error, `loading ${config.label}`);
-      }
-    }
-
-    // Load new building types - organized grid with better spacing
-    const buildingConfigs = [
-      { type: 'Villa', position: [-50, 0, 40], scale: 0.6, label: 'Villa' },
-      { type: 'Villa', position: [-50, 0, 80], scale: 0.6, label: 'Villa (Low-Poly)', lowPoly: true },
-      { type: 'Townhouse', position: [-100, 0, 40], scale: 0.8, label: 'Townhouse' },
-      { type: 'Barn', position: [-100, 0, 0], scale: 0.6, label: 'Barn' },
-      { type: 'DesertHouse', position: [-100, 0, 80], scale: 0.8, label: 'Desert House' },
-      { type: 'Dome', position: [-150, 0, 0], scale: 0.8, label: 'Dome' },
-      { type: 'DesertHouseWithPool', position: [-150, 0, 40], scale: 0.6, label: 'Desert House + Pool' },
-    ];
-
-    for (const config of buildingConfigs) {
-      try {
-        let building;
-
-        switch (config.type) {
-          case 'Villa':
-            building = new Villa({
-              scale: config.scale,
-              lowPoly: (config as any).lowPoly || false
-            });
-            break;
-          case 'Townhouse':
-            building = new Townhouse({ scale: config.scale });
-            break;
-          case 'Barn':
-            building = new Barn({ scale: config.scale });
-            break;
-          case 'DesertHouse':
-            building = new DesertHouse({ scale: config.scale });
-            break;
-          case 'Dome':
-            building = new Dome({ scale: config.scale });
-            break;
-          case 'DesertHouseWithPool':
-            building = new DesertHouseWithPool({ scale: config.scale });
-            break;
-          default:
-            continue;
-        }
-
-        const buildingMesh = building.load();
-        buildingMesh.position.set(
-          config.position[0] ?? 0,
-          -15, // Ground level
-          config.position[2] ?? 0
-        );
-        scene.add(buildingMesh);
-        this.componentMeshes.push(buildingMesh);
-
-        const buildingPolygons = countPolygons(buildingMesh);
-        const buildingLabel = createLabel(
-          config.label,
-          new THREE.Vector3(config.position[0], -10, config.position[2]),
-          buildingPolygons
-        );
-        scene.add(buildingLabel);
-        this.labelMeshes.push(buildingLabel);
-      } catch (error) {
-        this.handleError(error as Error, `loading ${config.label}`);
-      }
-    }
-
-    // Load trees - organized grid with better spacing
+    // Load trees - evenly distributed across the scene
     const treeConfigs = [
-      { type: 'Pine', position: [120, 0, 0], scale: 2.5, label: 'Pine Tree', component: PineTree },
-      { type: 'Tree', position: [120, 0, 30], scale: 2, label: 'Tree', component: Tree },
-      { type: 'Palm', position: [120, 0, 60], scale: 2, label: 'Palm Tree', component: PalmTree },
-      { type: 'Coconut', position: [160, 0, 0], scale: 2, label: 'Coconut Palm', component: CoconutPalm },
-      { type: 'Date', position: [160, 0, 30], scale: 2, label: 'Date Palm', component: DatePalm },
-      { type: 'Fan', position: [160, 0, 60], scale: 1.5, label: 'Fan Palm', component: FanPalm },
+      { type: 'Pine', position: [-60, 0, 0], scale: 2.5, label: 'Pine Tree', component: PineTree },
+      { type: 'Tree', position: [0, 0, 0], scale: 2, label: 'Tree', component: Tree },
+      { type: 'Palm', position: [60, 0, 0], scale: 2, label: 'Palm Tree', component: PalmTree },
+      { type: 'Coconut', position: [-60, 0, 60], scale: 2, label: 'Coconut Palm', component: CoconutPalm },
+      { type: 'Date', position: [0, 0, 60], scale: 2, label: 'Date Palm', component: DatePalm },
+      { type: 'Fan', position: [60, 0, 60], scale: 1.5, label: 'Fan Palm', component: FanPalm },
     ];
 
     for (const config of treeConfigs) {
@@ -289,10 +190,10 @@ class WorkshopApp extends WorkshopDemoBase {
       }
     }
 
-    // Load stones - organized with better spacing
+    // Load stones - evenly distributed
     const stoneConfigs = [
-      { position: [200, 0, 0], scale: [2, 2, 2], label: 'Stone' },
-      { position: [200, 0, 30], scale: [1.5, 3, 1.5], label: 'Tall Stone' },
+      { position: [120, 0, 0], scale: [2, 2, 2], label: 'Stone' },
+      { position: [120, 0, 60], scale: [1.5, 3, 1.5], label: 'Tall Stone' },
     ];
 
     for (const config of stoneConfigs) {
@@ -325,25 +226,25 @@ class WorkshopApp extends WorkshopDemoBase {
     try {
       const pool = new Pool();
       const poolMesh = pool.load();
-      poolMesh.position.set(320, -15, 30);
+      poolMesh.position.set(-120, -15, 60);
       poolMesh.scale.set(0.8, 0.8, 0.8);
       scene.add(poolMesh);
       this.componentMeshes.push(poolMesh);
 
       const poolPolygons = countPolygons(poolMesh);
-      const poolLabel = createLabel('Pool', new THREE.Vector3(320, -10, 30), poolPolygons);
+      const poolLabel = createLabel('Pool', new THREE.Vector3(-120, -10, 60), poolPolygons);
       scene.add(poolLabel);
       this.labelMeshes.push(poolLabel);
     } catch (error) {
       this.handleError(error as Error, 'loading pool');
     }
 
-    // Load cactus types - organized with better spacing
+    // Load cactus types - evenly distributed
     const cactusConfigs = [
-      { type: 'Saguaro', position: [240, 0, 0], scale: 0.6, label: 'Saguaro Cactus' },
-      { type: 'Barrel', position: [240, 0, 30], scale: 1.0, label: 'Barrel Cactus' },
-      { type: 'PricklyPear', position: [240, 0, 60], scale: 0.8, label: 'Prickly Pear' },
-      { type: 'OrganPipe', position: [280, 0, 20], scale: 0.7, label: 'Organ Pipe Cactus' },
+      { type: 'Saguaro', position: [-60, 0, -60], scale: 0.6, label: 'Saguaro Cactus' },
+      { type: 'Barrel', position: [0, 0, -60], scale: 1.0, label: 'Barrel Cactus' },
+      { type: 'PricklyPear', position: [60, 0, -60], scale: 0.8, label: 'Prickly Pear' },
+      { type: 'OrganPipe', position: [120, 0, -60], scale: 0.7, label: 'Organ Pipe Cactus' },
     ];
 
     for (const config of cactusConfigs) {
@@ -391,7 +292,7 @@ class WorkshopApp extends WorkshopDemoBase {
 
     // Add a simple ground plane for component showcase
     try {
-      const groundGeometry = new THREE.PlaneGeometry(500, 200);
+      const groundGeometry = new THREE.PlaneGeometry(400, 300);
       const groundMaterial = new THREE.MeshStandardMaterial({
         color: 0x8fbc8f, // Dark sea green for ground
         transparent: true,
@@ -404,7 +305,7 @@ class WorkshopApp extends WorkshopDemoBase {
       this.componentMeshes.push(ground);
 
       const groundPolygons = countPolygons(ground);
-      const groundLabel = createLabel('Workshop Ground', new THREE.Vector3(0, -10, 0), groundPolygons);
+      const groundLabel = createLabel('Workshop Ground', new THREE.Vector3(0, -10, 30), groundPolygons);
       scene.add(groundLabel);
       this.labelMeshes.push(groundLabel);
     } catch (error) {
@@ -413,8 +314,8 @@ class WorkshopApp extends WorkshopDemoBase {
   }
 
   private setupCamera(camera: THREE.Camera): void {
-    const lookAt = new THREE.Vector3(100, 0, 40); // Center point for reorganized compact layout
-    camera.position.set(400, 200, 300); // Closer position for better view of organized components
+    const lookAt = new THREE.Vector3(0, 0, 0); // Center point for evenly distributed layout
+    camera.position.set(200, 150, 200); // Optimal position for viewing redistributed components
     camera.lookAt(lookAt);
   }
 

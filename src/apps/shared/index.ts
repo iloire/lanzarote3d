@@ -63,6 +63,7 @@ export async function loadApp(appKey: string, options: StoryOptions): Promise<vo
     'pilot': () => import('../tools/workshop/demos/pilot/index'),
     'terrain': () => import('../tools/workshop/demos/terrain/index'),
     'town': () => import('../tools/workshop/demos/town/index'),
+    'houses': () => import('../tools/workshop/demos/houses/index'),
     'voxel': () => import('../tools/workshop/demos/voxel/index'),
     'terrain-gps': () => import('../tools/workshop/demos/terrain-gps/index'),
     'tile-debug': () => import('../tools/workshop/demos/tile-debug/app'),

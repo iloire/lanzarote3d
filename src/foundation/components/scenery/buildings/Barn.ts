@@ -9,6 +9,7 @@ export interface BarnOptions extends SimpleComponentOptions {
   doorColor?: string;
   trimColor?: string;
   scale?: number;
+  lowPoly?: boolean;
 }
 
 /**
@@ -44,6 +45,11 @@ export class Barn extends SimpleThreeComponent {
 
     const options = this.options as BarnOptions;
     const scale = options.scale || 1;
+    const isLowPoly = options.lowPoly || false;
+
+    if (isLowPoly) {
+      return this.createLowPolyBarn(options, scale);
+    }
 
     // Create materials with resource sharing
     const wallMaterial = resourceManager.getOrCreateMaterial(
@@ -193,6 +199,68 @@ export class Barn extends SimpleThreeComponent {
     const bottomRail = new THREE.Mesh(railGeometry, doorMaterial);
     bottomRail.position.set(0, 2, 15); // Adjusted for main body repositioning
     barn.add(bottomRail);
+
+    // Apply scale
+    if (scale !== 1) {
+      barn.scale.setScalar(scale);
+    }
+
+    return barn;
+  }
+
+  private createLowPolyBarn(options: BarnOptions, scale: number): THREE.Object3D {
+    const barn = new THREE.Group();
+    barn.name = 'Barn (Low-Poly)';
+
+    // Create simplified materials
+    const wallMaterial = resourceManager.getOrCreateMaterial(
+      `barn_wall_lowpoly_${options.wallColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.wallColor })
+    );
+
+    const roofMaterial = resourceManager.getOrCreateMaterial(
+      `barn_roof_lowpoly_${options.roofColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.roofColor })
+    );
+
+    const doorMaterial = resourceManager.getOrCreateMaterial(
+      `barn_door_lowpoly_${options.doorColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.doorColor })
+    );
+
+    // Main barn structure - simplified single box
+    const mainBodyGeometry = resourceManager.getOrCreateGeometry(
+      'barn_main_body_lowpoly',
+      () => new THREE.BoxGeometry(30, 18, 20)
+    );
+    const mainBody = new THREE.Mesh(mainBodyGeometry, wallMaterial);
+    mainBody.position.set(0, 9, 0);
+    mainBody.castShadow = this.options.castShadow ?? true;
+    mainBody.receiveShadow = this.options.receiveShadow ?? true;
+    barn.add(mainBody);
+
+    // Simplified roof - single angled box instead of gambrel
+    const roofGeometry = resourceManager.getOrCreateGeometry(
+      'barn_roof_lowpoly',
+      () => new THREE.BoxGeometry(32, 8, 22)
+    );
+    const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+    roof.position.set(0, 22, 0);
+    roof.rotation.x = -Math.PI / 8; // Single angle
+    roof.castShadow = this.options.castShadow ?? true;
+    barn.add(roof);
+
+    // Single large door - no separation, no frame
+    const doorGeometry = resourceManager.getOrCreateGeometry(
+      'barn_door_lowpoly',
+      () => new THREE.BoxGeometry(12, 12, 0.3)
+    );
+    const door = new THREE.Mesh(doorGeometry, doorMaterial);
+    door.position.set(0, 6, 10.15);
+    barn.add(door);
+
+    // No windows, no weathervane, no fence - minimal detail
+    // Just the essential barn shape
 
     // Apply scale
     if (scale !== 1) {

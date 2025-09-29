@@ -51,6 +51,10 @@ class Stone extends SimpleThreeComponent {
     };
   }
 
+  protected createSyncContent(): THREE.Object3D {
+    return this.createStone();
+  }
+
   public override async load(): Promise<THREE.Object3D> {
     const stone = (await super.load()) as THREE.Mesh;
 

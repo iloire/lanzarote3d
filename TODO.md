@@ -1,11 +1,7 @@
 Implement the following tasks if any is added follwing the instructions described below:
 ---
 TASKS:
-- remove skyscraper from codebase
-- better organize and distribute space across workshop demo components, less space between each other.
-- pool needs to have blue water.
-- add a bed inside the Dome.
-
+- suggest how to fix the mess and duplication in /Users/ivan/code/lanzarote3d/src/apps/shared/index.ts. Do we really need the concept of Stories any more? probably not.
 ---
 
 ### Instructions

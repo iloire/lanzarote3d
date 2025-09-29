@@ -62,6 +62,7 @@ export class HouseGroupCreator {
     try {
       switch (houseConfig.type) {
         case 'House':
+          console.log(`🐛 Creating House with lowPoly: ${this.lowPoly}`);
           house = new House({
             type: houseConfig.houseType || HouseType.Medium,
             lowPoly: this.lowPoly,
@@ -71,6 +72,7 @@ export class HouseGroupCreator {
           break;
 
         case 'Villa':
+          console.log(`🐛 Creating Villa with lowPoly: ${this.lowPoly}`);
           house = new Villa({
             scale: scale,
             lowPoly: this.lowPoly,
@@ -80,40 +82,50 @@ export class HouseGroupCreator {
           break;
 
         case 'Townhouse':
+          console.log(`✅ Creating Townhouse with lowPoly: ${this.lowPoly}`);
           house = new Townhouse({
             scale: scale,
+            lowPoly: this.lowPoly,
             ...(houseConfig.colors || {}),
           });
           houseMesh = house.load();
           break;
 
         case 'Barn':
+          console.log(`🐛 Creating Barn with lowPoly: ${this.lowPoly} (not yet implemented)`);
           house = new Barn({
             scale: scale,
+            // lowPoly: this.lowPoly, // TODO: Implement lowPoly for Barn
             ...(houseConfig.colors || {}),
           });
           houseMesh = house.load();
           break;
 
         case 'DesertHouse':
+          console.log(`✅ Creating DesertHouse with lowPoly: ${this.lowPoly}`);
           house = new DesertHouse({
             scale: scale,
+            lowPoly: this.lowPoly,
             ...(houseConfig.colors || {}),
           });
           houseMesh = house.load();
           break;
 
         case 'Dome':
+          console.log(`🐛 Creating Dome with lowPoly: ${this.lowPoly} (not yet implemented)`);
           house = new Dome({
             scale: scale,
+            // lowPoly: this.lowPoly, // TODO: Implement lowPoly for Dome
             ...(houseConfig.colors || {}),
           });
           houseMesh = house.load();
           break;
 
         case 'DesertHouseWithPool':
+          console.log(`🐛 Creating DesertHouseWithPool with lowPoly: ${this.lowPoly} (not yet implemented)`);
           house = new DesertHouseWithPool({
             scale: scale,
+            // lowPoly: this.lowPoly, // TODO: Implement lowPoly for DesertHouseWithPool
             ...(houseConfig.colors || {}),
           });
           houseMesh = house.load();

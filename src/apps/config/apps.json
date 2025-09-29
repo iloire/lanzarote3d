@@ -157,6 +157,16 @@
       "requiresWebGL": true,
       "status": "dev",
       "priority": 19
+    },
+    "houses": {
+      "name": "Houses",
+      "description": "House component showcase comparing normal vs low-poly versions with polygon count analysis",
+      "entry": "./tools/workshop/demos/houses",
+      "route": "/houses",
+      "category": "demo",
+      "requiresWebGL": true,
+      "status": "dev",
+      "priority": 20
     }
   },
   "showcase": {
@@ -172,6 +182,7 @@
         "paraglider-voxel",
         "terrain",
         "town",
+        "houses",
         "legacy-glider",
         "pilot",
         "game",
@@ -192,8 +203,9 @@
       "paraglider-voxel": 11,
       "terrain": 12,
       "town": 13,
-      "legacy-glider": 14,
-      "pilot": 15
+      "houses": 14,
+      "legacy-glider": 15,
+      "pilot": 16
     },
     "filenameOverrides": {
       "animation": "index.html",

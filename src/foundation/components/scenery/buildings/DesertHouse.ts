@@ -10,6 +10,7 @@ export interface DesertHouseOptions extends SimpleComponentOptions {
   windowColor?: string;
   accentColor?: string;
   scale?: number;
+  lowPoly?: boolean;
 }
 
 /**
@@ -46,6 +47,7 @@ export class DesertHouse extends SimpleThreeComponent {
 
     const options = this.options as DesertHouseOptions;
     const scale = options.scale || 1;
+    const isLowPoly = options.lowPoly || false;
 
     // Create materials with resource sharing
     const wallMaterial = resourceManager.getOrCreateMaterial(
@@ -94,14 +96,16 @@ export class DesertHouse extends SimpleThreeComponent {
     roof.castShadow = this.options.castShadow ?? true;
     desertHouse.add(roof);
 
-    // Small parapet wall around roof edge
-    const parapetGeometry = resourceManager.getOrCreateGeometry(
-      'desert_house_parapet',
-      () => new THREE.BoxGeometry(20.5, 2, 18.5)
-    );
-    const parapet = new THREE.Mesh(parapetGeometry, wallMaterial);
-    parapet.position.set(0, 15.5, 0); // Adjusted for main body repositioning
-    desertHouse.add(parapet);
+    // Small parapet wall around roof edge (skip for low-poly)
+    if (!isLowPoly) {
+      const parapetGeometry = resourceManager.getOrCreateGeometry(
+        'desert_house_parapet',
+        () => new THREE.BoxGeometry(20.5, 2, 18.5)
+      );
+      const parapet = new THREE.Mesh(parapetGeometry, wallMaterial);
+      parapet.position.set(0, 15.5, 0); // Adjusted for main body repositioning
+      desertHouse.add(parapet);
+    }
 
     // Simple arched doorway
     const doorGeometry = resourceManager.getOrCreateGeometry(
@@ -112,109 +116,128 @@ export class DesertHouse extends SimpleThreeComponent {
     door.position.set(0, 4, 8.25); // Adjusted for main body repositioning
     desertHouse.add(door);
 
-    // Arched door frame
-    const archGeometry = resourceManager.getOrCreateGeometry(
-      'desert_house_arch',
-      () => new THREE.RingGeometry(2, 2.5, 0, Math.PI)
-    );
-    const arch = new THREE.Mesh(archGeometry, accentMaterial);
-    arch.position.set(0, 8, 8.1); // Adjusted for main body repositioning
-    arch.rotation.z = Math.PI;
-    desertHouse.add(arch);
+    // Arched door frame (skip for low-poly)
+    if (!isLowPoly) {
+      const archGeometry = resourceManager.getOrCreateGeometry(
+        'desert_house_arch',
+        () => new THREE.RingGeometry(2, 2.5, 0, Math.PI)
+      );
+      const arch = new THREE.Mesh(archGeometry, accentMaterial);
+      arch.position.set(0, 8, 8.1); // Adjusted for main body repositioning
+      arch.rotation.z = Math.PI;
+      desertHouse.add(arch);
+    }
 
-    // Small desert-style windows
-    const windowGeometry = resourceManager.getOrCreateGeometry(
-      'desert_house_window',
-      () => new THREE.BoxGeometry(2.5, 2.5, 0.3)
-    );
+    // Windows - simplified for low-poly mode
+    if (isLowPoly) {
+      // Low-poly: just one simple window, no frames
+      const windowLowPolyGeometry = resourceManager.getOrCreateGeometry(
+        'desert_house_window_lowpoly',
+        () => new THREE.BoxGeometry(2, 2, 0.2)
+      );
 
-    // Side windows - asymmetrical placement for authentic look
-    const leftWindow = new THREE.Mesh(windowGeometry, windowMaterial);
-    leftWindow.position.set(-6, 9, 8.15); // Adjusted for main body repositioning
-    desertHouse.add(leftWindow);
+      const singleWindow = new THREE.Mesh(windowLowPolyGeometry, windowMaterial);
+      singleWindow.position.set(0, 8, 8.1);
+      desertHouse.add(singleWindow);
 
-    const rightWindow = new THREE.Mesh(windowGeometry, windowMaterial);
-    rightWindow.position.set(6, 8, 8.15); // Adjusted for main body repositioning
-    desertHouse.add(rightWindow);
+    } else {
+      // Full detail windows with frames
+      const windowGeometry = resourceManager.getOrCreateGeometry(
+        'desert_house_window',
+        () => new THREE.BoxGeometry(2.5, 2.5, 0.3)
+      );
 
-    // Side wall window
-    const sideWindow = new THREE.Mesh(windowGeometry, windowMaterial);
-    sideWindow.position.set(9.15, 7, 0); // Adjusted for main body repositioning
-    desertHouse.add(sideWindow);
+      // Side windows - asymmetrical placement for authentic look
+      const leftWindow = new THREE.Mesh(windowGeometry, windowMaterial);
+      leftWindow.position.set(-6, 9, 8.15); // Adjusted for main body repositioning
+      desertHouse.add(leftWindow);
 
-    // Window frames with desert accent color
-    const frameGeometry = resourceManager.getOrCreateGeometry(
-      'desert_house_window_frame',
-      () => new THREE.BoxGeometry(3, 3, 0.5)
-    );
+      const rightWindow = new THREE.Mesh(windowGeometry, windowMaterial);
+      rightWindow.position.set(6, 8, 8.15); // Adjusted for main body repositioning
+      desertHouse.add(rightWindow);
 
-    [leftWindow, rightWindow, sideWindow].forEach(window => {
-      const frame = new THREE.Mesh(frameGeometry, accentMaterial);
-      frame.position.copy(window.position);
-      frame.position.z -= 0.1; // Slightly behind window
-      desertHouse.add(frame);
-    });
+      // Side wall window
+      const sideWindow = new THREE.Mesh(windowGeometry, windowMaterial);
+      sideWindow.position.set(9.15, 7, 0); // Adjusted for main body repositioning
+      desertHouse.add(sideWindow);
 
-    // Small courtyard wall (typical of desert architecture)
-    const courtyardWallGeometry = resourceManager.getOrCreateGeometry(
-      'desert_house_courtyard_wall',
-      () => new THREE.BoxGeometry(12, 4, 1)
-    );
-    const courtyardWall = new THREE.Mesh(courtyardWallGeometry, wallMaterial);
-    courtyardWall.position.set(-8, 2, 10); // Adjusted for main body repositioning
-    desertHouse.add(courtyardWall);
+      // Window frames with desert accent color
+      const frameGeometry = resourceManager.getOrCreateGeometry(
+        'desert_house_window_frame',
+        () => new THREE.BoxGeometry(3, 3, 0.5)
+      );
 
-    // Desert plants/decoration (simple geometric cactus)
-    const cactusGeometry = resourceManager.getOrCreateGeometry(
-      'desert_house_cactus',
-      () => new THREE.CylinderGeometry(0.5, 0.8, 6)
-    );
-    const cactusMaterial = resourceManager.getOrCreateMaterial(
-      'desert_house_cactus',
-      () => new THREE.MeshLambertMaterial({ color: '#228B22' })
-    );
+      [leftWindow, rightWindow, sideWindow].forEach(window => {
+        const frame = new THREE.Mesh(frameGeometry, accentMaterial);
+        frame.position.copy(window.position);
+        frame.position.z -= 0.1; // Slightly behind window
+        desertHouse.add(frame);
+      });
+    }
 
-    const cactus = new THREE.Mesh(cactusGeometry, cactusMaterial);
-    cactus.position.set(-12, 3, 6); // Adjusted for main body repositioning
-    desertHouse.add(cactus);
+    // Decorative elements (skip for low-poly)
+    if (!isLowPoly) {
+      // Small courtyard wall (typical of desert architecture)
+      const courtyardWallGeometry = resourceManager.getOrCreateGeometry(
+        'desert_house_courtyard_wall',
+        () => new THREE.BoxGeometry(12, 4, 1)
+      );
+      const courtyardWall = new THREE.Mesh(courtyardWallGeometry, wallMaterial);
+      courtyardWall.position.set(-8, 2, 10); // Adjusted for main body repositioning
+      desertHouse.add(courtyardWall);
 
-    // Cactus arm
-    const cactusArmGeometry = resourceManager.getOrCreateGeometry(
-      'desert_house_cactus_arm',
-      () => new THREE.CylinderGeometry(0.3, 0.4, 3)
-    );
-    const cactusArm = new THREE.Mesh(cactusArmGeometry, cactusMaterial);
-    cactusArm.position.set(-10.5, 5, 6); // Adjusted for main body repositioning
-    cactusArm.rotation.z = Math.PI / 2;
-    desertHouse.add(cactusArm);
+      // Desert plants/decoration (simple geometric cactus)
+      const cactusGeometry = resourceManager.getOrCreateGeometry(
+        'desert_house_cactus',
+        () => new THREE.CylinderGeometry(0.5, 0.8, 6)
+      );
+      const cactusMaterial = resourceManager.getOrCreateMaterial(
+        'desert_house_cactus',
+        () => new THREE.MeshLambertMaterial({ color: '#228B22' })
+      );
 
-    // Small shade structure (ramada)
-    const shadeGeometry = resourceManager.getOrCreateGeometry(
-      'desert_house_shade',
-      () => new THREE.BoxGeometry(8, 0.5, 6)
-    );
-    const shade = new THREE.Mesh(shadeGeometry, accentMaterial);
-    shade.position.set(8, 11, -6); // Adjusted for main body repositioning
-    desertHouse.add(shade);
+      const cactus = new THREE.Mesh(cactusGeometry, cactusMaterial);
+      cactus.position.set(-12, 3, 6); // Adjusted for main body repositioning
+      desertHouse.add(cactus);
 
-    // Shade posts
-    const postGeometry = resourceManager.getOrCreateGeometry(
-      'desert_house_post',
-      () => new THREE.CylinderGeometry(0.3, 0.3, 8)
-    );
+      // Cactus arm
+      const cactusArmGeometry = resourceManager.getOrCreateGeometry(
+        'desert_house_cactus_arm',
+        () => new THREE.CylinderGeometry(0.3, 0.4, 3)
+      );
+      const cactusArm = new THREE.Mesh(cactusArmGeometry, cactusMaterial);
+      cactusArm.position.set(-10.5, 5, 6); // Adjusted for main body repositioning
+      cactusArm.rotation.z = Math.PI / 2;
+      desertHouse.add(cactusArm);
 
-    const posts = [
-      new THREE.Vector3(5, 4, -8), // Adjusted for main body repositioning
-      new THREE.Vector3(11, 4, -8), // Adjusted for main body repositioning
-      new THREE.Vector3(5, 4, -4), // Adjusted for main body repositioning
-      new THREE.Vector3(11, 4, -4) // Adjusted for main body repositioning
-    ];
+      // Small shade structure (ramada)
+      const shadeGeometry = resourceManager.getOrCreateGeometry(
+        'desert_house_shade',
+        () => new THREE.BoxGeometry(8, 0.5, 6)
+      );
+      const shade = new THREE.Mesh(shadeGeometry, accentMaterial);
+      shade.position.set(8, 11, -6); // Adjusted for main body repositioning
+      desertHouse.add(shade);
 
-    posts.forEach(pos => {
-      const post = new THREE.Mesh(postGeometry, accentMaterial);
-      post.position.copy(pos);
-      desertHouse.add(post);
-    });
+      // Shade posts
+      const postGeometry = resourceManager.getOrCreateGeometry(
+        'desert_house_post',
+        () => new THREE.CylinderGeometry(0.3, 0.3, 8)
+      );
+
+      const posts = [
+        new THREE.Vector3(5, 4, -8), // Adjusted for main body repositioning
+        new THREE.Vector3(11, 4, -8), // Adjusted for main body repositioning
+        new THREE.Vector3(5, 4, -4), // Adjusted for main body repositioning
+        new THREE.Vector3(11, 4, -4) // Adjusted for main body repositioning
+      ];
+
+      posts.forEach(pos => {
+        const post = new THREE.Mesh(postGeometry, accentMaterial);
+        post.position.copy(pos);
+        desertHouse.add(post);
+      });
+    }
 
     // Apply scale
     if (scale !== 1) {

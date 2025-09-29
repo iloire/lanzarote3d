@@ -215,7 +215,7 @@ class House extends SimpleThreeComponent {
 
       const frame = new THREE.Mesh(frameGeometry, frameMaterial);
       frame.position.copy(window.position);
-      frame.position.z -= 0.25;
+      frame.position.z -= 0.5; // Increased distance to avoid z-fighting
       house.add(frame);
     }
 
@@ -232,9 +232,9 @@ class House extends SimpleThreeComponent {
       const sideFrame = new THREE.Mesh(frameGeometry, frameMaterial);
       sideFrame.position.copy(sideWindow.position);
       if (wing.name === 'left') {
-        sideFrame.position.x += 0.25;
+        sideFrame.position.x += 0.5; // Increased distance to avoid z-fighting
       } else {
-        sideFrame.position.x -= 0.25;
+        sideFrame.position.x -= 0.5; // Increased distance to avoid z-fighting
       }
       house.add(sideFrame);
     }
