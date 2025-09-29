@@ -175,7 +175,7 @@ class Menu extends React.Component<MenuProps> {
       });
     };
 
-    const renderButtons = (apps: AppMetadata[]) =>
+    const renderButtons = (apps: AppMetadata[], isDevOnly: boolean = false) =>
       apps.map(app => {
         const routeKey = app.route.replace('/', '');
         const isHovered = this.state.hoveredRoute === routeKey;
@@ -195,8 +195,25 @@ class Menu extends React.Component<MenuProps> {
                   this.setState({ isMenuOpen: false });
                 }
               }}
+              style={isDevOnly ? {
+                position: 'relative'
+              } : undefined}
             >
               {app.name}
+              {isDevOnly && (
+                <span
+                  style={{
+                    fontSize: '10px',
+                    color: '#ff9800',
+                    marginLeft: '4px',
+                    opacity: 0.7,
+                    fontWeight: 'normal'
+                  }}
+                  title="Only visible in development mode"
+                >
+                  dev
+                </span>
+              )}
             </button>
             <span className={`description ${isHovered ? 'visible' : ''}`}>{app.description}</span>
           </div>
@@ -240,19 +257,19 @@ class Menu extends React.Component<MenuProps> {
             {shouldShowPrivate && privateApps.filter(app => app.category === 'demo').length > 0 && (
               <>
                 <h3>Private Demos</h3>
-                {renderButtons(privateApps.filter(app => app.category === 'demo'))}
+                {renderButtons(privateApps.filter(app => app.category === 'demo'), true)}
               </>
             )}
             {showDev && toolApps.length > 0 && (
               <>
                 <h3>Tools</h3>
-                {renderButtons(toolApps)}
+                {renderButtons(toolApps, true)}
               </>
             )}
             {shouldShowPrivate && privateApps.filter(app => app.category === 'experience').length > 0 && (
               <>
                 <h3>Experiences</h3>
-                {renderButtons(privateApps.filter(app => app.category === 'experience'))}
+                {renderButtons(privateApps.filter(app => app.category === 'experience'), true)}
               </>
             )}
           </div>
@@ -295,19 +312,19 @@ class Menu extends React.Component<MenuProps> {
             {shouldShowPrivate && privateApps.filter(app => app.category === 'demo').length > 0 && (
               <>
                 <h2>Private Demos</h2>
-                {renderButtons(privateApps.filter(app => app.category === 'demo'))}
+                {renderButtons(privateApps.filter(app => app.category === 'demo'), true)}
               </>
             )}
             {showDev && toolApps.length > 0 && (
               <>
                 <h2>Tools</h2>
-                {renderButtons(toolApps)}
+                {renderButtons(toolApps, true)}
               </>
             )}
             {shouldShowPrivate && privateApps.filter(app => app.category === 'experience').length > 0 && (
               <>
                 <h2>Experiences</h2>
-                {renderButtons(privateApps.filter(app => app.category === 'experience'))}
+                {renderButtons(privateApps.filter(app => app.category === 'experience'), true)}
               </>
             )}
           </>
