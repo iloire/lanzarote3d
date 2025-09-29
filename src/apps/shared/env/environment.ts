@@ -287,9 +287,10 @@ class Environment {
     }
   }
 
-  async addHouses(terrain: THREE.Mesh) {
+  async addHouses(terrain: THREE.Mesh, lowPoly: boolean = true) {
     // Create multiple neighborhoods at the same locations as before but with proper town structure
-    console.log('🏘️ Creating neighborhoods with HouseGroupCreator...');
+    const mode = lowPoly ? 'LOW-POLY' : 'HIGH-DETAIL';
+    console.log(`🏘️ Creating ${mode} neighborhoods for ${lowPoly ? 'optimized performance' : 'maximum detail'}...`);
 
     try {
       // Near paraglider area - suburban neighborhood
@@ -298,7 +299,7 @@ class Environment {
         12,
         'suburban',
         terrain,
-        false
+        lowPoly // Use low-poly for performance
       );
 
       // Famara - coastal village with street formation
@@ -307,7 +308,7 @@ class Environment {
         15,
         'street',
         terrain,
-        false
+        lowPoly
       );
 
       // Noruegos - small rural settlement
@@ -316,7 +317,7 @@ class Environment {
         8,
         'rural',
         terrain,
-        false
+        lowPoly
       );
 
       // Tenesar - scattered rural houses
@@ -325,7 +326,7 @@ class Environment {
         10,
         'rural',
         terrain,
-        false
+        lowPoly
       );
 
       // Teguise - historic town center with grid layout
@@ -334,7 +335,7 @@ class Environment {
         18,
         'grid',
         terrain,
-        false
+        lowPoly
       );
 
       console.log('✅ All neighborhoods created successfully');
