@@ -8,25 +8,19 @@ export { TerrainBase } from './TerrainBase';
 
 /**
  * Dynamic import wrapper that webpack can analyze
- * Uses a single dynamic import with computed path
+ * Simplified to handle current folder structure but ready for future consolidation
  */
 async function dynamicImportApp(path: string): Promise<any> {
-  // Webpack needs at least a partial static string to determine the chunk boundaries
-  // We use conditional imports based on the path prefix to help webpack optimize
+  // Remove the ../ prefix for the dynamic import
+  const importPath = path.startsWith('../') ? path.slice(3) : path;
 
-  if (path.startsWith('../experiences/')) {
-    return import(/* webpackChunkName: "experiences" */ `../experiences/${path.slice(15)}`);
-  } else if (path.startsWith('../demos/')) {
-    return import(/* webpackChunkName: "demos" */ `../demos/${path.slice(9)}`);
-  } else if (path.startsWith('../tools/workshop/demos/')) {
-    return import(/* webpackChunkName: "workshop" */ `../tools/workshop/demos/${path.slice(24)}`);
-  } else if (path.startsWith('../tools/')) {
-    return import(/* webpackChunkName: "tools" */ `../tools/${path.slice(9)}`);
-  } else if (path.startsWith('../flyzone-manager/')) {
-    return import(/* webpackChunkName: "flyzone" */ `../flyzone-manager/${path.slice(19)}`);
-  } else {
-    throw new Error(`Unknown import path pattern: ${path}`);
-  }
+  // Single dynamic import - webpack will handle chunking based on actual imports
+  // When we move to a single apps folder, this will just work without changes
+  return import(
+    /* webpackMode: "lazy" */
+    /* webpackChunkName: "[request]" */
+    `../${importPath}`
+  );
 }
 
 /**
