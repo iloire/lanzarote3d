@@ -157,7 +157,7 @@ class FlyingBehaviorTestApp extends WorkshopDemoBase {
           centerPoint: new THREE.Vector3(0, 0, 0),
           autoStart: true,
           faceDirection: true,
-          forwardAxis: 'z'
+          forwardAxis: 'x' // Updated to match hangglider's new orientation after 270° rotation
         });
 
         this.flyingBehavior.attachTo(hanggliderMesh);
