@@ -2,6 +2,17 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## [1.2.1] - 2025-09-29 14:30 UTC
+
+### Enhanced
+- **Animals Showcase**: Complete procedural bird geometry implementation
+  - Replaced GLB model loading with Three.js shape-based bird creation
+  - Enhanced bird appearance with wing shapes, eyes, natural beak colors
+  - Improved bird colors: Crow (0x404040), Vulture (0x808080) for better visibility
+  - Fixed "black squares" issue in animals showcase
+  - Removed unused GLB loading methods and dependencies
+  - Wing animation now works with procedural geometry shapes
+
 ## [1.2.0] - 2025-01-27 15:30 UTC
 
 ### Added
