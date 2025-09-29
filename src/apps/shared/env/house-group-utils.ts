@@ -210,7 +210,6 @@ export function generateUrbanNeighborhood(
     { type: 'House', weight: 0.25, houseType: HouseType.Modern },
     { type: 'House', weight: 0.15, houseType: HouseType.Large },
     { type: 'Villa', weight: 0.1 },
-    { type: 'Dome', weight: 0.1 },
   ];
 
   for (let i = 0; i < preset.count; i++) {
@@ -323,7 +322,6 @@ function generateLandPlot(houseType: HouseConfig['type'], scale: number = 1): { 
     'Townhouse': 50,
     'Barn': 80,
     'DesertHouse': 70,
-    'Dome': 55,
     'DesertHouseWithPool': 90,
   };
 
@@ -333,7 +331,6 @@ function generateLandPlot(houseType: HouseConfig['type'], scale: number = 1): { 
     'Townhouse': 70,
     'Barn': 100,
     'DesertHouse': 80,
-    'Dome': 55,
     'DesertHouseWithPool': 100,
   };
 
@@ -365,7 +362,6 @@ export function generateMixedNeighborhood(
     'Townhouse': 0.15,
     'Barn': 0.1,
     'DesertHouse': 0.1,
-    'Dome': 0.05,
     'DesertHouseWithPool': 0.05,
   };
 

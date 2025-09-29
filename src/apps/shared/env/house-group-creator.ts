@@ -14,7 +14,6 @@ import {
   Townhouse,
   Barn,
   DesertHouse,
-  Dome,
   DesertHouseWithPool,
 } from '../../../foundation/components/scenery/buildings';
 import { ComponentRegistry } from '../../../foundation/systems/ComponentRegistry';
@@ -157,15 +156,6 @@ export class HouseGroupCreator {
           houseMesh = house.load();
           break;
 
-        case 'Dome':
-          console.log(`🐛 Creating Dome with lowPoly: ${this.lowPoly} (not yet implemented)`);
-          house = new Dome({
-            scale: scale,
-            // lowPoly: this.lowPoly, // TODO: Implement lowPoly for Dome
-            ...(houseConfig.colors || {}),
-          });
-          houseMesh = house.load();
-          break;
 
         case 'DesertHouseWithPool':
           console.log(`✅ Creating DesertHouseWithPool with lowPoly: ${this.lowPoly}`);
@@ -338,7 +328,7 @@ export class HouseGroupCreator {
 
     // Count polygons for debugging
     let polygons = 0;
-    cactusMesh.traverse(child => {
+    cactusMesh.traverse((child: THREE.Object3D) => {
       if (child instanceof THREE.Mesh && child.geometry) {
         const geometry = child.geometry;
         if (geometry.index !== null) {

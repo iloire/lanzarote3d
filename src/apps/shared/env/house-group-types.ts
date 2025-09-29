@@ -5,7 +5,7 @@ import { HouseType } from '../../../foundation/components/scenery/buildings/Hous
  * Configuration for individual houses in a neighborhood
  */
 export interface HouseConfig {
-  type: 'House' | 'Villa' | 'Townhouse' | 'Barn' | 'DesertHouse' | 'Dome' | 'DesertHouseWithPool';
+  type: 'House' | 'Villa' | 'Townhouse' | 'Barn' | 'DesertHouse' | 'DesertHouseWithPool';
   houseType?: HouseType; // For House component only
   scale?: number;
   includePool?: boolean; // Random chance if not specified

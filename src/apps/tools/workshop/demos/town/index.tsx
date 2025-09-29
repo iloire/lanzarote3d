@@ -239,7 +239,7 @@ class TownWorkshop extends WorkshopDemoBase {
   /**
    * Update on-screen display with current state
    */
-  private updateOnScreenDisplay(housePolygons?: number, roadPolygons?: number): void {
+  private updateOnScreenDisplay(polygonCounts?: any): void {
     // Update button text and style
     if (this.isLowPoly) {
       this.toggleButton.textContent = '⚡ Low-Poly Mode';
@@ -249,15 +249,32 @@ class TownWorkshop extends WorkshopDemoBase {
       this.toggleButton.style.background = 'linear-gradient(45deg, #4CAF50, #45a049)';
     }
 
-    // Update performance display with breakdown if available
+    // Update performance display with detailed breakdown if available
     let polygonInfo = '';
-    if (housePolygons !== undefined && roadPolygons !== undefined) {
-      const total = housePolygons + roadPolygons;
-      const housePercent = Math.round((housePolygons / total) * 100);
+    if (polygonCounts) {
+      const totalPolygons = Object.values(polygonCounts).reduce((sum: number, count: any) => sum + count, 0);
+
+      // Calculate percentages
+      const percentages = {
+        houses: ((polygonCounts.houses / totalPolygons) * 100).toFixed(1),
+        cacti: ((polygonCounts.cacti / totalPolygons) * 100).toFixed(1),
+        stones: ((polygonCounts.stones / totalPolygons) * 100).toFixed(1),
+        pools: ((polygonCounts.pools / totalPolygons) * 100).toFixed(1),
+        roads: ((polygonCounts.roads / totalPolygons) * 100).toFixed(1),
+        other: ((polygonCounts.other / totalPolygons) * 100).toFixed(1)
+      };
+
       polygonInfo = `
-        <div><strong>Total Polygons:</strong> ${total.toLocaleString()}</div>
-        <div style="font-size: 11px; color: #ccc;">Houses: ${housePolygons.toLocaleString()} (${housePercent}%)</div>
-        <div style="font-size: 11px; color: #ccc;">Roads: ${roadPolygons.toLocaleString()} (${100-housePercent}%)</div>
+        <div><strong>Total Polygons:</strong> ${Math.floor(totalPolygons).toLocaleString()}</div>
+        <div style="margin-top: 8px; font-size: 11px; color: #ddd; border-top: 1px solid #333; padding-top: 6px;">
+          <div style="margin-bottom: 3px; font-weight: bold;">📊 Breakdown:</div>
+          <div>🏠 Houses: ${Math.floor(polygonCounts.houses).toLocaleString()} (${percentages.houses}%)</div>
+          <div>🌵 Cacti: ${Math.floor(polygonCounts.cacti).toLocaleString()} (${percentages.cacti}%)</div>
+          <div>🪨 Stones: ${Math.floor(polygonCounts.stones).toLocaleString()} (${percentages.stones}%)</div>
+          <div>🏊 Pools: ${Math.floor(polygonCounts.pools).toLocaleString()} (${percentages.pools}%)</div>
+          <div>🛣️ Roads: ${Math.floor(polygonCounts.roads).toLocaleString()} (${percentages.roads}%)</div>
+          <div>❓ Other: ${Math.floor(polygonCounts.other).toLocaleString()} (${percentages.other}%)</div>
+        </div>
       `;
     } else {
       const polygonText = this.performanceSettings.polygonCount > 0
@@ -267,10 +284,12 @@ class TownWorkshop extends WorkshopDemoBase {
     }
 
     this.performanceDisplay.innerHTML = `
-      <div><strong>Mode:</strong> ${this.isLowPoly ? 'Performance' : 'Quality'}</div>
-      ${polygonInfo}
-      <div><strong>Neighborhoods:</strong> ${this.neighborhoodMeshes.length > 0 ? '9' : 'Loading...'}</div>
-      <div style="margin-top: 8px; font-size: 11px; color: #aaa;">Click button to toggle modes</div>
+      <div style="background: rgba(0,0,0,0.9); color: white; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 12px; line-height: 1.4; min-width: 240px;">
+        <div><strong>Mode:</strong> ${this.isLowPoly ? 'Performance' : 'Quality'}</div>
+        ${polygonInfo}
+        <div><strong>Neighborhoods:</strong> ${this.neighborhoodMeshes.length > 0 ? '9' : 'Loading...'}</div>
+        <div style="margin-top: 6px; font-size: 10px; color: #aaa;">Click button to toggle modes</div>
+      </div>
     `;
   }
 
@@ -315,24 +334,46 @@ class TownWorkshop extends WorkshopDemoBase {
   }
 
   /**
-   * Count total polygons in all neighborhood meshes and roads
+   * Count total polygons in all neighborhood meshes and roads with detailed breakdown
    */
   private updatePolygonCount(): void {
-    let housePolygons = 0;
-    let roadPolygons = 0;
+    const polygonCounts = {
+      houses: 0,
+      cacti: 0,
+      stones: 0,
+      pools: 0,
+      roads: 0,
+      other: 0
+    };
 
-    // Count neighborhood polygons (houses, landscaping)
+    // Count neighborhood polygons with detailed breakdown by component type
     this.neighborhoodMeshes.forEach(obj => {
       obj.traverse(child => {
         if (child instanceof THREE.Mesh && child.geometry) {
           const geometry = child.geometry;
+          let childPolygons = 0;
+
           if (geometry.index !== null) {
-            housePolygons += geometry.index.count / 3;
+            childPolygons = geometry.index.count / 3;
           } else {
             const positionAttribute = geometry.getAttribute('position');
             if (positionAttribute) {
-              housePolygons += positionAttribute.count / 3;
+              childPolygons = positionAttribute.count / 3;
             }
+          }
+
+          // Categorize by mesh/object name
+          const name = child.name || child.parent?.name || '';
+          if (name.includes('House') || name.includes('Villa') || name.includes('Desert') || name.includes('Barn') || name.includes('Dome') || name.includes('Townhouse')) {
+            polygonCounts.houses += childPolygons;
+          } else if (name.includes('Cactus') || name.includes('Saguaro') || name.includes('Barrel') || name.includes('Prickly') || name.includes('Organ')) {
+            polygonCounts.cacti += childPolygons;
+          } else if (name.includes('Stone')) {
+            polygonCounts.stones += childPolygons;
+          } else if (name.includes('Pool')) {
+            polygonCounts.pools += childPolygons;
+          } else {
+            polygonCounts.other += childPolygons;
           }
         }
       });
@@ -344,25 +385,42 @@ class TownWorkshop extends WorkshopDemoBase {
         if (child instanceof THREE.Mesh && child.geometry) {
           const geometry = child.geometry;
           if (geometry.index !== null) {
-            roadPolygons += geometry.index.count / 3;
+            polygonCounts.roads += geometry.index.count / 3;
           } else {
             const positionAttribute = geometry.getAttribute('position');
             if (positionAttribute) {
-              roadPolygons += positionAttribute.count / 3;
+              polygonCounts.roads += positionAttribute.count / 3;
             }
           }
         }
       });
     });
 
-    const totalPolygons = housePolygons + roadPolygons;
+    const totalPolygons = Object.values(polygonCounts).reduce((sum, count) => sum + count, 0);
     this.performanceSettings.polygonCount = Math.floor(totalPolygons);
 
-    console.log(`📊 Polygon breakdown: Houses: ${Math.floor(housePolygons).toLocaleString()}, Roads: ${Math.floor(roadPolygons).toLocaleString()}, Total: ${this.performanceSettings.polygonCount.toLocaleString()}`);
+    // Calculate percentages
+    const percentages = {
+      houses: ((polygonCounts.houses / totalPolygons) * 100).toFixed(1),
+      cacti: ((polygonCounts.cacti / totalPolygons) * 100).toFixed(1),
+      stones: ((polygonCounts.stones / totalPolygons) * 100).toFixed(1),
+      pools: ((polygonCounts.pools / totalPolygons) * 100).toFixed(1),
+      roads: ((polygonCounts.roads / totalPolygons) * 100).toFixed(1),
+      other: ((polygonCounts.other / totalPolygons) * 100).toFixed(1)
+    };
+
+    console.log(`📊 Detailed Polygon Breakdown (LowPoly: ${this.isLowPoly}):`);
+    console.log(`  🏠 Houses: ${Math.floor(polygonCounts.houses).toLocaleString()} (${percentages.houses}%)`);
+    console.log(`  🌵 Cacti: ${Math.floor(polygonCounts.cacti).toLocaleString()} (${percentages.cacti}%)`);
+    console.log(`  🪨 Stones: ${Math.floor(polygonCounts.stones).toLocaleString()} (${percentages.stones}%)`);
+    console.log(`  🏊 Pools: ${Math.floor(polygonCounts.pools).toLocaleString()} (${percentages.pools}%)`);
+    console.log(`  🛣️ Roads: ${Math.floor(polygonCounts.roads).toLocaleString()} (${percentages.roads}%)`);
+    console.log(`  ❓ Other: ${Math.floor(polygonCounts.other).toLocaleString()} (${percentages.other}%)`);
+    console.log(`  📊 TOTAL: ${this.performanceSettings.polygonCount.toLocaleString()} polygons`);
 
     // Update on-screen display if available
     if (this.performanceDisplay) {
-      this.updateOnScreenDisplay(Math.floor(housePolygons), Math.floor(roadPolygons));
+      this.updateOnScreenDisplay(polygonCounts);
     }
   }
 
