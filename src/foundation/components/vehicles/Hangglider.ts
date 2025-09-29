@@ -44,6 +44,9 @@ class HangGliderModel extends AutoFlier {
     this.mesh.add(pilotMesh);
     this.mesh.add(wingMesh);
 
+    // Rotate the entire hangglider model 90 degrees to the left + 180 degrees (total 270 degrees)
+    this.mesh.rotateY(-Math.PI / 2 + Math.PI);
+
     if (path.length > 0 && path[0]) {
       this.mesh.position.copy(path[0]);
     }
