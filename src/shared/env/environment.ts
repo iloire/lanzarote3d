@@ -25,7 +25,6 @@ import { Theme } from '../../foundation/types/Theme';
 import { ThemeEngine } from '../../foundation/systems/ThemeEngine';
 import { IThreeComponent } from '../../foundation/components/base/IThreeComponent';
 import { ComponentRegistry } from '../../foundation/systems/ComponentRegistry';
-import * as dat from 'dat.gui';
 
 interface MovableComponent extends IThreeComponent {
   updateMovementOrigin?(): void;
@@ -79,7 +78,7 @@ class Environment {
     this.hg && this.hg.updateWrapSpeed(wrapSpeed);
   }
 
-  async addBirds(path: THREE.Vector3[], gui?: dat.GUI) {
+  async addBirds(path: THREE.Vector3[], gui?: { addFolder: (name: string) => any }) {
     // Create birds with optimized flight parameters for the environment
     this.birds = new Birds({
       speed: 2,
@@ -94,7 +93,7 @@ class Environment {
     this.scene.add(birdsMesh);
   }
 
-  async addHangGlider(path: THREE.Vector3[], gui?: dat.GUI) {
+  async addHangGlider(path: THREE.Vector3[], gui?: { addFolder: (name: string) => any }) {
     this.hg = new HangGlider();
     const hgMesh = await this.hg.load(path, gui);
     this.scene.add(hgMesh);

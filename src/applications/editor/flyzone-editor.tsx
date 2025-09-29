@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import * as dat from 'dat.gui';
 import { StoryOptions } from '../../shared/types';
 import { TerrainBase } from '../../shared/TerrainBase';
 import { flyzoneAPI } from '../../foundation/services/flyzone-api';
@@ -34,9 +33,29 @@ export interface EditorMode {
   subtype?: 'ridge' | 'thermal' | 'approach';
 }
 
+interface EditorItemData {
+  title?: string;
+  description?: string;
+  gps?: {
+    latitude?: number;
+    longitude?: number;
+    altitude?: number;
+  };
+  elevation?: number;
+  position?: THREE.Vector3;
+  safety?: {
+    difficulty?: string;
+    hazards?: string[];
+  };
+  access?: {
+    walkingTime?: number;
+  };
+  [key: string]: unknown;
+}
+
 // Union type for selected items in editor - allows for extended properties
 type SelectedItem = (TakeoffLocation | LandingZone | FlyzoneLocation | THREE.Object3D) & {
-  data?: unknown;
+  data?: EditorItemData;
   type?: string;
   isDirty?: boolean;
 } | null;
@@ -68,7 +87,17 @@ interface ImportLocationData {
 
 interface ImportData {
   allLocations: unknown[]; // Keep flexible since structure varies
-  metadata?: unknown;
+  currentLocation?: unknown;
+  editorSettings?: {
+    mode?: EditorMode;
+    isDirty?: boolean;
+    [key: string]: unknown;
+  };
+  metadata?: {
+    exportDate?: string;
+    version?: string;
+    [key: string]: unknown;
+  };
   [key: string]: unknown;
 }
 
@@ -542,7 +571,7 @@ class FlyzoneEditorApp extends TerrainBase {
           type,
           id,
           data,
-        };
+        } as SelectedItem;
 
         // Update UI
         this.editorUI?.refresh();
@@ -595,7 +624,7 @@ class FlyzoneEditorApp extends TerrainBase {
           const takeoffIndex = location.takeoffs.findIndex(t => t.id === item.id);
           if (takeoffIndex >= 0) {
             location.takeoffs.splice(takeoffIndex, 1);
-            this.markers.removeMarker(item.id);
+            this.markers.removeMarker(String(item.id));
           }
           break;
 
@@ -603,14 +632,14 @@ class FlyzoneEditorApp extends TerrainBase {
           const landingIndex = location.landingZones.findIndex(l => l.id === item.id);
           if (landingIndex >= 0) {
             location.landingZones.splice(landingIndex, 1);
-            this.markers.removeMarker(item.id);
+            this.markers.removeMarker(String(item.id));
           }
           break;
 
         case 'phase':
           if (location.flyzone.phases[item.id]) {
             delete location.flyzone.phases[item.id];
-            this.markers.removeMarker(item.id);
+            this.markers.removeMarker(String(item.id));
           }
           break;
       }
@@ -638,21 +667,21 @@ class FlyzoneEditorApp extends TerrainBase {
       switch (item.type) {
         case 'takeoff':
           const takeoffIndex = location.takeoffs.findIndex(t => t.id === item.id);
-          if (takeoffIndex >= 0) {
-            location.takeoffs[takeoffIndex] = { ...item.data };
+          if (takeoffIndex >= 0 && item.data) {
+            Object.assign(location.takeoffs[takeoffIndex], item.data);
           }
           break;
 
         case 'landing':
           const landingIndex = location.landingZones.findIndex(l => l.id === item.id);
-          if (landingIndex >= 0) {
-            location.landingZones[landingIndex] = { ...item.data };
+          if (landingIndex >= 0 && item.data) {
+            Object.assign(location.landingZones[landingIndex], item.data);
           }
           break;
 
         case 'phase':
-          if (location.flyzone.phases[item.id]) {
-            location.flyzone.phases[item.id] = { ...item.data };
+          if (location.flyzone.phases[item.id] && item.data) {
+            Object.assign(location.flyzone.phases[item.id], item.data);
           }
           break;
       }
@@ -793,7 +822,7 @@ class FlyzoneEditorApp extends TerrainBase {
     }
   }
 
-  private setupGUI(gui: dat.GUI): void {
+  private setupGUI(gui: { addFolder: (name: string) => any }): void {
     if (!gui || !this.editorState) return;
 
     const editorFolder = gui.addFolder('Flyzone Editor');
@@ -915,8 +944,8 @@ class FlyzoneEditorApp extends TerrainBase {
     // Handle UI actions from the editor interface
     switch (action) {
       case 'modeChange':
-        if (this.editorState) {
-          this.editorState.mode = data;
+        if (this.editorState && data) {
+          this.editorState.mode = data as EditorMode;
           this.updateCursor();
         }
         break;
@@ -936,16 +965,16 @@ class FlyzoneEditorApp extends TerrainBase {
         this.clearEditor();
         break;
       case 'deleteSelected':
-        this.deleteSelectedItem(data?.item);
+        this.deleteSelectedItem((data as { item?: SelectedItem })?.item);
         break;
       case 'saveSelectedItem':
-        this.saveSelectedItemChanges(data?.item);
+        this.saveSelectedItemChanges((data as { item?: SelectedItem })?.item);
         break;
       case 'deselectItem':
         this.deselectAllMarkers();
         break;
       case 'focusSelected':
-        this.focusOnSelectedItem(data?.item);
+        this.focusOnSelectedItem((data as { item?: SelectedItem })?.item);
         break;
       case 'selectedItemChanged':
         this.markLocationDirty();
@@ -1039,7 +1068,7 @@ class FlyzoneEditorApp extends TerrainBase {
       reader.onload = e => {
         try {
           const jsonContent = e.target?.result as string;
-          const importData = JSON.parse(jsonContent);
+          const importData = JSON.parse(jsonContent) as ImportData;
 
           // Validate import data structure
           if (!this.validateImportData(importData)) {
@@ -1096,13 +1125,15 @@ class FlyzoneEditorApp extends TerrainBase {
     }
 
     // Validate metadata
-    if (!data.metadata.exportDate || !data.metadata.version) {
+    const metadata = dataObj.metadata as { exportDate?: string; version?: string };
+    if (!metadata || !metadata.exportDate || !metadata.version) {
       return false;
     }
 
     // Validate locations array structure (basic check)
-    if (data.allLocations.length > 0) {
-      const sampleLocation = data.allLocations[0];
+    const allLocations = dataObj.allLocations as unknown[];
+    if (allLocations.length > 0) {
+      const sampleLocation = allLocations[0] as Record<string, unknown>;
       if (!sampleLocation.id || !sampleLocation.title || !sampleLocation.gps) {
         return false;
       }
@@ -1117,18 +1148,19 @@ class FlyzoneEditorApp extends TerrainBase {
     try {
       // Restore locations - cast to any temporarily for complex import logic
       this.editorState.locations = importData.allLocations.map((location: unknown) => {
+        const loc = location as ImportLocationData;
         // Convert plain objects back to Vector3 where needed
-        if (location.position && typeof location.position === 'object') {
-          location.position = new THREE.Vector3(
-            location.position.x,
-            location.position.y,
-            location.position.z
+        if (loc.position && typeof loc.position === 'object') {
+          loc.position = new THREE.Vector3(
+            loc.position.x,
+            loc.position.y,
+            loc.position.z
           );
         }
 
         // Convert takeoff positions
-        if (location.takeoffs) {
-          location.takeoffs.forEach((takeoff) => {
+        if (loc.takeoffs) {
+          loc.takeoffs.forEach((takeoff: any) => {
             if (takeoff.position && typeof takeoff.position === 'object') {
               takeoff.position = new THREE.Vector3(
                 takeoff.position.x,
@@ -1140,8 +1172,8 @@ class FlyzoneEditorApp extends TerrainBase {
         }
 
         // Convert landing zone positions
-        if (location.landingZones) {
-          location.landingZones.forEach((landing) => {
+        if (loc.landingZones) {
+          loc.landingZones.forEach((landing: any) => {
             if (landing.position && typeof landing.position === 'object') {
               landing.position = new THREE.Vector3(
                 landing.position.x,
@@ -1153,8 +1185,8 @@ class FlyzoneEditorApp extends TerrainBase {
         }
 
         // Convert flyzone phase positions
-        if (location.flyzone?.phases) {
-          Object.values(location.flyzone.phases).forEach((phase) => {
+        if (loc.flyzone?.phases) {
+          Object.values(loc.flyzone.phases).forEach((phase: any) => {
             if (phase.position && typeof phase.position === 'object') {
               phase.position = new THREE.Vector3(
                 phase.position.x,
@@ -1165,12 +1197,12 @@ class FlyzoneEditorApp extends TerrainBase {
           });
         }
 
-        return location;
-      });
+        return loc as unknown as FlyzoneLocation;
+      }) as FlyzoneLocation[];
 
       // Restore current location
       if (importData.currentLocation) {
-        const currentLocation = importData.currentLocation;
+        const currentLocation = importData.currentLocation as ImportLocationData;
 
         // Convert current location position
         if (currentLocation.position && typeof currentLocation.position === 'object') {
@@ -1181,7 +1213,7 @@ class FlyzoneEditorApp extends TerrainBase {
           );
         }
 
-        this.editorState.currentLocation = currentLocation;
+        this.editorState.currentLocation = currentLocation as unknown as FlyzoneLocation;
       }
 
       // Restore editor settings
