@@ -95,7 +95,7 @@ export class AutonomousCar extends Car {
   /**
    * Override the async load method to set up terrain navigation
    */
-  async load(): Promise<THREE.Object3D> {
+  override async load(): Promise<THREE.Object3D> {
     const carMesh = await super.load();
 
     // Set up terrain navigation
@@ -114,7 +114,7 @@ export class AutonomousCar extends Car {
   /**
    * Override the legacy synchronous load method
    */
-  loadSync(): THREE.Object3D {
+  override loadSync(): THREE.Object3D {
     const carMesh = super.loadSync();
 
     // Set up terrain navigation

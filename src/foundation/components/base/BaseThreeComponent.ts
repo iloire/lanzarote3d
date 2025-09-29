@@ -8,6 +8,9 @@ import {
   ComponentDisposedError,
 } from './IThreeComponent';
 
+// Re-export types for consumers
+export type { ComponentOptions, ComponentMetadata } from './IThreeComponent';
+
 /**
  * Base implementation of IThreeComponent providing common functionality
  *

@@ -229,7 +229,7 @@ export abstract class MovableCarComponent extends SimpleThreeComponent {
    */
   public updateMovementOrigin(): void {
     if (this.movingBehavior && this.currentMesh) {
-      this.movingBehavior.updateOrigin(this.currentMesh.position);
+      this.movingBehavior.updateOrigin();
     }
   }
 

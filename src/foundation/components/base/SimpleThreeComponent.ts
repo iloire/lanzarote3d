@@ -100,6 +100,52 @@ export abstract class SimpleThreeComponent extends BaseThreeComponent {
   }
 
   /**
+   * Synchronous load method for backward compatibility
+   */
+  public loadSync(): THREE.Object3D {
+    if (this._isLoaded && this._object) {
+      return this._object;
+    }
+
+    // Create mesh synchronously using the same logic as createObject
+    const geometryKey = this.getGeometryKey();
+    const geometry = resourceManager.getGeometry(geometryKey, () => this.createGeometry());
+
+    const materialKey = this.getMaterialKey();
+    const materialConfig = this.getMaterialConfig();
+    const material = resourceManager.getMaterial(materialKey, materialConfig);
+
+    const mesh = new THREE.Mesh(geometry, material);
+
+    // Apply transform options
+    if (this._options.position) {
+      mesh.position.copy(this._options.position);
+    }
+    if (this._options.rotation) {
+      mesh.rotation.copy(this._options.rotation);
+    }
+    if (this._options.scale) {
+      if (typeof this._options.scale === 'number') {
+        mesh.scale.setScalar(this._options.scale);
+      } else {
+        mesh.scale.copy(this._options.scale);
+      }
+    }
+
+    // Enable shadows if requested
+    if (this._options.castShadow !== false) {
+      mesh.castShadow = true;
+    }
+    if (this._options.receiveShadow !== false) {
+      mesh.receiveShadow = true;
+    }
+
+    this._object = mesh;
+    this._isLoaded = true;
+    return mesh;
+  }
+
+  /**
    * Override dispose to release shared resources
    */
   override dispose(): void {

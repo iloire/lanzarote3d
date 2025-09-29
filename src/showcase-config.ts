@@ -11,8 +11,8 @@ export function generateBundleToStoryMap(): Record<string, string> {
   // List of all known showcase apps (must match webpack.showcase.js)
   const knownApps = [
     'animation',
-    'photobooth',
     'famara',
+    'famara2',
     'game',
     'flyzones',
     'workshop',

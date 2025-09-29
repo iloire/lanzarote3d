@@ -6,10 +6,11 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
  * To add a new app: Just add an entry here!
  */
 const showcaseApps = [
-  // Main experiences
+  // Main applications
   { name: 'animation', title: 'Lanzarote - Animation', filename: 'index.html' },
-  { name: 'photobooth', title: 'Lanzarote - Photo Booth', filename: 'photobooth.html' },
   { name: 'famara', title: 'Lanzarote - Famara', filename: 'famara.html' },
+  { name: 'famara2', title: 'Lanzarote - Famara2', filename: 'famara2.html' },
+  { name: 'boats', title: 'Lanzarote - Boats', filename: 'boats.html' },
   { name: 'game', title: 'Lanzarote - Game', filename: 'game.html' },
   { name: 'flyzones', title: 'Lanzarote - Fly Zones', filename: 'flyzones.html' },
 
@@ -19,7 +20,7 @@ const showcaseApps = [
   { name: 'tile-debug', title: 'Lanzarote - Tile Debug', filename: 'tile-debug.html' },
 
   // Demos
-  { name: 'night', title: 'Lanzarote - Night', filename: 'night.html' },
+  { name: 'island', title: 'Lanzarote island', filename: 'island.html' },
   { name: 'paragliderVoxel', title: 'Lanzarote - Paraglider Voxel', filename: 'paragliderVoxel.html' },
   { name: 'terrain', title: 'Lanzarote - Terrain', filename: 'terrain.html' },
   { name: 'glider', title: 'Lanzarote - Glider', filename: 'glider.html' },

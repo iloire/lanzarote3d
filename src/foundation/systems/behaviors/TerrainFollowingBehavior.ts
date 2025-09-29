@@ -92,7 +92,7 @@ export class TerrainFollowingBehavior extends MovingBehavior {
   /**
    * Override the attachTo method to set up terrain navigation
    */
-  attachTo(object: THREE.Object3D): void {
+  override attachTo(object: THREE.Object3D): void {
     super.attachTo(object);
 
     if (this.mesh) {
@@ -105,7 +105,7 @@ export class TerrainFollowingBehavior extends MovingBehavior {
   /**
    * Override the animation loop with terrain-aware navigation
    */
-  protected animate = (): void => {
+  protected override animate = (): void => {
     if (!this.isMoving || !this.mesh) return;
 
     const deltaTime = 0.016; // Assume 60fps
@@ -317,7 +317,7 @@ export class TerrainFollowingBehavior extends MovingBehavior {
   /**
    * Override dispose to clean up terrain navigator
    */
-  dispose(): void {
+  override dispose(): void {
     super.dispose();
     this.terrainNavigator.dispose();
   }

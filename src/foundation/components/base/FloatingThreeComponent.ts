@@ -46,7 +46,7 @@ export abstract class FloatingThreeComponent extends SimpleThreeComponent {
    * Load the component synchronously for backward compatibility
    * This is a legacy method - prefer using load() for new code
    */
-  public loadSync(): THREE.Object3D {
+  public override loadSync(): THREE.Object3D {
     // Call the protected method through the regular load process
     const content = (this as any).createSyncContent();
 

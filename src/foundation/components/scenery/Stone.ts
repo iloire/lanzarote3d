@@ -42,7 +42,7 @@ class Stone extends SimpleThreeComponent {
 
   protected override getMaterialConfig() {
     return {
-      type: 'lambert' as const,
+      type: 'standard' as const,
       color: this.stoneColor,
       transparent: false,
       opacity: 1.0,

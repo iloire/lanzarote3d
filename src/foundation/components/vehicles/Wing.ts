@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 import { SimpleThreeComponent } from '../base/SimpleThreeComponent';
 import { resourceManager } from '../../systems/ResourceManager';
-import type { ComponentOptions } from '../base/BaseThreeComponent';
+import { SimpleComponentOptions } from '../base/SimpleThreeComponent';
 
-export interface WingOptions extends ComponentOptions {
+export interface WingOptions extends SimpleComponentOptions {
   wingColor?: string;
   numeroCajones?: number;
   wingSpan?: number;
@@ -21,6 +21,11 @@ export class Wing extends SimpleThreeComponent {
       version: '1.0.0',
       ...options,
     });
+  }
+
+  protected createGeometry(): THREE.BufferGeometry {
+    // Return placeholder - actual geometry created in createSyncContent
+    return new THREE.BoxGeometry(1, 1, 1);
   }
 
   protected createSyncContent(): THREE.Object3D {
@@ -277,12 +282,13 @@ export class Wing extends SimpleThreeComponent {
     return issues;
   }
 
-  public override getInfo(): Record<string, any> {
-    const baseInfo = super.getInfo();
+  public getInfo(): Record<string, any> {
     const options = this.options as WingOptions;
 
     return {
-      ...baseInfo,
+      name: 'Wing',
+      version: '1.0.0',
+      type: 'vehicle_component',
       wingType: options.wingType || 'hangglider',
       numeroCajones: options.numeroCajones || 16,
       wingSpan: options.wingSpan,

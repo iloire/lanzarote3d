@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import PilotHead, { PilotHeadOptions } from './PilotHead';
 // Temporary: Keep using legacy Pilot types for backward compatibility
 // TODO: Migrate to PilotOptions from './Pilot'
-import { PilotOptions } from '../vehicles/Pilot';
+import { PilotOptions } from './Pilot';
 
 const getColoredMaterial = (color: string) => {
   return new THREE.MeshStandardMaterial({
@@ -136,14 +136,24 @@ class TandemPilot {
     const group = new THREE.Group();
 
     const groupPilot = new THREE.Group();
-    const headPilot = await getHead(this.options.pilot.head);
+    const headPilot = await getHead({
+      headType: this.options.pilot.headType,
+      helmetType: this.options.pilot.helmetType,
+      helmetColor: this.options.pilot.helmetColor,
+      skinColor: this.options.pilot.skinColor,
+    } as PilotHeadOptions);
     const bodyPilot = this.getBody(this.options.pilot, -0.3);
     groupPilot.add(headPilot);
     groupPilot.add(bodyPilot);
     group.add(groupPilot);
 
     const groupPassenger = new THREE.Group();
-    const headPassenger = await getHead(this.options.passenger.head);
+    const headPassenger = await getHead({
+      headType: this.options.passenger.headType,
+      helmetType: this.options.passenger.helmetType,
+      helmetColor: this.options.passenger.helmetColor,
+      skinColor: this.options.passenger.skinColor,
+    } as PilotHeadOptions);
     const bodyPassenger = this.getBody(this.options.passenger, -2.8);
     groupPassenger.add(headPassenger);
     groupPassenger.add(bodyPassenger);

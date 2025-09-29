@@ -142,11 +142,11 @@ export const APP_REGISTRY: Record<string, Record<string, AppMetadata>> = {
       status: 'public',
       priority: 1,
     },
-    photobooth: {
+    famara2: {
       name: 'Famara',
       description: 'Beautiful static 3D scene showcasing paragliders and environment',
-      entry: './demos/photobooth/index.tsx',
-      route: '/photobooth',
+      entry: './demos/famara2/index.tsx',
+      route: '/famaras',
       category: 'demo',
       requiresWebGL: true,
       tags: ['showcase', 'static', 'visual', 'presentation'],

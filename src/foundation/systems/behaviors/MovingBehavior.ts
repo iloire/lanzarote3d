@@ -24,26 +24,26 @@ export interface MovingBehaviorOptions {
  * Can be combined with FloatingBehavior for boats or used alone for other objects
  */
 export class MovingBehavior {
-  private mesh: THREE.Object3D | null = null;
-  private originalPosition: THREE.Vector3 = new THREE.Vector3();
-  private animationId: number | null = null;
-  private isMoving = false;
+  protected mesh: THREE.Object3D | null = null;
+  protected originalPosition: THREE.Vector3 = new THREE.Vector3();
+  protected animationId: number | null = null;
+  protected isMoving = false;
 
   // Movement configuration
-  private pattern: MovementPattern;
-  private speed: number;
-  private radius: number;
-  private bounds: { min: THREE.Vector3; max: THREE.Vector3 } | null;
-  private waypoints: THREE.Vector3[];
-  private faceDirection: boolean;
-  private forwardAxis: 'x' | 'z';
+  protected pattern: MovementPattern;
+  protected speed: number;
+  protected radius: number;
+  protected bounds: { min: THREE.Vector3; max: THREE.Vector3 } | null;
+  protected waypoints: THREE.Vector3[];
+  protected faceDirection: boolean;
+  protected forwardAxis: 'x' | 'z';
 
   // Movement state
-  private time = 0;
-  private currentWaypointIndex = 0;
-  private targetPosition = new THREE.Vector3();
-  private randomTarget = new THREE.Vector3();
-  private lastRandomUpdate = 0;
+  protected time = 0;
+  protected currentWaypointIndex = 0;
+  protected targetPosition = new THREE.Vector3();
+  protected randomTarget = new THREE.Vector3();
+  protected lastRandomUpdate = 0;
 
   constructor(options: MovingBehaviorOptions = {}) {
     this.pattern = options.pattern || MovementPattern.CIRCULAR;
@@ -132,6 +132,41 @@ export class MovingBehavior {
   }
 
   /**
+   * Alias for updateOriginalPosition for backward compatibility
+   */
+  public updateOrigin(): void {
+    this.updateOriginalPosition();
+  }
+
+  /**
+   * Set the movement radius
+   */
+  public setRadius(radius: number): void {
+    this.radius = radius;
+  }
+
+  /**
+   * Get the movement radius
+   */
+  public getRadius(): number {
+    return this.radius;
+  }
+
+  /**
+   * Get the movement pattern
+   */
+  public getPattern(): MovementPattern {
+    return this.pattern;
+  }
+
+  /**
+   * Get the movement speed
+   */
+  public getSpeed(): number {
+    return this.speed;
+  }
+
+  /**
    * Dispose of the movement behavior
    */
   public dispose(): void {
@@ -139,7 +174,7 @@ export class MovingBehavior {
     this.mesh = null;
   }
 
-  private animate = (): void => {
+  protected animate = (): void => {
     if (!this.isMoving || !this.mesh) return;
 
     const deltaTime = 0.016; // Assume 60fps

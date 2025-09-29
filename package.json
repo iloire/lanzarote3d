@@ -56,6 +56,7 @@
     "dev": "yarn start",
     "build": "webpack --mode production",
     "build-all": "webpack --mode production",
+    "pre-build": "yarn lint:check && yarn format:check",
     "pre-deploy": "yarn lint:check && yarn format:check",
     "build-staging": "yarn clean && yarn pre-deploy && yarn build-all",
     "delete-staging": "aws s3 rm s3://lanzarote3d --recursive --profile lanzaroteparagliding",

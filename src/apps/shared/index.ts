@@ -43,8 +43,8 @@ export async function loadApp(appKey: string, options: StoryOptions): Promise<vo
     case 'flyzones':
       appModule = await import('../experiences/flyzones/index');
       break;
-    case 'photobooth':
-      appModule = await import('../demos/photobooth');
+    case 'famara2':
+      appModule = await import('../demos/famara2');
       break;
     case 'famara':
       appModule = await import('../demos/famara');

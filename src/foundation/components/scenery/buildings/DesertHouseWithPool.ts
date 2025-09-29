@@ -47,7 +47,7 @@ export class DesertHouseWithPool extends SimpleThreeComponent {
     return new THREE.BoxGeometry(1, 1, 1);
   }
 
-  protected createSyncContent(): THREE.Object3D {
+  protected async createSyncContent(): Promise<THREE.Object3D> {
     const compound = new THREE.Group();
     compound.name = 'DesertHouseWithPool';
 
@@ -66,7 +66,7 @@ export class DesertHouseWithPool extends SimpleThreeComponent {
       receiveShadow: this.options.receiveShadow,
     });
 
-    const houseMesh = desertHouse.createSyncContent();
+    const houseMesh = await desertHouse.load();
     houseMesh.position.set(0, 0, 0);
     compound.add(houseMesh);
 
@@ -83,15 +83,15 @@ export class DesertHouseWithPool extends SimpleThreeComponent {
       receiveShadow: this.options.receiveShadow,
     });
 
-    const poolMesh = pool.createSyncContent();
+    const poolMesh = await pool.load();
     poolMesh.position.set(0, 0, -25); // Position pool behind the house
     compound.add(poolMesh);
 
     // Add landscaping elements around the pool
-    this.addPoolLandscaping(compound, options);
+    this.addPoolLandscaping(compound);
 
     // Add outdoor furniture and amenities
-    this.addOutdoorAmenities(compound, options);
+    this.addOutdoorAmenities(compound);
 
     // Apply scale to the entire compound
     if (scale !== 1) {
@@ -101,7 +101,7 @@ export class DesertHouseWithPool extends SimpleThreeComponent {
     return compound;
   }
 
-  private addPoolLandscaping(compound: THREE.Group, options: DesertHouseWithPoolOptions): void {
+  private addPoolLandscaping(compound: THREE.Group): void {
     // Create materials for landscaping
     const plantMaterial = new THREE.MeshLambertMaterial({ color: '#228B22' });
     const rockMaterial = new THREE.MeshLambertMaterial({ color: '#696969' });
@@ -162,7 +162,7 @@ export class DesertHouseWithPool extends SimpleThreeComponent {
     }
   }
 
-  private addOutdoorAmenities(compound: THREE.Group, options: DesertHouseWithPoolOptions): void {
+  private addOutdoorAmenities(compound: THREE.Group): void {
     // Create materials for furniture
     const woodMaterial = new THREE.MeshLambertMaterial({ color: '#8B4513' });
     const cushionMaterial = new THREE.MeshLambertMaterial({ color: '#F0E68C' });

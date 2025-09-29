@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { /* Paraglider, */ ParagliderOptions } from '../../../foundation/components/vehicles';
+// import { /* Paraglider, */ ParagliderOptions } from '../../../foundation/components/vehicles';
 import ParagliderVoxel, {
   ParagliderVoxelOptions,
 } from '../../../foundation/components/vehicles/ParagliderVoxel';
@@ -41,7 +41,7 @@ const paraglidersVoxel: ParagliderVoxelConfig[] = [
 ];
 
 type ParagliderConfig = {
-  pg: ParagliderOptions;
+  pg: ParagliderVoxelOptions;
   position: any;
 };
 
@@ -56,7 +56,7 @@ class PhotoBoothApp extends TerrainBase {
   private showCars: boolean = process.env.NODE_ENV === 'development'; // Show cars only in development mode
 
   constructor() {
-    const appConfig = getAppConfig('photobooth');
+    const appConfig = getAppConfig('famara2');
     super({
       // Use metadata from app registry
       name: appConfig?.name || 'Photobooth',
@@ -103,7 +103,7 @@ class PhotoBoothApp extends TerrainBase {
       camera.position.copy(initialPos);
       camera.lookAt(lookAtPos);
 
-      // Apply landscape viewing controls for photobooth exploration
+      // Apply landscape viewing controls for famara2 exploration
       OrbitControlsHelper.focusOnTarget(controls, lookAtPos, ORBIT_CONTROLS_PRESETS['landscape']);
 
       // Load paragliders with proper tracking for disposal
@@ -123,7 +123,7 @@ class PhotoBoothApp extends TerrainBase {
       this.environment.addHouses(terrain);
       this.environment.addBoats(water);
 
-      // Add cars close to the camera position for photobooth (development mode only)
+      // Add cars close to the camera position for famara2 (development mode only)
       if (terrain && this.showCars) {
         await this.addCarsNearCamera(terrain);
       }
@@ -148,7 +148,7 @@ class PhotoBoothApp extends TerrainBase {
   }
 
   /**
-   * Enable or disable cars in the photobooth demo
+   * Enable or disable cars in the famara2 demo
    */
   public setCarsEnabled(enabled: boolean): void {
     this.showCars = enabled;
@@ -177,14 +177,14 @@ class PhotoBoothApp extends TerrainBase {
   }
 
   /**
-   * Add cars near the camera position for better photobooth shots
+   * Add cars near the camera position for better famara2 shots
    */
   private async addCarsNearCamera(terrain: THREE.Mesh): Promise<void> {
     if (!this.environment) return;
 
     try {
       // Camera starts at (6200, 970, 175) looking at paraglider around (6897, 920, -705)
-      // Add cars in the foreground and middle ground for interesting photobooth composition
+      // Add cars in the foreground and middle ground for interesting famara2 composition
 
       // Import movement patterns
       const { MovementPattern } = await import(
@@ -275,10 +275,10 @@ class PhotoBoothApp extends TerrainBase {
       });
 
       console.log(
-        '✅ Cars added around terrain location (6620.8, 45.1, -2809.6) for photobooth shots'
+        '✅ Cars added around terrain location (6620.8, 45.1, -2809.6) for phfamara2 shots'
       );
     } catch (error) {
-      console.warn('⚠️ Failed to add cars to photobooth:', error);
+      console.warn('⚠️ Failed to add cars to famara2:', error);
     }
   }
 

@@ -91,6 +91,21 @@ export class TerrainNavigator {
   }
 
   /**
+   * Sample terrain at a specific position (backward compatibility)
+   * Returns terrain data including height and validity
+   */
+  sampleTerrain(x: number, z: number): { height: number; isValid: boolean; normal?: THREE.Vector3 } {
+    const position = new THREE.Vector3(x, 0, z);
+    const height = this.getHeightAt(position);
+    const normal = this.getSurfaceNormalAt(position);
+    return {
+      height: height !== null ? height : 0,
+      isValid: height !== null,
+      normal: normal || undefined,
+    };
+  }
+
+  /**
    * Sample terrain in multiple directions around a position
    * Returns an array of sample points with height and drivability
    */

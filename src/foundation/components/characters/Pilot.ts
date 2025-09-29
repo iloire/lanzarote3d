@@ -58,6 +58,11 @@ export class Pilot extends SimpleThreeComponent {
     });
   }
 
+  protected createGeometry(): THREE.BufferGeometry {
+    // Return placeholder - actual geometry created in createSyncContent
+    return new THREE.BoxGeometry(1, 1, 1);
+  }
+
   protected createSyncContent(): THREE.Object3D {
     const container = new THREE.Object3D();
     container.name = 'PilotContainer';
@@ -92,7 +97,7 @@ export class Pilot extends SimpleThreeComponent {
         receiveShadow: this.options.receiveShadow,
       });
 
-      return pilotHead.getObject3D() || new THREE.Object3D();
+      return pilotHead.getObject() || new THREE.Object3D();
     } catch (error) {
       console.warn('Failed to create pilot head, using placeholder:', error);
       // Create a simple placeholder head
@@ -328,12 +333,13 @@ export class Pilot extends SimpleThreeComponent {
     return issues;
   }
 
-  public override getInfo(): Record<string, any> {
-    const baseInfo = super.getInfo();
+  public getInfo(): Record<string, any> {
     const options = this.options as PilotOptions;
 
     return {
-      ...baseInfo,
+      name: 'Pilot',
+      version: '1.0.0',
+      type: 'character',
       pilotState: this.pilotState,
       appearance: {
         headType: options.headType,
