@@ -287,7 +287,7 @@ class TownWorkshop extends WorkshopDemoBase {
       <div style="background: rgba(0,0,0,0.9); color: white; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 12px; line-height: 1.4; min-width: 240px;">
         <div><strong>Mode:</strong> ${this.isLowPoly ? 'Performance' : 'Quality'}</div>
         ${polygonInfo}
-        <div><strong>Neighborhoods:</strong> ${this.neighborhoodMeshes.length > 0 ? '17' : 'Loading...'}</div>
+        <div><strong>Neighborhoods:</strong> ${this.neighborhoodMeshes.length > 0 ? '27' : 'Loading...'}</div>
         <div style="margin-top: 6px; font-size: 10px; color: #aaa;">Click button to toggle modes</div>
       </div>
     `;
@@ -688,6 +688,79 @@ class TownWorkshop extends WorkshopDemoBase {
         type: 'suburban',
         size: 'small',
         variation: { ...DEFAULT_VARIATION, poolChance: 0.4 },
+      },
+      // Phase 3: Fill empty spaces within current boundaries
+      {
+        name: 'Central Plaza',
+        center: new THREE.Vector3(0, 0, 300),
+        type: 'cul-de-sac',
+        houses: 6,
+        variation: { ...DEFAULT_VARIATION, poolChance: 0.5 },
+      },
+      {
+        name: 'Midtown Residences',
+        center: new THREE.Vector3(100, 0, 100),
+        type: 'street',
+        houses: 10,
+        variation: { ...DEFAULT_VARIATION, poolChance: 0.3 },
+      },
+      {
+        name: 'Artisan Quarter',
+        center: new THREE.Vector3(-100, 0, -100),
+        type: 'suburban',
+        size: 'small',
+        variation: { ...DEFAULT_VARIATION, poolChance: 0.6 },
+      },
+      {
+        name: 'East Gardens',
+        center: new THREE.Vector3(750, 0, 100),
+        type: 'luxury',
+        houses: 5,
+        variation: { ...DEFAULT_VARIATION, poolChance: 0.8 },
+      },
+      {
+        name: 'Heritage Homes',
+        center: new THREE.Vector3(-700, 0, 100),
+        type: 'rural',
+        style: 'village',
+        houses: 7,
+        variation: { ...DEFAULT_VARIATION, poolChance: 0.4 },
+      },
+      {
+        name: 'Southside Commons',
+        center: new THREE.Vector3(0, 0, -450),
+        type: 'grid',
+        houses: 9,
+        variation: { ...DEFAULT_VARIATION, poolChance: 0.2 },
+      },
+      {
+        name: 'Desert Oaks',
+        center: new THREE.Vector3(-300, 0, 300),
+        type: 'cul-de-sac',
+        houses: 8,
+        variation: { ...DEFAULT_VARIATION, poolChance: 0.4 },
+      },
+      {
+        name: 'Sunrise Estates',
+        center: new THREE.Vector3(500, 0, -50),
+        type: 'suburban',
+        size: 'medium',
+        variation: { ...DEFAULT_VARIATION, poolChance: 0.6 },
+      },
+      {
+        name: 'Westside Village',
+        center: new THREE.Vector3(-500, 0, -50),
+        type: 'street',
+        houses: 8,
+        variation: { ...DEFAULT_VARIATION, poolChance: 0.3 },
+      },
+      {
+        name: 'Canyon View',
+        center: new THREE.Vector3(200, 0, 200),
+        type: 'rural',
+        style: 'scattered',
+        houses: 5,
+        variation: { ...DEFAULT_VARIATION, poolChance: 0.7 },
       },
     ];
 
