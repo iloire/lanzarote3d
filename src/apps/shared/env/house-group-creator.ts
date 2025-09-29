@@ -34,6 +34,7 @@ export class HouseGroupCreator {
   private scene: THREE.Scene;
   private componentRegistry: ComponentRegistry;
   private lowPoly: boolean = false;
+  private createdObjects: THREE.Object3D[] = []; // Track all created objects
 
   constructor(scene: THREE.Scene, componentRegistry: ComponentRegistry) {
     this.scene = scene;
@@ -45,6 +46,51 @@ export class HouseGroupCreator {
    */
   setLowPolyMode(lowPoly: boolean): void {
     this.lowPoly = lowPoly;
+  }
+
+  /**
+   * Clear all created objects from the scene and dispose them properly
+   */
+  clearAll(): void {
+    console.log(`🧹 HouseGroupCreator clearing ${this.createdObjects.length} objects`);
+
+    this.createdObjects.forEach(obj => {
+      // Remove from scene
+      if (obj.parent) {
+        obj.parent.remove(obj);
+      }
+
+      // Dispose object recursively
+      this.disposeObject3D(obj);
+    });
+
+    // Clear tracking array
+    this.createdObjects.length = 0;
+    console.log('✅ HouseGroupCreator cleanup completed');
+  }
+
+  /**
+   * Recursively dispose of Three.js objects
+   */
+  private disposeObject3D(obj: THREE.Object3D): void {
+    obj.children.forEach(child => {
+      this.disposeObject3D(child);
+    });
+
+    if (obj instanceof THREE.Mesh) {
+      if (obj.geometry) {
+        obj.geometry.dispose();
+      }
+      if (obj.material) {
+        if (Array.isArray(obj.material)) {
+          obj.material.forEach(material => material.dispose());
+        } else {
+          obj.material.dispose();
+        }
+      }
+    }
+
+    obj.userData = {};
   }
 
   /**
@@ -92,10 +138,10 @@ export class HouseGroupCreator {
           break;
 
         case 'Barn':
-          console.log(`🐛 Creating Barn with lowPoly: ${this.lowPoly} (not yet implemented)`);
+          console.log(`✅ Creating Barn with lowPoly: ${this.lowPoly}`);
           house = new Barn({
             scale: scale,
-            // lowPoly: this.lowPoly, // TODO: Implement lowPoly for Barn
+            lowPoly: this.lowPoly,
             ...(houseConfig.colors || {}),
           });
           houseMesh = house.load();
@@ -141,8 +187,13 @@ export class HouseGroupCreator {
         houseMesh.scale.setScalar(scale);
       }
 
-      // Position the house
-      houseMesh.position.copy(position);
+      // Position the house (check if position is valid)
+      if (position && position.copy) {
+        houseMesh.position.copy(position);
+      } else {
+        console.error('Invalid position provided to createSingleHouse:', position);
+        houseMesh.position.set(0, 0, 0);
+      }
 
       // Apply rotation in 90-degree increments (random or specified)
       if (houseConfig.rotation !== undefined) {
@@ -158,8 +209,9 @@ export class HouseGroupCreator {
         this.addLandPlot(position, houseConfig.landPlot, houseMesh.rotation.y);
       }
 
-      // Add to scene
+      // Add to scene and track
       this.scene.add(houseMesh);
+      this.createdObjects.push(houseMesh);
 
       // Add pool if specified and house doesn't already include one
       if (houseConfig.includePool && houseConfig.type !== 'DesertHouseWithPool') {
@@ -204,6 +256,7 @@ export class HouseGroupCreator {
       landMesh.renderOrder = -1;
 
       this.scene.add(landMesh);
+      this.createdObjects.push(landMesh);
 
       // Add random cacti and stones to the land plot
       this.addLandscapeElements(housePosition, landPlot, houseRotation);
@@ -271,6 +324,7 @@ export class HouseGroupCreator {
     stoneMesh.scale.setScalar(0.3 + Math.random() * 0.4); // Random scale 0.3-0.7
     stoneMesh.rotation.y = Math.random() * Math.PI * 2; // Random rotation
     this.scene.add(stoneMesh);
+    this.createdObjects.push(stoneMesh);
   }
 
   private addBarrelCactus(position: THREE.Vector3): void {
@@ -278,6 +332,7 @@ export class HouseGroupCreator {
     const cactusMesh = cactus.createSyncContent();
     cactusMesh.position.copy(position);
     this.scene.add(cactusMesh);
+    this.createdObjects.push(cactusMesh);
   }
 
   private addPricklyPearCactus(position: THREE.Vector3): void {
@@ -285,6 +340,7 @@ export class HouseGroupCreator {
     const cactusMesh = cactus.createSyncContent();
     cactusMesh.position.copy(position);
     this.scene.add(cactusMesh);
+    this.createdObjects.push(cactusMesh);
   }
 
   private addSaguaroCactus(position: THREE.Vector3): void {
@@ -292,6 +348,7 @@ export class HouseGroupCreator {
     const cactusMesh = cactus.createSyncContent();
     cactusMesh.position.copy(position);
     this.scene.add(cactusMesh);
+    this.createdObjects.push(cactusMesh);
   }
 
   private addOrganPipeCactus(position: THREE.Vector3): void {
@@ -299,6 +356,7 @@ export class HouseGroupCreator {
     const cactusMesh = cactus.createSyncContent();
     cactusMesh.position.copy(position);
     this.scene.add(cactusMesh);
+    this.createdObjects.push(cactusMesh);
   }
 
   /**
@@ -321,6 +379,7 @@ export class HouseGroupCreator {
       poolMesh.rotation.y = Math.random() * Math.PI * 2;
 
       this.scene.add(poolMesh);
+      this.createdObjects.push(poolMesh);
     } catch (error) {
       console.error('Error adding pool to house:', error);
     }

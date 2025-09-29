@@ -352,8 +352,13 @@ class TownWorkshop extends WorkshopDemoBase {
    * Recreate all neighborhoods with current settings
    */
   private async recreateNeighborhoods(): Promise<void> {
-    // Clear existing neighborhoods
+    // Clear existing neighborhoods from TownWorkshop tracking
     this.clearNeighborhoods();
+
+    // IMPORTANT: Clear all objects from HouseGroupCreator
+    if (this.houseGroupCreator) {
+      this.houseGroupCreator.clearAll();
+    }
 
     // Update house group creator with current low-poly setting
     console.log(`🐛 Setting HouseGroupCreator to lowPoly: ${this.isLowPoly}`);
