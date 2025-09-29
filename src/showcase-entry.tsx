@@ -46,3 +46,6 @@ if (rootElement && WebGL.isWebGLAvailable()) {
 } else {
   logger.error('Root element not found');
 }
+
+// Export empty object to satisfy webpack
+export default {};

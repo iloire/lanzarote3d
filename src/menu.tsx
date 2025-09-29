@@ -1,5 +1,5 @@
 import React from 'react';
-import { getAppsByStatus, type AppMetadata } from './apps/config/app-registry';
+import { getAppsByStatus, type AppMetadata } from './config/app-registry';
 import { themeManager } from './foundation/systems/ThemeManager';
 import { getAllThemes } from './foundation/themes';
 import { Theme } from './foundation/types/Theme';

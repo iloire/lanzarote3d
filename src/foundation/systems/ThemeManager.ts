@@ -1,7 +1,7 @@
 import { Theme } from '../types/Theme';
 import { getAllThemes, getThemeById, getDefaultTheme } from '../themes';
 import { ThemeEngine } from './ThemeEngine';
-import { StoryOptions } from '../../apps/shared/types';
+import { StoryOptions } from '../../shared/types';
 
 /**
  * Global Theme Manager for dynamic theme switching across the application

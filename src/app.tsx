@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react';
 import GUI from 'lil-gui';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import * as THREE from 'three';
-import { loadApp, hasApp } from './apps/shared/index';
+import { loadApp, hasApp } from './shared/index';
 import { CameraController as Camera } from './foundation/systems/scene/CameraController';
 import Menu from './menu';
 import Controls from './foundation/utils/controls';
-import { StoryOptions } from './apps/shared/types';
+import { StoryOptions } from './shared/types';
 import { themeManager } from './foundation/systems/ThemeManager';
 import { ThemeEngine } from './foundation/systems/ThemeEngine';
-import { getAllApps } from './apps/config/app-registry';
+import { getAllApps } from './config/app-registry';
 import { getThemeById } from './foundation/themes';
 
 import './index.css';

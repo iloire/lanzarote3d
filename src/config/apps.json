@@ -1,0 +1,216 @@
+{
+  "apps": {
+    "game": {
+      "name": "Flight Simulator",
+      "description": "Interactive paragliding flight simulation",
+      "entry": "./applications/game/index.tsx",
+      "route": "/game",
+      "category": "experience",
+      "htmlTemplate": "./applications/game/index.html",
+      "requiresWebGL": true,
+      "status": "dev",
+      "priority": 7
+    },
+    "flyzones": {
+      "name": "Flyzones",
+      "description": "Explore flyzing locations in 3D",
+      "entry": "./applications/flyzones/index.tsx",
+      "route": "/flyzones",
+      "category": "experience",
+      "htmlTemplate": "./applications/flyzones/index.html",
+      "requiresWebGL": true,
+      "status": "dev",
+      "priority": 1
+    },
+    "location-editor": {
+      "name": "Location Editor",
+      "description": "Basic tool for creating and editing flight locations (legacy)",
+      "entry": "./applications/location-editor/index.tsx",
+      "route": "/location-editor",
+      "category": "tool",
+      "requiresWebGL": true,
+      "status": "dev",
+      "priority": 3
+    },
+    "workshop-demo": {
+      "name": "Workshop Demo",
+      "description": "Dev environment for testing and showcasing individual 3D components",
+      "entry": "./applications/workshop-demo/index.tsx",
+      "route": "/workshop-demo",
+      "category": "tool",
+      "requiresWebGL": true,
+      "status": "dev",
+      "priority": 9
+    },
+    "tile-debug": {
+      "name": "Tile Debug Dashboard",
+      "description": "Debug tool showing satellite tile download process, calculations, and atlas creation for terrain mapping",
+      "entry": "./applications/tile-debug/index.tsx",
+      "route": "/tile-debug",
+      "category": "tool",
+      "requiresWebGL": true,
+      "status": "dev",
+      "priority": 11
+    },
+    "animation": {
+      "name": "Famara animation",
+      "description": "Dramatic camera animation showcasing voxel paragliders with golden hour lighting",
+      "entry": "./applications/animation/index.tsx",
+      "route": "/animation",
+      "category": "demo",
+      "requiresWebGL": true,
+      "status": "public",
+      "priority": 1
+    },
+    "famara2": {
+      "name": "Famara",
+      "description": "Beautiful static 3D scene showcasing paragliders and environment",
+      "entry": "./applications/famara2/index.tsx",
+      "route": "/famara2",
+      "category": "demo",
+      "requiresWebGL": true,
+      "status": "public",
+      "priority": 2
+    },
+    "famara": {
+      "name": "Famara Beach",
+      "description": "Natural beauty of Famara beach area without paragliders - pure landscape focus",
+      "entry": "./applications/famara/index.tsx",
+      "route": "/famara",
+      "category": "demo",
+      "requiresWebGL": true,
+      "status": "dev",
+      "priority": 3,
+      "theme": "artic"
+    },
+    "boats": {
+      "name": "Boats Animation",
+      "description": "Cinematic animation starting near boats and transitioning to focus on paragliders and clouds",
+      "entry": "./applications/boats/index.tsx",
+      "route": "/boats",
+      "category": "demo",
+      "requiresWebGL": true,
+      "status": "public",
+      "priority": 4
+    },
+    "island": {
+      "name": "Island",
+      "description": "Lanzarote island view with dramatic lighting",
+      "entry": "./applications/island",
+      "route": "/island",
+      "category": "demo",
+      "requiresWebGL": true,
+      "status": "public",
+      "priority": 3,
+      "hidden": false
+    },
+    "paraglider-voxel": {
+      "name": "Voxel pilot",
+      "description": "Voxel-based paraglider component showcase",
+      "entry": "./applications/paraglider-voxel",
+      "route": "/paraglider-voxel",
+      "category": "demo",
+      "requiresWebGL": true,
+      "status": "dev",
+      "priority": 3
+    },
+    "glider": {
+      "name": "Glider",
+      "description": "Legacy glider component demo showcasing traditional wing configurations",
+      "entry": "./applications/glider",
+      "route": "/glider",
+      "category": "demo",
+      "requiresWebGL": true,
+      "status": "dev",
+      "priority": 11
+    },
+    "pilot": {
+      "name": "Pilot",
+      "description": "Pilot component demo",
+      "entry": "./applications/pilot",
+      "route": "/pilot",
+      "category": "demo",
+      "requiresWebGL": true,
+      "status": "dev",
+      "priority": 17
+    },
+    "terrain": {
+      "name": "Terrain",
+      "description": "Terrain generation demo",
+      "entry": "./applications/terrain",
+      "route": "/terrain",
+      "category": "demo",
+      "requiresWebGL": true,
+      "status": "dev",
+      "priority": 18
+    },
+    "town": {
+      "name": "Town",
+      "description": "Neighborhood generation showcase with various residential formations and house types",
+      "entry": "./applications/town",
+      "route": "/town",
+      "category": "demo",
+      "requiresWebGL": true,
+      "status": "dev",
+      "priority": 19
+    },
+    "houses": {
+      "name": "Houses",
+      "description": "House component showcase comparing normal vs low-poly versions with polygon count analysis",
+      "entry": "./applications/houses",
+      "route": "/houses",
+      "category": "demo",
+      "requiresWebGL": true,
+      "status": "dev",
+      "priority": 20
+    }
+  },
+  "showcase": {
+    "includeCriteria": {
+      "byStatus": [
+        "public"
+      ],
+      "specificApps": [
+        "workshop-demo",
+        "location-editor",
+        "tile-debug",
+        "island",
+        "paraglider-voxel",
+        "terrain",
+        "town",
+        "houses",
+        "glider",
+        "pilot",
+        "game",
+        "flyzones"
+      ]
+    },
+    "order": {
+      "animation": 1,
+      "famara": 2,
+      "famara2": 3,
+      "boats": 4,
+      "game": 5,
+      "flyzones": 6,
+      "workshop-demo": 7,
+      "location-editor": 8,
+      "tile-debug": 9,
+      "island": 10,
+      "paraglider-voxel": 11,
+      "terrain": 12,
+      "town": 13,
+      "houses": 14,
+      "glider": 15,
+      "pilot": 16
+    },
+    "filenameOverrides": {
+      "animation": "index.html",
+      "paraglider-voxel": "paragliderVoxel.html",
+      "glider": "glider.html"
+    },
+    "customEntries": {
+      "tile-debug": "./src/applications/tile-debug/entry.tsx"
+    },
+    "defaultEntry": "./src/showcase-entry.tsx"
+  }
+}

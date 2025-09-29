@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { Theme, ThemeApplicationOptions } from '../types/Theme';
-import { StoryOptions } from '../../apps/shared/types';
-import Environment from '../../apps/shared/env/environment';
+import { StoryOptions } from '../../shared/types';
+import Environment from '../../shared/env/environment';
 import { Weather } from '../components/physics';
 
 export class ThemeEngine {

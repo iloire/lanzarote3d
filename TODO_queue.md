@@ -1,3 +1,2 @@
 - I want to introduce Next.js so I can make easy deployments in vercel, introduce server side rendering, API supports, Next.js routing, etc.. Do that work in a new branch, test throughly the app after is done, make sure it builds properly and finally commit to that new branch.
 - play with some ideas to use shaders on the water and sky
-- play with some ideas to have a less realistic and more cartoonish/vector like sun glare in the sky

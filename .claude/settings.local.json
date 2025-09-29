@@ -68,7 +68,8 @@
       "Bash(do echo -n \"Downloading tile $x_$y... \")",
       "Bash(npx next:*)",
       "Bash(yarn generate-showcase-config:*)",
-      "Bash(yarn build)"
+      "Bash(yarn build)",
+      "Bash(pkill:*)"
     ],
     "deny": [],
     "ask": []

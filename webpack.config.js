@@ -5,10 +5,10 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
  * Showcase configuration from JSON source of truth
  * Simple, reliable, no fallbacks needed
  *
- * The source of truth is: src/apps/config/apps.json
+ * The source of truth is: src/config/apps.json
  */
 
-const appsConfig = require('./src/apps/config/apps.json');
+const appsConfig = require('./src/config/apps.json');
 
 // Generate showcase apps from JSON
 function generateShowcaseApps() {
@@ -23,24 +23,20 @@ function generateShowcaseApps() {
     return `${key.replace(/-/g, '')}.html`;
   };
 
-  // Collect apps based on showcase criteria
-  Object.entries(appsConfig).forEach(([categoryKey, category]) => {
-    if (categoryKey === 'showcase') return; // Skip the showcase config itself
+  // Collect apps based on showcase criteria (now flat structure)
+  Object.entries(appsConfig.apps).forEach(([appKey, app]) => {
+    // Include if public status or specifically listed
+    const includeInShowcase =
+      showcase.includeCriteria.byStatus.includes(app.status) ||
+      showcase.includeCriteria.specificApps.includes(appKey);
 
-    Object.entries(category).forEach(([appKey, app]) => {
-      // Include if public status or specifically listed
-      const includeInShowcase =
-        showcase.includeCriteria.byStatus.includes(app.status) ||
-        showcase.includeCriteria.specificApps.includes(appKey);
-
-      if (includeInShowcase && !app.hidden) {
-        showcaseApps.push({
-          name: appKey,
-          title: `Lanzarote - ${app.name}`,
-          filename: getFilename(appKey)
-        });
-      }
-    });
+    if (includeInShowcase && !app.hidden) {
+      showcaseApps.push({
+        name: appKey,
+        title: `Lanzarote - ${app.name}`,
+        filename: getFilename(appKey)
+      });
+    }
   });
 
   // Sort by defined order
@@ -134,6 +130,11 @@ module.exports = {
         test: /\.css$/,
         use: ["style-loader", "css-loader"],
       },
+      {
+        // Exclude HTML and MD files from being processed as modules
+        test: /\.(html|md)$/,
+        type: "asset/resource",
+      },
     ],
   },
   resolve: {
@@ -143,10 +144,39 @@ module.exports = {
     // Generate HTML plugins dynamically for each app
     ...showcaseApps.map(app =>
       new HtmlWebpackPlugin({
-        template: path.join(__dirname, "./src/templates/showcase.html"),
+        templateContent: `<!DOCTYPE html>
+<html>
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-NDD28QQE9L"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-NDD28QQE9L');
+  </script>
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title><%= htmlWebpackPlugin.options.title %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+</head>
+
+<body style="background-color:black">
+  <div id="root"></div>
+  <div id="ui-controls"></div>
+  <div id="legend-points"></div>
+  <div id="stats"></div>
+  <div id="daytime"></div>
+</body>
+</html>`,
         chunks: [app.name],
         filename: app.filename,
-        title: app.title
+        title: app.title,
+        inject: 'body',
+        minify: false
       })
     ),
   ],
