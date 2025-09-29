@@ -72,6 +72,16 @@
       "visibility": "public",
       "priority": 1
     },
+    "boats-animation": {
+      "name": "Boats Animation",
+      "description": "Cinematic animation starting near boats and transitioning to focus on paragliders and clouds",
+      "entry": "./applications/boats-animation/index.tsx",
+      "route": "/boats-animation",
+      "category": "demo",
+      "requiresWebGL": true,
+      "visibility": "public",
+      "priority": 4
+    },
     "famara2": {
       "name": "Famara",
       "description": "Beautiful static 3D scene showcasing paragliders and environment",

@@ -47,7 +47,7 @@ export abstract class MovableBoatComponent extends FloatingThreeComponent {
         waypoints: options.waypoints,
         autoStart: options.autoStartMoving ?? true,
         faceDirection: options.faceDirection ?? true,
-        forwardAxis: options.forwardAxis || 'x',
+        forwardAxis: options.forwardAxis || 'z', // Default changed to 'z' after boat rotation
       });
     }
   }
