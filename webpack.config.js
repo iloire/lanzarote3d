@@ -25,12 +25,12 @@ function generateShowcaseApps() {
 
   // Collect apps based on showcase criteria (now flat structure)
   Object.entries(appsConfig.apps).forEach(([appKey, app]) => {
-    // Include if public status or specifically listed
+    // Include if public visibility or specifically listed
     const includeInShowcase =
-      showcase.includeCriteria.byStatus.includes(app.status) ||
+      (showcase.includeCriteria.byVisibility && showcase.includeCriteria.byVisibility.includes(app.visibility)) ||
       showcase.includeCriteria.specificApps.includes(appKey);
 
-    if (includeInShowcase && !app.hidden) {
+    if (includeInShowcase && app.visibility !== 'hidden') {
       showcaseApps.push({
         name: appKey,
         title: `Lanzarote - ${app.name}`,

@@ -16,9 +16,8 @@ export interface AppMetadata {
   category: 'experience' | 'tool' | 'demo';
   htmlTemplate?: string;
   requiresWebGL?: boolean;
-  status?: 'public' | 'experimental' | 'dev';
+  visibility: 'public' | 'private' | 'hidden';
   priority?: number; // For ordering in menus
-  hidden?: boolean; // Hide from menu when true
   theme?: string; // Optional theme ID that overrides global theme selection
 }
 
@@ -51,19 +50,60 @@ export function getAllApps(): AppMetadata[] {
 }
 
 /**
- * Get apps by status with optional category filter
+ * Get apps by visibility with optional category filter
+ * For backwards compatibility, also exports as getAppsByStatus
+ */
+export function getAppsByVisibility(
+  visibility: 'public' | 'private' | 'hidden',
+  category?: 'experience' | 'tool' | 'demo'
+): AppMetadata[] {
+  let apps = getAllApps()
+    .filter(app => app.visibility === visibility);
+  if (category) {
+    apps = apps.filter(app => app.category === category);
+  }
+  return apps.sort((a, b) => (a.priority || 999) - (b.priority || 999));
+}
+
+/**
+ * Get apps that should be visible in the menu based on environment
+ * In development: shows 'public' and 'private' apps
+ * In production: shows only 'public' apps
+ */
+export function getVisibleApps(
+  category?: 'experience' | 'tool' | 'demo'
+): AppMetadata[] {
+  const isDevelopment =
+    typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+  let apps = getAllApps()
+    .filter(app => {
+      if (app.visibility === 'hidden') return false;
+      if (app.visibility === 'private') return isDevelopment;
+      return true; // public apps always visible
+    });
+
+  if (category) {
+    apps = apps.filter(app => app.category === category);
+  }
+  return apps.sort((a, b) => (a.priority || 999) - (b.priority || 999));
+}
+
+/**
+ * @deprecated Use getAppsByVisibility instead
  */
 export function getAppsByStatus(
   status: 'public' | 'experimental' | 'dev',
   category?: 'experience' | 'tool' | 'demo'
 ): AppMetadata[] {
-  let apps = getAllApps()
-    .filter(app => app.status === status)
-    .filter(app => !app.hidden); // Filter out hidden apps
-  if (category) {
-    apps = apps.filter(app => app.category === category);
-  }
-  return apps.sort((a, b) => (a.priority || 999) - (b.priority || 999));
+  // Map old status values to new visibility values
+  const visibilityMap = {
+    'public': 'public' as const,
+    'experimental': 'private' as const,
+    'dev': 'private' as const
+  };
+  return getAppsByVisibility(visibilityMap[status], category);
 }
 
 /**

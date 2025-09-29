@@ -23,7 +23,7 @@ interface AppProps {
   initialStory?: string;
   showAppSelection?: boolean;
   showPublic?: boolean;
-  showExperiments?: boolean;
+  showPrivate?: boolean;
   showDev?: boolean;
 }
 
@@ -74,7 +74,7 @@ const App: React.FC<AppProps> = ({
   initialStory,
   showAppSelection: initialShowAppSelection = false,
   showPublic,
-  showExperiments,
+  showPrivate,
   showDev,
 }) => {
   const [loadingProcess, setLoadingProcess] = useState(0);
@@ -194,7 +194,7 @@ const App: React.FC<AppProps> = ({
         <Menu
           showPublic={typeof showPublic === 'undefined' ? true : showPublic}
           showDev={typeof showDev === 'undefined' ? false : showDev}
-          showExperiments={typeof showExperiments === 'undefined' ? false : showExperiments}
+          showPrivate={typeof showPrivate === 'undefined' ? false : showPrivate}
         />
       )}
       <canvas className="webgl" />

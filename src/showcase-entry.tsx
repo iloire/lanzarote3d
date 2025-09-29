@@ -31,7 +31,7 @@ if (rootElement && WebGL.isWebGLAvailable()) {
       showAppSelection={true}
       showPublic={true}
       showDev={isLocalhost}
-      showExperiments={isLocalhost}
+      showPrivate={isLocalhost}
       initialStory={storyName}
     />
   );

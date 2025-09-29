@@ -2,10 +2,6 @@ Implement the following tasks if any is added following the instructions describ
 ---
 TASKS:
 - do we need showcase-config.ts? We want to remove all that indirection and duplication
-- place all cactus scenery objects into the scenery/cactus folder.
-- also put all the trees scenery objects into the scenery/trees folder.
-- same way we added birds that implement FlyableBehaviour, let's also have planes. Create only one Plane class for now in the vehicles folders.
-- in AppMetadata, instead of having "status?: 'public' | 'experimental' | 'dev';" and "hidden?: boolean;" properties, let's remove the hidden property and rename the "status" property to "visibility: 'public', 'private', 'hidden''". 'public' will mean visible in production, 'private' visible in the menu only in development/localhost mode, and 'hidden' will hide the item in the menu always. 
 - go through all the base files located in the /Users/ivan/code/lanzarote3d/src/foundation/components/base and analyze and document their use. See if all of them are needed or we can refactor or remove some for efficiency and code readability and mantenability
 ---
 

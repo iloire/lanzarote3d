@@ -2,6 +2,7 @@
 - play with some ideas to use shaders on the water and sky
 - fix mess with category: 'experience' | 'tool' | 'demo'; and status. we need better granularity to show menu. also menu doesnt fit in window 
 - same thing we have a movingBehaviour or FloatingBehaviour, build a FlyingBehaviour that can be applied to a model and it can just fly around the scene. It must detect when terrain is close and slowly turn away from it. It shold also detect when has gone too far and return. To test the flyable behaviour, create an app that has a few walls and put the model with flyable behaviour in the middle. It should fly around and between the walls without going far away and without crash with the walls. Use the hangglider model for example to attach the flyable behaviour. We currently have the AutoFlier class but let's build the Flyable behavior and decide later what's best and remove the other option.
+- same way we added birds that implement FlyableBehaviour, let's also have planes. Create only one Plane class for now in the vehicles folders.
 
 
 

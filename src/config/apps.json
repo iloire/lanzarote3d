@@ -8,7 +8,7 @@
       "category": "experience",
       "htmlTemplate": "./applications/game/index.html",
       "requiresWebGL": true,
-      "status": "dev",
+      "visibility": "private",
       "priority": 7
     },
     "flyzones": {
@@ -19,7 +19,7 @@
       "category": "experience",
       "htmlTemplate": "./applications/flyzones/index.html",
       "requiresWebGL": true,
-      "status": "dev",
+      "visibility": "private",
       "priority": 1
     },
     "location-editor": {
@@ -29,7 +29,7 @@
       "route": "/location-editor",
       "category": "tool",
       "requiresWebGL": true,
-      "status": "dev",
+      "visibility": "private",
       "priority": 3
     },
     "workshop-demo": {
@@ -39,7 +39,7 @@
       "route": "/workshop-demo",
       "category": "tool",
       "requiresWebGL": true,
-      "status": "dev",
+      "visibility": "private",
       "priority": 9
     },
     "tile-debug": {
@@ -49,7 +49,7 @@
       "route": "/tile-debug",
       "category": "tool",
       "requiresWebGL": true,
-      "status": "dev",
+      "visibility": "private",
       "priority": 11
     },
     "animation": {
@@ -59,7 +59,7 @@
       "route": "/animation",
       "category": "demo",
       "requiresWebGL": true,
-      "status": "public",
+      "visibility": "public",
       "priority": 1
     },
     "famara2": {
@@ -69,7 +69,7 @@
       "route": "/famara2",
       "category": "demo",
       "requiresWebGL": true,
-      "status": "public",
+      "visibility": "public",
       "priority": 2
     },
     "famara": {
@@ -79,7 +79,7 @@
       "route": "/famara",
       "category": "demo",
       "requiresWebGL": true,
-      "status": "dev",
+      "visibility": "private",
       "priority": 3,
       "theme": "artic"
     },
@@ -90,7 +90,7 @@
       "route": "/boats",
       "category": "demo",
       "requiresWebGL": true,
-      "status": "public",
+      "visibility": "public",
       "priority": 4
     },
     "island": {
@@ -100,9 +100,8 @@
       "route": "/island",
       "category": "demo",
       "requiresWebGL": true,
-      "status": "public",
-      "priority": 3,
-      "hidden": false
+      "visibility": "public",
+      "priority": 3
     },
     "paraglider-voxel": {
       "name": "Voxel pilot",
@@ -111,7 +110,7 @@
       "route": "/paraglider-voxel",
       "category": "demo",
       "requiresWebGL": true,
-      "status": "dev",
+      "visibility": "private",
       "priority": 3
     },
     "glider": {
@@ -121,7 +120,7 @@
       "route": "/glider",
       "category": "demo",
       "requiresWebGL": true,
-      "status": "dev",
+      "visibility": "private",
       "priority": 11
     },
     "pilot": {
@@ -131,7 +130,7 @@
       "route": "/pilot",
       "category": "demo",
       "requiresWebGL": true,
-      "status": "dev",
+      "visibility": "private",
       "priority": 17
     },
     "terrain": {
@@ -141,7 +140,7 @@
       "route": "/terrain",
       "category": "demo",
       "requiresWebGL": true,
-      "status": "dev",
+      "visibility": "private",
       "priority": 18
     },
     "town": {
@@ -151,7 +150,7 @@
       "route": "/town",
       "category": "demo",
       "requiresWebGL": true,
-      "status": "dev",
+      "visibility": "private",
       "priority": 19
     },
     "houses": {
@@ -161,7 +160,7 @@
       "route": "/houses",
       "category": "demo",
       "requiresWebGL": true,
-      "status": "dev",
+      "visibility": "private",
       "priority": 20
     },
     "flier-pg": {
@@ -171,7 +170,7 @@
       "route": "/flier-pg",
       "category": "demo",
       "requiresWebGL": true,
-      "status": "dev",
+      "visibility": "private",
       "priority": 21
     },
     "animals": {
@@ -181,13 +180,13 @@
       "route": "/animals",
       "category": "demo",
       "requiresWebGL": true,
-      "status": "dev",
+      "visibility": "private",
       "priority": 22
     }
   },
   "showcase": {
     "includeCriteria": {
-      "byStatus": [
+      "byVisibility": [
         "public"
       ],
       "specificApps": [

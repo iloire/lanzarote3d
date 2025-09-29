@@ -1,13 +1,13 @@
 import React from 'react';
-import { getAppsByStatus, type AppMetadata } from './config/app-registry';
+import { getAppsByVisibility, getVisibleApps, type AppMetadata } from './config/app-registry';
 import { themeManager } from './foundation/systems/ThemeManager';
 import { getAllThemes } from './foundation/themes';
 import { Theme } from './foundation/types/Theme';
 
 interface MenuProps {
   showPublic?: boolean;
-  showExperiments?: boolean;
-  showDev?: boolean;
+  showPrivate?: boolean;
+  showDev?: boolean; // Kept for backwards compatibility
 }
 
 class Menu extends React.Component<MenuProps> {
@@ -133,13 +133,12 @@ class Menu extends React.Component<MenuProps> {
   }
 
   override render() {
-    // Get apps from registry by status
-    const publicApps = getAppsByStatus('public');
-    const experimentalApps = getAppsByStatus('experimental');
-    const devApps = getAppsByStatus('dev');
+    // Get apps from registry by visibility
+    const publicApps = getAppsByVisibility('public');
+    const privateApps = getAppsByVisibility('private');
 
-    // Get tool apps separately for the Tools section (dev only)
-    const toolApps = getAppsByStatus('dev').filter(app => app.category === 'tool');
+    // Get tool apps separately for the Tools section (private only)
+    const toolApps = getAppsByVisibility('private').filter(app => app.category === 'tool');
 
     // Get selected story from URL
     const params = new URLSearchParams(window.location.search);
@@ -206,9 +205,12 @@ class Menu extends React.Component<MenuProps> {
 
     const {
       showPublic = true,
-      showExperiments: showExperiments = false, // Default to false - only show in dev
-      showDev: showDev = false, // Default to false - only show in dev
+      showPrivate: showPrivate = false, // Default to false - only show in dev
+      showDev: showDev = false, // Kept for backwards compatibility
     } = this.props;
+
+    // For backwards compatibility, if showDev is true, also show private apps
+    const shouldShowPrivate = showPrivate || showDev;
     const { isMobile, isMenuOpen, isMenuVisible } = this.state;
 
     // Mobile menu
@@ -235,10 +237,10 @@ class Menu extends React.Component<MenuProps> {
                 {renderButtons(publicApps)}
               </>
             )}
-            {showExperiments && experimentalApps.length > 0 && (
+            {shouldShowPrivate && privateApps.filter(app => app.category === 'demo').length > 0 && (
               <>
-                <h3>Experiments</h3>
-                {renderButtons(experimentalApps)}
+                <h3>Private Demos</h3>
+                {renderButtons(privateApps.filter(app => app.category === 'demo'))}
               </>
             )}
             {showDev && toolApps.length > 0 && (
@@ -247,10 +249,10 @@ class Menu extends React.Component<MenuProps> {
                 {renderButtons(toolApps)}
               </>
             )}
-            {showDev && devApps.length > 0 && (
+            {shouldShowPrivate && privateApps.filter(app => app.category === 'experience').length > 0 && (
               <>
-                <h3>Development</h3>
-                {renderButtons(devApps.filter(app => app.category !== 'tool'))}
+                <h3>Experiences</h3>
+                {renderButtons(privateApps.filter(app => app.category === 'experience'))}
               </>
             )}
           </div>
@@ -290,10 +292,10 @@ class Menu extends React.Component<MenuProps> {
                 {renderButtons(publicApps)}
               </>
             )}
-            {showExperiments && experimentalApps.length > 0 && (
+            {shouldShowPrivate && privateApps.filter(app => app.category === 'demo').length > 0 && (
               <>
-                <h2>Experiments</h2>
-                {renderButtons(experimentalApps)}
+                <h2>Private Demos</h2>
+                {renderButtons(privateApps.filter(app => app.category === 'demo'))}
               </>
             )}
             {showDev && toolApps.length > 0 && (
@@ -302,10 +304,10 @@ class Menu extends React.Component<MenuProps> {
                 {renderButtons(toolApps)}
               </>
             )}
-            {showDev && devApps.length > 0 && (
+            {shouldShowPrivate && privateApps.filter(app => app.category === 'experience').length > 0 && (
               <>
-                <h2>Development</h2>
-                {renderButtons(devApps.filter(app => app.category !== 'tool'))}
+                <h2>Experiences</h2>
+                {renderButtons(privateApps.filter(app => app.category === 'experience'))}
               </>
             )}
           </>
