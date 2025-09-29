@@ -79,7 +79,7 @@ class Igloo extends SimpleThreeComponent {
     const rows = Math.floor(this.height / blockSize);
 
     for (let row = 0; row < rows; row++) {
-      const y = -this.height / 2 + row * blockSize;
+      const y = row * blockSize; // Adjusted for ground level positioning
       const currentRadius = this.radius * (1 - (row / rows) * 0.3); // Taper toward top
       const blocksInRow = Math.floor((currentRadius / blockSize) * 2);
 
@@ -104,14 +104,14 @@ class Igloo extends SimpleThreeComponent {
     const tunnelGeo = new THREE.CylinderGeometry(3, 4, 8, 8);
     const tunnel = new THREE.Mesh(tunnelGeo, mat_entrance);
     tunnel.rotation.z = Math.PI / 2;
-    tunnel.position.set(this.radius - 2, -this.height / 3, 0);
+    tunnel.position.set(this.radius - 2, this.height / 6, 0); // Adjusted for ground level positioning
     mesh.add(tunnel);
 
     // Add entrance archway
     const archGeo = new THREE.TorusGeometry(4, 1, 8, 16, Math.PI);
     const arch = new THREE.Mesh(archGeo, mat_ice);
     arch.rotation.z = Math.PI;
-    arch.position.set(this.radius + 2, -this.height / 3 + 2, 0);
+    arch.position.set(this.radius + 2, this.height / 6 + 2, 0); // Adjusted for ground level positioning
     mesh.add(arch);
   }
 
@@ -125,7 +125,7 @@ class Igloo extends SimpleThreeComponent {
 
       const snowGeo = new THREE.SphereGeometry(1 + Math.random() * 2, 8, 6);
       const snow = new THREE.Mesh(snowGeo, mat_snow);
-      snow.position.set(x, -this.height / 2 - 0.5, z);
+      snow.position.set(x, -0.5, z); // Adjusted for ground level positioning
       snow.scale.y = 0.3; // Flatten the snow patches
       mesh.add(snow);
     }
@@ -138,7 +138,7 @@ class Igloo extends SimpleThreeComponent {
 
       const icicleGeo = new THREE.ConeGeometry(0.2 + Math.random() * 0.3, 2 + Math.random() * 3, 6);
       const icicle = new THREE.Mesh(icicleGeo, mat_ice);
-      icicle.position.set(x, this.height / 3, z);
+      icicle.position.set(x, this.height * 5/6, z); // Adjusted for ground level positioning
       mesh.add(icicle);
     }
   }
@@ -151,7 +151,7 @@ class Igloo extends SimpleThreeComponent {
     if (dome.material instanceof THREE.Material) {
       dome.material = mat_ice;
     }
-    dome.position.y = -this.height / 2;
+    dome.position.y = 0; // Position dome at ground level
     iglooGroup.add(dome);
 
     // Add architectural features
@@ -169,7 +169,7 @@ class Igloo extends SimpleThreeComponent {
     // Main dome structure
     const domeGeo = this.createGeometry();
     const dome = new THREE.Mesh(domeGeo, mat_ice);
-    dome.position.y = -this.height / 2;
+    dome.position.y = 0; // Position dome at ground level
     group.add(dome);
 
     // Add architectural features
@@ -194,7 +194,7 @@ class Igloo extends SimpleThreeComponent {
     // Add chimney hole (small opening at top)
     const holeGeo = new THREE.CylinderGeometry(1, 1.5, 2, 8);
     const hole = new THREE.Mesh(holeGeo, mat_entrance);
-    hole.position.set(0, this.height / 4, 0);
+    hole.position.set(0, this.height * 3/4, 0); // Adjusted for ground level positioning
     mesh.add(hole);
   }
 }
