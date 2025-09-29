@@ -6,7 +6,6 @@ import { rndIntBetween } from '../../../foundation/utils/math';
 import Tree from '../../../foundation/components/scenery/Tree';
 import PineTree from '../../../foundation/components/scenery/PineTree';
 import Stone from '../../../foundation/components/scenery/Stone';
-import House, { HouseType } from '../../../foundation/components/scenery/buildings/House';
 import {
   SmallSailBoat,
   FishingBoat,
@@ -30,6 +29,7 @@ import { BoatGroupCreator } from './boat-group-creator';
 import { BoatConfig, BoatGroupConfig } from './boat-group-types';
 import { CarGroupCreator } from './car-group-creator';
 import { CarConfig, CarGroupConfig } from './car-group-types';
+import { HouseGroupCreator } from './house-group-creator';
 
 /**
  * Boat type weights for realistic marine distribution
@@ -223,65 +223,124 @@ class Environment {
     return meshes;
   }
 
-  async addHouses(terrain: THREE.Mesh) {
-    const house = await this.componentRegistry.register(
-      new House({ type: HouseType.Medium }),
-      'house_medium'
-    );
-    const house2 = await this.componentRegistry.register(
-      new House({ type: HouseType.Small }),
-      'house_small'
-    );
+  /**
+   * Create a neighborhood of houses with terrain adaptation
+   */
+  async createHouseNeighborhood(
+    center: THREE.Vector3,
+    houseCount: number,
+    formation: 'street' | 'cul-de-sac' | 'grid' | 'suburban' | 'rural' | 'random',
+    terrain: THREE.Mesh,
+    lowPoly: boolean = false
+  ): Promise<THREE.Object3D[]> {
+    // Get terrain height for the center position
+    const terrainHeight = this.getTerrainHeight(center.x, center.z, terrain);
+    if (isNaN(terrainHeight)) {
+      console.warn(`Could not determine terrain height at center ${center.x}, ${center.z}`);
+      return [];
+    }
 
-    addMeshAroundArea(
-      [house2, house],
-      new THREE.Vector3(6879, 0, -545),
-      20,
-      terrain,
-      this.scene,
-      70,
-      9
-    );
-    addMeshAroundArea(
-      // famara
-      [house, house2],
-      new THREE.Vector3(6279, 0, -3155),
-      40,
-      terrain,
-      this.scene,
-      40,
-      10
-    );
-    addMeshAroundArea(
-      // noruegos
-      [house, house2],
-      new THREE.Vector3(7827, 0, -3460),
-      10,
-      terrain,
-      this.scene,
-      20,
-      11
-    );
-    addMeshAroundArea(
-      // tenesar
-      [house, house2],
-      new THREE.Vector3(-5200, 0, -480),
-      10,
-      terrain,
-      this.scene,
-      40,
-      9
-    );
-    addMeshAroundArea(
-      // teguise
-      [house],
-      new THREE.Vector3(5600, 0, 705),
-      50,
-      terrain,
-      this.scene,
-      70,
-      7
-    );
+    // Update center position with correct terrain height
+    const terrainAdaptedCenter = new THREE.Vector3(center.x, terrainHeight, center.z);
+
+    // Create house group creator
+    const houseGroupCreator = new HouseGroupCreator(this.scene, this.componentRegistry);
+    houseGroupCreator.setLowPolyMode(lowPoly);
+
+    try {
+      // Use the appropriate neighborhood creation method based on formation
+      let meshes: THREE.Object3D[] = [];
+
+      switch (formation) {
+        case 'suburban':
+          meshes = await houseGroupCreator.createSuburbanNeighborhood(terrainAdaptedCenter, 'medium');
+          break;
+        case 'rural':
+          meshes = await houseGroupCreator.createRuralNeighborhood(terrainAdaptedCenter, 'village');
+          break;
+        case 'grid':
+          meshes = await houseGroupCreator.createMixedNeighborhood(terrainAdaptedCenter, houseCount, 'grid');
+          break;
+        case 'street':
+          meshes = await houseGroupCreator.createMixedNeighborhood(terrainAdaptedCenter, houseCount, 'street');
+          break;
+        case 'cul-de-sac':
+          meshes = await houseGroupCreator.createMixedNeighborhood(terrainAdaptedCenter, houseCount, 'cul-de-sac');
+          break;
+        default:
+          meshes = await houseGroupCreator.createMixedNeighborhood(terrainAdaptedCenter, houseCount, 'random');
+          break;
+      }
+
+      // Adapt all created houses to terrain height
+      meshes.forEach((mesh: THREE.Object3D) => {
+        const meshTerrainHeight = this.getTerrainHeight(mesh.position.x, mesh.position.z, terrain);
+        if (!isNaN(meshTerrainHeight)) {
+          mesh.position.y = meshTerrainHeight;
+        }
+      });
+
+      return meshes;
+    } catch (error) {
+      console.error(`Error creating ${formation} neighborhood:`, error);
+      return [];
+    }
+  }
+
+  async addHouses(terrain: THREE.Mesh) {
+    // Create multiple neighborhoods at the same locations as before but with proper town structure
+    console.log('🏘️ Creating neighborhoods with HouseGroupCreator...');
+
+    try {
+      // Near paraglider area - suburban neighborhood
+      await this.createHouseNeighborhood(
+        new THREE.Vector3(6879, 0, -545),
+        12,
+        'suburban',
+        terrain,
+        false
+      );
+
+      // Famara - coastal village with street formation
+      await this.createHouseNeighborhood(
+        new THREE.Vector3(6279, 0, -3155),
+        15,
+        'street',
+        terrain,
+        false
+      );
+
+      // Noruegos - small rural settlement
+      await this.createHouseNeighborhood(
+        new THREE.Vector3(7827, 0, -3460),
+        8,
+        'rural',
+        terrain,
+        false
+      );
+
+      // Tenesar - scattered rural houses
+      await this.createHouseNeighborhood(
+        new THREE.Vector3(-5200, 0, -480),
+        10,
+        'rural',
+        terrain,
+        false
+      );
+
+      // Teguise - historic town center with grid layout
+      await this.createHouseNeighborhood(
+        new THREE.Vector3(5600, 0, 705),
+        18,
+        'grid',
+        terrain,
+        false
+      );
+
+      console.log('✅ All neighborhoods created successfully');
+    } catch (error) {
+      console.error('❌ Error creating neighborhoods:', error);
+    }
   }
 
   async addStones(terrain: THREE.Mesh) {
@@ -604,6 +663,22 @@ class Environment {
    */
   getComponentRegistry(): ComponentRegistry {
     return this.componentRegistry;
+  }
+
+  /**
+   * Get terrain height at specific coordinates using raycasting
+   */
+  private getTerrainHeight(x: number, z: number, terrain: THREE.Mesh): number {
+    const rayVertical = new THREE.Raycaster(
+      new THREE.Vector3(x, 10000, z), // Start from high above
+      new THREE.Vector3(0, -1, 0) // Cast downward
+    );
+    const intersects = rayVertical.intersectObject(terrain);
+    if (intersects.length > 0 && intersects[0]) {
+      return intersects[0].point.y;
+    } else {
+      return NaN;
+    }
   }
 
   /**
