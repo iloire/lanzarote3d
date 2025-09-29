@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { PatrolBoat } from '../../foundation/components/scenery';
+import { PatrolBoat, Yacht } from '../../foundation/components/scenery';
 import { StoryOptions } from '../../shared/types';
 import { WorkshopDemoBase } from '../../shared/WorkshopDemoBase';
 
@@ -21,7 +21,6 @@ class BoatWorkshopApp extends WorkshopDemoBase {
       },
       lighting: {
         sunPosition: 14,
-        
       },
     });
   }
@@ -31,8 +30,8 @@ class BoatWorkshopApp extends WorkshopDemoBase {
       this.initializeCore(options);
       const { camera, scene, renderer, controls } = options;
 
-      // Create single patrol boat
-      await this.createPatrolBoat(scene);
+      // Create single boat
+      await this.createBoat(scene);
 
       // Set up camera for boat showcase - much closer view
       camera.position.set(0, 300, 500);
@@ -50,20 +49,19 @@ class BoatWorkshopApp extends WorkshopDemoBase {
     }
   }
 
-  private async createPatrolBoat(scene: THREE.Scene): Promise<void> {
-    // Create PatrolBoat with scale and position
-    const patrolBoat = new PatrolBoat({ scale: 3.5 });
-    const boatMesh = await patrolBoat.load();
+  private async createBoat(scene: THREE.Scene): Promise<void> {
+    // Create boat with scale and position
+    const boat = new Yacht({ scale: 3.5 });
+    const boatMesh = await boat.load();
 
     // Position at center for focused view
     boatMesh.position.set(0, 50, 0);
-    boatMesh.rotation.y = Math.PI / 8;
+    boatMesh.rotation.y = Math.PI / 2; // 90 degrees to the left
 
     scene.add(boatMesh);
     this.boat = boatMesh;
 
-    console.log('Added Coast Guard Patrol Boat at center position');
-
+    console.log('Added boat at center position');
     // Note: Boat has built-in floating animation via FloatingThreeComponent base class
   }
 

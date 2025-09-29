@@ -170,6 +170,9 @@ export class Yacht extends MovableBoatComponent {
       yacht.scale.setScalar(scale);
     }
 
+    // Rotate 90 degrees to align with forward axis
+    yacht.rotateY(Math.PI / 2);
+
     return yacht;
   }
 

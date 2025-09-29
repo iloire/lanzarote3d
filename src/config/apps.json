@@ -101,7 +101,7 @@
       "category": "demo",
       "requiresWebGL": true,
       "visibility": "private",
-      "priority": 35
+      "priority": 5
     },
     "island": {
       "name": "Island",
@@ -221,7 +221,7 @@
       "category": "demo",
       "requiresWebGL": true,
       "visibility": "private",
-      "priority": 24
+      "priority": 4
     },
     "car": {
       "name": "Car",
@@ -260,7 +260,7 @@
       "route": "/helmet",
       "category": "demo",
       "requiresWebGL": true,
-      "visibility": "private",
+      "visibility": "hidden",
       "priority": 28
     },
     "paraglider": {
@@ -320,7 +320,7 @@
       "route": "/voxel",
       "category": "demo",
       "requiresWebGL": true,
-      "visibility": "private",
+      "visibility": "hidden",
       "priority": 34
     }
   },

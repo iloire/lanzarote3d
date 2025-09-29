@@ -149,6 +149,9 @@ export class SpeedBoat extends MovableBoatComponent {
       speedboat.scale.setScalar(scale);
     }
 
+    // Rotate 90 degrees to align with forward axis
+    speedboat.rotateY(Math.PI / 2);
+
     return speedboat;
   }
 
