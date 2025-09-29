@@ -79,6 +79,7 @@ export class Townhouse extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(12, 18, 15)
     );
     const mainBody = new THREE.Mesh(mainBodyGeometry, wallMaterial);
+    mainBody.position.set(0, 9, 0); // Position so bottom is at y=0 (ground level)
     mainBody.castShadow = this.options.castShadow ?? true;
     mainBody.receiveShadow = this.options.receiveShadow ?? true;
     townhouse.add(mainBody);
@@ -89,7 +90,7 @@ export class Townhouse extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(14, 3, 17)
     );
     const roof = new THREE.Mesh(roofGeometry, roofMaterial);
-    roof.position.set(0, 10.5, 0);
+    roof.position.set(0, 19.5, 0); // Adjusted for main body repositioning
     roof.castShadow = this.options.castShadow ?? true;
     townhouse.add(roof);
 
@@ -99,7 +100,7 @@ export class Townhouse extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(2, 4, 17)
     );
     const peak = new THREE.Mesh(peakGeometry, roofMaterial);
-    peak.position.set(0, 13, 0);
+    peak.position.set(0, 22, 0); // Adjusted for main body repositioning
     peak.castShadow = this.options.castShadow ?? true;
     townhouse.add(peak);
 
@@ -109,7 +110,7 @@ export class Townhouse extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(3, 7, 0.5)
     );
     const door = new THREE.Mesh(doorGeometry, doorMaterial);
-    door.position.set(0, -9, 7.75);
+    door.position.set(0, 0, 7.75); // Adjusted for main body repositioning
     townhouse.add(door);
 
     // Door frame with steps
@@ -118,7 +119,7 @@ export class Townhouse extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(4, 8, 1)
     );
     const doorFrame = new THREE.Mesh(doorFrameGeometry, trimMaterial);
-    doorFrame.position.set(0, -9, 7.5);
+    doorFrame.position.set(0, 0, 7.5); // Adjusted for main body repositioning
     townhouse.add(doorFrame);
 
     // Front steps
@@ -127,7 +128,7 @@ export class Townhouse extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(6, 1, 3)
     );
     const steps = new THREE.Mesh(stepsGeometry, trimMaterial);
-    steps.position.set(0, -12, 9);
+    steps.position.set(0, -3, 9); // Adjusted for main body repositioning
     townhouse.add(steps);
 
     // Windows for each floor - create a grid pattern
@@ -142,7 +143,7 @@ export class Townhouse extends SimpleThreeComponent {
     );
 
     // Ground floor windows (2 windows)
-    const groundFloorY = -6;
+    const groundFloorY = 3; // Adjusted for main body repositioning
     for (let i = 0; i < 2; i++) {
       const x = -2.5 + i * 5;
 
@@ -156,7 +157,7 @@ export class Townhouse extends SimpleThreeComponent {
     }
 
     // Second floor windows (3 windows)
-    const secondFloorY = 1;
+    const secondFloorY = 10; // Adjusted for main body repositioning
     for (let i = 0; i < 3; i++) {
       const x = -3 + i * 3;
 
@@ -172,11 +173,11 @@ export class Townhouse extends SimpleThreeComponent {
 
     // Side windows
     const sideWindow = new THREE.Mesh(windowGeometry, windowMaterial);
-    sideWindow.position.set(6.15, 1, 0);
+    sideWindow.position.set(6.15, 10, 0); // Adjusted for main body repositioning
     townhouse.add(sideWindow);
 
     const sideFrame = new THREE.Mesh(frameGeometry, trimMaterial);
-    sideFrame.position.set(6, 1, 0);
+    sideFrame.position.set(6, 10, 0); // Adjusted for main body repositioning
     townhouse.add(sideFrame);
 
     // Decorative cornices between floors (adjusted for 2-story)
@@ -186,11 +187,11 @@ export class Townhouse extends SimpleThreeComponent {
     );
 
     const cornice1 = new THREE.Mesh(corniceGeometry, trimMaterial);
-    cornice1.position.set(0, -2.5, 0);
+    cornice1.position.set(0, 6.5, 0); // Adjusted for main body repositioning
     townhouse.add(cornice1);
 
     const cornice2 = new THREE.Mesh(corniceGeometry, trimMaterial);
-    cornice2.position.set(0, 2, 0);
+    cornice2.position.set(0, 11, 0); // Adjusted for main body repositioning
     townhouse.add(cornice2);
 
     // Chimney (adjusted for reduced building height)
@@ -199,7 +200,7 @@ export class Townhouse extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(2, 8, 2)
     );
     const chimney = new THREE.Mesh(chimneyGeometry, wallMaterial);
-    chimney.position.set(4, 13, 6);
+    chimney.position.set(4, 22, 6); // Adjusted for main body repositioning
     chimney.castShadow = this.options.castShadow ?? true;
     townhouse.add(chimney);
 
