@@ -158,11 +158,16 @@ class WorkshopApp extends WorkshopDemoBase {
       { type: HouseType.Medium, position: [50, 0, 20], label: 'Medium House' },
       { type: HouseType.Large, position: [50, 0, 60], label: 'Large House' },
       { type: HouseType.Modern, position: [90, 0, 20], label: 'Modern House' },
+      // Low-poly version for comparison
+      { type: HouseType.Medium, position: [130, 0, 20], label: 'Medium House (Low-Poly)', lowPoly: true },
     ];
 
     for (const config of houseConfigs) {
       try {
-        const house = new House({ type: config.type });
+        const house = new House({
+          type: config.type,
+          lowPoly: (config as any).lowPoly || false
+        });
         const houseMesh = house.load(gui);
         houseMesh.position.set(
           config.position[0] ?? 0,
@@ -188,11 +193,12 @@ class WorkshopApp extends WorkshopDemoBase {
     // Load new building types - organized grid with better spacing
     const buildingConfigs = [
       { type: 'Villa', position: [-50, 0, 40], scale: 0.6, label: 'Villa' },
-      { type: 'Townhouse', position: [-50, 0, 80], scale: 0.8, label: 'Townhouse' },
+      { type: 'Villa', position: [-50, 0, 80], scale: 0.6, label: 'Villa (Low-Poly)', lowPoly: true },
+      { type: 'Townhouse', position: [-100, 0, 40], scale: 0.8, label: 'Townhouse' },
       { type: 'Barn', position: [-100, 0, 0], scale: 0.6, label: 'Barn' },
-      { type: 'DesertHouse', position: [-100, 0, 40], scale: 0.8, label: 'Desert House' },
-      { type: 'Dome', position: [-100, 0, 80], scale: 0.8, label: 'Dome' },
-      { type: 'DesertHouseWithPool', position: [-150, 0, 20], scale: 0.6, label: 'Desert House + Pool' },
+      { type: 'DesertHouse', position: [-100, 0, 80], scale: 0.8, label: 'Desert House' },
+      { type: 'Dome', position: [-150, 0, 0], scale: 0.8, label: 'Dome' },
+      { type: 'DesertHouseWithPool', position: [-150, 0, 40], scale: 0.6, label: 'Desert House + Pool' },
     ];
 
     for (const config of buildingConfigs) {
@@ -201,7 +207,10 @@ class WorkshopApp extends WorkshopDemoBase {
 
         switch (config.type) {
           case 'Villa':
-            building = new Villa({ scale: config.scale });
+            building = new Villa({
+              scale: config.scale,
+              lowPoly: (config as any).lowPoly || false
+            });
             break;
           case 'Townhouse':
             building = new Townhouse({ scale: config.scale });

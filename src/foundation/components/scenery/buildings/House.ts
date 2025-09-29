@@ -18,6 +18,7 @@ export interface HouseOptions extends SimpleComponentOptions {
   roofColor?: string;
   windowColor?: string;
   scale?: number;
+  lowPoly?: boolean;
 }
 
 /**
@@ -97,6 +98,7 @@ class House extends SimpleThreeComponent {
 
     const options = this.options as HouseOptions;
     const scale = options.scale || 1;
+    const isLowPoly = options.lowPoly || false;
 
     // Create materials with resource sharing
     const wallMaterial = resourceManager.getOrCreateMaterial(
@@ -156,15 +158,23 @@ class House extends SimpleThreeComponent {
       roof.castShadow = this.options.castShadow ?? true;
       house.add(roof);
 
-      // Add windows to each wing
-      this.addWindowsToWing(house, wing, windowMaterial, frameMaterial);
+      // Add windows to each wing (simplified for low-poly)
+      if (isLowPoly) {
+        this.addWindowsToWingLowPoly(house, wing, windowMaterial);
+      } else {
+        this.addWindowsToWing(house, wing, windowMaterial, frameMaterial);
+      }
     });
 
-    // Add entrance door on main wing
-    this.addEntrance(house, wings[0], accentMaterial, frameMaterial);
+    // Add entrance door on main wing (simplified for low-poly)
+    if (isLowPoly) {
+      this.addEntranceLowPoly(house, wings[0], accentMaterial);
+    } else {
+      this.addEntrance(house, wings[0], accentMaterial, frameMaterial);
+    }
 
-    // Add special features based on type
-    if (this.type === HouseType.Modern) {
+    // Add special features based on type (skip for low-poly except essential elements)
+    if (this.type === HouseType.Modern && !isLowPoly) {
       this.addModernFeatures(house, wings, windowMaterial, frameMaterial, accentMaterial);
     }
 
@@ -320,6 +330,66 @@ class House extends SimpleThreeComponent {
       mainWing.position[2] + mainWing.size[2]/2 - 2
     );
     house.add(pillar);
+  }
+
+  /**
+   * Add simplified windows for low-poly version - fewer windows, no frames
+   */
+  private addWindowsToWingLowPoly(
+    house: THREE.Group,
+    wing: { position: [number, number, number]; size: [number, number, number]; name: string },
+    windowMaterial: THREE.Material
+  ): void {
+    const windowSize = 4; // Smaller than regular windows
+    const windowGeometry = resourceManager.getOrCreateGeometry(
+      `house_window_lowpoly_${windowSize}`,
+      () => new THREE.BoxGeometry(windowSize, windowSize, 0.3)
+    );
+
+    // Only add windows to main wing and reduce count significantly
+    if (wing.name === 'main') {
+      // Just 2 front windows for main wing
+      for (let i = 0; i < 2; i++) {
+        const spacing = wing.size[0] / 3;
+        const x = wing.position[0] - wing.size[0]/2 + spacing * (i + 1);
+
+        const window = new THREE.Mesh(windowGeometry, windowMaterial);
+        window.position.set(x, wing.position[1] + 2, wing.position[2] + wing.size[2]/2 + 0.15);
+        house.add(window);
+      }
+    } else {
+      // Just 1 window for side wings
+      const window = new THREE.Mesh(windowGeometry, windowMaterial);
+      window.position.set(
+        wing.position[0],
+        wing.position[1] + 2,
+        wing.position[2] + wing.size[2]/2 + 0.15
+      );
+      house.add(window);
+    }
+  }
+
+  /**
+   * Add simplified entrance for low-poly version - just a door, no frame or steps
+   */
+  private addEntranceLowPoly(
+    house: THREE.Group,
+    mainWing: { position: [number, number, number]; size: [number, number, number] },
+    accentMaterial: THREE.Material
+  ): void {
+    // Simple door without frame
+    const doorGeometry = resourceManager.getOrCreateGeometry(
+      'house_door_lowpoly',
+      () => new THREE.BoxGeometry(3, 6, 0.3)
+    );
+
+    const door = new THREE.Mesh(doorGeometry, accentMaterial);
+    door.position.set(
+      mainWing.position[0],
+      mainWing.position[1] - 7,
+      mainWing.position[2] + mainWing.size[2]/2 + 0.15
+    );
+    house.add(door);
   }
 
   public override validate(): string[] {
