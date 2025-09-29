@@ -20,7 +20,7 @@ class FlyingBehaviorTestApp extends WorkshopDemoBase {
       description: 'Test autonomous flying behavior with obstacle avoidance and boundary detection',
       ground: {
         create: true,
-        size: { width: 50, height: 50 },
+        size: { width: 120, height: 120 }, // Larger ground to accommodate wider wall spacing
         color: 0x4a6741,
         opacity: 0.8
       },
@@ -94,27 +94,27 @@ class FlyingBehaviorTestApp extends WorkshopDemoBase {
       metalness: 0.1
     });
 
-    const wallGeometry = new THREE.BoxGeometry(2, 15, 2);
+    const wallGeometry = new THREE.BoxGeometry(3, 30, 3); // Taller and thicker walls
 
-    // Position walls around the flight area with more spacing
+    // Position walls with much more separation for better flight space
     const wallPositions = [
-      { x: 18, z: 18 },   // Front right
-      { x: -18, z: 18 },  // Front left
-      { x: 18, z: -18 },  // Back right
-      { x: -18, z: -18 }, // Back left
-      { x: 0, z: 25 },    // North wall
-      { x: 0, z: -25 },   // South wall
-      { x: 25, z: 0 },    // East wall
-      { x: -25, z: 0 }    // West wall
+      { x: 40, z: 40 },   // Front right
+      { x: -40, z: 40 },  // Front left
+      { x: 40, z: -40 },  // Back right
+      { x: -40, z: -40 }, // Back left
+      { x: 0, z: 50 },    // North wall
+      { x: 0, z: -50 },   // South wall
+      { x: 50, z: 0 },    // East wall
+      { x: -50, z: 0 }    // West wall
     ];
 
     wallPositions.forEach((pos, index) => {
       const wall = new THREE.Mesh(wallGeometry, wallMaterial);
-      wall.position.set(pos.x, 7.5, pos.z); // Half height above ground
+      wall.position.set(pos.x, 15, pos.z); // Half height above ground (30/2 = 15)
       wall.name = `Wall_${index}`;
       scene.add(wall);
       this.walls.push(wall);
-      console.log(`🧱 Wall ${index} placed at (${pos.x}, 7.5, ${pos.z})`);
+      console.log(`🧱 Wall ${index} placed at (${pos.x}, 15, ${pos.z})`);
     });
 
     // Get reference to ground for terrain detection
@@ -147,13 +147,13 @@ class FlyingBehaviorTestApp extends WorkshopDemoBase {
         // Create and attach flying behavior
         this.flyingBehavior = new FlyingBehavior({
           pattern: FlightPattern.FREE_ROAM,
-          speed: 6.0, // Increased speed for better testing
+          speed: 16.0, // Increased speed for better testing
           turnSpeed: 3.0, // Increased turn speed for more responsive avoidance
-          flightRadius: 22, // Adjusted for wider wall spacing
-          returnDistance: 30, // Adjusted for outer wall positions
+          flightRadius: 45, // Adjusted for much wider wall spacing (50 units to walls)
+          returnDistance: 55, // Adjusted for outer wall positions (beyond 50 unit walls)
           minHeight: 5,
-          maxHeight: 20,
-          obstacleAvoidanceDistance: 10, // Increased for better wall avoidance
+          maxHeight: 25, // Increased max height since walls are now 30 units tall
+          obstacleAvoidanceDistance: 15, // Increased avoidance distance for taller walls
           centerPoint: new THREE.Vector3(0, 0, 0),
           autoStart: true,
           faceDirection: true,
@@ -188,9 +188,9 @@ class FlyingBehaviorTestApp extends WorkshopDemoBase {
 
     if (this.flyingBehavior) {
       const params = {
-        speed: 6.0,
+        speed: 16.0,
         turnSpeed: 3.0,
-        flightRadius: 22,
+        flightRadius: 45,
         pattern: 'FREE_ROAM',
         start: () => this.flyingBehavior?.start(),
         stop: () => this.flyingBehavior?.stop(),
@@ -200,7 +200,7 @@ class FlyingBehaviorTestApp extends WorkshopDemoBase {
         }
       };
 
-      behaviorFolder.add(params, 'speed', 0.5, 8.0, 0.1).onChange((value: number) => {
+      behaviorFolder.add(params, 'speed', 0.5, 30.0, 0.1).onChange((value: number) => {
         if (this.flyingBehavior) {
           (this.flyingBehavior as any).speed = value;
         }
@@ -212,7 +212,7 @@ class FlyingBehaviorTestApp extends WorkshopDemoBase {
         }
       });
 
-      behaviorFolder.add(params, 'flightRadius', 5, 30, 1).onChange((value: number) => {
+      behaviorFolder.add(params, 'flightRadius', 10, 60, 1).onChange((value: number) => {
         if (this.flyingBehavior) {
           (this.flyingBehavior as any).flightRadius = value;
         }

@@ -19,7 +19,8 @@ class LegacyGliderWorkshopApp extends WorkshopDemoBase {
       },
       helpers: {
         axes: true,
-        grid: true
+        grid: true,
+        scale: 5000 // Large scale for distant camera position (12000+ units away)
       }
     });
   }
@@ -27,6 +28,10 @@ class LegacyGliderWorkshopApp extends WorkshopDemoBase {
   override async load(options: StoryOptions): Promise<void> {
     try {
       this.initializeCore(options);
+
+      // Set up clean workshop environment with specified helpers
+      this.setupCleanEnvironment(options);
+
       const { camera, scene, renderer, gui, controls } = options;
 
       const gliderOptions = {

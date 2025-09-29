@@ -312,15 +312,22 @@ export class FlyingBehavior {
   }
 
   /**
-   * Orient object to face movement direction
+   * Orient object to face movement direction with horizontal stability
    */
   private orientToDirection(direction: THREE.Vector3): void {
     if (!this.mesh || direction.length() === 0) return;
 
-    // Create target position for lookAt
-    const targetPosition = this.mesh.position.clone().add(direction);
+    // Create horizontal-only direction (ignore Y component for stability)
+    const horizontalDirection = direction.clone();
+    horizontalDirection.y = 0; // Remove vertical component
 
-    // Create a temporary object to get the lookAt rotation
+    if (horizontalDirection.length() === 0) return; // Avoid pure vertical movement
+    horizontalDirection.normalize();
+
+    // Create target position for lookAt using only horizontal direction
+    const targetPosition = this.mesh.position.clone().add(horizontalDirection);
+
+    // Create a temporary object to get the lookAt rotation (horizontal only)
     const tempObject = new THREE.Object3D();
     tempObject.position.copy(this.mesh.position);
     tempObject.lookAt(targetPosition);
@@ -351,8 +358,14 @@ export class FlyingBehavior {
     const correctionQuaternion = new THREE.Quaternion().setFromEuler(correction);
     const finalQuaternion = tempObject.quaternion.clone().multiply(correctionQuaternion);
 
-    // Smooth rotation
-    this.mesh.quaternion.slerp(finalQuaternion, this.turnSpeed * 0.1);
+    // Extract only the Y-axis rotation to maintain horizontal stability
+    const euler = new THREE.Euler().setFromQuaternion(finalQuaternion);
+    euler.x = 0; // Remove pitch rotation
+    euler.z = 0; // Remove roll rotation
+    const horizontalQuaternion = new THREE.Quaternion().setFromEuler(euler);
+
+    // Smooth rotation (horizontal only)
+    this.mesh.quaternion.slerp(horizontalQuaternion, this.turnSpeed * 0.1);
   }
 
   /**

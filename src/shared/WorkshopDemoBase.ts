@@ -18,6 +18,7 @@ export interface WorkshopDemoConfig extends Omit<AppConfig, 'scene' | 'requiredC
     axes?: boolean; // Show axis helper with directional labels
     grid?: boolean; // Show grid helper
     lighting?: boolean; // Show lighting helpers (sun position, etc)
+    scale?: number; // Scale factor for helpers (default: 100)
   } | boolean; // Can be boolean for simple enable/disable or object for granular control
 }
 
@@ -91,11 +92,12 @@ export abstract class WorkshopDemoBase extends AppBase {
     const helpersConfig = config?.helpers;
     if (helpersConfig !== false) {
       if (typeof helpersConfig === 'boolean' || helpersConfig === undefined) {
-        // Default behavior: show all helpers
-        Helpers.createHelpers(scene);
+        // Default behavior: show all helpers with default scale
+        Helpers.createHelpers(scene, 100);
       } else {
-        // Granular control: create specific helpers
-        Helpers.createSelectiveHelpers(scene, helpersConfig);
+        // Granular control: create specific helpers with custom scale
+        const scale = helpersConfig.scale || 100; // Default scale factor
+        Helpers.createSelectiveHelpers(scene, helpersConfig, scale);
       }
     }
 

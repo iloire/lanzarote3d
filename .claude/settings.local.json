@@ -70,7 +70,12 @@
       "Bash(yarn generate-showcase-config:*)",
       "Bash(yarn build)",
       "Bash(pkill:*)",
-      "Bash(timeout 30s npm run build)"
+      "Bash(timeout 30s npm run build)",
+      "Bash(for app in autonomous-driving boat car clouds editor head helmet paraglider satellite-terrain terrain-gps tile-mapper truck visualizer voxel)",
+      "Bash(do echo -n \"$app: \")",
+      "Bash(ls:*)",
+      "Bash(do echo -n \"$app: \" if ls src/applications/$app/index.*)",
+      "Bash(then echo \"has index file\" else echo \"no index file\" fi done)"
     ],
     "deny": [],
     "ask": []

@@ -28,20 +28,23 @@ const Helpers = {
     scene.add(cube);
   },
 
-  createHelpers: function (scene: THREE.Scene) {
-    const grid = this.getGrid(new THREE.Vector3(0, 0, 0));
+  createHelpers: function (scene: THREE.Scene, scale: number = 100) {
+    const grid = this.getGrid(new THREE.Vector3(0, 0, 0), scale);
     scene.add(grid);
-    scene.add(this.getAxisHelperWithLabels(100));
+    scene.add(this.getAxisHelperWithLabels(scale));
   },
 
-  createSelectiveHelpers: function (scene: THREE.Scene, config: { axes?: boolean; grid?: boolean; lighting?: boolean }) {
+  createSelectiveHelpers: function (scene: THREE.Scene, config: { axes?: boolean; grid?: boolean; lighting?: boolean; scale?: number }, scale: number = 100) {
+    // Use the scale from config if provided, otherwise use the passed scale parameter
+    const actualScale = config.scale || scale;
+
     if (config.grid !== false) {
-      const grid = this.getGrid(new THREE.Vector3(0, 0, 0));
+      const grid = this.getGrid(new THREE.Vector3(0, 0, 0), actualScale);
       scene.add(grid);
     }
 
     if (config.axes !== false) {
-      scene.add(this.getAxisHelperWithLabels(100));
+      scene.add(this.getAxisHelperWithLabels(actualScale));
     }
 
     // Lighting helpers can be added here in the future
@@ -179,15 +182,18 @@ const Helpers = {
     return group;
   },
 
-  getGrid: (pos: THREE.Vector3) => {
+  getGrid: (pos: THREE.Vector3, scale: number = 100) => {
     const grid = new THREE.Object3D();
-    const gridH = new THREE.GridHelper(100, 10, 0x0000ff, 0x808080);
+    const gridSize = scale;
+    const divisions = 10;
+
+    const gridH = new THREE.GridHelper(gridSize, divisions, 0x0000ff, 0x808080);
     pos.y = 0;
     pos.x = 0;
     gridH.rotation.x = 0;
     grid.add(gridH);
 
-    const gridV = new THREE.GridHelper(100, 10, 0x0000ff, 0x808080);
+    const gridV = new THREE.GridHelper(gridSize, divisions, 0x0000ff, 0x808080);
     pos.y = 0;
     pos.x = 0;
     gridV.rotation.x = -Math.PI / 2;

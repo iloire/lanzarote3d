@@ -202,6 +202,126 @@
       "requiresWebGL": true,
       "visibility": "private",
       "priority": 22
+    },
+    "autonomous-driving": {
+      "name": "Autonomous Driving",
+      "description": "Autonomous driving simulation demo",
+      "entry": "./applications/autonomous-driving/index.tsx",
+      "route": "/autonomous-driving",
+      "category": "demo",
+      "requiresWebGL": true,
+      "visibility": "private",
+      "priority": 23
+    },
+    "boat": {
+      "name": "Boat",
+      "description": "Boat component demo",
+      "entry": "./applications/boat/index.tsx",
+      "route": "/boat",
+      "category": "demo",
+      "requiresWebGL": true,
+      "visibility": "private",
+      "priority": 24
+    },
+    "car": {
+      "name": "Car",
+      "description": "Car component demo",
+      "entry": "./applications/car/index.tsx",
+      "route": "/car",
+      "category": "demo",
+      "requiresWebGL": true,
+      "visibility": "private",
+      "priority": 25
+    },
+    "clouds": {
+      "name": "Clouds",
+      "description": "Cloud system demo",
+      "entry": "./applications/clouds/index.tsx",
+      "route": "/clouds",
+      "category": "demo",
+      "requiresWebGL": true,
+      "visibility": "private",
+      "priority": 26
+    },
+    "head": {
+      "name": "Head",
+      "description": "Head component demo",
+      "entry": "./applications/head/index.tsx",
+      "route": "/head",
+      "category": "demo",
+      "requiresWebGL": true,
+      "visibility": "private",
+      "priority": 27
+    },
+    "helmet": {
+      "name": "Helmet",
+      "description": "Helmet component demo",
+      "entry": "./applications/helmet/index.tsx",
+      "route": "/helmet",
+      "category": "demo",
+      "requiresWebGL": true,
+      "visibility": "private",
+      "priority": 28
+    },
+    "paraglider": {
+      "name": "Paraglider",
+      "description": "Paraglider component demo",
+      "entry": "./applications/paraglider/index.tsx",
+      "route": "/paraglider",
+      "category": "demo",
+      "requiresWebGL": true,
+      "visibility": "private",
+      "priority": 29
+    },
+    "satellite-terrain": {
+      "name": "Satellite Terrain",
+      "description": "Satellite terrain generation demo",
+      "entry": "./applications/satellite-terrain/index.tsx",
+      "route": "/satellite-terrain",
+      "category": "demo",
+      "requiresWebGL": true,
+      "visibility": "private",
+      "priority": 30
+    },
+    "terrain-gps": {
+      "name": "Terrain GPS",
+      "description": "GPS-based terrain generation demo",
+      "entry": "./applications/terrain-gps/index.tsx",
+      "route": "/terrain-gps",
+      "category": "demo",
+      "requiresWebGL": true,
+      "visibility": "private",
+      "priority": 31
+    },
+    "tile-mapper": {
+      "name": "Tile Mapper",
+      "description": "Tile mapping system demo",
+      "entry": "./applications/tile-mapper/index.tsx",
+      "route": "/tile-mapper",
+      "category": "demo",
+      "requiresWebGL": true,
+      "visibility": "private",
+      "priority": 32
+    },
+    "truck": {
+      "name": "Truck",
+      "description": "Truck component demo",
+      "entry": "./applications/truck/index.tsx",
+      "route": "/truck",
+      "category": "demo",
+      "requiresWebGL": true,
+      "visibility": "private",
+      "priority": 33
+    },
+    "voxel": {
+      "name": "Voxel",
+      "description": "Voxel system demo",
+      "entry": "./applications/voxel/index.tsx",
+      "route": "/voxel",
+      "category": "demo",
+      "requiresWebGL": true,
+      "visibility": "private",
+      "priority": 34
     }
   },
   "showcase": {

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { StoryOptions } from '../../shared/types';
 import { TerrainBase } from '../../shared/TerrainBase';
-import { flyzoneAPI } from '../api/flyzone-api';
+import { flyzoneAPI } from '../../foundation/services/flyzone-api';
 import {
   FlyzoneLocation,
   TakeoffLocation,
