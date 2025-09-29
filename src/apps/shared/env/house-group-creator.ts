@@ -434,6 +434,39 @@ export class HouseGroupCreator {
   }
 
   /**
+   * Calculate dynamic spacing based on house types and sizes in the neighborhood
+   */
+  private calculateDynamicSpacing(houses: HouseConfig[], baseSpacing: number): number {
+    // Calculate average land plot size for houses in this neighborhood
+    const totalLandSize = houses.reduce((sum, house) => {
+      const scale = house.scale || 1;
+
+      // Base sizes for different house types (matching the land plot calculations)
+      const baseSizes: Record<HouseConfig['type'], number> = {
+        'House': 60,
+        'Villa': 100,
+        'Townhouse': 50,
+        'Barn': 80,
+        'DesertHouse': 70,
+        'DesertHouseWithPool': 90,
+      };
+
+      const baseSize = baseSizes[house.type] || 60;
+      return sum + (baseSize * scale);
+    }, 0);
+
+    const averageLandSize = totalLandSize / houses.length;
+
+    // Adjust spacing based on average land size
+    // Minimum spacing should be at least 1.5x the average land size
+    const dynamicSpacing = Math.max(baseSpacing, averageLandSize * 1.5);
+
+    console.log(`🏘️ Dynamic spacing for ${houses.length} houses: base=${baseSpacing}, avgLandSize=${averageLandSize.toFixed(1)}, final=${dynamicSpacing.toFixed(1)}`);
+
+    return dynamicSpacing;
+  }
+
+  /**
    * Create a suburban neighborhood with mixed housing
    */
   async createSuburbanNeighborhood(
@@ -442,13 +475,14 @@ export class HouseGroupCreator {
     variation: NeighborhoodVariation = DEFAULT_VARIATION
   ): Promise<THREE.Object3D[]> {
     const houses = generateSuburbanNeighborhood(size, variation);
-    const spacing = size === 'small' ? 80 : size === 'medium' ? 90 : 100;
+    const baseSpacing = size === 'small' ? 80 : size === 'medium' ? 90 : 100;
+    const dynamicSpacing = this.calculateDynamicSpacing(houses, baseSpacing);
 
     return this.createNeighborhood(houses, {
       center,
       formation: 'suburban',
-      spacing,
-      neighborhoodSize: size === 'small' ? 100 : size === 'medium' ? 120 : 150,
+      spacing: dynamicSpacing,
+      neighborhoodSize: size === 'small' ? 120 : size === 'medium' ? 150 : 180,
       randomVariation: 0.3,
     }, variation);
   }
@@ -462,13 +496,14 @@ export class HouseGroupCreator {
     variation: NeighborhoodVariation = DEFAULT_VARIATION
   ): Promise<THREE.Object3D[]> {
     const houses = generateUrbanNeighborhood(density, variation);
-    const spacing = density === 'compact' ? 60 : density === 'dense' ? 50 : 45;
+    const baseSpacing = density === 'compact' ? 60 : density === 'dense' ? 50 : 45;
+    const dynamicSpacing = this.calculateDynamicSpacing(houses, baseSpacing);
 
     return this.createNeighborhood(houses, {
       center,
       formation: 'grid',
-      spacing,
-      neighborhoodSize: density === 'compact' ? 120 : density === 'dense' ? 140 : 160,
+      spacing: dynamicSpacing,
+      neighborhoodSize: density === 'compact' ? 140 : density === 'dense' ? 160 : 180,
       randomVariation: 0.15,
     }, variation);
   }

@@ -334,7 +334,7 @@ function generateLandPlot(houseType: HouseConfig['type'], scale: number = 1): { 
     'DesertHouseWithPool': 100,
   };
 
-  const landColors = ['#7CFC00', '#90EE90', '#98FB98', '#ADFF2F', '#9ACD32'];
+  const landColors = ['#D2B48C', '#DEB887', '#F5DEB3', '#D2691E', '#CD853F']; // Desert sand shades
 
   // Add some random variation to land plot size
   const widthVariation = 1 + (Math.random() - 0.5) * 0.4; // ±20% variation

@@ -61,8 +61,8 @@ class TownWorkshop extends WorkshopDemoBase {
       description: 'Neighborhood generation showcase displaying various residential formations',
       ground: {
         create: true,
-        size: { width: 2000, height: 1500 },
-        color: 0x7CFC00, // Lawn green for town ground
+        size: { width: 2400, height: 2000 },
+        color: 0xD2B48C, // Sandy brown for desert town ground
         opacity: 0.4,
       },
       lighting: {
@@ -287,7 +287,7 @@ class TownWorkshop extends WorkshopDemoBase {
       <div style="background: rgba(0,0,0,0.9); color: white; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 12px; line-height: 1.4; min-width: 240px;">
         <div><strong>Mode:</strong> ${this.isLowPoly ? 'Performance' : 'Quality'}</div>
         ${polygonInfo}
-        <div><strong>Neighborhoods:</strong> ${this.neighborhoodMeshes.length > 0 ? '9' : 'Loading...'}</div>
+        <div><strong>Neighborhoods:</strong> ${this.neighborhoodMeshes.length > 0 ? '17' : 'Loading...'}</div>
         <div style="margin-top: 6px; font-size: 10px; color: #aaa;">Click button to toggle modes</div>
       </div>
     `;
@@ -362,15 +362,27 @@ class TownWorkshop extends WorkshopDemoBase {
             }
           }
 
-          // Categorize by mesh/object name
+          // Categorize by mesh/object name - debug what names we're actually seeing
           const name = child.name || child.parent?.name || '';
-          if (name.includes('House') || name.includes('Villa') || name.includes('Desert') || name.includes('Barn') || name.includes('Dome') || name.includes('Townhouse')) {
+          const parentName = child.parent?.name || '';
+          const grandParentName = child.parent?.parent?.name || '';
+
+          // Debug: log some names to see what we're working with
+          if (Math.random() < 0.01) { // Log 1% of objects to avoid spam
+            console.log(`🔍 Object names: child="${name}", parent="${parentName}", grandParent="${grandParentName}"`);
+          }
+
+          if (name.includes('House') || name.includes('Villa') || name.includes('Desert') || name.includes('Barn') || name.includes('Townhouse') ||
+              parentName.includes('House') || parentName.includes('Villa') || parentName.includes('Desert') || parentName.includes('Barn') || parentName.includes('Townhouse') ||
+              grandParentName.includes('House') || grandParentName.includes('Villa') || grandParentName.includes('Desert') || grandParentName.includes('Barn') || grandParentName.includes('Townhouse')) {
             polygonCounts.houses += childPolygons;
-          } else if (name.includes('Cactus') || name.includes('Saguaro') || name.includes('Barrel') || name.includes('Prickly') || name.includes('Organ')) {
+          } else if (name.includes('Cactus') || name.includes('Saguaro') || name.includes('Barrel') || name.includes('Prickly') || name.includes('Organ') ||
+                     parentName.includes('Cactus') || parentName.includes('Saguaro') || parentName.includes('Barrel') || parentName.includes('Prickly') || parentName.includes('Organ') ||
+                     grandParentName.includes('Cactus') || grandParentName.includes('Saguaro') || grandParentName.includes('Barrel') || grandParentName.includes('Prickly') || grandParentName.includes('Organ')) {
             polygonCounts.cacti += childPolygons;
-          } else if (name.includes('Stone')) {
+          } else if (name.includes('Stone') || parentName.includes('Stone') || grandParentName.includes('Stone')) {
             polygonCounts.stones += childPolygons;
-          } else if (name.includes('Pool')) {
+          } else if (name.includes('Pool') || parentName.includes('Pool') || grandParentName.includes('Pool')) {
             polygonCounts.pools += childPolygons;
           } else {
             polygonCounts.other += childPolygons;
@@ -540,8 +552,8 @@ class TownWorkshop extends WorkshopDemoBase {
   }
 
   private async loadNeighborhoods(scene: THREE.Scene, gui: any): Promise<void> {
-    // Define neighborhood configurations - 9 neighborhoods showcasing different formations
-    // Positioned away from roads (roads are at x=-400,0,400 and z=0)
+    // Define neighborhood configurations - 17 neighborhoods showcasing different formations
+    // Positioned strategically across the expanded 2400x2000 ground area
     const neighborhoods: Array<{
       name: string;
       center: THREE.Vector3;
@@ -616,6 +628,66 @@ class TownWorkshop extends WorkshopDemoBase {
         type: 'urban',
         density: 'downtown',
         variation: { ...DEFAULT_VARIATION, poolChance: 0.05 },
+      },
+      // Phase 1: New neighborhood types
+      {
+        name: 'Tech Campus',
+        center: new THREE.Vector3(0, 0, 700),
+        type: 'grid',
+        houses: 12,
+        variation: { ...DEFAULT_VARIATION, poolChance: 0.2 },
+      },
+      {
+        name: 'Historic District',
+        center: new THREE.Vector3(-300, 0, -700),
+        type: 'street',
+        houses: 10,
+        variation: { ...DEFAULT_VARIATION, poolChance: 0.6 },
+      },
+      {
+        name: 'Waterfront Villas',
+        center: new THREE.Vector3(400, 0, 700),
+        type: 'luxury',
+        houses: 8,
+        variation: { ...DEFAULT_VARIATION, poolChance: 0.9 },
+      },
+      {
+        name: 'Student Housing',
+        center: new THREE.Vector3(0, 0, -700),
+        type: 'urban',
+        density: 'dense',
+        variation: { ...DEFAULT_VARIATION, poolChance: 0.1 },
+      },
+      // Phase 2: Strategic gap fillers
+      {
+        name: 'Mountain View Estates',
+        center: new THREE.Vector3(-900, 0, -300),
+        type: 'rural',
+        style: 'scattered',
+        houses: 6,
+        variation: { ...DEFAULT_VARIATION, poolChance: 0.7 },
+      },
+      {
+        name: 'Commercial District',
+        center: new THREE.Vector3(900, 0, -200),
+        type: 'grid',
+        houses: 15,
+        variation: { ...DEFAULT_VARIATION, poolChance: 0.15 },
+      },
+      {
+        name: 'Eco Village',
+        center: new THREE.Vector3(-400, 0, 800),
+        type: 'rural',
+        style: 'village',
+        houses: 8,
+        variation: { ...DEFAULT_VARIATION, poolChance: 0.3 },
+      },
+      {
+        name: 'Senior Community',
+        center: new THREE.Vector3(300, 0, 500),
+        type: 'suburban',
+        size: 'small',
+        variation: { ...DEFAULT_VARIATION, poolChance: 0.4 },
       },
     ];
 
@@ -735,7 +807,6 @@ class TownWorkshop extends WorkshopDemoBase {
       'Townhouse': 50,
       'Barn': 80,
       'DesertHouse': 70,
-      'Dome': 55,
       'DesertHouseWithPool': 90,
     };
 
@@ -745,7 +816,6 @@ class TownWorkshop extends WorkshopDemoBase {
       'Townhouse': 70,
       'Barn': 100,
       'DesertHouse': 80,
-      'Dome': 55,
       'DesertHouseWithPool': 100,
     };
 
@@ -773,7 +843,6 @@ class TownWorkshop extends WorkshopDemoBase {
       { type: 'Townhouse' as const, weight: 0.15 },
       { type: 'Barn' as const, weight: 0.1 },
       { type: 'DesertHouse' as const, weight: 0.1 },
-      { type: 'Dome' as const, weight: 0.05 },
       { type: 'DesertHouseWithPool' as const, weight: 0.05 },
     ];
 
