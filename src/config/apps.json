@@ -1,16 +1,5 @@
 {
   "apps": {
-    "game": {
-      "name": "Flight Simulator",
-      "description": "Interactive paragliding flight simulation",
-      "entry": "./applications/game/index.tsx",
-      "route": "/game",
-      "category": "experience",
-      "htmlTemplate": "./applications/game/index.html",
-      "requiresWebGL": true,
-      "visibility": "private",
-      "priority": 7
-    },
     "flyzones": {
       "name": "Flyzones",
       "description": "Explore flyzing locations in 3D",
@@ -341,7 +330,6 @@
         "glider",
         "hangglider",
         "pilot",
-        "game",
         "flyzones",
         "flier-pg",
         "animals"
@@ -352,7 +340,6 @@
       "famara": 2,
       "famara2": 3,
       "boats": 4,
-      "game": 5,
       "flyzones": 6,
       "workshop-demo": 7,
       "location-editor": 8,

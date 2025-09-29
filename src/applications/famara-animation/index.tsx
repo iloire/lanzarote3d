@@ -45,7 +45,7 @@ const SHOW_HANGGLIDER = true; // Set to false to hide hangglider
 
 // Hangglider configuration
 const hanggliderConfig = {
-  position: new THREE.Vector3(6800, 950, -500), // Slightly offset from paraglider
+  position: new THREE.Vector3(4800, 950, -500), // Slightly offset from paraglider
   scale: 1.0,
   path: [
     new THREE.Vector3(6800, 950, -500),
@@ -226,15 +226,15 @@ class AnimationApp extends TerrainBase {
       const centerPoint = hanggliderConfig.position.clone();
 
       this.hanggliderFlyingBehavior = new FlyingBehavior({
-        pattern: FlightPattern.FREE_ROAM,
-        speed: 1.0, // Increased speed for better testing
-        turnSpeed: 7.0, // Increased turn speed for more responsive avoidance
-        flightRadius: 45, // Adjusted for much wider wall spacing (50 units to walls)
-        returnDistance: 55, // Adjusted for outer wall positions (beyond 50 unit walls)
-        minHeight: 5,
-        maxHeight: 2225,
-        obstacleAvoidanceDistance: 15, // Increased avoidance distance for taller walls
-        centerPoint: new THREE.Vector3(0, 0, 0),
+        pattern: FlightPattern.FIGURE_EIGHT,
+        speed: 3.0,
+        turnSpeed: 7.0,
+        flightRadius: 145,
+        returnDistance: 155, // Adjusted for outer wall positions (beyond 50 unit walls)
+        minHeight: 900,
+        maxHeight: 1225,
+        obstacleAvoidanceDistance: 150, // Increased avoidance distance for taller walls
+        centerPoint: hanggliderConfig.position,
         autoStart: true,
         faceDirection: true,
         forwardAxis: 'x' // Updated to match hangglider's new orientation after 270° rotation
