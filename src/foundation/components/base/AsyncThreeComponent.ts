@@ -14,13 +14,13 @@ export interface ResourceDescriptor {
   readonly id: string;
   readonly type: ResourceType;
   readonly url: string;
-  readonly options?: any;
+  readonly options?: Record<string, unknown>;
 }
 
 /**
  * Loaded resource with its data
  */
-export interface LoadedResource<T = any> {
+export interface LoadedResource<T = unknown> {
   readonly id: string;
   readonly type: ResourceType;
   readonly data: T;

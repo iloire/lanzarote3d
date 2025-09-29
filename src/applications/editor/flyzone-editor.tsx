@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import * as dat from 'dat.gui';
 import { StoryOptions } from '../../shared/types';
 import { TerrainBase } from '../../shared/TerrainBase';
 import { flyzoneAPI } from '../../foundation/services/flyzone-api';
@@ -9,6 +11,7 @@ import {
   FlightPhase,
   WindCondition,
   GPS,
+  FlyZone,
 } from '../../types/flyzone-types';
 import { FlyzoneEditorUI } from './flyzone-editor-ui';
 import { FlyzoneMarkers } from './flyzone-markers';
@@ -31,10 +34,48 @@ export interface EditorMode {
   subtype?: 'ridge' | 'thermal' | 'approach';
 }
 
+// Union type for selected items in editor - allows for extended properties
+type SelectedItem = (TakeoffLocation | LandingZone | FlyzoneLocation | THREE.Object3D) & {
+  data?: unknown;
+  type?: string;
+  isDirty?: boolean;
+} | null;
+
+interface SerializedVector3 {
+  x: number;
+  y: number;
+  z: number;
+}
+
+interface ImportLocationData {
+  position?: SerializedVector3 | THREE.Vector3;
+  takeoffs?: Array<{
+    position?: SerializedVector3 | THREE.Vector3;
+    [key: string]: unknown;
+  }>;
+  landingZones?: Array<{
+    position?: SerializedVector3 | THREE.Vector3;
+    [key: string]: unknown;
+  }>;
+  flyzone?: {
+    phases?: Record<string, {
+      [key: string]: unknown;
+    }>;
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+}
+
+interface ImportData {
+  allLocations: unknown[]; // Keep flexible since structure varies
+  metadata?: unknown;
+  [key: string]: unknown;
+}
+
 export interface EditorState {
   mode: EditorMode;
   currentLocation: FlyzoneLocation | null;
-  selectedItem: any | null;
+  selectedItem: SelectedItem;
   isEditing: boolean;
   isDirty: boolean;
   locations: FlyzoneLocation[];
@@ -50,7 +91,7 @@ class FlyzoneEditorApp extends TerrainBase {
   private isMouseDown = false;
   private terrainMesh: THREE.Mesh | undefined;
   private camera: THREE.Camera | undefined;
-  private controls: any;
+  private controls: OrbitControls | undefined;
   private eventHandlers: {
     onMouseMove?: (event: MouseEvent) => void;
     onMouseDown?: (event: MouseEvent) => void;
@@ -375,7 +416,7 @@ class FlyzoneEditorApp extends TerrainBase {
     const phaseType = this.editorState.mode.subtype || 'ridge';
     const phase: FlightPhase = {
       id: `phase_${Date.now()}`,
-      type: phaseType as any,
+      type: phaseType as FlightPhase['type'],
       position: position.clone(),
       gps,
       dimensions: { width: 500, height: 200, length: 800 },
@@ -416,7 +457,7 @@ class FlyzoneEditorApp extends TerrainBase {
     gps: GPS,
     takeoffs: TakeoffLocation[] = [],
     landingZones: LandingZone[] = [],
-    flyzone?: any
+    flyzone?: FlyZone
   ): void {
     if (!this.editorState) return;
 
@@ -540,7 +581,7 @@ class FlyzoneEditorApp extends TerrainBase {
     this.editorUI?.refresh();
   }
 
-  private deleteSelectedItem(item: any): void {
+  private deleteSelectedItem(item: SelectedItem): void {
     if (!item || !this.editorState?.currentLocation || !this.markers) return;
 
     const location = this.editorState.currentLocation;
@@ -586,7 +627,7 @@ class FlyzoneEditorApp extends TerrainBase {
     }
   }
 
-  private saveSelectedItemChanges(item: any): void {
+  private saveSelectedItemChanges(item: SelectedItem): void {
     if (!item || !this.editorState?.currentLocation) return;
 
     try {
@@ -627,7 +668,7 @@ class FlyzoneEditorApp extends TerrainBase {
     }
   }
 
-  private focusOnSelectedItem(item: any): void {
+  private focusOnSelectedItem(item: SelectedItem): void {
     if (!item?.data || !this.camera || !this.controls) return;
 
     try {
@@ -752,7 +793,7 @@ class FlyzoneEditorApp extends TerrainBase {
     }
   }
 
-  private setupGUI(gui: any): void {
+  private setupGUI(gui: dat.GUI): void {
     if (!gui || !this.editorState) return;
 
     const editorFolder = gui.addFolder('Flyzone Editor');
@@ -765,7 +806,7 @@ class FlyzoneEditorApp extends TerrainBase {
       .name('Editor Mode')
       .onChange((value: string) => {
         if (this.editorState) {
-          this.editorState.mode.type = value as any;
+          this.editorState.mode.type = value as EditorMode['type'];
           this.updateCursor();
         }
       });
@@ -777,7 +818,7 @@ class FlyzoneEditorApp extends TerrainBase {
       .name('Phase Type')
       .onChange((value: string) => {
         if (this.editorState) {
-          this.editorState.mode.subtype = value as any;
+          this.editorState.mode.subtype = value as EditorMode['subtype'];
         }
       });
 
@@ -870,7 +911,7 @@ class FlyzoneEditorApp extends TerrainBase {
     window.addEventListener('keydown', this.eventHandlers.onKeyDown);
   }
 
-  private onUIAction(action: string, data?: any): void {
+  private onUIAction(action: string, data?: unknown): void {
     // Handle UI actions from the editor interface
     switch (action) {
       case 'modeChange':
@@ -1039,15 +1080,17 @@ class FlyzoneEditorApp extends TerrainBase {
     document.body.removeChild(fileInput);
   }
 
-  private validateImportData(data: any): boolean {
+  private validateImportData(data: unknown): data is ImportData {
     // Basic structure validation
     if (!data || typeof data !== 'object') return false;
 
+    const dataObj = data as Record<string, unknown>;
+
     // Check for required top-level properties
     if (
-      !data.metadata ||
-      !data.hasOwnProperty('currentLocation') ||
-      !Array.isArray(data.allLocations)
+      !dataObj.metadata ||
+      !dataObj.hasOwnProperty('currentLocation') ||
+      !Array.isArray(dataObj.allLocations)
     ) {
       return false;
     }
@@ -1068,12 +1111,12 @@ class FlyzoneEditorApp extends TerrainBase {
     return true;
   }
 
-  private processImportData(importData: any): void {
+  private processImportData(importData: ImportData): void {
     if (!this.editorState || !this.markers) return;
 
     try {
-      // Restore locations
-      this.editorState.locations = importData.allLocations.map((location: any) => {
+      // Restore locations - cast to any temporarily for complex import logic
+      this.editorState.locations = importData.allLocations.map((location: unknown) => {
         // Convert plain objects back to Vector3 where needed
         if (location.position && typeof location.position === 'object') {
           location.position = new THREE.Vector3(
@@ -1085,7 +1128,7 @@ class FlyzoneEditorApp extends TerrainBase {
 
         // Convert takeoff positions
         if (location.takeoffs) {
-          location.takeoffs.forEach((takeoff: any) => {
+          location.takeoffs.forEach((takeoff) => {
             if (takeoff.position && typeof takeoff.position === 'object') {
               takeoff.position = new THREE.Vector3(
                 takeoff.position.x,
@@ -1098,7 +1141,7 @@ class FlyzoneEditorApp extends TerrainBase {
 
         // Convert landing zone positions
         if (location.landingZones) {
-          location.landingZones.forEach((landing: any) => {
+          location.landingZones.forEach((landing) => {
             if (landing.position && typeof landing.position === 'object') {
               landing.position = new THREE.Vector3(
                 landing.position.x,
@@ -1110,8 +1153,8 @@ class FlyzoneEditorApp extends TerrainBase {
         }
 
         // Convert flyzone phase positions
-        if (location.flyzone && location.flyzone.phases) {
-          Object.values(location.flyzone.phases).forEach((phase: any) => {
+        if (location.flyzone?.phases) {
+          Object.values(location.flyzone.phases).forEach((phase) => {
             if (phase.position && typeof phase.position === 'object') {
               phase.position = new THREE.Vector3(
                 phase.position.x,
@@ -1180,7 +1223,7 @@ class FlyzoneEditorApp extends TerrainBase {
     scene: THREE.Scene,
     camera: THREE.Camera,
     renderer: THREE.WebGLRenderer,
-    controls: any
+    controls: OrbitControls
   ): void {
     const animate = () => {
       try {

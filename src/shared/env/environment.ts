@@ -25,6 +25,15 @@ import { Theme } from '../../foundation/types/Theme';
 import { ThemeEngine } from '../../foundation/systems/ThemeEngine';
 import { IThreeComponent } from '../../foundation/components/base/IThreeComponent';
 import { ComponentRegistry } from '../../foundation/systems/ComponentRegistry';
+import * as dat from 'dat.gui';
+
+interface MovableComponent extends IThreeComponent {
+  updateMovementOrigin?(): void;
+}
+
+interface DisposableComponent {
+  dispose?(): void;
+}
 import { BoatGroupCreator } from './boat-group-creator';
 import { BoatConfig, BoatGroupConfig } from './boat-group-types';
 import { CarGroupCreator } from './car-group-creator';
@@ -70,7 +79,7 @@ class Environment {
     this.hg && this.hg.updateWrapSpeed(wrapSpeed);
   }
 
-  async addBirds(path: THREE.Vector3[], gui?: any) {
+  async addBirds(path: THREE.Vector3[], gui?: dat.GUI) {
     // Create birds with optimized flight parameters for the environment
     this.birds = new Birds({
       speed: 2,
@@ -85,7 +94,7 @@ class Environment {
     this.scene.add(birdsMesh);
   }
 
-  async addHangGlider(path: THREE.Vector3[], gui?: any) {
+  async addHangGlider(path: THREE.Vector3[], gui?: dat.GUI) {
     this.hg = new HangGlider();
     const hgMesh = await this.hg.load(path, gui);
     this.scene.add(hgMesh);
@@ -639,8 +648,8 @@ class Environment {
   private updateAllBoatMovementOrigins(): void {
     this.componentRegistry.getAllComponents().forEach((component, id) => {
       // Check if component has movement behavior (PatrolBoat, etc.)
-      if (component && typeof (component as any).updateMovementOrigin === 'function') {
-        (component as any).updateMovementOrigin();
+      if (component && typeof (component as MovableComponent).updateMovementOrigin === 'function') {
+        (component as MovableComponent).updateMovementOrigin();
         console.log(`Updated movement origin for component: ${id}`);
       }
     });
@@ -652,8 +661,8 @@ class Environment {
   private updateAllCarMovementOrigins(): void {
     this.componentRegistry.getAllComponents().forEach((component, id) => {
       // Check if component has movement behavior (Car, AutonomousCar, etc.)
-      if (component && typeof (component as any).updateMovementOrigin === 'function') {
-        (component as any).updateMovementOrigin();
+      if (component && typeof (component as MovableComponent).updateMovementOrigin === 'function') {
+        (component as MovableComponent).updateMovementOrigin();
         console.log(`Updated movement origin for car component: ${id}`);
       }
     });
@@ -698,15 +707,15 @@ class Environment {
 
     // Clean up other environment objects
     this.thermals.forEach(thermal => {
-      if (thermal && typeof (thermal as any).dispose === 'function') {
-        (thermal as any).dispose();
+      if (thermal && typeof (thermal as DisposableComponent).dispose === 'function') {
+        (thermal as DisposableComponent).dispose();
       }
     });
     this.thermals.length = 0;
 
     this.cloudInstances.forEach(cloud => {
-      if (cloud && typeof (cloud as any).dispose === 'function') {
-        (cloud as any).dispose();
+      if (cloud && typeof (cloud as DisposableComponent).dispose === 'function') {
+        (cloud as DisposableComponent).dispose();
       }
     });
     this.cloudInstances.length = 0;

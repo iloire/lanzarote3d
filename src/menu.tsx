@@ -1,4 +1,5 @@
 import React from 'react';
+import * as THREE from 'three';
 import { getAppsByVisibility, getVisibleApps, type AppMetadata } from './config/app-registry';
 import { themeManager } from './foundation/systems/ThemeManager';
 import { getAllThemes } from './foundation/themes';
@@ -11,7 +12,7 @@ interface MenuProps {
 }
 
 class Menu extends React.Component<MenuProps> {
-  renderer: any;
+  renderer: THREE.WebGLRenderer;
 
   override state = {
     loadingProcess: 0,

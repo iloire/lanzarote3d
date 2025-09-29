@@ -75,7 +75,9 @@
       "Bash(do echo -n \"$app: \")",
       "Bash(ls:*)",
       "Bash(do echo -n \"$app: \" if ls src/applications/$app/index.*)",
-      "Bash(then echo \"has index file\" else echo \"no index file\" fi done)"
+      "Bash(then echo \"has index file\" else echo \"no index file\" fi done)",
+      "Bash(sort:*)",
+      "Bash(awk:*)"
     ],
     "deny": [],
     "ask": []
