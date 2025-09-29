@@ -42,6 +42,16 @@
       "visibility": "private",
       "priority": 9
     },
+    "flying-behavior-test": {
+      "name": "Flying Behavior Test",
+      "description": "Test autonomous flying behavior system with obstacle avoidance and boundary detection",
+      "entry": "./applications/flying-behavior-test/index.tsx",
+      "route": "/flying-behavior-test",
+      "category": "tool",
+      "requiresWebGL": true,
+      "visibility": "private",
+      "priority": 10
+    },
     "tile-debug": {
       "name": "Tile Debug Dashboard",
       "description": "Debug tool showing satellite tile download process, calculations, and atlas creation for terrain mapping",
