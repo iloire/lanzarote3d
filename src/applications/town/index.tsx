@@ -67,7 +67,7 @@ class TownWorkshop extends WorkshopDemoBase {
       },
       lighting: {
         sunPosition: 10,
-        showHelpers: true,
+        
       },
     });
   }

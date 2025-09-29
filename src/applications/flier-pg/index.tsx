@@ -30,7 +30,7 @@ class ParagliderWorkshopApp extends WorkshopDemoBase {
       },
       lighting: {
         sunPosition: 12,
-        showHelpers: true,
+        
       },
     });
   }

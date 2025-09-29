@@ -133,6 +133,16 @@
       "visibility": "private",
       "priority": 11
     },
+    "hangglider": {
+      "name": "Hang Glider",
+      "description": "Hang glider component demo showcasing hang glider wing configurations",
+      "entry": "./applications/hangglider",
+      "route": "/hangglider",
+      "category": "demo",
+      "requiresWebGL": true,
+      "visibility": "private",
+      "priority": 12
+    },
     "pilot": {
       "name": "Pilot",
       "description": "Pilot component demo",
@@ -140,7 +150,7 @@
       "route": "/pilot",
       "category": "demo",
       "requiresWebGL": true,
-      "visibility": "private",
+      "visibility": "hidden",
       "priority": 17
     },
     "terrain": {
@@ -150,7 +160,7 @@
       "route": "/terrain",
       "category": "demo",
       "requiresWebGL": true,
-      "visibility": "private",
+      "visibility": "hidden",
       "priority": 18
     },
     "town": {
@@ -209,6 +219,7 @@
         "town",
         "houses",
         "glider",
+        "hangglider",
         "pilot",
         "game",
         "flyzones",
@@ -232,9 +243,10 @@
       "town": 13,
       "houses": 14,
       "glider": 15,
-      "pilot": 16,
-      "flier-pg": 17,
-      "animals": 18
+      "hangglider": 16,
+      "pilot": 17,
+      "flier-pg": 18,
+      "animals": 19
     },
     "filenameOverrides": {
       "animation": "index.html",

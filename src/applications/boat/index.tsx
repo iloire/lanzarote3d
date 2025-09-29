@@ -27,7 +27,7 @@ class BoatWorkshopApp extends WorkshopDemoBase {
       },
       lighting: {
         sunPosition: 14,
-        showHelpers: false,
+        
       },
     });
   }

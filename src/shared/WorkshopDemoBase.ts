@@ -13,8 +13,12 @@ export interface WorkshopDemoConfig extends Omit<AppConfig, 'scene' | 'requiredC
   };
   lighting?: {
     sunPosition?: number;
-    showHelpers?: boolean;
   };
+  helpers?: {
+    axes?: boolean; // Show axis helper with directional labels
+    grid?: boolean; // Show grid helper
+    lighting?: boolean; // Show lighting helpers (sun position, etc)
+  } | boolean; // Can be boolean for simple enable/disable or object for granular control
 }
 
 /**
@@ -83,9 +87,16 @@ export abstract class WorkshopDemoBase extends AppBase {
       options.sky.updateSunPosition(sunPosition);
     }
 
-    // Create helpers if requested
-    if (config?.lighting?.showHelpers !== false) {
-      Helpers.createHelpers(scene);
+    // Create helpers if requested (independent of lighting)
+    const helpersConfig = config?.helpers;
+    if (helpersConfig !== false) {
+      if (typeof helpersConfig === 'boolean' || helpersConfig === undefined) {
+        // Default behavior: show all helpers
+        Helpers.createHelpers(scene);
+      } else {
+        // Granular control: create specific helpers
+        Helpers.createSelectiveHelpers(scene, helpersConfig);
+      }
     }
 
     // Create ground plane if requested

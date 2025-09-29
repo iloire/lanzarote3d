@@ -24,8 +24,8 @@ class AnimalsApp extends WorkshopDemoBase {
       },
       lighting: {
         sunPosition: 0.3,
-        showHelpers: false
-      }
+      },
+      helpers: false
     });
   }
 

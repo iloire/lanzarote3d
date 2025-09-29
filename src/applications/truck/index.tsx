@@ -21,7 +21,7 @@ class TruckWorkshopApp extends WorkshopDemoBase {
       },
       lighting: {
         sunPosition: 16,
-        showHelpers: false,
+        
       },
     });
   }

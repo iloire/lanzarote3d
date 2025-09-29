@@ -16,7 +16,10 @@ class HangGliderWorkshopApp extends WorkshopDemoBase {
       },
       lighting: {
         sunPosition: 12,
-        showHelpers: true,
+      },
+      helpers: {
+        axes: true,
+        grid: true
       },
     });
   }

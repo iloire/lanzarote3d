@@ -26,8 +26,8 @@ class FlyingBehaviorTestApp extends WorkshopDemoBase {
       },
       lighting: {
         sunPosition: 0.3,
-        showHelpers: false
-      }
+      },
+      helpers: false
     });
   }
 

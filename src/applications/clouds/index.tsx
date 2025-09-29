@@ -28,7 +28,7 @@ class CloudsWorkshopApp extends WorkshopDemoBase {
       },
       lighting: {
         sunPosition: 14,
-        showHelpers: true,
+        
       },
     });
   }

@@ -21,7 +21,7 @@ class CarWorkshopApp extends WorkshopDemoBase {
       },
       lighting: {
         sunPosition: 14,
-        showHelpers: false,
+        
       },
     });
   }
