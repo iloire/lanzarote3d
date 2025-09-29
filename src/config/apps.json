@@ -93,15 +93,25 @@
       "priority": 3,
       "theme": "artic"
     },
-    "boats": {
+    "boats-animation": {
       "name": "Boats Animation",
       "description": "Cinematic animation starting near boats and transitioning to focus on paragliders and clouds",
-      "entry": "./applications/boats/index.tsx",
-      "route": "/boats",
+      "entry": "./applications/boats-animation/index.tsx",
+      "route": "/boats-animation",
       "category": "demo",
       "requiresWebGL": true,
       "visibility": "public",
       "priority": 4
+    },
+    "boats": {
+      "name": "Boats Workshop",
+      "description": "Multiple boat types showcase with variations",
+      "entry": "./applications/boats/index.tsx",
+      "route": "/boats",
+      "category": "demo",
+      "requiresWebGL": true,
+      "visibility": "private",
+      "priority": 35
     },
     "island": {
       "name": "Island",
@@ -215,7 +225,7 @@
     },
     "boat": {
       "name": "Boat",
-      "description": "Boat component demo",
+      "description": "Single PatrolBoat component showcase",
       "entry": "./applications/boat/index.tsx",
       "route": "/boat",
       "category": "demo",

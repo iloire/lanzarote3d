@@ -162,7 +162,7 @@ class AnimationApp extends TerrainBase {
       // Create flying behavior with cinematic settings
       this.flyingBehavior = new FlyingBehavior({
         pattern: FlightPattern.CIRCULAR,
-        speed: 8.0, // Faster for dramatic effect
+        speed: 0,
         turnSpeed: 0.8,
         flightRadius: 150, // Large radius for cinematic movement
         minHeight: centerPoint.y - 50,
