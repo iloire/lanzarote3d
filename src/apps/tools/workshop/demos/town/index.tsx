@@ -95,7 +95,8 @@ class TownWorkshop extends WorkshopDemoBase {
   }
 
   private async loadNeighborhoods(scene: THREE.Scene, gui: any): Promise<void> {
-    // Define neighborhood configurations
+    // Define neighborhood configurations - reduced from 9 to 5 neighborhoods for better performance
+    // Positioned away from roads (roads are at x=-400,0,400 and z=0)
     const neighborhoods: Array<{
       name: string;
       center: THREE.Vector3;
@@ -107,66 +108,40 @@ class TownWorkshop extends WorkshopDemoBase {
       variation: NeighborhoodVariation;
     }> = [
       {
-        name: 'Suburban (Medium)',
-        center: new THREE.Vector3(-400, 0, -300),
+        name: 'Suburban District',
+        center: new THREE.Vector3(-600, 0, -150),
         type: 'suburban',
         size: 'medium',
         variation: DEFAULT_VARIATION,
       },
       {
-        name: 'Urban Dense',
-        center: new THREE.Vector3(0, 0, -300),
+        name: 'Urban Center',
+        center: new THREE.Vector3(550, 0, -120),
         type: 'urban',
         density: 'dense',
         variation: { ...DEFAULT_VARIATION, poolChance: 0.1 },
       },
       {
-        name: 'Rural Village',
-        center: new THREE.Vector3(400, 0, -300),
-        type: 'rural',
-        style: 'village',
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.5 },
-      },
-      {
-        name: 'Cul-de-Sac',
-        center: new THREE.Vector3(-400, 0, 0),
+        name: 'Cul-de-Sac Community',
+        center: new THREE.Vector3(-550, 0, 150),
         type: 'cul-de-sac',
         houses: 8,
         variation: { ...DEFAULT_VARIATION, poolChance: 0.4 },
       },
       {
-        name: 'Main Street',
-        center: new THREE.Vector3(0, 0, 0),
-        type: 'street',
-        houses: 12,
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.25 },
-      },
-      {
-        name: 'Grid Neighborhood',
-        center: new THREE.Vector3(400, 0, 0),
-        type: 'grid',
-        houses: 15,
-        variation: DEFAULT_VARIATION,
-      },
-      {
-        name: 'Luxury Suburban',
-        center: new THREE.Vector3(-400, 0, 300),
+        name: 'Luxury Estates',
+        center: new THREE.Vector3(600, 0, 180),
         type: 'luxury',
+        houses: 6,
         variation: { ...DEFAULT_VARIATION, poolChance: 0.8 },
       },
       {
-        name: 'Mixed Random',
-        center: new THREE.Vector3(0, 0, 300),
-        type: 'random',
-        houses: 18,
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.35 },
-      },
-      {
-        name: 'Large Suburban',
-        center: new THREE.Vector3(400, 0, 300),
-        type: 'suburban',
-        size: 'large',
-        variation: { ...DEFAULT_VARIATION, poolChance: 0.45 },
+        name: 'Village Green',
+        center: new THREE.Vector3(-200, 0, 80),
+        type: 'rural',
+        style: 'village',
+        houses: 10,
+        variation: { ...DEFAULT_VARIATION, poolChance: 0.3 },
       },
     ];
 

@@ -346,7 +346,7 @@ export class HouseGroupCreator {
       center,
       formation: 'suburban',
       spacing,
-      neighborhoodSize: size === 'small' ? 200 : size === 'medium' ? 300 : 400,
+      neighborhoodSize: size === 'small' ? 100 : size === 'medium' ? 120 : 150,
       randomVariation: 0.3,
     }, variation);
   }
@@ -366,7 +366,7 @@ export class HouseGroupCreator {
       center,
       formation: 'grid',
       spacing,
-      neighborhoodSize: density === 'compact' ? 250 : density === 'dense' ? 300 : 350,
+      neighborhoodSize: density === 'compact' ? 120 : density === 'dense' ? 140 : 160,
       randomVariation: 0.15,
     }, variation);
   }
@@ -386,7 +386,7 @@ export class HouseGroupCreator {
       center,
       formation: 'rural',
       spacing,
-      neighborhoodSize: style === 'farmstead' ? 400 : style === 'village' ? 350 : 500,
+      neighborhoodSize: style === 'farmstead' ? 180 : style === 'village' ? 150 : 200,
       randomVariation: 0.4,
     }, variation);
   }
@@ -461,7 +461,7 @@ export class HouseGroupCreator {
       center,
       formation,
       spacing,
-      neighborhoodSize: 300,
+      neighborhoodSize: 120,
       randomVariation: 0.3,
     }, variation);
   }
@@ -472,7 +472,7 @@ export class HouseGroupCreator {
   async createRandomNeighborhood(
     center: THREE.Vector3,
     houses: HouseConfig[],
-    size: number = 300
+    size: number = 120
   ): Promise<THREE.Object3D[]> {
     return this.createNeighborhood(houses, {
       center,

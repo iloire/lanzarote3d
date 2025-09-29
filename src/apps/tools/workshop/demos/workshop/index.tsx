@@ -1,24 +1,69 @@
 import * as THREE from 'three';
-import { SmallSailBoat, Tree, Stone } from '../../../../../foundation/components/scenery';
+import { Tree, Stone } from '../../../../../foundation/components/scenery';
 import { House, HouseType } from '../../../../../foundation/components/scenery/buildings';
 import { PineTree, PalmTree, CoconutPalm, DatePalm, FanPalm, Igloo, IglooSize, Pool, SaguaroCactus, BarrelCactus, PricklyPearCactus, OrganPipeCactus } from '../../../../../foundation/components/scenery';
 import { VillaLegacy as Villa, TownhouseLegacy as Townhouse, BarnLegacy as Barn, DesertHouseLegacy as DesertHouse, DomeLegacy as Dome, DesertHouseWithPoolLegacy as DesertHouseWithPool } from '../../../../../foundation/components/scenery';
 import { StoryOptions } from '../../../../shared/types';
 import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
 
-const createLabel = (text: string, position: THREE.Vector3) => {
+/**
+ * Count the total number of triangles/polygons in a 3D object
+ */
+const countPolygons = (object: THREE.Object3D): number => {
+  let totalTriangles = 0;
+
+  object.traverse((child) => {
+    if (child instanceof THREE.Mesh && child.geometry) {
+      const geometry = child.geometry;
+
+      if (geometry.index !== null) {
+        // Indexed geometry
+        totalTriangles += geometry.index.count / 3;
+      } else {
+        // Non-indexed geometry
+        const positionAttribute = geometry.getAttribute('position');
+        if (positionAttribute) {
+          totalTriangles += positionAttribute.count / 3;
+        }
+      }
+    }
+  });
+
+  return Math.floor(totalTriangles);
+};
+
+/**
+ * Format polygon count for display
+ */
+const formatPolygonCount = (count: number): string => {
+  if (count >= 1000) {
+    return `${(count / 1000).toFixed(1)}k`;
+  }
+  return count.toString();
+};
+
+const createLabel = (text: string, position: THREE.Vector3, polygonCount?: number) => {
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d');
-  canvas.width = 256;
-  canvas.height = 64;
+  canvas.width = 320;
+  canvas.height = 80;
 
   if (context) {
-    context.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    context.fillStyle = 'rgba(0, 0, 0, 0.8)';
     context.fillRect(0, 0, canvas.width, canvas.height);
-    context.font = 'bold 32px Arial';
+
+    // Main title
+    context.font = 'bold 28px Arial';
     context.fillStyle = '#ffffff';
     context.textAlign = 'center';
-    context.fillText(text, canvas.width / 2, canvas.height / 2 + 8);
+    context.fillText(text, canvas.width / 2, 30);
+
+    // Polygon count
+    if (polygonCount !== undefined) {
+      context.font = '20px Arial';
+      context.fillStyle = '#ffff00'; // Yellow for polygon count
+      context.fillText(`${formatPolygonCount(polygonCount)} polys`, canvas.width / 2, 55);
+    }
   }
 
   const texture = new THREE.CanvasTexture(canvas);
@@ -28,10 +73,10 @@ const createLabel = (text: string, position: THREE.Vector3) => {
     side: THREE.DoubleSide,
     depthTest: false,
   });
-  const geometry = new THREE.PlaneGeometry(12, 3);
+  const geometry = new THREE.PlaneGeometry(15, 4);
   const mesh = new THREE.Mesh(geometry, material);
   mesh.position.copy(position);
-  mesh.position.y = -10;
+  mesh.position.y = 25; // Position labels above the models
   return mesh;
 };
 
@@ -94,39 +139,25 @@ class WorkshopApp extends WorkshopDemoBase {
     try {
       const igloo = new Igloo(IglooSize.Medium);
       const iglooMesh = igloo.load();
-      iglooMesh.position.set(0, 0, -60);
+      iglooMesh.position.set(0, -15, -60);
       iglooMesh.scale.set(0.8, 0.8, 0.8);
       scene.add(iglooMesh);
       this.componentMeshes.push(iglooMesh);
 
-      const iglooLabel = createLabel('Igloo', new THREE.Vector3(0, -10, -60));
+      const iglooPolygons = countPolygons(iglooMesh);
+      const iglooLabel = createLabel('Igloo', new THREE.Vector3(0, -10, -60), iglooPolygons);
       scene.add(iglooLabel);
       this.labelMeshes.push(iglooLabel);
     } catch (error) {
       this.handleError(error as Error, 'loading igloo');
     }
 
-    // Load boat
-    try {
-      const boat = new SmallSailBoat();
-      const boatMesh = await boat.load(); // Handle async loading
-      boatMesh.position.set(-60, 0, 120);
-      scene.add(boatMesh);
-      this.componentMeshes.push(boatMesh);
-
-      const boatLabel = createLabel('Boat', new THREE.Vector3(-60, -10, 120));
-      scene.add(boatLabel);
-      this.labelMeshes.push(boatLabel);
-    } catch (error) {
-      this.handleError(error as Error, 'loading boat');
-    }
-
-    // Load houses - organized with better spacing
+    // Load houses - organized with better spacing to avoid overlapping
     const houseConfigs = [
-      { type: HouseType.Small, position: [50, 0, 0], label: 'Small House' },
-      { type: HouseType.Medium, position: [50, 0, 30], label: 'Medium House' },
+      { type: HouseType.Small, position: [50, 0, -20], label: 'Small House' },
+      { type: HouseType.Medium, position: [50, 0, 20], label: 'Medium House' },
       { type: HouseType.Large, position: [50, 0, 60], label: 'Large House' },
-      { type: HouseType.Modern, position: [80, 0, 20], label: 'Modern House' },
+      { type: HouseType.Modern, position: [90, 0, 20], label: 'Modern House' },
     ];
 
     for (const config of houseConfigs) {
@@ -135,15 +166,17 @@ class WorkshopApp extends WorkshopDemoBase {
         const houseMesh = house.load(gui);
         houseMesh.position.set(
           config.position[0] ?? 0,
-          config.position[1] ?? 0,
+          -15, // Ground level
           config.position[2] ?? 0
         );
         scene.add(houseMesh);
         this.componentMeshes.push(houseMesh);
 
+        const housePolygons = countPolygons(houseMesh);
         const houseLabel = createLabel(
           config.label,
-          new THREE.Vector3(config.position[0], -10, config.position[2])
+          new THREE.Vector3(config.position[0], -10, config.position[2]),
+          housePolygons
         );
         scene.add(houseLabel);
         this.labelMeshes.push(houseLabel);
@@ -192,15 +225,17 @@ class WorkshopApp extends WorkshopDemoBase {
         const buildingMesh = building.load();
         buildingMesh.position.set(
           config.position[0] ?? 0,
-          config.position[1] ?? 0,
+          -15, // Ground level
           config.position[2] ?? 0
         );
         scene.add(buildingMesh);
         this.componentMeshes.push(buildingMesh);
 
+        const buildingPolygons = countPolygons(buildingMesh);
         const buildingLabel = createLabel(
           config.label,
-          new THREE.Vector3(config.position[0], -10, config.position[2])
+          new THREE.Vector3(config.position[0], -10, config.position[2]),
+          buildingPolygons
         );
         scene.add(buildingLabel);
         this.labelMeshes.push(buildingLabel);
@@ -226,15 +261,17 @@ class WorkshopApp extends WorkshopDemoBase {
         treeMesh.scale.set(config.scale, config.scale, config.scale);
         treeMesh.position.set(
           config.position[0] ?? 0,
-          config.position[1] ?? 0,
+          -15, // Ground level
           config.position[2] ?? 0
         );
         scene.add(treeMesh);
         this.componentMeshes.push(treeMesh);
 
+        const treePolygons = countPolygons(treeMesh);
         const treeLabel = createLabel(
           config.label,
-          new THREE.Vector3(config.position[0], -10, config.position[2])
+          new THREE.Vector3(config.position[0], -10, config.position[2]),
+          treePolygons
         );
         scene.add(treeLabel);
         this.labelMeshes.push(treeLabel);
@@ -255,16 +292,18 @@ class WorkshopApp extends WorkshopDemoBase {
         const stoneMesh = stone.load();
         stoneMesh.position.set(
           config.position[0] ?? 0,
-          config.position[1] ?? 0,
+          -15, // Ground level
           config.position[2] ?? 0
         );
         stoneMesh.scale.set(config.scale[0] ?? 1, config.scale[1] ?? 1, config.scale[2] ?? 1);
         scene.add(stoneMesh);
         this.componentMeshes.push(stoneMesh);
 
+        const stonePolygons = countPolygons(stoneMesh);
         const stoneLabel = createLabel(
           config.label,
-          new THREE.Vector3(config.position[0], -10, config.position[2])
+          new THREE.Vector3(config.position[0], -10, config.position[2]),
+          stonePolygons
         );
         scene.add(stoneLabel);
         this.labelMeshes.push(stoneLabel);
@@ -277,12 +316,13 @@ class WorkshopApp extends WorkshopDemoBase {
     try {
       const pool = new Pool();
       const poolMesh = pool.load();
-      poolMesh.position.set(320, 0, 30);
+      poolMesh.position.set(320, -15, 30);
       poolMesh.scale.set(0.8, 0.8, 0.8);
       scene.add(poolMesh);
       this.componentMeshes.push(poolMesh);
 
-      const poolLabel = createLabel('Pool', new THREE.Vector3(320, -10, 30));
+      const poolPolygons = countPolygons(poolMesh);
+      const poolLabel = createLabel('Pool', new THREE.Vector3(320, -10, 30), poolPolygons);
       scene.add(poolLabel);
       this.labelMeshes.push(poolLabel);
     } catch (error) {
@@ -321,15 +361,17 @@ class WorkshopApp extends WorkshopDemoBase {
         const cactusMesh = cactus.load();
         cactusMesh.position.set(
           config.position[0] ?? 0,
-          config.position[1] ?? 0,
+          -15, // Ground level
           config.position[2] ?? 0
         );
         scene.add(cactusMesh);
         this.componentMeshes.push(cactusMesh);
 
+        const cactusPolygons = countPolygons(cactusMesh);
         const cactusLabel = createLabel(
           config.label,
-          new THREE.Vector3(config.position[0], -10, config.position[2])
+          new THREE.Vector3(config.position[0], -10, config.position[2]),
+          cactusPolygons
         );
         scene.add(cactusLabel);
         this.labelMeshes.push(cactusLabel);
@@ -352,7 +394,8 @@ class WorkshopApp extends WorkshopDemoBase {
       scene.add(ground);
       this.componentMeshes.push(ground);
 
-      const groundLabel = createLabel('Workshop Ground', new THREE.Vector3(0, -10, 0));
+      const groundPolygons = countPolygons(ground);
+      const groundLabel = createLabel('Workshop Ground', new THREE.Vector3(0, -10, 0), groundPolygons);
       scene.add(groundLabel);
       this.labelMeshes.push(groundLabel);
     } catch (error) {
