@@ -9,12 +9,29 @@ export interface VillaOptions extends SimpleComponentOptions {
   roofColor?: string;
   windowColor?: string;
   scale?: number;
+  rooms?: {
+    bedrooms?: number;
+    bathrooms?: number;
+    livingRooms?: number;
+    kitchens?: number;
+    garages?: number;
+  };
+  size?: 'small' | 'medium' | 'large' | 'mansion';
 }
 
 /**
  * Villa building component - Large luxury house with modern amenities
  */
 export class Villa extends SimpleThreeComponent {
+  private villaSize: 'small' | 'medium' | 'large' | 'mansion';
+  private roomConfig: {
+    bedrooms: number;
+    bathrooms: number;
+    livingRooms: number;
+    kitchens: number;
+    garages: number;
+  };
+
   constructor(options: VillaOptions = {}) {
     const metadata: ComponentMetadata = {
       name: 'Villa',
@@ -26,11 +43,31 @@ export class Villa extends SimpleThreeComponent {
     super(metadata, {
       wallColor: '#F5F5DC', // Beige for luxury walls
       accentColor: '#8B4513', // Brown accents
-      roofColor: '#2F4F4F', // Dark slate gray roof
+      roofColor: '#DEB887', // Burlywood matching desert house
       windowColor: '#000080', // Navy blue glass
       scale: 1,
       ...options,
     });
+
+    // Set villa size
+    this.villaSize = options.size || 'medium';
+
+    // Set default room configuration based on size
+    const defaultRooms = this.getDefaultRoomConfiguration(this.villaSize);
+    this.roomConfig = {
+      ...defaultRooms,
+      ...options.rooms,
+    };
+  }
+
+  private getDefaultRoomConfiguration(size: 'small' | 'medium' | 'large' | 'mansion') {
+    const configs = {
+      small: { bedrooms: 2, bathrooms: 2, livingRooms: 1, kitchens: 1, garages: 1 },
+      medium: { bedrooms: 4, bathrooms: 3, livingRooms: 2, kitchens: 1, garages: 2 },
+      large: { bedrooms: 6, bathrooms: 4, livingRooms: 3, kitchens: 2, garages: 3 },
+      mansion: { bedrooms: 8, bathrooms: 6, livingRooms: 4, kitchens: 2, garages: 4 },
+    };
+    return configs[size];
   }
 
   protected createGeometry(): THREE.BufferGeometry {

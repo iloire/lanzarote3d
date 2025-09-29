@@ -147,6 +147,16 @@
       "requiresWebGL": true,
       "status": "dev",
       "priority": 18
+    },
+    "town": {
+      "name": "Town",
+      "description": "Neighborhood generation showcase with various residential formations and house types",
+      "entry": "./tools/workshop/demos/town",
+      "route": "/town",
+      "category": "demo",
+      "requiresWebGL": true,
+      "status": "dev",
+      "priority": 19
     }
   },
   "showcase": {
@@ -161,6 +171,7 @@
         "island",
         "paraglider-voxel",
         "terrain",
+        "town",
         "legacy-glider",
         "pilot",
         "game",
@@ -180,8 +191,9 @@
       "island": 10,
       "paraglider-voxel": 11,
       "terrain": 12,
-      "legacy-glider": 13,
-      "pilot": 14
+      "town": 13,
+      "legacy-glider": 14,
+      "pilot": 15
     },
     "filenameOverrides": {
       "animation": "index.html",

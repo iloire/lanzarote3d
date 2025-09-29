@@ -28,101 +28,60 @@ export async function loadApp(appKey: string, options: StoryOptions): Promise<vo
     throw new Error(`App '${resolvedKey}' not found in registry`);
   }
 
-  // Dynamic import based on resolved app key - minimal coupling needed for webpack
+  // Dynamic import mapping - cleaner than switch but webpack-friendly
+  const importMap: Record<string, () => Promise<any>> = {
+    // Experiences
+    'game': () => import('../experiences/game/game'),
+    'flyzones': () => import('../experiences/flyzones/index'),
+
+    // Demos
+    'animation': () => import('../demos/animation/index'),
+    'boats': () => import('../demos/boats/index'),
+    'famara2': () => import('../demos/famara2'),
+    'famara': () => import('../demos/famara'),
+    'satellite-terrain': () => import('../demos/satellite-terrain'),
+    'autonomous-driving': () => import('../demos/autonomous-driving/index'),
+
+    // Tools
+    'location-editor': () => import('../tools/location-editor/index'),
+    'tile-mapper': () => import('../tools/tile-mapper/index'),
+
+    // Workshop Demos
+    'workshop': () => import('../tools/workshop/demos/workshop/index'),
+    'boat': () => import('../tools/workshop/demos/boat/index'),
+    'clouds': () => import('../tools/workshop/demos/clouds/index'),
+    'flier-pg': () => import('../tools/workshop/demos/flier-pg/index'),
+    'legacy-glider': () => import('../tools/workshop/demos/glider/index'),
+    'hangglider': () => import('../tools/workshop/demos/hangglider/index'),
+    'head': () => import('../tools/workshop/demos/head/index'),
+    'helmet': () => import('../tools/workshop/demos/helmet/index'),
+    'car': () => import('../tools/workshop/demos/car/index'),
+    'truck': () => import('../tools/workshop/demos/truck/index'),
+    'island': () => import('../tools/workshop/demos/island/index'),
+    'paraglider-voxel': () => import('../tools/workshop/demos/paraglider-voxel/index'),
+    'paraglider': () => import('../tools/workshop/demos/paraglider/index'),
+    'pilot': () => import('../tools/workshop/demos/pilot/index'),
+    'terrain': () => import('../tools/workshop/demos/terrain/index'),
+    'town': () => import('../tools/workshop/demos/town/index'),
+    'voxel': () => import('../tools/workshop/demos/voxel/index'),
+    'terrain-gps': () => import('../tools/workshop/demos/terrain-gps/index'),
+    'tile-debug': () => import('../tools/workshop/demos/tile-debug/app'),
+
+    // Flyzone Manager
+    'flyzone-editor': () => import('../flyzone-manager/editor/flyzone-editor'),
+    'flyzone-visualizer': () => import('../flyzone-manager/visualizer/flyzone-visualizer'),
+  };
+
+  const importFn = importMap[resolvedKey];
+  if (!importFn) {
+    throw new Error(`No import mapping found for app '${resolvedKey}' (original: '${appKey}')`);
+  }
+
   let appModule;
-  switch (resolvedKey) {
-    case 'animation':
-      appModule = await import('../demos/animation/index');
-      break;
-    case 'boats':
-      appModule = await import('../demos/boats/index');
-      break;
-    case 'game':
-      appModule = await import('../experiences/game/game');
-      break;
-    case 'flyzones':
-      appModule = await import('../experiences/flyzones/index');
-      break;
-    case 'famara2':
-      appModule = await import('../demos/famara2');
-      break;
-    case 'famara':
-      appModule = await import('../demos/famara');
-      break;
-    case 'satellite-terrain':
-      appModule = await import('../demos/satellite-terrain');
-      break;
-    case 'autonomous-driving':
-      appModule = await import('../demos/autonomous-driving/index');
-      break;
-    case 'location-editor':
-      appModule = await import('../tools/location-editor/index');
-      break;
-    case 'flyzone-editor':
-      appModule = await import('../flyzone-manager/editor/flyzone-editor');
-      break;
-    case 'flyzone-visualizer':
-      appModule = await import('../flyzone-manager/visualizer/flyzone-visualizer');
-      break;
-    case 'workshop':
-      appModule = await import('../tools/workshop/demos/workshop/index');
-      break;
-    case 'boat':
-      appModule = await import('../tools/workshop/demos/boat/index');
-      break;
-    case 'clouds':
-      appModule = await import('../tools/workshop/demos/clouds/index');
-      break;
-    case 'flier-pg':
-      appModule = await import('../tools/workshop/demos/flier-pg/index');
-      break;
-    case 'legacy-glider':
-      appModule = await import('../tools/workshop/demos/glider/index');
-      break;
-    case 'hangglider':
-      appModule = await import('../tools/workshop/demos/hangglider/index');
-      break;
-    case 'head':
-      appModule = await import('../tools/workshop/demos/head/index');
-      break;
-    case 'helmet':
-      appModule = await import('../tools/workshop/demos/helmet/index');
-      break;
-    case 'car':
-      appModule = await import('../tools/workshop/demos/car/index');
-      break;
-    case 'truck':
-      appModule = await import('../tools/workshop/demos/truck/index');
-      break;
-    case 'island':
-      appModule = await import('../tools/workshop/demos/island/index');
-      break;
-    case 'paraglider-voxel':
-      appModule = await import('../tools/workshop/demos/paraglider-voxel/index');
-      break;
-    case 'paraglider':
-      appModule = await import('../tools/workshop/demos/paraglider/index');
-      break;
-    case 'pilot':
-      appModule = await import('../tools/workshop/demos/pilot/index');
-      break;
-    case 'terrain':
-      appModule = await import('../tools/workshop/demos/terrain/index');
-      break;
-    case 'voxel':
-      appModule = await import('../tools/workshop/demos/voxel/index');
-      break;
-    case 'terrain-gps':
-      appModule = await import('../tools/workshop/demos/terrain-gps/index');
-      break;
-    case 'tile-debug':
-      appModule = await import('../tools/workshop/demos/tile-debug/app');
-      break;
-    case 'tile-mapper':
-      appModule = await import('../tools/tile-mapper/index');
-      break;
-    default:
-      throw new Error(`No import mapping found for app '${resolvedKey}' (original: '${appKey}')`);
+  try {
+    appModule = await importFn();
+  } catch (error) {
+    throw new Error(`Failed to load app '${resolvedKey}': ${error}`);
   }
 
   const appInstance = appModule.default;

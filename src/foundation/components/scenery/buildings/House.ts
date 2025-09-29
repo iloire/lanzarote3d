@@ -11,7 +11,7 @@ const mat = getColorMaterial(0xffffff);
 const mat_window = getColorMaterial(0x004d1a);
 const mat_door = getColorMaterial(0x004d1a);
 const mat_door2 = getColorMaterial(0x4d0000);
-const mat_roof = getColorMaterial(0x8b4513); // Brown color for roof
+const mat_roof = getColorMaterial(0xf8f8ff); // Almost white color for roof
 const mat_frame = getColorMaterial(0x4a4a4a); // Dark gray for window frames
 const mat_modern = getColorMaterial(0xcccccc); // Light gray for modern houses
 const mat_modern_window = getColorMaterial(0x000080); // Navy blue for modern windows
@@ -108,11 +108,10 @@ class House extends SimpleThreeComponent {
 
   private createRoof(mesh: THREE.Object3D): void {
     if (this.type !== HouseType.Modern) {
-      // Traditional pyramidal roof
-      const roofGeo = new THREE.ConeGeometry(15, 10, 4);
+      // Flat traditional roof with slight slope (much flatter than cone)
+      const roofGeo = new THREE.BoxGeometry(22, 2, 22);
       const roof = new THREE.Mesh(roofGeo, mat_roof);
-      roof.position.set(0, this.height / 2 + 3, 0);
-      roof.rotation.y = Math.PI / 4;
+      roof.position.set(0, this.height / 2 + 1, 0);
       mesh.add(roof);
     } else {
       // Modern flat roof with overhang
@@ -231,11 +230,10 @@ class House extends SimpleThreeComponent {
     extension.position.set(0, -5, 10);
     mesh.add(extension);
 
-    // Add extension roof
-    const roofGeo = new THREE.ConeGeometry(12, 8, 4);
+    // Add extension flat roof
+    const roofGeo = new THREE.BoxGeometry(18, 2, 18);
     const roof = new THREE.Mesh(roofGeo, mat_roof);
-    roof.position.set(0, (this.height - 9) / 2 - 1, 10);
-    roof.rotation.y = Math.PI / 4;
+    roof.position.set(0, (this.height - 9) / 2 + 1, 10);
     mesh.add(roof);
 
     // Add garage door

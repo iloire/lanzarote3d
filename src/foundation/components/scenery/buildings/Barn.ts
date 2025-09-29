@@ -24,8 +24,8 @@ export class Barn extends SimpleThreeComponent {
     };
 
     super(metadata, {
-      wallColor: '#8B0000', // Dark red for classic barn
-      roofColor: '#2F4F4F', // Dark slate gray roof
+      wallColor: '#F5DEB3', // Sandy beige matching desert house
+      roofColor: '#DEB887', // Burlywood matching desert house
       doorColor: '#654321', // Brown wooden doors
       trimColor: '#FFFFFF', // White trim
       scale: 1,

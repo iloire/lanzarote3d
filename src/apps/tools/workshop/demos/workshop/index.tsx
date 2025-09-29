@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { SmallSailBoat, Tree, Stone } from '../../../../../foundation/components/scenery';
 import { House, HouseType } from '../../../../../foundation/components/scenery/buildings';
 import { PineTree, PalmTree, CoconutPalm, DatePalm, FanPalm, Igloo, IglooSize, Pool, SaguaroCactus, BarrelCactus, PricklyPearCactus, OrganPipeCactus } from '../../../../../foundation/components/scenery';
-import { CottageLegacy as Cottage, VillaLegacy as Villa, TownhouseLegacy as Townhouse, BarnLegacy as Barn, DesertHouseLegacy as DesertHouse, DomeLegacy as Dome, DesertHouseWithPoolLegacy as DesertHouseWithPool } from '../../../../../foundation/components/scenery';
+import { VillaLegacy as Villa, TownhouseLegacy as Townhouse, BarnLegacy as Barn, DesertHouseLegacy as DesertHouse, DomeLegacy as Dome, DesertHouseWithPoolLegacy as DesertHouseWithPool } from '../../../../../foundation/components/scenery';
 import { StoryOptions } from '../../../../shared/types';
 import { WorkshopDemoBase } from '../../../../shared/WorkshopDemoBase';
 
@@ -154,7 +154,6 @@ class WorkshopApp extends WorkshopDemoBase {
 
     // Load new building types - organized grid with better spacing
     const buildingConfigs = [
-      { type: 'Cottage', position: [-50, 0, 0], scale: 0.8, label: 'Cottage' },
       { type: 'Villa', position: [-50, 0, 40], scale: 0.6, label: 'Villa' },
       { type: 'Townhouse', position: [-50, 0, 80], scale: 0.8, label: 'Townhouse' },
       { type: 'Barn', position: [-100, 0, 0], scale: 0.6, label: 'Barn' },
@@ -168,9 +167,6 @@ class WorkshopApp extends WorkshopDemoBase {
         let building;
 
         switch (config.type) {
-          case 'Cottage':
-            building = new Cottage({ scale: config.scale });
-            break;
           case 'Villa':
             building = new Villa({ scale: config.scale });
             break;

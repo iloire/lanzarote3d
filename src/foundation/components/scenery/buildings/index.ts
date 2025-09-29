@@ -1,6 +1,5 @@
 // Building Components
 export { default as House, HouseType } from './House';
-export { Cottage, default as CottageLegacy } from './Cottage';
 export { Villa, default as VillaLegacy } from './Villa';
 export { Townhouse, default as TownhouseLegacy } from './Townhouse';
 export { Barn, default as BarnLegacy } from './Barn';
@@ -10,7 +9,6 @@ export { Dome, default as DomeLegacy } from './Dome';
 
 // Export types
 export type { HouseOptions } from './House';
-export type { CottageOptions } from './Cottage';
 export type { VillaOptions } from './Villa';
 export type { TownhouseOptions } from './Townhouse';
 export type { BarnOptions } from './Barn';

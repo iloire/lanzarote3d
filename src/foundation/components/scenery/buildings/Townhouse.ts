@@ -4,7 +4,7 @@ import { ComponentMetadata } from '../../base/IThreeComponent';
 import { resourceManager } from '../../../systems/ResourceManager';
 
 export interface TownhouseOptions extends SimpleComponentOptions {
-  brickColor?: string;
+  wallColor?: string;
   roofColor?: string;
   doorColor?: string;
   windowColor?: string;
@@ -25,10 +25,10 @@ export class Townhouse extends SimpleThreeComponent {
     };
 
     super(metadata, {
-      brickColor: '#8B4513', // Saddle brown for brick
-      roofColor: '#2F4F4F', // Dark slate gray
-      doorColor: '#4B0000', // Dark red door
-      windowColor: '#F0F8FF', // Alice blue glass
+      wallColor: '#FFFACD', // Light yellow (lemon chiffon)
+      roofColor: '#DEB887', // Burlywood matching desert house
+      doorColor: '#228B22', // Forest green door
+      windowColor: '#4169E1', // Royal blue windows
       trimColor: '#FFFFFF', // White trim
       scale: 1,
       ...options,
@@ -48,9 +48,9 @@ export class Townhouse extends SimpleThreeComponent {
     const scale = options.scale || 1;
 
     // Create materials with resource sharing
-    const brickMaterial = resourceManager.getOrCreateMaterial(
-      `townhouse_brick_${options.brickColor}`,
-      () => new THREE.MeshLambertMaterial({ color: options.brickColor })
+    const wallMaterial = resourceManager.getOrCreateMaterial(
+      `townhouse_wall_${options.wallColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.wallColor })
     );
 
     const roofMaterial = resourceManager.getOrCreateMaterial(
@@ -73,12 +73,12 @@ export class Townhouse extends SimpleThreeComponent {
       () => new THREE.MeshLambertMaterial({ color: options.trimColor })
     );
 
-    // Main townhouse structure - tall and narrow
+    // Main townhouse structure - tall and narrow (2-story)
     const mainBodyGeometry = resourceManager.getOrCreateGeometry(
       'townhouse_main_body',
-      () => new THREE.BoxGeometry(12, 25, 15)
+      () => new THREE.BoxGeometry(12, 18, 15)
     );
-    const mainBody = new THREE.Mesh(mainBodyGeometry, brickMaterial);
+    const mainBody = new THREE.Mesh(mainBodyGeometry, wallMaterial);
     mainBody.castShadow = this.options.castShadow ?? true;
     mainBody.receiveShadow = this.options.receiveShadow ?? true;
     townhouse.add(mainBody);
@@ -89,7 +89,7 @@ export class Townhouse extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(14, 3, 17)
     );
     const roof = new THREE.Mesh(roofGeometry, roofMaterial);
-    roof.position.set(0, 14, 0);
+    roof.position.set(0, 10.5, 0);
     roof.castShadow = this.options.castShadow ?? true;
     townhouse.add(roof);
 
@@ -99,7 +99,7 @@ export class Townhouse extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(2, 4, 17)
     );
     const peak = new THREE.Mesh(peakGeometry, roofMaterial);
-    peak.position.set(0, 16.5, 0);
+    peak.position.set(0, 13, 0);
     peak.castShadow = this.options.castShadow ?? true;
     townhouse.add(peak);
 
@@ -169,19 +169,6 @@ export class Townhouse extends SimpleThreeComponent {
       townhouse.add(frame);
     }
 
-    // Third floor windows (2 windows)
-    const thirdFloorY = 8;
-    for (let i = 0; i < 2; i++) {
-      const x = -2.5 + i * 5;
-
-      const window = new THREE.Mesh(windowGeometry, windowMaterial);
-      window.position.set(x, thirdFloorY, 7.65);
-      townhouse.add(window);
-
-      const frame = new THREE.Mesh(frameGeometry, trimMaterial);
-      frame.position.set(x, thirdFloorY, 7.5);
-      townhouse.add(frame);
-    }
 
     // Side windows
     const sideWindow = new THREE.Mesh(windowGeometry, windowMaterial);
@@ -192,7 +179,7 @@ export class Townhouse extends SimpleThreeComponent {
     sideFrame.position.set(6, 1, 0);
     townhouse.add(sideFrame);
 
-    // Decorative cornices between floors
+    // Decorative cornices between floors (adjusted for 2-story)
     const corniceGeometry = resourceManager.getOrCreateGeometry(
       'townhouse_cornice',
       () => new THREE.BoxGeometry(13, 0.5, 16)
@@ -203,16 +190,16 @@ export class Townhouse extends SimpleThreeComponent {
     townhouse.add(cornice1);
 
     const cornice2 = new THREE.Mesh(corniceGeometry, trimMaterial);
-    cornice2.position.set(0, 5, 0);
+    cornice2.position.set(0, 2, 0);
     townhouse.add(cornice2);
 
-    // Chimney
+    // Chimney (adjusted for reduced building height)
     const chimneyGeometry = resourceManager.getOrCreateGeometry(
       'townhouse_chimney',
       () => new THREE.BoxGeometry(2, 8, 2)
     );
-    const chimney = new THREE.Mesh(chimneyGeometry, brickMaterial);
-    chimney.position.set(4, 18, 6);
+    const chimney = new THREE.Mesh(chimneyGeometry, wallMaterial);
+    chimney.position.set(4, 13, 6);
     chimney.castShadow = this.options.castShadow ?? true;
     townhouse.add(chimney);
 
@@ -244,8 +231,8 @@ export class Townhouse extends SimpleThreeComponent {
       type: 'building',
       subtype: 'residential',
       style: 'urban',
-      floors: 3,
-      brickColor: options.brickColor,
+      floors: 2,
+      wallColor: options.wallColor,
       roofColor: options.roofColor,
       scale: options.scale,
     };
