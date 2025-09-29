@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { rndIntBetween } from '../../utils/math';
-import { SimpleThreeComponent, SimpleComponentOptions } from '../base/SimpleThreeComponent';
-import { ComponentMetadata } from '../base/IThreeComponent';
+import { rndIntBetween } from '../../../utils/math';
+import { SimpleThreeComponent, SimpleComponentOptions } from '../../base/SimpleThreeComponent';
+import { ComponentMetadata } from '../../base/IThreeComponent';
 
 const pineMaterials = [
   new THREE.MeshBasicMaterial({ color: 0x0d5b28 }),

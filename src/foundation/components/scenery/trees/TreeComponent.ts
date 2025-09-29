@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { SimpleThreeComponent, SimpleComponentOptions } from '../base/SimpleThreeComponent';
-import { ComponentOptions } from '../base/IThreeComponent';
-import { resourceManager } from '../../systems/ResourceManager';
+import { SimpleThreeComponent, SimpleComponentOptions } from '../../base/SimpleThreeComponent';
+import { ComponentOptions } from '../../base/IThreeComponent';
+import { resourceManager } from '../../../systems/ResourceManager';
 
 /**
  * Options for tree component

@@ -9,7 +9,7 @@ import {
   FlightPhase,
   WindCondition,
   GPS,
-} from '../types/flyzone-types';
+} from '../../types/flyzone-types';
 import { FlyzoneEditorUI } from './flyzone-editor-ui';
 import { FlyzoneMarkers } from './flyzone-markers';
 import './flyzone-editor.css';

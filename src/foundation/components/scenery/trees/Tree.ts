@@ -1,7 +1,7 @@
 // inspired in: https://codepen.io/yitliu/pen/gOaPxRX
 import * as THREE from 'three';
-import { SimpleThreeComponent, SimpleComponentOptions } from '../base/SimpleThreeComponent';
-import { ComponentMetadata } from '../base/IThreeComponent';
+import { SimpleThreeComponent, SimpleComponentOptions } from '../../base/SimpleThreeComponent';
+import { ComponentMetadata } from '../../base/IThreeComponent';
 
 var mat_grey = new THREE.MeshLambertMaterial({ color: 0xf3f2f7 });
 var mat_yellow = new THREE.MeshLambertMaterial({ color: 0xfeb42b });

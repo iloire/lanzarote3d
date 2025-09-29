@@ -8,7 +8,7 @@ import {
   WeatherAnalysis,
   CurrentWeather,
   TakeoffRecommendation,
-} from '../types/flyzone-types';
+} from '../../types/flyzone-types';
 
 /**
  * FlyzoneAPI - Backend API for managing flyzone locations and weather analysis

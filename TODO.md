@@ -2,13 +2,11 @@ Implement the following tasks if any is added following the instructions describ
 ---
 TASKS:
 - do we need showcase-config.ts? We want to remove all that indirection and duplication
-- same thing we have a movingBehaviour or FloatingBehaviour, build a FlyingBehaviour that can be applied to a model and it can just fly around the scene. It must detect when terrain is close and slowly turn away from it. It shold also detect when has gone too far and return. To test the flyable behaviour, create an app that has a few walls and put the model with flyable behaviour in the middle. It should fly around and between the walls without going far away and without crash with the walls. Use the hangglider model for example to attach the flyable behaviour. We currently have the AutoFlier class but let's build the Flyable behavior and decide later what's best and remove the other option.
-- we have some blender model for birds. Try creating some threejs based birds. Build a Crow class, an Eagle class and a Vulture class. All can inherit from a base class. Those birds should have an animation to move their wings. They should also implement the flyable behavior so they can fly around facing forward and avoid collisions with terrain.
 - place all cactus scenery objects into the scenery/cactus folder.
 - also put all the trees scenery objects into the scenery/trees folder.
-- same way we added birds that implement FlyableBehaviour, let's also have planes. Create only one Plane class for now in the vehicles folders
-- there is a "types" folder inside the applications folder but it's not an application. It needs to be moved out.
-
+- same way we added birds that implement FlyableBehaviour, let's also have planes. Create only one Plane class for now in the vehicles folders.
+- in AppMetadata, instead of having "status?: 'public' | 'experimental' | 'dev';" and "hidden?: boolean;" properties, let's remove the hidden property and rename the "status" property to "visibility: 'public', 'private', 'hidden''". 'public' will mean visible in production, 'private' visible in the menu only in development/localhost mode, and 'hidden' will hide the item in the menu always. 
+- go through all the base files located in the /Users/ivan/code/lanzarote3d/src/foundation/components/base and analyze and document their use. See if all of them are needed or we can refactor or remove some for efficiency and code readability and mantenability
 ---
 
 ### Instructions

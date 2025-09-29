@@ -69,7 +69,8 @@
       "Bash(npx next:*)",
       "Bash(yarn generate-showcase-config:*)",
       "Bash(yarn build)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(timeout 30s npm run build)"
     ],
     "deny": [],
     "ask": []

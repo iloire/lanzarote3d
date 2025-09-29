@@ -3,8 +3,8 @@ import { Clouds } from '../../foundation/components/environment';
 import { Weather } from '../../foundation/components/physics';
 import { Thermal } from '../../foundation/components/physics';
 import { rndIntBetween } from '../../foundation/utils/math';
-import Tree from '../../foundation/components/scenery/Tree';
-import PineTree from '../../foundation/components/scenery/PineTree';
+import Tree from '../../foundation/components/scenery/trees/Tree';
+import PineTree from '../../foundation/components/scenery/trees/PineTree';
 import Stone from '../../foundation/components/scenery/Stone';
 import {
   SmallSailBoat,

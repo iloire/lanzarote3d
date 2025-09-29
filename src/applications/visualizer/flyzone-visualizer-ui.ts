@@ -1,5 +1,5 @@
 import { VisualizerState } from './flyzone-visualizer';
-import { TakeoffRecommendation } from '../types/flyzone-types';
+import { TakeoffRecommendation } from '../../types/flyzone-types';
 
 /**
  * FlyzoneVisualizerUI - User interface for weather-based takeoff recommendations

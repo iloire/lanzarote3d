@@ -92,18 +92,6 @@ export function getRouteToStoryMap(): Record<string, string> {
     // Map route to key for story lookup
     const route = app.route.replace('/', '');
     mapping[route] = key;
-
-    // Add common aliases
-    if (key === 'location-editor') {
-      mapping['locationEditor'] = key;
-    }
-    if (key === 'paraglider-voxel') {
-      mapping['paragliderVoxel'] = key;
-    }
-    if (key === 'flier-pg') {
-      mapping['flier'] = key;
-      mapping['flierPg'] = key;
-    }
   });
 
   return mapping;

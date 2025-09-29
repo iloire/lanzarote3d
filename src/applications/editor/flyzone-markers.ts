@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { TakeoffLocation, LandingZone, FlightPhase } from '../types/flyzone-types';
+import { TakeoffLocation, LandingZone, FlightPhase } from '../../types/flyzone-types';
 
 /**
  * FlyzoneMarkers - Visual markers for flyzone elements in 3D scene

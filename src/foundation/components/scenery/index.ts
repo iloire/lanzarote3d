@@ -1,20 +1,24 @@
 // Scenery Components
 export { default as Island } from './Island';
 export { default as Igloo, IglooSize } from './Igloo';
-export { default as Tree } from './Tree';
-export { default as PineTree } from './PineTree';
-export { default as PalmTree } from './PalmTree';
 export { default as CoconutPalm } from './CoconutPalm';
 export { default as DatePalm } from './DatePalm';
 export { default as FanPalm } from './FanPalm';
 export { default as Pool } from './Pool';
 export { default as Stone } from './Stone';
 
-// Cactus Components
-export { default as SaguaroCactus } from './SaguaroCactus';
-export { default as BarrelCactus } from './BarrelCactus';
-export { default as PricklyPearCactus } from './PricklyPearCactus';
-export { default as OrganPipeCactus } from './OrganPipeCactus';
+// Tree Components (organized in trees subfolder)
+export { default as Tree } from './trees/Tree';
+export { default as PineTree } from './trees/PineTree';
+export { default as PalmTree } from './trees/PalmTree';
+export * from './trees';
+
+// Cactus Components (organized in cactus subfolder)
+export { default as SaguaroCactus } from './cactus/SaguaroCactus';
+export { default as BarrelCactus } from './cactus/BarrelCactus';
+export { default as PricklyPearCactus } from './cactus/PricklyPearCactus';
+export { default as OrganPipeCactus } from './cactus/OrganPipeCactus';
+export * from './cactus';
 
 // Boat Components (organized in boats subfolder)
 export * from './boats';

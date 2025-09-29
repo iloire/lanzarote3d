@@ -7,7 +7,7 @@ import {
   WeatherAnalysis,
   TakeoffRecommendation,
   CurrentWeather,
-} from '../types/flyzone-types';
+} from '../../types/flyzone-types';
 import { FlyzoneVisualizerUI } from './flyzone-visualizer-ui';
 import { FlyzoneMarkers } from '../editor/flyzone-markers';
 import { WindVisualization } from './wind-visualization';

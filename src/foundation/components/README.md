@@ -57,7 +57,7 @@ Factory pattern providing:
 ### Basic Component Creation
 
 ```typescript
-import { Tree } from './scenery/TreeComponent';
+import { Tree } from './scenery/trees/TreeComponent';
 import { componentFactory } from './factory/ComponentFactory';
 
 // Register component
