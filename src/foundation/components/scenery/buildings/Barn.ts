@@ -72,6 +72,7 @@ export class Barn extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(30, 18, 20)
     );
     const mainBody = new THREE.Mesh(mainBodyGeometry, wallMaterial);
+    mainBody.position.set(0, 9, 0); // Position so bottom is at y=0 (ground level)
     mainBody.castShadow = this.options.castShadow ?? true;
     mainBody.receiveShadow = this.options.receiveShadow ?? true;
     barn.add(mainBody);
@@ -82,7 +83,7 @@ export class Barn extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(32, 4, 22)
     );
     const roofLower = new THREE.Mesh(roofLowerGeometry, roofMaterial);
-    roofLower.position.set(0, 11, 0);
+    roofLower.position.set(0, 20, 0); // Adjusted for main body repositioning
     roofLower.rotation.x = -Math.PI / 12; // Slight angle
     roofLower.castShadow = this.options.castShadow ?? true;
     barn.add(roofLower);
@@ -92,7 +93,7 @@ export class Barn extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(26, 4, 22)
     );
     const roofUpper = new THREE.Mesh(roofUpperGeometry, roofMaterial);
-    roofUpper.position.set(0, 15, 0);
+    roofUpper.position.set(0, 24, 0); // Adjusted for main body repositioning
     roofUpper.rotation.x = -Math.PI / 6; // Steeper angle
     roofUpper.castShadow = this.options.castShadow ?? true;
     barn.add(roofUpper);
@@ -104,11 +105,11 @@ export class Barn extends SimpleThreeComponent {
     );
 
     const leftDoor = new THREE.Mesh(largeDoorGeometry, doorMaterial);
-    leftDoor.position.set(-4, -3, 10.25);
+    leftDoor.position.set(-4, 6, 10.25); // Adjusted for main body repositioning
     barn.add(leftDoor);
 
     const rightDoor = new THREE.Mesh(largeDoorGeometry, doorMaterial);
-    rightDoor.position.set(4, -3, 10.25);
+    rightDoor.position.set(4, 6, 10.25); // Adjusted for main body repositioning
     barn.add(rightDoor);
 
     // Door frame and track
@@ -117,7 +118,7 @@ export class Barn extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(18, 14, 1)
     );
     const doorFrame = new THREE.Mesh(doorFrameGeometry, trimMaterial);
-    doorFrame.position.set(0, -3, 10);
+    doorFrame.position.set(0, 6, 10); // Adjusted for main body repositioning
     barn.add(doorFrame);
 
     // Barn windows - small and high up
@@ -133,11 +134,11 @@ export class Barn extends SimpleThreeComponent {
 
     // Side windows
     const leftSideWindow = new THREE.Mesh(windowGeometry, windowMaterial);
-    leftSideWindow.position.set(-15.15, 4, 5);
+    leftSideWindow.position.set(-15.15, 13, 5); // Adjusted for main body repositioning
     barn.add(leftSideWindow);
 
     const rightSideWindow = new THREE.Mesh(windowGeometry, windowMaterial);
-    rightSideWindow.position.set(15.15, 4, 5);
+    rightSideWindow.position.set(15.15, 13, 5); // Adjusted for main body repositioning
     barn.add(rightSideWindow);
 
     // Hay loft door (upper level)
@@ -146,7 +147,7 @@ export class Barn extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(4, 4, 0.3)
     );
     const loftDoor = new THREE.Mesh(loftDoorGeometry, doorMaterial);
-    loftDoor.position.set(0, 6, 10.15);
+    loftDoor.position.set(0, 15, 10.15); // Adjusted for main body repositioning
     barn.add(loftDoor);
 
     // Weathervane on roof peak
@@ -155,7 +156,7 @@ export class Barn extends SimpleThreeComponent {
       () => new THREE.CylinderGeometry(0.1, 0.1, 4)
     );
     const weathervane = new THREE.Mesh(weathervaneGeometry, trimMaterial);
-    weathervane.position.set(0, 18, 0);
+    weathervane.position.set(0, 27, 0); // Adjusted for main body repositioning
     barn.add(weathervane);
 
     // Weathervane arrow
@@ -164,7 +165,7 @@ export class Barn extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(3, 0.2, 0.5)
     );
     const arrow = new THREE.Mesh(arrowGeometry, trimMaterial);
-    arrow.position.set(0, 19.5, 0);
+    arrow.position.set(0, 28.5, 0); // Adjusted for main body repositioning
     barn.add(arrow);
 
     // Fence posts around barn (decorative)
@@ -176,7 +177,7 @@ export class Barn extends SimpleThreeComponent {
     // Create fence line
     for (let i = 0; i < 8; i++) {
       const fencePost = new THREE.Mesh(fencePostGeometry, doorMaterial);
-      fencePost.position.set(-21 + i * 6, -6, 15);
+      fencePost.position.set(-21 + i * 6, 3, 15); // Adjusted for main body repositioning
       barn.add(fencePost);
     }
 
@@ -186,11 +187,11 @@ export class Barn extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(42, 0.5, 1)
     );
     const topRail = new THREE.Mesh(railGeometry, doorMaterial);
-    topRail.position.set(0, -4, 15);
+    topRail.position.set(0, 5, 15); // Adjusted for main body repositioning
     barn.add(topRail);
 
     const bottomRail = new THREE.Mesh(railGeometry, doorMaterial);
-    bottomRail.position.set(0, -7, 15);
+    bottomRail.position.set(0, 2, 15); // Adjusted for main body repositioning
     barn.add(bottomRail);
 
     // Apply scale

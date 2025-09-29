@@ -79,6 +79,7 @@ export class DesertHouse extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(18, 14, 16)
     );
     const mainBody = new THREE.Mesh(mainBodyGeometry, wallMaterial);
+    mainBody.position.set(0, 7, 0); // Position so bottom is at y=0 (ground level)
     mainBody.castShadow = this.options.castShadow ?? true;
     mainBody.receiveShadow = this.options.receiveShadow ?? true;
     desertHouse.add(mainBody);
@@ -89,7 +90,7 @@ export class DesertHouse extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(20, 1.5, 18)
     );
     const roof = new THREE.Mesh(roofGeometry, roofMaterial);
-    roof.position.set(0, 7.75, 0);
+    roof.position.set(0, 14.75, 0); // Adjusted for main body repositioning
     roof.castShadow = this.options.castShadow ?? true;
     desertHouse.add(roof);
 
@@ -99,7 +100,7 @@ export class DesertHouse extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(20.5, 2, 18.5)
     );
     const parapet = new THREE.Mesh(parapetGeometry, wallMaterial);
-    parapet.position.set(0, 8.5, 0);
+    parapet.position.set(0, 15.5, 0); // Adjusted for main body repositioning
     desertHouse.add(parapet);
 
     // Simple arched doorway
@@ -108,7 +109,7 @@ export class DesertHouse extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(4, 8, 0.5)
     );
     const door = new THREE.Mesh(doorGeometry, doorMaterial);
-    door.position.set(0, -3, 8.25);
+    door.position.set(0, 4, 8.25); // Adjusted for main body repositioning
     desertHouse.add(door);
 
     // Arched door frame
@@ -117,7 +118,7 @@ export class DesertHouse extends SimpleThreeComponent {
       () => new THREE.RingGeometry(2, 2.5, 0, Math.PI)
     );
     const arch = new THREE.Mesh(archGeometry, accentMaterial);
-    arch.position.set(0, 1, 8.1);
+    arch.position.set(0, 8, 8.1); // Adjusted for main body repositioning
     arch.rotation.z = Math.PI;
     desertHouse.add(arch);
 
@@ -129,16 +130,16 @@ export class DesertHouse extends SimpleThreeComponent {
 
     // Side windows - asymmetrical placement for authentic look
     const leftWindow = new THREE.Mesh(windowGeometry, windowMaterial);
-    leftWindow.position.set(-6, 2, 8.15);
+    leftWindow.position.set(-6, 9, 8.15); // Adjusted for main body repositioning
     desertHouse.add(leftWindow);
 
     const rightWindow = new THREE.Mesh(windowGeometry, windowMaterial);
-    rightWindow.position.set(6, 1, 8.15);
+    rightWindow.position.set(6, 8, 8.15); // Adjusted for main body repositioning
     desertHouse.add(rightWindow);
 
     // Side wall window
     const sideWindow = new THREE.Mesh(windowGeometry, windowMaterial);
-    sideWindow.position.set(9.15, 0, 0);
+    sideWindow.position.set(9.15, 7, 0); // Adjusted for main body repositioning
     desertHouse.add(sideWindow);
 
     // Window frames with desert accent color
@@ -160,7 +161,7 @@ export class DesertHouse extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(12, 4, 1)
     );
     const courtyardWall = new THREE.Mesh(courtyardWallGeometry, wallMaterial);
-    courtyardWall.position.set(-8, -5, 10);
+    courtyardWall.position.set(-8, 2, 10); // Adjusted for main body repositioning
     desertHouse.add(courtyardWall);
 
     // Desert plants/decoration (simple geometric cactus)
@@ -174,7 +175,7 @@ export class DesertHouse extends SimpleThreeComponent {
     );
 
     const cactus = new THREE.Mesh(cactusGeometry, cactusMaterial);
-    cactus.position.set(-12, -4, 6);
+    cactus.position.set(-12, 3, 6); // Adjusted for main body repositioning
     desertHouse.add(cactus);
 
     // Cactus arm
@@ -183,7 +184,7 @@ export class DesertHouse extends SimpleThreeComponent {
       () => new THREE.CylinderGeometry(0.3, 0.4, 3)
     );
     const cactusArm = new THREE.Mesh(cactusArmGeometry, cactusMaterial);
-    cactusArm.position.set(-10.5, -2, 6);
+    cactusArm.position.set(-10.5, 5, 6); // Adjusted for main body repositioning
     cactusArm.rotation.z = Math.PI / 2;
     desertHouse.add(cactusArm);
 
@@ -193,7 +194,7 @@ export class DesertHouse extends SimpleThreeComponent {
       () => new THREE.BoxGeometry(8, 0.5, 6)
     );
     const shade = new THREE.Mesh(shadeGeometry, accentMaterial);
-    shade.position.set(8, 4, -6);
+    shade.position.set(8, 11, -6); // Adjusted for main body repositioning
     desertHouse.add(shade);
 
     // Shade posts
@@ -203,10 +204,10 @@ export class DesertHouse extends SimpleThreeComponent {
     );
 
     const posts = [
-      new THREE.Vector3(5, -3, -8),
-      new THREE.Vector3(11, -3, -8),
-      new THREE.Vector3(5, -3, -4),
-      new THREE.Vector3(11, -3, -4)
+      new THREE.Vector3(5, 4, -8), // Adjusted for main body repositioning
+      new THREE.Vector3(11, 4, -8), // Adjusted for main body repositioning
+      new THREE.Vector3(5, 4, -4), // Adjusted for main body repositioning
+      new THREE.Vector3(11, 4, -4) // Adjusted for main body repositioning
     ];
 
     posts.forEach(pos => {
