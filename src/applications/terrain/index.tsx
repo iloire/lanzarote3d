@@ -4,6 +4,7 @@ import { StoryOptions } from '../../shared/types';
 import { getAllThemes, getThemeById } from '../../foundation/themes';
 import { ThemeEngine } from '../../foundation/systems/ThemeEngine';
 import { themeManager } from '../../foundation/systems/ThemeManager';
+import { Theme } from '../../foundation/types/Theme';
 
 // Terrain style definitions
 interface TerrainStyle {
@@ -302,7 +303,7 @@ const TerrainWorkshop = {
     };
 
     // Function to sync terrain with theme
-    const syncTerrainWithTheme = async (theme: any) => {
+    const syncTerrainWithTheme = async (theme: Theme) => {
       currentTheme = theme;
       await themeManager.applyTheme(theme.id);
 

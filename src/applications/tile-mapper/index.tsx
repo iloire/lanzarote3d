@@ -2,6 +2,11 @@ import { NonRenderingAppBase } from '../../shared/NonRenderingAppBase';
 import { StoryOptions } from '../../shared/types';
 import { getAppConfig } from '../../config/app-registry';
 
+interface TileBounds {
+  topLeft: { lon: number; lat: number };
+  bottomRight: { lon: number; lat: number };
+}
+
 /**
  * Comprehensive Tile Mapper Debug Tool - Interactive satellite tile system debugger
  *
@@ -67,7 +72,7 @@ class TileMapperApp extends NonRenderingAppBase {
   private calculateTileGrid(): Array<{
     x: number;
     y: number;
-    bounds: any;
+    bounds: TileBounds;
     url: string;
     status: string;
   }> {
@@ -319,7 +324,7 @@ done</div>
   }
 
   private createInteractiveTileGrid(
-    tiles: Array<{ x: number; y: number; bounds: any; url: string; status: string }>
+    tiles: Array<{ x: number; y: number; bounds: TileBounds; url: string; status: string }>
   ): void {
     setTimeout(() => {
       const gridContainer = document.getElementById('tile-grid-container');
@@ -430,7 +435,7 @@ done</div>
   private async selectTile(tile: {
     x: number;
     y: number;
-    bounds: any;
+    bounds: TileBounds;
     url: string;
     status: string;
   }): Promise<void> {

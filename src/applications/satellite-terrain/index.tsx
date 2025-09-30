@@ -10,6 +10,13 @@ import {
 } from '../../foundation/utils/OrbitControlsHelper';
 import { getAppConfig } from '../../config/app-registry';
 import SatelliteThemes from '../../foundation/utils/satellite-themes';
+import { Theme } from '../../foundation/types/Theme';
+
+interface ThemeOption {
+  name: string;
+  theme: Theme;
+  description: string;
+}
 
 /**
  * Satellite Terrain Demo - Showcases realistic terrain with satellite imagery
@@ -30,7 +37,7 @@ class SatelliteTerrainApp extends TerrainBase {
   private environment: Environment | undefined;
   private animationId: number | undefined;
   private currentThemeIndex = 0;
-  private availableThemes: any[] = [];
+  private availableThemes: ThemeOption[] = [];
   private uiContainer: HTMLElement | undefined;
   private debugUI: HTMLElement | undefined;
 
@@ -148,7 +155,7 @@ class SatelliteTerrainApp extends TerrainBase {
     }
   }
 
-  private async applyThemeWithIslandSupport(options: StoryOptions, theme: any): Promise<void> {
+  private async applyThemeWithIslandSupport(options: StoryOptions, theme: Theme): Promise<void> {
     // Apply theme with special handling for satellite imagery
     await ThemeEngine.apply(options, theme);
 
