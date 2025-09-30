@@ -42,6 +42,11 @@ async function dynamicImportApp(path: string): Promise<any> {
 
 /**
  * Load an app by key using the app registry
+ *
+ * Convention: Apps are located at ./applications/{folder-name}/index.tsx
+ * The folder name is derived from the route (e.g., /famara-animation -> famara-animation)
+ *
+ * Special cases can override with the 'entry' field in apps.json
  */
 export async function loadApp(appKey: string, options: StoryOptions): Promise<void> {
   // Handle route aliases (e.g., 'flier' -> 'flier-pg')
@@ -55,18 +60,19 @@ export async function loadApp(appKey: string, options: StoryOptions): Promise<vo
     throw new Error(`App '${resolvedKey}' not found in registry`);
   }
 
-  // Extract the relative path from the entry field
-  // Entry format: "./experiences/game/index.tsx" or "./tools/workshop/demos/tile-debug/app"
-  const entryPath = app.entry
-    .replace(/^\.\//, '../') // Replace ./ with ../
-    .replace(/\.(tsx?|jsx?)$/, ''); // Remove file extension
+  // Determine import path: use custom entry or derive from route
+  let importPath: string;
 
-  // Special case handling for known mismatches
-  let importPath = entryPath;
-
-  // Handle specific cases where the actual file differs from entry
-  if (entryPath === '../tools/workshop/index') {
-    importPath = '../tools/workshop/demos/workshop/index';
+  if (app.entry) {
+    // Custom entry specified (e.g., tile-debug with special structure)
+    importPath = app.entry
+      .replace(/^\.\//, '../') // Convert ./applications/... to ../applications/...
+      .replace(/\.(tsx?|jsx?)$/, ''); // Remove extension
+  } else {
+    // Standard convention: route name = folder name
+    // E.g., /famara-animation -> ../applications/famara-animation
+    const folderName = app.route.replace(/^\//, '');
+    importPath = `../applications/${folderName}`;
   }
 
   let appModule;

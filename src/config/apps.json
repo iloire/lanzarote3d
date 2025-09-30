@@ -3,7 +3,6 @@
     "flyzones": {
       "name": "Flyzones",
       "description": "Explore flyzing locations in 3D",
-      "entry": "./applications/flyzones/index.tsx",
       "route": "/flyzones",
       "category": "experience",
       "htmlTemplate": "./applications/flyzones/index.html",
@@ -14,7 +13,6 @@
     "locationeditor": {
       "name": "Location Editor",
       "description": "Basic tool for creating and editing flight locations (legacy)",
-      "entry": "./applications/location-editor/index.tsx",
       "route": "/location-editor",
       "category": "tool",
       "requiresWebGL": true,
@@ -24,7 +22,6 @@
     "workshopdemo": {
       "name": "Workshop Demo",
       "description": "Dev environment for testing and showcasing individual 3D components",
-      "entry": "./applications/workshop-demo/index.tsx",
       "route": "/workshop-demo",
       "category": "tool",
       "requiresWebGL": true,
@@ -34,7 +31,6 @@
     "flyingbehaviortest": {
       "name": "Flying Behavior Test",
       "description": "Test autonomous flying behavior system with obstacle avoidance and boundary detection",
-      "entry": "./applications/flying-behavior-test/index.tsx",
       "route": "/flying-behavior-test",
       "category": "tool",
       "requiresWebGL": true,
@@ -44,7 +40,6 @@
     "cameraswitcherdemo": {
       "name": "Camera Switcher Demo",
       "description": "Demonstrates CameraTargetController with multiple dynamic targets and camera modes",
-      "entry": "./applications/camera-switcher-demo/index.tsx",
       "route": "/camera-switcher-demo",
       "category": "tool",
       "requiresWebGL": true,
@@ -59,12 +54,12 @@
       "category": "tool",
       "requiresWebGL": true,
       "visibility": "private",
-      "priority": 11
+      "priority": 11,
+      "webpackEntry": "./applications/tile-debug/entry.tsx"
     },
     "animation": {
       "name": "Famara animation",
       "description": "Dramatic camera animation showcasing voxel paragliders with golden hour lighting",
-      "entry": "./applications/famara-animation/index.tsx",
       "route": "/famara-animation",
       "category": "demo",
       "requiresWebGL": true,
@@ -74,7 +69,6 @@
     "boatsanimation": {
       "name": "Boats Animation",
       "description": "Cinematic animation starting near boats and transitioning to focus on paragliders and clouds",
-      "entry": "./applications/boats-animation/index.tsx",
       "route": "/boats-animation",
       "category": "demo",
       "requiresWebGL": true,
@@ -84,7 +78,6 @@
     "famara": {
       "name": "Famara static",
       "description": "Natural beauty of Famara beach area without paragliders - pure landscape focus",
-      "entry": "./applications/famara/index.tsx",
       "route": "/famara",
       "category": "demo",
       "requiresWebGL": true,
@@ -95,7 +88,6 @@
     "boats": {
       "name": "Boats Workshop",
       "description": "Multiple boat types showcase with variations",
-      "entry": "./applications/boats/index.tsx",
       "route": "/boats",
       "category": "demo",
       "requiresWebGL": true,
@@ -105,7 +97,6 @@
     "island": {
       "name": "Island",
       "description": "Lanzarote island view with dramatic lighting",
-      "entry": "./applications/island",
       "route": "/island",
       "category": "demo",
       "requiresWebGL": true,
@@ -115,7 +106,6 @@
     "paraglidervoxel": {
       "name": "Voxel pilot",
       "description": "Voxel-based paraglider component showcase",
-      "entry": "./applications/paraglider-voxel",
       "route": "/paraglider-voxel",
       "category": "demo",
       "requiresWebGL": true,
@@ -125,7 +115,6 @@
     "glider": {
       "name": "Glider",
       "description": "Legacy glider component demo showcasing traditional wing configurations",
-      "entry": "./applications/glider",
       "route": "/glider",
       "category": "demo",
       "requiresWebGL": true,
@@ -135,7 +124,6 @@
     "hangglider": {
       "name": "Hang Glider",
       "description": "Hang glider component demo showcasing hang glider wing configurations",
-      "entry": "./applications/hangglider",
       "route": "/hangglider",
       "category": "demo",
       "requiresWebGL": true,
@@ -145,7 +133,6 @@
     "pilot": {
       "name": "Pilot",
       "description": "Pilot component demo",
-      "entry": "./applications/pilot",
       "route": "/pilot",
       "category": "demo",
       "requiresWebGL": true,
@@ -155,7 +142,6 @@
     "terrain": {
       "name": "Terrain",
       "description": "Terrain generation demo",
-      "entry": "./applications/terrain",
       "route": "/terrain",
       "category": "demo",
       "requiresWebGL": true,
@@ -165,7 +151,6 @@
     "proceduralterrain": {
       "name": "Procedural Terrain",
       "description": "Interactive parametric terrain generator with noise-based displacement and multiple presets",
-      "entry": "./applications/procedural-terrain/index.tsx",
       "route": "/procedural-terrain",
       "category": "tool",
       "requiresWebGL": true,
@@ -175,7 +160,6 @@
     "town": {
       "name": "Town",
       "description": "Neighborhood generation showcase with various residential formations and house types",
-      "entry": "./applications/town",
       "route": "/town",
       "category": "demo",
       "requiresWebGL": true,
@@ -185,7 +169,6 @@
     "houses": {
       "name": "Houses",
       "description": "House component showcase comparing normal vs low-poly versions with polygon count analysis",
-      "entry": "./applications/houses",
       "route": "/houses",
       "category": "demo",
       "requiresWebGL": true,
@@ -195,7 +178,6 @@
     "flierpg": {
       "name": "flier pg",
       "description": "Workshop demo showcasing paraglider physics simulation with weather system",
-      "entry": "./applications/flier-pg/index.tsx",
       "route": "/flier-pg",
       "category": "demo",
       "requiresWebGL": true,
@@ -205,7 +187,6 @@
     "animals": {
       "name": "Animals",
       "description": "Showcase of bird species with realistic wing animations including Crow, Eagle, and Vulture",
-      "entry": "./applications/animals/index.tsx",
       "route": "/animals",
       "category": "demo",
       "requiresWebGL": true,
@@ -215,7 +196,6 @@
     "cars": {
       "name": "Cars",
       "description": "Cars",
-      "entry": "./applications/cars/index.tsx",
       "route": "/cars",
       "category": "demo",
       "requiresWebGL": true,
@@ -225,7 +205,6 @@
     "boat": {
       "name": "Boat",
       "description": "Single PatrolBoat component showcase",
-      "entry": "./applications/boat/index.tsx",
       "route": "/boat",
       "category": "demo",
       "requiresWebGL": true,
@@ -235,7 +214,6 @@
     "car": {
       "name": "Car",
       "description": "Car component demo",
-      "entry": "./applications/car/index.tsx",
       "route": "/car",
       "category": "demo",
       "requiresWebGL": true,
@@ -245,7 +223,6 @@
     "clouds": {
       "name": "Clouds",
       "description": "Cloud system demo",
-      "entry": "./applications/clouds/index.tsx",
       "route": "/clouds",
       "category": "demo",
       "requiresWebGL": true,
@@ -255,7 +232,6 @@
     "head": {
       "name": "Head",
       "description": "Head component demo",
-      "entry": "./applications/head/index.tsx",
       "route": "/head",
       "category": "demo",
       "requiresWebGL": true,
@@ -265,7 +241,6 @@
     "helmet": {
       "name": "Helmet",
       "description": "Helmet component demo",
-      "entry": "./applications/helmet/index.tsx",
       "route": "/helmet",
       "category": "demo",
       "requiresWebGL": true,
@@ -275,7 +250,6 @@
     "paraglider": {
       "name": "Paraglider",
       "description": "Paraglider component demo",
-      "entry": "./applications/paraglider/index.tsx",
       "route": "/paraglider",
       "category": "demo",
       "requiresWebGL": true,
@@ -285,7 +259,6 @@
     "satelliteterrain": {
       "name": "Satellite Terrain",
       "description": "Satellite terrain generation demo",
-      "entry": "./applications/satellite-terrain/index.tsx",
       "route": "/satellite-terrain",
       "category": "demo",
       "requiresWebGL": true,
@@ -295,7 +268,6 @@
     "terraingps": {
       "name": "Terrain GPS",
       "description": "GPS-based terrain generation demo",
-      "entry": "./applications/terrain-gps/index.tsx",
       "route": "/terrain-gps",
       "category": "demo",
       "requiresWebGL": true,
@@ -305,7 +277,6 @@
     "tilemapper": {
       "name": "Tile Mapper",
       "description": "Tile mapping system demo",
-      "entry": "./applications/tile-mapper/index.tsx",
       "route": "/tile-mapper",
       "category": "demo",
       "requiresWebGL": true,
@@ -315,7 +286,6 @@
     "truck": {
       "name": "Truck",
       "description": "Truck component demo",
-      "entry": "./applications/truck/index.tsx",
       "route": "/truck",
       "category": "demo",
       "requiresWebGL": true,
@@ -325,7 +295,6 @@
     "voxel": {
       "name": "Voxel",
       "description": "Voxel system demo",
-      "entry": "./applications/voxel/index.tsx",
       "route": "/voxel",
       "category": "demo",
       "requiresWebGL": true,
@@ -335,7 +304,6 @@
     "plane": {
       "name": "Plane",
       "description": "Military jet aircraft showcase",
-      "entry": "./applications/plane/index.tsx",
       "route": "/plane",
       "category": "demo",
       "requiresWebGL": true,
@@ -345,7 +313,6 @@
     "planes": {
       "name": "Planes",
       "description": "Aircraft showcase featuring Jet, Airliner, and Cessna with comparison",
-      "entry": "./applications/planes/index.tsx",
       "route": "/planes",
       "category": "demo",
       "requiresWebGL": true,
@@ -355,7 +322,6 @@
     "roads": {
       "name": "Roads",
       "description": "Procedural road generation showcase on island terrain with customizable settings",
-      "entry": "./applications/roads/index.tsx",
       "route": "/roads",
       "category": "demo",
       "requiresWebGL": true,

@@ -21,9 +21,9 @@ const showcaseApps = Object.entries(appsConfig.apps)
     name: appKey,
     title: `Lanzarote - ${app.name}`,
     filename: app.route.replace(/^\//, '') + '.html',
-    // Only tile-debug has a custom entry point (entry.tsx), all others use index.tsx
-    entry: app.entry.includes('/entry.tsx')
-      ? './src/' + app.entry.slice(2)  // Custom entry like tile-debug
+    // Use custom webpack entry if specified (e.g., tile-debug), otherwise use standard index.tsx
+    entry: app.webpackEntry
+      ? './src/' + app.webpackEntry.slice(2)  // Custom webpack entry
       : './src/index.tsx'  // Standard entry point for all showcase apps
   }))
   .sort((a, b) => {
