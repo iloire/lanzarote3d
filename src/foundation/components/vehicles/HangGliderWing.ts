@@ -547,7 +547,7 @@ class HangGliderWingLegacy {
     this.component = new HangGliderWing(options);
   }
 
-  async load(_gui?: any): Promise<THREE.Mesh> {
+  async load(_gui?: unknown): Promise<THREE.Mesh> {
     const wingObject = await this.component.load();
     return wingObject as THREE.Mesh; // Cast for compatibility
   }

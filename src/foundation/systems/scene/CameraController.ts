@@ -86,7 +86,7 @@ export class CameraController extends THREE.PerspectiveCamera {
     super(fov, aspect, near, far);
   }
 
-  addGui(gui: any) {
+  addGui(gui: { addFolder: (name: string) => { add: (obj: any, prop: string, min?: number, max?: number) => { name: (name: string) => { listen: () => void } } } }) {
     GuiHelper.addLocationGui(gui, 'Camera', this, { min: 0, max: 10000 });
     GuiHelper.addPositionGui(gui, 'Camera.firstPersonViewOffset', this.firstPersonViewOffset, {
       min: -20,
@@ -166,7 +166,7 @@ export class CameraController extends THREE.PerspectiveCamera {
     newTarget: THREE.Vector3,
     duration: number = 2000,
     controls: OrbitControls,
-    cb: any = () => {}
+    cb: () => void = () => {}
   ) {
     // Store initial positions
     const startPosition = this.position.clone();

@@ -67,10 +67,10 @@ class HeadWorkshopApp extends WorkshopDemoBase {
           const baseHelmetOptions: HelmetOptions = this.getThemedHelmetOptions(headKey, variant);
 
           heads.push({
-            headType: (PilotHeadType as any)[headKey],
-            helmetType: (HelmetType as any)[helmetKey],
+            headType: PilotHeadType[headKey as keyof typeof PilotHeadType],
+            helmetType: HelmetType[helmetKey as keyof typeof HelmetType],
             helmetOptions: baseHelmetOptions,
-            glassesType: (GlassesType as any)[glassesKey],
+            glassesType: GlassesType[glassesKey as keyof typeof GlassesType],
             skinColor: this.getThemedSkinColor(headKey),
             beardColor: this.getThemedBeardColor(headKey),
             eyeColor: this.getThemedEyeColor(headKey),
@@ -92,7 +92,7 @@ class HeadWorkshopApp extends WorkshopDemoBase {
 
         // Fix the enum value display
         const headTypeName = Object.keys(PilotHeadType).find(
-          key => (PilotHeadType as any)[key] === headOptions.headType
+          key => PilotHeadType[key as keyof typeof PilotHeadType] === headOptions.headType
         );
 
         // Calculate grid position with increased spacing
@@ -106,11 +106,11 @@ class HeadWorkshopApp extends WorkshopDemoBase {
 
         scene.add(mesh);
         const helmetTypeName = Object.keys(HelmetType).find(
-          key => (HelmetType as any)[key] === headOptions.helmetType
+          key => HelmetType[key as keyof typeof HelmetType] === headOptions.helmetType
         );
         const glassesTypeName = headOptions.glassesType
           ? Object.keys(GlassesType).find(
-              key => (GlassesType as any)[key] === headOptions.glassesType
+              key => GlassesType[key as keyof typeof GlassesType] === headOptions.glassesType
             )
           : null;
 

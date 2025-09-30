@@ -48,7 +48,7 @@ export abstract class FloatingThreeComponent extends SimpleThreeComponent {
    */
   public override loadSync(): THREE.Object3D {
     // Call the protected method through the regular load process
-    const content = (this as any).createSyncContent();
+    const content = super.loadSync();
 
     // Integrate floating behavior
     this.floatingBehavior.attachTo(content);

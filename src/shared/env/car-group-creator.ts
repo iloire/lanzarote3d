@@ -4,6 +4,7 @@ import { AutonomousCar } from '../../foundation/components/vehicles/AutonomousCa
 import { ComponentRegistry } from '../../foundation/systems/ComponentRegistry';
 import { CarConfig, CarGroupConfig } from './car-group-types';
 import { TerrainDrivingMode } from '../../foundation/systems/behaviors/TerrainFollowingBehavior';
+import { MovementPattern } from '../../foundation/systems/behaviors/MovingBehavior';
 import {
   calculateCarPositions,
   generateParkingLotCars,
@@ -294,7 +295,7 @@ export class CarGroupCreator {
       cars.push({
         type: isAutonomous ? 'AutonomousCar' : 'Car',
         enableMovement: true,
-        pattern: 'LINEAR' as any,
+        pattern: MovementPattern.LINEAR,
         speed: 0.15 + Math.random() * 0.1,
         radius: 300,
         scale: 0.9 + Math.random() * 0.2,
