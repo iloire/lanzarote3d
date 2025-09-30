@@ -3,16 +3,18 @@ import { TerrainBase } from '../../shared/TerrainBase';
 import { StoryOptions } from '../../shared/types';
 import { CameraTargetController, CameraMode } from '../../foundation/systems/scene/CameraTargetController';
 import { createCameraTargetUI } from '../../foundation/components/ui/CameraTargetUI';
-import { Cessna, Jet } from '../../foundation/components/vehicles';
+import { Cessna, Jet, HangGliderWing } from '../../foundation/components/vehicles';
 import { EngineFlyingBehavior } from '../../foundation/systems/behaviors/EngineFlyingBehavior';
+import { FlyingBehavior, FlightPattern } from '../../foundation/systems/behaviors/FlyingBehavior';
 import { getAppConfig } from '../../config/app-registry';
 
 /**
  * Camera Switcher Demo
  *
  * Demonstrates the CameraTargetController with multiple dynamic targets:
- * - Flying Cessna with autonomous flight
- * - Flying Jet with different flight pattern
+ * - Flying Cessna with autonomous terrain-avoidance flight
+ * - Flying Jet with faster, higher altitude flight
+ * - Hang glider soaring in circles with FlyingBehavior
  * - Static markers (ground, hill)
  *
  * Features:
@@ -25,6 +27,7 @@ class CameraSwitcherDemo extends TerrainBase {
   private targetController: CameraTargetController | null = null;
   private cessnaBehavior: EngineFlyingBehavior | undefined;
   private jetBehavior: EngineFlyingBehavior | undefined;
+  private hanggliderBehavior: FlyingBehavior | undefined;
   private animationId: number | undefined;
 
   constructor() {
@@ -85,6 +88,9 @@ class CameraSwitcherDemo extends TerrainBase {
 
     // Add flying Jet
     await this.addFlyingJet(scene, terrain);
+
+    // Add hang glider
+    await this.addHangglider(scene, terrain);
 
     // Add static markers
     await this.addStaticMarkers(scene);
@@ -184,6 +190,36 @@ class CameraSwitcherDemo extends TerrainBase {
     this.targetController?.addTarget(jetMesh, '✈️ Jet (Fast)');
   }
 
+  private async addHangglider(scene: THREE.Scene, terrain: THREE.Mesh): Promise<void> {
+    // Create hang glider wing mesh
+    const wingComponent = new HangGliderWing({
+      wingColor: '#ff6b35',
+      wingspan: 80,
+      scale: 1,
+    });
+    const hanggliderMesh = await wingComponent.load();
+    hanggliderMesh.position.set(7500, 250, -1500);
+    scene.add(hanggliderMesh);
+
+    // Add circular soaring behavior  (wind-dependent flight)
+    this.hanggliderBehavior = new FlyingBehavior({
+      pattern: FlightPattern.CIRCULAR,
+      speed: 5.0,
+      turnSpeed: 0.7,
+      flightRadius: 800,
+      minHeight: 180,
+      maxHeight: 320,
+      centerPoint: new THREE.Vector3(7500, 0, -1500),
+      autoStart: true,
+    });
+
+    this.hanggliderBehavior.attachTo(hanggliderMesh);
+    this.hanggliderBehavior.setTerrain(terrain);
+
+    // Add to camera targets
+    this.targetController?.addTarget(hanggliderMesh, '🪂 Hang Glider (Soaring)');
+  }
+
   private async addStaticMarkers(scene: THREE.Scene): Promise<void> {
     // Ground marker
     const groundMarker = new THREE.Group();
@@ -225,6 +261,10 @@ class CameraSwitcherDemo extends TerrainBase {
     if (this.jetBehavior) {
       this.jetBehavior.dispose();
       this.jetBehavior = undefined;
+    }
+    if (this.hanggliderBehavior) {
+      this.hanggliderBehavior.dispose();
+      this.hanggliderBehavior = undefined;
     }
 
     // Clean up target controller
