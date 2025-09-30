@@ -74,16 +74,10 @@ export class DesertHouseWithPool extends SimpleThreeComponent {
     // Create materials
     const materials = this.createMaterials(options);
 
-    // Add main house
-    this.addDesertHouse(compound, options);
-
-    // Add swimming pool
-    this.addSwimmingPool(compound, options);
-
-    // Add landscaping
+    // Add landscaping (synchronous geometry only)
     this.addPoolLandscaping(compound, materials);
 
-    // Add outdoor amenities
+    // Add outdoor amenities (synchronous geometry only)
     this.addOutdoorAmenities(compound, materials);
 
     // Apply scale to the entire compound
@@ -92,6 +86,28 @@ export class DesertHouseWithPool extends SimpleThreeComponent {
     }
 
     return compound;
+  }
+
+  /**
+   * Override async load to add house and pool after base content
+   */
+  override async load(): Promise<THREE.Object3D> {
+    // Load base synchronous content first
+    const baseObject = await super.load();
+
+    const options = this.options as DesertHouseWithPoolOptions;
+    const isLowPoly = options.lowPoly || false;
+
+    // Skip async loading for low-poly mode (everything is synchronous)
+    if (!isLowPoly && baseObject instanceof THREE.Group) {
+      // Load house and pool in parallel
+      await Promise.all([
+        this.addDesertHouse(baseObject, options),
+        this.addSwimmingPool(baseObject, options)
+      ]);
+    }
+
+    return baseObject;
   }
 
   /**
@@ -113,7 +129,7 @@ export class DesertHouseWithPool extends SimpleThreeComponent {
   /**
    * Add the main desert house
    */
-  private addDesertHouse(compound: THREE.Group, options: DesertHouseWithPoolOptions): void {
+  private async addDesertHouse(compound: THREE.Group, options: DesertHouseWithPoolOptions): Promise<void> {
     const desertHouse = new DesertHouse({
       wallColor: options.wallColor,
       roofColor: options.roofColor,
@@ -126,7 +142,7 @@ export class DesertHouseWithPool extends SimpleThreeComponent {
       receiveShadow: this.options.receiveShadow,
     });
 
-    const houseMesh = desertHouse.loadSync(); // Synchronous load
+    const houseMesh = await desertHouse.load();
     houseMesh.position.set(0, 0, 0);
     compound.add(houseMesh);
   }
@@ -134,7 +150,7 @@ export class DesertHouseWithPool extends SimpleThreeComponent {
   /**
    * Add the swimming pool
    */
-  private addSwimmingPool(compound: THREE.Group, options: DesertHouseWithPoolOptions): void {
+  private async addSwimmingPool(compound: THREE.Group, options: DesertHouseWithPoolOptions): Promise<void> {
     const pool = new Pool({
       waterColor: options.poolWaterColor,
       tileColor: options.poolTileColor,
@@ -147,7 +163,7 @@ export class DesertHouseWithPool extends SimpleThreeComponent {
       receiveShadow: this.options.receiveShadow,
     });
 
-    const poolMesh = pool.loadSync(); // Synchronous load
+    const poolMesh = await pool.load();
     poolMesh.position.set(0, 0, -25);
     compound.add(poolMesh);
   }
