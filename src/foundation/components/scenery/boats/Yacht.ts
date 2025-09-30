@@ -43,12 +43,6 @@ export class Yacht extends MovableBoatComponent {
     return new THREE.BoxGeometry(1, 1, 1);
   }
 
-  /**
-   * Override createObject to return the full yacht group instead of a simple mesh
-   */
-  protected override async createObject(): Promise<THREE.Object3D> {
-    return this.createSyncContent();
-  }
 
   protected createSyncContent(): THREE.Object3D {
     const yacht = new THREE.Group();
@@ -56,6 +50,7 @@ export class Yacht extends MovableBoatComponent {
 
     const options = this.options as YachtOptions;
     const scale = options.scale || 1;
+    console.log('🚤 Creating yacht with options:', options);
 
     // Create materials with resource sharing
     const hullMaterial = resourceManager.getOrCreateMaterial(
@@ -181,6 +176,14 @@ export class Yacht extends MovableBoatComponent {
 
     // Rotate 90 degrees to align with forward axis
     yacht.rotateY(Math.PI / 2);
+
+    console.log('🚤 Yacht created with', yacht.children.length, 'children');
+    console.log('🚤 Yacht bounding box:', yacht);
+    yacht.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        console.log('  - Mesh:', child.name || 'unnamed', 'geometry:', child.geometry, 'material:', child.material);
+      }
+    });
 
     return yacht;
   }

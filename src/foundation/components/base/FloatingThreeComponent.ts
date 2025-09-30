@@ -30,7 +30,15 @@ export abstract class FloatingThreeComponent extends SimpleThreeComponent {
   }
 
   protected override async createObject(): Promise<THREE.Object3D> {
-    const object = await super.createObject();
+    let object: THREE.Object3D;
+
+    // Check if child class has createSyncContent method (for complex multi-mesh components like boats)
+    if ('createSyncContent' in this && typeof (this as any).createSyncContent === 'function') {
+      object = (this as any).createSyncContent();
+    } else {
+      // Otherwise use the standard SimpleThreeComponent single-mesh creation
+      object = await super.createObject();
+    }
 
     // Integrate floating behavior
     this.floatingBehavior.attachTo(object);
@@ -47,8 +55,17 @@ export abstract class FloatingThreeComponent extends SimpleThreeComponent {
    * This is a legacy method - prefer using load() for new code
    */
   public override loadSync(): THREE.Object3D {
-    // Call the protected method through the regular load process
-    const content = super.loadSync();
+    let content: THREE.Object3D;
+
+    // Check if child class has createSyncContent method (for complex multi-mesh components like boats)
+    if ('createSyncContent' in this && typeof (this as any).createSyncContent === 'function') {
+      content = (this as any).createSyncContent();
+      this._object = content;
+      this._isLoaded = true;
+    } else {
+      // Otherwise use the standard SimpleThreeComponent single-mesh creation
+      content = super.loadSync();
+    }
 
     // Integrate floating behavior
     this.floatingBehavior.attachTo(content);
