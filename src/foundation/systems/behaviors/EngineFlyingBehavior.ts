@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { FlyingBehavior, FlyingBehaviorOptions, FlightPattern } from './FlyingBehavior';
+import { logger } from '../../utils/logger';
 
 export interface EngineFlyingBehaviorOptions extends FlyingBehaviorOptions {
   // Engine-specific options
@@ -149,7 +150,7 @@ export class EngineFlyingBehavior extends FlyingBehavior {
 
         // Log when climbing to avoid terrain
         if (Math.random() < 0.01) { // 1% of frames
-          console.log(`⛰️  Climbing to avoid terrain: required=${requiredAltitude.toFixed(0)}, current=${currentAltitude.toFixed(0)}`);
+          logger.debug(`Climbing to avoid terrain: required=${requiredAltitude.toFixed(0)}, current=${currentAltitude.toFixed(0)}`);
         }
       }
     }

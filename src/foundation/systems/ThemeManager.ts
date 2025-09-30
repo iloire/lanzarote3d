@@ -137,7 +137,7 @@ class ThemeManager {
    */
   async applySavedThemeAfterLoad(): Promise<void> {
     if (!this.isReady() || !this.currentTheme) {
-      console.warn('Cannot apply saved theme after load: ThemeManager not ready');
+      logger.warn('Cannot apply saved theme after load: ThemeManager not ready');
       return;
     }
 
@@ -145,14 +145,14 @@ class ThemeManager {
     try {
       const savedThemeId = this.loadThemeFromStorage();
       if (savedThemeId) {
-        console.log(`📱 Applying saved theme "${this.currentTheme.name}" after story load`);
+        logger.info(`Applying saved theme "${this.currentTheme.name}" after story load`);
       } else {
-        console.log(`📱 Applying default theme "${this.currentTheme.name}" after story load`);
+        logger.info(`Applying default theme "${this.currentTheme.name}" after story load`);
       }
       await ThemeEngine.apply(this.storyOptions!, this.currentTheme);
       this.notifyListeners(this.currentTheme);
     } catch (error) {
-      console.error(
+      logger.error(
         `Failed to apply theme "${this.currentTheme.name}" after story load:`,
         error
       );
@@ -181,7 +181,7 @@ class ThemeManager {
       try {
         callback(theme);
       } catch (error) {
-        console.error('Error in theme change listener:', error);
+        logger.error('Error in theme change listener:', error);
       }
     });
   }
@@ -207,7 +207,7 @@ class ThemeManager {
     try {
       localStorage.setItem(this.STORAGE_KEY, themeId);
     } catch (error) {
-      console.warn('Failed to save theme to localStorage:', error);
+      logger.warn('Failed to save theme to localStorage:', error);
     }
   }
 
@@ -218,7 +218,7 @@ class ThemeManager {
     try {
       return localStorage.getItem(this.STORAGE_KEY);
     } catch (error) {
-      console.warn('Failed to load theme from localStorage:', error);
+      logger.warn('Failed to load theme from localStorage:', error);
       return null;
     }
   }
@@ -229,9 +229,9 @@ class ThemeManager {
   clearSavedTheme(): void {
     try {
       localStorage.removeItem(this.STORAGE_KEY);
-      console.log('Saved theme cleared from localStorage');
+      logger.debug('Saved theme cleared from localStorage');
     } catch (error) {
-      console.warn('Failed to clear theme from localStorage:', error);
+      logger.warn('Failed to clear theme from localStorage:', error);
     }
   }
 }

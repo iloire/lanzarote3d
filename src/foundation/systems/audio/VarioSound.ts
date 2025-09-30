@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import Flier from '../../types/flier';
+import { logger } from '../../utils/logger';
 
 // Define event types for Vario
 export interface VarioEventMap {
@@ -69,7 +70,7 @@ class Vario extends THREE.EventDispatcher<VarioEventMap> {
 
       this.loaded = true;
     } catch (error) {
-      console.error('Failed to load vario audio files:', error);
+      logger.error('Failed to load vario audio files:', error);
     } finally {
       this.loading = false;
     }
@@ -112,7 +113,7 @@ class Vario extends THREE.EventDispatcher<VarioEventMap> {
     if (this.status === 'on') {
       if (Math.abs(delta) > 0.5) {
         this.play(delta).catch(error => {
-          console.error('Error playing vario sound:', error);
+          logger.error('Error playing vario sound:', error);
         });
       }
     }
@@ -171,7 +172,7 @@ class Vario extends THREE.EventDispatcher<VarioEventMap> {
       },
       undefined, // onProgress
       error => {
-        console.error('Error loading vario beep:', error);
+        logger.error('Error loading vario beep:', error);
       }
     );
   }

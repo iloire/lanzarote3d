@@ -29,29 +29,57 @@ This document tracks pending technical debt and issues that need to be addressed
 **Migration**: All apps using CameraController should switch to CameraTargetController
 
 ### TypeScript Strict Mode Violations
-**Status**: ✅ Significantly Improved (17 batches completed)
+**Status**: ✅ Significantly Improved (18 batches completed)
 **Files**: Reduced from 30+ to ~5 remaining instances
 **Issue**: TypeScript strict mode violations and excessive use of `any` type
 **Impact**: Runtime errors, poor developer experience, harder debugging, reduced type safety
 
-**Fixed Files** (Batches 1-17):
+**Fixed Files** (Batches 1-18):
 - ✅ Foundation components base classes (IThreeComponent, BaseThreeComponent, AsyncThreeComponent)
 - ✅ Resource management (ResourceManager, ComponentRegistry, ComponentBenchmark)
 - ✅ Physics components (Weather, Thermal, WindIndicator)
 - ✅ Environment components (Sky, Water, DesertHouseWithPool)
 - ✅ Vehicle components (Hangglider, Paraglider, TerrainFollowingBehavior)
-- ✅ Systems (ThemeEngine, ThemeManager partial, VarioSound, disposal-utils)
+- ✅ Systems (ThemeEngine, ThemeManager, VarioSound, disposal-utils)
 - ✅ Location editor (state.ts, markers.ts)
 - ✅ Applications (procedural-terrain, satellite-terrain, visualizer, flying-behavior-test)
 - ✅ Character components (PilotVoxel, Marker, CharacterRegistry)
 - ✅ GUI components (flyzone-editor-ui, Wing, Tree, CameraTargetUI)
 - ✅ Foundation utils (models.ts already clean)
 - ✅ CameraController (already using event.code, not event.which)
-- ✅ Audio systems (SoundManager, SimpleAnimator)
+- ✅ Audio systems (SoundManager, SimpleAnimator, BackgroundAudio, VarioSound)
+- ✅ Behaviors (FlyingBehavior, EngineFlyingBehavior, TerrainNavigator)
+- ✅ Scene systems (CameraTargetController)
 - ✅ **Batch 14 (Sept 30, 2025)**: Window interface, GUI controls, shared/index.ts logging
 - ✅ **Batch 15 (Sept 30, 2025)**: Core app modules, island, navigation, helpers
 - ✅ **Batch 16 (Sept 30, 2025)**: Foundation components (ProceduralRoad, Bird, Water, CharacterRegistry, CameraTargetUI)
 - ✅ **Batch 17 (Sept 30, 2025)**: Systems (SimpleAnimator, SoundManager, ProceduralTerrainGenerator, ThemeEngine, ThemeManager partial)
+- ✅ **Batch 18 (Sept 30, 2025)**: Audio & behaviors complete (ThemeManager complete, BackgroundAudio, VarioSound, EngineFlyingBehavior, CameraTargetController)
+
+**Batch 18 Completed (Sept 30, 2025)**:
+1. **src/foundation/systems/ThemeManager.ts**: Completed console replacements (remaining 9 statements)
+   - Changed 2 `console.info` to `logger.info` (theme application after load)
+   - Changed 2 `console.warn` to `logger.warn` (not ready warnings)
+   - Changed 1 `console.error` to `logger.error` (apply theme failure)
+   - Changed 1 `console.error` to `logger.error` (event listener)
+   - Changed 2 `console.warn` to `logger.warn` (localStorage errors)
+   - Changed 1 `console.log` to `logger.debug` (clear saved theme)
+
+2. **src/foundation/systems/audio/BackgroundAudio.ts**: Replaced console
+   - Changed 2 `console.error` to `logger.error`
+   - Audio loading and playback error handling
+
+3. **src/foundation/systems/audio/VarioSound.ts**: Replaced console
+   - Changed 3 `console.error` to `logger.error`
+   - Vario audio loading and playback error handling
+
+4. **src/foundation/systems/behaviors/EngineFlyingBehavior.ts**: Replaced console
+   - Changed 1 `console.log` to `logger.debug`
+   - Terrain avoidance logging with sampling
+
+5. **src/foundation/systems/scene/CameraTargetController.ts**: Replaced console
+   - Changed 1 `console.warn` to `logger.warn`
+   - Invalid target index warning
 
 **Batch 17 Completed (Sept 30, 2025)**:
 1. **src/foundation/systems/animation/SimpleAnimator.ts**: Replaced console
@@ -77,7 +105,7 @@ This document tracks pending technical debt and issues that need to be addressed
    - Changed 2 `console.warn` to `logger.warn` (not ready)
    - Changed 2 `console.log` to `logger.info` (theme application)
    - Changed 1 `console.error` to `logger.error` (theme not found)
-   - Note: 9 more console statements remain in this file for batch 18
+   - Note: Completed in batch 18
 
 **Batch 16 Completed (Sept 30, 2025)**:
 1. **src/foundation/components/scenery/ProceduralRoad.ts**: Replaced console

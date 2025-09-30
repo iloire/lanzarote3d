@@ -3,6 +3,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { animator } from '../animation/SimpleAnimator';
 import GuiHelper from '../../utils/gui';
 import { GUI } from 'lil-gui';
+import { logger } from '../../utils/logger';
 
 export enum CameraMode {
   Follow = 'follow',
@@ -109,7 +110,7 @@ export class CameraTargetController extends THREE.PerspectiveCamera {
     controls?: OrbitControls
   ): void {
     if (index < 0 || index >= this.targets.length) {
-      console.warn(`Invalid target index: ${index}`);
+      logger.warn(`Invalid target index: ${index}`);
       return;
     }
 

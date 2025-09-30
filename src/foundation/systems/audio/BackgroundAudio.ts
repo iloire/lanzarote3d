@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { logger } from '../../utils/logger';
 
 class BackgroundSound {
   wind1: THREE.Audio | null = null;
@@ -38,7 +39,7 @@ class BackgroundSound {
         },
         undefined, // onProgress
         error => {
-          console.error('Error loading audio:', error);
+          logger.error('Error loading audio:', error);
           reject(error);
         }
       );
@@ -72,7 +73,7 @@ class BackgroundSound {
       this.music = music;
       this.loaded = true;
     } catch (error) {
-      console.error('Failed to load background audio:', error);
+      logger.error('Failed to load background audio:', error);
     } finally {
       this.loading = false;
     }

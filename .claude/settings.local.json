@@ -4,7 +4,8 @@
       "Bash(git commit:*)",
       "Bash(rm:*)",
       "Bash(git reset:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(npm run type-check:*)"
     ],
     "deny": [],
     "ask": []
