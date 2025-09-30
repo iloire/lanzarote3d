@@ -39,8 +39,12 @@ export class SpeedBoat extends MovableBoatComponent {
   }
 
   protected createGeometry(): THREE.BufferGeometry {
-    // Return placeholder - actual geometry created in createSyncContent
+    // Return placeholder - actual geometry created in createObject
     return new THREE.BoxGeometry(1, 1, 1);
+  }
+
+  protected override async createObject(): Promise<THREE.Object3D> {
+    return this.createSyncContent();
   }
 
   protected createSyncContent(): THREE.Object3D {
