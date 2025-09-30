@@ -76,32 +76,47 @@ This document tracks pending technical debt and issues that need to be addressed
 - `src/apps/experiences/flyzones/navigation/camera.ts` - Debug output
 **Solution**: Replace with proper logging utility or remove
 
-### Synchronous vs Async Component Loading Pattern Inconsistency
-**Status**: ⚠️ Needs architectural decision
-**Files**: Building components, houses application
-**Issue**: Inconsistent loading patterns between legacy synchronous and modern async component loading
-**Impact**: Code complexity, maintenance burden, TypeScript type gymnastics required
-**Details**:
-- **Building components** (House, Villa, Barn, etc.) use legacy synchronous `load()` via prototype override
-  - Required for backward compatibility with houses application
-  - Uses `loadSync()` internally which blocks UI thread during geometry creation
-- **Most other components** (boats, trees, cacti) use async `load()` pattern
-  - Better for performance and non-blocking UI
-  - Allows for future async resource loading
-- **Mixed usage** creates confusion:
-  - DesertHouseWithPool internally uses `loadSync()` for Pool and DesertHouse
-  - houses app casts components as `any` to use legacy synchronous load
-  - workshop-demo uses `await` for async loads
-**Recommended Solutions**:
-- **Option 1**: Refactor houses application to use async/await pattern (preferred)
-  - Would allow removal of all legacy synchronous patterns
-  - Cleaner code, better TypeScript types, no casting needed
-- **Option 2**: Make all components support both patterns (current state)
-  - Higher maintenance burden
-  - Requires type casting and documentation
-- **Option 3**: Use dedicated sync wrapper for houses app only
-  - Isolates the legacy pattern to one place
-  - Still requires maintenance of two patterns
+### Legacy loadSync() Method Removal
+**Status**: 🔄 In Progress - Gradual Refactoring
+**Files**: 9 files still using loadSync()
+**Issue**: Legacy synchronous loading method still used in some components
+**Impact**: Code complexity, blocks main thread, prevents async resource loading
+
+**Progress:**
+- ✅ **Completed**: Refactored houses application to use async/await (Sept 30)
+  - Removed all legacy prototype overrides from building components
+  - Houses app now properly uses `await load()` pattern
+  - All building components export clean classes
+
+**Remaining Usage** (9 files):
+1. **Base Components** (Internal/Template Methods):
+   - `SimpleThreeComponent.ts:132` - Base implementation (OK - internal use)
+   - `FloatingThreeComponent.ts:51,54` - Override for floating behavior (OK - composition)
+   - `MovableBoatComponent.ts:73,74` - Boat movement system (OK - composition)
+   - `MovableCarComponent.ts:102,103` - Car movement system (OK - composition)
+
+2. **Vehicle Components** (Need Refactoring):
+   - `Car.ts:209,255` - Internal sync loading (OK - template method)
+   - `AutonomousCar.ts:117,118,307` - Autonomous behavior needs async
+   - `Truck.ts:260,306` - Internal sync loading (OK - template method)
+
+3. **Environment Utilities** (Needs Refactoring - HIGH PRIORITY):
+   - `house-group-creator.ts:314,328,357,368,379,391` - 6 uses in group generation
+     - Stones, cacti, and pool loading
+     - **Issue**: Synchronous loading in procedural generation
+     - **Solution**: Refactor to async/await with Promise.all for parallel loading
+
+4. **Composite Components** (Needs Refactoring):
+   - `DesertHouseWithPool.ts:129,150` - Composite building
+     - **Issue**: Calls loadSync() on Pool and DesertHouse within createContent()
+     - **Solution**: Move composition to async initialization phase
+
+**Refactoring Strategy**:
+1. Keep `loadSync()` in base components for internal template method pattern
+2. Remove `loadSync()` from public APIs (completed for buildings)
+3. Refactor house-group-creator to use async/await with Promise.all
+4. Refactor composite components to async composition
+5. Eventually deprecate public loadSync() entirely
 
 ## Medium Priority Issues
 
