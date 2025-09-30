@@ -22,6 +22,16 @@ export type { TruckOptions } from './Truck';
 export { AutonomousCar } from './AutonomousCar';
 export type { AutonomousCarOptions } from './AutonomousCar';
 
+// Aircraft components
+export { Jet } from './Jet';
+export type { JetOptions } from './Jet';
+
+export { Airliner } from './Airliner';
+export type { AirlinerOptions } from './Airliner';
+
+export { Cessna } from './Cessna';
+export type { CessnaOptions } from './Cessna';
+
 // Type exports
 export type { VehicleConfig } from '../../types';
 export type { ParagliderVoxelOptions } from './ParagliderVoxel';

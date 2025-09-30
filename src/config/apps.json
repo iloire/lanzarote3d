@@ -321,6 +321,26 @@
       "requiresWebGL": true,
       "visibility": "hidden",
       "priority": 34
+    },
+    "plane": {
+      "name": "Plane",
+      "description": "Military jet aircraft showcase",
+      "entry": "./applications/plane/index.tsx",
+      "route": "/plane",
+      "category": "demo",
+      "requiresWebGL": true,
+      "visibility": "private",
+      "priority": 35
+    },
+    "planes": {
+      "name": "Planes",
+      "description": "Aircraft showcase featuring Jet, Airliner, and Cessna with comparison",
+      "entry": "./applications/planes/index.tsx",
+      "route": "/planes",
+      "category": "demo",
+      "requiresWebGL": true,
+      "visibility": "private",
+      "priority": 36
     }
   },
   "showcase": {

@@ -2,6 +2,37 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## [1.3.0] - 2025-09-30 UTC
+
+### Added
+- **Aircraft Components**: Three new procedural aircraft types
+  - **Jet**: Military-style jet with swept wings, twin engines, and glowing exhausts
+  - **Airliner**: Commercial passenger aircraft with wide body, windows, and detailed features
+  - **Cessna**: General aviation single-engine aircraft with high-wing configuration and landing gear
+  - All aircraft use procedural geometry with configurable colors and scales
+  - Resource-managed materials for efficient memory usage
+  - Shadow casting and receiving support
+
+#### New Applications
+- **Plane** (`/plane`): Single military jet aircraft showcase
+  - Interactive camera controls
+  - Rotation and scale adjustments via GUI
+  - Clean workshop environment with ground plane
+- **Planes** (`/planes`): Complete aircraft comparison showcase
+  - All three aircraft types displayed side-by-side
+  - Polygon count analysis for each aircraft
+  - Labeled display with triangle counts
+  - Interactive GUI controls for all aircraft
+
+### Enhanced
+- **Vehicle System**: Extended vehicles index with aircraft exports
+  - Added Jet, Airliner, and Cessna to vehicle exports
+  - TypeScript type exports for all new aircraft options
+- **Configuration**: Updated apps.json with new aircraft applications
+  - Plane application (priority 35)
+  - Planes application (priority 36)
+  - Both set to private visibility for development testing
+
 ## [1.2.1] - 2025-09-29 14:30 UTC
 
 ### Added

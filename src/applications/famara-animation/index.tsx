@@ -42,7 +42,7 @@ const paraglidersVoxel: ParagliderVoxelConfig[] = [
 ];
 
 // Visibility flags for easy toggling
-const SHOW_HANGGLIDER = true; // Set to false to hide hangglider
+const SHOW_HANGGLIDER = false; // Set to false to hide hangglider
 
 // Hangglider configuration
 const hanggliderConfig = {
