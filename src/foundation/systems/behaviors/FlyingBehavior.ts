@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { logger } from '../../utils/logger';
 
 export enum FlightPattern {
   FREE_ROAM = 'free_roam',
@@ -325,7 +326,7 @@ export class FlyingBehavior {
 
         // Log close encounters
         if (this.debugLogCounter % 30 === 0) { // Log every ~0.5 seconds at 60fps
-          console.log(`⚠️ Close to ${nearestObstacleName}: distance=${distance.toFixed(2)}, strength=${strength.toFixed(2)}`);
+          logger.debug(`⚠️ Close to ${nearestObstacleName}: distance=${distance.toFixed(2)}, strength=${strength.toFixed(2)}`);
         }
       }
     }
@@ -424,7 +425,7 @@ export class FlyingBehavior {
     if (this.debugLogCounter % 120 === 0) {
       const distanceFromCenter = this.mesh.position.distanceTo(this.centerPoint);
 
-      console.log('🛩️ Flight Status:', {
+      logger.debug('🛩️ Flight Status:', {
         position: `(${this.mesh.position.x.toFixed(1)}, ${this.mesh.position.y.toFixed(1)}, ${this.mesh.position.z.toFixed(1)})`,
         speed: `${this.currentSpeed.toFixed(2)} (${(this.speedReductionFactor * 100).toFixed(0)}% of base)`,
         baseSpeed: this.baseSpeed.toFixed(2),
@@ -508,7 +509,7 @@ export class FlyingBehavior {
 
     // Debug logging (can be removed later)
     if (Math.random() < 0.01) { // Log 1% of the time to avoid spam
-      console.log('🔄 FlyingBehavior orientation:', {
+      logger.debug('🔄 FlyingBehavior orientation:', {
         direction: normalizedDirection.toArray(),
         currentRotation: this.mesh.rotation.toArray(),
         targetRotation: euler.toArray(),

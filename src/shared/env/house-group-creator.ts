@@ -18,6 +18,7 @@ import {
 } from '../../foundation/components/scenery/buildings';
 import { ComponentRegistry } from '../../foundation/systems/ComponentRegistry';
 import { HouseConfig, HouseGroupConfig, NeighborhoodVariation, DEFAULT_VARIATION } from './house-group-types';
+import { logger } from '../../foundation/utils/logger';
 import {
   calculateHousePositions,
   generateSuburbanNeighborhood,
@@ -53,7 +54,7 @@ export class HouseGroupCreator {
    * Clear all created objects from the scene and dispose them properly
    */
   clearAll(): void {
-    console.log(`🧹 HouseGroupCreator clearing ${this.createdObjects.length} objects`);
+    logger.debug(`🧹 HouseGroupCreator clearing ${this.createdObjects.length} objects`);
 
     this.createdObjects.forEach(obj => {
       // Remove from scene
@@ -67,7 +68,7 @@ export class HouseGroupCreator {
 
     // Clear tracking array
     this.createdObjects.length = 0;
-    console.log('✅ HouseGroupCreator cleanup completed');
+    logger.debug('✅ HouseGroupCreator cleanup completed');
   }
 
   /**
@@ -109,7 +110,7 @@ export class HouseGroupCreator {
     try {
       switch (houseConfig.type) {
         case 'House':
-          console.log(`✅ Creating House with lowPoly: ${this.lowPoly}`);
+          logger.debug(`✅ Creating House with lowPoly: ${this.lowPoly}`);
           house = new House({
             type: houseConfig.houseType || HouseType.Medium,
             lowPoly: this.lowPoly,
@@ -119,7 +120,7 @@ export class HouseGroupCreator {
           break;
 
         case 'Villa':
-          console.log(`✅ Creating Villa with lowPoly: ${this.lowPoly}`);
+          logger.debug(`✅ Creating Villa with lowPoly: ${this.lowPoly}`);
           house = new Villa({
             scale: scale,
             lowPoly: this.lowPoly,
@@ -129,7 +130,7 @@ export class HouseGroupCreator {
           break;
 
         case 'Townhouse':
-          console.log(`✅ Creating Townhouse with lowPoly: ${this.lowPoly}`);
+          logger.debug(`✅ Creating Townhouse with lowPoly: ${this.lowPoly}`);
           house = new Townhouse({
             scale: scale,
             lowPoly: this.lowPoly,
@@ -139,7 +140,7 @@ export class HouseGroupCreator {
           break;
 
         case 'Barn':
-          console.log(`✅ Creating Barn with lowPoly: ${this.lowPoly}`);
+          logger.debug(`✅ Creating Barn with lowPoly: ${this.lowPoly}`);
           house = new Barn({
             scale: scale,
             lowPoly: this.lowPoly,
@@ -149,7 +150,7 @@ export class HouseGroupCreator {
           break;
 
         case 'DesertHouse':
-          console.log(`✅ Creating DesertHouse with lowPoly: ${this.lowPoly}`);
+          logger.debug(`✅ Creating DesertHouse with lowPoly: ${this.lowPoly}`);
           house = new DesertHouse({
             scale: scale,
             lowPoly: this.lowPoly,
@@ -160,7 +161,7 @@ export class HouseGroupCreator {
 
 
         case 'DesertHouseWithPool':
-          console.log(`✅ Creating DesertHouseWithPool with lowPoly: ${this.lowPoly}`);
+          logger.debug(`✅ Creating DesertHouseWithPool with lowPoly: ${this.lowPoly}`);
           house = new DesertHouseWithPool({
             scale: scale,
             lowPoly: this.lowPoly,
@@ -170,7 +171,7 @@ export class HouseGroupCreator {
           break;
 
         default:
-          console.warn(`Unknown house type: ${houseConfig.type}`);
+          logger.warn(`Unknown house type: ${houseConfig.type}`);
           return null;
       }
 
@@ -183,7 +184,7 @@ export class HouseGroupCreator {
       if (position && position.copy) {
         houseMesh.position.copy(position);
       } else {
-        console.error('Invalid position provided to createSingleHouse:', position);
+        logger.error('Invalid position provided to createSingleHouse:', position);
         houseMesh.position.set(0, 0, 0);
       }
 
@@ -212,7 +213,7 @@ export class HouseGroupCreator {
 
       return houseMesh;
     } catch (error) {
-      console.error(`Error creating house of type ${houseConfig.type}:`, error);
+      logger.error(`Error creating house of type ${houseConfig.type}:`, error);
       return null;
     }
   }
@@ -253,7 +254,7 @@ export class HouseGroupCreator {
       // Add random cacti and stones to the land plot
       await this.addLandscapeElements(housePosition, landPlot, houseRotation);
     } catch (error) {
-      console.error('Error adding land plot:', error);
+      logger.error('Error adding land plot:', error);
     }
   }
 
@@ -307,7 +308,7 @@ export class HouseGroupCreator {
           elementPromises.push(this.addOrganPipeCactus(elementPosition));
         }
       } catch (error) {
-        console.error('Error adding landscape element:', error);
+        logger.error('Error adding landscape element:', error);
       }
     }
 
@@ -326,7 +327,7 @@ export class HouseGroupCreator {
   }
 
   private async addBarrelCactus(position: THREE.Vector3): Promise<void> {
-    console.log(`🌵 Creating BarrelCactus with lowPoly: ${this.lowPoly}`);
+    logger.debug(`🌵 Creating BarrelCactus with lowPoly: ${this.lowPoly}`);
     const cactus = new BarrelCactus({
       scale: 0.4 + Math.random() * 0.3,
       lowPoly: this.lowPoly
@@ -349,7 +350,7 @@ export class HouseGroupCreator {
         }
       }
     });
-    console.log(`🌵 BarrelCactus created with ${Math.floor(polygons)} polygons (lowPoly: ${this.lowPoly})`);
+    logger.debug(`🌵 BarrelCactus created with ${Math.floor(polygons)} polygons (lowPoly: ${this.lowPoly})`);
 
     this.scene.add(cactusMesh);
     this.createdObjects.push(cactusMesh);
@@ -410,7 +411,7 @@ export class HouseGroupCreator {
       this.scene.add(poolMesh);
       this.createdObjects.push(poolMesh);
     } catch (error) {
-      console.error('Error adding pool to house:', error);
+      logger.error('Error adding pool to house:', error);
     }
   }
 
@@ -469,7 +470,7 @@ export class HouseGroupCreator {
     // Minimum spacing should be at least 1.5x the average land size
     const dynamicSpacing = Math.max(baseSpacing, averageLandSize * 1.5);
 
-    console.log(`🏘️ Dynamic spacing for ${houses.length} houses: base=${baseSpacing}, avgLandSize=${averageLandSize.toFixed(1)}, final=${dynamicSpacing.toFixed(1)}`);
+    logger.debug(`🏘️ Dynamic spacing for ${houses.length} houses: base=${baseSpacing}, avgLandSize=${averageLandSize.toFixed(1)}, final=${dynamicSpacing.toFixed(1)}`);
 
     return dynamicSpacing;
   }

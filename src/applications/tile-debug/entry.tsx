@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import TileDebugPage from './TileDebugPage';
+import { logger } from '../../foundation/utils/logger';
 
 // Import CSS if needed
 import '../../index.css';
@@ -15,5 +16,5 @@ if (rootElement) {
   const root = createRoot(rootElement);
   root.render(<TileDebugPage />);
 } else {
-  console.error('Root element not found');
+  logger.error('Root element not found');
 }

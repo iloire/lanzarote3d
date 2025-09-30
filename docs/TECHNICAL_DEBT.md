@@ -29,12 +29,12 @@ This document tracks pending technical debt and issues that need to be addressed
 **Migration**: All apps using CameraController should switch to CameraTargetController
 
 ### TypeScript Strict Mode Violations
-**Status**: ✅ Significantly Improved (18 batches completed)
-**Files**: Reduced from 30+ to ~5 remaining instances
+**Status**: ✅ Significantly Improved (19 batches completed)
+**Files**: Reduced from 30+ to minimal remaining instances
 **Issue**: TypeScript strict mode violations and excessive use of `any` type
 **Impact**: Runtime errors, poor developer experience, harder debugging, reduced type safety
 
-**Fixed Files** (Batches 1-18):
+**Fixed Files** (Batches 1-19):
 - ✅ Foundation components base classes (IThreeComponent, BaseThreeComponent, AsyncThreeComponent)
 - ✅ Resource management (ResourceManager, ComponentRegistry, ComponentBenchmark)
 - ✅ Physics components (Weather, Thermal, WindIndicator)
@@ -55,6 +55,40 @@ This document tracks pending technical debt and issues that need to be addressed
 - ✅ **Batch 16 (Sept 30, 2025)**: Foundation components (ProceduralRoad, Bird, Water, CharacterRegistry, CameraTargetUI)
 - ✅ **Batch 17 (Sept 30, 2025)**: Systems (SimpleAnimator, SoundManager, ProceduralTerrainGenerator, ThemeEngine, ThemeManager partial)
 - ✅ **Batch 18 (Sept 30, 2025)**: Audio & behaviors complete (ThemeManager complete, BackgroundAudio, VarioSound, EngineFlyingBehavior, CameraTargetController)
+- ✅ **Batch 19 (Sept 30, 2025)**: UI, environment, and house systems (ThemeSelector, environment.ts, house-group-creator.ts, FlyingBehavior, tile-debug)
+
+**Batch 19 Completed (Sept 30, 2025)**:
+1. **src/components/ThemeSelector.tsx**: Replaced console
+   - Changed 1 `console.error` to `logger.error`
+   - Theme application error handling
+
+2. **src/shared/env/environment.ts**: Replaced console (9 statements)
+   - Changed 1 `console.warn` to `logger.warn` (terrain height)
+   - Changed 2 `console.error` to `logger.error` (neighborhood creation errors)
+   - Changed 2 `console.log` to `logger.info` (neighborhood creation)
+   - Changed 3 `console.log` to `logger.debug` (cloud updates, movement origins)
+   - Changed 1 `console.log` to `logger.debug` (disposal)
+
+3. **src/shared/env/house-group-creator.ts**: Replaced console (17 statements)
+   - Changed 2 `console.log` to `logger.debug` (cleanup operations)
+   - Changed 6 `console.log` to `logger.debug` (house creation by type)
+   - Changed 1 `console.warn` to `logger.warn` (unknown house type)
+   - Changed 1 `console.error` to `logger.error` (invalid position)
+   - Changed 1 `console.error` to `logger.error` (house creation error)
+   - Changed 1 `console.error` to `logger.error` (land plot error)
+   - Changed 1 `console.error` to `logger.error` (landscape element error)
+   - Changed 2 `console.log` to `logger.debug` (barrel cactus creation with polygon count)
+   - Changed 1 `console.error` to `logger.error` (pool addition error)
+   - Changed 1 `console.log` to `logger.debug` (dynamic spacing calculation)
+
+4. **src/foundation/systems/behaviors/FlyingBehavior.ts**: Replaced console (3 statements)
+   - Changed 1 `console.log` to `logger.debug` (close obstacle encounters)
+   - Changed 1 `console.log` to `logger.debug` (flight status)
+   - Changed 1 `console.log` to `logger.debug` (orientation debugging)
+
+5. **src/applications/tile-debug/entry.tsx**: Replaced console
+   - Changed 1 `console.error` to `logger.error`
+   - Root element not found error
 
 **Batch 18 Completed (Sept 30, 2025)**:
 1. **src/foundation/systems/ThemeManager.ts**: Completed console replacements (remaining 9 statements)

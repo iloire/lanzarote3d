@@ -1,6 +1,7 @@
 import { Component } from 'react';
 import { themeManager } from '../foundation/systems/ThemeManager';
 import { Theme } from '../foundation/types/Theme';
+import { logger } from '../foundation/utils/logger';
 
 interface ThemeSelectorProps {
   isMobile?: boolean;
@@ -98,8 +99,7 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
         }
       }
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Failed to apply theme:', error);
+      logger.error('Failed to apply theme:', error);
     } finally {
       this.setState({ isApplying: false });
     }

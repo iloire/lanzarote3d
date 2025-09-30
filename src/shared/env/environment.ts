@@ -6,6 +6,7 @@ import { rndIntBetween } from '../../foundation/utils/math';
 import Tree from '../../foundation/components/scenery/trees/Tree';
 import PineTree from '../../foundation/components/scenery/trees/PineTree';
 import Stone from '../../foundation/components/scenery/Stone';
+import { logger } from '../../foundation/utils/logger';
 import {
   SmallSailBoat,
   FishingBoat,
@@ -253,7 +254,7 @@ class Environment {
     // Get terrain height for the center position
     const terrainHeight = this.getTerrainHeight(center.x, center.z, terrain);
     if (isNaN(terrainHeight)) {
-      console.warn(`Could not determine terrain height at center ${center.x}, ${center.z}`);
+      logger.warn(`Could not determine terrain height at center ${center.x}, ${center.z}`);
       return [];
     }
 
@@ -299,7 +300,7 @@ class Environment {
 
       return meshes;
     } catch (error) {
-      console.error(`Error creating ${formation} neighborhood:`, error);
+      logger.error(`Error creating ${formation} neighborhood:`, error);
       return [];
     }
   }
@@ -307,7 +308,7 @@ class Environment {
   async addHouses(terrain: THREE.Mesh, lowPoly: boolean = true): Promise<THREE.Vector3[]> {
     // Create multiple neighborhoods at the same locations as before but with proper town structure
     const mode = lowPoly ? 'LOW-POLY' : 'HIGH-DETAIL';
-    console.log(`🏘️ Creating ${mode} neighborhoods for ${lowPoly ? 'optimized performance' : 'maximum detail'}...`);
+    logger.info(`🏘️ Creating ${mode} neighborhoods for ${lowPoly ? 'optimized performance' : 'maximum detail'}...`);
 
     const neighborhoodCenters: THREE.Vector3[] = [];
 
@@ -356,10 +357,10 @@ class Environment {
       );
       neighborhoodCenters.push(center4);
 
-      console.log('✅ All neighborhoods created successfully');
+      logger.info('✅ All neighborhoods created successfully');
       return neighborhoodCenters;
     } catch (error) {
-      console.error('❌ Error creating neighborhoods:', error);
+      logger.error('❌ Error creating neighborhoods:', error);
       return neighborhoodCenters;
     }
   }
@@ -618,7 +619,7 @@ class Environment {
   updateCloudColors(theme: Theme): void {
     const cloudOptions = ThemeEngine.getCloudOptionsFromTheme(theme);
     if (cloudOptions.colors && cloudOptions.colors.length > 0) {
-      console.log('Updating cloud colors for theme:', theme.name, cloudOptions.colors);
+      logger.debug('Updating cloud colors for theme:', theme.name, cloudOptions.colors);
       this.cloudInstances.forEach(cloudInstance => {
         cloudInstance.updateColors(cloudOptions.colors!);
       });
@@ -661,7 +662,7 @@ class Environment {
       // Check if component has movement behavior (PatrolBoat, etc.)
       if (component && typeof (component as MovableComponent).updateMovementOrigin === 'function') {
         (component as MovableComponent).updateMovementOrigin();
-        console.log(`Updated movement origin for component: ${id}`);
+        logger.debug(`Updated movement origin for component: ${id}`);
       }
     });
   }
@@ -674,7 +675,7 @@ class Environment {
       // Check if component has movement behavior (Car, AutonomousCar, etc.)
       if (component && typeof (component as MovableComponent).updateMovementOrigin === 'function') {
         (component as MovableComponent).updateMovementOrigin();
-        console.log(`Updated movement origin for car component: ${id}`);
+        logger.debug(`Updated movement origin for car component: ${id}`);
       }
     });
   }
@@ -740,7 +741,7 @@ class Environment {
       this.hg.dispose();
     }
 
-    console.log('Environment disposed with all components cleaned up');
+    logger.debug('Environment disposed with all components cleaned up');
   }
 }
 
