@@ -7,6 +7,8 @@ export enum FlightPattern {
   FIGURE_EIGHT = 'figure8',
 }
 
+export type ForwardAxis = 'x' | 'y' | 'z' | '-x' | '-y' | '-z';
+
 export interface FlyingBehaviorOptions {
   pattern?: FlightPattern;
   speed?: number;
@@ -19,8 +21,17 @@ export interface FlyingBehaviorOptions {
   centerPoint?: THREE.Vector3;
   autoStart?: boolean;
   faceDirection?: boolean;
-  forwardAxis?: 'x' | 'y' | 'z' | '-x' | '-y' | '-z';
+  forwardAxis?: ForwardAxis;
   debugVectors?: boolean; // Show velocity and forward direction vectors
+}
+
+export interface FlightState {
+  isFlying: boolean;
+  position: THREE.Vector3 | undefined;
+  velocity: THREE.Vector3;
+  direction: THREE.Vector3;
+  distanceFromCenter: number;
+  pattern: FlightPattern;
 }
 
 /**
@@ -44,7 +55,7 @@ export class FlyingBehavior {
   protected returnDistance: number;
   protected centerPoint: THREE.Vector3;
   protected faceDirection: boolean;
-  protected forwardAxis: 'x' | 'y' | 'z' | '-x' | '-y' | '-z';
+  protected forwardAxis: ForwardAxis;
   protected debugVectors: boolean;
 
   // Debug visualization
@@ -110,6 +121,13 @@ export class FlyingBehavior {
    */
   public addObstacles(obstacles: THREE.Object3D[]): void {
     this.obstacles.push(...obstacles);
+  }
+
+  /**
+   * Add single obstacle to avoid
+   */
+  public addObstacle(obstacle: THREE.Object3D): void {
+    this.obstacles.push(obstacle);
   }
 
   /**
@@ -456,7 +474,7 @@ export class FlyingBehavior {
     if (!this.mesh) return new THREE.Vector3(0, 0, 1);
 
     // Create the base forward vector based on forwardAxis
-    let baseForward = new THREE.Vector3();
+    const baseForward = new THREE.Vector3();
     switch (this.forwardAxis) {
       case 'x':
         baseForward.set(1, 0, 0);
@@ -510,7 +528,10 @@ export class FlyingBehavior {
   /**
    * Get current flight state for debugging
    */
-  public getFlightState() {
+  /**
+   * Get current flight state information
+   */
+  public getFlightState(): FlightState {
     return {
       isFlying: this.isFlying,
       position: this.mesh?.position.clone(),
@@ -519,5 +540,19 @@ export class FlyingBehavior {
       distanceFromCenter: this.mesh ? this.mesh.position.distanceTo(this.centerPoint) : 0,
       pattern: this.pattern
     };
+  }
+
+  /**
+   * Update the center point for flight patterns
+   */
+  public updateCenterPoint(point: THREE.Vector3): void {
+    this.centerPoint.copy(point);
+  }
+
+  /**
+   * Check if currently flying
+   */
+  public isFlyingActive(): boolean {
+    return this.isFlying;
   }
 }
