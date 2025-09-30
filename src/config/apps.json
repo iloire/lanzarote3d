@@ -54,7 +54,7 @@
     "tiledebug": {
       "name": "Tile Debug Dashboard",
       "description": "Debug tool showing satellite tile download process, calculations, and atlas creation for terrain mapping",
-      "entry": "./applications/tile-debug/index.tsx",
+      "entry": "./applications/tile-debug/entry.tsx",
       "route": "/tile-debug",
       "category": "tool",
       "requiresWebGL": true,
@@ -362,54 +362,5 @@
       "visibility": "private",
       "priority": 37
     }
-  },
-  "showcase": {
-    "includeCriteria": {
-      "byVisibility": [
-        "public"
-      ],
-      "specificApps": [
-        "workshopdemo",
-        "locationeditor",
-        "tiledebug",
-        "island",
-        "paraglidervoxel",
-        "terrain",
-        "proceduralterrain",
-        "town",
-        "houses",
-        "glider",
-        "hangglider",
-        "pilot",
-        "flyzones",
-        "flierpg",
-        "animals"
-      ]
-    },
-    "order": {
-      "animation": 1,
-      "famara": 2,
-      "famara2": 3,
-      "boats": 4,
-      "flyzones": 6,
-      "workshopdemo": 7,
-      "locationeditor": 8,
-      "tiledebug": 9,
-      "island": 10,
-      "paraglidervoxel": 11,
-      "terrain": 12,
-      "proceduralterrain": 13,
-      "town": 14,
-      "houses": 15,
-      "glider": 16,
-      "hangglider": 17,
-      "pilot": 18,
-      "flierpg": 19,
-      "animals": 20
-    },
-    "customEntries": {
-      "tiledebug": "./src/applications/tile-debug/entry.tsx"
-    },
-    "defaultEntry": "./src/showcase-entry.tsx"
   }
 }

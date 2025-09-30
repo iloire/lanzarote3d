@@ -2,63 +2,43 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 /**
- * Showcase configuration from JSON source of truth
- * Simple, reliable, no fallbacks needed
+ * Build configuration from apps.json
  *
- * The source of truth is: src/config/apps.json
+ * Simple rules:
+ * - All apps except "hidden" are built
+ * - HTML filename comes from route (e.g., /boats-animation → boats-animation.html)
+ * - Bundle name comes from app key (e.g., boatsanimation → boatsanimation.bundle.js)
+ * - Entry point comes from app.entry or defaults to showcase-entry.tsx
+ * - Apps are sorted by priority field
  */
 
 const appsConfig = require('./src/config/apps.json');
 
-// Generate showcase apps from JSON
-function generateShowcaseApps() {
-  const showcaseApps = [];
-  const { showcase } = appsConfig;
-
-  // Helper to format filename from route - use route as source of truth
-  // Routes like "/boats-animation" become "boats-animation.html"
-  const getFilename = (appKey) => {
-    const app = appsConfig.apps[appKey];
-    const routeWithoutSlash = app.route.replace(/^\//, '');
-    return `${routeWithoutSlash}.html`;
-  };
-
-  // Collect apps based on showcase criteria (now flat structure)
-  Object.entries(appsConfig.apps).forEach(([appKey, app]) => {
-    // Include if public visibility or specifically listed
-    const includeInShowcase =
-      (showcase.includeCriteria.byVisibility && showcase.includeCriteria.byVisibility.includes(app.visibility)) ||
-      showcase.includeCriteria.specificApps.includes(appKey);
-
-    if (includeInShowcase && app.visibility !== 'hidden') {
-      showcaseApps.push({
-        name: appKey,
-        title: `Lanzarote - ${app.name}`,
-        filename: getFilename(appKey)
-      });
-    }
+// Build list of apps to compile
+const showcaseApps = Object.entries(appsConfig.apps)
+  .filter(([_, app]) => app.visibility !== 'hidden')
+  .map(([appKey, app]) => ({
+    name: appKey,
+    title: `Lanzarote - ${app.name}`,
+    filename: app.route.replace(/^\//, '') + '.html',
+    entry: app.entry.startsWith('./applications/')
+      ? './src/' + app.entry.slice(2)  // Convert ./applications/... to ./src/applications/...
+      : './src/showcase-entry.tsx'  // Default for showcase apps
+  }))
+  .sort((a, b) => {
+    const priorityA = appsConfig.apps[a.name]?.priority || 999;
+    const priorityB = appsConfig.apps[b.name]?.priority || 999;
+    return priorityA - priorityB;
   });
 
-  // Sort by defined order
-  showcaseApps.sort((a, b) => {
-    const orderA = showcase.order[a.name] || 999;
-    const orderB = showcase.order[b.name] || 999;
-    return orderA - orderB;
-  });
-
-  return showcaseApps;
-}
-
-const showcaseApps = generateShowcaseApps();
-
-console.log(`Building ${showcaseApps.length} showcase applications...`);
+console.log(`Building ${showcaseApps.length} applications...`);
 
 // Export for use in other files
 module.exports.showcaseApps = showcaseApps;
 
-// Generate entry points dynamically from JSON configuration
+// Generate webpack entry points
 const entries = showcaseApps.reduce((acc, app) => {
-  acc[app.name] = appsConfig.showcase.customEntries[app.name] || appsConfig.showcase.defaultEntry;
+  acc[app.name] = app.entry;
   return acc;
 }, {});
 
