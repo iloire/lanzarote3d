@@ -293,12 +293,4 @@ export class OrganPipeCactus extends SimpleThreeComponent {
   }
 }
 
-// Legacy export for backward compatibility with old synchronous API
-const OrganPipeCactusLegacy = OrganPipeCactus as any;
-
-// Add legacy load method that returns mesh directly
-OrganPipeCactusLegacy.prototype.load = function (): THREE.Object3D {
-  return this.createSyncContent();
-};
-
-export default OrganPipeCactusLegacy;
+export default OrganPipeCactus;

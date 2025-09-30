@@ -174,12 +174,5 @@ export class FishingBoat extends MovableBoatComponent {
   }
 }
 
-// Legacy export for backward compatibility with old synchronous API
-const FishingBoatLegacy = FishingBoat as any;
 
-// Add legacy load method that returns mesh directly
-FishingBoatLegacy.prototype.load = function (): THREE.Object3D {
-  return this.loadSync();
-};
-
-export default FishingBoatLegacy;
+export default FishingBoat;

@@ -49,7 +49,6 @@ export class Yacht extends MovableBoatComponent {
 
     const options = this.options as YachtOptions;
     const scale = options.scale || 1;
-    console.log('🚤 Creating yacht with options:', options);
 
     // Create materials with resource sharing
     const hullMaterial = resourceManager.getOrCreateMaterial(
@@ -176,14 +175,6 @@ export class Yacht extends MovableBoatComponent {
     // Rotate 90 degrees to align with forward axis
     yacht.rotateY(Math.PI / 2);
 
-    console.log('🚤 Yacht created with', yacht.children.length, 'children');
-    console.log('🚤 Yacht bounding box:', yacht);
-    yacht.traverse((child) => {
-      if (child instanceof THREE.Mesh) {
-        console.log('  - Mesh:', child.name || 'unnamed', 'geometry:', child.geometry, 'material:', child.material);
-      }
-    });
-
     return yacht;
   }
 
@@ -214,12 +205,4 @@ export class Yacht extends MovableBoatComponent {
   }
 }
 
-// Legacy export for backward compatibility with old synchronous API
-const YachtLegacy = Yacht as any;
-
-// Add legacy load method that returns mesh directly
-YachtLegacy.prototype.load = function (): THREE.Object3D {
-  return this.loadSync();
-};
-
-export default YachtLegacy;
+export default Yacht;

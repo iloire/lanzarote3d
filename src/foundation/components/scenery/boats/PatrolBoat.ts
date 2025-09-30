@@ -225,15 +225,5 @@ export class PatrolBoat extends MovableBoatComponent {
   }
 }
 
-// Legacy export for backward compatibility with old synchronous API
-const PatrolBoatLegacy = PatrolBoat as any;
 
-// Add legacy load method that returns mesh directly
-PatrolBoatLegacy.prototype.load = function (): THREE.Object3D {
-  const boat = this.loadSync();
-  // Start moving after legacy load
-  this.startMoving();
-  return boat;
-};
-
-export default PatrolBoatLegacy;
+export default PatrolBoat;

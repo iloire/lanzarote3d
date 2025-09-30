@@ -116,12 +116,5 @@ export class SmallSailBoat extends MovableBoatComponent {
   }
 }
 
-// Legacy export for backward compatibility with old synchronous API
-const SmallSailBoatLegacy = SmallSailBoat as any;
 
-// Add legacy load method that returns mesh directly
-SmallSailBoatLegacy.prototype.load = function (): THREE.Object3D {
-  return this.loadSync();
-};
-
-export default SmallSailBoatLegacy;
+export default SmallSailBoat;

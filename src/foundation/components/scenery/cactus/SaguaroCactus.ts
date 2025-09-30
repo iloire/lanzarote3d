@@ -296,12 +296,4 @@ export class SaguaroCactus extends SimpleThreeComponent {
   }
 }
 
-// Legacy export for backward compatibility with old synchronous API
-const SaguaroCactusLegacy = SaguaroCactus as any;
-
-// Add legacy load method that returns mesh directly
-SaguaroCactusLegacy.prototype.load = function (): THREE.Object3D {
-  return this.createSyncContent();
-};
-
-export default SaguaroCactusLegacy;
+export default SaguaroCactus;

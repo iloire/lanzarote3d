@@ -297,12 +297,25 @@ export class Barn extends SimpleThreeComponent {
   }
 }
 
-// Legacy export for backward compatibility with old synchronous API
-const BarnLegacy = Barn as any;
+// Legacy compatibility method - synchronous load for backward compatibility
+export class BarnWithLegacyLoad extends Barn {
+  loadWithGui(gui?: any): THREE.Object3D {
+    return this.loadSync();
+  }
+}
 
-// Add legacy load method that returns mesh directly
-BarnLegacy.prototype.load = function (): THREE.Object3D {
-  return this.createSyncContent();
+// Type-safe legacy compatibility layer
+interface BarnWithSyncLoad extends BarnWithLegacyLoad {
+  load(gui?: any): THREE.Object3D;
+}
+
+const BarnConstructor = BarnWithLegacyLoad as unknown as {
+  new(options?: BarnOptions): BarnWithSyncLoad;
 };
 
-export default BarnLegacy;
+// Override load method to be synchronous for backward compatibility
+BarnConstructor.prototype.load = function(gui?: any): THREE.Object3D {
+  return this.loadWithGui(gui);
+};
+
+export default BarnConstructor as unknown as typeof Barn;

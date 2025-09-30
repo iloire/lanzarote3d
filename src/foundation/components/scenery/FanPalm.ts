@@ -240,12 +240,4 @@ export class FanPalm extends SimpleThreeComponent {
   }
 }
 
-// Legacy export for backward compatibility with old synchronous API
-const FanPalmLegacy = FanPalm as any;
-
-// Add legacy load method that returns mesh directly
-FanPalmLegacy.prototype.load = function (): THREE.Object3D {
-  return this.createSyncContent();
-};
-
-export default FanPalmLegacy;
+export default FanPalm;

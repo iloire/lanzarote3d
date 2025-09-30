@@ -227,12 +227,4 @@ export class DatePalm extends SimpleThreeComponent {
   }
 }
 
-// Legacy export for backward compatibility with old synchronous API
-const DatePalmLegacy = DatePalm as any;
-
-// Add legacy load method that returns mesh directly
-DatePalmLegacy.prototype.load = function (): THREE.Object3D {
-  return this.createSyncContent();
-};
-
-export default DatePalmLegacy;
+export default DatePalm;

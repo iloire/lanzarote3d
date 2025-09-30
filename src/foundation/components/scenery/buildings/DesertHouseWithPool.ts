@@ -420,12 +420,25 @@ export class DesertHouseWithPool extends SimpleThreeComponent {
   }
 }
 
-// Legacy export for backward compatibility with old synchronous API
-const DesertHouseWithPoolLegacy = DesertHouseWithPool as any;
+// Legacy compatibility method - synchronous load for backward compatibility
+export class DesertHouseWithPoolWithLegacyLoad extends DesertHouseWithPool {
+  loadWithGui(gui?: any): THREE.Object3D {
+    return this.loadSync();
+  }
+}
 
-// Add legacy load method that returns mesh directly
-DesertHouseWithPoolLegacy.prototype.load = function (): THREE.Object3D {
-  return this.createSyncContent();
+// Type-safe legacy compatibility layer
+interface DesertHouseWithPoolWithSyncLoad extends DesertHouseWithPoolWithLegacyLoad {
+  load(gui?: any): THREE.Object3D;
+}
+
+const DesertHouseWithPoolConstructor = DesertHouseWithPoolWithLegacyLoad as unknown as {
+  new(options?: DesertHouseWithPoolOptions): DesertHouseWithPoolWithSyncLoad;
 };
 
-export default DesertHouseWithPoolLegacy;
+// Override load method to be synchronous for backward compatibility
+DesertHouseWithPoolConstructor.prototype.load = function(gui?: any): THREE.Object3D {
+  return this.loadWithGui(gui);
+};
+
+export default DesertHouseWithPoolConstructor as unknown as typeof DesertHouseWithPool;

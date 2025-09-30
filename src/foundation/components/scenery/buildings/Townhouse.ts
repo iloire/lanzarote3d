@@ -377,12 +377,25 @@ export class Townhouse extends SimpleThreeComponent {
   }
 }
 
-// Legacy export for backward compatibility with old synchronous API
-const TownhouseLegacy = Townhouse as any;
+// Legacy compatibility method - synchronous load for backward compatibility
+export class TownhouseWithLegacyLoad extends Townhouse {
+  loadWithGui(gui?: any): THREE.Object3D {
+    return this.loadSync();
+  }
+}
 
-// Add legacy load method that returns mesh directly
-TownhouseLegacy.prototype.load = function (): THREE.Object3D {
-  return this.createSyncContent();
+// Type-safe legacy compatibility layer
+interface TownhouseWithSyncLoad extends TownhouseWithLegacyLoad {
+  load(gui?: any): THREE.Object3D;
+}
+
+const TownhouseConstructor = TownhouseWithLegacyLoad as unknown as {
+  new(options?: TownhouseOptions): TownhouseWithSyncLoad;
 };
 
-export default TownhouseLegacy;
+// Override load method to be synchronous for backward compatibility
+TownhouseConstructor.prototype.load = function(gui?: any): THREE.Object3D {
+  return this.loadWithGui(gui);
+};
+
+export default TownhouseConstructor as unknown as typeof Townhouse;

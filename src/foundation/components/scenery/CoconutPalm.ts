@@ -201,12 +201,4 @@ export class CoconutPalm extends SimpleThreeComponent {
   }
 }
 
-// Legacy export for backward compatibility with old synchronous API
-const CoconutPalmLegacy = CoconutPalm as any;
-
-// Add legacy load method that returns mesh directly
-CoconutPalmLegacy.prototype.load = function (): THREE.Object3D {
-  return this.createSyncContent();
-};
-
-export default CoconutPalmLegacy;
+export default CoconutPalm;

@@ -101,7 +101,7 @@ export class HouseGroupCreator {
     houseConfig: HouseConfig,
     position: THREE.Vector3
   ): Promise<THREE.Object3D | null> {
-    let house: HouseComponent;
+    let house: any; // Type as any to allow legacy synchronous load()
     let houseMesh: THREE.Object3D;
     let scale = houseConfig.scale || 1;
 
@@ -311,7 +311,7 @@ export class HouseGroupCreator {
 
   private addStone(position: THREE.Vector3): void {
     const stone = new Stone();
-    const stoneMesh = stone.createSyncContent();
+    const stoneMesh = stone.loadSync();
     stoneMesh.position.copy(position);
     stoneMesh.scale.setScalar(0.3 + Math.random() * 0.4); // Random scale 0.3-0.7
     stoneMesh.rotation.y = Math.random() * Math.PI * 2; // Random rotation
@@ -325,7 +325,7 @@ export class HouseGroupCreator {
       scale: 0.4 + Math.random() * 0.3,
       lowPoly: this.lowPoly
     });
-    const cactusMesh = cactus.createSyncContent();
+    const cactusMesh = cactus.loadSync();
     cactusMesh.position.copy(position);
 
     // Count polygons for debugging
@@ -354,7 +354,7 @@ export class HouseGroupCreator {
       scale: 0.3 + Math.random() * 0.4,
       lowPoly: this.lowPoly
     });
-    const cactusMesh = cactus.createSyncContent();
+    const cactusMesh = cactus.loadSync();
     cactusMesh.position.copy(position);
     this.scene.add(cactusMesh);
     this.createdObjects.push(cactusMesh);
@@ -365,7 +365,7 @@ export class HouseGroupCreator {
       scale: 0.2 + Math.random() * 0.3,
       lowPoly: this.lowPoly
     });
-    const cactusMesh = cactus.createSyncContent();
+    const cactusMesh = cactus.loadSync();
     cactusMesh.position.copy(position);
     this.scene.add(cactusMesh);
     this.createdObjects.push(cactusMesh);
@@ -376,7 +376,7 @@ export class HouseGroupCreator {
       scale: 0.3 + Math.random() * 0.3,
       lowPoly: this.lowPoly
     });
-    const cactusMesh = cactus.createSyncContent();
+    const cactusMesh = cactus.loadSync();
     cactusMesh.position.copy(position);
     this.scene.add(cactusMesh);
     this.createdObjects.push(cactusMesh);
@@ -388,7 +388,7 @@ export class HouseGroupCreator {
   private async addPoolToHouse(housePosition: THREE.Vector3, houseScale: number): Promise<void> {
     try {
       const pool = new Pool();
-      const poolMesh = pool.createSyncContent();
+      const poolMesh = pool.loadSync();
 
       // Position pool behind or to the side of the house
       const poolOffset = new THREE.Vector3(

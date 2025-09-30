@@ -294,12 +294,4 @@ export class PricklyPearCactus extends SimpleThreeComponent {
   }
 }
 
-// Legacy export for backward compatibility with old synchronous API
-const PricklyPearCactusLegacy = PricklyPearCactus as any;
-
-// Add legacy load method that returns mesh directly
-PricklyPearCactusLegacy.prototype.load = function (): THREE.Object3D {
-  return this.createSyncContent();
-};
-
-export default PricklyPearCactusLegacy;
+export default PricklyPearCactus;

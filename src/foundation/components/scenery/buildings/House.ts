@@ -421,29 +421,28 @@ class House extends SimpleThreeComponent {
     };
   }
 
-  // Legacy compatibility methods
-  public loadWithGui(gui?: any): Promise<THREE.Object3D> {
-    return Promise.resolve(this.createContent()).then(mesh => {
-      if (gui) {
-        GuiHelper.addLocationGui(gui, 'House', mesh);
-      }
-      return mesh;
-    });
+  // Legacy compatibility method - synchronous load for backward compatibility
+  public loadWithGui(gui?: any): THREE.Object3D {
+    const mesh = this.loadSync();
+    if (gui) {
+      GuiHelper.addLocationGui(gui, 'House', mesh);
+    }
+    return mesh;
   }
 }
 
-// Legacy compatibility layer for synchronous API
-const HouseLegacy = House as any;
+// Type-safe legacy compatibility layer
+interface HouseWithSyncLoad extends House {
+  load(gui?: any): THREE.Object3D;
+}
 
-// Add legacy load method that returns mesh directly and supports GUI
-HouseLegacy.prototype.load = function (gui?: any): THREE.Object3D {
-  const mesh = this.createContent();
-
-  if (gui) {
-    GuiHelper.addLocationGui(gui, 'House', mesh);
-  }
-
-  return mesh;
+const HouseConstructor = House as unknown as {
+  new(options?: HouseOptions): HouseWithSyncLoad;
 };
 
-export default HouseLegacy;
+// Override load method to be synchronous for backward compatibility
+HouseConstructor.prototype.load = function(gui?: any): THREE.Object3D {
+  return this.loadWithGui(gui);
+};
+
+export default HouseConstructor as unknown as typeof House;

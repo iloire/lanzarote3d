@@ -280,12 +280,4 @@ export class Pool extends SimpleThreeComponent {
   }
 }
 
-// Legacy export for backward compatibility with old synchronous API
-const PoolLegacy = Pool as any;
-
-// Add legacy load method that returns mesh directly
-PoolLegacy.prototype.load = function (): THREE.Object3D {
-  return this.createSyncContent();
-};
-
-export default PoolLegacy;
+export default Pool;

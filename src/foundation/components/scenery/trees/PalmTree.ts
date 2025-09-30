@@ -236,12 +236,4 @@ export class PalmTree extends SimpleThreeComponent {
   }
 }
 
-// Legacy export for backward compatibility with old synchronous API
-const PalmTreeLegacy = PalmTree as any;
-
-// Add legacy load method that returns mesh directly
-PalmTreeLegacy.prototype.load = function (): THREE.Object3D {
-  return this.createSyncContent();
-};
-
-export default PalmTreeLegacy;
+export default PalmTree;
