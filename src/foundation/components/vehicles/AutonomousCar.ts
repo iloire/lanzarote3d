@@ -299,15 +299,4 @@ export class AutonomousCar extends Car {
   }
 }
 
-// Legacy export for backward compatibility with synchronous API
-const AutonomousCarLegacy = AutonomousCar as any;
-
-// Add legacy load method that returns mesh directly and starts driving
-AutonomousCarLegacy.prototype.load = function (): THREE.Object3D {
-  const car = this.loadSync();
-  // Start autonomous driving after legacy load
-  this.startAutonomousDriving();
-  return car;
-};
-
-export default AutonomousCarLegacy;
+export default AutonomousCar;

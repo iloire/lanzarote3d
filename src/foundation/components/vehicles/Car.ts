@@ -247,15 +247,4 @@ export class Car extends MovableCarComponent {
   }
 }
 
-// Legacy export for backward compatibility with old synchronous API
-const CarLegacy = Car as any;
-
-// Add legacy load method that returns mesh directly
-CarLegacy.prototype.load = function (): THREE.Object3D {
-  const car = this.loadSync();
-  // Start moving after legacy load
-  this.startMoving();
-  return car;
-};
-
-export default CarLegacy;
+export default Car;
