@@ -6,6 +6,14 @@ import { logger } from './foundation/utils/logger';
 
 import './index.css';
 
+// Extend Window interface for dev mode functions
+declare global {
+  interface Window {
+    enableDevMode?: () => void;
+    disableDevMode?: () => void;
+  }
+}
+
 THREE.Cache.enabled = true;
 
 /**
@@ -65,11 +73,11 @@ function isDevModeEnabled(): boolean {
 
   // Expose global helper functions for dev mode control (only in production)
   if (!isLocalhost) {
-    (window as any).enableDevMode = () => {
+    window.enableDevMode = () => {
       localStorage.setItem('lanzarote_dev_mode', 'true');
       console.log('🔓 Dev mode enabled. Reload the page to activate.');
     };
-    (window as any).disableDevMode = () => {
+    window.disableDevMode = () => {
       localStorage.removeItem('lanzarote_dev_mode');
       console.log('🔒 Dev mode disabled. Reload the page to deactivate.');
     };

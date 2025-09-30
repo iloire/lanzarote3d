@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { GUI } from 'lil-gui';
 import { StoryOptions } from '../../shared/types';
 import { TerrainBase } from '../../shared/TerrainBase';
 import { flyzoneAPI } from '../../foundation/services/flyzone-api';
@@ -329,8 +330,7 @@ class FlyzoneVisualizerApp extends TerrainBase {
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private setupGUI(gui: any): void {
+  private setupGUI(gui: GUI): void {
     if (!gui || !this.visualizerState) return;
 
     const visualizerFolder = gui.addFolder('Flyzone Visualizer');
@@ -423,22 +423,26 @@ class FlyzoneVisualizerApp extends TerrainBase {
     window.addEventListener('keydown', onKeyDown);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private onUIAction(action: string, data?: any): void {
+  private onUIAction(action: string, data?: unknown): void {
+    if (!data || typeof data !== 'object') return;
+
+    const actionData = data as Record<string, unknown>;
+
     switch (action) {
       case 'analyzeWeather':
-        if (data.windDirection !== undefined && data.windSpeed !== undefined) {
-          this.analyzeWeatherConditions(data.windDirection, data.windSpeed);
+        if (typeof actionData.windDirection === 'number' && typeof actionData.windSpeed === 'number') {
+          this.analyzeWeatherConditions(actionData.windDirection, actionData.windSpeed);
         }
         break;
       case 'selectRecommendation':
-        if (data.recommendation) {
-          this.selectTakeoffLocation(data.recommendation.takeoff);
+        if (actionData.recommendation && typeof actionData.recommendation === 'object') {
+          const rec = actionData.recommendation as { takeoff: TakeoffLocation };
+          this.selectTakeoffLocation(rec.takeoff);
         }
         break;
       case 'userLevelChange':
-        if (this.visualizerState) {
-          this.visualizerState.userLevel = data.level;
+        if (this.visualizerState && typeof actionData.level === 'string') {
+          this.visualizerState.userLevel = actionData.level as VisualizerState['userLevel'];
           if (this.visualizerState.currentWeather) {
             this.analyzeWeatherConditions(
               this.visualizerState.currentWeather.windDirection,
@@ -448,8 +452,8 @@ class FlyzoneVisualizerApp extends TerrainBase {
         }
         break;
       case 'filterChange':
-        if (this.visualizerState) {
-          this.visualizerState.filterByScore = data.minScore;
+        if (this.visualizerState && typeof actionData.minScore === 'number') {
+          this.visualizerState.filterByScore = actionData.minScore;
           this.visualizerUI?.refresh();
         }
         break;
@@ -460,8 +464,7 @@ class FlyzoneVisualizerApp extends TerrainBase {
     scene: THREE.Scene,
     camera: THREE.Camera,
     renderer: THREE.WebGLRenderer,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    controls: any
+    controls: StoryOptions['controls']
   ): void {
     const animate = () => {
       try {

@@ -29,12 +29,12 @@ This document tracks pending technical debt and issues that need to be addressed
 **Migration**: All apps using CameraController should switch to CameraTargetController
 
 ### TypeScript Strict Mode Violations
-**Status**: ✅ Significantly Improved (13 batches completed)
-**Files**: Reduced from 30+ to ~10 remaining instances
+**Status**: ✅ Significantly Improved (14 batches completed)
+**Files**: Reduced from 30+ to ~5 remaining instances
 **Issue**: TypeScript strict mode violations and excessive use of `any` type
 **Impact**: Runtime errors, poor developer experience, harder debugging, reduced type safety
 
-**Fixed Files** (Batches 1-13):
+**Fixed Files** (Batches 1-14):
 - ✅ Foundation components base classes (IThreeComponent, BaseThreeComponent, AsyncThreeComponent)
 - ✅ Resource management (ResourceManager, ComponentRegistry, ComponentBenchmark)
 - ✅ Physics components (Weather, Thermal, WindIndicator)
@@ -47,12 +47,46 @@ This document tracks pending technical debt and issues that need to be addressed
 - ✅ GUI components (flyzone-editor-ui, Wing, Tree)
 - ✅ Foundation utils (models.ts already clean)
 - ✅ CameraController (already using event.code, not event.which)
+- ✅ **Batch 14 (Sept 30, 2025)**: Window interface, GUI controls, shared/index.ts logging
+
+**Batch 14 Completed (Sept 30, 2025)**:
+1. **src/index.tsx**: Added proper Window interface declaration for dev mode functions
+   - Replaced `(window as any).enableDevMode` with typed `window.enableDevMode`
+   - Replaced `(window as any).disableDevMode` with typed `window.disableDevMode`
+   - Added `declare global { interface Window { ... } }` block
+
+2. **src/shared/index.ts**: Replaced console.log with logger
+   - Changed 3 `console.log` statements to `logger.debug`
+   - Changed 1 `console.error` to `logger.error`
+   - Added logger import
+
+3. **src/applications/flying-behavior-test/index.tsx**: Fixed GUI types and logging
+   - Added imports for `OrbitControls` and `GUI` from proper packages
+   - Changed `controls: any` → `controls: OrbitControls`
+   - Changed `gui: any` → `gui: GUI`
+   - Replaced 13 console statements with logger (info/debug/error)
+   - Fixed GUI property access to use proper setters instead of `as any` casts
+
+4. **src/foundation/systems/behaviors/FlyingBehavior.ts**: Added public setters
+   - Added `setSpeed()`, `setTurnSpeed()`, `setFlightRadius()`, `setPattern()` methods
+   - Enables type-safe GUI controls without `as any` casts
+
+5. **src/applications/visualizer/flyzone-visualizer.tsx**: Fixed types
+   - Added `GUI` import
+   - Changed `gui: any` → `gui: GUI`
+   - Changed `controls: any` → `controls: StoryOptions['controls']`
+   - Changed `data?: any` → `data?: unknown` with proper type narrowing
+   - Added runtime type checking for action data
+
+6. **src/foundation/components/scenery/buildings/Townhouse.ts**: Created materials interface
+   - Added `TownhouseMaterials` interface with proper Material types
+   - Changed all `materials: any` parameters to `materials: TownhouseMaterials`
+   - Changed `getInfo(): Record<string, any>` → `Record<string, unknown>`
 
 **Remaining Files to Fix**:
 
 1. **src/applications/location-editor/state.ts**
    - Has eslint-disable for JSON deserialization (acceptable use of `any`)
-   - Some additional lines may need review
 
 2. **Workshop demos** (lower priority - demo code):
    - `src/applications/workshop/demos/helmet/index.tsx`

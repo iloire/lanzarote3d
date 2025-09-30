@@ -1,8 +1,11 @@
 import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { GUI } from 'lil-gui';
 import { StoryOptions } from '../../shared/types';
 import { WorkshopDemoBase } from '../../shared/WorkshopDemoBase';
 import { FlyingBehavior, FlightPattern } from '../../foundation/systems/behaviors/FlyingBehavior';
 import HangGliderModel from '../../foundation/components/vehicles/Hangglider';
+import { logger } from '../../foundation/utils/logger';
 
 /**
  * Flying Behavior Test - Test the FlyingBehavior system with autonomous flight
@@ -61,7 +64,7 @@ class FlyingBehaviorTestApp extends WorkshopDemoBase {
       });
 
       this.isLoaded = true;
-      console.log('✅ Flying Behavior Test loaded successfully');
+      logger.info('Flying Behavior Test loaded successfully');
 
     } catch (error) {
       this.handleError(error as Error, 'load');
@@ -69,24 +72,23 @@ class FlyingBehaviorTestApp extends WorkshopDemoBase {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private setupCamera(camera: THREE.PerspectiveCamera, controls: any): void {
+  private setupCamera(camera: THREE.PerspectiveCamera, controls: OrbitControls): void {
     // Position camera for good view of flying area
     camera.position.set(30, 20, 30);
     camera.lookAt(0, 10, 0);
-    console.log(`📷 Camera positioned at (30, 20, 30) looking at (0, 10, 0)`);
+    logger.debug('Camera positioned at (30, 20, 30) looking at (0, 10, 0)');
 
     if (controls) {
       controls.target.set(0, 10, 0);
       controls.enableDamping = true;
       controls.dampingFactor = 0.05;
       controls.update();
-      console.log(`🎮 Controls configured with target at (0, 10, 0)`);
+      logger.debug('Controls configured with target at (0, 10, 0)');
     }
   }
 
   private async createTestEnvironment(scene: THREE.Scene): Promise<void> {
-    console.log('🏗️ Creating test environment with walls...');
+    logger.debug('Creating test environment with walls...');
 
     // Create walls as obstacles
     const wallMaterial = new THREE.MeshStandardMaterial({
@@ -143,7 +145,7 @@ class FlyingBehaviorTestApp extends WorkshopDemoBase {
       wall.name = `Wall_${index}`;
       scene.add(wall);
       this.walls.push(wall);
-      console.log(`🧱 Wall ${index} placed at (${pos.x}, ${pos.height / 2}, ${pos.z}) - height: ${pos.height}`);
+      logger.debug(`Wall ${index} placed at (${pos.x}, ${pos.height / 2}, ${pos.z}) - height: ${pos.height}`);
     });
 
     // Get reference to ground for terrain detection
@@ -153,12 +155,12 @@ class FlyingBehaviorTestApp extends WorkshopDemoBase {
 
     if (groundObjects.length > 0 && groundObjects[0] instanceof THREE.Mesh) {
       this.ground = groundObjects[0] as THREE.Mesh;
-      console.log('🌍 Ground reference found for terrain detection');
+      logger.debug('Ground reference found for terrain detection');
     }
   }
 
   private async createFlyingHangglider(scene: THREE.Scene): Promise<void> {
-    console.log('🪂 Creating hangglider with flying behavior...');
+    logger.debug('Creating hangglider with flying behavior...');
 
     try {
       // Create hangglider - now uses FlyingBehavior composition instead of AutoFlier
@@ -170,7 +172,7 @@ class FlyingBehaviorTestApp extends WorkshopDemoBase {
         hanggliderMesh.position.set(0, 10, 0);
         hanggliderMesh.scale.setScalar(0.1); // Make it smaller for better viewing
         scene.add(hanggliderMesh);
-        console.log('✅ Hangglider added to scene');
+        logger.info('Hangglider added to scene');
 
         // Create and attach flying behavior
         this.flyingBehavior = new FlyingBehavior({
@@ -201,19 +203,18 @@ class FlyingBehaviorTestApp extends WorkshopDemoBase {
 
         // Start flying
         this.flyingBehavior.start();
-        console.log('🚁 Flying behavior started');
+        logger.info('Flying behavior started');
 
       } else {
-        console.error('❌ Failed to create hangglider mesh');
+        logger.error('Failed to create hangglider mesh');
       }
 
     } catch (error) {
-      console.error('❌ Error creating hangglider:', error);
+      logger.error('Error creating hangglider:', error);
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private setupGUI(gui: any): void {
+  private setupGUI(gui: GUI): void {
     const behaviorFolder = gui.addFolder('Flying Behavior');
 
     if (this.flyingBehavior) {
@@ -226,32 +227,24 @@ class FlyingBehaviorTestApp extends WorkshopDemoBase {
         stop: () => this.flyingBehavior?.stop(),
         getState: () => {
           const state = this.flyingBehavior?.getFlightState();
-          console.log('Flight State:', state);
+          logger.info('Flight State:', state);
         }
       };
 
       behaviorFolder.add(params, 'speed', 0.5, 30.0, 0.1).onChange((value: number) => {
-        if (this.flyingBehavior) {
-          (this.flyingBehavior as any).speed = value;
-        }
+        this.flyingBehavior?.setSpeed(value);
       });
 
       behaviorFolder.add(params, 'turnSpeed', 0.1, 5.0, 0.1).onChange((value: number) => {
-        if (this.flyingBehavior) {
-          (this.flyingBehavior as any).turnSpeed = value;
-        }
+        this.flyingBehavior?.setTurnSpeed(value);
       });
 
       behaviorFolder.add(params, 'flightRadius', 10, 60, 1).onChange((value: number) => {
-        if (this.flyingBehavior) {
-          (this.flyingBehavior as any).flightRadius = value;
-        }
+        this.flyingBehavior?.setFlightRadius(value);
       });
 
       behaviorFolder.add(params, 'pattern', ['FREE_ROAM', 'CIRCULAR', 'FIGURE_EIGHT']).onChange((value: string) => {
-        if (this.flyingBehavior) {
-          (this.flyingBehavior as any).pattern = value;
-        }
+        this.flyingBehavior?.setPattern(value as FlightPattern);
       });
 
       behaviorFolder.add(params, 'start').name('Start Flying');
@@ -264,7 +257,7 @@ class FlyingBehaviorTestApp extends WorkshopDemoBase {
   }
 
   override dispose(): void {
-    console.log('🧹 Disposing Flying Behavior Test');
+    logger.debug('Disposing Flying Behavior Test');
 
     // Stop and dispose flying behavior
     if (this.flyingBehavior) {

@@ -140,6 +140,35 @@ export class FlyingBehavior {
   }
 
   /**
+   * Update flight speed (for GUI controls)
+   */
+  public setSpeed(speed: number): void {
+    this.speed = speed;
+    this.baseSpeed = speed;
+  }
+
+  /**
+   * Update turn speed (for GUI controls)
+   */
+  public setTurnSpeed(turnSpeed: number): void {
+    this.turnSpeed = turnSpeed;
+  }
+
+  /**
+   * Update flight radius (for GUI controls)
+   */
+  public setFlightRadius(radius: number): void {
+    this.flightRadius = radius;
+  }
+
+  /**
+   * Update flight pattern (for GUI controls)
+   */
+  public setPattern(pattern: FlightPattern): void {
+    this.pattern = pattern;
+  }
+
+  /**
    * Start the flying animation
    */
   public start(): void {

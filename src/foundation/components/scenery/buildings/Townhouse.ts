@@ -14,6 +14,17 @@ export interface TownhouseOptions extends SimpleComponentOptions {
 }
 
 /**
+ * Material set for townhouse construction
+ */
+interface TownhouseMaterials {
+  wall: THREE.Material;
+  roof: THREE.Material;
+  door: THREE.Material;
+  window: THREE.Material;
+  trim: THREE.Material;
+}
+
+/**
  * Townhouse building component - Multi-story urban building
  */
 export class Townhouse extends SimpleThreeComponent {
@@ -79,7 +90,7 @@ export class Townhouse extends SimpleThreeComponent {
   /**
    * Create all material resources
    */
-  private createMaterials(options: TownhouseOptions) {
+  private createMaterials(options: TownhouseOptions): TownhouseMaterials {
     return {
       wall: resourceManager.getOrCreateMaterial(
         `townhouse_wall_${options.wallColor}`,
@@ -107,7 +118,7 @@ export class Townhouse extends SimpleThreeComponent {
   /**
    * Add main structure (walls, roof, and roof peak)
    */
-  private addMainStructure(townhouse: THREE.Group, materials: any): void {
+  private addMainStructure(townhouse: THREE.Group, materials: TownhouseMaterials): void {
 
     // Main townhouse structure - properly proportioned 2-story building
     const mainBodyGeometry = resourceManager.getOrCreateGeometry(
@@ -144,7 +155,7 @@ export class Townhouse extends SimpleThreeComponent {
   /**
    * Add entrance (door, frame, and steps)
    */
-  private addEntrance(townhouse: THREE.Group, materials: any): void {
+  private addEntrance(townhouse: THREE.Group, materials: TownhouseMaterials): void {
 
     // Front door
     const doorGeometry = resourceManager.getOrCreateGeometry(
@@ -177,7 +188,7 @@ export class Townhouse extends SimpleThreeComponent {
   /**
    * Add windows for both floors
    */
-  private addWindows(townhouse: THREE.Group, materials: any): void {
+  private addWindows(townhouse: THREE.Group, materials: TownhouseMaterials): void {
 
     // Full detail windows with frames
     const windowGeometry = resourceManager.getOrCreateGeometry(
@@ -239,7 +250,7 @@ export class Townhouse extends SimpleThreeComponent {
   /**
    * Add decorative elements (cornices and chimney)
    */
-  private addDecorativeElements(townhouse: THREE.Group, materials: any): void {
+  private addDecorativeElements(townhouse: THREE.Group, materials: TownhouseMaterials): void {
 
     // Decorative cornices between floors
     const corniceGeometry = resourceManager.getOrCreateGeometry(
@@ -360,7 +371,7 @@ export class Townhouse extends SimpleThreeComponent {
     return issues;
   }
 
-  public getInfo(): Record<string, any> {
+  public getInfo(): Record<string, unknown> {
     const options = this.options as TownhouseOptions;
 
     return {

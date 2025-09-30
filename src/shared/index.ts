@@ -1,5 +1,6 @@
 import { StoryOptions } from './types';
 import { APP_REGISTRY, getRouteToStoryMap, AppMetadata } from '../config/app-registry';
+import { logger } from '../foundation/utils/logger';
 
 // Export specialized base classes
 export { AppBase } from './AppBase';
@@ -77,17 +78,17 @@ export async function loadApp(appKey: string, options: StoryOptions): Promise<vo
 
   let appModule;
   try {
-    console.log(`Attempting to dynamically import: ${importPath}`);
+    logger.debug(`Attempting to dynamically import: ${importPath}`);
     appModule = await dynamicImportApp(importPath);
-    console.log('Imported module:', appModule);
-    console.log('Module default export:', appModule.default);
+    logger.debug('Imported module:', appModule);
+    logger.debug('Module default export:', appModule.default);
   } catch (error) {
     throw new Error(`Failed to load app '${resolvedKey}': ${error}`);
   }
 
   const appInstance = appModule.default;
   if (!appInstance || typeof appInstance.load !== 'function') {
-    console.error('Invalid app instance:', appInstance);
+    logger.error('Invalid app instance:', appInstance);
     throw new Error(`App '${resolvedKey}' does not export a valid app instance with load method`);
   }
   return appInstance.load(options);
