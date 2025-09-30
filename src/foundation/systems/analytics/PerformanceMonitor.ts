@@ -1,5 +1,21 @@
 import * as THREE from 'three';
 
+/**
+ * Performance memory interface for browsers that support it
+ */
+interface PerformanceMemory {
+  usedJSHeapSize: number;
+  totalJSHeapSize: number;
+  jsHeapSizeLimit: number;
+}
+
+/**
+ * Extended Performance interface with memory property
+ */
+interface PerformanceWithMemory extends Performance {
+  memory?: PerformanceMemory;
+}
+
 export interface PerformanceMetrics {
   fps: number;
   frameTime: number;
@@ -82,7 +98,7 @@ export class PerformanceMonitor {
     }
 
     // Update memory usage
-    const perfMemory = (performance as any).memory;
+    const perfMemory = (performance as PerformanceWithMemory).memory;
     if (perfMemory) {
       this.metrics.memoryUsage = {
         usedJSHeapSize: perfMemory.usedJSHeapSize,

@@ -486,9 +486,9 @@ export class FlyzoneMarkers {
           child.userData.animationPhase += child.userData.pulseSpeed;
           const pulse = (Math.sin(child.userData.animationPhase) + 1) * 0.5; // 0 to 1
 
-          // Pulse opacity
-          if (child.material instanceof THREE.Material) {
-            (child.material as any).opacity = 0.3 + pulse * 0.5; // 0.3 to 0.8
+          // Pulse opacity for materials that support transparency
+          if (child.material instanceof THREE.Material && 'opacity' in child.material) {
+            (child.material as THREE.Material & { opacity: number }).opacity = 0.3 + pulse * 0.5; // 0.3 to 0.8
           }
 
           // Pulse scale

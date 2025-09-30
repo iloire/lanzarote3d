@@ -163,7 +163,10 @@ export abstract class SimpleThreeComponent extends BaseThreeComponent {
    * Create clone with same geometry/material sharing
    */
   protected override createClone(options: ComponentOptions): SimpleThreeComponent {
-    return new (this.constructor as any)(options);
+    // Use proper constructor typing for cloning
+    type ComponentConstructor = new (metadata: ComponentMetadata, options?: ComponentOptions) => SimpleThreeComponent;
+    const Constructor = this.constructor as ComponentConstructor;
+    return new Constructor(this.metadata, options);
   }
 
   /**

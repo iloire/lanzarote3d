@@ -1,4 +1,20 @@
-import { EditorState, EditorMode } from './flyzone-editor';
+import * as THREE from 'three';
+import { EditorState } from './flyzone-editor';
+import { TakeoffLocation, LandingZone, FlyzoneLocation, FlightPhase } from '../../types/flyzone-types';
+
+/**
+ * Action callback for UI events
+ */
+type ActionCallback = (action: string, data?: unknown) => void;
+
+/**
+ * Selected item type for editor
+ */
+type SelectedItem = (TakeoffLocation | LandingZone | FlyzoneLocation | THREE.Object3D) & {
+  data?: any;
+  type?: string;
+  isDirty?: boolean;
+} | null;
 
 /**
  * FlyzoneEditorUI - User interface for flyzone editor
@@ -13,9 +29,9 @@ import { EditorState, EditorMode } from './flyzone-editor';
 export class FlyzoneEditorUI {
   private container: HTMLElement | undefined;
   private editorState: EditorState;
-  private onAction: (action: string, data?: any) => void;
+  private onAction: ActionCallback;
 
-  constructor(editorState: EditorState, onAction: (action: string, data?: any) => void) {
+  constructor(editorState: EditorState, onAction: ActionCallback) {
     this.editorState = editorState;
     this.onAction = onAction;
     this.createUI();
@@ -260,26 +276,31 @@ export class FlyzoneEditorUI {
     `;
   }
 
-  private getItemSpecificFields(item: any): string {
-    const data = item.data;
+  private getItemSpecificFields(item: SelectedItem): string {
+    if (!item) return '';
+
+    // Handle different item structures
+    const data = item.data || item;
 
     switch (item.type) {
       case 'takeoff':
+        // Type guard to ensure we have TakeoffLocation properties
+        const takeoffData = data as TakeoffLocation;
         return `
           <div class="field-group">
             <label>Difficulty:</label>
             <select id="selected-difficulty">
-              <option value="beginner" ${data.safety?.difficulty === 'beginner' ? 'selected' : ''}>Beginner</option>
-              <option value="intermediate" ${data.safety?.difficulty === 'intermediate' ? 'selected' : ''}>Intermediate</option>
-              <option value="advanced" ${data.safety?.difficulty === 'advanced' ? 'selected' : ''}>Advanced</option>
-              <option value="expert" ${data.safety?.difficulty === 'expert' ? 'selected' : ''}>Expert</option>
+              <option value="beginner" ${takeoffData.safety?.difficulty === 'beginner' ? 'selected' : ''}>Beginner</option>
+              <option value="intermediate" ${takeoffData.safety?.difficulty === 'intermediate' ? 'selected' : ''}>Intermediate</option>
+              <option value="advanced" ${takeoffData.safety?.difficulty === 'advanced' ? 'selected' : ''}>Advanced</option>
+              <option value="expert" ${takeoffData.safety?.difficulty === 'expert' ? 'selected' : ''}>Expert</option>
             </select>
           </div>
 
           <div class="field-group">
             <label>Walking Time (minutes):</label>
             <input type="number" id="selected-walking-time" min="0" max="120"
-                   value="${data.access?.walkingTime || 10}" />
+                   value="${takeoffData.access?.walkingTime || 10}" />
           </div>
 
           <div class="field-group">
@@ -291,56 +312,60 @@ export class FlyzoneEditorUI {
         `;
 
       case 'landing':
+        // Type guard to ensure we have LandingZone properties
+        const landingData = data as LandingZone;
         return `
           <div class="field-group">
             <label>Landing Type:</label>
             <select id="selected-landing-type">
-              <option value="primary" ${data.type === 'primary' ? 'selected' : ''}>Primary</option>
-              <option value="secondary" ${data.type === 'secondary' ? 'selected' : ''}>Secondary</option>
-              <option value="emergency" ${data.type === 'emergency' ? 'selected' : ''}>Emergency</option>
+              <option value="primary" ${landingData.type === 'primary' ? 'selected' : ''}>Primary</option>
+              <option value="secondary" ${landingData.type === 'secondary' ? 'selected' : ''}>Secondary</option>
+              <option value="emergency" ${landingData.type === 'emergency' ? 'selected' : ''}>Emergency</option>
             </select>
           </div>
 
           <div class="field-group">
             <label>Surface Type:</label>
             <select id="selected-surface">
-              <option value="grass" ${data.surface === 'grass' ? 'selected' : ''}>Grass</option>
-              <option value="sand" ${data.surface === 'sand' ? 'selected' : ''}>Sand</option>
-              <option value="gravel" ${data.surface === 'gravel' ? 'selected' : ''}>Gravel</option>
-              <option value="paved" ${data.surface === 'paved' ? 'selected' : ''}>Paved</option>
-              <option value="mixed" ${data.surface === 'mixed' ? 'selected' : ''}>Mixed</option>
+              <option value="grass" ${landingData.surface === 'grass' ? 'selected' : ''}>Grass</option>
+              <option value="sand" ${landingData.surface === 'sand' ? 'selected' : ''}>Sand</option>
+              <option value="gravel" ${landingData.surface === 'gravel' ? 'selected' : ''}>Gravel</option>
+              <option value="paved" ${landingData.surface === 'paved' ? 'selected' : ''}>Paved</option>
+              <option value="mixed" ${landingData.surface === 'mixed' ? 'selected' : ''}>Mixed</option>
             </select>
           </div>
 
           <div class="field-group">
             <label>Size (W×L meters):</label>
             <div class="size-inputs">
-              <input type="number" id="selected-width" value="${data.size?.width || 100}" min="10" max="1000" />
+              <input type="number" id="selected-width" value="${landingData.size?.width || 100}" min="10" max="1000" />
               <span>×</span>
-              <input type="number" id="selected-length" value="${data.size?.length || 150}" min="10" max="1000" />
+              <input type="number" id="selected-length" value="${landingData.size?.length || 150}" min="10" max="1000" />
             </div>
           </div>
         `;
 
       case 'phase':
+        // Type guard to ensure we have FlightPhase properties
+        const phaseData = data as FlightPhase;
         return `
           <div class="field-group">
             <label>Phase Type:</label>
             <select id="selected-phase-type">
-              <option value="takeoff" ${data.type === 'takeoff' ? 'selected' : ''}>Takeoff</option>
-              <option value="ridge" ${data.type === 'ridge' ? 'selected' : ''}>Ridge Soaring</option>
-              <option value="thermal" ${data.type === 'thermal' ? 'selected' : ''}>Thermal</option>
-              <option value="approach" ${data.type === 'approach' ? 'selected' : ''}>Approach</option>
-              <option value="landing" ${data.type === 'landing' ? 'selected' : ''}>Landing</option>
+              <option value="takeoff" ${phaseData.type === 'takeoff' ? 'selected' : ''}>Takeoff</option>
+              <option value="ridge" ${phaseData.type === 'ridge' ? 'selected' : ''}>Ridge Soaring</option>
+              <option value="thermal" ${phaseData.type === 'thermal' ? 'selected' : ''}>Thermal</option>
+              <option value="approach" ${phaseData.type === 'approach' ? 'selected' : ''}>Approach</option>
+              <option value="landing" ${phaseData.type === 'landing' ? 'selected' : ''}>Landing</option>
             </select>
           </div>
 
           <div class="field-group">
             <label>Altitude Range (meters):</label>
             <div class="altitude-inputs">
-              <input type="number" id="selected-alt-min" value="${data.altitudeRange?.min || 0}" />
+              <input type="number" id="selected-alt-min" value="${phaseData.altitudeRange?.min || 0}" />
               <span>to</span>
-              <input type="number" id="selected-alt-max" value="${data.altitudeRange?.max || 500}" />
+              <input type="number" id="selected-alt-max" value="${phaseData.altitudeRange?.max || 500}" />
             </div>
           </div>
         `;
@@ -673,13 +698,16 @@ export class FlyzoneEditorUI {
     this.onAction('saveSelectedItem', { item });
   }
 
-  private saveItemSpecificChanges(item: any): void {
-    if (!this.container) return;
+  private saveItemSpecificChanges(item: SelectedItem): void {
+    if (!this.container || !item) return;
 
-    const data = item.data;
+    // Handle different item structures
+    const data = item.data || item;
 
     switch (item.type) {
       case 'takeoff':
+        // Type guard to ensure we have TakeoffLocation properties
+        const takeoffData = data as TakeoffLocation;
         const difficultySelect = this.container.querySelector(
           '#selected-difficulty'
         ) as HTMLSelectElement;
@@ -689,18 +717,18 @@ export class FlyzoneEditorUI {
         const hazardsInput = this.container.querySelector('#selected-hazards') as HTMLInputElement;
 
         if (difficultySelect) {
-          if (!data.safety) data.safety = {};
-          data.safety.difficulty = difficultySelect.value;
+          if (!takeoffData.safety) takeoffData.safety = {} as any;
+          takeoffData.safety.difficulty = difficultySelect.value as any;
         }
 
         if (walkingTimeInput) {
-          if (!data.access) data.access = {};
-          data.access.walkingTime = parseInt(walkingTimeInput.value) || 10;
+          if (!takeoffData.access) takeoffData.access = {} as any;
+          takeoffData.access.walkingTime = parseInt(walkingTimeInput.value) || 10;
         }
 
         if (hazardsInput) {
-          if (!data.safety) data.safety = {};
-          data.safety.hazards = hazardsInput.value
+          if (!takeoffData.safety) takeoffData.safety = {} as any;
+          (takeoffData.safety as any).hazards = hazardsInput.value
             .split(',')
             .map(h => h.trim())
             .filter(h => h.length > 0);
@@ -708,6 +736,8 @@ export class FlyzoneEditorUI {
         break;
 
       case 'landing':
+        // Type guard to ensure we have LandingZone properties
+        const landingData = data as LandingZone;
         const typeSelect = this.container.querySelector(
           '#selected-landing-type'
         ) as HTMLSelectElement;
@@ -717,29 +747,31 @@ export class FlyzoneEditorUI {
         const widthInput = this.container.querySelector('#selected-width') as HTMLInputElement;
         const lengthInput = this.container.querySelector('#selected-length') as HTMLInputElement;
 
-        if (typeSelect) data.type = typeSelect.value;
-        if (surfaceSelect) data.surface = surfaceSelect.value;
+        if (typeSelect) landingData.type = typeSelect.value as any;
+        if (surfaceSelect) landingData.surface = surfaceSelect.value as any;
 
         if (widthInput && lengthInput) {
-          if (!data.size) data.size = {};
-          data.size.width = parseInt(widthInput.value) || 100;
-          data.size.length = parseInt(lengthInput.value) || 150;
+          if (!landingData.size) landingData.size = {} as any;
+          landingData.size.width = parseInt(widthInput.value) || 100;
+          landingData.size.length = parseInt(lengthInput.value) || 150;
         }
         break;
 
       case 'phase':
+        // Type guard to ensure we have FlightPhase properties
+        const phaseData = data as FlightPhase;
         const phaseTypeSelect = this.container.querySelector(
           '#selected-phase-type'
         ) as HTMLSelectElement;
         const altMinInput = this.container.querySelector('#selected-alt-min') as HTMLInputElement;
         const altMaxInput = this.container.querySelector('#selected-alt-max') as HTMLInputElement;
 
-        if (phaseTypeSelect) data.type = phaseTypeSelect.value;
+        if (phaseTypeSelect) phaseData.type = phaseTypeSelect.value as any;
 
         if (altMinInput && altMaxInput) {
-          if (!data.altitudeRange) data.altitudeRange = {};
-          data.altitudeRange.min = parseInt(altMinInput.value) || 0;
-          data.altitudeRange.max = parseInt(altMaxInput.value) || 500;
+          if (!phaseData.altitudeRange) phaseData.altitudeRange = {} as any;
+          phaseData.altitudeRange.min = parseInt(altMinInput.value) || 0;
+          phaseData.altitudeRange.max = parseInt(altMaxInput.value) || 500;
         }
         break;
     }

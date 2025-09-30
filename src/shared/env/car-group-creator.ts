@@ -3,6 +3,7 @@ import { Car } from '../../foundation/components/vehicles/Car';
 import { AutonomousCar } from '../../foundation/components/vehicles/AutonomousCar';
 import { ComponentRegistry } from '../../foundation/systems/ComponentRegistry';
 import { CarConfig, CarGroupConfig } from './car-group-types';
+import { TerrainDrivingMode } from '../../foundation/systems/behaviors/TerrainFollowingBehavior';
 import {
   calculateCarPositions,
   generateParkingLotCars,
@@ -35,7 +36,7 @@ export class CarGroupCreator {
     position: THREE.Vector3,
     terrain?: THREE.Mesh
   ): Promise<THREE.Object3D | null> {
-    let car: any;
+    let car: Car | AutonomousCar;
     let carMesh: THREE.Object3D;
     let scale = carConfig.scale || 1.0;
 
@@ -300,7 +301,7 @@ export class CarGroupCreator {
         bodyColor: ['#FFFFFF', '#000000', '#C0C0C0', '#800000', '#000080'][
           Math.floor(Math.random() * 5)
         ],
-        drivingMode: isAutonomous ? ('EXPLORATION' as any) : undefined,
+        drivingMode: isAutonomous ? TerrainDrivingMode.EXPLORATION : undefined,
         explorationRadius: isAutonomous ? 200 : undefined,
       });
     }

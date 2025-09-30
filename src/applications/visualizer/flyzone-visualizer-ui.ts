@@ -2,6 +2,11 @@ import { VisualizerState } from './flyzone-visualizer';
 import { TakeoffRecommendation } from '../../types/flyzone-types';
 
 /**
+ * Action callback for UI events
+ */
+type ActionCallback = (action: string, data?: unknown) => void;
+
+/**
  * FlyzoneVisualizerUI - User interface for weather-based takeoff recommendations
  *
  * Provides:
@@ -14,9 +19,9 @@ import { TakeoffRecommendation } from '../../types/flyzone-types';
 export class FlyzoneVisualizerUI {
   private container: HTMLElement | undefined;
   private visualizerState: VisualizerState;
-  private onAction: (action: string, data?: any) => void;
+  private onAction: ActionCallback;
 
-  constructor(visualizerState: VisualizerState, onAction: (action: string, data?: any) => void) {
+  constructor(visualizerState: VisualizerState, onAction: ActionCallback) {
     this.visualizerState = visualizerState;
     this.onAction = onAction;
     this.createUI();
