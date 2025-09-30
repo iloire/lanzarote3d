@@ -9,7 +9,18 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Modified Environment.addHouses() to return neighborhood center positions
   - Integrated ProceduralRoad in famara-animation using returned house positions
   - Road connects 4 neighborhoods: suburban area, Famara coastal village, Noruegos rural settlement, and Teguise town center
-  - Road configuration: 8 meters wide, 150 segments for smooth curves, dark gray asphalt with center and edge lines
+  - Road configuration: 8 meters wide, 150 segments for smooth curves, light gray surface with center and edge lines
+  - Added intermediate waypoint for improved road routing
+  - Opacity support: Roads now support transparency with configurable opacity (0.2 in animation for subtle effect)
+
+- **ProceduralRoad opacity support**: Added transparency options to road component
+  - New `opacity` parameter (0-1, default: 1.0) for material transparency
+  - New `transparent` boolean parameter to enable transparency rendering
+  - Updated material caching to include opacity settings
+
+### Fixed
+- **Roads demo height offset slider**: Fixed GUI slider range from 0-2 to 0-10 to match configured heightOffset of 5
+  - Roads now properly render above terrain in the demo application
 
 ### Removed
 - **FlightControls**: Removed unused FlightControls and DEFAULT_FLIGHT_KEYBINDINGS exports

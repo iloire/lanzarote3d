@@ -238,7 +238,7 @@ class RoadsApp extends TerrainBase {
       this.recreateRoads(scene, terrain);
     });
 
-    roadFolder.add(this.roadConfig, 'heightOffset', 0, 2).name('Height Offset').onChange(() => {
+    roadFolder.add(this.roadConfig, 'heightOffset', 0, 10).name('Height Offset').onChange(() => {
       this.recreateRoads(scene, terrain);
     });
 

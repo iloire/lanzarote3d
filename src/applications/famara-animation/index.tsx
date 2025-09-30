@@ -144,15 +144,26 @@ class AnimationApp extends TerrainBase {
 
       // Create road connecting the neighborhoods
       if (housePositions.length >= 2) {
+        // Add intermediate waypoints for better road routing
+        const roadControlPoints = [
+          housePositions[0], // Suburban area near paraglider
+          housePositions[1], // Famara coastal village
+          new THREE.Vector3(6705.5, 0, -3263.7), // Intermediate point 1
+          housePositions[2], // Noruegos rural settlement
+          housePositions[3], // Teguise town center
+        ];
+
         const road = new ProceduralRoad({
-          controlPoints: housePositions,
+          controlPoints: roadControlPoints,
           terrain,
           width: 8,
           segments: 150,
-          roadColor: '#3A3A3A',
+          roadColor: '#f2f2f2',
           showCenterLine: true,
           showEdgeLines: true,
           heightOffset: 5,
+          opacity: 0.2,
+          transparent: true
         });
 
         const roadMesh = await road.load();

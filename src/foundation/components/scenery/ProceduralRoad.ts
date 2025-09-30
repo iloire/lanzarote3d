@@ -27,6 +27,8 @@ export interface ProceduralRoadOptions extends SimpleComponentOptions {
   // Material options
   roughness?: number; // Material roughness (default: 0.9)
   metalness?: number; // Material metalness (default: 0.0)
+  opacity?: number; // Material opacity (0-1, default: 1.0)
+  transparent?: boolean; // Enable transparency (default: false)
 
   // Advanced features
   smoothSlopes?: boolean; // Smooth steep transitions (default: true)
@@ -73,6 +75,8 @@ export class ProceduralRoad extends SimpleThreeComponent {
       // Material defaults
       roughness: 0.9,
       metalness: 0.0,
+      opacity: 1.0,
+      transparent: false,
 
       // Advanced defaults
       smoothSlopes: true,
@@ -248,11 +252,13 @@ export class ProceduralRoad extends SimpleThreeComponent {
 
     // Create material
     const material = resourceManager.getOrCreateMaterial(
-      `road_surface_${options.roadColor}_${options.roughness}_${options.metalness}`,
+      `road_surface_${options.roadColor}_${options.roughness}_${options.metalness}_${options.opacity}_${options.transparent}`,
       () => new THREE.MeshStandardMaterial({
         color: options.roadColor,
         roughness: options.roughness || 0.9,
         metalness: options.metalness || 0.0,
+        opacity: options.opacity ?? 1.0,
+        transparent: options.transparent ?? false,
         side: THREE.DoubleSide,
       })
     );
