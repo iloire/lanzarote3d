@@ -32,7 +32,7 @@ export interface TextureLoadOptions {
 /**
  * Serialized component data
  */
-export interface SerializedComponentData {
+export interface SerializedComponentData extends Record<string, unknown> {
   readonly metadata: ComponentMetadata;
   readonly resources: ResourceDescriptor[];
   readonly loadingState: string;
