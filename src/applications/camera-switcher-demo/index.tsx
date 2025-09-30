@@ -198,4 +198,20 @@ class CameraSwitcherDemo extends TerrainBase {
   }
 }
 
-export default CameraSwitcherDemo;
+// Create singleton instance
+const cameraSwitcherDemoApp = new CameraSwitcherDemo();
+
+// Export in the expected format for the Stories system
+const CameraSwitcherDemoExport = {
+  load: async (options: StoryOptions) => {
+    return cameraSwitcherDemoApp.load(options);
+  },
+  dispose: () => {
+    return cameraSwitcherDemoApp.dispose();
+  },
+  getAppInfo: () => {
+    return cameraSwitcherDemoApp.getAppInfo();
+  },
+};
+
+export default CameraSwitcherDemoExport;
