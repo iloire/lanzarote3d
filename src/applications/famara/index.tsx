@@ -9,6 +9,7 @@ import {
   ORBIT_CONTROLS_PRESETS,
 } from '../../foundation/utils/OrbitControlsHelper';
 import { getAppConfig } from '../../config/app-registry';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 /**
  * Famara Demo - Based on PhotoBooth but without paragliders
@@ -125,7 +126,7 @@ class FamaraApp extends TerrainBase {
     renderer: THREE.WebGLRenderer,
     scene: THREE.Scene,
     camera: THREE.Camera,
-    controls: any
+    controls: OrbitControls
   ): void {
     const animate = () => {
       try {

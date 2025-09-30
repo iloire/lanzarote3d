@@ -13,7 +13,7 @@ export interface Marker {
   position: THREE.Vector3;
   object?: THREE.Object3D;
   label?: CSS2DObject;
-  data?: any;
+  data?: unknown;
   pin: THREE.Object3D;
   setVisibility?: (visible: boolean) => void;
 }

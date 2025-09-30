@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { StoryOptions } from '../../shared/types';
 import { TerrainBase } from '../../shared/TerrainBase';
 import Environment from '../../shared/env/environment';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 /**
  * Island Workshop Demo - Simple island view demo with full terrain
@@ -211,7 +212,7 @@ class IslandWorkshopApp extends TerrainBase {
     renderer: THREE.WebGLRenderer,
     scene: THREE.Scene,
     camera: THREE.Camera,
-    controls: any
+    controls: OrbitControls
   ): void {
     const animate = () => {
       try {

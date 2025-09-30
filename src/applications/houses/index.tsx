@@ -3,6 +3,8 @@ import { House, HouseType, BarnLegacy as Barn } from '../../foundation/component
 import { VillaLegacy as Villa, TownhouseLegacy as Townhouse, DesertHouseLegacy as DesertHouse } from '../../foundation/components/scenery';
 import { StoryOptions } from '../../shared/types';
 import { WorkshopDemoBase } from '../../shared/WorkshopDemoBase';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { GUI } from 'lil-gui';
 
 /**
  * Count the total number of triangles/polygons in a 3D object
@@ -108,7 +110,7 @@ class HousesWorkshop extends WorkshopDemoBase {
     await this.init(scene, camera, renderer, controls, gui);
   }
 
-  async init(scene: THREE.Scene, camera: THREE.Camera, renderer: THREE.WebGLRenderer, controls: any, gui: any): Promise<void> {
+  async init(scene: THREE.Scene, camera: THREE.Camera, renderer: THREE.WebGLRenderer, controls: OrbitControls, gui: GUI): Promise<void> {
     // Set up lighting
     const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
     scene.add(ambientLight);

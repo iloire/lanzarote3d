@@ -6,7 +6,7 @@ import Environment from '../../shared/env/environment';
 import adriModel from '../../../assets/foundation/models/characters/adri/adri.obj';
 import adriTextureImage from '../../../assets/foundation/models/characters/adri/adri.png';
 import { StoryOptions } from '../../shared/types';
-import { animator } from '../../foundation/systems/animation/SimpleAnimator';
+import { animator, SimpleAnimator } from '../../foundation/systems/animation/SimpleAnimator';
 import { getDefaultTheme } from '../../foundation/themes';
 import { ThemeEngine } from '../../foundation/systems/ThemeEngine';
 import { TerrainBase } from '../../shared/TerrainBase';
@@ -16,6 +16,7 @@ import {
 } from '../../foundation/utils/OrbitControlsHelper';
 import { getAppConfig } from '../../config/app-registry';
 import { FlyingBehavior, FlightPattern } from '../../foundation/systems/behaviors/FlyingBehavior';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 type ParagliderVoxelConfig = {
   pg: ParagliderVoxelOptions;
@@ -65,7 +66,7 @@ class AnimationApp extends TerrainBase {
   private animationId: number | undefined;
   private paragliderMeshes: THREE.Object3D[] = [];
   private hanggliderMesh: THREE.Object3D | undefined;
-  private animatorInstance: any | undefined;
+  private isAnimating: boolean = false;
   private flyingBehavior: FlyingBehavior | undefined;
   private hanggliderFlyingBehavior: FlyingBehavior | undefined;
 
@@ -259,7 +260,7 @@ class AnimationApp extends TerrainBase {
 
   private setupCameraAnimation(
     camera: THREE.Camera,
-    controls: any,
+    controls: OrbitControls,
     renderer: THREE.WebGLRenderer,
     scene: THREE.Scene
   ): void {
@@ -298,7 +299,8 @@ class AnimationApp extends TerrainBase {
       const startTarget = controls ? controls.target.clone() : pgPos.clone();
 
       // Single seamless animation with custom easing (configurable duration)
-      this.animatorInstance = animator.animate(
+      this.isAnimating = true;
+      animator.animate(
         'camera-seamless',
         this.ANIMATION_DURATION_MS,
         progress => {
@@ -370,7 +372,7 @@ class AnimationApp extends TerrainBase {
             );
           }
           // Allow floating motion to begin
-          this.animatorInstance = undefined;
+          this.isAnimating = false;
         }
       );
     }, 100);
@@ -380,7 +382,7 @@ class AnimationApp extends TerrainBase {
     renderer: THREE.WebGLRenderer,
     scene: THREE.Scene,
     camera: THREE.Camera,
-    controls: any
+    controls: OrbitControls
   ): void {
     let startTime = Date.now();
 
@@ -395,7 +397,7 @@ class AnimationApp extends TerrainBase {
         const floatSpeed = 1.2; // Speed of floating motion
 
         // Store original position during animation, only apply floating after animation completes
-        if (this.animatorInstance === undefined) {
+        if (!this.isAnimating) {
           // Apply subtle floating motion in multiple directions for more natural cloud-like movement
           const floatY = Math.sin(time * floatSpeed) * floatAmplitude;
           const floatX = Math.sin(time * floatSpeed * 0.7) * (floatAmplitude * 0.3); // Slower, smaller horizontal drift
@@ -440,11 +442,11 @@ class AnimationApp extends TerrainBase {
     }
 
     // Stop animator if running
-    if (this.animatorInstance) {
+    if (this.isAnimating) {
       // Stop any ongoing animations
       // Stop any ongoing animations - note: stop method doesn't need ID parameter
       // animator.stop();
-      this.animatorInstance = undefined;
+      this.isAnimating = false;
     }
 
     // Dispose paraglider meshes
