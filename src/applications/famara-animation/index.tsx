@@ -345,19 +345,22 @@ class AnimationApp extends TerrainBase {
           if (progress < 0.35) {
             // Phase 1: Fast approach (first 35% of total duration)
             const phase1Progress = progress / 0.35; // 0-1 for first phase
-            // Use smooth acceleration with gentle end
-            const easedProgress = phase1Progress * phase1Progress * (3 - 2 * phase1Progress); // smoothstep
+            // Use smoother cubic easing for gentle acceleration and deceleration
+            const easedProgress = phase1Progress < 0.5
+              ? 4 * phase1Progress * phase1Progress * phase1Progress // Ease in cubic
+              : 1 - Math.pow(-2 * phase1Progress + 2, 3) / 2; // Ease out cubic
+
             currentPosition = new THREE.Vector3().lerpVectors(
               initialCameraPosition,
               intermediatePosition,
               easedProgress
             );
 
-            // Look towards the area gradually
+            // Look towards the area gradually with smoother interpolation
             const lookTarget = new THREE.Vector3().lerpVectors(
               startTarget,
               pgPos,
-              easedProgress * 0.6
+              easedProgress * 0.5 // Even more gradual look transition
             );
             if (controls) {
               controls.target.copy(lookTarget);
@@ -366,18 +369,21 @@ class AnimationApp extends TerrainBase {
           } else {
             // Phase 2: Slow approach (last 65% = 5.2 seconds)
             const phase2Progress = (progress - 0.35) / 0.65; // 0-1 for second phase
-            // Use very smooth decelerated easing that connects perfectly
-            const easedProgress = 1 - Math.pow(1 - phase2Progress, 2.5); // smooth deceleration
+            // Use ultra-smooth quartic easing for buttery deceleration
+            const easedProgress = 1 - Math.pow(1 - phase2Progress, 4); // Quartic ease out
+
             currentPosition = new THREE.Vector3().lerpVectors(
               intermediatePosition,
               finalCameraPosition,
               easedProgress
             );
 
-            // Gradually focus on the paraglider with smooth transition
+            // Gradually focus on the paraglider with ultra-smooth transition
             if (controls) {
-              const targetProgress = Math.min(phase2Progress * 1.5, 1.0); // More gradual targeting
-              controls.target.lerpVectors(controls.target, pgPos, targetProgress * 0.05); // Very smooth
+              const targetProgress = Math.min(phase2Progress * 1.2, 1.0); // Even more gradual
+              // Use exponential smoothing for buttery-smooth target tracking
+              const smoothFactor = 0.03 * (1 - Math.pow(1 - phase2Progress, 2));
+              controls.target.lerpVectors(controls.target, pgPos, smoothFactor);
               controls.update();
             }
           }

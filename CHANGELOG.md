@@ -18,9 +18,31 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - New `transparent` boolean parameter to enable transparency rendering
   - Updated material caching to include opacity settings
 
+- **Default theme**: Added "Default" theme to themes menu
+  - Provides neutral, clean styling that matches original "no theme" appearance
+  - Set as the default theme when users first load the application
+  - Allows users to return to basic styling after trying other themed looks
+  - Features: white/gray clouds, volcanic terrain with brown coloring, standard blue water, normal lighting
+
 ### Fixed
 - **Roads demo height offset slider**: Fixed GUI slider range from 0-2 to 0-10 to match configured heightOffset of 5
   - Roads now properly render above terrain in the demo application
+
+### Improved
+- **Famara-animation camera transitions**: Enhanced camera animation smoothness
+  - Upgraded Phase 1 to cubic easing (ease-in-out) for gentler acceleration/deceleration
+  - Upgraded Phase 2 to quartic easing (ease-out) for ultra-smooth, buttery deceleration
+  - Implemented exponential smoothing for target tracking with progressive increase
+  - Made look transitions more gradual throughout the animation
+  - Results in significantly smoother, more cinematic camera movement with no jarring transitions
+
+### Improved
+- **famara-animation camera transition**: Enhanced camera animation smoothness
+  - Phase 1: Upgraded from smoothstep to cubic easing (ease-in-out cubic) for gentler acceleration/deceleration
+  - Phase 2: Upgraded from quadratic to quartic easing (ease-out quartic) for ultra-smooth, buttery deceleration
+  - Target tracking: Implemented exponential smoothing with progressive increase for natural camera behavior
+  - Made look transitions more gradual (reduced from 0.6 to 0.5 in phase 1, 1.5 to 1.2 in phase 2)
+  - Result: Significantly smoother, more cinematic camera movement with no jarring transitions
 
 ### Removed
 - **FlightControls**: Removed unused FlightControls and DEFAULT_FLIGHT_KEYBINDINGS exports
