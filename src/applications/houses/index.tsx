@@ -148,7 +148,7 @@ class HousesWorkshop extends WorkshopDemoBase {
     for (const houseConfig of houseTypes) {
       try {
         // Normal version
-        const normalHouse = new House({ type: houseConfig.type, lowPoly: false });
+        const normalHouse = new House({ type: houseConfig.type, lowPoly: false }) as any;
         const normalHouseMesh = normalHouse.load();
         if (normalHouseMesh) {
           normalHouseMesh.position.set(xPosition, 0, normalRow);
@@ -159,7 +159,7 @@ class HousesWorkshop extends WorkshopDemoBase {
           console.log(`✅ ${houseConfig.name} normal loaded: ${normalPolygons} triangles`);
 
           // Low-poly version
-          const lowPolyHouse = new House({ type: houseConfig.type, lowPoly: true });
+          const lowPolyHouse = new House({ type: houseConfig.type, lowPoly: true }) as any;
           const lowPolyHouseMesh = lowPolyHouse.load();
           if (lowPolyHouseMesh) {
             lowPolyHouseMesh.position.set(xPosition, 0, lowPolyRow);
@@ -187,7 +187,7 @@ class HousesWorkshop extends WorkshopDemoBase {
     xPosition += 40; // Extra spacing for visual separation
     try {
       // Normal Villa
-      const normalVilla = new Villa({ lowPoly: false });
+      const normalVilla = new Villa({ lowPoly: false }) as any;
       const normalVillaMesh = normalVilla.load();
       if (normalVillaMesh) {
         normalVillaMesh.position.set(xPosition, 0, normalRow);
@@ -198,7 +198,7 @@ class HousesWorkshop extends WorkshopDemoBase {
         console.log(`✅ Villa normal loaded: ${normalVillaPolygons} triangles`);
 
         // Low-poly Villa
-        const lowPolyVilla = new Villa({ lowPoly: true });
+        const lowPolyVilla = new Villa({ lowPoly: true }) as any;
         const lowPolyVillaMesh = lowPolyVilla.load();
         if (lowPolyVillaMesh) {
           lowPolyVillaMesh.position.set(xPosition, 0, lowPolyRow);
@@ -224,7 +224,7 @@ class HousesWorkshop extends WorkshopDemoBase {
     // Townhouse
     try {
       // Normal Townhouse
-      const normalTownhouse = new Townhouse({ lowPoly: false });
+      const normalTownhouse = new Townhouse({ lowPoly: false }) as any;
       const normalTownhouseMesh = normalTownhouse.load();
       if (normalTownhouseMesh) {
         normalTownhouseMesh.position.set(xPosition, 0, normalRow);
@@ -235,7 +235,7 @@ class HousesWorkshop extends WorkshopDemoBase {
         console.log(`✅ Townhouse normal loaded: ${normalTownhousePolygons} triangles`);
 
         // Low-poly Townhouse
-        const lowPolyTownhouse = new Townhouse({ lowPoly: true });
+        const lowPolyTownhouse = new Townhouse({ lowPoly: true }) as any;
         const lowPolyTownhouseMesh = lowPolyTownhouse.load();
         if (lowPolyTownhouseMesh) {
           lowPolyTownhouseMesh.position.set(xPosition, 0, lowPolyRow);
@@ -261,7 +261,7 @@ class HousesWorkshop extends WorkshopDemoBase {
     // Barn
     try {
       // Normal Barn
-      const normalBarn = new Barn({ lowPoly: false });
+      const normalBarn = new Barn({ lowPoly: false }) as any;
       const normalBarnMesh = normalBarn.load();
       if (normalBarnMesh) {
         normalBarnMesh.position.set(xPosition, 0, normalRow);
@@ -272,7 +272,7 @@ class HousesWorkshop extends WorkshopDemoBase {
         console.log(`✅ Barn normal loaded: ${normalBarnPolygons} triangles`);
 
         // Low-poly Barn
-        const lowPolyBarn = new Barn({ lowPoly: true });
+        const lowPolyBarn = new Barn({ lowPoly: true }) as any;
         const lowPolyBarnMesh = lowPolyBarn.load();
         if (lowPolyBarnMesh) {
           lowPolyBarnMesh.position.set(xPosition, 0, lowPolyRow);
@@ -298,7 +298,7 @@ class HousesWorkshop extends WorkshopDemoBase {
     // DesertHouse
     try {
       // Normal DesertHouse
-      const normalDesertHouse = new DesertHouse({ lowPoly: false });
+      const normalDesertHouse = new DesertHouse({ lowPoly: false }) as any;
       const normalDesertHouseMesh = normalDesertHouse.load();
       if (normalDesertHouseMesh) {
         normalDesertHouseMesh.position.set(xPosition, 0, normalRow);
@@ -309,7 +309,7 @@ class HousesWorkshop extends WorkshopDemoBase {
         console.log(`✅ DesertHouse normal loaded: ${normalDesertHousePolygons} triangles`);
 
         // Low-poly DesertHouse
-        const lowPolyDesertHouse = new DesertHouse({ lowPoly: true });
+        const lowPolyDesertHouse = new DesertHouse({ lowPoly: true }) as any;
         const lowPolyDesertHouseMesh = lowPolyDesertHouse.load();
         if (lowPolyDesertHouseMesh) {
           lowPolyDesertHouseMesh.position.set(xPosition, 0, lowPolyRow);

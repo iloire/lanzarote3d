@@ -1,5 +1,8 @@
 // Building Components
+// House exports legacy constructor as default (synchronous load)
 export { default as House, HouseType } from './House';
+
+// Other buildings export both original class and legacy constructor
 export { Villa, default as VillaLegacy } from './Villa';
 export { Townhouse, default as TownhouseLegacy } from './Townhouse';
 export { Barn, default as BarnLegacy } from './Barn';

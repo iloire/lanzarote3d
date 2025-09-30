@@ -325,25 +325,10 @@ export class Villa extends SimpleThreeComponent {
   }
 }
 
-// Legacy compatibility method - synchronous load for backward compatibility
-export class VillaWithLegacyLoad extends Villa {
-  loadWithGui(gui?: any): THREE.Object3D {
-    return this.loadSync();
-  }
-}
-
-// Type-safe legacy compatibility layer
-interface VillaWithSyncLoad extends VillaWithLegacyLoad {
-  load(gui?: any): THREE.Object3D;
-}
-
-const VillaConstructor = VillaWithLegacyLoad as unknown as {
-  new(options?: VillaOptions): VillaWithSyncLoad;
+// Legacy compatibility - override load to be synchronous for backward compatibility
+const VillaLegacy = Villa as any;
+VillaLegacy.prototype.load = function(gui?: any): THREE.Object3D {
+  return this.loadSync();
 };
 
-// Override load method to be synchronous for backward compatibility
-VillaConstructor.prototype.load = function(gui?: any): THREE.Object3D {
-  return this.loadWithGui(gui);
-};
-
-export default VillaConstructor as unknown as typeof Villa;
+export default VillaLegacy as typeof Villa;

@@ -226,7 +226,7 @@ class WorkshopApp extends WorkshopDemoBase {
     // Load standalone Pool
     try {
       const pool = new Pool();
-      const poolMesh = pool.load();
+      const poolMesh = await pool.load();
       poolMesh.position.set(-120, -15, 60);
       poolMesh.scale.set(0.8, 0.8, 0.8);
       scene.add(poolMesh);
@@ -279,7 +279,7 @@ class WorkshopApp extends WorkshopDemoBase {
             continue;
         }
 
-        const cactusMesh = cactus.load();
+        const cactusMesh = await cactus.load();
         cactusMesh.position.set(
           config.position[0] ?? 0,
           -15, // Ground level
