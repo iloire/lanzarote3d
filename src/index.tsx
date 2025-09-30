@@ -82,10 +82,6 @@ function isDevModeEnabled(): boolean {
 const storyName = getStoryName();
 const isDevMode = isDevModeEnabled();
 
-console.log('🔍 Debug - pathname:', window.location.pathname);
-console.log('🔍 Debug - extracted story name:', storyName);
-console.log('🔍 Debug - dev mode:', isDevMode);
-
 const rootElement = document.getElementById('root');
 if (rootElement && WebGL.isWebGLAvailable()) {
   const root = createRoot(rootElement);
@@ -98,7 +94,6 @@ if (rootElement && WebGL.isWebGLAvailable()) {
       initialStory={storyName}
     />
   );
-  console.log(`✓ Loading story: "${storyName}"`);
   logger.info(`${storyName} story started`);
 } else if (rootElement) {
   const warning = WebGL.getWebGLErrorMessage();
