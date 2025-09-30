@@ -4,6 +4,7 @@ import * as THREE from 'three';
  * Configuration options for Three.js components
  */
 export interface ComponentOptions {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
 
@@ -154,7 +155,7 @@ export interface IThreeComponent extends ComponentLifecycle {
    *
    * @returns Serializable representation of component state
    */
-  serialize(): any;
+  serialize(): Record<string, unknown>;
 }
 
 /**
@@ -185,6 +186,7 @@ export class ComponentDisposedError extends Error {
 /**
  * Type guard to check if an object implements IThreeComponent
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isThreeComponent(obj: any): obj is IThreeComponent {
   return (
     obj &&

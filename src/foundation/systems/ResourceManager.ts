@@ -3,7 +3,7 @@ import * as THREE from 'three';
 /**
  * Resource cache entry
  */
-interface CacheEntry<T = any> {
+interface CacheEntry<T = unknown> {
   readonly id: string;
   readonly data: T;
   readonly size: number;
@@ -61,7 +61,7 @@ export interface MaterialConfig {
   roughnessMap?: THREE.Texture;
   metalnessMap?: THREE.Texture;
   envMap?: THREE.Texture;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /**
@@ -450,7 +450,7 @@ export class ResourceManager {
     this.cache.delete(id);
   }
 
-  private hashConfig(config: any): string {
+  private hashConfig(config: Record<string, unknown>): string {
     // Simple hash function for configuration objects
     return btoa(JSON.stringify(config)).slice(0, 16);
   }

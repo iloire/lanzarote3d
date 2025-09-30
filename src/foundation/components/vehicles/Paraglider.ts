@@ -66,6 +66,7 @@ class Paraglider implements IFlyable {
     return this.mesh;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async load(gui?: any): Promise<THREE.Object3D> {
     this.mesh = new THREE.Object3D();
 

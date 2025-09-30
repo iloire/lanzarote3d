@@ -22,6 +22,7 @@ class HangGliderModel extends AutoFlier {
   wing!: HangGliderWing;
   pilot!: LegacyPilot;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async load(path: THREE.Vector3[], gui?: any): Promise<THREE.Mesh> {
     this.path = path;
     this.mesh = new THREE.Mesh();

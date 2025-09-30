@@ -16,17 +16,19 @@ export interface BenchmarkResult {
 }
 
 export interface ComponentConstructor {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   new (options?: any): any;
 }
 
 export interface LegacyComponent {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   load(gui?: any): Promise<THREE.Object3D> | THREE.Object3D;
 }
 
 export interface ModernComponent {
   load(): Promise<THREE.Object3D>;
   dispose(): void;
-  getInfo(): Record<string, any>;
+  getInfo(): Record<string, unknown>;
   getObject3D?(): THREE.Object3D | null;
 }
 
@@ -48,6 +50,7 @@ export class ComponentBenchmark {
    */
   public async benchmarkModernComponent(
     ComponentClass: ComponentConstructor,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     options: any = {},
     iterations: number = 100
   ): Promise<BenchmarkResult> {

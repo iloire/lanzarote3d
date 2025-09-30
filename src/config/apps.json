@@ -152,6 +152,16 @@
       "visibility": "hidden",
       "priority": 18
     },
+    "procedural-terrain": {
+      "name": "Procedural Terrain",
+      "description": "Interactive parametric terrain generator with noise-based displacement and multiple presets",
+      "entry": "./applications/procedural-terrain/index.tsx",
+      "route": "/procedural-terrain",
+      "category": "tool",
+      "requiresWebGL": true,
+      "visibility": "private",
+      "priority": 13
+    },
     "town": {
       "name": "Town",
       "description": "Neighborhood generation showcase with various residential formations and house types",
@@ -325,6 +335,7 @@
         "island",
         "paraglider-voxel",
         "terrain",
+        "procedural-terrain",
         "town",
         "houses",
         "glider",
@@ -347,13 +358,14 @@
       "island": 10,
       "paraglider-voxel": 11,
       "terrain": 12,
-      "town": 13,
-      "houses": 14,
-      "glider": 15,
-      "hangglider": 16,
-      "pilot": 17,
-      "flier-pg": 18,
-      "animals": 19
+      "procedural-terrain": 13,
+      "town": 14,
+      "houses": 15,
+      "glider": 16,
+      "hangglider": 17,
+      "pilot": 18,
+      "flier-pg": 19,
+      "animals": 20
     },
     "filenameOverrides": {
       "animation": "index.html",
