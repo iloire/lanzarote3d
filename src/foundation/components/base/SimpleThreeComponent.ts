@@ -55,94 +55,97 @@ export abstract class SimpleThreeComponent extends BaseThreeComponent {
   }
 
   /**
-   * Create the Three.js object using shared resources
+   * Template method for creating component content.
+   * Override this method for complex multi-mesh components.
+   * Default implementation creates a single mesh from createGeometry().
+   *
+   * @returns THREE.Object3D - Either a single Mesh or a Group with multiple meshes
    */
-  protected async createObject(): Promise<THREE.Object3D> {
-    // Get shared geometry
+  protected createContent(): THREE.Object3D {
+    // Default implementation: single mesh from geometry
     const geometryKey = this.getGeometryKey();
     const geometry = resourceManager.getGeometry(geometryKey, () => this.createGeometry());
 
-    // Get shared material
     const materialKey = this.getMaterialKey();
     const materialConfig = this.getMaterialConfig();
     const material = resourceManager.getMaterial(materialKey, materialConfig);
 
-    // Create mesh
-    const mesh = new THREE.Mesh(geometry, material);
+    return new THREE.Mesh(geometry, material);
+  }
 
-    // Apply transform options
+  /**
+   * Apply transform options to an object
+   */
+  protected applyTransforms(object: THREE.Object3D): void {
     if (this._options.position) {
-      mesh.position.copy(this._options.position);
+      object.position.copy(this._options.position);
     }
 
     if (this._options.rotation) {
-      mesh.rotation.copy(this._options.rotation);
+      object.rotation.copy(this._options.rotation);
     }
 
     if (this._options.scale) {
       if (typeof this._options.scale === 'number') {
-        mesh.scale.setScalar(this._options.scale);
+        object.scale.setScalar(this._options.scale);
       } else {
-        mesh.scale.copy(this._options.scale);
+        object.scale.copy(this._options.scale);
       }
     }
+  }
 
-    // Enable shadows if requested
-    if (this._options.castShadow !== false) {
-      mesh.castShadow = true;
-    }
+  /**
+   * Apply shadow settings to an object (recursively for Groups)
+   */
+  protected applyShadows(object: THREE.Object3D): void {
+    const castShadow = this._options.castShadow !== false;
+    const receiveShadow = this._options.receiveShadow !== false;
 
-    if (this._options.receiveShadow !== false) {
-      mesh.receiveShadow = true;
-    }
+    object.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        child.castShadow = castShadow;
+        child.receiveShadow = receiveShadow;
+      }
+    });
+  }
 
-    return mesh;
+  /**
+   * Create the Three.js object using the template method pattern
+   */
+  protected async createObject(): Promise<THREE.Object3D> {
+    // Call template method (can be overridden by subclasses)
+    const object = this.createContent();
+
+    // Apply transform options
+    this.applyTransforms(object);
+
+    // Apply shadow settings
+    this.applyShadows(object);
+
+    return object;
   }
 
   /**
    * Synchronous load method for backward compatibility
+   * Uses the same template method pattern as async load()
    */
   public loadSync(): THREE.Object3D {
     if (this._isLoaded && this._object) {
       return this._object;
     }
 
-    // Create mesh synchronously using the same logic as createObject
-    const geometryKey = this.getGeometryKey();
-    const geometry = resourceManager.getGeometry(geometryKey, () => this.createGeometry());
-
-    const materialKey = this.getMaterialKey();
-    const materialConfig = this.getMaterialConfig();
-    const material = resourceManager.getMaterial(materialKey, materialConfig);
-
-    const mesh = new THREE.Mesh(geometry, material);
+    // Call template method (same as createObject but synchronous)
+    const object = this.createContent();
 
     // Apply transform options
-    if (this._options.position) {
-      mesh.position.copy(this._options.position);
-    }
-    if (this._options.rotation) {
-      mesh.rotation.copy(this._options.rotation);
-    }
-    if (this._options.scale) {
-      if (typeof this._options.scale === 'number') {
-        mesh.scale.setScalar(this._options.scale);
-      } else {
-        mesh.scale.copy(this._options.scale);
-      }
-    }
+    this.applyTransforms(object);
 
-    // Enable shadows if requested
-    if (this._options.castShadow !== false) {
-      mesh.castShadow = true;
-    }
-    if (this._options.receiveShadow !== false) {
-      mesh.receiveShadow = true;
-    }
+    // Apply shadow settings
+    this.applyShadows(object);
 
-    this._object = mesh;
+    this._object = object;
     this._isLoaded = true;
-    return mesh;
+    return object;
   }
 
   /**

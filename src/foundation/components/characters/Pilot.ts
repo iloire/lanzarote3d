@@ -63,7 +63,7 @@ export class Pilot extends SimpleThreeComponent {
     return new THREE.BoxGeometry(1, 1, 1);
   }
 
-  protected createSyncContent(): THREE.Object3D {
+  protected override createContent(): THREE.Object3D {
     const container = new THREE.Object3D();
     container.name = 'PilotContainer';
 

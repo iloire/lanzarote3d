@@ -38,7 +38,7 @@ export class DatePalm extends SimpleThreeComponent {
     return new THREE.BoxGeometry(1, 1, 1);
   }
 
-  protected createSyncContent(): THREE.Object3D {
+  protected override createContent(): THREE.Object3D {
     const palm = new THREE.Group();
     palm.name = 'DatePalm';
 

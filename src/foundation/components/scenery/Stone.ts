@@ -51,7 +51,7 @@ class Stone extends SimpleThreeComponent {
     };
   }
 
-  protected createSyncContent(): THREE.Object3D {
+  protected override createContent(): THREE.Object3D {
     return this.createStone();
   }
 

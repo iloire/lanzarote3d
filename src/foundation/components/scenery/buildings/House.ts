@@ -92,7 +92,7 @@ class House extends SimpleThreeComponent {
     }
   }
 
-  protected createSyncContent(): THREE.Object3D {
+  protected override createContent(): THREE.Object3D {
     const house = new THREE.Group();
     house.name = 'House';
 
@@ -423,7 +423,7 @@ class House extends SimpleThreeComponent {
 
   // Legacy compatibility methods
   public loadWithGui(gui?: any): Promise<THREE.Object3D> {
-    return Promise.resolve(this.createSyncContent()).then(mesh => {
+    return Promise.resolve(this.createContent()).then(mesh => {
       if (gui) {
         GuiHelper.addLocationGui(gui, 'House', mesh);
       }
@@ -437,7 +437,7 @@ const HouseLegacy = House as any;
 
 // Add legacy load method that returns mesh directly and supports GUI
 HouseLegacy.prototype.load = function (gui?: any): THREE.Object3D {
-  const mesh = this.createSyncContent();
+  const mesh = this.createContent();
 
   if (gui) {
     GuiHelper.addLocationGui(gui, 'House', mesh);

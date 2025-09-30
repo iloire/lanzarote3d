@@ -39,12 +39,11 @@ export class Yacht extends MovableBoatComponent {
   }
 
   protected createGeometry(): THREE.BufferGeometry {
-    // Return placeholder - actual geometry created in createObject
+    // Return placeholder - actual geometry created in createContent
     return new THREE.BoxGeometry(1, 1, 1);
   }
 
-
-  protected createSyncContent(): THREE.Object3D {
+  protected override createContent(): THREE.Object3D {
     const yacht = new THREE.Group();
     yacht.name = 'Yacht';
 

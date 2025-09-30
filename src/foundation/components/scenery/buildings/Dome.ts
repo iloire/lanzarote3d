@@ -42,7 +42,7 @@ export class Dome extends SimpleThreeComponent {
     return new THREE.BoxGeometry(1, 1, 1);
   }
 
-  protected createSyncContent(): THREE.Object3D {
+  protected override createContent(): THREE.Object3D {
     const dome = new THREE.Group();
     dome.name = 'Dome';
 
