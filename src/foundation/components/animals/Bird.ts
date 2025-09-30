@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { SimpleThreeComponent, SimpleComponentOptions } from '../base/SimpleThreeComponent';
 import { ComponentMetadata } from '../base/IThreeComponent';
+import { logger } from '../../utils/logger';
 
 export interface BirdOptions extends SimpleComponentOptions {
   wingSpan?: number;
@@ -145,14 +146,14 @@ export abstract class Bird extends SimpleThreeComponent {
     this.birdModel = group;
     if (this._object) {
       this._object.add(this.birdModel);
-      console.log(`✅ Enhanced procedural bird created for ${this._metadata.name}`);
+      logger.debug(`Enhanced procedural bird created for ${this._metadata.name}`);
     }
   }
 
 
   private setupWingAnimation(): void {
     if (!this.leftWing || !this.rightWing) {
-      console.warn('Wings not found, animation may not work properly');
+      logger.warn('Wings not found, animation may not work properly');
       return;
     }
 

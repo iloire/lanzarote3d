@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { logger } from '../../utils/logger';
 
 /**
  * Character types available in the system
@@ -228,7 +229,7 @@ export class CharacterRegistry {
       version: '1.0.0',
     });
 
-    console.log(`📚 Character Registry initialized with ${this.characters.size} characters`);
+    logger.debug(`Character Registry initialized with ${this.characters.size} characters`);
   }
 
   /**
@@ -236,7 +237,7 @@ export class CharacterRegistry {
    */
   public registerCharacter(character: CharacterDefinition): void {
     this.characters.set(character.id, character);
-    console.log(`✅ Registered character: ${character.name} (${character.id})`);
+    logger.debug(`Registered character: ${character.name} (${character.id})`);
   }
 
   /**
@@ -323,7 +324,7 @@ export class CharacterRegistry {
 
     // Note: In a real implementation, you'd use fetch or file system checks
     // For now, we assume assets exist
-    console.log(`🔍 Validating assets for ${character.name}...`);
+    logger.debug(`Validating assets for ${character.name}...`);
 
     return {
       valid: missingAssets.length === 0,

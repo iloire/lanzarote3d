@@ -3,6 +3,7 @@ import { SimpleThreeComponent, SimpleComponentOptions } from '../base/SimpleThre
 import { ComponentMetadata } from '../base/IThreeComponent';
 import { resourceManager } from '../../systems/ResourceManager';
 import { TerrainNavigator } from '../../systems/behaviors/TerrainNavigator';
+import { logger } from '../../utils/logger';
 
 export interface ProceduralRoadOptions extends SimpleComponentOptions {
   // Path definition
@@ -108,12 +109,12 @@ export class ProceduralRoad extends SimpleThreeComponent {
 
     // Validate control points
     if (!options.controlPoints || options.controlPoints.length < 2) {
-      console.error('ProceduralRoad requires at least 2 control points');
+      logger.error('ProceduralRoad requires at least 2 control points');
       return roadGroup;
     }
 
     if (!this.terrainNavigator) {
-      console.error('ProceduralRoad requires a terrain mesh');
+      logger.error('ProceduralRoad requires a terrain mesh');
       return roadGroup;
     }
 

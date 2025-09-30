@@ -29,12 +29,12 @@ This document tracks pending technical debt and issues that need to be addressed
 **Migration**: All apps using CameraController should switch to CameraTargetController
 
 ### TypeScript Strict Mode Violations
-**Status**: ✅ Significantly Improved (15 batches completed)
+**Status**: ✅ Significantly Improved (16 batches completed)
 **Files**: Reduced from 30+ to ~5 remaining instances
 **Issue**: TypeScript strict mode violations and excessive use of `any` type
 **Impact**: Runtime errors, poor developer experience, harder debugging, reduced type safety
 
-**Fixed Files** (Batches 1-15):
+**Fixed Files** (Batches 1-16):
 - ✅ Foundation components base classes (IThreeComponent, BaseThreeComponent, AsyncThreeComponent)
 - ✅ Resource management (ResourceManager, ComponentRegistry, ComponentBenchmark)
 - ✅ Physics components (Weather, Thermal, WindIndicator)
@@ -43,12 +43,35 @@ This document tracks pending technical debt and issues that need to be addressed
 - ✅ Systems (ThemeEngine, VarioSound, disposal-utils)
 - ✅ Location editor (state.ts, markers.ts)
 - ✅ Applications (procedural-terrain, satellite-terrain, visualizer, flying-behavior-test)
-- ✅ Character components (PilotVoxel, Marker)
-- ✅ GUI components (flyzone-editor-ui, Wing, Tree)
+- ✅ Character components (PilotVoxel, Marker, CharacterRegistry)
+- ✅ GUI components (flyzone-editor-ui, Wing, Tree, CameraTargetUI)
 - ✅ Foundation utils (models.ts already clean)
 - ✅ CameraController (already using event.code, not event.which)
 - ✅ **Batch 14 (Sept 30, 2025)**: Window interface, GUI controls, shared/index.ts logging
 - ✅ **Batch 15 (Sept 30, 2025)**: Core app modules, island, navigation, helpers
+- ✅ **Batch 16 (Sept 30, 2025)**: Foundation components (ProceduralRoad, Bird, Water, CharacterRegistry, CameraTargetUI)
+
+**Batch 16 Completed (Sept 30, 2025)**:
+1. **src/foundation/components/scenery/ProceduralRoad.ts**: Replaced console
+   - Changed 2 `console.error` to `logger.error`
+   - Validation error messages for control points and terrain
+
+2. **src/foundation/components/animals/Bird.ts**: Replaced console
+   - Changed 1 `console.log` to `logger.debug`
+   - Changed 1 `console.warn` to `logger.warn`
+   - Bird creation and wing animation warnings
+
+3. **src/foundation/components/environment/Water.ts**: Replaced console
+   - Changed 1 `console.log` to `logger.debug`
+   - Water component loading message
+
+4. **src/foundation/components/characters/CharacterRegistry.ts**: Replaced console
+   - Changed 3 `console.log` to `logger.debug`
+   - Registry initialization, character registration, and asset validation
+
+5. **src/foundation/components/ui/CameraTargetUI.tsx**: Replaced console
+   - Changed 1 `console.error` to `logger.error`
+   - UI element not found error
 
 **Batch 15 Completed (Sept 30, 2025)**:
 1. **src/shared/index.ts**: Fixed 'any' type in dynamicImportApp

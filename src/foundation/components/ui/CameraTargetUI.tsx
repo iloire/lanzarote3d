@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { CameraTargetController, CameraMode, CameraTarget } from '../../systems/scene/CameraTargetController';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { logger } from '../../utils/logger';
 
 interface CameraTargetUIProps {
   controller: CameraTargetController;
@@ -259,7 +260,7 @@ export const createCameraTargetUI = (
 ): void => {
   const rootElement = document.getElementById('ui-controls');
   if (!rootElement) {
-    console.error('UI controls element not found');
+    logger.error('UI controls element not found');
     return;
   }
 

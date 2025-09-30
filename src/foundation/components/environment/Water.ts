@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { Water as WaterEffect } from 'three/examples/jsm/objects/Water';
+import { logger } from '../../utils/logger';
 
 export type WaterOptions = {
   size: number;
@@ -14,7 +15,7 @@ export default class Water {
   }
 
   load(sunPosition: THREE.Vector3) {
-    console.log('=== water load');
+    logger.debug('Loading water component');
     const waterGeometry = new THREE.PlaneGeometry(this.options.size, this.options.size);
     const mat = new THREE.MeshLambertMaterial({ color: 0x000511 });
     mat.transparent = true;
