@@ -254,21 +254,6 @@ export class Truck extends MovableCarComponent {
     return truck;
   }
 
-  /**
-   * Load the component synchronously for backward compatibility
-   */
-  public override loadSync(): THREE.Object3D {
-    const truck = this.createTruckGeometry();
-    this._object = truck;
-    this._isLoaded = true;
-
-    // Start moving if enabled
-    if ((this.options as TruckOptions).enableMovement && ((this.options as TruckOptions).autoStartMoving ?? true)) {
-      this.startMoving();
-    }
-
-    return truck;
-  }
 
   public override validate(): string[] {
     const issues: string[] = [];

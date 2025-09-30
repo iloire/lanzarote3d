@@ -125,28 +125,6 @@ export abstract class SimpleThreeComponent extends BaseThreeComponent {
     return object;
   }
 
-  /**
-   * Synchronous load method for backward compatibility
-   * Uses the same template method pattern as async load()
-   */
-  public loadSync(): THREE.Object3D {
-    if (this._isLoaded && this._object) {
-      return this._object;
-    }
-
-    // Call template method (same as createObject but synchronous)
-    const object = this.createContent();
-
-    // Apply transform options
-    this.applyTransforms(object);
-
-    // Apply shadow settings
-    this.applyShadows(object);
-
-    this._object = object;
-    this._isLoaded = true;
-    return object;
-  }
 
   /**
    * Override dispose to release shared resources

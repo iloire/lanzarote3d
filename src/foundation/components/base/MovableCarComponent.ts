@@ -96,27 +96,6 @@ export abstract class MovableCarComponent extends SimpleThreeComponent {
     return object;
   }
 
-  /**
-   * Load the component synchronously for backward compatibility
-   */
-  public override loadSync(): THREE.Object3D {
-    const content = super.loadSync();
-    this.currentMesh = content;
-
-    // Integrate moving behavior if enabled
-    if (this.movingBehavior) {
-      this.movingBehavior.attachTo(content);
-
-      if ((this.options as MovableCarComponentOptions).autoStartMoving ?? true) {
-        this.movingBehavior.start();
-      }
-    }
-
-    // Set initial terrain height
-    this.updateTerrainHeight();
-
-    return content;
-  }
 
   /**
    * Update method called each frame - handles terrain following

@@ -111,24 +111,6 @@ export class AutonomousCar extends Car {
     return carMesh;
   }
 
-  /**
-   * Override the legacy synchronous load method
-   */
-  override loadSync(): THREE.Object3D {
-    const carMesh = super.loadSync();
-
-    // Set up terrain navigation
-    if (this.terrainBehavior) {
-      this.terrainBehavior.attachTo(carMesh);
-
-      // Add debug visualization if requested
-      if (this.autonomousOptions.showDebugInfo) {
-        this.createDebugVisualization(carMesh);
-      }
-    }
-
-    return carMesh;
-  }
 
   /**
    * Start autonomous driving

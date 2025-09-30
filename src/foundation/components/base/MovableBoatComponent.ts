@@ -67,23 +67,6 @@ export abstract class MovableBoatComponent extends FloatingThreeComponent {
     return object;
   }
 
-  /**
-   * Load the component synchronously for backward compatibility
-   */
-  public override loadSync(): THREE.Object3D {
-    const content = super.loadSync();
-
-    // Integrate moving behavior if enabled
-    if (this.movingBehavior) {
-      this.movingBehavior.attachTo(content);
-
-      if ((this.options as MovableBoatComponentOptions).autoStartMoving ?? true) {
-        this.movingBehavior.start();
-      }
-    }
-
-    return content;
-  }
 
   // Movement control methods (only work if movement is enabled)
   public startMoving(): void {

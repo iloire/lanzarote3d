@@ -44,24 +44,6 @@ export abstract class FloatingThreeComponent extends SimpleThreeComponent {
     return object;
   }
 
-  /**
-   * Load the component synchronously for backward compatibility
-   * This is a legacy method - prefer using load() for new code
-   */
-  public override loadSync(): THREE.Object3D {
-    // Use template method pattern from SimpleThreeComponent
-    // Child classes override createContent() for complex geometry
-    const content = super.loadSync();
-
-    // Integrate floating behavior
-    this.floatingBehavior.attachTo(content);
-
-    if ((this.options as FloatingComponentOptions).autoStartFloating ?? true) {
-      this.floatingBehavior.start();
-    }
-
-    return content;
-  }
 
   // Floating control methods
   public startFloating(): void {

@@ -203,21 +203,6 @@ export class Car extends MovableCarComponent {
     return car;
   }
 
-  /**
-   * Load the component synchronously for backward compatibility
-   */
-  public override loadSync(): THREE.Object3D {
-    const car = this.createCarGeometry();
-    this._object = car;
-    this._isLoaded = true;
-
-    // Start moving if enabled
-    if ((this.options as CarOptions).enableMovement && ((this.options as CarOptions).autoStartMoving ?? true)) {
-      this.startMoving();
-    }
-
-    return car;
-  }
 
   public override validate(): string[] {
     const issues: string[] = [];
