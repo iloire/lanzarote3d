@@ -108,6 +108,8 @@ class ThemeSelector extends Component<ThemeSelectorProps, ThemeSelectorState> {
   getThemeColor = (theme: Theme): string => {
     // Extract predominant color from theme
     switch (theme.id) {
+      case 'default':
+        return '#616161';
       case 'golden':
         return '#FFD700';
       case 'arctic':

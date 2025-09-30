@@ -19,10 +19,13 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Updated material caching to include opacity settings
 
 - **Default theme**: Added "Default" theme to themes menu
-  - Provides neutral, clean styling that matches original "no theme" appearance
+  - Provides neutral, clean styling with light gray wireframe terrain
   - Set as the default theme when users first load the application
   - Allows users to return to basic styling after trying other themed looks
-  - Features: white/gray clouds, volcanic terrain with brown coloring, standard blue water, normal lighting
+  - Features: white/gray clouds, light wireframe terrain, medium blue water, fog enabled
+  - ThemeManager now always applies default theme on first load (no longer shows "no theme")
+  - Theme selector highlights active theme with solid color background and thicker border
+  - Default theme button shows medium gray color (#616161) instead of green
 
 ### Fixed
 - **Roads demo height offset slider**: Fixed GUI slider range from 0-2 to 0-10 to match configured heightOffset of 5
