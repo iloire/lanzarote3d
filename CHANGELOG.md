@@ -30,14 +30,6 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 
 ### Improved
 - **Famara-animation camera transitions**: Enhanced camera animation smoothness
-  - Upgraded Phase 1 to cubic easing (ease-in-out) for gentler acceleration/deceleration
-  - Upgraded Phase 2 to quartic easing (ease-out) for ultra-smooth, buttery deceleration
-  - Implemented exponential smoothing for target tracking with progressive increase
-  - Made look transitions more gradual throughout the animation
-  - Results in significantly smoother, more cinematic camera movement with no jarring transitions
-
-### Improved
-- **famara-animation camera transition**: Enhanced camera animation smoothness
   - Phase 1: Upgraded from smoothstep to cubic easing (ease-in-out cubic) for gentler acceleration/deceleration
   - Phase 2: Upgraded from quadratic to quartic easing (ease-out quartic) for ultra-smooth, buttery deceleration
   - Target tracking: Implemented exponential smoothing with progressive increase for natural camera behavior
