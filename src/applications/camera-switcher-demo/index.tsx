@@ -155,6 +155,7 @@ class CameraSwitcherDemo extends TerrainBase {
 
     this.cessnaBehavior.attachTo(cessnaMesh);
     this.cessnaBehavior.setTerrain(terrain);
+    this.cessnaBehavior.start(); // Manually start the behavior
 
     // Add to camera targets
     this.targetController?.addTarget(cessnaMesh, '✈️ Cessna (Flying)');
@@ -185,6 +186,7 @@ class CameraSwitcherDemo extends TerrainBase {
 
     this.jetBehavior.attachTo(jetMesh);
     this.jetBehavior.setTerrain(terrain);
+    this.jetBehavior.start(); // Manually start the behavior
 
     // Add to camera targets
     this.targetController?.addTarget(jetMesh, '✈️ Jet (Fast)');
@@ -215,6 +217,7 @@ class CameraSwitcherDemo extends TerrainBase {
 
     this.hanggliderBehavior.attachTo(hanggliderMesh);
     this.hanggliderBehavior.setTerrain(terrain);
+    this.hanggliderBehavior.start(); // Manually start the behavior
 
     // Add to camera targets
     this.targetController?.addTarget(hanggliderMesh, '🪂 Hang Glider (Soaring)');
