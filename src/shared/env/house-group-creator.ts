@@ -198,7 +198,7 @@ export class HouseGroupCreator {
 
       // Add land plot if specified
       if (houseConfig.landPlot) {
-        this.addLandPlot(position, houseConfig.landPlot, houseMesh.rotation.y);
+        await this.addLandPlot(position, houseConfig.landPlot, houseMesh.rotation.y);
       }
 
       // Add to scene and track
@@ -220,11 +220,11 @@ export class HouseGroupCreator {
   /**
    * Add a land plot under a house
    */
-  private addLandPlot(
+  private async addLandPlot(
     housePosition: THREE.Vector3,
     landPlot: { width: number; depth: number; color?: string },
     houseRotation: number = 0
-  ): void {
+  ): Promise<void> {
     try {
       const landGeometry = new THREE.PlaneGeometry(landPlot.width, landPlot.depth);
       const landMaterial = new THREE.MeshStandardMaterial({
@@ -251,7 +251,7 @@ export class HouseGroupCreator {
       this.createdObjects.push(landMesh);
 
       // Add random cacti and stones to the land plot
-      this.addLandscapeElements(housePosition, landPlot, houseRotation);
+      await this.addLandscapeElements(housePosition, landPlot, houseRotation);
     } catch (error) {
       console.error('Error adding land plot:', error);
     }
@@ -260,13 +260,16 @@ export class HouseGroupCreator {
   /**
    * Add random cacti and stones to a land plot
    */
-  private addLandscapeElements(
+  private async addLandscapeElements(
     centerPosition: THREE.Vector3,
     landPlot: { width: number; depth: number },
     rotation: number = 0
-  ): void {
+  ): Promise<void> {
     const maxElements = Math.floor((landPlot.width * landPlot.depth) / 1000); // Density based on area
     const elementCount = Math.floor(Math.random() * maxElements) + 1;
+
+    // Collect all element creation promises
+    const elementPromises: Promise<void>[] = [];
 
     for (let i = 0; i < elementCount; i++) {
       // Random position within the land plot
@@ -289,29 +292,32 @@ export class HouseGroupCreator {
       try {
         if (elementType < 0.3) {
           // 30% chance for stones
-          this.addStone(elementPosition);
+          elementPromises.push(this.addStone(elementPosition));
         } else if (elementType < 0.5) {
           // 20% chance for barrel cactus
-          this.addBarrelCactus(elementPosition);
+          elementPromises.push(this.addBarrelCactus(elementPosition));
         } else if (elementType < 0.7) {
           // 20% chance for prickly pear cactus
-          this.addPricklyPearCactus(elementPosition);
+          elementPromises.push(this.addPricklyPearCactus(elementPosition));
         } else if (elementType < 0.85) {
           // 15% chance for saguaro cactus
-          this.addSaguaroCactus(elementPosition);
+          elementPromises.push(this.addSaguaroCactus(elementPosition));
         } else {
           // 15% chance for organ pipe cactus
-          this.addOrganPipeCactus(elementPosition);
+          elementPromises.push(this.addOrganPipeCactus(elementPosition));
         }
       } catch (error) {
         console.error('Error adding landscape element:', error);
       }
     }
+
+    // Load all elements in parallel
+    await Promise.all(elementPromises);
   }
 
-  private addStone(position: THREE.Vector3): void {
+  private async addStone(position: THREE.Vector3): Promise<void> {
     const stone = new Stone();
-    const stoneMesh = stone.loadSync();
+    const stoneMesh = await stone.load();
     stoneMesh.position.copy(position);
     stoneMesh.scale.setScalar(0.3 + Math.random() * 0.4); // Random scale 0.3-0.7
     stoneMesh.rotation.y = Math.random() * Math.PI * 2; // Random rotation
@@ -319,13 +325,13 @@ export class HouseGroupCreator {
     this.createdObjects.push(stoneMesh);
   }
 
-  private addBarrelCactus(position: THREE.Vector3): void {
+  private async addBarrelCactus(position: THREE.Vector3): Promise<void> {
     console.log(`🌵 Creating BarrelCactus with lowPoly: ${this.lowPoly}`);
     const cactus = new BarrelCactus({
       scale: 0.4 + Math.random() * 0.3,
       lowPoly: this.lowPoly
     });
-    const cactusMesh = cactus.loadSync();
+    const cactusMesh = await cactus.load();
     cactusMesh.position.copy(position);
 
     // Count polygons for debugging
@@ -349,34 +355,34 @@ export class HouseGroupCreator {
     this.createdObjects.push(cactusMesh);
   }
 
-  private addPricklyPearCactus(position: THREE.Vector3): void {
+  private async addPricklyPearCactus(position: THREE.Vector3): Promise<void> {
     const cactus = new PricklyPearCactus({
       scale: 0.3 + Math.random() * 0.4,
       lowPoly: this.lowPoly
     });
-    const cactusMesh = cactus.loadSync();
+    const cactusMesh = await cactus.load();
     cactusMesh.position.copy(position);
     this.scene.add(cactusMesh);
     this.createdObjects.push(cactusMesh);
   }
 
-  private addSaguaroCactus(position: THREE.Vector3): void {
+  private async addSaguaroCactus(position: THREE.Vector3): Promise<void> {
     const cactus = new SaguaroCactus({
       scale: 0.2 + Math.random() * 0.3,
       lowPoly: this.lowPoly
     });
-    const cactusMesh = cactus.loadSync();
+    const cactusMesh = await cactus.load();
     cactusMesh.position.copy(position);
     this.scene.add(cactusMesh);
     this.createdObjects.push(cactusMesh);
   }
 
-  private addOrganPipeCactus(position: THREE.Vector3): void {
+  private async addOrganPipeCactus(position: THREE.Vector3): Promise<void> {
     const cactus = new OrganPipeCactus({
       scale: 0.3 + Math.random() * 0.3,
       lowPoly: this.lowPoly
     });
-    const cactusMesh = cactus.loadSync();
+    const cactusMesh = await cactus.load();
     cactusMesh.position.copy(position);
     this.scene.add(cactusMesh);
     this.createdObjects.push(cactusMesh);
@@ -388,7 +394,7 @@ export class HouseGroupCreator {
   private async addPoolToHouse(housePosition: THREE.Vector3, houseScale: number): Promise<void> {
     try {
       const pool = new Pool();
-      const poolMesh = pool.loadSync();
+      const poolMesh = await pool.load();
 
       // Position pool behind or to the side of the house
       const poolOffset = new THREE.Vector3(
