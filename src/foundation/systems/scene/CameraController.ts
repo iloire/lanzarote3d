@@ -3,6 +3,7 @@ import Flier from '../../types/flier';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { animator } from '../animation/SimpleAnimator';
 import GuiHelper from '../../utils/gui';
+import { GUI } from 'lil-gui';
 
 const DEFAULT_FOLLOW_DISTANCE = 180;
 const DEFAULT_ANGLE = -Math.PI / 5.8;
@@ -86,7 +87,7 @@ export class CameraController extends THREE.PerspectiveCamera {
     super(fov, aspect, near, far);
   }
 
-  addGui(gui: { addFolder: (name: string) => { add: (obj: any, prop: string, min?: number, max?: number) => { name: (name: string) => { listen: () => void } } } }) {
+  addGui(gui: GUI) {
     GuiHelper.addLocationGui(gui, 'Camera', this, { min: 0, max: 10000 });
     GuiHelper.addPositionGui(gui, 'Camera.firstPersonViewOffset', this.firstPersonViewOffset, {
       min: -20,

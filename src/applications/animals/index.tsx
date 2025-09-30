@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import { StoryOptions } from '../../shared/types';
 import { WorkshopDemoBase } from '../../shared/WorkshopDemoBase';
 import { Crow, Eagle, Vulture } from '../../foundation/components/animals';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { GUI } from 'lil-gui';
 
 /**
  * Animals Showcase - Display various bird species with wing animations
@@ -60,7 +62,7 @@ class AnimalsApp extends WorkshopDemoBase {
   }
 
 
-  private setupCamera(camera: THREE.PerspectiveCamera, controls: any): void {
+  private setupCamera(camera: THREE.PerspectiveCamera, controls: OrbitControls): void {
     // Position camera closer for better bird viewing
     camera.position.set(4, 3, 6);
     camera.lookAt(0, 2, 0);
@@ -75,7 +77,7 @@ class AnimalsApp extends WorkshopDemoBase {
     }
   }
 
-  private async createBirds(scene: THREE.Scene, gui?: any): Promise<void> {
+  private async createBirds(scene: THREE.Scene, gui?: GUI): Promise<void> {
     console.log('🐦 Starting bird creation...');
 
     // Create Crow (left position)
@@ -137,7 +139,7 @@ class AnimalsApp extends WorkshopDemoBase {
     }
   }
 
-  private setupGUI(gui: any): void {
+  private setupGUI(gui: GUI): void {
     const birdFolder = gui.addFolder('Birds');
     birdFolder.add({ info: 'Bird models loaded successfully' }, 'info').name('Status');
     birdFolder.open();
