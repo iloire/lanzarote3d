@@ -1,30 +1,6 @@
 # Technical Debt
 
-This document tracks technical debt and issues that need to be addressed for improved code quality, performance, and maintainability.
-
-## Recent Improvements (2025-09-27)
-
-### ✅ App Loading Architecture
-**Completed**: Replaced complex "Stories" system with simple app registry-based loading
-- Removed StoryLoader class and complex proxy patterns
-- Simplified to direct `loadApp()` function with app registry lookup
-- Still using switch statement for webpack compatibility - could be further improved with dynamic imports if webpack config allows
-
-### ✅ App Architecture Standardization
-**Completed**: All 8 applications converted to unified AppBase architecture
-- Standardized lifecycle management, performance monitoring, error handling, and resource cleanup
-- Fixed inconsistent patterns across demos, experiences, and tools
-- Implemented proper dispose() methods with event listener cleanup
-
-### ✅ Animation System Simplification
-**Completed**: Replaced complex animation system with SimpleAnimator
-- Self-contained, no external dependencies, transparent operation, easy to debug
-- Fixed previous AnimationManager → TWEEN → Animations utility complexity
-
-### ✅ Animation Loop Management
-**Completed**: Centralized animation loop management across all applications
-- Fixed multiple competing animation loops
-- Standardized rendering patterns in AppBase architecture
+This document tracks pending technical debt and issues that need to be addressed for improved code quality, performance, and maintainability.
 
 ## High Priority Issues
 
@@ -89,6 +65,22 @@ This document tracks technical debt and issues that need to be addressed for imp
 
 **Solution**: Replace with proper TypeScript interfaces and fix strict mode violations
 
+### App Registry Import Mapping Technical Debt
+**Status**: ⚠️ High Priority
+**Files**: `src/apps/shared/index.ts`, `src/config/apps.json`
+**Issue**: Duplication between app registry and import mapping causes maintenance burden
+**Impact**: High maintenance burden, risk of inconsistency, manual synchronization prone to error
+
+**Problems**:
+1. **Duplication**: Apps defined in both `apps.json` and manual `importMap`
+2. **Manual Maintenance**: Each new app requires updates in two places
+3. **Legacy "Stories" Concept**: Unnecessary Proxy pattern for backward compatibility
+
+**Recommended Solutions**:
+- **Option 1**: Auto-generate import mapping from `apps.json` at build time
+- **Option 2**: Use direct dynamic imports based on app metadata
+- **Option 3**: Remove Stories concept entirely and update all consumers
+
 ### Production Debug Code
 **Status**: ⚠️ Should be removed
 **Files**: 5+ files with console.log in production
@@ -125,16 +117,6 @@ This document tracks technical debt and issues that need to be addressed for imp
 **Impact**: Flexibility, different environments
 **Solution**: Make configurable via environment or app registry
 
-### Event Listener Memory Leaks
-**Status**: ✅ Significantly Improved
-**Files**: All AppBase applications now have proper cleanup
-**Issue**: Many event listeners lack proper cleanup mechanisms
-**Impact**: Memory leaks, degraded performance over time
-**Files Affected**:
-- `src/apps/experiences/flyzones/events/mouse.ts` - ✅ Now has proper cleanup in AppBase
-- Multiple window resize listeners - ✅ Now tracked and cleaned up in dispose() methods
-**Solution**: ✅ AppBase architecture ensures all event listeners are properly cleaned up via standardized dispose() methods
-
 ## Low Priority Issues
 
 ### Mixed Component Patterns
@@ -163,6 +145,7 @@ This document tracks technical debt and issues that need to be addressed for imp
 **High Priority**:
 - Multiple render loops (memory leak risk)
 - TypeScript strict mode violations
+- App registry import mapping technical debt
 - CameraController deprecated API usage
 - Location editor implicit any types
 - Production debug code cleanup
@@ -179,58 +162,6 @@ This document tracks technical debt and issues that need to be addressed for imp
 - Mixed component patterns
 - Bundle size optimization
 - Accessibility compliance
-
----
-
-## Suggested Next Areas of Improvement
-
-### Phase 1: Critical Stability (High Impact, Medium Effort)
-1. **Render Loop Centralization** - Fix memory leaks in component animations
-2. **Type Safety Audit** - Replace all `any` types with proper interfaces
-3. **Production Debug Cleanup** - Remove console.log statements from production code
-4. **Deprecated API Updates** - Fix CameraController event.which usage
-
-### Phase 2: Developer Experience (High Impact, High Effort)
-5. **Testing Infrastructure** - Implement comprehensive test suite (Jest + RTL + E2E)
-6. **Error Handling Standardization** - Consistent error handling patterns across apps
-7. **Development Tooling** - Enhanced debugging capabilities and better error reporting
-
-### Phase 3: Performance & User Experience (Medium Impact, Medium Effort)
-8. **Bundle Optimization** - Code splitting and tree-shaking for faster load times
-9. **Progressive Web App** - Service worker, offline capability, installability
-10. **Accessibility Compliance** - WCAG 2.1 compliance for inclusive user experience
-
-### Phase 4: Architecture Enhancement (Medium Impact, High Effort)
-11. **Component Interface Standardization** - Consistent APIs across foundation components
-12. **Advanced Asset Management** - Centralized loading with priority and caching
-13. **Performance Monitoring** - Real-time metrics and optimization insights
-
----
-
-## Design Decisions & Architecture Evaluations
-
-### Apps Directory Structure Evaluation
-**Status**: ✅ Evaluated - No Change Recommended
-**Date**: 2025-09-26
-**Question**: Should apps be restructured with an additional `/applications` parent directory?
-
-**Current Structure** (Recommended):
-```
-src/apps/
-├── config/           # Central app registry
-├── demos/            # Standalone demo applications (3 apps)
-├── experiences/      # Full interactive experiences (2 apps)
-├── shared/           # Shared utilities & AppBase
-└── tools/            # Development/authoring tools (2 apps)
-```
-
-**Decision**: Keep current structure
-**Reasoning**:
-- Current structure is already well-organized with clear logical separation
-- Proposed change adds unnecessary nesting without significant benefit
-- Would require extensive migration (69+ files, webpack configs, registry paths)
-- Flat structure with 3 clear categories is more conventional and easier to navigate
-- Each category has a distinct purpose: demos (showcase), experiences (interactive), tools (development)
 
 ---
 

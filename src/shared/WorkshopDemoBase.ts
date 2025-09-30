@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import Helpers from '../foundation/utils/helpers';
 import { AppBase, AppConfig } from './AppBase';
 import { StoryOptions } from './types';
@@ -183,7 +184,7 @@ export abstract class WorkshopDemoBase extends AppBase {
     renderer: THREE.WebGLRenderer,
     scene: THREE.Scene,
     camera: THREE.Camera,
-    controls: any,
+    controls: OrbitControls,
     onUpdate?: () => void
   ): void {
     const animate = () => {

@@ -8,6 +8,7 @@ import {
   WeatherAnalysis,
   CurrentWeather,
   TakeoffRecommendation,
+  TakeoffLocation,
 } from '../../types/flyzone-types';
 
 /**
@@ -275,7 +276,7 @@ export class FlyzoneAPI {
   }
 
   private analyzeWindConditions(
-    takeoff: any,
+    takeoff: TakeoffLocation,
     weather: CurrentWeather,
     userLevel: string
   ): TakeoffRecommendation {
@@ -314,7 +315,7 @@ export class FlyzoneAPI {
     };
   }
 
-  private calculateDirectionScore(windDirection: number, idealDirection: any): number {
+  private calculateDirectionScore(windDirection: number, idealDirection: { ideal: number; range: [number, number] }): number {
     const ideal = idealDirection.ideal;
     const range = idealDirection.range;
 
@@ -341,7 +342,7 @@ export class FlyzoneAPI {
     return Math.max(0, 70 - (diff / maxDeviation) * 70);
   }
 
-  private calculateSpeedScore(windSpeed: number, idealSpeed: any): number {
+  private calculateSpeedScore(windSpeed: number, idealSpeed: { min: number; max: number; ideal: number }): number {
     const { min, max, ideal } = idealSpeed;
 
     if (windSpeed >= min && windSpeed <= max) {
@@ -365,7 +366,7 @@ export class FlyzoneAPI {
     return 0;
   }
 
-  private generateReasoning(score: number, windMatch: any, weather: CurrentWeather): string[] {
+  private generateReasoning(score: number, windMatch: { directionScore: number; speedScore: number; overallScore: number }, weather: CurrentWeather): string[] {
     const reasoning = [];
 
     if (score >= 80) {
@@ -389,7 +390,7 @@ export class FlyzoneAPI {
     return reasoning;
   }
 
-  private generateWarnings(takeoff: any, weather: CurrentWeather, userLevel: string): string[] {
+  private generateWarnings(takeoff: TakeoffLocation, weather: CurrentWeather, userLevel: string): string[] {
     const warnings = [];
 
     // High wind speed warnings

@@ -8,6 +8,37 @@ import { ComponentOptions, ComponentMetadata } from './IThreeComponent';
 export type ResourceType = 'model' | 'texture';
 
 /**
+ * Model loading options
+ */
+export interface ModelLoadOptions {
+  readonly scale?: number;
+  readonly position?: THREE.Vector3;
+  readonly rotation?: THREE.Euler;
+  readonly castShadow?: boolean;
+  readonly receiveShadow?: boolean;
+}
+
+/**
+ * Texture loading options
+ */
+export interface TextureLoadOptions {
+  readonly wrapS?: THREE.Wrapping;
+  readonly wrapT?: THREE.Wrapping;
+  readonly magFilter?: THREE.TextureFilter;
+  readonly minFilter?: THREE.TextureFilter;
+  readonly flipY?: boolean;
+}
+
+/**
+ * Serialized component data
+ */
+export interface SerializedComponentData {
+  readonly metadata: ComponentMetadata;
+  readonly resources: ResourceDescriptor[];
+  readonly loadingState: string;
+}
+
+/**
  * Resource descriptor for async loading
  */
 export interface ResourceDescriptor {
@@ -230,7 +261,7 @@ export abstract class AsyncThreeComponent extends BaseThreeComponent {
   /**
    * Load 3D model (GLTF, GLB, OBJ, etc.)
    */
-  protected async loadModel(url: string, options?: any): Promise<THREE.Object3D> {
+  protected async loadModel(url: string, options?: ModelLoadOptions): Promise<THREE.Object3D> {
     return new Promise((resolve, reject) => {
       const extension = url.split('.').pop()?.toLowerCase();
 
@@ -262,7 +293,7 @@ export abstract class AsyncThreeComponent extends BaseThreeComponent {
   /**
    * Load texture
    */
-  protected async loadTexture(url: string, _options?: any): Promise<THREE.Texture> {
+  protected async loadTexture(url: string, _options?: TextureLoadOptions): Promise<THREE.Texture> {
     return new Promise((resolve, reject) => {
       const loader = new THREE.TextureLoader();
       loader.load(
@@ -326,7 +357,7 @@ export abstract class AsyncThreeComponent extends BaseThreeComponent {
   /**
    * Override serialize to include resource information
    */
-  override serialize(): any {
+  override serialize(): SerializedComponentData {
     const baseData = super.serialize();
     return {
       ...baseData,

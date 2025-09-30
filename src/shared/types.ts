@@ -5,6 +5,7 @@ import { Sky } from '../foundation/components/environment';
 import { Island } from '../foundation/components/scenery/Island';
 import { GUI } from 'lil-gui';
 import { Theme } from '../foundation/types/Theme';
+import Environment from './env/environment';
 
 export interface StoryOptions {
   camera: CameraController;
@@ -21,5 +22,5 @@ export interface StoryOptions {
 
   // Optional parameters
   theme?: Theme; // Optional theme parameter
-  environment?: any; // Optional Environment instance for theme application
+  environment?: Environment; // Optional Environment instance for theme application
 }

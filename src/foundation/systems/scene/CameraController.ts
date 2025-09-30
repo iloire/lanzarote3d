@@ -25,16 +25,16 @@ let keydownListener: ((event: KeyboardEvent) => void) | null = null;
 let keyupListener: ((event: KeyboardEvent) => void) | null = null;
 
 enum KeyCodes {
-  left = 37, // left arrow
-  right = 39, //right arrow
-  up = 38, // up arrow
-  down = 40, // down arrow
-  in = 33, // page up
-  out = 34, // page down
+  left = 'ArrowLeft',
+  right = 'ArrowRight',
+  up = 'ArrowUp',
+  down = 'ArrowDown',
+  in = 'PageUp',
+  out = 'PageDown',
 }
 
 function onDocumentKeyDown(event: KeyboardEvent) {
-  const keyCode = event.keyCode || event.which; // Fallback for compatibility
+  const keyCode = event.code;
   if (keyCode === KeyCodes.left) {
     isLeftViewing = true;
   } else if (keyCode === KeyCodes.right) {
@@ -51,7 +51,7 @@ function onDocumentKeyDown(event: KeyboardEvent) {
 }
 
 function onDocumentKeyUp(event: KeyboardEvent) {
-  const keyCode = event.keyCode || event.which; // Fallback for compatibility
+  const keyCode = event.code;
   if (keyCode === KeyCodes.left) {
     isLeftViewing = false;
   } else if (keyCode === KeyCodes.right) {
