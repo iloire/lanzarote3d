@@ -220,7 +220,7 @@ export abstract class BaseThreeComponent implements IThreeComponent {
     return [];
   }
 
-  protected serializeComponent(): any {
+  protected serializeComponent(): Record<string, unknown> {
     // Default implementation returns empty object
     // Subclasses can override to add specific serialization
     return {};

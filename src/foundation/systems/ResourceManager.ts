@@ -340,7 +340,8 @@ export class ResourceManager {
     // Apply configuration
     Object.keys(config).forEach(key => {
       if (key !== 'type' && key in material) {
-        (material as any)[key] = config[key];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (material as any)[key] = config[key as keyof MaterialConfig];
       }
     });
 
