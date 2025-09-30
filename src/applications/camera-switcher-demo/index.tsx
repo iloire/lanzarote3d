@@ -3,7 +3,7 @@ import { TerrainBase } from '../../shared/TerrainBase';
 import { StoryOptions } from '../../shared/types';
 import { CameraTargetController, CameraMode } from '../../foundation/systems/scene/CameraTargetController';
 import { createCameraTargetUI } from '../../foundation/components/ui/CameraTargetUI';
-import { Cessna } from '../../foundation/components/vehicles';
+import { Cessna, Jet } from '../../foundation/components/vehicles';
 import { EngineFlyingBehavior } from '../../foundation/systems/behaviors/EngineFlyingBehavior';
 import { getAppConfig } from '../../config/app-registry';
 
@@ -12,6 +12,7 @@ import { getAppConfig } from '../../config/app-registry';
  *
  * Demonstrates the CameraTargetController with multiple dynamic targets:
  * - Flying Cessna with autonomous flight
+ * - Flying Jet with different flight pattern
  * - Static markers (ground, hill)
  *
  * Features:
@@ -23,6 +24,7 @@ import { getAppConfig } from '../../config/app-registry';
 class CameraSwitcherDemo extends TerrainBase {
   private targetController: CameraTargetController | null = null;
   private cessnaBehavior: EngineFlyingBehavior | undefined;
+  private jetBehavior: EngineFlyingBehavior | undefined;
   private animationId: number | undefined;
 
   constructor() {
@@ -80,6 +82,9 @@ class CameraSwitcherDemo extends TerrainBase {
 
     // Add flying Cessna
     await this.addFlyingCessna(scene, terrain);
+
+    // Add flying Jet
+    await this.addFlyingJet(scene, terrain);
 
     // Add static markers
     await this.addStaticMarkers(scene);
@@ -149,6 +154,36 @@ class CameraSwitcherDemo extends TerrainBase {
     this.targetController?.addTarget(cessnaMesh, '✈️ Cessna (Flying)');
   }
 
+  private async addFlyingJet(scene: THREE.Scene, terrain: THREE.Mesh): Promise<void> {
+    const jet = new Jet({
+      bodyColor: '#4169e1',
+      scale: 4,
+    });
+    const jetMesh = await jet.load();
+    jetMesh.position.set(8500, 350, 500);
+    scene.add(jetMesh);
+
+    // Add flying behavior with different parameters
+    this.jetBehavior = new EngineFlyingBehavior({
+      speed: 12.0, // Faster than Cessna
+      turnSpeed: 0.4, // Wider turns
+      flightRadius: 3000,
+      cruiseAltitude: 350, // Flies higher
+      minHeight: 250,
+      maxHeight: 500,
+      terrainClearance: 150,
+      lookAheadDistance: 300,
+      centerPoint: new THREE.Vector3(8500, 0, 500),
+      autoStart: true,
+    });
+
+    this.jetBehavior.attachTo(jetMesh);
+    this.jetBehavior.setTerrain(terrain);
+
+    // Add to camera targets
+    this.targetController?.addTarget(jetMesh, '✈️ Jet (Fast)');
+  }
+
   private async addStaticMarkers(scene: THREE.Scene): Promise<void> {
     // Ground marker
     const groundMarker = new THREE.Group();
@@ -186,6 +221,10 @@ class CameraSwitcherDemo extends TerrainBase {
     if (this.cessnaBehavior) {
       this.cessnaBehavior.dispose();
       this.cessnaBehavior = undefined;
+    }
+    if (this.jetBehavior) {
+      this.jetBehavior.dispose();
+      this.jetBehavior = undefined;
     }
 
     // Clean up target controller
