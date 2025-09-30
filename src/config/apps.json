@@ -11,7 +11,7 @@
       "visibility": "private",
       "priority": 1
     },
-    "location-editor": {
+    "locationeditor": {
       "name": "Location Editor",
       "description": "Basic tool for creating and editing flight locations (legacy)",
       "entry": "./applications/location-editor/index.tsx",
@@ -21,7 +21,7 @@
       "visibility": "private",
       "priority": 3
     },
-    "workshop-demo": {
+    "workshopdemo": {
       "name": "Workshop Demo",
       "description": "Dev environment for testing and showcasing individual 3D components",
       "entry": "./applications/workshop-demo/index.tsx",
@@ -31,7 +31,7 @@
       "visibility": "private",
       "priority": 9
     },
-    "flying-behavior-test": {
+    "flyingbehaviortest": {
       "name": "Flying Behavior Test",
       "description": "Test autonomous flying behavior system with obstacle avoidance and boundary detection",
       "entry": "./applications/flying-behavior-test/index.tsx",
@@ -41,7 +41,7 @@
       "visibility": "private",
       "priority": 10
     },
-    "camera-switcher-demo": {
+    "cameraswitcherdemo": {
       "name": "Camera Switcher Demo",
       "description": "Demonstrates CameraTargetController with multiple dynamic targets and camera modes",
       "entry": "./applications/camera-switcher-demo/index.tsx",
@@ -51,7 +51,7 @@
       "visibility": "private",
       "priority": 11
     },
-    "tile-debug": {
+    "tiledebug": {
       "name": "Tile Debug Dashboard",
       "description": "Debug tool showing satellite tile download process, calculations, and atlas creation for terrain mapping",
       "entry": "./applications/tile-debug/index.tsx",
@@ -71,7 +71,7 @@
       "visibility": "public",
       "priority": 1
     },
-    "boats-animation": {
+    "boatsanimation": {
       "name": "Boats Animation",
       "description": "Cinematic animation starting near boats and transitioning to focus on paragliders and clouds",
       "entry": "./applications/boats-animation/index.tsx",
@@ -112,7 +112,7 @@
       "visibility": "public",
       "priority": 3
     },
-    "paraglider-voxel": {
+    "paraglidervoxel": {
       "name": "Voxel pilot",
       "description": "Voxel-based paraglider component showcase",
       "entry": "./applications/paraglider-voxel",
@@ -162,7 +162,7 @@
       "visibility": "hidden",
       "priority": 18
     },
-    "procedural-terrain": {
+    "proceduralterrain": {
       "name": "Procedural Terrain",
       "description": "Interactive parametric terrain generator with noise-based displacement and multiple presets",
       "entry": "./applications/procedural-terrain/index.tsx",
@@ -192,7 +192,7 @@
       "visibility": "private",
       "priority": 20
     },
-    "flier-pg": {
+    "flierpg": {
       "name": "flier pg",
       "description": "Workshop demo showcasing paraglider physics simulation with weather system",
       "entry": "./applications/flier-pg/index.tsx",
@@ -282,7 +282,7 @@
       "visibility": "private",
       "priority": 29
     },
-    "satellite-terrain": {
+    "satelliteterrain": {
       "name": "Satellite Terrain",
       "description": "Satellite terrain generation demo",
       "entry": "./applications/satellite-terrain/index.tsx",
@@ -292,7 +292,7 @@
       "visibility": "private",
       "priority": 30
     },
-    "terrain-gps": {
+    "terraingps": {
       "name": "Terrain GPS",
       "description": "GPS-based terrain generation demo",
       "entry": "./applications/terrain-gps/index.tsx",
@@ -302,7 +302,7 @@
       "visibility": "private",
       "priority": 31
     },
-    "tile-mapper": {
+    "tilemapper": {
       "name": "Tile Mapper",
       "description": "Tile mapping system demo",
       "entry": "./applications/tile-mapper/index.tsx",
@@ -369,20 +369,20 @@
         "public"
       ],
       "specificApps": [
-        "workshop-demo",
-        "location-editor",
-        "tile-debug",
+        "workshopdemo",
+        "locationeditor",
+        "tiledebug",
         "island",
-        "paraglider-voxel",
+        "paraglidervoxel",
         "terrain",
-        "procedural-terrain",
+        "proceduralterrain",
         "town",
         "houses",
         "glider",
         "hangglider",
         "pilot",
         "flyzones",
-        "flier-pg",
+        "flierpg",
         "animals"
       ]
     },
@@ -392,28 +392,23 @@
       "famara2": 3,
       "boats": 4,
       "flyzones": 6,
-      "workshop-demo": 7,
-      "location-editor": 8,
-      "tile-debug": 9,
+      "workshopdemo": 7,
+      "locationeditor": 8,
+      "tiledebug": 9,
       "island": 10,
-      "paraglider-voxel": 11,
+      "paraglidervoxel": 11,
       "terrain": 12,
-      "procedural-terrain": 13,
+      "proceduralterrain": 13,
       "town": 14,
       "houses": 15,
       "glider": 16,
       "hangglider": 17,
       "pilot": 18,
-      "flier-pg": 19,
+      "flierpg": 19,
       "animals": 20
     },
-    "filenameOverrides": {
-      "animation": "index.html",
-      "paraglider-voxel": "paragliderVoxel.html",
-      "glider": "glider.html"
-    },
     "customEntries": {
-      "tile-debug": "./src/applications/tile-debug/entry.tsx"
+      "tiledebug": "./src/applications/tile-debug/entry.tsx"
     },
     "defaultEntry": "./src/showcase-entry.tsx"
   }

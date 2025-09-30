@@ -15,12 +15,12 @@ function generateShowcaseApps() {
   const showcaseApps = [];
   const { showcase } = appsConfig;
 
-  // Helper to format filename
-  const getFilename = (key) => {
-    if (showcase.filenameOverrides[key]) {
-      return showcase.filenameOverrides[key];
-    }
-    return `${key.replace(/-/g, '')}.html`;
+  // Helper to format filename from route - use route as source of truth
+  // Routes like "/boats-animation" become "boats-animation.html"
+  const getFilename = (appKey) => {
+    const app = appsConfig.apps[appKey];
+    const routeWithoutSlash = app.route.replace(/^\//, '');
+    return `${routeWithoutSlash}.html`;
   };
 
   // Collect apps based on showcase criteria (now flat structure)
@@ -74,6 +74,9 @@ module.exports = {
   },
   devServer: {
     port: 8080,
+    open: {
+      target: ['famara-animation.html'], // Open default app instead of file browser
+    },
   },
   module: {
     rules: [
@@ -154,5 +157,14 @@ module.exports = {
         minify: false
       })
     ),
+    // Create index.html that redirects to the main animation
+    new HtmlWebpackPlugin({
+      template: path.join(__dirname, 'src/templates/showcase.html'),
+      chunks: ['animation'],
+      filename: 'index.html',
+      title: 'Lanzarote - Famara animation',
+      inject: 'body',
+      minify: false
+    }),
   ],
 }; 

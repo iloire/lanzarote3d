@@ -9,7 +9,7 @@ import Controls from './foundation/utils/controls';
 import { StoryOptions } from './shared/types';
 import { themeManager } from './foundation/systems/ThemeManager';
 import { ThemeEngine } from './foundation/systems/ThemeEngine';
-import { getAllApps } from './config/app-registry';
+import { getAppConfig } from './config/app-registry';
 import { getThemeById } from './foundation/themes';
 
 import './index.css';
@@ -134,8 +134,8 @@ const App: React.FC<AppProps> = ({
     };
 
     // Check for app-specific theme override
-    const allApps = getAllApps();
-    const currentApp = allApps.find(app => app.route.replace('/', '') === initialStory);
+    // Match by route (without leading slash) which comes from the HTML filename
+    const currentApp = initialStory ? getAppConfig(initialStory) : null;
 
     if (currentApp?.theme) {
       const appTheme = getThemeById(currentApp.theme);
