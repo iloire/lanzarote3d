@@ -1,4 +1,11 @@
 import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+
+// Extended OrbitControls interface with custom pan limit properties
+interface ExtendedOrbitControls extends OrbitControls {
+  minPan?: THREE.Vector3;
+  maxPan?: THREE.Vector3;
+}
 
 export interface OrbitControlsLimits {
   // Distance limits
@@ -124,7 +131,7 @@ export class OrbitControlsHelper {
   /**
    * Apply limits and settings to orbit controls
    */
-  static applyLimits(controls: any, limits: OrbitControlsLimits): void {
+  static applyLimits(controls: ExtendedOrbitControls, limits: OrbitControlsLimits): void {
     if (!controls) {
       console.warn('OrbitControlsHelper: No controls provided');
       return;
@@ -203,7 +210,7 @@ export class OrbitControlsHelper {
   /**
    * Apply a preset configuration to orbit controls
    */
-  static applyPreset(controls: any, presetName: keyof typeof ORBIT_CONTROLS_PRESETS): void {
+  static applyPreset(controls: ExtendedOrbitControls, presetName: keyof typeof ORBIT_CONTROLS_PRESETS): void {
     const preset = ORBIT_CONTROLS_PRESETS[presetName];
     if (!preset) {
       console.warn(`OrbitControlsHelper: Preset '${presetName}' not found`);
@@ -237,7 +244,7 @@ export class OrbitControlsHelper {
   /**
    * Update controls target and apply limits around new target
    */
-  static focusOnTarget(controls: any, target: THREE.Vector3, limits?: OrbitControlsLimits): void {
+  static focusOnTarget(controls: ExtendedOrbitControls, target: THREE.Vector3, limits?: OrbitControlsLimits): void {
     if (!controls) return;
 
     // Update target
@@ -258,7 +265,7 @@ export class OrbitControlsHelper {
    * Note: This is a basic implementation - could be enhanced with proper tweening
    */
   static transitionToLimits(
-    controls: any,
+    controls: ExtendedOrbitControls,
     newLimits: OrbitControlsLimits,
     duration: number = 1000
   ): Promise<void> {
@@ -273,14 +280,14 @@ export class OrbitControlsHelper {
   /**
    * Check if controls need update (for damping)
    */
-  static needsUpdate(controls: any): boolean {
+  static needsUpdate(controls: OrbitControls): boolean {
     return controls && controls.enableDamping;
   }
 
   /**
    * Update controls (should be called in animation loop if damping is enabled)
    */
-  static update(controls: any): void {
+  static update(controls: OrbitControls): void {
     if (controls && controls.enableDamping) {
       controls.update();
     }
