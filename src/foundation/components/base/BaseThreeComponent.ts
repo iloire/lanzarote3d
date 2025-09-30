@@ -189,7 +189,7 @@ export abstract class BaseThreeComponent implements IThreeComponent {
     return issues;
   }
 
-  serialize(): any {
+  serialize(): Record<string, unknown> {
     return {
       metadata: this._metadata,
       options: this._options,

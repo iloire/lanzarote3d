@@ -358,16 +358,13 @@ export abstract class AsyncThreeComponent extends BaseThreeComponent {
   /**
    * Override serialize to include resource information
    */
-  override serialize(): SerializedComponentData {
+  override serialize(): Record<string, unknown> {
     const baseData = super.serialize();
     return {
       ...baseData,
-      resources: Array.from(this.resources.entries()).map(([id, resource]) => ({
-        id,
-        type: resource.type,
-        url: resource.url,
-        loadTime: resource.loadTime,
-      })),
+      metadata: this._metadata,
+      loadingState: this._isLoaded ? 'loaded' : 'pending',
+      resources: this.getResourceDescriptors(),
     };
   }
 }
