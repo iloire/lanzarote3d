@@ -41,6 +41,31 @@ yarn install
 yarn dev
 ```
 
+#### Dev Mode in Production
+
+By default, only public apps are visible in production. To access private/hidden apps and dev tools in production:
+
+**Enable dev mode:**
+1. Open browser console on the production site
+2. Run: `enableDevMode()`
+3. Reload the page
+
+**Disable dev mode:**
+```javascript
+disableDevMode()
+```
+
+**Manual control:**
+```javascript
+// Enable
+localStorage.setItem('lanzarote_dev_mode', 'true')
+
+// Disable
+localStorage.removeItem('lanzarote_dev_mode')
+```
+
+When dev mode is enabled in production, you'll see "🔓 Secret dev mode enabled" in the console and have access to all private apps (workshop-demo, location-editor, tile-debug, etc.).
+
 ### Deployment
 
 The project can be deployed to different S3 buckets:
