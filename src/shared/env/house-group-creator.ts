@@ -236,9 +236,9 @@ export class HouseGroupCreator {
 
       const landMesh = new THREE.Mesh(landGeometry, landMaterial);
 
-      // Position the land plot at ground level
+      // Position the land plot at ground level, following terrain height
       landMesh.position.copy(housePosition);
-      landMesh.position.y = -0.5; // Slightly below ground to avoid z-fighting
+      landMesh.position.y = housePosition.y - 0.5; // Slightly below house to avoid z-fighting
 
       // Rotate to lie flat and match house rotation if needed
       landMesh.rotation.x = -Math.PI / 2; // Lie flat

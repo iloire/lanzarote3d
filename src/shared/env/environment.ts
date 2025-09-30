@@ -312,7 +312,7 @@ class Environment {
     try {
       // Near paraglider area - suburban neighborhood
       await this.createHouseNeighborhood(
-        new THREE.Vector3(6879, 0, -545),
+        new THREE.Vector3(6879, 0, 545),
         12,
         'suburban',
         terrain,
@@ -337,18 +337,9 @@ class Environment {
         lowPoly
       );
 
-      // Tenesar - scattered rural houses
-      await this.createHouseNeighborhood(
-        new THREE.Vector3(-5200, 0, -480),
-        10,
-        'rural',
-        terrain,
-        lowPoly
-      );
-
       // Teguise - historic town center with grid layout
       await this.createHouseNeighborhood(
-        new THREE.Vector3(5600, 0, 705),
+        new THREE.Vector3(5600, 0, 1205),
         18,
         'grid',
         terrain,
