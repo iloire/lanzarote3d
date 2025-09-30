@@ -1,7 +1,6 @@
 Implement the following tasks if any is added following the instructions described below:
 ---
 TASKS:
-- create 3 vehicles of type plane (we don't have any yet). Create a "Jet" plane, an "Airliner" and a "Cesna". Put the Jet in the "plane" application by itself and the the three of them in the "planes" application.
 ---
 
 ### Instructions

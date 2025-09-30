@@ -104,13 +104,33 @@ export class Airliner extends SimpleThreeComponent {
     fuselage.receiveShadow = this.options.receiveShadow ?? true;
     airliner.add(fuselage);
 
-    // Nose cone (rounded)
-    const noseGeometry = new THREE.SphereGeometry(2, 16, 16, 0, Math.PI / 2);
+    // Nose cone (rounded with more segments for smoother shape)
+    const noseGeometry = new THREE.SphereGeometry(2, 24, 24, 0, Math.PI * 0.6);
     const nose = new THREE.Mesh(noseGeometry, bodyMaterial);
     nose.rotation.y = -Math.PI / 2;
     nose.position.set(9, 0, 0);
     nose.castShadow = this.options.castShadow ?? true;
     airliner.add(nose);
+
+    // Cockpit windshield (distinctive angled windows)
+    const windshieldGeometry = new THREE.BoxGeometry(2, 1.5, 3);
+    const windshield = new THREE.Mesh(windshieldGeometry, windowMaterial);
+    windshield.position.set(10, 1, 0);
+    windshield.rotation.z = -0.2; // Slight downward angle for realistic look
+    airliner.add(windshield);
+
+    // Side cockpit windows
+    const sideWindowGeometry = new THREE.BoxGeometry(1, 1, 0.1);
+
+    const leftCockpitWindow = new THREE.Mesh(sideWindowGeometry, windowMaterial);
+    leftCockpitWindow.position.set(10, 0.7, 1.6);
+    leftCockpitWindow.rotation.x = -0.2;
+    airliner.add(leftCockpitWindow);
+
+    const rightCockpitWindow = new THREE.Mesh(sideWindowGeometry, windowMaterial);
+    rightCockpitWindow.position.set(10, 0.7, -1.6);
+    rightCockpitWindow.rotation.x = -0.2;
+    airliner.add(rightCockpitWindow);
 
     // Tail cone
     const tailGeometry = new THREE.ConeGeometry(2, 4, 16);
