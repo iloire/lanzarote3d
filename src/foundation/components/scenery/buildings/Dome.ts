@@ -382,10 +382,4 @@ export class Dome extends SimpleThreeComponent {
   }
 }
 
-// Legacy compatibility - override load to be synchronous for backward compatibility
-const DomeLegacy = Dome as any;
-DomeLegacy.prototype.load = function(gui?: any): THREE.Object3D {
-  return this.loadSync();
-};
-
-export default DomeLegacy as typeof Dome;
+export default Dome;

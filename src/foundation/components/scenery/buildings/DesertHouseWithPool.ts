@@ -420,10 +420,4 @@ export class DesertHouseWithPool extends SimpleThreeComponent {
   }
 }
 
-// Legacy compatibility - override load to be synchronous for backward compatibility
-const DesertHouseWithPoolLegacy = DesertHouseWithPool as any;
-DesertHouseWithPoolLegacy.prototype.load = function(gui?: any): THREE.Object3D {
-  return this.loadSync();
-};
-
-export default DesertHouseWithPoolLegacy as typeof DesertHouseWithPool;
+export default DesertHouseWithPool;

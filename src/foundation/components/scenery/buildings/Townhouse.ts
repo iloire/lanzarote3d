@@ -377,10 +377,4 @@ export class Townhouse extends SimpleThreeComponent {
   }
 }
 
-// Legacy compatibility - override load to be synchronous for backward compatibility
-const TownhouseLegacy = Townhouse as any;
-TownhouseLegacy.prototype.load = function(gui?: any): THREE.Object3D {
-  return this.loadSync();
-};
-
-export default TownhouseLegacy as typeof Townhouse;
+export default Townhouse;

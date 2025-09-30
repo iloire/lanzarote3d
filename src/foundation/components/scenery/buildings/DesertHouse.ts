@@ -382,10 +382,4 @@ export class DesertHouse extends SimpleThreeComponent {
   }
 }
 
-// Legacy compatibility - override load to be synchronous for backward compatibility
-const DesertHouseLegacy = DesertHouse as any;
-DesertHouseLegacy.prototype.load = function(gui?: any): THREE.Object3D {
-  return this.loadSync();
-};
-
-export default DesertHouseLegacy as typeof DesertHouse;
+export default DesertHouse;

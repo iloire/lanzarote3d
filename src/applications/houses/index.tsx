@@ -148,33 +148,25 @@ class HousesWorkshop extends WorkshopDemoBase {
     for (const houseConfig of houseTypes) {
       try {
         // Normal version
-        const normalHouse = new House({ type: houseConfig.type, lowPoly: false }) as any;
-        const normalHouseMesh = normalHouse.load();
-        if (normalHouseMesh) {
-          normalHouseMesh.position.set(xPosition, 0, normalRow);
-          scene.add(normalHouseMesh);
+        const normalHouse = new House({ type: houseConfig.type, lowPoly: false });
+        const normalHouseMesh = await normalHouse.load();
+        normalHouseMesh.position.set(xPosition, 0, normalRow);
+        scene.add(normalHouseMesh);
 
-          const normalPolygons = countPolygons(normalHouseMesh);
-          scene.add(createLabel(houseConfig.name, new THREE.Vector3(xPosition, 35, normalRow), normalPolygons)); // Higher labels
-          console.log(`✅ ${houseConfig.name} normal loaded: ${normalPolygons} triangles`);
+        const normalPolygons = countPolygons(normalHouseMesh);
+        scene.add(createLabel(houseConfig.name, new THREE.Vector3(xPosition, 35, normalRow), normalPolygons));
+        console.log(`✅ ${houseConfig.name} normal loaded: ${normalPolygons} triangles`);
 
-          // Low-poly version
-          const lowPolyHouse = new House({ type: houseConfig.type, lowPoly: true }) as any;
-          const lowPolyHouseMesh = lowPolyHouse.load();
-          if (lowPolyHouseMesh) {
-            lowPolyHouseMesh.position.set(xPosition, 0, lowPolyRow);
-            scene.add(lowPolyHouseMesh);
+        // Low-poly version
+        const lowPolyHouse = new House({ type: houseConfig.type, lowPoly: true });
+        const lowPolyHouseMesh = await lowPolyHouse.load();
+        lowPolyHouseMesh.position.set(xPosition, 0, lowPolyRow);
+        scene.add(lowPolyHouseMesh);
 
-            const lowPolyPolygons = countPolygons(lowPolyHouseMesh);
-            const reduction = Math.round(((normalPolygons - lowPolyPolygons) / normalPolygons) * 100);
-            scene.add(createLabel(`${houseConfig.name} (-${reduction}%)`, new THREE.Vector3(xPosition, 35, lowPolyRow), lowPolyPolygons)); // Higher labels
-            console.log(`✅ ${houseConfig.name} low-poly loaded: ${lowPolyPolygons} triangles (-${reduction}%)`);
-          } else {
-            scene.add(createLabel(`${houseConfig.name} (Low-poly Failed)`, new THREE.Vector3(xPosition, 35, lowPolyRow)));
-          }
-        } else {
-          scene.add(createLabel(`${houseConfig.name} (Failed)`, new THREE.Vector3(xPosition, 35, normalRow)));
-        }
+        const lowPolyPolygons = countPolygons(lowPolyHouseMesh);
+        const reduction = Math.round(((normalPolygons - lowPolyPolygons) / normalPolygons) * 100);
+        scene.add(createLabel(`${houseConfig.name} (-${reduction}%)`, new THREE.Vector3(xPosition, 35, lowPolyRow), lowPolyPolygons));
+        console.log(`✅ ${houseConfig.name} low-poly loaded: ${lowPolyPolygons} triangles (-${reduction}%)`);
       } catch (error) {
         console.error(`❌ Error loading ${houseConfig.name}:`, error);
         scene.add(createLabel(`${houseConfig.name} (Error)`, new THREE.Vector3(xPosition, 25, normalRow)));
@@ -187,33 +179,25 @@ class HousesWorkshop extends WorkshopDemoBase {
     xPosition += 40; // Extra spacing for visual separation
     try {
       // Normal Villa
-      const normalVilla = new Villa({ lowPoly: false }) as any;
-      const normalVillaMesh = normalVilla.load();
-      if (normalVillaMesh) {
-        normalVillaMesh.position.set(xPosition, 0, normalRow);
-        scene.add(normalVillaMesh);
+      const normalVilla = new Villa({ lowPoly: false });
+      const normalVillaMesh = await normalVilla.load();
+      normalVillaMesh.position.set(xPosition, 0, normalRow);
+      scene.add(normalVillaMesh);
 
-        const normalVillaPolygons = countPolygons(normalVillaMesh);
-        scene.add(createLabel('Villa', new THREE.Vector3(xPosition, 35, normalRow), normalVillaPolygons));
-        console.log(`✅ Villa normal loaded: ${normalVillaPolygons} triangles`);
+      const normalVillaPolygons = countPolygons(normalVillaMesh);
+      scene.add(createLabel('Villa', new THREE.Vector3(xPosition, 35, normalRow), normalVillaPolygons));
+      console.log(`✅ Villa normal loaded: ${normalVillaPolygons} triangles`);
 
-        // Low-poly Villa
-        const lowPolyVilla = new Villa({ lowPoly: true }) as any;
-        const lowPolyVillaMesh = lowPolyVilla.load();
-        if (lowPolyVillaMesh) {
-          lowPolyVillaMesh.position.set(xPosition, 0, lowPolyRow);
-          scene.add(lowPolyVillaMesh);
+      // Low-poly Villa
+      const lowPolyVilla = new Villa({ lowPoly: true });
+      const lowPolyVillaMesh = await lowPolyVilla.load();
+      lowPolyVillaMesh.position.set(xPosition, 0, lowPolyRow);
+      scene.add(lowPolyVillaMesh);
 
-          const lowPolyVillaPolygons = countPolygons(lowPolyVillaMesh);
-          const villaReduction = Math.round(((normalVillaPolygons - lowPolyVillaPolygons) / normalVillaPolygons) * 100);
-          scene.add(createLabel(`Villa (-${villaReduction}%)`, new THREE.Vector3(xPosition, 35, lowPolyRow), lowPolyVillaPolygons));
-          console.log(`✅ Villa low-poly loaded: ${lowPolyVillaPolygons} triangles (-${villaReduction}%)`);
-        } else {
-          scene.add(createLabel('Villa (Low-poly Failed)', new THREE.Vector3(xPosition, 35, lowPolyRow)));
-        }
-      } else {
-        scene.add(createLabel('Villa (Failed)', new THREE.Vector3(xPosition, 35, normalRow)));
-      }
+      const lowPolyVillaPolygons = countPolygons(lowPolyVillaMesh);
+      const villaReduction = Math.round(((normalVillaPolygons - lowPolyVillaPolygons) / normalVillaPolygons) * 100);
+      scene.add(createLabel(`Villa (-${villaReduction}%)`, new THREE.Vector3(xPosition, 35, lowPolyRow), lowPolyVillaPolygons));
+      console.log(`✅ Villa low-poly loaded: ${lowPolyVillaPolygons} triangles (-${villaReduction}%)`);
     } catch (error) {
       console.error('❌ Error loading Villa:', error);
       scene.add(createLabel('Villa (Error)', new THREE.Vector3(xPosition, 35, normalRow)));
@@ -224,33 +208,25 @@ class HousesWorkshop extends WorkshopDemoBase {
     // Townhouse
     try {
       // Normal Townhouse
-      const normalTownhouse = new Townhouse({ lowPoly: false }) as any;
-      const normalTownhouseMesh = normalTownhouse.load();
-      if (normalTownhouseMesh) {
-        normalTownhouseMesh.position.set(xPosition, 0, normalRow);
-        scene.add(normalTownhouseMesh);
+      const normalTownhouse = new Townhouse({ lowPoly: false });
+      const normalTownhouseMesh = await normalTownhouse.load();
+      normalTownhouseMesh.position.set(xPosition, 0, normalRow);
+      scene.add(normalTownhouseMesh);
 
-        const normalTownhousePolygons = countPolygons(normalTownhouseMesh);
-        scene.add(createLabel('Townhouse', new THREE.Vector3(xPosition, 35, normalRow), normalTownhousePolygons));
-        console.log(`✅ Townhouse normal loaded: ${normalTownhousePolygons} triangles`);
+      const normalTownhousePolygons = countPolygons(normalTownhouseMesh);
+      scene.add(createLabel('Townhouse', new THREE.Vector3(xPosition, 35, normalRow), normalTownhousePolygons));
+      console.log(`✅ Townhouse normal loaded: ${normalTownhousePolygons} triangles`);
 
-        // Low-poly Townhouse
-        const lowPolyTownhouse = new Townhouse({ lowPoly: true }) as any;
-        const lowPolyTownhouseMesh = lowPolyTownhouse.load();
-        if (lowPolyTownhouseMesh) {
-          lowPolyTownhouseMesh.position.set(xPosition, 0, lowPolyRow);
-          scene.add(lowPolyTownhouseMesh);
+      // Low-poly Townhouse
+      const lowPolyTownhouse = new Townhouse({ lowPoly: true });
+      const lowPolyTownhouseMesh = await lowPolyTownhouse.load();
+      lowPolyTownhouseMesh.position.set(xPosition, 0, lowPolyRow);
+      scene.add(lowPolyTownhouseMesh);
 
-          const lowPolyTownhousePolygons = countPolygons(lowPolyTownhouseMesh);
-          const townhouseReduction = Math.round(((normalTownhousePolygons - lowPolyTownhousePolygons) / normalTownhousePolygons) * 100);
-          scene.add(createLabel(`Townhouse (-${townhouseReduction}%)`, new THREE.Vector3(xPosition, 35, lowPolyRow), lowPolyTownhousePolygons));
-          console.log(`✅ Townhouse low-poly loaded: ${lowPolyTownhousePolygons} triangles (-${townhouseReduction}%)`);
-        } else {
-          scene.add(createLabel('Townhouse (Low-poly Failed)', new THREE.Vector3(xPosition, 35, lowPolyRow)));
-        }
-      } else {
-        scene.add(createLabel('Townhouse (Failed)', new THREE.Vector3(xPosition, 35, normalRow)));
-      }
+      const lowPolyTownhousePolygons = countPolygons(lowPolyTownhouseMesh);
+      const townhouseReduction = Math.round(((normalTownhousePolygons - lowPolyTownhousePolygons) / normalTownhousePolygons) * 100);
+      scene.add(createLabel(`Townhouse (-${townhouseReduction}%)`, new THREE.Vector3(xPosition, 35, lowPolyRow), lowPolyTownhousePolygons));
+      console.log(`✅ Townhouse low-poly loaded: ${lowPolyTownhousePolygons} triangles (-${townhouseReduction}%)`);
     } catch (error) {
       console.error('❌ Error loading Townhouse:', error);
       scene.add(createLabel('Townhouse (Error)', new THREE.Vector3(xPosition, 35, normalRow)));
@@ -261,33 +237,25 @@ class HousesWorkshop extends WorkshopDemoBase {
     // Barn
     try {
       // Normal Barn
-      const normalBarn = new Barn({ lowPoly: false }) as any;
-      const normalBarnMesh = normalBarn.load();
-      if (normalBarnMesh) {
-        normalBarnMesh.position.set(xPosition, 0, normalRow);
-        scene.add(normalBarnMesh);
+      const normalBarn = new Barn({ lowPoly: false });
+      const normalBarnMesh = await normalBarn.load();
+      normalBarnMesh.position.set(xPosition, 0, normalRow);
+      scene.add(normalBarnMesh);
 
-        const normalBarnPolygons = countPolygons(normalBarnMesh);
-        scene.add(createLabel('Barn', new THREE.Vector3(xPosition, 35, normalRow), normalBarnPolygons));
-        console.log(`✅ Barn normal loaded: ${normalBarnPolygons} triangles`);
+      const normalBarnPolygons = countPolygons(normalBarnMesh);
+      scene.add(createLabel('Barn', new THREE.Vector3(xPosition, 35, normalRow), normalBarnPolygons));
+      console.log(`✅ Barn normal loaded: ${normalBarnPolygons} triangles`);
 
-        // Low-poly Barn
-        const lowPolyBarn = new Barn({ lowPoly: true }) as any;
-        const lowPolyBarnMesh = lowPolyBarn.load();
-        if (lowPolyBarnMesh) {
-          lowPolyBarnMesh.position.set(xPosition, 0, lowPolyRow);
-          scene.add(lowPolyBarnMesh);
+      // Low-poly Barn
+      const lowPolyBarn = new Barn({ lowPoly: true });
+      const lowPolyBarnMesh = await lowPolyBarn.load();
+      lowPolyBarnMesh.position.set(xPosition, 0, lowPolyRow);
+      scene.add(lowPolyBarnMesh);
 
-          const lowPolyBarnPolygons = countPolygons(lowPolyBarnMesh);
-          const barnReduction = Math.round(((normalBarnPolygons - lowPolyBarnPolygons) / normalBarnPolygons) * 100);
-          scene.add(createLabel(`Barn (-${barnReduction}%)`, new THREE.Vector3(xPosition, 35, lowPolyRow), lowPolyBarnPolygons));
-          console.log(`✅ Barn low-poly loaded: ${lowPolyBarnPolygons} triangles (-${barnReduction}%)`);
-        } else {
-          scene.add(createLabel('Barn (Low-poly Failed)', new THREE.Vector3(xPosition, 35, lowPolyRow)));
-        }
-      } else {
-        scene.add(createLabel('Barn (Failed)', new THREE.Vector3(xPosition, 35, normalRow)));
-      }
+      const lowPolyBarnPolygons = countPolygons(lowPolyBarnMesh);
+      const barnReduction = Math.round(((normalBarnPolygons - lowPolyBarnPolygons) / normalBarnPolygons) * 100);
+      scene.add(createLabel(`Barn (-${barnReduction}%)`, new THREE.Vector3(xPosition, 35, lowPolyRow), lowPolyBarnPolygons));
+      console.log(`✅ Barn low-poly loaded: ${lowPolyBarnPolygons} triangles (-${barnReduction}%)`);
     } catch (error) {
       console.error('❌ Error loading Barn:', error);
       scene.add(createLabel('Barn (Error)', new THREE.Vector3(xPosition, 35, normalRow)));
@@ -298,33 +266,25 @@ class HousesWorkshop extends WorkshopDemoBase {
     // DesertHouse
     try {
       // Normal DesertHouse
-      const normalDesertHouse = new DesertHouse({ lowPoly: false }) as any;
-      const normalDesertHouseMesh = normalDesertHouse.load();
-      if (normalDesertHouseMesh) {
-        normalDesertHouseMesh.position.set(xPosition, 0, normalRow);
-        scene.add(normalDesertHouseMesh);
+      const normalDesertHouse = new DesertHouse({ lowPoly: false });
+      const normalDesertHouseMesh = await normalDesertHouse.load();
+      normalDesertHouseMesh.position.set(xPosition, 0, normalRow);
+      scene.add(normalDesertHouseMesh);
 
-        const normalDesertHousePolygons = countPolygons(normalDesertHouseMesh);
-        scene.add(createLabel('Desert House', new THREE.Vector3(xPosition, 35, normalRow), normalDesertHousePolygons));
-        console.log(`✅ DesertHouse normal loaded: ${normalDesertHousePolygons} triangles`);
+      const normalDesertHousePolygons = countPolygons(normalDesertHouseMesh);
+      scene.add(createLabel('Desert House', new THREE.Vector3(xPosition, 35, normalRow), normalDesertHousePolygons));
+      console.log(`✅ DesertHouse normal loaded: ${normalDesertHousePolygons} triangles`);
 
-        // Low-poly DesertHouse
-        const lowPolyDesertHouse = new DesertHouse({ lowPoly: true }) as any;
-        const lowPolyDesertHouseMesh = lowPolyDesertHouse.load();
-        if (lowPolyDesertHouseMesh) {
-          lowPolyDesertHouseMesh.position.set(xPosition, 0, lowPolyRow);
-          scene.add(lowPolyDesertHouseMesh);
+      // Low-poly DesertHouse
+      const lowPolyDesertHouse = new DesertHouse({ lowPoly: true });
+      const lowPolyDesertHouseMesh = await lowPolyDesertHouse.load();
+      lowPolyDesertHouseMesh.position.set(xPosition, 0, lowPolyRow);
+      scene.add(lowPolyDesertHouseMesh);
 
-          const lowPolyDesertHousePolygons = countPolygons(lowPolyDesertHouseMesh);
-          const desertHouseReduction = Math.round(((normalDesertHousePolygons - lowPolyDesertHousePolygons) / normalDesertHousePolygons) * 100);
-          scene.add(createLabel(`Desert House (-${desertHouseReduction}%)`, new THREE.Vector3(xPosition, 35, lowPolyRow), lowPolyDesertHousePolygons));
-          console.log(`✅ DesertHouse low-poly loaded: ${lowPolyDesertHousePolygons} triangles (-${desertHouseReduction}%)`);
-        } else {
-          scene.add(createLabel('Desert House (Low-poly Failed)', new THREE.Vector3(xPosition, 35, lowPolyRow)));
-        }
-      } else {
-        scene.add(createLabel('Desert House (Failed)', new THREE.Vector3(xPosition, 35, normalRow)));
-      }
+      const lowPolyDesertHousePolygons = countPolygons(lowPolyDesertHouseMesh);
+      const desertHouseReduction = Math.round(((normalDesertHousePolygons - lowPolyDesertHousePolygons) / normalDesertHousePolygons) * 100);
+      scene.add(createLabel(`Desert House (-${desertHouseReduction}%)`, new THREE.Vector3(xPosition, 35, lowPolyRow), lowPolyDesertHousePolygons));
+      console.log(`✅ DesertHouse low-poly loaded: ${lowPolyDesertHousePolygons} triangles (-${desertHouseReduction}%)`);
     } catch (error) {
       console.error('❌ Error loading DesertHouse:', error);
       scene.add(createLabel('Desert House (Error)', new THREE.Vector3(xPosition, 35, normalRow)));

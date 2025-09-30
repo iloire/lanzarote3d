@@ -423,14 +423,4 @@ class House extends SimpleThreeComponent {
 
 }
 
-// Legacy compatibility - override load to be synchronous for backward compatibility
-const HouseLegacy = House as any;
-HouseLegacy.prototype.load = function(gui?: any): THREE.Object3D {
-  const mesh = this.loadSync();
-  if (gui) {
-    GuiHelper.addLocationGui(gui, 'House', mesh);
-  }
-  return mesh;
-};
-
-export default HouseLegacy as typeof House;
+export default House;

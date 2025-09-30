@@ -297,10 +297,4 @@ export class Barn extends SimpleThreeComponent {
   }
 }
 
-// Legacy compatibility - override load to be synchronous for backward compatibility
-const BarnLegacy = Barn as any;
-BarnLegacy.prototype.load = function(gui?: any): THREE.Object3D {
-  return this.loadSync();
-};
-
-export default BarnLegacy as typeof Barn;
+export default Barn;
