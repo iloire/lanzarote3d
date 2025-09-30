@@ -8,6 +8,7 @@ import {
   ORBIT_CONTROLS_PRESETS,
 } from '../../foundation/utils/OrbitControlsHelper';
 import { getAppConfig } from '../../config/app-registry';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 /**
  * Terrain GPS Coordinate Mapper - Interactive tool for mapping 3D terrain to GPS coordinates
@@ -32,7 +33,7 @@ class TerrainGPSMapperApp extends TerrainBase {
   private markers: THREE.Group;
   private uiContainer: HTMLElement | undefined;
   private camera: THREE.Camera | undefined;
-  private controls: any | undefined;
+  private controls: OrbitControls | undefined;
   private coordinateList: Array<{
     terrain: THREE.Vector3;
     gps: { lat: number; lon: number };
@@ -221,7 +222,7 @@ class TerrainGPSMapperApp extends TerrainBase {
     renderer: THREE.WebGLRenderer,
     camera: THREE.Camera,
     scene: THREE.Scene,
-    terrain: any
+    terrain: THREE.Mesh
   ): void {
     const canvas = renderer.domElement;
 
@@ -540,7 +541,7 @@ class TerrainGPSMapperApp extends TerrainBase {
     renderer: THREE.WebGLRenderer,
     scene: THREE.Scene,
     camera: THREE.Camera,
-    controls: any
+    controls: OrbitControls
   ): void {
     const animate = () => {
       try {

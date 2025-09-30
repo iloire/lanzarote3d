@@ -14,6 +14,8 @@ import { createEditorUI } from './ui';
 import { setupInteraction } from './interaction';
 import './styles.css'; // Import the CSS
 import { TerrainBase } from '../../shared/TerrainBase';
+import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer';
+import { GUI } from 'lil-gui';
 
 /**
  * Location Editor App - Interactive location creation and editing tool
@@ -21,7 +23,7 @@ import { TerrainBase } from '../../shared/TerrainBase';
  */
 class LocationEditorApp extends TerrainBase {
   private editorState: EditorState | undefined;
-  private labelRenderer: any;
+  private labelRenderer: CSS2DRenderer | undefined;
   private animationId: number | undefined;
   private resizeHandler: (() => void) | undefined;
   private raycaster: THREE.Raycaster | undefined;
@@ -123,10 +125,10 @@ class LocationEditorApp extends TerrainBase {
     this.labelRenderer = setupLabelRenderer();
   }
 
-  private setupTerrain(terrain: any): void {
+  private setupTerrain(terrain: THREE.Mesh): void {
     // Make sure terrain is clickable
     if (terrain) {
-      terrain.traverse((child: any) => {
+      terrain.traverse((child: THREE.Object3D) => {
         if (child instanceof THREE.Mesh) {
           child.userData['type'] = 'terrain';
           child.userData['clickable'] = true;
@@ -135,13 +137,13 @@ class LocationEditorApp extends TerrainBase {
     }
   }
 
-  private setupInteraction(renderer: any, camera: any, scene: THREE.Scene): void {
+  private setupInteraction(renderer: THREE.WebGLRenderer, camera: THREE.Camera, scene: THREE.Scene): void {
     const result = setupInteraction(renderer, camera, scene, this.editorState!);
     this.raycaster = result.raycaster;
     this.mouse = result.mouse;
   }
 
-  private setupGUI(gui: any, scene: THREE.Scene): void {
+  private setupGUI(gui: GUI, scene: THREE.Scene): void {
     if (!gui || !this.editorState) return;
 
     // Setup editor GUI
