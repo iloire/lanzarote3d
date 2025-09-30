@@ -258,7 +258,7 @@ export class Tree extends SimpleThreeComponent {
   /**
    * Export tree-specific serialization
    */
-  protected override serializeComponent(): any {
+  protected override serializeComponent(): Record<string, unknown> {
     return {
       treeOptions: this.treeOptions,
     };

@@ -366,7 +366,7 @@ export class PilotVoxel extends AsyncThreeComponent {
   /**
    * Provide fallback resources for failed loads
    */
-  protected override getFallbackResources(): Partial<Record<string, any>> {
+  protected override getFallbackResources(): Partial<Record<string, THREE.Object3D | THREE.Texture>> {
     return {
       model: this.createFallbackModel(),
       texture: this.createFallbackTexture(),
@@ -646,7 +646,7 @@ export class PilotVoxel extends AsyncThreeComponent {
   /**
    * Export character-specific serialization
    */
-  protected override serializeComponent(): any {
+  protected override serializeComponent(): Record<string, unknown> {
     return {
       pilotOptions: this.pilotOptions,
       characterInfo: this.getCharacterInfo(),

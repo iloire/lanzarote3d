@@ -24,8 +24,8 @@ export const setupLabelRenderer = () => {
 export class MarkerObject {
   pin: THREE.Object3D;
   type: MarkerType;
-  hoverAnimation: (() => void) | any;
-  unhoverAnimation: (() => void) | any;
+  hoverAnimation: { start: () => void } | (() => void);
+  unhoverAnimation: { start: () => void } | (() => void);
   showPopup: () => void;
   setVisibility: (visible: boolean) => void;
   flyzone?: THREE.Object3D;
@@ -67,7 +67,7 @@ export const createMarker = async (
   _navigateTo: (position: THREE.Vector3, location?: Location) => void,
   _location: Location | undefined,
   camera: THREE.Camera,
-  conditions?: any[]
+  conditions?: Array<{ direction: { ideal: number }; rating: number }>
 ): Promise<MarkerObject> => {
   const pin = await createPinMesh(type);
   setupPinBasics(pin, position, type);
