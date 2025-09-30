@@ -182,7 +182,7 @@ export class FlyingBehavior {
   /**
    * Update flight behavior
    */
-  private updateFlight(deltaTime: number): void {
+  protected updateFlight(deltaTime: number): void {
     if (!this.mesh) return;
 
     // Get desired direction based on pattern
@@ -228,7 +228,7 @@ export class FlyingBehavior {
   /**
    * Get desired direction based on flight pattern
    */
-  private getDesiredDirection(): THREE.Vector3 {
+  protected getDesiredDirection(): THREE.Vector3 {
     const direction = new THREE.Vector3();
 
     switch (this.pattern) {
@@ -269,7 +269,7 @@ export class FlyingBehavior {
   /**
    * Calculate force to avoid obstacles and track nearest obstacle distance
    */
-  private calculateObstacleAvoidance(): THREE.Vector3 {
+  protected calculateObstacleAvoidance(): THREE.Vector3 {
     const avoidanceForce = new THREE.Vector3();
     if (!this.mesh) return avoidanceForce;
 
@@ -310,7 +310,7 @@ export class FlyingBehavior {
   /**
    * Calculate force to stay within boundaries
    */
-  private calculateBoundaryForce(): THREE.Vector3 {
+  protected calculateBoundaryForce(): THREE.Vector3 {
     const boundaryForce = new THREE.Vector3();
     if (!this.mesh) return boundaryForce;
 
@@ -335,7 +335,7 @@ export class FlyingBehavior {
   /**
    * Calculate force to avoid terrain
    */
-  private calculateTerrainAvoidance(): THREE.Vector3 {
+  protected calculateTerrainAvoidance(): THREE.Vector3 {
     const terrainForce = new THREE.Vector3();
     if (!this.mesh || !this.terrain) return terrainForce;
 
@@ -363,7 +363,7 @@ export class FlyingBehavior {
    * Update speed based on proximity to obstacles
    * Reduces speed when approaching obstacles to allow time to maneuver
    */
-  private updateSpeedReduction(): void {
+  protected updateSpeedReduction(): void {
     // Calculate speed reduction based on nearest obstacle
     // Full speed when far away, reduced speed when close
     const safeDistance = this.obstacleAvoidanceDistance * 2; // Start slowing at 2x avoidance distance
@@ -386,7 +386,7 @@ export class FlyingBehavior {
   /**
    * Log debug information about flight state
    */
-  private logDebugInfo(): void {
+  protected logDebugInfo(): void {
     if (!this.mesh) return;
 
     this.debugLogCounter++;
@@ -410,7 +410,7 @@ export class FlyingBehavior {
   /**
    * Constrain height to bounds
    */
-  private constrainHeight(): void {
+  protected constrainHeight(): void {
     if (!this.mesh) return;
 
     if (this.mesh.position.y < this.minHeight) {
@@ -425,7 +425,7 @@ export class FlyingBehavior {
   /**
    * Orient object to face movement direction with horizontal stability
    */
-  private orientToDirection(direction: THREE.Vector3): void {
+  protected orientToDirection(direction: THREE.Vector3): void {
     if (!this.mesh || direction.length() === 0) return;
 
     // Use the full 3D direction for more natural aircraft orientation
@@ -531,7 +531,7 @@ export class FlyingBehavior {
   /**
    * Update debug arrows to show current velocity and forward direction
    */
-  private updateDebugArrows(): void {
+  protected updateDebugArrows(): void {
     if (!this.debugVectors || !this.mesh || !this.velocityArrow || !this.forwardArrow) return;
 
     // Update velocity arrow (red) - normalized velocity direction

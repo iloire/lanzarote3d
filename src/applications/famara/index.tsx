@@ -10,6 +10,8 @@ import {
 } from '../../foundation/utils/OrbitControlsHelper';
 import { getAppConfig } from '../../config/app-registry';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { Cessna } from '../../foundation/components/vehicles';
+import { EngineFlyingBehavior } from '../../foundation/systems/behaviors/EngineFlyingBehavior';
 
 /**
  * Famara Demo - Based on PhotoBooth but without paragliders
@@ -20,6 +22,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 class FamaraApp extends TerrainBase {
   private environment: Environment | undefined;
   private animationId: number | undefined;
+  private cessnaFlyingBehavior: EngineFlyingBehavior | undefined;
 
   constructor() {
     const appConfig = getAppConfig('famara');
@@ -101,15 +104,8 @@ class FamaraApp extends TerrainBase {
       ];
       await this.environment.addBirds(birdPath);
 
-      // Add hang glider for variety (different from paragliders)
-      // const hangGliderPath = [
-      //   new THREE.Vector3(6000, 1500, -200),
-      //   new THREE.Vector3(6200, 1400, -400),
-      //   new THREE.Vector3(6400, 1300, -600),
-      //   new THREE.Vector3(6600, 1200, -400),
-      //   new THREE.Vector3(6400, 1100, -200),
-      // ];
-      // await this.environment.addHangGlider(hangGliderPath);
+      // Add Cessna with engine-powered flight behavior
+      await this.addCessna(scene, terrain);
 
       // Start animation loop
       this.startAnimationLoop(renderer, scene, camera, controls);
@@ -119,6 +115,55 @@ class FamaraApp extends TerrainBase {
     } catch (error) {
       this.handleError(error as Error, 'load');
       throw error;
+    }
+  }
+
+  /**
+   * Add Cessna aircraft with autonomous flight behavior around the island
+   */
+  private async addCessna(scene: THREE.Scene, terrain: THREE.Mesh): Promise<void> {
+    try {
+      // Create Cessna component
+      const cessna = new Cessna({
+        bodyColor: '#FFFACD', // Lemon chiffon (classic small plane color)
+        scale: 3, // Scale up for visibility
+        castShadow: true,
+      });
+
+      const cessnaMesh = await cessna.load();
+
+      // Position Cessna at a nice starting point over Famara beach
+      const startPosition = new THREE.Vector3(6000, 300, -500);
+      cessnaMesh.position.copy(startPosition);
+
+      // Add to scene
+      scene.add(cessnaMesh);
+
+      // Create engine flying behavior with terrain avoidance
+      this.cessnaFlyingBehavior = new EngineFlyingBehavior({
+        speed: 8.0, // Moderate cruise speed
+        turnSpeed: 0.6,
+        flightRadius: 2000, // Large radius for island tours
+        cruiseAltitude: 250, // Fly at 250 units altitude
+        minHeight: 150, // Don't go below 150
+        maxHeight: 400, // Don't go above 400
+        terrainClearance: 100, // Stay 100 units above terrain
+        lookAheadDistance: 200, // Look ahead 200 units
+        centerPoint: new THREE.Vector3(6500, 0, -400), // Center around Famara area
+        obstacleAvoidanceDistance: 80,
+        autoStart: true,
+        faceDirection: true,
+        forwardAxis: 'x', // Cessna points forward on X axis
+        debugVectors: false,
+      });
+
+      // Attach behavior to Cessna
+      this.cessnaFlyingBehavior.attachTo(cessnaMesh);
+      this.cessnaFlyingBehavior.setTerrain(terrain);
+
+      console.log('✈️  Cessna added with engine-powered flight behavior');
+    } catch (error) {
+      console.error('Failed to add Cessna:', error);
     }
   }
 
@@ -152,6 +197,12 @@ class FamaraApp extends TerrainBase {
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
       this.animationId = undefined;
+    }
+
+    // Dispose Cessna flying behavior
+    if (this.cessnaFlyingBehavior) {
+      this.cessnaFlyingBehavior.dispose();
+      this.cessnaFlyingBehavior = undefined;
     }
 
     // Dispose environment resources
