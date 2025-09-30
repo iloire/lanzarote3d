@@ -304,51 +304,63 @@ class Environment {
     }
   }
 
-  async addHouses(terrain: THREE.Mesh, lowPoly: boolean = true) {
+  async addHouses(terrain: THREE.Mesh, lowPoly: boolean = true): Promise<THREE.Vector3[]> {
     // Create multiple neighborhoods at the same locations as before but with proper town structure
     const mode = lowPoly ? 'LOW-POLY' : 'HIGH-DETAIL';
     console.log(`🏘️ Creating ${mode} neighborhoods for ${lowPoly ? 'optimized performance' : 'maximum detail'}...`);
 
+    const neighborhoodCenters: THREE.Vector3[] = [];
+
     try {
       // Near paraglider area - suburban neighborhood
+      const center1 = new THREE.Vector3(6879, 0, 545);
       await this.createHouseNeighborhood(
-        new THREE.Vector3(6879, 0, 545),
+        center1,
         12,
         'suburban',
         terrain,
         lowPoly // Use low-poly for performance
       );
+      neighborhoodCenters.push(center1);
 
       // Famara - coastal village with street formation
+      const center2 = new THREE.Vector3(6279, 0, -3155);
       await this.createHouseNeighborhood(
-        new THREE.Vector3(6279, 0, -3155),
+        center2,
         15,
         'street',
         terrain,
         lowPoly
       );
+      neighborhoodCenters.push(center2);
 
       // Noruegos - small rural settlement
+      const center3 = new THREE.Vector3(7827, 0, -3460);
       await this.createHouseNeighborhood(
-        new THREE.Vector3(7827, 0, -3460),
+        center3,
         8,
         'rural',
         terrain,
         lowPoly
       );
+      neighborhoodCenters.push(center3);
 
       // Teguise - historic town center with grid layout
+      const center4 = new THREE.Vector3(5600, 0, 1205);
       await this.createHouseNeighborhood(
-        new THREE.Vector3(5600, 0, 1205),
+        center4,
         18,
         'grid',
         terrain,
         lowPoly
       );
+      neighborhoodCenters.push(center4);
 
       console.log('✅ All neighborhoods created successfully');
+      return neighborhoodCenters;
     } catch (error) {
       console.error('❌ Error creating neighborhoods:', error);
+      return neighborhoodCenters;
     }
   }
 

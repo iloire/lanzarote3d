@@ -4,6 +4,13 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 
 ## [1.5.0] - 2025-09-30 UTC
 
+### Added
+- **ProceduralRoad for famara-animation**: Added procedural road connecting neighborhoods
+  - Modified Environment.addHouses() to return neighborhood center positions
+  - Integrated ProceduralRoad in famara-animation using returned house positions
+  - Road connects 4 neighborhoods: suburban area, Famara coastal village, Noruegos rural settlement, and Teguise town center
+  - Road configuration: 8 meters wide, 150 segments for smooth curves, dark gray asphalt with center and edge lines
+
 ### Removed
 - **FlightControls**: Removed unused FlightControls and DEFAULT_FLIGHT_KEYBINDINGS exports
   - FlightControls was exported but never used in the codebase

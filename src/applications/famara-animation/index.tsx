@@ -17,6 +17,7 @@ import {
 import { getAppConfig } from '../../config/app-registry';
 import { FlyingBehavior, FlightPattern } from '../../foundation/systems/behaviors/FlyingBehavior';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { ProceduralRoad } from '../../foundation/components/scenery';
 
 type ParagliderVoxelConfig = {
   pg: ParagliderVoxelOptions;
@@ -89,7 +90,7 @@ class AnimationApp extends TerrainBase {
         lighting: 'dynamic',
         physics: false,
         fog: {
-          enabled: false, // Fog handled by theme system
+          enabled: true, // Fog handled by theme system
         },
       },
       performance: {
@@ -113,6 +114,13 @@ class AnimationApp extends TerrainBase {
       const theme = options.theme ?? getDefaultTheme();
       await ThemeEngine.apply(options, theme);
 
+      // Increase fog for more atmospheric effect
+      scene.fog = new THREE.Fog(
+        0x87CEEB, // Sky blue color
+        3000,     // Start fog closer for more atmosphere
+        12000     // End fog sooner for denser effect
+      );
+
       // Load voxel paragliders with proper tracking
       await this.loadParagliders(scene);
 
@@ -132,7 +140,26 @@ class AnimationApp extends TerrainBase {
       // Add environment elements using theme
       await this.environment.addCloudsFromTheme(thermals, theme);
       // this.environment.addTrees(terrain);
-      this.environment.addHouses(terrain);
+      const housePositions = await this.environment.addHouses(terrain);
+
+      // Create road connecting the neighborhoods
+      if (housePositions.length >= 2) {
+        const road = new ProceduralRoad({
+          controlPoints: housePositions,
+          terrain,
+          width: 8,
+          segments: 150,
+          roadColor: '#3A3A3A',
+          showCenterLine: true,
+          showEdgeLines: true,
+          heightOffset: 5,
+        });
+
+        const roadMesh = await road.load();
+        scene.add(roadMesh);
+        console.log('✅ Road connecting neighborhoods created');
+      }
+
       this.environment.addRandomBoats(water); // Use randomized boat types for variety
 
       // Make environment available for theme switching
