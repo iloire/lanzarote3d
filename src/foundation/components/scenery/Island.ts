@@ -4,6 +4,7 @@ import Models from '../../utils/models';
 import { MeshBVH, acceleratedRaycast } from 'three-mesh-bvh';
 import { TerrainTheme, SatelliteImageryConfig } from '../../types/Theme';
 import SatelliteTextureManager from '../../utils/satellite-textures';
+import { logger } from '../../utils/logger';
 
 THREE.Mesh.prototype.raycast = acceleratedRaycast;
 
@@ -45,11 +46,11 @@ class Island {
    */
   async applyTheme(terrainTheme: TerrainTheme): Promise<void> {
     if (!this.mesh || !this.mesh.material) {
-      console.warn('Island mesh not loaded - cannot apply theme');
+      logger.warn('Island mesh not loaded - cannot apply theme');
       return;
     }
 
-    console.log('Applying terrain theme to island:', terrainTheme);
+    logger.debug('Applying terrain theme to island:', terrainTheme);
 
     // Handle satellite imagery mode
     if (terrainTheme.style === 'satellite' && terrainTheme.satelliteImagery?.enabled) {
@@ -114,7 +115,7 @@ class Island {
       material.needsUpdate = true;
     }
 
-    console.log('Island terrain theme applied successfully');
+    logger.debug('Island terrain theme applied successfully');
   }
 
   /**
@@ -122,20 +123,20 @@ class Island {
    */
   private async applySatelliteTexture(satelliteConfig: SatelliteImageryConfig): Promise<void> {
     if (!this.mesh || !satelliteConfig.staticConfig) {
-      console.warn('Cannot apply satellite texture: missing mesh or static config');
+      logger.warn('Cannot apply satellite texture: missing mesh or static config');
       return;
     }
 
     try {
-      console.log('Loading satellite texture from:', satelliteConfig.staticConfig.textureAtlas);
+      logger.debug('Loading satellite texture from:', satelliteConfig.staticConfig.textureAtlas);
 
       // Load satellite texture and tile mapping
       const { texture, tileMapping } = await this.satelliteManager.loadSatelliteTexture(
         satelliteConfig.staticConfig
       );
 
-      console.log('Texture loaded:', texture);
-      console.log('Tile mapping loaded:', tileMapping);
+      logger.debug('Texture loaded:', texture);
+      logger.debug('Tile mapping loaded:', tileMapping);
 
       // Generate UV mapping for the terrain geometry
       this.satelliteManager.generateTerrainUVMapping(
@@ -144,7 +145,7 @@ class Island {
         tileMapping
       );
 
-      console.log('UV mapping generated for geometry');
+      logger.debug('UV mapping generated for geometry');
 
       // Create satellite material
       const satelliteMaterial = new THREE.MeshStandardMaterial({
@@ -169,11 +170,11 @@ class Island {
 
       this.mesh.material = satelliteMaterial;
 
-      console.log('✅ Satellite texture applied successfully');
-      console.log('Material:', satelliteMaterial);
-      console.log('Texture image:', texture.image);
+      logger.info('Satellite texture applied successfully');
+      logger.debug('Material:', satelliteMaterial);
+      logger.debug('Texture image:', texture.image);
     } catch (error) {
-      console.error('Failed to apply satellite texture:', error);
+      logger.error('Failed to apply satellite texture:', error);
 
       // Fallback to wireframe if specified
       if (satelliteConfig.fallbackToWireframe && this.originalMaterial) {
@@ -186,7 +187,7 @@ class Island {
           (fallbackMaterial as any).wireframe = true;
           this.mesh.material = fallbackMaterial;
         }
-        console.log('Applied wireframe fallback due to satellite texture failure');
+        logger.info('Applied wireframe fallback due to satellite texture failure');
       }
     }
   }

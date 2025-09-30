@@ -8,10 +8,19 @@ export { WorkshopDemoBase } from './WorkshopDemoBase';
 export { TerrainBase } from './TerrainBase';
 
 /**
+ * App module structure returned by dynamic imports
+ */
+interface AppModule {
+  default: {
+    load: (options: StoryOptions) => Promise<void> | void;
+  };
+}
+
+/**
  * Dynamic import wrapper that webpack can analyze
  * Uses a more explicit approach to avoid webpack trying to import non-JS files
  */
-async function dynamicImportApp(path: string): Promise<any> {
+async function dynamicImportApp(path: string): Promise<AppModule> {
   // Remove the ../ prefix and any file extension
   let importPath = path.startsWith('../') ? path.slice(3) : path;
   importPath = importPath.replace(/\.(tsx?|jsx?)$/, '');

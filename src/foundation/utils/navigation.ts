@@ -1,6 +1,7 @@
 // import Animations from './animations'; // TODO: Missing animations module
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { logger } from './logger';
 
 type Callback = () => void | {};
 
@@ -8,31 +9,31 @@ const Navigation = (camera: THREE.PerspectiveCamera, controls: OrbitControls) =>
   const nav = {
     default: (_t: number = 1600, cb?: Callback) => {
       // TODO: Restore when Animations module is available
-      console.warn('Navigation.default: Animations module not available');
+      logger.warn('Navigation.default: Animations module not available');
       if (cb) cb();
     },
 
     famara: (_t: number = 1600, cb?: Callback) => {
       // TODO: Restore when Animations module is available
-      console.warn('Navigation.famara: Animations module not available');
+      logger.warn('Navigation.famara: Animations module not available');
       if (cb) cb();
     },
 
     orzola: (_t: number = 1600, cb?: Callback) => {
       // TODO: Restore when Animations module is available
-      console.warn('Navigation.orzola: Animations module not available');
+      logger.warn('Navigation.orzola: Animations module not available');
       if (cb) cb();
     },
 
     macher: (_t: number = 1600, cb?: Callback) => {
       // TODO: Restore when Animations module is available
-      console.warn('Navigation.macher: Animations module not available');
+      logger.warn('Navigation.macher: Animations module not available');
       if (cb) cb();
     },
 
     tenesar: (_t: number = 1600, cb?: Callback) => {
       // TODO: Restore when Animations module is available
-      console.warn('Navigation.tenesar: Animations module not available');
+      logger.warn('Navigation.tenesar: Animations module not available');
       if (cb) cb();
     },
   };

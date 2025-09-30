@@ -50,7 +50,7 @@ const Helpers = {
     // Lighting helpers can be added here in the future
     if (config.lighting) {
       // TODO: Add lighting helpers (sun position indicator, etc)
-      console.log('Lighting helpers not yet implemented');
+      logger.debug('Lighting helpers not yet implemented');
     }
   },
 

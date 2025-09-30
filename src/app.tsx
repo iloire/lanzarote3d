@@ -11,6 +11,7 @@ import { themeManager } from './foundation/systems/ThemeManager';
 import { ThemeEngine } from './foundation/systems/ThemeEngine';
 import { getAppConfig } from './config/app-registry';
 import { getThemeById } from './foundation/themes';
+import { logger } from './foundation/utils/logger';
 
 import './index.css';
 
@@ -140,13 +141,13 @@ const App: React.FC<AppProps> = ({
     if (currentApp?.theme) {
       const appTheme = getThemeById(currentApp.theme);
       if (appTheme) {
-        console.log(`🎨 Applying app-specific theme: ${appTheme.name} for app: ${currentApp.name}`);
+        logger.info(`Applying app-specific theme: ${appTheme.name} for app: ${currentApp.name}`);
         // Apply the app-specific theme before initializing theme manager
         await ThemeEngine.apply(storyOptions, appTheme);
         storyOptions.theme = appTheme;
       } else {
-        console.warn(
-          `🎨 App-specific theme '${currentApp.theme}' not found for app: ${currentApp.name}`
+        logger.warn(
+          `App-specific theme '${currentApp.theme}' not found for app: ${currentApp.name}`
         );
       }
     }
@@ -166,7 +167,7 @@ const App: React.FC<AppProps> = ({
       // Apply saved theme after app has loaded (includes environment for cloud colors)
       await themeManager.applySavedThemeAfterLoad();
     } else {
-      console.error(`App "${initialStory}" not found in registry`);
+      logger.error(`App "${initialStory}" not found in registry`);
     }
 
     // Rendering complete

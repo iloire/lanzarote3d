@@ -29,12 +29,12 @@ This document tracks pending technical debt and issues that need to be addressed
 **Migration**: All apps using CameraController should switch to CameraTargetController
 
 ### TypeScript Strict Mode Violations
-**Status**: ✅ Significantly Improved (14 batches completed)
+**Status**: ✅ Significantly Improved (15 batches completed)
 **Files**: Reduced from 30+ to ~5 remaining instances
 **Issue**: TypeScript strict mode violations and excessive use of `any` type
 **Impact**: Runtime errors, poor developer experience, harder debugging, reduced type safety
 
-**Fixed Files** (Batches 1-14):
+**Fixed Files** (Batches 1-15):
 - ✅ Foundation components base classes (IThreeComponent, BaseThreeComponent, AsyncThreeComponent)
 - ✅ Resource management (ResourceManager, ComponentRegistry, ComponentBenchmark)
 - ✅ Physics components (Weather, Thermal, WindIndicator)
@@ -48,6 +48,31 @@ This document tracks pending technical debt and issues that need to be addressed
 - ✅ Foundation utils (models.ts already clean)
 - ✅ CameraController (already using event.code, not event.which)
 - ✅ **Batch 14 (Sept 30, 2025)**: Window interface, GUI controls, shared/index.ts logging
+- ✅ **Batch 15 (Sept 30, 2025)**: Core app modules, island, navigation, helpers
+
+**Batch 15 Completed (Sept 30, 2025)**:
+1. **src/shared/index.ts**: Fixed 'any' type in dynamicImportApp
+   - Created `AppModule` interface with proper typing
+   - Changed return type from `Promise<any>` → `Promise<AppModule>`
+   - Ensures type safety for dynamic app imports
+
+2. **src/app.tsx**: Replaced console with logger
+   - Changed 1 `console.log` to `logger.info`
+   - Changed 1 `console.warn` to `logger.warn`
+   - Changed 1 `console.error` to `logger.error`
+   - Added logger import
+
+3. **src/foundation/utils/helpers.ts**: Replaced console
+   - Changed 1 `console.log` to `logger.debug`
+
+4. **src/foundation/utils/navigation.ts**: Replaced console warnings
+   - Changed 5 `console.warn` statements to `logger.warn`
+   - Note: This file is not currently used anywhere (candidate for removal)
+
+5. **src/foundation/components/scenery/Island.ts**: Replaced console logging
+   - Changed 11 console statements to logger (warn/debug/info/error)
+   - Improved logging levels for satellite texture operations
+   - Added logger import
 
 **Batch 14 Completed (Sept 30, 2025)**:
 1. **src/index.tsx**: Added proper Window interface declaration for dev mode functions
