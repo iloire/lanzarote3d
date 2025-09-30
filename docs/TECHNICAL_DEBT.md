@@ -16,6 +16,18 @@ This document tracks pending technical debt and issues that need to be addressed
 - `src/foundation/components/environment/Cloud.ts` - Uses expensive Date.now() in loop
 **Solution**: Implement centralized render loop manager with proper cleanup
 
+### Legacy CameraController Removal
+**Status**: ⚠️ Deprecated - Schedule for Removal
+**Files**: `src/foundation/systems/scene/CameraController.ts`
+**Issue**: Legacy CameraController deprecated in favor of CameraTargetController
+**Impact**: Maintenance burden, Flier dependency prevents full type safety
+**Dependencies**: Only app.tsx uses it (already migrated to CameraTargetController)
+**Solution**: Remove in next major version (v2.0.0)
+**Timeline**:
+- ✅ v1.5.0: CameraTargetController created, CameraController deprecated
+- 📅 v2.0.0: Remove CameraController entirely
+**Migration**: All apps using CameraController should switch to CameraTargetController
+
 ### TypeScript Strict Mode Violations
 **Status**: ✅ Significantly Improved (13 batches completed)
 **Files**: Reduced from 30+ to ~10 remaining instances
@@ -166,9 +178,9 @@ This document tracks pending technical debt and issues that need to be addressed
 
 **High Priority**:
 - Multiple render loops (memory leak risk)
+- Legacy CameraController removal (deprecated in v1.5.0)
 - TypeScript strict mode violations
 - App registry import mapping technical debt
-- CameraController deprecated API usage
 - Location editor implicit any types
 - Production debug code cleanup
 

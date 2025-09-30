@@ -1,6 +1,8 @@
 Implement the following tasks if any is added following the instructions described below:
 ---
 TASKS:
+- remove  { FlightControls, DEFAULT_FLIGHT_KEYBINDINGS } from './FlightControls'; if not used, remove unused files
+
 ---
 
 ### Instructions

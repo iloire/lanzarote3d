@@ -2,6 +2,61 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## [1.5.0] - 2025-09-30 UTC
+
+### Added
+- **CameraTargetController**: Modern camera system with multi-target support
+  - Generic THREE.Object3D targeting (no Flier dependency)
+  - Four camera modes: Follow, FirstPerson, Orbit, Static
+  - Smooth transitions between targets using animation interpolation
+  - React UI component for target selection
+  - lil-gui integration for fine-tuning
+  - 80% less code than deprecated CameraController
+
+#### New Features
+- **Multi-Target Management**: Add/remove targets dynamically with names and metadata
+- **Camera Modes**:
+  - Follow: Chase camera behind target with configurable distance/height
+  - FirstPerson: Inside target view with directional awareness
+  - Orbit: Circular orbit around target (OrbitControls integration)
+  - Static: Fixed camera position
+- **React UI Component** (`CameraTargetUI.tsx`):
+  - Collapsible panel with target selection buttons
+  - Camera mode selector grid
+  - Color-coded target buttons
+  - Visual indicator for active target
+  - Smooth hover effects and transitions
+
+#### New Applications
+- **Camera Switcher Demo** (`/camera-switcher-demo`): Comprehensive demonstration
+  - Flying Cessna with autonomous flight behavior
+  - Static ground and hill markers
+  - Interactive target switching via UI
+  - All camera modes showcased
+  - Both React UI and lil-gui controls
+
+### Enhanced
+- **StoryOptions Interface**: Changed camera type from CameraController to THREE.PerspectiveCamera
+  - Increases flexibility for different camera implementations
+  - Backward compatible with proper type checking
+  - Legacy apps use runtime type checking for CameraController features
+
+- **Type Safety**: Added proper fallbacks for legacy camera features
+  - flier-pg app uses runtime checking for animateTo method
+  - Graceful degradation for cameras without legacy methods
+
+### Deprecated
+- **CameraController**: Marked as deprecated with migration guide
+  - Replaced by CameraTargetController
+  - Will be removed in future major version
+  - Deprecation notice includes migration instructions
+  - Technical debt item created for removal
+
+### Documentation
+- Comprehensive JSDoc comments in CameraTargetController
+- React UI component usage examples
+- Demo application showing best practices
+
 ## [1.4.0] - 2025-09-30 UTC
 
 ### Added

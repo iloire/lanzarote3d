@@ -1,7 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(do sed -i '' 's/protected createSyncContent()/protected override createContent()/g' \"$file\")"
+      "Bash(git restore:*)"
     ],
     "deny": [],
     "ask": []

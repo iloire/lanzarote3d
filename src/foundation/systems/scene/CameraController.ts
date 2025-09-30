@@ -1,3 +1,15 @@
+/**
+ * @deprecated This class is deprecated and will be removed in a future version.
+ * Use CameraTargetController instead, which:
+ * - Works with any THREE.Object3D (no Flier dependency)
+ * - Supports multiple targets with smooth switching
+ * - Has React UI integration
+ * - Provides cleaner, more focused API
+ *
+ * Migration:
+ * Replace: import { CameraController } from './CameraController'
+ * With:    import { CameraTargetController } from './CameraTargetController'
+ */
 import * as THREE from 'three';
 import Flier from '../../types/flier';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';

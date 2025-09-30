@@ -8,7 +8,7 @@ import { Theme } from '../foundation/types/Theme';
 import Environment from './env/environment';
 
 export interface StoryOptions {
-  camera: CameraController;
+  camera: THREE.PerspectiveCamera; // Changed from CameraController to base class for flexibility
   scene: THREE.Scene;
   renderer: THREE.WebGLRenderer;
   gui: GUI;

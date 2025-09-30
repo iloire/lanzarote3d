@@ -3,7 +3,7 @@ import GUI from 'lil-gui';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import * as THREE from 'three';
 import { loadApp, hasApp } from './shared/index';
-import { CameraController as Camera } from './foundation/systems/scene/CameraController';
+import { CameraTargetController as Camera } from './foundation/systems/scene/CameraTargetController';
 import Menu from './menu';
 import Controls from './foundation/utils/controls';
 import { StoryOptions } from './shared/types';

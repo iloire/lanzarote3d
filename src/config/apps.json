@@ -41,6 +41,16 @@
       "visibility": "private",
       "priority": 10
     },
+    "camera-switcher-demo": {
+      "name": "Camera Switcher Demo",
+      "description": "Demonstrates CameraTargetController with multiple dynamic targets and camera modes",
+      "entry": "./applications/camera-switcher-demo/index.tsx",
+      "route": "/camera-switcher-demo",
+      "category": "tool",
+      "requiresWebGL": true,
+      "visibility": "private",
+      "priority": 11
+    },
     "tile-debug": {
       "name": "Tile Debug Dashboard",
       "description": "Debug tool showing satellite tile download process, calculations, and atlas creation for terrain mapping",

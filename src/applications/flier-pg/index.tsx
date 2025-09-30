@@ -88,7 +88,16 @@ class ParagliderWorkshopApp extends WorkshopDemoBase {
         perfStats: null as any,
       };
 
-      camera.animateTo(initialCamPos, initialPGPos, 200, controls);
+      // Legacy camera animation - check if camera has animateTo method
+      if ('animateTo' in camera && typeof (camera as any).animateTo === 'function') {
+        (camera as any).animateTo(initialCamPos, initialPGPos, 200, controls);
+      } else {
+        // Fallback for cameras without animateTo
+        camera.position.copy(initialCamPos);
+        camera.lookAt(initialPGPos);
+        controls.target.copy(initialPGPos);
+        controls.update();
+      }
 
       this.flier = new Flier(pgOptions, envOptions, false);
       this.flier.addGui(gui);
