@@ -21,9 +21,10 @@ const showcaseApps = Object.entries(appsConfig.apps)
     name: appKey,
     title: `Lanzarote - ${app.name}`,
     filename: app.route.replace(/^\//, '') + '.html',
-    entry: app.entry.startsWith('./applications/')
-      ? './src/' + app.entry.slice(2)  // Convert ./applications/... to ./src/applications/...
-      : './src/index.tsx'  // Default entry point for all apps
+    // Only tile-debug has a custom entry point (entry.tsx), all others use index.tsx
+    entry: app.entry.includes('/entry.tsx')
+      ? './src/' + app.entry.slice(2)  // Custom entry like tile-debug
+      : './src/index.tsx'  // Standard entry point for all showcase apps
   }))
   .sort((a, b) => {
     const priorityA = appsConfig.apps[a.name]?.priority || 999;

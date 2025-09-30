@@ -12,6 +12,7 @@ THREE.Cache.enabled = true;
  * Extract story name from URL
  * - From query parameter: ?story=boats-animation
  * - From HTML path: /boats-animation.html -> boats-animation
+ * - From root path or index: famara-animation
  * - Default: famara-animation
  */
 function getStoryName(): string {
@@ -21,9 +22,18 @@ function getStoryName(): string {
   if (queryStory) return queryStory;
 
   const currentPath = window.location.pathname;
-  const pathStory = currentPath.match(/\/([^/]+)\.html$/)?.[1];
 
-  return pathStory || 'famara-animation';
+  // Extract from HTML filename
+  const pathMatch = currentPath.match(/\/([^/]+)\.html$/);
+  if (pathMatch) return pathMatch[1];
+
+  // Root path or index.html -> default
+  if (currentPath === '/' || currentPath === '/index.html') {
+    return 'famara-animation';
+  }
+
+  // Fallback
+  return 'famara-animation';
 }
 
 /**
@@ -72,6 +82,10 @@ function isDevModeEnabled(): boolean {
 const storyName = getStoryName();
 const isDevMode = isDevModeEnabled();
 
+console.log('🔍 Debug - pathname:', window.location.pathname);
+console.log('🔍 Debug - extracted story name:', storyName);
+console.log('🔍 Debug - dev mode:', isDevMode);
+
 const rootElement = document.getElementById('root');
 if (rootElement && WebGL.isWebGLAvailable()) {
   const root = createRoot(rootElement);
@@ -84,7 +98,7 @@ if (rootElement && WebGL.isWebGLAvailable()) {
       initialStory={storyName}
     />
   );
-  console.log(`Loading story: "${storyName}"`);
+  console.log(`✓ Loading story: "${storyName}"`);
   logger.info(`${storyName} story started`);
 } else if (rootElement) {
   const warning = WebGL.getWebGLErrorMessage();
