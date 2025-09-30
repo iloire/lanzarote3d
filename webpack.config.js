@@ -23,7 +23,7 @@ const showcaseApps = Object.entries(appsConfig.apps)
     filename: app.route.replace(/^\//, '') + '.html',
     entry: app.entry.startsWith('./applications/')
       ? './src/' + app.entry.slice(2)  // Convert ./applications/... to ./src/applications/...
-      : './src/showcase-entry.tsx'  // Default for showcase apps
+      : './src/index.tsx'  // Default entry point for all apps
   }))
   .sort((a, b) => {
     const priorityA = appsConfig.apps[a.name]?.priority || 999;
