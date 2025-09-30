@@ -7,7 +7,7 @@ import {
 } from '../base/AsyncThreeComponent';
 import { ComponentOptions } from '../base/IThreeComponent';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
-import { CharacterType, characterRegistry, CharacterDefinition } from './CharacterRegistry';
+import { CharacterType, characterRegistry, CharacterDefinition, CharacterAssets } from './CharacterRegistry';
 
 /**
  * Options for pilot voxel component
@@ -147,7 +147,7 @@ export class PilotVoxel extends AsyncThreeComponent {
   /**
    * Get selected model based on options
    */
-  private getSelectedModel(assets: any): string {
+  private getSelectedModel(assets: CharacterAssets): string {
     if (this.pilotOptions.useAlternativeModel !== undefined && assets.alternativeModels) {
       const altIndex = Math.min(
         this.pilotOptions.useAlternativeModel,
@@ -161,7 +161,7 @@ export class PilotVoxel extends AsyncThreeComponent {
   /**
    * Get selected texture based on options
    */
-  private getSelectedTexture(assets: any): string {
+  private getSelectedTexture(assets: CharacterAssets): string {
     if (this.pilotOptions.useAlternativeTexture !== undefined && assets.alternativeTextures) {
       const altIndex = Math.min(
         this.pilotOptions.useAlternativeTexture,

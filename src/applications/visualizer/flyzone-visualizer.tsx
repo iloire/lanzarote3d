@@ -7,6 +7,7 @@ import {
   WeatherAnalysis,
   TakeoffRecommendation,
   CurrentWeather,
+  TakeoffLocation,
 } from '../../types/flyzone-types';
 import { FlyzoneVisualizerUI } from './flyzone-visualizer-ui';
 import { FlyzoneMarkers } from '../editor/flyzone-markers';
@@ -213,7 +214,7 @@ class FlyzoneVisualizerApp extends TerrainBase {
     return false; // No marker was selected, allow camera controls
   }
 
-  private selectTakeoffLocation(takeoff: any): void {
+  private selectTakeoffLocation(takeoff: TakeoffLocation): void {
     if (!this.visualizerState?.weatherAnalysis) return;
 
     // Find the recommendation for this takeoff

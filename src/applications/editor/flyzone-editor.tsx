@@ -1160,7 +1160,7 @@ class FlyzoneEditorApp extends TerrainBase {
 
         // Convert takeoff positions
         if (loc.takeoffs) {
-          loc.takeoffs.forEach((takeoff: any) => {
+          loc.takeoffs.forEach((takeoff: { position?: { x: number; y: number; z: number } }) => {
             if (takeoff.position && typeof takeoff.position === 'object') {
               takeoff.position = new THREE.Vector3(
                 takeoff.position.x,
@@ -1173,7 +1173,7 @@ class FlyzoneEditorApp extends TerrainBase {
 
         // Convert landing zone positions
         if (loc.landingZones) {
-          loc.landingZones.forEach((landing: any) => {
+          loc.landingZones.forEach((landing: { position?: { x: number; y: number; z: number } }) => {
             if (landing.position && typeof landing.position === 'object') {
               landing.position = new THREE.Vector3(
                 landing.position.x,
@@ -1186,7 +1186,7 @@ class FlyzoneEditorApp extends TerrainBase {
 
         // Convert flyzone phase positions
         if (loc.flyzone?.phases) {
-          Object.values(loc.flyzone.phases).forEach((phase: any) => {
+          Object.values(loc.flyzone.phases).forEach((phase: { position?: { x: number; y: number; z: number } }) => {
             if (phase.position && typeof phase.position === 'object') {
               phase.position = new THREE.Vector3(
                 phase.position.x,
