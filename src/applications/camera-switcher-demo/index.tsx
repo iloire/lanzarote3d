@@ -136,7 +136,7 @@ class CameraSwitcherDemo extends TerrainBase {
       scale: 3,
     });
     const cessnaMesh = await cessna.load();
-    cessnaMesh.position.set(6000, 300, -500);
+    cessnaMesh.position.set(6000, 1200, -500);
     scene.add(cessnaMesh);
 
     // Add autonomous flight behavior
@@ -149,7 +149,7 @@ class CameraSwitcherDemo extends TerrainBase {
       maxHeight: 400,
       terrainClearance: 100,
       lookAheadDistance: 200,
-      centerPoint: new THREE.Vector3(6500, 0, -400),
+      centerPoint: new THREE.Vector3(6500, 1200, -400),
       autoStart: true,
     });
 
@@ -167,7 +167,7 @@ class CameraSwitcherDemo extends TerrainBase {
       scale: 4,
     });
     const jetMesh = await jet.load();
-    jetMesh.position.set(8500, 350, 500);
+    jetMesh.position.set(6500, 1450, 500);
     scene.add(jetMesh);
 
     // Add flying behavior with different parameters
@@ -180,7 +180,7 @@ class CameraSwitcherDemo extends TerrainBase {
       maxHeight: 500,
       terrainClearance: 150,
       lookAheadDistance: 300,
-      centerPoint: new THREE.Vector3(8500, 0, 500),
+      centerPoint: new THREE.Vector3(8500, 1400, 500),
       autoStart: true,
     });
 
@@ -200,7 +200,7 @@ class CameraSwitcherDemo extends TerrainBase {
       scale: 1,
     });
     const hanggliderMesh = await wingComponent.load();
-    hanggliderMesh.position.set(7500, 250, -1500);
+    hanggliderMesh.position.set(7500, 850, -1500);
     scene.add(hanggliderMesh);
 
     // Add circular soaring behavior  (wind-dependent flight)
@@ -209,9 +209,9 @@ class CameraSwitcherDemo extends TerrainBase {
       speed: 5.0,
       turnSpeed: 0.7,
       flightRadius: 800,
-      minHeight: 180,
-      maxHeight: 320,
-      centerPoint: new THREE.Vector3(7500, 0, -1500),
+      minHeight: 780,
+      maxHeight: 1320,
+      centerPoint: new THREE.Vector3(7500, 900, -1500),
       autoStart: true,
     });
 

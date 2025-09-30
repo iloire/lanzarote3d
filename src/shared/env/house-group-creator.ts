@@ -125,7 +125,7 @@ export class HouseGroupCreator {
             lowPoly: this.lowPoly,
             ...(houseConfig.colors || {}),
           });
-          houseMesh = house.load();
+          houseMesh = await house.load();
           break;
 
         case 'Townhouse':
@@ -135,7 +135,7 @@ export class HouseGroupCreator {
             lowPoly: this.lowPoly,
             ...(houseConfig.colors || {}),
           });
-          houseMesh = house.load();
+          houseMesh = await house.load();
           break;
 
         case 'Barn':
@@ -145,7 +145,7 @@ export class HouseGroupCreator {
             lowPoly: this.lowPoly,
             ...(houseConfig.colors || {}),
           });
-          houseMesh = house.load();
+          houseMesh = await house.load();
           break;
 
         case 'DesertHouse':
@@ -155,7 +155,7 @@ export class HouseGroupCreator {
             lowPoly: this.lowPoly,
             ...(houseConfig.colors || {}),
           });
-          houseMesh = house.load();
+          houseMesh = await house.load();
           break;
 
 
@@ -166,7 +166,7 @@ export class HouseGroupCreator {
             lowPoly: this.lowPoly,
             ...(houseConfig.colors || {}),
           });
-          houseMesh = house.load();
+          houseMesh = await house.load();
           break;
 
         default:
