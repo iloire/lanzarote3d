@@ -78,7 +78,7 @@ This document tracks pending technical debt and issues that need to be addressed
 
 ### Legacy loadSync() Method Removal
 **Status**: 🔄 In Progress - Gradual Refactoring
-**Files**: 9 files still using loadSync()
+**Files**: 3 files still using loadSync()
 **Issue**: Legacy synchronous loading method still used in some components
 **Impact**: Code complexity, blocks main thread, prevents async resource loading
 
@@ -87,35 +87,36 @@ This document tracks pending technical debt and issues that need to be addressed
   - Removed all legacy prototype overrides from building components
   - Houses app now properly uses `await load()` pattern
   - All building components export clean classes
+- ✅ **Completed**: Removed vehicle legacy patterns (Car, Truck, AutonomousCar) (Sept 30)
+  - Removed prototype.load overrides
+  - All applications already using async/await
+- ✅ **Completed**: Refactored house-group-creator.ts with parallel loading (Sept 30)
+  - Converted all 6 loadSync() calls to async/await
+  - Implemented Promise.all for parallel landscape element loading
+  - Stones, cacti, and pool loading now non-blocking
 
-**Remaining Usage** (9 files):
-1. **Base Components** (Internal/Template Methods):
-   - `SimpleThreeComponent.ts:132` - Base implementation (OK - internal use)
-   - `FloatingThreeComponent.ts:51,54` - Override for floating behavior (OK - composition)
-   - `MovableBoatComponent.ts:73,74` - Boat movement system (OK - composition)
-   - `MovableCarComponent.ts:102,103` - Car movement system (OK - composition)
+**Remaining Usage** (3 files):
+1. **Base Components** (Internal/Template Methods - OK):
+   - `SimpleThreeComponent.ts:132` - Base implementation for template method pattern
+   - `FloatingThreeComponent.ts:51,54` - Override for floating behavior composition
+   - `MovableBoatComponent.ts:73,74` - Boat movement system composition
+   - `MovableCarComponent.ts:102,103` - Car movement system composition
 
-2. **Vehicle Components** (Need Refactoring):
-   - `Car.ts:209,255` - Internal sync loading (OK - template method)
-   - `AutonomousCar.ts:117,118,307` - Autonomous behavior needs async
-   - `Truck.ts:260,306` - Internal sync loading (OK - template method)
+2. **Vehicle Components** (Internal Template Methods - OK):
+   - `Car.ts:209` - Internal sync loading within template method
+   - `AutonomousCar.ts:117,118` - Calls parent loadSync() within template method
+   - `Truck.ts:260` - Internal sync loading within template method
 
-3. **Environment Utilities** (Needs Refactoring - HIGH PRIORITY):
-   - `house-group-creator.ts:314,328,357,368,379,391` - 6 uses in group generation
-     - Stones, cacti, and pool loading
-     - **Issue**: Synchronous loading in procedural generation
-     - **Solution**: Refactor to async/await with Promise.all for parallel loading
-
-4. **Composite Components** (Needs Refactoring):
+3. **Composite Components** (Needs Refactoring - NEXT PRIORITY):
    - `DesertHouseWithPool.ts:129,150` - Composite building
      - **Issue**: Calls loadSync() on Pool and DesertHouse within createContent()
      - **Solution**: Move composition to async initialization phase
 
 **Refactoring Strategy**:
-1. Keep `loadSync()` in base components for internal template method pattern
-2. Remove `loadSync()` from public APIs (completed for buildings)
-3. Refactor house-group-creator to use async/await with Promise.all
-4. Refactor composite components to async composition
+1. ✅ Keep `loadSync()` in base components for internal template method pattern
+2. ✅ Remove `loadSync()` from public APIs (completed for buildings and vehicles)
+3. ✅ Refactor house-group-creator to use async/await with Promise.all
+4. 🔄 Next: Refactor composite components (DesertHouseWithPool) to async composition
 5. Eventually deprecate public loadSync() entirely
 
 ## Medium Priority Issues
