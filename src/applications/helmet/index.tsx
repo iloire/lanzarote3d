@@ -3,6 +3,7 @@ import {
   HelmetOptions,
   HelmetType,
 } from '../../foundation/components/characters/helmets/types';
+import { BaseHelmet } from '../../foundation/components/characters/helmets/BaseHelmet';
 import { DefaultHelmet } from '../../foundation/components/characters/helmets/DefaultHelmet';
 import { FullFaceHelmet } from '../../foundation/components/characters/helmets/FullFaceHelmet';
 import { HelmetWithHorns } from '../../foundation/components/characters/helmets/HelmetWithHorns';
@@ -139,7 +140,7 @@ class HelmetWorkshopApp extends WorkshopDemoBase {
 
     helmets.forEach((helmetConfig, index) => {
       try {
-        let helmet: any;
+        let helmet: BaseHelmet;
 
         switch (helmetConfig.type) {
           case HelmetType.Default:

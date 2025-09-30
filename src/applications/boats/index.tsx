@@ -6,6 +6,7 @@ import {
   SpeedBoat,
   PatrolBoat,
 } from '../../foundation/components/scenery';
+import { MovableBoatComponent } from '../../foundation/components/base/MovableBoatComponent';
 import { StoryOptions } from '../../shared/types';
 import { WorkshopDemoBase } from '../../shared/WorkshopDemoBase';
 
@@ -13,7 +14,7 @@ import { WorkshopDemoBase } from '../../shared/WorkshopDemoBase';
  * Boats Workshop Demo - Showcases multiple boat components with variations
  */
 class BoatsWorkshopApp extends WorkshopDemoBase {
-  private boats: (THREE.Mesh | THREE.Group)[] = [];
+  private boats: THREE.Object3D[] = [];
 
   constructor() {
     super({
@@ -104,8 +105,8 @@ class BoatsWorkshopApp extends WorkshopDemoBase {
 
     // Load all boats concurrently
     const boatPromises = boatConfigurations.map(async config => {
-      let boat: any;
-      let boatMesh: THREE.Mesh | THREE.Group;
+      let boat: MovableBoatComponent;
+      let boatMesh: THREE.Object3D;
 
       // Create appropriate boat type with modern API
       switch (config.type) {

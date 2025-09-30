@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { StoryOptions } from '../../shared/types';
 import createVoxelExample from './example';
 import { STLExporter } from 'three/examples/jsm/exporters/STLExporter';
@@ -134,7 +135,7 @@ class VoxelDemoApp extends AppBase {
     scene.add(this.platform);
   }
 
-  private setupCamera(camera: any, controls: any): void {
+  private setupCamera(camera: THREE.PerspectiveCamera, controls: OrbitControls): void {
     // Reset camera and controls
     camera.position.set(500, 1400, 1000);
     camera.lookAt(0, 300, 0);
@@ -184,7 +185,7 @@ class VoxelDemoApp extends AppBase {
     document.body.appendChild(this.downloadButton);
   }
 
-  private startAnimationLoop(renderer: any, scene: THREE.Scene, camera: any): void {
+  private startAnimationLoop(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.PerspectiveCamera): void {
     const animate = () => {
       try {
         // Update performance monitoring

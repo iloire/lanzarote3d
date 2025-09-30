@@ -5,6 +5,7 @@ import { getAllThemes, getThemeById } from '../../foundation/themes';
 import { ThemeEngine } from '../../foundation/systems/ThemeEngine';
 import { themeManager } from '../../foundation/systems/ThemeManager';
 import { WorkshopDemoBase } from '../../shared/WorkshopDemoBase';
+import { Theme } from '../../foundation/types/Theme';
 
 // Use themes from our comprehensive theme system
 const ALL_THEMES = getAllThemes();
@@ -14,7 +15,7 @@ const ALL_THEMES = getAllThemes();
  */
 class CloudsWorkshopApp extends WorkshopDemoBase {
   private currentClouds: THREE.Object3D | null = null;
-  private currentTheme: any;
+  private currentTheme: Theme | undefined;
 
   constructor() {
     super({
@@ -70,7 +71,7 @@ class CloudsWorkshopApp extends WorkshopDemoBase {
     }
   }
 
-  private async createClouds(scene: THREE.Scene, theme: any): Promise<THREE.Object3D> {
+  private async createClouds(scene: THREE.Scene, theme: Theme): Promise<THREE.Object3D> {
     // Remove existing clouds
     if (this.currentClouds) {
       scene.remove(this.currentClouds);
