@@ -17,6 +17,17 @@ export interface DesertHouseWithPoolOptions extends SimpleComponentOptions {
   lowPoly?: boolean;
 }
 
+interface LandscapingMaterials {
+  plant: THREE.MeshLambertMaterial;
+  rock: THREE.MeshLambertMaterial;
+  path: THREE.MeshLambertMaterial;
+  wood: THREE.MeshLambertMaterial;
+  cushion: THREE.MeshLambertMaterial;
+  metal: THREE.MeshLambertMaterial;
+  firePit: THREE.MeshLambertMaterial;
+  canopy: THREE.MeshLambertMaterial;
+}
+
 /**
  * Desert House with Pool component - Luxury desert house with swimming pool and landscaping
  */
@@ -144,7 +155,7 @@ export class DesertHouseWithPool extends SimpleThreeComponent {
   /**
    * Add landscaping around the pool
    */
-  private addPoolLandscaping(compound: THREE.Group, materials: any): void {
+  private addPoolLandscaping(compound: THREE.Group, materials: LandscapingMaterials): void {
 
     // Desert plants around the pool
     const plantPositions = [
@@ -204,7 +215,7 @@ export class DesertHouseWithPool extends SimpleThreeComponent {
   /**
    * Add outdoor furniture and amenities
    */
-  private addOutdoorAmenities(compound: THREE.Group, materials: any): void {
+  private addOutdoorAmenities(compound: THREE.Group, materials: LandscapingMaterials): void {
 
     // Pool lounge chairs
     const loungePositions = [

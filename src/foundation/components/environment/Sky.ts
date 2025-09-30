@@ -116,7 +116,7 @@ type SkyOptions = {
   rayleigh: number; // Rayleigh scattering (blue sky) (0-4)
   mieCoefficient: number; // Mie scattering (sun disk) (0-0.1)
   mieDirectionalG: number; // Sun direction influence (0-1)
-  [key: string]: any; // Allow dynamic property access for Three.js uniforms
+  [key: string]: unknown; // Allow dynamic property access for Three.js uniforms
 };
 
 const DEFAULT_SKY_OPTIONS: SkyOptions = {
@@ -183,7 +183,11 @@ export default class Sky extends THREE.Object3D {
     const skyUniforms = this.sky.material.uniforms;
     for (const key in this.skyOptions) {
       if (skyUniforms[key]) {
-        skyUniforms[key].value = this.skyOptions[key];
+        const value = this.skyOptions[key];
+        // Type guard: value should be a number for sky uniforms
+        if (typeof value === 'number') {
+          skyUniforms[key].value = value;
+        }
       } else {
         console.warn(`Sky uniform '${key}' not found`);
       }

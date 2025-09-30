@@ -78,6 +78,7 @@ class Weather extends THREE.EventDispatcher<WeatherEventMap> {
     ).multiplyScalar(multiplier * this.options.speedMetresPerSecond);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   addGui(gui: any) {
     const weatherGui = gui.addFolder('Weather');
     weatherGui.add(this.options, 'windDirectionDegreesFromNorth', 0, 360).listen();
