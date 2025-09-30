@@ -4,6 +4,7 @@ import { TerrainBase } from '../../shared/TerrainBase';
 import { ProceduralRoad } from '../../foundation/components/scenery/ProceduralRoad';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { GUI } from 'lil-gui';
+import { logger } from '../../foundation/utils/logger';
 
 /**
  * Roads Demo - Showcases ProceduralRoad component on island terrain
@@ -48,11 +49,11 @@ class RoadsApp extends TerrainBase {
 
       // Wait for terrain to be available
       if (!options.terrain) {
-        console.error('❌ Terrain not available for roads demo');
+        logger.error('❌ Terrain not available for roads demo');
         throw new Error('Terrain is required for roads demo');
       }
 
-      console.log('🛣️ Creating procedural roads on island terrain...');
+      logger.info('🛣️ Creating procedural roads on island terrain...');
 
       // Create multiple demo roads
       await this.createDemoRoads(scene, options.terrain);
@@ -84,7 +85,7 @@ class RoadsApp extends TerrainBase {
       this.startAnimationLoop(renderer, scene, camera, controls);
 
       this.isLoaded = true;
-      console.log(`✅ ${this.config.name} loaded successfully with ${this.roads.length} roads`);
+      logger.info(`✅ ${this.config.name} loaded successfully with ${this.roads.length} roads`);
     } catch (error) {
       this.handleError(error as Error, 'load');
       throw error;
@@ -199,7 +200,7 @@ class RoadsApp extends TerrainBase {
     this.roads.push(serpentineRoad);
     this.roadMeshes.push(serpentineMesh);
 
-    console.log(`✅ Created ${this.roads.length} demo roads on island terrain`);
+    logger.info(`✅ Created ${this.roads.length} demo roads on island terrain`);
   }
 
   /**
@@ -310,7 +311,7 @@ class RoadsApp extends TerrainBase {
   }
 
   public override dispose(): void {
-    console.log(`🧹 Disposing ${this.config.name}`);
+    logger.debug(`🧹 Disposing ${this.config.name}`);
 
     // Cancel animation loop
     if (this.animationId) {

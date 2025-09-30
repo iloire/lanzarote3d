@@ -7,6 +7,7 @@ import { Cessna, Jet, HangGliderWing } from '../../foundation/components/vehicle
 import { EngineFlyingBehavior } from '../../foundation/systems/behaviors/EngineFlyingBehavior';
 import { FlyingBehavior, FlightPattern } from '../../foundation/systems/behaviors/FlyingBehavior';
 import { getAppConfig } from '../../config/app-registry';
+import { logger } from '../../foundation/utils/logger';
 
 /**
  * Camera Switcher Demo
@@ -100,7 +101,7 @@ class CameraSwitcherDemo extends TerrainBase {
 
     // Create React UI
     createCameraTargetUI(this.targetController, controls, (targetIndex, mode) => {
-      console.log(`📷 Switched to target ${targetIndex} in ${mode} mode`);
+      logger.info(`📷 Switched to target ${targetIndex} in ${mode} mode`);
     });
 
     // Set initial camera position and target
@@ -123,7 +124,7 @@ class CameraSwitcherDemo extends TerrainBase {
     };
     animate();
 
-    console.log(
+    logger.info(
       '🎬 Camera Switcher Demo loaded with',
       this.targetController.getTargets().length,
       'targets'

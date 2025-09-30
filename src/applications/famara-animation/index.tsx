@@ -18,6 +18,7 @@ import { getAppConfig } from '../../config/app-registry';
 import { FlyingBehavior, FlightPattern } from '../../foundation/systems/behaviors/FlyingBehavior';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { ProceduralRoad } from '../../foundation/components/scenery';
+import { logger } from '../../foundation/utils/logger';
 
 type ParagliderVoxelConfig = {
   pg: ParagliderVoxelOptions;
@@ -168,7 +169,7 @@ class AnimationApp extends TerrainBase {
 
         const roadMesh = await road.load();
         scene.add(roadMesh);
-        console.log('✅ Road connecting neighborhoods created');
+        logger.info('✅ Road connecting neighborhoods created');
       }
 
       this.environment.addRandomBoats(water); // Use randomized boat types for variety
@@ -189,7 +190,7 @@ class AnimationApp extends TerrainBase {
       this.setupCameraAnimation(camera, controls, renderer, scene);
 
       this.isLoaded = true;
-      console.log(
+      logger.info(
         `✅ ${this.config.name} loaded successfully with ${this.paragliderMeshes.length} paragliders`
       );
     } catch (error) {
@@ -284,11 +285,11 @@ class AnimationApp extends TerrainBase {
       setTimeout(() => {
         if (this.hanggliderFlyingBehavior) {
           this.hanggliderFlyingBehavior.start();
-          console.log('🪂 Flying behavior started for hangglider');
+          logger.info('🪂 Flying behavior started for hangglider');
         }
       }, this.ANIMATION_DURATION_MS + 2000); // Start 2 seconds after animation ends
 
-      console.log('✅ Hangglider loaded successfully with flying behavior');
+      logger.info('✅ Hangglider loaded successfully with flying behavior');
     } catch (error) {
       this.handleError(error as Error, 'loading hangglider');
     }
@@ -463,7 +464,7 @@ class AnimationApp extends TerrainBase {
   }
 
   public override dispose(): void {
-    console.log(`🧹 Disposing ${this.config.name}`);
+    logger.debug(`🧹 Disposing ${this.config.name}`);
 
     // Cancel animation loop
     if (this.animationId) {

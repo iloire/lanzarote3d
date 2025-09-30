@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import HangGlider from '../../foundation/components/vehicles/Hangglider';
 import { StoryOptions } from '../../shared/types';
 import { WorkshopDemoBase } from '../../shared/WorkshopDemoBase';
+import { logger } from '../../foundation/utils/logger';
 
 /**
  * Hang Glider Workshop Demo - Showcases hang glider components
@@ -48,7 +49,7 @@ class HangGliderWorkshopApp extends WorkshopDemoBase {
       this.startAnimationLoop(renderer, scene, camera, controls);
 
       this.isLoaded = true;
-      console.log(`✅ ${this.config.name} loaded successfully`);
+      logger.info(`✅ ${this.config.name} loaded successfully`);
     } catch (error) {
       this.handleError(error as Error, 'load');
       throw error;
@@ -56,7 +57,7 @@ class HangGliderWorkshopApp extends WorkshopDemoBase {
   }
 
   public override dispose(): void {
-    console.log(`🧹 Disposing ${this.config.name}`);
+    logger.debug(`🧹 Disposing ${this.config.name}`);
     super.dispose();
   }
 }

@@ -3,6 +3,7 @@ import { GUI } from 'lil-gui';
 import { StoryOptions } from '../../shared/types';
 import { TerrainBase } from '../../shared/TerrainBase';
 import { flyzoneAPI } from '../../foundation/services/flyzone-api';
+import { logger } from '../../foundation/utils/logger';
 import {
   FlyzoneLocation,
   WeatherAnalysis,
@@ -129,7 +130,7 @@ class FlyzoneVisualizerApp extends TerrainBase {
       this.startAnimationLoop(scene, camera, renderer, controls);
 
       this.isLoaded = true;
-      console.log(`✅ ${this.config.name} loaded successfully`);
+      logger.info(`✅ ${this.config.name} loaded successfully`);
     } catch (error) {
       this.handleError(error as Error, 'load');
       throw error;
@@ -238,7 +239,7 @@ class FlyzoneVisualizerApp extends TerrainBase {
         this.markers.selectMarker(takeoff.id);
       }
 
-      console.log(`Selected takeoff: ${takeoff.title} (Score: ${recommendation.score})`);
+      logger.info(`Selected takeoff: ${takeoff.title} (Score: ${recommendation.score})`);
     }
   }
 
@@ -262,9 +263,9 @@ class FlyzoneVisualizerApp extends TerrainBase {
         }
       }
 
-      console.log(`Loaded ${this.visualizerState.locations.length} flyzone locations`);
+      logger.info(`Loaded ${this.visualizerState.locations.length} flyzone locations`);
     } catch (error) {
-      console.error('Failed to load flyzone locations:', error);
+      logger.error('Failed to load flyzone locations:', error);
     }
   }
 
@@ -295,9 +296,9 @@ class FlyzoneVisualizerApp extends TerrainBase {
       // Update UI
       this.visualizerUI?.refresh();
 
-      console.log(`Weather analysis complete: ${analysis.recommendations.length} recommendations`);
+      logger.info(`Weather analysis complete: ${analysis.recommendations.length} recommendations`);
     } catch (error) {
-      console.error('Failed to analyze weather conditions:', error);
+      logger.error('Failed to analyze weather conditions:', error);
     }
   }
 
@@ -497,7 +498,7 @@ class FlyzoneVisualizerApp extends TerrainBase {
   }
 
   public override dispose(): void {
-    console.log(`🧹 Disposing ${this.config.name}`);
+    logger.debug(`🧹 Disposing ${this.config.name}`);
 
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
