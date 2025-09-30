@@ -68,13 +68,22 @@ export class FlyingBehavior {
   protected obstacles: THREE.Object3D[] = [];
   protected terrain: THREE.Mesh | null = null;
 
+  // Speed management for collision avoidance
+  protected baseSpeed: number; // Original configured speed
+  protected currentSpeed: number; // Actual speed (reduced when near obstacles)
+  protected speedReductionFactor = 1.0; // Multiplier (1.0 = full speed, 0.3 = 30% speed)
+  protected nearestObstacleDistance = Infinity;
+
   // Internal state
   private time = 0;
   private lastUpdate = 0;
+  private debugLogCounter = 0; // For throttled debug logging
 
   constructor(options: FlyingBehaviorOptions = {}) {
     this.pattern = options.pattern || FlightPattern.FREE_ROAM;
     this.speed = options.speed || 2.0;
+    this.baseSpeed = this.speed; // Store original speed
+    this.currentSpeed = this.speed; // Initialize current speed
     this.turnSpeed = options.turnSpeed || 1.0;
     this.flightRadius = options.flightRadius || 20;
     this.minHeight = options.minHeight || 3;
@@ -179,7 +188,7 @@ export class FlyingBehavior {
     // Get desired direction based on pattern
     const desiredDirection = this.getDesiredDirection();
 
-    // Apply obstacle avoidance
+    // Apply obstacle avoidance and calculate speed reduction
     const avoidanceForce = this.calculateObstacleAvoidance();
     desiredDirection.add(avoidanceForce);
 
@@ -191,9 +200,12 @@ export class FlyingBehavior {
     const terrainForce = this.calculateTerrainAvoidance();
     desiredDirection.add(terrainForce);
 
+    // Calculate speed reduction based on obstacle proximity
+    this.updateSpeedReduction();
+
     // Smooth direction changes
     this.targetDirection.lerp(desiredDirection.normalize(), this.turnSpeed * deltaTime);
-    this.currentVelocity.copy(this.targetDirection).multiplyScalar(this.speed);
+    this.currentVelocity.copy(this.targetDirection).multiplyScalar(this.currentSpeed);
 
     // Apply velocity
     this.mesh.position.add(this.currentVelocity.clone().multiplyScalar(deltaTime));
@@ -208,6 +220,9 @@ export class FlyingBehavior {
 
     // Update debug arrows if enabled
     this.updateDebugArrows();
+
+    // Log debug information periodically
+    this.logDebugInfo();
   }
 
   /**
@@ -252,14 +267,23 @@ export class FlyingBehavior {
   }
 
   /**
-   * Calculate force to avoid obstacles
+   * Calculate force to avoid obstacles and track nearest obstacle distance
    */
   private calculateObstacleAvoidance(): THREE.Vector3 {
     const avoidanceForce = new THREE.Vector3();
     if (!this.mesh) return avoidanceForce;
 
+    let nearestDistance = Infinity;
+    let nearestObstacleName = 'None';
+
     for (const obstacle of this.obstacles) {
       const distance = this.mesh.position.distanceTo(obstacle.position);
+
+      // Track nearest obstacle
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestObstacleName = obstacle.name || 'Unknown';
+      }
 
       if (distance < this.obstacleAvoidanceDistance) {
         // Calculate avoidance force
@@ -269,8 +293,16 @@ export class FlyingBehavior {
         // Stronger force when closer
         const strength = (this.obstacleAvoidanceDistance - distance) / this.obstacleAvoidanceDistance;
         avoidanceForce.add(avoidDirection.multiplyScalar(strength * 2));
+
+        // Log close encounters
+        if (this.debugLogCounter % 30 === 0) { // Log every ~0.5 seconds at 60fps
+          console.log(`⚠️ Close to ${nearestObstacleName}: distance=${distance.toFixed(2)}, strength=${strength.toFixed(2)}`);
+        }
       }
     }
+
+    // Store nearest obstacle distance for speed calculation
+    this.nearestObstacleDistance = nearestDistance;
 
     return avoidanceForce;
   }
@@ -325,6 +357,54 @@ export class FlyingBehavior {
     }
 
     return terrainForce;
+  }
+
+  /**
+   * Update speed based on proximity to obstacles
+   * Reduces speed when approaching obstacles to allow time to maneuver
+   */
+  private updateSpeedReduction(): void {
+    // Calculate speed reduction based on nearest obstacle
+    // Full speed when far away, reduced speed when close
+    const safeDistance = this.obstacleAvoidanceDistance * 2; // Start slowing at 2x avoidance distance
+
+    if (this.nearestObstacleDistance < safeDistance) {
+      // Linear speed reduction from 100% at safeDistance to 30% at contact
+      this.speedReductionFactor = Math.max(
+        0.3, // Minimum 30% speed
+        this.nearestObstacleDistance / safeDistance
+      );
+    } else {
+      // Gradually return to full speed
+      this.speedReductionFactor = Math.min(1.0, this.speedReductionFactor + 0.02);
+    }
+
+    // Apply speed reduction
+    this.currentSpeed = this.baseSpeed * this.speedReductionFactor;
+  }
+
+  /**
+   * Log debug information about flight state
+   */
+  private logDebugInfo(): void {
+    if (!this.mesh) return;
+
+    this.debugLogCounter++;
+
+    // Log every 2 seconds (120 frames at 60fps)
+    if (this.debugLogCounter % 120 === 0) {
+      const distanceFromCenter = this.mesh.position.distanceTo(this.centerPoint);
+
+      console.log('🛩️ Flight Status:', {
+        position: `(${this.mesh.position.x.toFixed(1)}, ${this.mesh.position.y.toFixed(1)}, ${this.mesh.position.z.toFixed(1)})`,
+        speed: `${this.currentSpeed.toFixed(2)} (${(this.speedReductionFactor * 100).toFixed(0)}% of base)`,
+        baseSpeed: this.baseSpeed.toFixed(2),
+        nearestObstacle: this.nearestObstacleDistance === Infinity ? 'None' : this.nearestObstacleDistance.toFixed(2),
+        distanceFromCenter: distanceFromCenter.toFixed(2),
+        velocity: `(${this.currentVelocity.x.toFixed(2)}, ${this.currentVelocity.y.toFixed(2)}, ${this.currentVelocity.z.toFixed(2)})`,
+        pattern: this.pattern
+      });
+    }
   }
 
   /**

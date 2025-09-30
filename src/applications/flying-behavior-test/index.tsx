@@ -95,27 +95,55 @@ class FlyingBehaviorTestApp extends WorkshopDemoBase {
       metalness: 0.1
     });
 
-    const wallGeometry = new THREE.BoxGeometry(3, 30, 3); // Taller and thicker walls
+    const shortWallMaterial = new THREE.MeshStandardMaterial({
+      color: 0xA0522D,
+      roughness: 0.7,
+      metalness: 0.1
+    });
 
-    // Position walls with much more separation for better flight space
+    const tallWallGeometry = new THREE.BoxGeometry(3, 30, 3); // Tall walls
+    const shortWallGeometry = new THREE.BoxGeometry(2, 15, 2); // Shorter walls for variety
+
+    // Position walls scattered throughout the flight area
     const wallPositions = [
-      { x: 40, z: 40 },   // Front right
-      { x: -40, z: 40 },  // Front left
-      { x: 40, z: -40 },  // Back right
-      { x: -40, z: -40 }, // Back left
-      { x: 0, z: 50 },    // North wall
-      { x: 0, z: -50 },   // South wall
-      { x: 50, z: 0 },    // East wall
-      { x: -50, z: 0 }    // West wall
+      // Outer perimeter walls (tall)
+      { x: 40, z: 40, height: 30, geometry: tallWallGeometry, material: wallMaterial },   // Front right
+      { x: -40, z: 40, height: 30, geometry: tallWallGeometry, material: wallMaterial },  // Front left
+      { x: 40, z: -40, height: 30, geometry: tallWallGeometry, material: wallMaterial },  // Back right
+      { x: -40, z: -40, height: 30, geometry: tallWallGeometry, material: wallMaterial }, // Back left
+      { x: 0, z: 50, height: 30, geometry: tallWallGeometry, material: wallMaterial },    // North wall
+      { x: 0, z: -50, height: 30, geometry: tallWallGeometry, material: wallMaterial },   // South wall
+      { x: 50, z: 0, height: 30, geometry: tallWallGeometry, material: wallMaterial },    // East wall
+      { x: -50, z: 0, height: 30, geometry: tallWallGeometry, material: wallMaterial },   // West wall
+
+      // Inner scattered walls (mixed heights)
+      { x: 15, z: 15, height: 15, geometry: shortWallGeometry, material: shortWallMaterial },
+      { x: -15, z: 15, height: 15, geometry: shortWallGeometry, material: shortWallMaterial },
+      { x: 15, z: -15, height: 15, geometry: shortWallGeometry, material: shortWallMaterial },
+      { x: -15, z: -15, height: 15, geometry: shortWallGeometry, material: shortWallMaterial },
+      { x: 25, z: 0, height: 15, geometry: shortWallGeometry, material: shortWallMaterial },
+      { x: -25, z: 0, height: 15, geometry: shortWallGeometry, material: shortWallMaterial },
+      { x: 0, z: 25, height: 15, geometry: shortWallGeometry, material: shortWallMaterial },
+      { x: 0, z: -25, height: 15, geometry: shortWallGeometry, material: shortWallMaterial },
+
+      // Additional scattered obstacles
+      { x: 30, z: 20, height: 15, geometry: shortWallGeometry, material: shortWallMaterial },
+      { x: -30, z: 20, height: 15, geometry: shortWallGeometry, material: shortWallMaterial },
+      { x: 30, z: -20, height: 15, geometry: shortWallGeometry, material: shortWallMaterial },
+      { x: -30, z: -20, height: 15, geometry: shortWallGeometry, material: shortWallMaterial },
+      { x: 20, z: 30, height: 15, geometry: shortWallGeometry, material: shortWallMaterial },
+      { x: -20, z: 30, height: 15, geometry: shortWallGeometry, material: shortWallMaterial },
+      { x: 20, z: -30, height: 15, geometry: shortWallGeometry, material: shortWallMaterial },
+      { x: -20, z: -30, height: 15, geometry: shortWallGeometry, material: shortWallMaterial },
     ];
 
     wallPositions.forEach((pos, index) => {
-      const wall = new THREE.Mesh(wallGeometry, wallMaterial);
-      wall.position.set(pos.x, 15, pos.z); // Half height above ground (30/2 = 15)
+      const wall = new THREE.Mesh(pos.geometry, pos.material);
+      wall.position.set(pos.x, pos.height / 2, pos.z); // Center at half height
       wall.name = `Wall_${index}`;
       scene.add(wall);
       this.walls.push(wall);
-      console.log(`🧱 Wall ${index} placed at (${pos.x}, 15, ${pos.z})`);
+      console.log(`🧱 Wall ${index} placed at (${pos.x}, ${pos.height / 2}, ${pos.z}) - height: ${pos.height}`);
     });
 
     // Get reference to ground for terrain detection
