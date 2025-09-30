@@ -2,6 +2,32 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## [1.4.0] - 2025-09-30 UTC
+
+### Added
+- **EngineFlyingBehavior**: Autonomous flight behavior for powered aircraft
+  - Forward-looking terrain avoidance: Casts rays ahead to detect hills and initiates climbs proactively
+  - Cruise altitude maintenance: Maintains preferred altitude when not avoiding obstacles
+  - Multi-directional scanning: Checks center, left, and right (±17°) for comprehensive terrain awareness
+  - Configurable parameters: cruise altitude, climb rate, terrain clearance, look-ahead distance
+  - Extends FlyingBehavior with engine-specific characteristics
+
+### Enhanced
+- **FlyingBehavior Base Class**: Changed visibility of methods from private to protected
+  - Enables proper inheritance for EngineFlyingBehavior
+  - Methods made protected: updateFlight, getDesiredDirection, calculateObstacleAvoidance, calculateBoundaryForce, calculateTerrainAvoidance, updateSpeedReduction, logDebugInfo, constrainHeight, orientToDirection, updateDebugArrows
+
+- **Famara Application**: Added Cessna aircraft with autonomous flight
+  - Cessna flies autonomously around Famara beach area
+  - Uses EngineFlyingBehavior with island-aware settings (2000 radius, 250 cruise altitude)
+  - Avoids terrain with 100-unit clearance, looks ahead 200 units
+  - Flies at 8.0 speed with smooth 0.6 turn rate
+  - Proper cleanup in dispose method
+
+### Documentation
+- Updated behavior inheritance patterns for flight systems
+- Clarified distinction between wind-dependent (gliders) and engine-powered (planes) flight
+
 ## [1.3.0] - 2025-09-30 UTC
 
 ### Added
