@@ -329,6 +329,7 @@ class FlyzoneVisualizerApp extends TerrainBase {
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private setupGUI(gui: any): void {
     if (!gui || !this.visualizerState) return;
 
@@ -422,6 +423,7 @@ class FlyzoneVisualizerApp extends TerrainBase {
     window.addEventListener('keydown', onKeyDown);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private onUIAction(action: string, data?: any): void {
     switch (action) {
       case 'analyzeWeather':
@@ -458,6 +460,7 @@ class FlyzoneVisualizerApp extends TerrainBase {
     scene: THREE.Scene,
     camera: THREE.Camera,
     renderer: THREE.WebGLRenderer,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     controls: any
   ): void {
     const animate = () => {

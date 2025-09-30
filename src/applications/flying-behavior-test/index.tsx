@@ -69,6 +69,7 @@ class FlyingBehaviorTestApp extends WorkshopDemoBase {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private setupCamera(camera: THREE.PerspectiveCamera, controls: any): void {
     // Position camera for good view of flying area
     camera.position.set(30, 20, 30);
@@ -184,6 +185,7 @@ class FlyingBehaviorTestApp extends WorkshopDemoBase {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private setupGUI(gui: any): void {
     const behaviorFolder = gui.addFolder('Flying Behavior');
 

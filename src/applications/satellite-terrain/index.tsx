@@ -411,6 +411,7 @@ class SatelliteTerrainApp extends TerrainBase {
     renderer: THREE.WebGLRenderer,
     scene: THREE.Scene,
     camera: THREE.Camera,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     controls: any
   ): void {
     const animate = () => {

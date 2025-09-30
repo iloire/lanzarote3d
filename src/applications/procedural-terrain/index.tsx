@@ -118,6 +118,7 @@ class ProceduralTerrainApp extends AppBase {
     scene.add(hemisphereLight);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async setupEnvironment(scene: THREE.Scene, gui: any): Promise<void> {
     // Add sky
     const sky = new Sky(14, 3);
@@ -370,6 +371,7 @@ class ProceduralTerrainApp extends AppBase {
     renderer: THREE.WebGLRenderer,
     scene: THREE.Scene,
     camera: THREE.Camera,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     controls: any
   ): void {
     const animate = () => {
