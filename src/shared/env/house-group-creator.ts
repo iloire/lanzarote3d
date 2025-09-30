@@ -115,7 +115,7 @@ export class HouseGroupCreator {
             lowPoly: this.lowPoly,
             ...(houseConfig.colors || {}),
           });
-          houseMesh = house.load();
+          houseMesh = await house.load();
           break;
 
         case 'Villa':
