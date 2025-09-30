@@ -92,22 +92,6 @@ export function getVisibleApps(
 }
 
 /**
- * @deprecated Use getAppsByVisibility instead
- */
-export function getAppsByStatus(
-  status: 'public' | 'experimental' | 'dev',
-  category?: 'experience' | 'tool' | 'demo'
-): AppMetadata[] {
-  // Map old status values to new visibility values
-  const visibilityMap = {
-    'public': 'public' as const,
-    'experimental': 'private' as const,
-    'dev': 'private' as const
-  };
-  return getAppsByVisibility(visibilityMap[status], category);
-}
-
-/**
  * Get app config by route or key for use in AppBase constructors
  */
 export function getAppConfig(routeOrKey: string): AppMetadata | null {
