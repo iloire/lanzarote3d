@@ -299,7 +299,7 @@ export class TerrainFollowingBehavior extends MovingBehavior {
     currentTarget: THREE.Vector3;
     isStuck: boolean;
     isReversing: boolean;
-    terrainStats: any;
+    terrainStats: { slope?: number; roughness?: number; height?: number } | null;
   } {
     const terrainStats = this.mesh
       ? this.terrainNavigator.getTerrainStats(this.mesh.position)

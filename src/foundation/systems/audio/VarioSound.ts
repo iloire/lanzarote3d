@@ -8,7 +8,7 @@ export interface VarioEventMap {
 }
 
 class Vario extends THREE.EventDispatcher<VarioEventMap> {
-  sound: any;
+  sound: THREE.Audio | null;
   pg: Flier;
   status: string = 'off';
   paused: boolean = false;

@@ -126,6 +126,7 @@ export class ThemeEngine {
   /**
    * Apply terrain theme to Island component
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private static async applyTerrainTheme(terrainInstance: any, theme: Theme): Promise<void> {
     if (terrainInstance && typeof terrainInstance.applyTheme === 'function') {
       console.log('🌍 Applying terrain theme to Island component');
@@ -138,6 +139,7 @@ export class ThemeEngine {
   /**
    * Apply environment theme (clouds, etc.)
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private static async applyEnvironmentTheme(environment: any, theme: Theme): Promise<void> {
     if (environment && typeof environment.updateCloudColors === 'function') {
       console.log('🌥️ Applying environment theme to update cloud colors');
@@ -228,17 +230,20 @@ export class ThemeEngine {
   /**
    * Validate theme structure
    */
-  static validateTheme(theme: any): theme is Theme {
+  static validateTheme(theme: unknown): theme is Theme {
     return (
       typeof theme === 'object' &&
-      typeof theme.id === 'string' &&
-      typeof theme.name === 'string' &&
-      typeof theme.description === 'string' &&
-      typeof theme.sky === 'object' &&
-      typeof theme.clouds === 'object' &&
-      typeof theme.terrain === 'object' &&
-      typeof theme.water === 'object' &&
-      typeof theme.weather === 'object'
+      theme !== null &&
+      'id' in theme &&
+      'name' in theme &&
+      'description' in theme &&
+      'sky' in theme &&
+      'clouds' in theme &&
+      'terrain' in theme &&
+      'water' in theme &&
+      'weather' in theme &&
+      typeof (theme as Theme).id === 'string' &&
+      typeof (theme as Theme).name === 'string'
     );
   }
 }
