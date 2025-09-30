@@ -351,6 +351,16 @@
       "requiresWebGL": true,
       "visibility": "private",
       "priority": 36
+    },
+    "roads": {
+      "name": "Roads",
+      "description": "Procedural road generation showcase on island terrain with customizable settings",
+      "entry": "./applications/roads/index.tsx",
+      "route": "/roads",
+      "category": "demo",
+      "requiresWebGL": true,
+      "visibility": "private",
+      "priority": 37
     }
   },
   "showcase": {

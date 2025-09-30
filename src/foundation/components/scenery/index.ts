@@ -6,6 +6,7 @@ export { default as DatePalm } from './DatePalm';
 export { default as FanPalm } from './FanPalm';
 export { default as Pool } from './Pool';
 export { default as Stone } from './Stone';
+export { default as ProceduralRoad } from './ProceduralRoad';
 
 // Tree Components (organized in trees subfolder)
 export { default as Tree } from './trees/Tree';
