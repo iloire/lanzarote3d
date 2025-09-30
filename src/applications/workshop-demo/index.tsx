@@ -3,6 +3,7 @@ import { Tree, Stone } from '../../foundation/components/scenery';
 import { PineTree, PalmTree, CoconutPalm, DatePalm, FanPalm, Igloo, IglooSize, Pool, SaguaroCactus, BarrelCactus, PricklyPearCactus, OrganPipeCactus } from '../../foundation/components/scenery';
 import { StoryOptions } from '../../shared/types';
 import { WorkshopDemoBase } from '../../shared/WorkshopDemoBase';
+import { GUI } from 'lil-gui';
 
 /**
  * Count the total number of triangles/polygons in a 3D object
@@ -132,7 +133,7 @@ class WorkshopApp extends WorkshopDemoBase {
     }
   }
 
-  private async loadComponents(scene: THREE.Scene, gui: any): Promise<void> {
+  private async loadComponents(scene: THREE.Scene, gui: GUI): Promise<void> {
     // Load igloo
     try {
       const igloo = new Igloo(IglooSize.Medium);

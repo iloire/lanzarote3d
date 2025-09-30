@@ -6,6 +6,7 @@ import { ThemeEngine } from '../../foundation/systems/ThemeEngine';
 import { themeManager } from '../../foundation/systems/ThemeManager';
 import { WorkshopDemoBase } from '../../shared/WorkshopDemoBase';
 import { Theme } from '../../foundation/types/Theme';
+import { GUI } from 'lil-gui';
 
 // Use themes from our comprehensive theme system
 const ALL_THEMES = getAllThemes();
@@ -97,7 +98,7 @@ class CloudsWorkshopApp extends WorkshopDemoBase {
     return mesh;
   }
 
-  private setupThemeGUI(gui: any, scene: THREE.Scene): void {
+  private setupThemeGUI(gui: GUI, scene: THREE.Scene): void {
     const themeFolder = gui.addFolder('🎨 Cloud Themes');
 
     // Quick theme selector

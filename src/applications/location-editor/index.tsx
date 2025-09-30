@@ -16,6 +16,7 @@ import './styles.css'; // Import the CSS
 import { TerrainBase } from '../../shared/TerrainBase';
 import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer';
 import { GUI } from 'lil-gui';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 /**
  * Location Editor App - Interactive location creation and editing tool
@@ -227,7 +228,7 @@ class LocationEditorApp extends TerrainBase {
     }
   }
 
-  private updateCursorStyle(mode: string, renderer?: any): void {
+  private updateCursorStyle(mode: string, renderer?: THREE.WebGLRenderer): void {
     const rendererElement = renderer?.domElement || document.querySelector('canvas');
     if (!rendererElement) return;
 
@@ -270,7 +271,7 @@ class LocationEditorApp extends TerrainBase {
     window.addEventListener('resize', this.resizeHandler);
   }
 
-  private startAnimationLoop(scene: THREE.Scene, camera: any, renderer: any, controls: any): void {
+  private startAnimationLoop(scene: THREE.Scene, camera: THREE.Camera, renderer: THREE.WebGLRenderer, controls: OrbitControls): void {
     const animate = () => {
       try {
         // Update performance monitoring

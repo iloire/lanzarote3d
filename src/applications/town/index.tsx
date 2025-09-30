@@ -7,6 +7,7 @@ import { createLabel } from './label-utils';
 import { TOWN_NEIGHBORHOODS, NeighborhoodConfig } from './neighborhoods-data';
 import { PerformanceUI, PerformanceSettings, PolygonBreakdown } from './performance-ui';
 import { disposeObject3D, disposeObjects } from './disposal-utils';
+import { GUI } from 'lil-gui';
 
 /**
  * Town Workshop - Showcase of neighborhood generation using HouseGroupCreator
@@ -19,7 +20,7 @@ class TownWorkshop extends WorkshopDemoBase {
   private houseGroupCreator!: HouseGroupCreator;
   private componentRegistry!: ComponentRegistry;
   private currentScene!: THREE.Scene;
-  private currentGui: any;
+  private currentGui: GUI | undefined;
   private isLowPoly: boolean = true; // Start in low-poly mode by default
   private performanceUI!: PerformanceUI;
   private performanceSettings: PerformanceSettings = {
@@ -146,7 +147,7 @@ class TownWorkshop extends WorkshopDemoBase {
   /**
    * Setup performance controls and monitoring
    */
-  private setupPerformanceControls(gui: any): void {
+  private setupPerformanceControls(gui: GUI): void {
     console.log('🐛 Setting up performance controls, GUI:', gui);
 
     if (!gui) {
