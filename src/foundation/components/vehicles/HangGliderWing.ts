@@ -539,18 +539,5 @@ export class HangGliderWing extends SimpleThreeComponent {
   }
 }
 
-// Legacy export for backward compatibility with old API
-class HangGliderWingLegacy {
-  private component: HangGliderWing;
-
-  constructor(options: HangGliderWingOptions = {}) {
-    this.component = new HangGliderWing(options);
-  }
-
-  async load(_gui?: unknown): Promise<THREE.Mesh> {
-    const wingObject = await this.component.load();
-    return wingObject as THREE.Mesh; // Cast for compatibility
-  }
-}
-
-export default HangGliderWingLegacy;
+// Export the modern component as default
+export default HangGliderWing;

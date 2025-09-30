@@ -4,6 +4,29 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 
 ## [1.5.0] - 2025-09-30 UTC
 
+### Removed
+- **FlightControls**: Removed unused FlightControls and DEFAULT_FLIGHT_KEYBINDINGS exports
+  - FlightControls was exported but never used in the codebase
+  - Cleaned up src/foundation/systems/controls/index.ts
+  - Deleted src/foundation/systems/controls/FlightControls.ts
+
+### Refactored
+- **Hangglider Component**: Simplified architecture by removing AutoFlier inheritance
+  - No longer extends AutoFlier (removes tight coupling to path-following)
+  - Now a simple component that returns THREE.Group
+  - Use FlyingBehavior composition for autonomous flight when needed
+  - Updated applications:
+    - famara-animation: Uses scale option in constructor
+    - flying-behavior-test: Removed emptyPath parameter
+    - hangglider app: Added addGuiControls() call
+    - environment.ts: Removed updateWrapSpeed() calls (no longer path-following)
+  - More flexible: Can be used as static model or with behavior composition
+
+- **HangGliderWing Component**: Removed legacy export wrapper
+  - Simplified export to use modern SimpleThreeComponent directly
+  - Removed HangGliderWingLegacy wrapper class
+  - All applications now use the modern API
+
 ### Added
 - **CameraTargetController**: Modern camera system with multi-target support
   - Generic THREE.Object3D targeting (no Flier dependency)

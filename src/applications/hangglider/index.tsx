@@ -30,7 +30,12 @@ class HangGliderWorkshopApp extends WorkshopDemoBase {
       const { camera, scene, renderer, gui, controls } = options;
 
       const hg = new HangGlider();
-      const mesh = await hg.load([], gui);
+      const mesh = await hg.load();
+
+      // Add GUI controls if needed
+      if (gui) {
+        hg.addGuiControls(gui);
+      }
 
       mesh.position.set(0, 0, 0);
       scene.add(mesh);

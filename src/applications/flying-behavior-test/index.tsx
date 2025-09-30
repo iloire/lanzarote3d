@@ -161,10 +161,9 @@ class FlyingBehaviorTestApp extends WorkshopDemoBase {
     console.log('🪂 Creating hangglider with flying behavior...');
 
     try {
-      // Create hangglider (it extends AutoFlier but we'll override with FlyingBehavior)
+      // Create hangglider - now uses FlyingBehavior composition instead of AutoFlier
       this.hangglider = new HangGliderModel();
-      const emptyPath: THREE.Vector3[] = []; // We won't use the path system
-      const hanggliderMesh = await this.hangglider.load(emptyPath);
+      const hanggliderMesh = await this.hangglider.load();
 
       if (hanggliderMesh) {
         // Position hangglider in center of flight area

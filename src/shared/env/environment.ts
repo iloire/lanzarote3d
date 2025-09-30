@@ -75,7 +75,8 @@ class Environment {
 
   updateWrapSpeed(wrapSpeed: number) {
     this.birds && this.birds.updateWrapSpeed(wrapSpeed);
-    this.hg && this.hg.updateWrapSpeed(wrapSpeed);
+    // Note: Hangglider no longer extends AutoFlier, so updateWrapSpeed removed
+    // Use FlyingBehavior composition for autonomous flight instead
   }
 
   async addBirds(path: THREE.Vector3[], gui?: { addFolder: (name: string) => any }) {
@@ -95,8 +96,16 @@ class Environment {
 
   async addHangGlider(path: THREE.Vector3[], gui?: { addFolder: (name: string) => any }) {
     this.hg = new HangGlider();
-    const hgMesh = await this.hg.load(path, gui);
+    const hgMesh = await this.hg.load();
     this.scene.add(hgMesh);
+
+    // Add GUI controls if provided
+    if (gui) {
+      this.hg.addGuiControls(gui);
+    }
+
+    // Note: Path following removed with AutoFlier inheritance
+    // Use FlyingBehavior composition for autonomous flight instead
   }
 
   async addBoats(

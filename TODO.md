@@ -2,7 +2,8 @@ Implement the following tasks if any is added following the instructions describ
 ---
 TASKS:
 - remove  { FlightControls, DEFAULT_FLIGHT_KEYBINDINGS } from './FlightControls'; if not used, remove unused files
-
+- Make HangGlider don't extend from AutoFlier, as we will add the flyingBehaviour to it when needed.
+- chrome source still looks like this <title>&lt;%= htmlWebpackPlugin.options.title %&gt;</title>
 ---
 
 ### Instructions

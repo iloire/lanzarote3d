@@ -212,13 +212,11 @@ class AnimationApp extends TerrainBase {
 
   private async loadHangglider(scene: THREE.Scene): Promise<void> {
     try {
-      const hangglider = new HangGlider();
-      const mesh = await hangglider.load(hanggliderConfig.path);
+      const hangglider = new HangGlider({ scale: hanggliderConfig.scale });
+      const mesh = await hangglider.load();
 
-      // Position and scale the hangglider
+      // Position the hangglider
       mesh.position.copy(hanggliderConfig.position);
-      const scale = hanggliderConfig.scale;
-      mesh.scale.set(scale, scale, scale);
 
       scene.add(mesh);
       this.hanggliderMesh = mesh;
