@@ -26,6 +26,8 @@ import {
   generateMixedNeighborhood,
 } from './house-group-utils';
 
+type HouseComponent = InstanceType<typeof House> | InstanceType<typeof Villa> | InstanceType<typeof Townhouse> | InstanceType<typeof Barn> | InstanceType<typeof DesertHouse> | InstanceType<typeof DesertHouseWithPool>;
+
 /**
  * House Group Creator - handles the creation and management of neighborhoods
  */
@@ -99,7 +101,7 @@ export class HouseGroupCreator {
     houseConfig: HouseConfig,
     position: THREE.Vector3
   ): Promise<THREE.Object3D | null> {
-    let house: any;
+    let house: HouseComponent;
     let houseMesh: THREE.Object3D;
     let scale = houseConfig.scale || 1;
 

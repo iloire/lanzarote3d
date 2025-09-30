@@ -52,7 +52,7 @@ const Models = {
     mesh.castShadow = true;
     return mesh;
   },
-  load: async (model: any, scale: number, pos?: THREE.Vector3): Promise<THREE.Object3D> => {
+  load: async (model: string, scale: number, pos?: THREE.Vector3): Promise<THREE.Object3D> => {
     console.warn('deprecated, use loadsimple instead');
     const gltf = await modelLoader(model, false);
     const mesh: THREE.Object3D = gltf.scene.children[0]!;

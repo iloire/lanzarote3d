@@ -17,6 +17,8 @@ import {
   generateMixedRecreationalBoats,
 } from './boat-group-utils';
 
+type BoatComponent = InstanceType<typeof SmallSailBoat> | InstanceType<typeof FishingBoat> | InstanceType<typeof Yacht> | InstanceType<typeof SpeedBoat> | InstanceType<typeof PatrolBoat>;
+
 /**
  * Boat Group Creator - handles the creation and management of boat groups
  */
@@ -37,7 +39,7 @@ export class BoatGroupCreator {
     position: THREE.Vector3,
     water: THREE.Mesh
   ): Promise<THREE.Object3D | null> {
-    let boat: any;
+    let boat: BoatComponent;
     let boatMesh: THREE.Object3D;
     let scale = boatConfig.scale || 2.5;
 
