@@ -11,7 +11,7 @@ type ActionCallback = (action: string, data?: unknown) => void;
  * Selected item type for editor
  */
 type SelectedItem = (TakeoffLocation | LandingZone | FlyzoneLocation | THREE.Object3D) & {
-  data?: any;
+  data?: TakeoffLocation | LandingZone | FlightPhase | Record<string, unknown>;
   type?: string;
   isDirty?: boolean;
 } | null;
@@ -306,7 +306,7 @@ export class FlyzoneEditorUI {
           <div class="field-group">
             <label>Hazards (comma-separated):</label>
             <input type="text" id="selected-hazards"
-                   value="${data.safety?.hazards?.join(', ') || ''}"
+                   value="${takeoffData.safety?.hazards?.join(', ') || ''}"
                    placeholder="power lines, rocks, etc." />
           </div>
         `;
@@ -448,7 +448,7 @@ export class FlyzoneEditorUI {
     // Mode buttons
     this.container.querySelectorAll('.mode-btn').forEach(btn => {
       btn.addEventListener('click', e => {
-        const mode = (e.currentTarget as HTMLElement).dataset.mode as any;
+        const mode = (e.currentTarget as HTMLElement).dataset.mode as 'select' | 'takeoff' | 'landing' | 'flyzone';
         this.onAction('modeChange', { type: mode });
         this.refresh();
       });
@@ -717,18 +717,36 @@ export class FlyzoneEditorUI {
         const hazardsInput = this.container.querySelector('#selected-hazards') as HTMLInputElement;
 
         if (difficultySelect) {
-          if (!takeoffData.safety) takeoffData.safety = {} as any;
-          takeoffData.safety.difficulty = difficultySelect.value as any;
+          if (!takeoffData.safety) {
+            takeoffData.safety = {
+              difficulty: 'beginner',
+              hazards: [],
+              emergency: { contacts: [], procedures: [] }
+            };
+          }
+          takeoffData.safety.difficulty = difficultySelect.value as 'beginner' | 'intermediate' | 'advanced' | 'expert';
         }
 
         if (walkingTimeInput) {
-          if (!takeoffData.access) takeoffData.access = {} as any;
+          if (!takeoffData.access) {
+            takeoffData.access = {
+              difficulty: 'easy',
+              description: '',
+              walkingTime: 10
+            };
+          }
           takeoffData.access.walkingTime = parseInt(walkingTimeInput.value) || 10;
         }
 
         if (hazardsInput) {
-          if (!takeoffData.safety) takeoffData.safety = {} as any;
-          (takeoffData.safety as any).hazards = hazardsInput.value
+          if (!takeoffData.safety) {
+            takeoffData.safety = {
+              difficulty: 'beginner',
+              hazards: [],
+              emergency: { contacts: [], procedures: [] }
+            };
+          }
+          takeoffData.safety.hazards = hazardsInput.value
             .split(',')
             .map(h => h.trim())
             .filter(h => h.length > 0);
@@ -747,11 +765,13 @@ export class FlyzoneEditorUI {
         const widthInput = this.container.querySelector('#selected-width') as HTMLInputElement;
         const lengthInput = this.container.querySelector('#selected-length') as HTMLInputElement;
 
-        if (typeSelect) landingData.type = typeSelect.value as any;
-        if (surfaceSelect) landingData.surface = surfaceSelect.value as any;
+        if (typeSelect) landingData.type = typeSelect.value as 'primary' | 'secondary' | 'emergency';
+        if (surfaceSelect) landingData.surface = surfaceSelect.value as 'grass' | 'sand' | 'gravel' | 'paved' | 'mixed';
 
         if (widthInput && lengthInput) {
-          if (!landingData.size) landingData.size = {} as any;
+          if (!landingData.size) {
+            landingData.size = { width: 100, length: 150 };
+          }
           landingData.size.width = parseInt(widthInput.value) || 100;
           landingData.size.length = parseInt(lengthInput.value) || 150;
         }
@@ -766,10 +786,12 @@ export class FlyzoneEditorUI {
         const altMinInput = this.container.querySelector('#selected-alt-min') as HTMLInputElement;
         const altMaxInput = this.container.querySelector('#selected-alt-max') as HTMLInputElement;
 
-        if (phaseTypeSelect) phaseData.type = phaseTypeSelect.value as any;
+        if (phaseTypeSelect) phaseData.type = phaseTypeSelect.value as 'takeoff' | 'ridge' | 'thermal' | 'approach' | 'landing';
 
         if (altMinInput && altMaxInput) {
-          if (!phaseData.altitudeRange) phaseData.altitudeRange = {} as any;
+          if (!phaseData.altitudeRange) {
+            phaseData.altitudeRange = { min: 0, max: 500 };
+          }
           phaseData.altitudeRange.min = parseInt(altMinInput.value) || 0;
           phaseData.altitudeRange.max = parseInt(altMaxInput.value) || 500;
         }

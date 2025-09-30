@@ -798,7 +798,7 @@ export const saveToLocalStorage = (state: EditorState): void => {
             z: t.position.z,
           },
           // Remove the marker reference as it can't be serialized
-          marker: null as any,
+          marker: null as unknown as THREE.Object3D,
         })),
         landingSpots: location.landingSpots.map(l => ({
           ...l,
@@ -808,7 +808,7 @@ export const saveToLocalStorage = (state: EditorState): void => {
             z: l.position.z,
           },
           // Remove the marker reference as it can't be serialized
-          marker: null as any,
+          marker: null as unknown as THREE.Object3D,
         })),
         flyzone: {
           phases: Object.keys(location.flyzone.phases).reduce(
@@ -817,19 +817,15 @@ export const saveToLocalStorage = (state: EditorState): void => {
               if (!phase) return acc;
               acc[key] = {
                 ...phase,
-                position: {
-                  x: phase.position.x,
-                  y: phase.position.y,
-                  z: phase.position.z,
-                },
+                position: new THREE.Vector3(phase.position.x, phase.position.y, phase.position.z),
                 // Remove the object reference as it can't be serialized
-                object: null as any,
+                object: null as unknown as THREE.Object3D,
               };
               return acc;
             },
-            {} as Record<string, any>
+            {} as Record<string, EditorFlightPhase>
           ),
-          object: null as any,
+          object: null as THREE.Object3D | null,
         },
       })),
       currentLocationIndex: state.currentLocationIndex,

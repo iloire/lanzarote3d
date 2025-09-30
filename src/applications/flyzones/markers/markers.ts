@@ -5,8 +5,8 @@ import { MarkerType } from '../helpers/types';
 // Define the MarkerObject class that properly extends THREE.Object3D
 export class MarkerObject extends THREE.Object3D {
   override type: MarkerType = 'marker' as MarkerType;
-  hoverAnimation: (() => void) | any;
-  unhoverAnimation: (() => void) | any;
+  hoverAnimation: (() => void) | null;
+  unhoverAnimation: (() => void) | null;
   showPopup: () => void;
   setVisibility: (visible: boolean) => void;
   flyzone?: THREE.Object3D;
