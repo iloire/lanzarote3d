@@ -2,6 +2,7 @@ import { Theme } from '../types/Theme';
 import { getAllThemes, getThemeById, getDefaultTheme } from '../themes';
 import { ThemeEngine } from './ThemeEngine';
 import { StoryOptions } from '../../shared/types';
+import { logger } from '../utils/logger';
 
 /**
  * Global Theme Manager for dynamic theme switching across the application
@@ -39,18 +40,18 @@ class ThemeManager {
       const savedTheme = getThemeById(savedThemeId);
       if (savedTheme) {
         this.currentTheme = savedTheme;
-        console.log(`ThemeManager initialized with saved theme: ${savedTheme.name}`);
+        logger.debug(`ThemeManager initialized with saved theme: ${savedTheme.name}`);
       } else {
         this.currentTheme = getDefaultTheme();
-        console.log(
+        logger.debug(
           `ThemeManager initialized with default theme (saved theme not found): ${this.currentTheme.name}`
         );
       }
     } else if (!this.currentTheme) {
       this.currentTheme = getDefaultTheme();
-      console.log(`ThemeManager initialized with default theme: ${this.currentTheme.name}`);
+      logger.debug(`ThemeManager initialized with default theme: ${this.currentTheme.name}`);
     } else {
-      console.log('ThemeManager initialized');
+      logger.debug('ThemeManager initialized');
     }
   }
 
@@ -61,7 +62,7 @@ class ThemeManager {
     this.isEnabled = false;
     this.storyOptions = null;
     this.currentTheme = null;
-    console.log('ThemeManager disabled');
+    logger.debug('ThemeManager disabled');
   }
 
   /**
@@ -90,18 +91,18 @@ class ThemeManager {
    */
   async applyTheme(themeId: string): Promise<boolean> {
     if (!this.isReady()) {
-      console.warn('ThemeManager not ready - story may not be loaded yet');
+      logger.warn('ThemeManager not ready - story may not be loaded yet');
       return false;
     }
 
     const theme = getThemeById(themeId);
     if (!theme) {
-      console.error(`Theme with ID "${themeId}" not found`);
+      logger.error(`Theme with ID "${themeId}" not found`);
       return false;
     }
 
     try {
-      console.log(`Applying theme: ${theme.name}`);
+      logger.info(`Applying theme: ${theme.name}`);
 
       // Apply theme to the current story options
       await ThemeEngine.apply(this.storyOptions!, theme);
@@ -115,10 +116,10 @@ class ThemeManager {
       // Notify listeners
       this.notifyListeners(theme);
 
-      console.log(`Theme "${theme.name}" applied successfully`);
+      logger.info(`Theme "${theme.name}" applied successfully`);
       return true;
     } catch (error) {
-      console.error(`Failed to apply theme "${theme.name}":`, error);
+      logger.error(`Failed to apply theme "${theme.name}":`, error);
       return false;
     }
   }

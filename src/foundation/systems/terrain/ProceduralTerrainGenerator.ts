@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { MeshBVH, acceleratedRaycast } from 'three-mesh-bvh';
 import { FractalNoise, type NoiseType } from './noise/FractalNoise';
+import { logger } from '../../utils/logger';
 
 // Enable BVH acceleration for raycasting
 THREE.Mesh.prototype.raycast = acceleratedRaycast;
@@ -145,7 +146,7 @@ export class ProceduralTerrainGenerator {
     // Calculate metadata
     this.calculateMetadata(geometry);
 
-    console.log('✅ Procedural terrain generated:', this.metadata);
+    logger.debug('Procedural terrain generated:', this.metadata);
 
     return this.mesh;
   }

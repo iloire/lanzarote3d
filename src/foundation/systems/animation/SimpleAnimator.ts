@@ -5,6 +5,8 @@
  * Each animation is independent and can be started/stopped individually.
  */
 
+import { logger } from '../../utils/logger';
+
 export type AnimationFunction = (progress: number, deltaTime: number) => void;
 export type AnimationCompleteCallback = () => void;
 
@@ -158,7 +160,7 @@ export class SimpleAnimator {
           }
         }
       } catch (error) {
-        console.error(`Error in animation '${id}':`, error);
+        logger.error(`Error in animation '${id}':`, error);
         completedAnimations.push(id); // Remove broken animations
       }
     }

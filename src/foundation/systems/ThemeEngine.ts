@@ -3,6 +3,7 @@ import { Theme, ThemeApplicationOptions } from '../types/Theme';
 import { StoryOptions } from '../../shared/types';
 import Environment from '../../shared/env/environment';
 import { Weather } from '../components/physics';
+import { logger } from '../utils/logger';
 
 export class ThemeEngine {
   private static currentTheme: Theme | null = null;
@@ -17,7 +18,7 @@ export class ThemeEngine {
   ): Promise<void> {
     const { skipComponents = [] } = applicationOptions;
 
-    console.log(`Applying theme: ${theme.name}`);
+    logger.info(`Applying theme: ${theme.name}`);
 
     // Store current theme reference
     this.currentTheme = theme;
@@ -48,9 +49,9 @@ export class ThemeEngine {
         await this.applyAmbientTheme(options, theme);
       }
 
-      console.log(`Theme '${theme.name}' applied successfully`);
+      logger.info(`Theme '${theme.name}' applied successfully`);
     } catch (error) {
-      console.error(`Failed to apply theme '${theme.name}':`, error);
+      logger.error(`Failed to apply theme '${theme.name}':`, error);
       throw error;
     }
   }
@@ -63,7 +64,7 @@ export class ThemeEngine {
     theme: Theme,
     _options?: { terrain?: THREE.Mesh }
   ): Promise<void> {
-    console.log(`Applying theme to environment: ${theme.name}`);
+    logger.debug(`Applying theme to environment: ${theme.name}`);
 
     try {
       // Update cloud colors for existing clouds
@@ -75,9 +76,9 @@ export class ThemeEngine {
       // Note: Terrain is typically handled during creation
       // but we can add methods to update it post-creation if needed
 
-      console.log(`Theme '${theme.name}' applied to environment successfully`);
+      logger.debug(`Theme '${theme.name}' applied to environment successfully`);
     } catch (error) {
-      console.error(`Failed to apply theme to environment '${theme.name}':`, error);
+      logger.error(`Failed to apply theme to environment '${theme.name}':`, error);
       throw error;
     }
   }
@@ -129,10 +130,10 @@ export class ThemeEngine {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private static async applyTerrainTheme(terrainInstance: any, theme: Theme): Promise<void> {
     if (terrainInstance && typeof terrainInstance.applyTheme === 'function') {
-      console.log('🌍 Applying terrain theme to Island component');
+      logger.debug('Applying terrain theme to Island component');
       terrainInstance.applyTheme(theme.terrain);
     } else {
-      console.warn('🌍 Terrain instance not available or does not support theming');
+      logger.warn('Terrain instance not available or does not support theming');
     }
   }
 
@@ -142,10 +143,10 @@ export class ThemeEngine {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private static async applyEnvironmentTheme(environment: any, theme: Theme): Promise<void> {
     if (environment && typeof environment.updateCloudColors === 'function') {
-      console.log('🌥️ Applying environment theme to update cloud colors');
+      logger.debug('Applying environment theme to update cloud colors');
       environment.updateCloudColors(theme);
     } else {
-      console.warn('🌥️ Environment instance not available or does not support cloud color theming');
+      logger.warn('Environment instance not available or does not support cloud color theming');
     }
   }
 

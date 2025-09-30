@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { logger } from '../../utils/logger';
 
 export interface SoundConfig {
   volume?: number;
@@ -82,7 +83,7 @@ export class SoundManager {
         },
         undefined,
         error => {
-          console.error(`Failed to load sound ${id}:`, error);
+          logger.error(`Failed to load sound ${id}:`, error);
           reject(error);
         }
       );
