@@ -44,9 +44,9 @@ export function disposeObject3D(obj: THREE.Object3D): void {
 export function disposeMaterial(material: THREE.Material): void {
   // Dispose of textures and other disposable properties
   Object.values(material).forEach(value => {
-    if (value && typeof value === 'object' && 'dispose' in value && typeof (value as any).dispose === 'function') {
+    if (value && typeof value === 'object' && 'dispose' in value && typeof (value as { dispose: () => void }).dispose === 'function') {
       try {
-        (value as any).dispose();
+        (value as { dispose: () => void }).dispose();
       } catch (error) {
         console.warn('Error disposing material property:', error);
       }

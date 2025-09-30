@@ -89,6 +89,7 @@ export interface EditorFlightPhase {
 export interface EditorAction {
   type: 'add_takeoff' | 'add_landing' | 'add_flyzone' | 'create_location';
   object: THREE.Object3D;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data?: any; // Additional data if needed
 }
 
@@ -862,6 +863,7 @@ export const loadFromLocalStorage = (scene: THREE.Scene): EditorState | null => 
 
     if (parsed.locations && Array.isArray(parsed.locations)) {
       // Recreate each location
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       parsed.locations.forEach((savedLocation: any) => {
         const position = new THREE.Vector3(
           savedLocation.position.x,
@@ -888,6 +890,7 @@ export const loadFromLocalStorage = (scene: THREE.Scene): EditorState | null => 
           // Clear the takeoffs array that was created by createNewLocation
           location.takeoffs = [];
 
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           savedLocation.takeoffs.forEach((t: any) => {
             const position = new THREE.Vector3(t.position.x, t.position.y, t.position.z);
             addTakeoff(state, position, scene);
@@ -899,6 +902,7 @@ export const loadFromLocalStorage = (scene: THREE.Scene): EditorState | null => 
           // Clear the landing spots array that was created by createNewLocation
           location.landingSpots = [];
 
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           savedLocation.landingSpots.forEach((l: any) => {
             const position = new THREE.Vector3(l.position.x, l.position.y, l.position.z);
             addLandingSpot(state, position, scene);

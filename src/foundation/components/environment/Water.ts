@@ -41,7 +41,7 @@ export default class Water {
   /**
    * Apply water theme settings to the water mesh
    */
-  applyTheme(waterTheme: any) {
+  applyTheme(waterTheme: { color?: string; opacity?: number; roughness?: number; animated?: boolean }) {
     if (!this.waterMesh || !this.waterMesh.material) return;
 
     const material = this.waterMesh.material as THREE.MeshLambertMaterial;
