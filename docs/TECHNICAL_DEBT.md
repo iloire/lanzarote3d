@@ -76,6 +76,33 @@ This document tracks pending technical debt and issues that need to be addressed
 - `src/apps/experiences/flyzones/navigation/camera.ts` - Debug output
 **Solution**: Replace with proper logging utility or remove
 
+### Synchronous vs Async Component Loading Pattern Inconsistency
+**Status**: ⚠️ Needs architectural decision
+**Files**: Building components, houses application
+**Issue**: Inconsistent loading patterns between legacy synchronous and modern async component loading
+**Impact**: Code complexity, maintenance burden, TypeScript type gymnastics required
+**Details**:
+- **Building components** (House, Villa, Barn, etc.) use legacy synchronous `load()` via prototype override
+  - Required for backward compatibility with houses application
+  - Uses `loadSync()` internally which blocks UI thread during geometry creation
+- **Most other components** (boats, trees, cacti) use async `load()` pattern
+  - Better for performance and non-blocking UI
+  - Allows for future async resource loading
+- **Mixed usage** creates confusion:
+  - DesertHouseWithPool internally uses `loadSync()` for Pool and DesertHouse
+  - houses app casts components as `any` to use legacy synchronous load
+  - workshop-demo uses `await` for async loads
+**Recommended Solutions**:
+- **Option 1**: Refactor houses application to use async/await pattern (preferred)
+  - Would allow removal of all legacy synchronous patterns
+  - Cleaner code, better TypeScript types, no casting needed
+- **Option 2**: Make all components support both patterns (current state)
+  - Higher maintenance burden
+  - Requires type casting and documentation
+- **Option 3**: Use dedicated sync wrapper for houses app only
+  - Isolates the legacy pattern to one place
+  - Still requires maintenance of two patterns
+
 ## Medium Priority Issues
 
 ### Testing Infrastructure Gap
