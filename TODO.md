@@ -1,7 +1,6 @@
 Implement the following tasks if any is added following the instructions described below:
 ---
 TASKS:
-- chrome source still looks like this <title>&lt;%= htmlWebpackPlugin.options.title %&gt;</title>
 ---
 
 ### Instructions
