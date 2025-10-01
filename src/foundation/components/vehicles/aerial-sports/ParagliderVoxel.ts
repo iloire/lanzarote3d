@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { SimpleThreeComponent, SimpleComponentOptions } from '../../base/SimpleThreeComponent';
 import { ComponentMetadata } from '../../base/IThreeComponent';
-import LegacyPilotVoxel, { PilotVoxelOptions } from '../../characters/LegacyPilotVoxel';
+import { PilotVoxel, PilotVoxelOptions } from '../../characters/PilotVoxel';
 import Glider, { GliderOptions } from '../components/Glider';
 
 export interface ParagliderVoxelOptions extends SimpleComponentOptions {
@@ -13,14 +13,14 @@ export interface ParagliderVoxelOptions extends SimpleComponentOptions {
  * ParagliderVoxel - voxel-style paraglider with simplified pilot
  *
  * This component uses Pattern B (SimpleThreeComponent + createObject override)
- * for async composition of multiple sub-components (Glider + LegacyPilotVoxel).
+ * for async composition of multiple sub-components (Glider + PilotVoxel).
  * Uses voxel-based (blocky/Minecraft-style) graphics for the pilot character.
  *
  * See docs/COMPONENT_COMPOSITION.md for architecture details.
  */
 export class ParagliderVoxel extends SimpleThreeComponent {
   private glider?: Glider;
-  private pilot?: LegacyPilotVoxel;
+  private pilot?: PilotVoxel;
   private pilotMesh?: THREE.Object3D;
 
   constructor(options: ParagliderVoxelOptions) {
@@ -58,7 +58,7 @@ export class ParagliderVoxel extends SimpleThreeComponent {
     group.add(wing);
 
     // Create voxel pilot
-    this.pilot = new LegacyPilotVoxel(options.pilot);
+    this.pilot = new PilotVoxel(options.pilot);
     this.pilotMesh = await this.pilot.load();
     this.pilotMesh.position.x = 350;
     this.pilotMesh.position.y = -600;
@@ -117,7 +117,7 @@ export class ParagliderVoxel extends SimpleThreeComponent {
   public override dispose(): void {
     // Dispose sub-components first
     if (this.pilot) {
-      // LegacyPilotVoxel doesn't have dispose, just clear reference
+      // PilotVoxel doesn't have dispose, just clear reference
       this.pilot = undefined;
     }
     if (this.glider) {
