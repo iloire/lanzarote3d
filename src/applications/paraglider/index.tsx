@@ -3,6 +3,7 @@ import { Paraglider } from '../../foundation/components/vehicles';
 import { PilotHeadType } from '../../foundation/components/characters/PilotHead';
 import { StoryOptions } from '../../shared/types';
 import { WorkshopDemoBase } from '../../shared/WorkshopDemoBase';
+import GuiHelper from '../../foundation/utils/gui';
 
 /**
  * Paraglider Workshop Demo - Showcases paraglider wing variations
@@ -62,8 +63,12 @@ class ParagliderWorkshopApp extends WorkshopDemoBase {
 
       const paraglider = new Paraglider(paragliderOptions);
       const mesh = await paraglider.load();
-      paraglider.addGuiControls(gui);
       scene.add(mesh);
+
+      // Add GUI controls (modern pattern)
+      if (gui) {
+        GuiHelper.addLocationGui(gui, 'Paraglider', mesh);
+      }
 
       // Set camera position for paraglider showcase
       const lookAt = mesh.position.clone().add(new THREE.Vector3(0, 0, 0));

@@ -1,91 +1,79 @@
 import * as THREE from 'three';
+import { SimpleThreeComponent, SimpleComponentOptions } from '../../base/SimpleThreeComponent';
+import { ComponentMetadata } from '../../base/IThreeComponent';
 import { Pilot, type PilotOptions } from '../../characters/Pilot';
 import Glider, { GliderOptions } from '../components/Glider';
-import GuiHelper from '../../../utils/gui';
-import { IVehicleWithGUI } from '../../../types/IVehicle';
 
-export interface ParagliderOptions {
+export interface ParagliderOptions extends SimpleComponentOptions {
   glider: GliderOptions;
   pilot: PilotOptions;
-  castShadow?: boolean;
-  receiveShadow?: boolean;
 }
 
 /**
  * Paraglider - combines a glider wing with a pilot
  *
- * This component composes both the glider wing and pilot character into a single assembly.
- * Implements IVehicleWith GUI for consistent vehicle interface across the application.
+ * This component uses Pattern B (SimpleThreeComponent + createObject override)
+ * for async composition of multiple sub-components (Glider + Pilot).
  *
- * Note: This class doesn't extend a base component class because it's a composite
- * that assembles two different component types (Glider and Pilot) with
- * different APIs. Instead, it implements the IVehicle interface for consistency.
+ * See docs/COMPONENT_COMPOSITION.md for architecture details.
  */
-export class Paraglider implements IVehicleWithGUI {
-  private mesh?: THREE.Object3D;
-  private glider!: Glider;
-  private pilot!: Pilot;
-  private pilotMesh!: THREE.Object3D;
-  private options: ParagliderOptions;
+export class Paraglider extends SimpleThreeComponent {
+  private glider?: Glider;
+  private pilot?: Pilot;
+  private pilotMesh?: THREE.Object3D;
 
   constructor(options: ParagliderOptions) {
-    this.options = options;
+    const metadata: ComponentMetadata = {
+      name: 'Paraglider',
+      version: '2.0.0',
+      description: 'Paraglider with pilot and RAM-air parachute wing',
+      tags: ['vehicle', 'aircraft', 'paraglider', 'aerial-sports', 'composite'],
+    };
+
+    super(metadata, options);
+  }
+
+  protected createGeometry(): THREE.BufferGeometry {
+    // Placeholder - not used since we override createObject for async composition
+    return new THREE.BoxGeometry(1, 1, 1);
   }
 
   /**
-   * Load and assemble the paraglider
+   * Override createObject to compose async sub-components.
+   * This is Pattern B from COMPONENT_COMPOSITION.md - the standard pattern
+   * for vehicles that combine multiple loadable components.
    */
-  async load(): Promise<THREE.Object3D> {
-    this.mesh = new THREE.Object3D();
-    this.mesh.name = 'Paraglider';
+  protected override async createObject(): Promise<THREE.Object3D> {
+    const group = new THREE.Object3D();
+    group.name = 'Paraglider';
 
-    // Create glider wing
-    this.glider = new Glider(this.options.glider);
+    const options = this.options as ParagliderOptions;
+
+    // Create and load glider wing
+    this.glider = new Glider(options.glider);
     const wing = await this.glider.load();
     wing.translateY(-300);
     wing.translateX(300);
-    this.mesh.add(wing);
+    group.add(wing);
 
-    // Create pilot
+    // Create and load pilot
     this.pilot = new Pilot({
       castShadow: this.options.castShadow,
       receiveShadow: this.options.receiveShadow,
-      ...this.options.pilot,
+      ...options.pilot,
     });
     this.pilotMesh = await this.pilot.load();
     this.pilotMesh.position.x = 17;
     this.pilotMesh.position.z = -0.4;
     this.pilotMesh.rotateY(Math.PI / 2);
-    this.mesh.add(this.pilotMesh);
+    group.add(this.pilotMesh);
 
-    return this.mesh;
+    return group;
   }
 
   /**
-   * Get the mesh
-   */
-  public getMesh(): THREE.Object3D {
-    if (!this.mesh) {
-      throw Error('mesh not loaded - use load()');
-    }
-    return this.mesh;
-  }
-
-  /**
-   * Add GUI controls for this paraglider
-   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public addGuiControls(gui: any): void {
-    if (!this.mesh) return;
-
-    if (this.pilotMesh) {
-      GuiHelper.addLocationGui(gui, 'Pilot model', this.pilotMesh);
-    }
-    GuiHelper.addLocationGui(gui, 'Paraglider model', this.mesh);
-  }
-
-  /**
-   * Control methods - delegate to glider
+   * Control methods - delegate to glider for brake inputs.
+   * These methods are called by ParagliderInputController.
    */
   public left(): void {
     if (this.glider) {
@@ -111,18 +99,51 @@ export class Paraglider implements IVehicleWithGUI {
     }
   }
 
-  /**
-   * Clean up resources
-   */
-  public dispose(): void {
+  public override validate(): string[] {
+    const issues: string[] = [];
+    const options = this.options as ParagliderOptions;
+
+    if (!options.glider) {
+      issues.push('Glider configuration is required');
+    }
+
+    if (!options.pilot) {
+      issues.push('Pilot configuration is required');
+    }
+
+    return issues;
+  }
+
+  public override dispose(): void {
+    // Dispose sub-components first
     if (this.pilot) {
       this.pilot.dispose();
     }
+    if (this.glider) {
+      // Glider doesn't have dispose, just clear reference
+      this.glider = undefined;
+    }
+
     // Clear references
-    this.mesh = undefined;
-    this.glider = undefined as any;
-    this.pilot = undefined as any;
-    this.pilotMesh = undefined as any;
+    this.pilot = undefined;
+    this.pilotMesh = undefined;
+
+    // Call parent dispose
+    super.dispose();
+  }
+
+  public getInfo(): Record<string, unknown> {
+    const options = this.options as ParagliderOptions;
+
+    return {
+      name: 'Paraglider',
+      version: '2.0.0',
+      type: 'vehicle',
+      subtype: 'aircraft',
+      category: 'aerial_sports',
+      gliderConfig: options.glider,
+      pilotConfig: options.pilot,
+    };
   }
 }
 
