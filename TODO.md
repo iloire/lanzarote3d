@@ -26,3 +26,4 @@ Don't forget to:
 - Implement, commit then remove each task from this file as you implent them, leaving the instructions like this one untouched.
 - Keep the CHANGELOG.md up to date with all the changes we are commiting.
 - If you find some technical debt as you go along, add it to the docs/TECHNICAL_DEBT.md file
+- When creating new components, make sure to following the guidelines at (see docs/COMPONENT_COMPOSITION.md)

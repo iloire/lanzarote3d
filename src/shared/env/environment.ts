@@ -18,6 +18,7 @@ import { Car } from '../../foundation/components/vehicles/ground/Car';
 import { AutonomousCar } from '../../foundation/components/vehicles/ground/AutonomousCar';
 import { MovementPattern } from '../../foundation/systems/behaviors/MovingBehavior';
 import FlockBirds from '../../foundation/components/wildlife/FlockBirds';
+import GuiHelper from '../../foundation/utils/gui';
 import { Hangglider as HangGlider } from '../../foundation/components/vehicles';
 import { addMeshAroundArea } from './mesh-utils';
 import { generateThermalPair, ThermalGenerationOptions } from './thermal-utils';
@@ -100,9 +101,9 @@ class Environment {
     const hgMesh = await this.hg.load();
     this.scene.add(hgMesh);
 
-    // Add GUI controls if provided
+    // Add GUI controls if provided (modern pattern)
     if (gui) {
-      this.hg.addGuiControls(gui);
+      GuiHelper.addLocationGui(gui as any, 'Hangglider', hgMesh);
     }
 
     // Note: Path following removed with AutoFlier inheritance

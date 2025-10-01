@@ -3,6 +3,7 @@ import { Hangglider } from '../../foundation/components/vehicles';
 import { StoryOptions } from '../../shared/types';
 import { WorkshopDemoBase } from '../../shared/WorkshopDemoBase';
 import { logger } from '../../foundation/utils/logger';
+import GuiHelper from '../../foundation/utils/gui';
 
 /**
  * Hang Glider Workshop Demo - Showcases hang glider components
@@ -33,13 +34,13 @@ class HangGliderWorkshopApp extends WorkshopDemoBase {
       const hg = new Hangglider();
       const mesh = await hg.load();
 
-      // Add GUI controls if needed
-      if (gui) {
-        hg.addGuiControls(gui);
-      }
-
       mesh.position.set(0, 0, 0);
       scene.add(mesh);
+
+      // Add GUI controls if needed (modern pattern)
+      if (gui) {
+        GuiHelper.addLocationGui(gui, 'Hangglider', mesh);
+      }
 
       // Set camera position for hang glider viewing
       const lookAt = mesh.position.clone().add(new THREE.Vector3(0, 0, 0));

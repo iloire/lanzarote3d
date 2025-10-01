@@ -128,26 +128,6 @@ export class Hangglider extends SimpleThreeComponent {
     super.dispose();
   }
 
-  /**
-   * Add GUI controls for this hangglider
-   * Part of IVehicleWithGUI interface for compatibility
-   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public addGuiControls(gui: any): void {
-    const object = this.getObject();
-    if (!object) return;
-
-    if (this.pilotMesh) {
-      // Add pilot controls if gui helper is available
-      const GuiHelper = require('../../../utils/gui').default;
-      GuiHelper.addLocationGui(gui, 'Hangglider pilot', this.pilotMesh);
-    }
-
-    // Add main hangglider controls
-    const GuiHelper = require('../../../utils/gui').default;
-    GuiHelper.addLocationGui(gui, 'Hangglider', object);
-  }
-
   public getInfo(): Record<string, unknown> {
     const options = this.options as HanggliderOptions;
 
