@@ -104,9 +104,14 @@ export class PilotVoxel extends AsyncThreeComponent {
    * Resolve character assets from character type or manual paths
    */
   private resolveCharacterAssets(options: PilotVoxelOptions): void {
+    logger.info(`🔍 Resolving character assets. CharacterType: ${options.characterType}`);
+    logger.info(`🔍 Registry has ${characterRegistry ? 'INITIALIZED' : 'NOT INITIALIZED'}`);
+
     if (options.characterType) {
       // Use character registry
       this.characterDefinition = characterRegistry.getCharacter(options.characterType);
+
+      logger.info(`🔍 Character definition found: ${this.characterDefinition ? 'YES' : 'NO'}`);
 
       if (!this.characterDefinition) {
         console.warn(
