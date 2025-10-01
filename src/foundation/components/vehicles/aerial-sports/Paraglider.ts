@@ -22,7 +22,6 @@ export class Paraglider {
   private glider!: LegacyGlider;
   private pilot!: Pilot;
   private pilotMesh!: THREE.Object3D;
-  private axesHelper!: THREE.AxesHelper;
   private options: ParagliderOptions;
 
   constructor(options: ParagliderOptions) {
@@ -54,11 +53,6 @@ export class Paraglider {
     this.pilotMesh.position.z = -0.4;
     this.pilotMesh.rotateY(Math.PI / 2);
     this.mesh.add(this.pilotMesh);
-
-    // Add axes helper
-    this.axesHelper = new THREE.AxesHelper(100);
-    this.axesHelper.visible = false;
-    this.mesh.add(this.axesHelper);
 
     return this.mesh;
   }
@@ -98,7 +92,6 @@ export class Paraglider {
     this.glider = undefined as any;
     this.pilot = undefined as any;
     this.pilotMesh = undefined as any;
-    this.axesHelper = undefined as any;
   }
 }
 
