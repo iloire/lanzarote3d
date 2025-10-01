@@ -1,80 +1,118 @@
 import * as THREE from 'three';
+import { SimpleThreeComponent, SimpleComponentOptions } from '../../base/SimpleThreeComponent';
+import { ComponentMetadata } from '../../base/IThreeComponent';
 import TandemPilot, { TandemPilotOptions } from '../../characters/TandemPilot';
 import Glider, { GliderOptions } from '../components/Glider';
-import { IVehicle } from '../../../types/IVehicle';
 
-export interface TandemOptions {
+export interface TandemOptions extends SimpleComponentOptions {
   glider: GliderOptions;
   pilot: TandemPilotOptions;
-  castShadow?: boolean;
-  receiveShadow?: boolean;
 }
 
 /**
- * Tandem - tandem paraglider with two pilots
+ * Tandem - tandem paraglider with two pilots (instructor + passenger)
  *
- * This component composes both the glider wing and tandem pilot (pilot + passenger)
- * into a single assembly. Implements IVehicle for consistent vehicle interface.
+ * This component uses Pattern B (SimpleThreeComponent + createObject override)
+ * for async composition of multiple sub-components (Glider + TandemPilot).
  *
- * Note: This class doesn't extend a base component class because it's a composite
- * that assembles two different component types (Glider and TandemPilot) with
- * different configurations. Instead, it implements the IVehicle interface for consistency.
+ * See docs/COMPONENT_COMPOSITION.md for architecture details.
  */
-export class Tandem implements IVehicle {
-  private mesh?: THREE.Object3D;
-  private glider!: Glider;
-  private pilot!: TandemPilot;
-  private pilotMesh!: THREE.Object3D;
-  private options: TandemOptions;
+export class Tandem extends SimpleThreeComponent {
+  private glider?: Glider;
+  private pilot?: TandemPilot;
+  private pilotMesh?: THREE.Object3D;
 
   constructor(options: TandemOptions) {
-    this.options = options;
+    const metadata: ComponentMetadata = {
+      name: 'Tandem',
+      version: '2.0.0',
+      description: 'Tandem paraglider with instructor and passenger pilots',
+      tags: ['vehicle', 'aircraft', 'paraglider', 'tandem', 'aerial-sports', 'composite'],
+    };
+
+    super(metadata, options);
+  }
+
+  protected createGeometry(): THREE.BufferGeometry {
+    // Placeholder - not used since we override createObject for async composition
+    return new THREE.BoxGeometry(1, 1, 1);
   }
 
   /**
-   * Load and assemble the tandem paraglider
+   * Override createObject to compose async sub-components.
+   * This is Pattern B from COMPONENT_COMPOSITION.md - the standard pattern
+   * for vehicles that combine multiple loadable components.
    */
-  async load(): Promise<THREE.Object3D> {
-    this.mesh = new THREE.Object3D();
-    this.mesh.name = 'Tandem';
+  protected override async createObject(): Promise<THREE.Object3D> {
+    const group = new THREE.Object3D();
+    group.name = 'Tandem';
 
-    // Create glider wing
-    this.glider = new Glider(this.options.glider);
+    const options = this.options as TandemOptions;
+
+    // Create and load glider wing
+    this.glider = new Glider(options.glider);
     const wing = this.glider.createWing();
     wing.position.y = 2800;
     wing.position.x = 300;
-    this.mesh.add(wing);
+    group.add(wing);
 
-    // Create tandem pilot (pilot + passenger)
-    this.pilot = new TandemPilot(this.options.pilot);
+    // Create and load tandem pilot (instructor + passenger)
+    this.pilot = new TandemPilot(options.pilot);
     this.pilotMesh = await this.pilot.load();
     this.pilotMesh.position.x = 17;
     this.pilotMesh.position.z = -0.4;
     this.pilotMesh.rotateY(Math.PI / 2);
-    this.mesh.add(this.pilotMesh);
+    group.add(this.pilotMesh);
 
-    return this.mesh;
+    return group;
   }
 
-  /**
-   * Get the mesh
-   */
-  public getMesh(): THREE.Object3D {
-    if (!this.mesh) {
-      throw Error('mesh not loaded - use load()');
+  public override validate(): string[] {
+    const issues: string[] = [];
+    const options = this.options as TandemOptions;
+
+    if (!options.glider) {
+      issues.push('Glider configuration is required');
     }
-    return this.mesh;
+
+    if (!options.pilot) {
+      issues.push('Pilot configuration is required');
+    }
+
+    return issues;
   }
 
-  /**
-   * Clean up resources
-   */
-  public dispose(): void {
+  public override dispose(): void {
+    // Dispose sub-components first
+    if (this.pilot) {
+      // TandemPilot doesn't have dispose, just clear reference
+      this.pilot = undefined;
+    }
+    if (this.glider) {
+      // Glider doesn't have dispose, just clear reference
+      this.glider = undefined;
+    }
+
     // Clear references
-    this.mesh = undefined;
-    this.glider = undefined as any;
-    this.pilot = undefined as any;
-    this.pilotMesh = undefined as any;
+    this.pilotMesh = undefined;
+
+    // Call parent dispose
+    super.dispose();
+  }
+
+  public getInfo(): Record<string, unknown> {
+    const options = this.options as TandemOptions;
+
+    return {
+      name: 'Tandem',
+      version: '2.0.0',
+      type: 'vehicle',
+      subtype: 'aircraft',
+      category: 'aerial_sports',
+      variant: 'tandem',
+      gliderConfig: options.glider,
+      pilotConfig: options.pilot,
+    };
   }
 }
 
