@@ -83,51 +83,27 @@ export class Barn extends SimpleThreeComponent {
     mainBody.receiveShadow = this.options.receiveShadow ?? true;
     barn.add(mainBody);
 
-    // Gambrel roof (traditional barn roof) - use multiple parts
-    const roofLowerGeometry = resourceManager.getOrCreateGeometry(
-      'barn_roof_lower',
-      () => new THREE.BoxGeometry(32, 4, 22)
+    // Simplified roof - single piece instead of gambrel (saves polygons)
+    const roofGeometry = resourceManager.getOrCreateGeometry(
+      'barn_roof_simple',
+      () => new THREE.BoxGeometry(32, 6, 22)
     );
-    const roofLower = new THREE.Mesh(roofLowerGeometry, roofMaterial);
-    roofLower.position.set(0, 20, 0); // Adjusted for main body repositioning
-    roofLower.rotation.x = -Math.PI / 12; // Slight angle
-    roofLower.castShadow = this.options.castShadow ?? true;
-    barn.add(roofLower);
+    const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+    roof.position.set(0, 21, 0);
+    roof.rotation.x = -Math.PI / 10; // Single angle
+    roof.castShadow = this.options.castShadow ?? true;
+    barn.add(roof);
 
-    const roofUpperGeometry = resourceManager.getOrCreateGeometry(
-      'barn_roof_upper',
-      () => new THREE.BoxGeometry(26, 4, 22)
+    // Single large door - no double doors (saves polygons)
+    const doorGeometry = resourceManager.getOrCreateGeometry(
+      'barn_door_simple',
+      () => new THREE.BoxGeometry(10, 12, 0.5)
     );
-    const roofUpper = new THREE.Mesh(roofUpperGeometry, roofMaterial);
-    roofUpper.position.set(0, 24, 0); // Adjusted for main body repositioning
-    roofUpper.rotation.x = -Math.PI / 6; // Steeper angle
-    roofUpper.castShadow = this.options.castShadow ?? true;
-    barn.add(roofUpper);
+    const door = new THREE.Mesh(doorGeometry, doorMaterial);
+    door.position.set(0, 6, 10.25);
+    barn.add(door);
 
-    // Large barn doors - traditional sliding style
-    const largeDoorGeometry = resourceManager.getOrCreateGeometry(
-      'barn_large_door',
-      () => new THREE.BoxGeometry(8, 12, 0.5)
-    );
-
-    const leftDoor = new THREE.Mesh(largeDoorGeometry, doorMaterial);
-    leftDoor.position.set(-4, 6, 10.25); // Adjusted for main body repositioning
-    barn.add(leftDoor);
-
-    const rightDoor = new THREE.Mesh(largeDoorGeometry, doorMaterial);
-    rightDoor.position.set(4, 6, 10.25); // Adjusted for main body repositioning
-    barn.add(rightDoor);
-
-    // Door frame and track
-    const doorFrameGeometry = resourceManager.getOrCreateGeometry(
-      'barn_door_frame',
-      () => new THREE.BoxGeometry(18, 14, 1)
-    );
-    const doorFrame = new THREE.Mesh(doorFrameGeometry, trimMaterial);
-    doorFrame.position.set(0, 6, 10); // Adjusted for main body repositioning
-    barn.add(doorFrame);
-
-    // Barn windows - small and high up
+    // Minimal windows - just 2 side windows (removed loft door)
     const windowGeometry = resourceManager.getOrCreateGeometry(
       'barn_window',
       () => new THREE.BoxGeometry(3, 2, 0.3)
@@ -138,67 +114,16 @@ export class Barn extends SimpleThreeComponent {
       () => new THREE.MeshLambertMaterial({ color: '#333333' })
     );
 
-    // Side windows
     const leftSideWindow = new THREE.Mesh(windowGeometry, windowMaterial);
-    leftSideWindow.position.set(-15.15, 13, 5); // Adjusted for main body repositioning
+    leftSideWindow.position.set(-15.15, 13, 5);
     barn.add(leftSideWindow);
 
     const rightSideWindow = new THREE.Mesh(windowGeometry, windowMaterial);
-    rightSideWindow.position.set(15.15, 13, 5); // Adjusted for main body repositioning
+    rightSideWindow.position.set(15.15, 13, 5);
     barn.add(rightSideWindow);
 
-    // Hay loft door (upper level)
-    const loftDoorGeometry = resourceManager.getOrCreateGeometry(
-      'barn_loft_door',
-      () => new THREE.BoxGeometry(4, 4, 0.3)
-    );
-    const loftDoor = new THREE.Mesh(loftDoorGeometry, doorMaterial);
-    loftDoor.position.set(0, 15, 10.15); // Adjusted for main body repositioning
-    barn.add(loftDoor);
-
-    // Weathervane on roof peak
-    const weathervaneGeometry = resourceManager.getOrCreateGeometry(
-      'barn_weathervane',
-      () => new THREE.CylinderGeometry(0.1, 0.1, 4)
-    );
-    const weathervane = new THREE.Mesh(weathervaneGeometry, trimMaterial);
-    weathervane.position.set(0, 27, 0); // Adjusted for main body repositioning
-    barn.add(weathervane);
-
-    // Weathervane arrow
-    const arrowGeometry = resourceManager.getOrCreateGeometry(
-      'barn_weathervane_arrow',
-      () => new THREE.BoxGeometry(3, 0.2, 0.5)
-    );
-    const arrow = new THREE.Mesh(arrowGeometry, trimMaterial);
-    arrow.position.set(0, 28.5, 0); // Adjusted for main body repositioning
-    barn.add(arrow);
-
-    // Fence posts around barn (decorative)
-    const fencePostGeometry = resourceManager.getOrCreateGeometry(
-      'barn_fence_post',
-      () => new THREE.CylinderGeometry(0.3, 0.3, 6)
-    );
-
-    // Create fence line
-    for (let i = 0; i < 8; i++) {
-      const fencePost = new THREE.Mesh(fencePostGeometry, doorMaterial);
-      fencePost.position.set(-21 + i * 6, 3, 15); // Adjusted for main body repositioning
-      barn.add(fencePost);
-    }
-
-    // Horizontal fence rails
-    const railGeometry = resourceManager.getOrCreateGeometry(
-      'barn_fence_rail',
-      () => new THREE.BoxGeometry(42, 0.5, 1)
-    );
-    const topRail = new THREE.Mesh(railGeometry, doorMaterial);
-    topRail.position.set(0, 5, 15); // Adjusted for main body repositioning
-    barn.add(topRail);
-
-    const bottomRail = new THREE.Mesh(railGeometry, doorMaterial);
-    bottomRail.position.set(0, 2, 15); // Adjusted for main body repositioning
-    barn.add(bottomRail);
+    // Removed: weathervane, fence posts, fence rails to reduce polygon count
+    // Barn is now: 1 body + 1 roof + 1 door + 2 windows = 5 meshes ≈ 60 triangles (12 per box)
 
     // Apply scale
     if (scale !== 1) {

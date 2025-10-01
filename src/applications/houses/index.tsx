@@ -125,37 +125,41 @@ class HousesWorkshop extends WorkshopDemoBase {
   }
 
   private createStatsOverlay(): void {
-    // Create toggle button
+    // Create toggle button - more visible with clear instructions
     this.toggleButton = document.createElement('button');
-    this.toggleButton.textContent = '📊 Stats';
+    this.toggleButton.innerHTML = '📊 Hide Stats<br><span style="font-size: 10px; opacity: 0.8;">(Click to toggle)</span>';
     this.toggleButton.style.cssText = `
       position: fixed;
       bottom: 20px;
       left: 20px;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 8px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      padding: 14px 24px;
+      border-radius: 10px;
       font-family: Arial, sans-serif;
-      font-size: 14px;
+      font-size: 15px;
       font-weight: bold;
       cursor: pointer;
       z-index: 1001;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
       transition: all 0.3s ease;
+      line-height: 1.3;
+      text-align: center;
     `;
     this.toggleButton.addEventListener('click', () => this.toggleStatsVisibility());
     this.toggleButton.addEventListener('mouseenter', () => {
       if (this.toggleButton) {
         this.toggleButton.style.transform = 'scale(1.05)';
-        this.toggleButton.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.4)';
+        this.toggleButton.style.boxShadow = '0 8px 24px rgba(102, 126, 234, 0.8)';
+        this.toggleButton.style.borderColor = 'rgba(255, 255, 255, 0.6)';
       }
     });
     this.toggleButton.addEventListener('mouseleave', () => {
       if (this.toggleButton) {
         this.toggleButton.style.transform = 'scale(1)';
-        this.toggleButton.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.3)';
+        this.toggleButton.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.6)';
+        this.toggleButton.style.borderColor = 'rgba(255, 255, 255, 0.3)';
       }
     });
     document.body.appendChild(this.toggleButton);
@@ -205,7 +209,9 @@ class HousesWorkshop extends WorkshopDemoBase {
     }
 
     if (this.toggleButton) {
-      this.toggleButton.textContent = this.isOverlayVisible ? '📊 Stats' : '📊 Show Stats';
+      this.toggleButton.innerHTML = this.isOverlayVisible
+        ? '📊 Hide Stats<br><span style="font-size: 10px; opacity: 0.8;">(Click to toggle)</span>'
+        : '📊 Show Stats<br><span style="font-size: 10px; opacity: 0.8;">(Click to toggle)</span>';
     }
   }
 
