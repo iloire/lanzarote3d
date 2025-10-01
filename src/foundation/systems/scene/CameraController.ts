@@ -11,7 +11,6 @@
  * With:    import { CameraTargetController } from './CameraTargetController'
  */
 import * as THREE from 'three';
-// Note: Flier import removed - this class is deprecated anyway
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { animator } from '../animation/SimpleAnimator';
 import GuiHelper from '../../utils/gui';

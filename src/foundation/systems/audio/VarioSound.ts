@@ -9,7 +9,6 @@ export interface VarioEventMap {
 
 /**
  * Interface for anything that can provide altitude information
- * (used instead of tightly coupling to deprecated Flier class)
  */
 export interface IAltitudeProvider {
   getAltitude(): number;
