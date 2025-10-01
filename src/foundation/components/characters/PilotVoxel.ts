@@ -67,10 +67,7 @@ export class PilotVoxel extends AsyncThreeComponent {
 
     super(metadata, options, callbacks);
 
-    // Resolve character definition and assets
-    this.resolveCharacterAssets(options);
-
-    // Set default options with resolved assets
+    // Set default options first
     this.pilotOptions = {
       characterType: CharacterType.ADRI, // Default character
       materialOptions: {
@@ -90,6 +87,9 @@ export class PilotVoxel extends AsyncThreeComponent {
       receiveShadow: true,
       ...options,
     };
+
+    // Resolve character definition and assets (this will update pilotOptions with objFile/textureFile)
+    this.resolveCharacterAssets(this.pilotOptions);
 
     // Apply character-specific defaults if available
     if (this.characterDefinition) {

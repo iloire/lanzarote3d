@@ -4,7 +4,7 @@ import { CharacterType } from '../../foundation/components/characters/CharacterR
 import { FlightPattern } from '../../foundation/systems/behaviors/FlyingBehavior';
 
 export type ParagliderVoxelConfig = {
-  pg: ParagliderVoxelOptions;
+  options: ParagliderVoxelOptions;
   position: THREE.Vector3;
   flightPattern?: FlightPattern;
   speed?: number;
@@ -75,7 +75,7 @@ export type HerculesConfig = {
 
 export const paraglidersVoxel: ParagliderVoxelConfig[] = [
   {
-    pg: {
+    options: {
       glider: {
         wingColor1: '#c30010',
         wingColor2: '#b100cd',

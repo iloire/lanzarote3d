@@ -33,8 +33,8 @@ export async function loadParagliders(
 
   const voxelPromises = configs.map(async (p) => {
     try {
-      logger.info('🪂 Creating paraglider with config:', JSON.stringify(p.pg, null, 2));
-      const paraglider = new ParagliderVoxel(p.pg);
+      logger.info('🪂 Creating paraglider with config:', JSON.stringify(p.options, null, 2));
+      const paraglider = new ParagliderVoxel(p.options);
       logger.info('🪂 Paraglider created, loading...');
       const mesh = await paraglider.load();
       mesh.position.copy(p.position);
