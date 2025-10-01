@@ -83,7 +83,8 @@ class ParagliderVoxelWorkshopApp extends WorkshopDemoBase {
 
         try {
           const paraglider = new ParagliderVoxel(paragliderOptions);
-          const mesh = await paraglider.load(gui);
+          const mesh = await paraglider.load();
+          paraglider.addGuiControls(gui);
 
           // Scale and position each paraglider
           mesh.scale.set(0.01, 0.01, 0.01);
