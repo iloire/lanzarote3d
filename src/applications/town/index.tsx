@@ -219,29 +219,37 @@ class TownWorkshop extends WorkshopDemoBase {
             }
           }
 
-          // Categorize by mesh/object name - debug what names we're actually seeing
-          const name = child.name || child.parent?.name || '';
-          const parentName = child.parent?.name || '';
-          const grandParentName = child.parent?.parent?.name || '';
+          // Categorize by mesh/object name - check entire hierarchy
+          const name = (child.name || '').toLowerCase();
+          const parentName = (child.parent?.name || '').toLowerCase();
+          const grandParentName = (child.parent?.parent?.name || '').toLowerCase();
+          const greatGrandParentName = (child.parent?.parent?.parent?.name || '').toLowerCase();
 
-          // Debug: log some names to see what we're working with
-          if (Math.random() < 0.01) { // Log 1% of objects to avoid spam
-            logger.debug(`🔍 Object names: child="${name}", parent="${parentName}", grandParent="${grandParentName}"`);
-          }
+          // Combine all names for easier checking
+          const allNames = `${name} ${parentName} ${grandParentName} ${greatGrandParentName}`;
 
-          if (name.includes('House') || name.includes('Villa') || name.includes('Desert') || name.includes('Barn') || name.includes('Townhouse') ||
-              parentName.includes('House') || parentName.includes('Villa') || parentName.includes('Desert') || parentName.includes('Barn') || parentName.includes('Townhouse') ||
-              grandParentName.includes('House') || grandParentName.includes('Villa') || grandParentName.includes('Desert') || grandParentName.includes('Barn') || grandParentName.includes('Townhouse')) {
+          // House-related patterns (most common, check first)
+          if (allNames.includes('house') || allNames.includes('villa') ||
+              allNames.includes('barn') || allNames.includes('townhouse') ||
+              allNames.includes('desert')) {
             polygonCounts.houses += childPolygons;
-          } else if (name.includes('Cactus') || name.includes('Saguaro') || name.includes('Barrel') || name.includes('Prickly') || name.includes('Organ') ||
-                     parentName.includes('Cactus') || parentName.includes('Saguaro') || parentName.includes('Barrel') || parentName.includes('Prickly') || parentName.includes('Organ') ||
-                     grandParentName.includes('Cactus') || grandParentName.includes('Saguaro') || grandParentName.includes('Barrel') || grandParentName.includes('Prickly') || grandParentName.includes('Organ')) {
+          }
+          // Cactus patterns
+          else if (allNames.includes('cactus') || allNames.includes('saguaro') ||
+                   allNames.includes('barrel') || allNames.includes('prickly') ||
+                   allNames.includes('organ')) {
             polygonCounts.cacti += childPolygons;
-          } else if (name.includes('Stone') || parentName.includes('Stone') || grandParentName.includes('Stone')) {
+          }
+          // Stone patterns
+          else if (allNames.includes('stone') || allNames.includes('rock')) {
             polygonCounts.stones += childPolygons;
-          } else if (name.includes('Pool') || parentName.includes('Pool') || grandParentName.includes('Pool')) {
+          }
+          // Pool patterns
+          else if (allNames.includes('pool') || allNames.includes('water')) {
             polygonCounts.pools += childPolygons;
-          } else {
+          }
+          // Everything else
+          else {
             polygonCounts.other += childPolygons;
           }
         }
@@ -302,6 +310,9 @@ class TownWorkshop extends WorkshopDemoBase {
     const totalPolygons = Object.values(polygonCounts).reduce((sum, count) => sum + count, 0);
     this.performanceSettings.polygonCount = Math.floor(totalPolygons);
 
+    // Debug: Log array sizes to diagnose zero counts
+    logger.debug(`📊 Array sizes: neighborhoods=${this.neighborhoodMeshes.length}, parks=${this.parkMeshes.length}, squares=${this.squareMeshes.length}, roads=${this.roadMeshes.length}`);
+
     // Calculate percentages
     const percentages = {
       houses: ((polygonCounts.houses / totalPolygons) * 100).toFixed(1),
@@ -320,8 +331,8 @@ class TownWorkshop extends WorkshopDemoBase {
     logger.info(`  🪨 Stones: ${Math.floor(polygonCounts.stones).toLocaleString()} (${percentages.stones}%)`);
     logger.info(`  🏊 Pools: ${Math.floor(polygonCounts.pools).toLocaleString()} (${percentages.pools}%)`);
     logger.info(`  🛣️ Roads: ${Math.floor(polygonCounts.roads).toLocaleString()} (${percentages.roads}%)`);
-    logger.info(`  🌳 Parks: ${Math.floor(polygonCounts.parks).toLocaleString()} (${percentages.parks}%)`);
-    logger.info(`  🏛️ Squares: ${Math.floor(polygonCounts.squares).toLocaleString()} (${percentages.squares}%)`);
+    logger.info(`  🌳 Parks: ${Math.floor(polygonCounts.parks).toLocaleString()} (${percentages.parks}%) [${this.parkMeshes.length} parks]`);
+    logger.info(`  🏛️ Squares: ${Math.floor(polygonCounts.squares).toLocaleString()} (${percentages.squares}%) [${this.squareMeshes.length} squares]`);
     logger.info(`  ❓ Other: ${Math.floor(polygonCounts.other).toLocaleString()} (${percentages.other}%)`);
     logger.info(`  📊 TOTAL: ${this.performanceSettings.polygonCount.toLocaleString()} polygons`);
 

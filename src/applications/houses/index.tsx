@@ -97,7 +97,9 @@ interface HouseStats {
 
 class HousesWorkshop extends WorkshopDemoBase {
   private statsOverlay?: HTMLDivElement;
+  private toggleButton?: HTMLButtonElement;
   private houseStats: HouseStats[] = [];
+  private isOverlayVisible: boolean = true;
 
   constructor() {
     super({
@@ -123,26 +125,88 @@ class HousesWorkshop extends WorkshopDemoBase {
   }
 
   private createStatsOverlay(): void {
-    this.statsOverlay = document.createElement('div');
-    this.statsOverlay.style.cssText = `
+    // Create toggle button
+    this.toggleButton = document.createElement('button');
+    this.toggleButton.textContent = '📊 Stats';
+    this.toggleButton.style.cssText = `
       position: fixed;
       bottom: 20px;
       left: 20px;
-      background: rgba(0, 0, 0, 0.9);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 1001;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+    `;
+    this.toggleButton.addEventListener('click', () => this.toggleStatsVisibility());
+    this.toggleButton.addEventListener('mouseenter', () => {
+      if (this.toggleButton) {
+        this.toggleButton.style.transform = 'scale(1.05)';
+        this.toggleButton.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.4)';
+      }
+    });
+    this.toggleButton.addEventListener('mouseleave', () => {
+      if (this.toggleButton) {
+        this.toggleButton.style.transform = 'scale(1)';
+        this.toggleButton.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.3)';
+      }
+    });
+    document.body.appendChild(this.toggleButton);
+
+    // Create stats overlay (lighter theme)
+    this.statsOverlay = document.createElement('div');
+    this.statsOverlay.style.cssText = `
+      position: fixed;
+      bottom: 80px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.95);
+      color: #333;
       padding: 20px;
       border-radius: 10px;
       font-family: 'Courier New', monospace;
       font-size: 13px;
       line-height: 1.6;
-      max-height: 80vh;
+      max-height: 75vh;
       overflow-y: auto;
       min-width: 500px;
       z-index: 1000;
       backdrop-filter: blur(10px);
-      border: 2px solid rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(102, 126, 234, 0.3);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
     `;
     document.body.appendChild(this.statsOverlay);
+  }
+
+  private toggleStatsVisibility(): void {
+    this.isOverlayVisible = !this.isOverlayVisible;
+
+    if (this.statsOverlay) {
+      if (this.isOverlayVisible) {
+        this.statsOverlay.style.display = 'block';
+        this.statsOverlay.style.opacity = '1';
+        this.statsOverlay.style.transform = 'translateY(0)';
+      } else {
+        this.statsOverlay.style.opacity = '0';
+        this.statsOverlay.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+          if (this.statsOverlay) {
+            this.statsOverlay.style.display = 'none';
+          }
+        }, 300);
+      }
+    }
+
+    if (this.toggleButton) {
+      this.toggleButton.textContent = this.isOverlayVisible ? '📊 Stats' : '📊 Show Stats';
+    }
   }
 
   private updateStatsOverlay(): void {
@@ -153,10 +217,10 @@ class HousesWorkshop extends WorkshopDemoBase {
     const overallReduction = Math.round(((totalNormal - totalLowPoly) / totalNormal) * 100);
 
     let html = `
-      <div style="font-size: 16px; font-weight: bold; margin-bottom: 15px; border-bottom: 2px solid #00ff88; padding-bottom: 10px;">
+      <div style="font-size: 18px; font-weight: bold; margin-bottom: 15px; border-bottom: 3px solid #667eea; padding-bottom: 10px; color: #667eea;">
         🏠 House Polygon Comparison
       </div>
-      <div style="display: grid; grid-template-columns: 200px 120px 120px 80px; gap: 10px; font-weight: bold; color: #00ff88; margin-bottom: 10px;">
+      <div style="display: grid; grid-template-columns: 200px 120px 120px 80px; gap: 10px; font-weight: bold; color: #667eea; margin-bottom: 10px; font-size: 12px;">
         <div>House Type</div>
         <div>Normal</div>
         <div>Low-Poly</div>
@@ -166,26 +230,26 @@ class HousesWorkshop extends WorkshopDemoBase {
 
     this.houseStats.forEach((stat) => {
       html += `
-        <div style="display: grid; grid-template-columns: 200px 120px 120px 80px; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
-          <div style="color: #ffffff;">${stat.name}</div>
-          <div style="color: #ff6b6b;">${formatPolygonCount(stat.normalPolygons)}</div>
-          <div style="color: #4ecdc4;">${formatPolygonCount(stat.lowPolyPolygons)}</div>
-          <div style="color: #00ff88; font-weight: bold;">-${stat.reduction}%</div>
+        <div style="display: grid; grid-template-columns: 200px 120px 120px 80px; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.08);">
+          <div style="color: #333; font-weight: 500;">${stat.name}</div>
+          <div style="color: #e74c3c; font-weight: 600;">${formatPolygonCount(stat.normalPolygons)}</div>
+          <div style="color: #3498db; font-weight: 600;">${formatPolygonCount(stat.lowPolyPolygons)}</div>
+          <div style="color: #27ae60; font-weight: bold;">-${stat.reduction}%</div>
         </div>
       `;
     });
 
     html += `
-      <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #00ff88; font-weight: bold;">
+      <div style="margin-top: 15px; padding-top: 15px; border-top: 3px solid #667eea; font-weight: bold;">
         <div style="display: grid; grid-template-columns: 200px 120px 120px 80px; gap: 10px;">
-          <div style="color: #ffffff;">TOTAL</div>
-          <div style="color: #ff6b6b;">${formatPolygonCount(totalNormal)}</div>
-          <div style="color: #4ecdc4;">${formatPolygonCount(totalLowPoly)}</div>
-          <div style="color: #00ff88; font-size: 16px;">-${overallReduction}%</div>
+          <div style="color: #667eea; font-size: 15px;">TOTAL</div>
+          <div style="color: #e74c3c; font-size: 15px;">${formatPolygonCount(totalNormal)}</div>
+          <div style="color: #3498db; font-size: 15px;">${formatPolygonCount(totalLowPoly)}</div>
+          <div style="color: #27ae60; font-size: 17px;">-${overallReduction}%</div>
         </div>
       </div>
-      <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.2); font-size: 11px; color: #aaa;">
-        💡 Low-poly versions save ${formatPolygonCount(totalNormal - totalLowPoly)} triangles overall
+      <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 12px; color: #666; background: rgba(102, 126, 234, 0.08); padding: 10px; border-radius: 5px;">
+        💡 Low-poly versions save <strong style="color: #27ae60;">${formatPolygonCount(totalNormal - totalLowPoly)}</strong> triangles overall
       </div>
     `;
 
@@ -442,6 +506,11 @@ class HousesWorkshop extends WorkshopDemoBase {
     // Remove stats overlay
     if (this.statsOverlay && this.statsOverlay.parentElement) {
       this.statsOverlay.parentElement.removeChild(this.statsOverlay);
+    }
+
+    // Remove toggle button
+    if (this.toggleButton && this.toggleButton.parentElement) {
+      this.toggleButton.parentElement.removeChild(this.toggleButton);
     }
 
     // Call parent dispose
