@@ -354,7 +354,7 @@ export class Hospital extends SimpleThreeComponent {
       )
     };
 
-    // Main structure - simplified single box
+    // Main structure - simplified single box (same size as high-poly)
     const mainBodyGeometry = resourceManager.getOrCreateGeometry(
       'hospital_main_body_lowpoly',
       () => new THREE.BoxGeometry(20, 24, 18)
@@ -365,7 +365,29 @@ export class Hospital extends SimpleThreeComponent {
     mainBody.receiveShadow = this.options.receiveShadow ?? true;
     hospital.add(mainBody);
 
-    // Simple flat roof
+    // Left wing - simplified (same size as high-poly)
+    const leftWingGeometry = resourceManager.getOrCreateGeometry(
+      'hospital_left_wing_lowpoly',
+      () => new THREE.BoxGeometry(12, 16, 12)
+    );
+    const leftWing = new THREE.Mesh(leftWingGeometry, materials.wall);
+    leftWing.position.set(-16, 8, 3);
+    leftWing.castShadow = this.options.castShadow ?? true;
+    leftWing.receiveShadow = this.options.receiveShadow ?? true;
+    hospital.add(leftWing);
+
+    // Right wing - simplified (same size as high-poly)
+    const rightWingGeometry = resourceManager.getOrCreateGeometry(
+      'hospital_right_wing_lowpoly',
+      () => new THREE.BoxGeometry(12, 16, 12)
+    );
+    const rightWing = new THREE.Mesh(rightWingGeometry, materials.wall);
+    rightWing.position.set(16, 8, 3);
+    rightWing.castShadow = this.options.castShadow ?? true;
+    rightWing.receiveShadow = this.options.receiveShadow ?? true;
+    hospital.add(rightWing);
+
+    // Simple flat roof (same size as high-poly)
     const roofGeometry = resourceManager.getOrCreateGeometry(
       'hospital_roof_lowpoly',
       () => new THREE.BoxGeometry(21, 1, 19)

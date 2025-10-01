@@ -176,9 +176,9 @@
       "priority": 19
     },
     "houses": {
-      "name": "Houses",
+      "name": "Buildings",
       "description": "House component showcase comparing normal vs low-poly versions with polygon count analysis",
-      "route": "/houses",
+      "route": "/buildings",
       "category": "demo",
       "requiresWebGL": true,
       "visibility": "private",

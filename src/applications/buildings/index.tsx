@@ -6,7 +6,7 @@ import {
   HospitalLegacy as Hospital,
   DomeLegacy as Dome
 } from '../../foundation/components/scenery/buildings';
-import { VillaLegacy as Villa, TownhouseLegacy as Townhouse, DesertHouseLegacy as DesertHouse } from '../../foundation/components/scenery';
+import { VillaLegacy as Villa, TownhouseLegacy as Townhouse, DesertHouseLegacy as DesertHouse, TownSquare } from '../../foundation/components/scenery';
 import { StoryOptions } from '../../shared/types';
 import { WorkshopDemoBase } from '../../shared/WorkshopDemoBase';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
@@ -114,7 +114,7 @@ class BuildingsWorkshop extends WorkshopDemoBase {
       requiredComponents: ['scene', 'camera', 'renderer', 'gui'],
       ground: {
         create: true,
-        size: { width: 600, height: 150 }, // Larger ground to accommodate wider layout
+        size: { width: 1000, height: 150 }, // Much larger ground for all buildings
         color: 0x90EE90,
         opacity: 0.8
       }
@@ -290,8 +290,8 @@ class BuildingsWorkshop extends WorkshopDemoBase {
     scene.add(createLabel('🏠 Normal Detail Houses', new THREE.Vector3(0, 15, normalRow - 20)));
     scene.add(createLabel('⚡ Low-Poly Optimized', new THREE.Vector3(0, 15, lowPolyRow + 20)));
 
-    let xPosition = -200; // Start further left
-    const spacing = 80; // Increase spacing between houses
+    let xPosition = -350; // Start much further left for better distribution
+    const spacing = 90; // Increase spacing for better visibility
 
     logger.info('🏠 Starting comprehensive houses demo...');
 
@@ -567,6 +567,52 @@ class BuildingsWorkshop extends WorkshopDemoBase {
     } catch (error) {
       logger.error('❌ Error loading Hospital:', error);
       scene.add(createLabel('Hospital (Error)', new THREE.Vector3(xPosition, 35, normalRow)));
+    }
+
+    xPosition += spacing;
+
+    // TownSquare
+    try {
+      // Normal TownSquare
+      const normalTownSquare = new TownSquare({
+        size: { width: 25, depth: 25 },
+        monumentType: 'fountain',
+        lowPoly: false
+      });
+      const normalTownSquareMesh = await normalTownSquare.load();
+      normalTownSquareMesh.position.set(xPosition, 0, normalRow);
+      scene.add(normalTownSquareMesh);
+
+      const normalTownSquarePolygons = countPolygons(normalTownSquareMesh);
+      scene.add(createLabel('Town Square', new THREE.Vector3(xPosition, 35, normalRow), normalTownSquarePolygons));
+      logger.info(`✅ TownSquare normal loaded: ${normalTownSquarePolygons} triangles`);
+
+      // Low-poly TownSquare
+      const lowPolyTownSquare = new TownSquare({
+        size: { width: 25, depth: 25 },
+        monumentType: 'fountain',
+        lowPoly: true
+      });
+      const lowPolyTownSquareMesh = await lowPolyTownSquare.load();
+      lowPolyTownSquareMesh.position.set(xPosition, 0, lowPolyRow);
+      scene.add(lowPolyTownSquareMesh);
+
+      const lowPolyTownSquarePolygons = countPolygons(lowPolyTownSquareMesh);
+      const townSquareReduction = Math.round(((normalTownSquarePolygons - lowPolyTownSquarePolygons) / normalTownSquarePolygons) * 100);
+      scene.add(createLabel(`Town Square (-${townSquareReduction}%)`, new THREE.Vector3(xPosition, 35, lowPolyRow), lowPolyTownSquarePolygons));
+      logger.info(`✅ TownSquare low-poly loaded: ${lowPolyTownSquarePolygons} triangles (-${townSquareReduction}%)`);
+
+      // Add to stats
+      this.buildingStats.push({
+        name: 'Town Square',
+        normalPolygons: normalTownSquarePolygons,
+        lowPolyPolygons: lowPolyTownSquarePolygons,
+        reduction: townSquareReduction
+      });
+      this.updateStatsOverlay();
+    } catch (error) {
+      logger.error('❌ Error loading TownSquare:', error);
+      scene.add(createLabel('Town Square (Error)', new THREE.Vector3(xPosition, 35, normalRow)));
     }
 
     logger.info('🏢 Buildings demo setup complete - all types loaded!');
