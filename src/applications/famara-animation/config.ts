@@ -84,8 +84,8 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
         numeroCajones: 35,
       },
       pilot: {
-        objFile: adriModel,
-        textureFile: adriTextureImage,
+        bodyColor: '#ff6b35',
+        scale: 15,
       },
     },
     position: new THREE.Vector3(6897, 920, -705),

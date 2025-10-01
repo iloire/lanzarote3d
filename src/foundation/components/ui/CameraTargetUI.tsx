@@ -132,18 +132,21 @@ const CameraTargetUIComponent: React.FC<CameraTargetUIProps> = ({
             >
               Camera Mode
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
-              {Object.values(CameraMode).map(mode => (
+            <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+              {Object.values(CameraMode)
+                .filter(mode => mode !== CameraMode.FirstPerson)
+                .map(mode => (
                 <button
                   key={mode}
                   onClick={() => handleModeChange(mode)}
                   style={{
+                    flex: '1',
                     background:
                       currentMode === mode
                         ? 'rgba(100, 50, 200, 0.8)'
                         : 'rgba(100, 50, 200, 0.3)',
                     color: 'white',
-                    border: currentMode === mode ? '2px solid #fff' : '2px solid transparent',
+                    border: currentMode === mode ? '1px solid #fff' : '1px solid rgba(100, 50, 200, 0.3)',
                     borderRadius: '3px',
                     padding: '4px',
                     fontSize: '10px',
