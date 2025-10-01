@@ -1,9 +1,7 @@
 Implement the following tasks if any is added following the instructions described below:
 ---
 TASKS:
-- the dome is missing from the workshop application
-- town square is great but make sure we don't put any buildings over it when generating the town
-- make sure the Hercules plane is added to the planes application
+- we have environment helpers to create houses and we use that in animation-famara and others. Instead of just adding houses we are going to use in those animations a new helper function addTown. Add that function so we can easily populate towns of different types and sizes in a certain point.
 ---
 
 ### Instructions
@@ -14,4 +12,3 @@ Don't forget to:
 - Implement, commit then remove each task from this file as you implent them, leaving the instructions like this one untouched.
 - Keep the CHANGELOG.md up to date with all the changes we are commiting.
 - If you find some technical debt as you go along, add it to the docs/TECHNICAL_DEBT.md file
-- When creating new components, make sure to following the guidelines at (see docs/COMPONENT_COMPOSITION.md)
