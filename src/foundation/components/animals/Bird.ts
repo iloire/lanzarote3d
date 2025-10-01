@@ -48,8 +48,8 @@ export abstract class Bird extends SimpleThreeComponent {
   }
 
   protected createGeometry(): THREE.BufferGeometry {
-    // Fallback geometry - will be replaced by loaded model
-    return new THREE.BoxGeometry(1, 0.5, 2);
+    // Return empty geometry - bird is created procedurally in createProceduralBird
+    return new THREE.BufferGeometry();
   }
 
   private createProceduralBird(): void {
@@ -61,9 +61,9 @@ export abstract class Bird extends SimpleThreeComponent {
     const scale = this.getModelScale();
     group.scale.setScalar(scale);
 
-    // Body (ellipsoid) - LEANER and THINNER body shape
-    const bodyGeometry = new THREE.SphereGeometry(0.3, 16, 12);
-    bodyGeometry.scale(0.9, 0.6, 1.6); // Leaner, thinner proportions
+    // Body - streamlined teardrop shape (thin and aerodynamic)
+    const bodyGeometry = new THREE.SphereGeometry(0.25, 16, 12);
+    bodyGeometry.scale(0.7, 0.5, 1.8); // Very lean, thin, elongated
     const bodyMaterial = new THREE.MeshStandardMaterial({
       color: this.getSpeciesColor(),
       metalness: 0.1,
@@ -71,14 +71,19 @@ export abstract class Bird extends SimpleThreeComponent {
     });
     const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
     body.position.set(0, 0, 0);
+    body.name = 'body';
     group.add(body);
 
-    // Wings - BIGGER wings with more realistic shape
+    // Wings - BIGGER wings with realistic bird wing shape
+    // Create wing with primary and secondary feathers
     const wingShape = new THREE.Shape();
     wingShape.moveTo(0, 0);
-    wingShape.quadraticCurveTo(1.2, 0.4, 2.0, 0.1); // Extended wing tip
-    wingShape.quadraticCurveTo(1.8, -0.1, 1.4, -0.5); // Deeper curve
-    wingShape.quadraticCurveTo(0.7, -0.4, 0, 0);
+    // Primary feathers (long outer section)
+    wingShape.quadraticCurveTo(1.0, 0.5, 2.2, 0.3);
+    wingShape.quadraticCurveTo(2.0, 0.1, 1.8, -0.1);
+    // Secondary feathers (inner section)
+    wingShape.quadraticCurveTo(1.2, -0.3, 0.6, -0.5);
+    wingShape.quadraticCurveTo(0.3, -0.3, 0, 0);
 
     const wingGeometry = new THREE.ShapeGeometry(wingShape);
     const wingMaterial = new THREE.MeshStandardMaterial({
@@ -88,16 +93,22 @@ export abstract class Bird extends SimpleThreeComponent {
       roughness: 0.8
     });
 
+    // Left wing - attach at body, rotate from shoulder
     this.leftWing = new THREE.Mesh(wingGeometry, wingMaterial);
-    this.leftWing.position.set(-0.4, 0.1, -0.15);
-    this.leftWing.rotation.set(0, 0, Math.PI / 12);
+    this.leftWing.position.set(-0.3, 0.05, -0.1);
+    this.leftWing.rotation.set(0, 0, 0);
     this.leftWing.userData.originalRotation = this.leftWing.rotation.clone();
+    this.leftWing.userData.originalPosition = this.leftWing.position.clone();
+    this.leftWing.name = 'leftWing';
     group.add(this.leftWing);
 
+    // Right wing - mirror of left
     this.rightWing = new THREE.Mesh(wingGeometry, wingMaterial);
-    this.rightWing.position.set(0.4, 0.1, -0.15);
-    this.rightWing.rotation.set(0, Math.PI, -Math.PI / 12);
+    this.rightWing.position.set(0.3, 0.05, -0.1);
+    this.rightWing.rotation.set(0, Math.PI, 0);
     this.rightWing.userData.originalRotation = this.rightWing.rotation.clone();
+    this.rightWing.userData.originalPosition = this.rightWing.position.clone();
+    this.rightWing.name = 'rightWing';
     group.add(this.rightWing);
 
     // Tail - more streamlined
@@ -173,7 +184,7 @@ export abstract class Bird extends SimpleThreeComponent {
     return this._object;
   }
 
-  // Wing animation - proper flapping motion
+  // Wing animation - proper flapping motion (not oscillation)
   private updateWingAnimation(deltaTime: number): void {
     if (!this.leftWing || !this.rightWing) return;
 
@@ -182,28 +193,29 @@ export abstract class Bird extends SimpleThreeComponent {
 
     this.wingBeatTime += deltaTime * frequency * Math.PI * 2;
 
-    // Use sine wave for smooth up-down flapping
-    const flapCycle = Math.sin(this.wingBeatTime);
+    // Flapping cycle: down -> up -> down (not simple oscillation)
+    const cycle = this.wingBeatTime % (Math.PI * 2);
+    let flapAngle: number;
 
-    // Create natural flapping motion with ease-in/ease-out
-    // Wings move faster on downstroke (power stroke) than upstroke
-    const wingAngle = flapCycle > 0
-      ? Math.pow(flapCycle, 0.7) * amplitude  // Faster downstroke
-      : Math.pow(-flapCycle, 1.3) * -amplitude; // Slower upstroke
+    if (cycle < Math.PI) {
+      // Downstroke - powerful, fast motion
+      const t = cycle / Math.PI;
+      flapAngle = Math.sin(t * Math.PI) * amplitude * 1.5; // Down
+    } else {
+      // Upstroke - recovery, slower motion
+      const t = (cycle - Math.PI) / Math.PI;
+      flapAngle = -Math.sin(t * Math.PI) * amplitude * 0.8; // Up
+    }
 
-    // Animate wings - flapping up and down
+    // Apply flapping rotation around Z axis (up/down motion)
     if (this.leftWing.userData.originalRotation) {
       this.leftWing.rotation.copy(this.leftWing.userData.originalRotation);
-      this.leftWing.rotation.z += wingAngle;
-      // Add slight forward/back motion for realism
-      this.leftWing.rotation.x = Math.sin(this.wingBeatTime * 0.5) * 0.1;
+      this.leftWing.rotation.z = -flapAngle; // Flap down/up
     }
 
     if (this.rightWing.userData.originalRotation) {
       this.rightWing.rotation.copy(this.rightWing.userData.originalRotation);
-      this.rightWing.rotation.z -= wingAngle;
-      // Add slight forward/back motion for realism
-      this.rightWing.rotation.x = Math.sin(this.wingBeatTime * 0.5) * 0.1;
+      this.rightWing.rotation.z = flapAngle; // Mirror flapping
     }
   }
 
