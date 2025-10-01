@@ -1,0 +1,110 @@
+import * as THREE from 'three';
+import type { ParagliderVoxelOptions } from '../../foundation/components/vehicles';
+import adriModel from '../../../assets/foundation/models/characters/adri/adri.obj';
+import adriTextureImage from '../../../assets/foundation/models/characters/adri/adri.png';
+import { FlightPattern } from '../../foundation/systems/behaviors/FlyingBehavior';
+
+export type ParagliderVoxelConfig = {
+  pg: ParagliderVoxelOptions;
+  position: THREE.Vector3;
+};
+
+export type HanggliderConfig = {
+  position: THREE.Vector3;
+  scale: number;
+  flightPattern: FlightPattern;
+  speed: number;
+  turnSpeed: number;
+  flightRadius: number;
+  returnDistance: number;
+  minHeight: number;
+  maxHeight: number;
+  obstacleAvoidanceDistance: number;
+  forwardAxis: 'x' | 'y' | 'z' | '-x' | '-y' | '-z';
+};
+
+export type CessnaConfig = {
+  position: THREE.Vector3;
+  scale: number;
+  bodyColor: string;
+  wingColor: string;
+  propellerColor: string;
+  windowColor: string;
+  stripeColor: string;
+  flightPattern: FlightPattern;
+  speed: number;
+  turnSpeed: number;
+  flightRadius: number;
+  returnDistance: number;
+  minHeight: number;
+  maxHeight: number;
+  obstacleAvoidanceDistance: number;
+  forwardAxis: 'x' | 'y' | 'z' | '-x' | '-y' | '-z';
+};
+
+export const paraglidersVoxel: ParagliderVoxelConfig[] = [
+  {
+    pg: {
+      glider: {
+        wingColor1: '#c30010',
+        wingColor2: '#b100cd',
+        inletsColor: 'pink',
+        numeroCajones: 35,
+      },
+      pilot: {
+        objFile: adriModel,
+        textureFile: adriTextureImage,
+      },
+    },
+    position: new THREE.Vector3(6897, 920, -705),
+  },
+];
+
+export const hanggliderConfig: HanggliderConfig = {
+  position: new THREE.Vector3(4800, 950, -500),
+  scale: 1.0,
+  flightPattern: FlightPattern.FIGURE_EIGHT,
+  speed: 3.0,
+  turnSpeed: 7.0,
+  flightRadius: 145,
+  returnDistance: 155,
+  minHeight: 900,
+  maxHeight: 1225,
+  obstacleAvoidanceDistance: 150,
+  forwardAxis: 'x',
+};
+
+export const cessnaConfig: CessnaConfig = {
+  position: new THREE.Vector3(5500, 1100, -800),
+  scale: 3.0,
+  bodyColor: '#F4F4F4',
+  wingColor: '#E8E8E8',
+  propellerColor: '#2C3E50',
+  windowColor: '#87CEEB',
+  stripeColor: '#FF4500',
+  flightPattern: FlightPattern.CIRCULAR,
+  speed: 4.5,
+  turnSpeed: 5.0,
+  flightRadius: 250,
+  returnDistance: 300,
+  minHeight: 1000,
+  maxHeight: 1500,
+  obstacleAvoidanceDistance: 200,
+  forwardAxis: 'x',
+};
+
+// Visibility flags for easy toggling
+export const SHOW_HANGGLIDER = true;
+export const SHOW_CESSNA = true;
+
+// Animation configuration
+export const ANIMATION_DURATION_MS = 6000; // 6 seconds
+
+// Bird path configuration
+export const birdPath = [
+  new THREE.Vector3(5000, 1000, 0),
+  new THREE.Vector3(6000, 1100, -500),
+  new THREE.Vector3(7000, 1200, -1000),
+  new THREE.Vector3(8000, 1000, -500),
+  new THREE.Vector3(7000, 900, 0),
+];

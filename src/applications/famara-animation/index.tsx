@@ -1,63 +1,34 @@
 import * as THREE from 'three';
-import { ParagliderVoxel } from '../../foundation/components/vehicles';
-import type { ParagliderVoxelOptions } from '../../foundation/components/vehicles';
-import HangGlider from '../../foundation/components/vehicles/Hangglider';
 import Environment from '../../shared/env/environment';
-import adriModel from '../../../assets/foundation/models/characters/adri/adri.obj';
-import adriTextureImage from '../../../assets/foundation/models/characters/adri/adri.png';
 import { StoryOptions } from '../../shared/types';
-import { animator, SimpleAnimator } from '../../foundation/systems/animation/SimpleAnimator';
 import { getDefaultTheme } from '../../foundation/themes';
 import { ThemeEngine } from '../../foundation/systems/ThemeEngine';
 import { TerrainBase } from '../../shared/TerrainBase';
-import {
-  OrbitControlsHelper,
-  ORBIT_CONTROLS_PRESETS,
-} from '../../foundation/utils/OrbitControlsHelper';
+import { OrbitControlsHelper } from '../../foundation/utils/OrbitControlsHelper';
 import { getAppConfig } from '../../config/app-registry';
-import { FlyingBehavior, FlightPattern } from '../../foundation/systems/behaviors/FlyingBehavior';
+import { FlyingBehavior } from '../../foundation/systems/behaviors/FlyingBehavior';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { ProceduralRoad } from '../../foundation/components/scenery';
 import { logger } from '../../foundation/utils/logger';
-
-type ParagliderVoxelConfig = {
-  pg: ParagliderVoxelOptions;
-  position: THREE.Vector3;
-};
-
-const paraglidersVoxel: ParagliderVoxelConfig[] = [
-  {
-    pg: {
-      glider: {
-        wingColor1: '#c30010',
-        wingColor2: '#b100cd',
-        inletsColor: 'pink',
-        numeroCajones: 35,
-      },
-      pilot: {
-        objFile: adriModel,
-        textureFile: adriTextureImage,
-      },
-    },
-    position: new THREE.Vector3(6897, 920, -705),
-  },
-];
-
-// Visibility flags for easy toggling
-const SHOW_HANGGLIDER = false; // Set to false to hide hangglider
-
-// Hangglider configuration
-const hanggliderConfig = {
-  position: new THREE.Vector3(4800, 950, -500), // Slightly offset from paraglider
-  scale: 1.0,
-  path: [
-    new THREE.Vector3(6800, 950, -500),
-    new THREE.Vector3(6900, 1000, -600),
-    new THREE.Vector3(7000, 1050, -700),
-    new THREE.Vector3(6900, 1000, -800),
-    new THREE.Vector3(6800, 950, -700),
-  ],
-};
+import {
+  paraglidersVoxel,
+  hanggliderConfig,
+  cessnaConfig,
+  SHOW_HANGGLIDER,
+  SHOW_CESSNA,
+  ANIMATION_DURATION_MS,
+  birdPath,
+} from './config';
+import {
+  loadParagliders,
+  loadHangglider,
+  loadCessna,
+  VehicleLoadResult,
+} from './vehicleLoader';
+import {
+  setupCameraAnimation,
+  applyFloatingMotion,
+} from './cameraAnimation';
 
 /**
  * Animation Demo - Restored original animation with voxel paraglider
@@ -68,12 +39,11 @@ class AnimationApp extends TerrainBase {
   private animationId: number | undefined;
   private paragliderMeshes: THREE.Object3D[] = [];
   private hanggliderMesh: THREE.Object3D | undefined;
+  private cessnaMesh: THREE.Object3D | undefined;
   private isAnimating: boolean = false;
   private flyingBehavior: FlyingBehavior | undefined;
   private hanggliderFlyingBehavior: FlyingBehavior | undefined;
-
-  // Animation configuration
-  private readonly ANIMATION_DURATION_MS = 6000; // 6 seconds
+  private cessnaFlyingBehavior: FlyingBehavior | undefined;
 
   constructor() {
     const appConfig = getAppConfig('animation');
@@ -123,11 +93,39 @@ class AnimationApp extends TerrainBase {
       );
 
       // Load voxel paragliders with proper tracking
-      await this.loadParagliders(scene);
+      const paragliderResults = await loadParagliders(
+        scene,
+        paraglidersVoxel,
+        this.handleError.bind(this)
+      );
+      this.paragliderMeshes = paragliderResults.map((r) => r.mesh);
 
       // Load hangglider if enabled
       if (SHOW_HANGGLIDER) {
-        await this.loadHangglider(scene);
+        const hanggliderResult = await loadHangglider(
+          scene,
+          hanggliderConfig,
+          ANIMATION_DURATION_MS,
+          this.handleError.bind(this)
+        );
+        if (hanggliderResult) {
+          this.hanggliderMesh = hanggliderResult.mesh;
+          this.hanggliderFlyingBehavior = hanggliderResult.flyingBehavior;
+        }
+      }
+
+      // Load Cessna if enabled
+      if (SHOW_CESSNA) {
+        const cessnaResult = await loadCessna(
+          scene,
+          cessnaConfig,
+          ANIMATION_DURATION_MS,
+          this.handleError.bind(this)
+        );
+        if (cessnaResult) {
+          this.cessnaMesh = cessnaResult.mesh;
+          this.cessnaFlyingBehavior = cessnaResult.flyingBehavior;
+        }
       }
 
       // must render before adding env
@@ -177,121 +175,21 @@ class AnimationApp extends TerrainBase {
       // Make environment available for theme switching
       options.environment = this.environment;
 
-      const birdPath = [
-        new THREE.Vector3(5000, 1000, 0),
-        new THREE.Vector3(6000, 1100, -500),
-        new THREE.Vector3(7000, 1200, -1000),
-        new THREE.Vector3(8000, 1000, -500),
-        new THREE.Vector3(7000, 900, 0),
-      ];
       await this.environment.addBirds(birdPath);
 
       // Setup camera animation sequence
       this.setupCameraAnimation(camera, controls, renderer, scene);
 
       this.isLoaded = true;
+      const vehicleCount = this.paragliderMeshes.length +
+        (this.hanggliderMesh ? 1 : 0) +
+        (this.cessnaMesh ? 1 : 0);
       logger.info(
-        `✅ ${this.config.name} loaded successfully with ${this.paragliderMeshes.length} paragliders`
+        `✅ ${this.config.name} loaded successfully with ${vehicleCount} flying vehicles`
       );
     } catch (error) {
       this.handleError(error as Error, 'load');
       throw error;
-    }
-  }
-
-  private async loadParagliders(scene: THREE.Scene): Promise<void> {
-    const voxelPromises = paraglidersVoxel.map(async p => {
-      try {
-        const paraglider = new ParagliderVoxel(p.pg);
-        const mesh = await paraglider.load();
-        mesh.position.copy(p.position);
-        const scale = 0.01;
-        mesh.scale.set(scale, scale, scale);
-        scene.add(mesh);
-        this.paragliderMeshes.push(mesh);
-        return mesh;
-      } catch (error) {
-        this.handleError(error as Error, 'loading voxel paraglider');
-        return null;
-      }
-    });
-
-    await Promise.all(voxelPromises);
-
-    // Set up flying behavior for the first paraglider
-    if (this.paragliderMeshes.length > 0) {
-      const paragliderMesh = this.paragliderMeshes[0];
-      const centerPoint = paragliderMesh.position.clone();
-
-      // Create flying behavior with cinematic settings
-      // this.flyingBehavior = new FlyingBehavior({
-      //   pattern: FlightPattern.CIRCULAR,
-      //   speed: 0,
-      //   turnSpeed: 0.8,
-      //   flightRadius: 150, // Large radius for cinematic movement
-      //   minHeight: centerPoint.y - 50,
-      //   maxHeight: centerPoint.y + 100,
-      //   centerPoint: centerPoint,
-      //   faceDirection: true,
-      //   forwardAxis: 'z', // Voxel paraglider faces forward in Z direction
-      // });
-
-      // Attach to paraglider mesh
-      // this.flyingBehavior.attachTo(paragliderMesh);
-
-      // Start flying behavior after animation completes
-      // setTimeout(() => {
-      //   if (this.flyingBehavior) {
-      //     this.flyingBehavior.start();
-      //     console.log('🪂 Flying behavior started for paraglider');
-      //   }
-      // }, this.ANIMATION_DURATION_MS + 1000); // Start 1 second after animation ends
-    }
-  }
-
-  private async loadHangglider(scene: THREE.Scene): Promise<void> {
-    try {
-      const hangglider = new HangGlider({ scale: hanggliderConfig.scale });
-      const mesh = await hangglider.load();
-
-      // Position the hangglider
-      mesh.position.copy(hanggliderConfig.position);
-
-      scene.add(mesh);
-      this.hanggliderMesh = mesh;
-
-      // Set up flying behavior for hangglider
-      const centerPoint = hanggliderConfig.position.clone();
-
-      this.hanggliderFlyingBehavior = new FlyingBehavior({
-        pattern: FlightPattern.FIGURE_EIGHT,
-        speed: 3.0,
-        turnSpeed: 7.0,
-        flightRadius: 145,
-        returnDistance: 155, // Adjusted for outer wall positions (beyond 50 unit walls)
-        minHeight: 900,
-        maxHeight: 1225,
-        obstacleAvoidanceDistance: 150, // Increased avoidance distance for taller walls
-        centerPoint: hanggliderConfig.position,
-        autoStart: true,
-        faceDirection: true,
-        forwardAxis: 'x' // Updated to match hangglider's new orientation after 270° rotation
-      });
-
-      // Attach to hangglider mesh
-      this.hanggliderFlyingBehavior.attachTo(mesh);
-
-      // Start flying behavior after animation completes
-      setTimeout(() => {
-        if (this.hanggliderFlyingBehavior) {
-          this.hanggliderFlyingBehavior.start();
-          logger.info('🪂 Flying behavior started for hangglider');
-        }
-      }, this.ANIMATION_DURATION_MS + 2000); // Start 2 seconds after animation ends
-
-      logger.info('✅ Hangglider loaded successfully with flying behavior');
-    } catch (error) {
-      this.handleError(error as Error, 'loading hangglider');
     }
   }
 
@@ -303,122 +201,20 @@ class AnimationApp extends TerrainBase {
   ): void {
     const pgPos = paraglidersVoxel[0]?.position.clone() || new THREE.Vector3();
 
-    // Starting position - extremely far away on the other side of the island
-    const initialCameraPosition = new THREE.Vector3(-2000, 2200, 5000);
-
-    // Intermediate position - approaching the area quickly
-    const intermediatePosition = new THREE.Vector3(4500, 1800, 1500);
-
-    // Final position - slow, careful approach to the paraglider
-    const finalCameraPosition = new THREE.Vector3(
-      pgPos.x - 100, // Close to paraglider
-      pgPos.y + 50, // Slightly above
-      pgPos.z + 200 // Behind the paraglider
-    );
-
-    // Set initial camera position and look at the paraglider
-    camera.position.copy(initialCameraPosition);
-    camera.lookAt(pgPos);
-
-    // Ensure controls are set up properly
-    if (controls) {
-      controls.target.copy(pgPos);
-      controls.update();
-      controls.enabled = false; // Disable controls during animation
-    }
-
     // Start animation loop
     this.startAnimationLoop(renderer, scene, camera, controls);
 
-    // Start the dramatic two-phase camera animation
-    setTimeout(() => {
-      // Store initial positions
-      const startTarget = controls ? controls.target.clone() : pgPos.clone();
-
-      // Single seamless animation with custom easing (configurable duration)
-      this.isAnimating = true;
-      animator.animate(
-        'camera-seamless',
-        this.ANIMATION_DURATION_MS,
-        progress => {
-          let currentPosition;
-
-          if (progress < 0.35) {
-            // Phase 1: Fast approach (first 35% of total duration)
-            const phase1Progress = progress / 0.35; // 0-1 for first phase
-            // Use smoother cubic easing for gentle acceleration and deceleration
-            const easedProgress = phase1Progress < 0.5
-              ? 4 * phase1Progress * phase1Progress * phase1Progress // Ease in cubic
-              : 1 - Math.pow(-2 * phase1Progress + 2, 3) / 2; // Ease out cubic
-
-            currentPosition = new THREE.Vector3().lerpVectors(
-              initialCameraPosition,
-              intermediatePosition,
-              easedProgress
-            );
-
-            // Look towards the area gradually with smoother interpolation
-            const lookTarget = new THREE.Vector3().lerpVectors(
-              startTarget,
-              pgPos,
-              easedProgress * 0.5 // Even more gradual look transition
-            );
-            if (controls) {
-              controls.target.copy(lookTarget);
-              controls.update();
-            }
-          } else {
-            // Phase 2: Slow approach (last 65% = 5.2 seconds)
-            const phase2Progress = (progress - 0.35) / 0.65; // 0-1 for second phase
-            // Use ultra-smooth quartic easing for buttery deceleration
-            const easedProgress = 1 - Math.pow(1 - phase2Progress, 4); // Quartic ease out
-
-            currentPosition = new THREE.Vector3().lerpVectors(
-              intermediatePosition,
-              finalCameraPosition,
-              easedProgress
-            );
-
-            // Gradually focus on the paraglider with ultra-smooth transition
-            if (controls) {
-              const targetProgress = Math.min(phase2Progress * 1.2, 1.0); // Even more gradual
-              // Use exponential smoothing for buttery-smooth target tracking
-              const smoothFactor = 0.03 * (1 - Math.pow(1 - phase2Progress, 2));
-              controls.target.lerpVectors(controls.target, pgPos, smoothFactor);
-              controls.update();
-            }
-          }
-
-          camera.position.copy(currentPosition);
-        },
-        () => {
-          // Animation complete
-          if (controls) {
-            controls.enabled = true;
-
-            // Apply orbit control limits using the reusable utility
-            const pgPos = paraglidersVoxel[0]?.position || new THREE.Vector3();
-            OrbitControlsHelper.focusOnTarget(
-              controls,
-              pgPos,
-              OrbitControlsHelper.createCenteredLimits(pgPos, {
-                ...ORBIT_CONTROLS_PRESETS['closeSubject'],
-                // Customize if needed
-                minDistance: 50,
-                maxDistance: 1500,
-                panBoundary: {
-                  center: pgPos,
-                  radius: 500,
-                  verticalScale: 0.5,
-                },
-              })
-            );
-          }
-          // Allow floating motion to begin
-          this.isAnimating = false;
-        }
-      );
-    }, 100);
+    // Setup and execute camera animation
+    const animationState = setupCameraAnimation(camera, controls, {
+      targetPosition: pgPos,
+      animationDurationMs: ANIMATION_DURATION_MS,
+      onAnimationStart: () => {
+        this.isAnimating = true;
+      },
+      onAnimationComplete: () => {
+        this.isAnimating = false;
+      },
+    });
   }
 
   private startAnimationLoop(
@@ -427,29 +223,15 @@ class AnimationApp extends TerrainBase {
     camera: THREE.Camera,
     controls: OrbitControls
   ): void {
-    let startTime = Date.now();
+    const startTime = Date.now();
 
     const animate = () => {
       try {
         // Update performance monitoring
         this.updatePerformance();
 
-        // Add gentle floating motion like a cloud
-        const time = (Date.now() - startTime) * 0.0005; // Slow motion
-        const floatAmplitude = 2; // Vertical float range in units
-        const floatSpeed = 1.2; // Speed of floating motion
-
-        // Store original position during animation, only apply floating after animation completes
-        if (!this.isAnimating) {
-          // Apply subtle floating motion in multiple directions for more natural cloud-like movement
-          const floatY = Math.sin(time * floatSpeed) * floatAmplitude;
-          const floatX = Math.sin(time * floatSpeed * 0.7) * (floatAmplitude * 0.3); // Slower, smaller horizontal drift
-          const floatZ = Math.cos(time * floatSpeed * 0.5) * (floatAmplitude * 0.2); // Even slower depth variation
-
-          camera.position.y += floatY * 0.02; // Very gentle motion
-          camera.position.x += floatX * 0.01;
-          camera.position.z += floatZ * 0.01;
-        }
+        // Apply floating motion
+        applyFloatingMotion(camera, startTime, this.isAnimating);
 
         // Update controls for damping to work
         OrbitControlsHelper.update(controls);
@@ -484,11 +266,14 @@ class AnimationApp extends TerrainBase {
       this.hanggliderFlyingBehavior = undefined;
     }
 
+    // Stop Cessna flying behavior
+    if (this.cessnaFlyingBehavior) {
+      this.cessnaFlyingBehavior.dispose();
+      this.cessnaFlyingBehavior = undefined;
+    }
+
     // Stop animator if running
     if (this.isAnimating) {
-      // Stop any ongoing animations
-      // Stop any ongoing animations - note: stop method doesn't need ID parameter
-      // animator.stop();
       this.isAnimating = false;
     }
 
@@ -525,6 +310,23 @@ class AnimationApp extends TerrainBase {
         }
       });
       this.hanggliderMesh = undefined;
+    }
+
+    // Dispose Cessna mesh
+    if (this.cessnaMesh) {
+      this.cessnaMesh.traverse(child => {
+        if (child instanceof THREE.Mesh) {
+          if (child.geometry) child.geometry.dispose();
+          if (child.material) {
+            if (Array.isArray(child.material)) {
+              child.material.forEach((material: THREE.Material) => material.dispose());
+            } else {
+              child.material.dispose();
+            }
+          }
+        }
+      });
+      this.cessnaMesh = undefined;
     }
 
     // Dispose environment resources
