@@ -2,7 +2,7 @@
 export { Paraglider } from './Paraglider';
 export { Hangglider } from './Hangglider';
 export { Tandem } from './Tandem';
-export { default as ParagliderVoxel } from './ParagliderVoxel';
+export { ParagliderVoxel } from './ParagliderVoxel';
 
 export type { ParagliderOptions } from './Paraglider';
 export type { HanggliderOptions } from './Hangglider';
