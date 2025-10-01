@@ -1,7 +1,6 @@
 Implement the following tasks if any is added following the instructions described below:
 ---
 TASKS:
-- town square is great but make sure we don't put any buildings over it when generating the town
 - add hercules planes to planes workshop application showcase.
 - also add an hercules to the famara animation application
 - head is missing from the Pilot component

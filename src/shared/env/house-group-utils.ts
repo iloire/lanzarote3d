@@ -3,6 +3,20 @@ import { HouseConfig, HouseGroupConfig, NEIGHBORHOOD_PRESETS, NeighborhoodVariat
 import { HouseType } from '../../foundation/components/scenery/buildings/House';
 
 /**
+ * Check if a position is within any exclusion zone
+ */
+function isInExclusionZone(position: THREE.Vector3, exclusionZones?: Array<{ center: THREE.Vector3; radius: number }>): boolean {
+  if (!exclusionZones || exclusionZones.length === 0) {
+    return false;
+  }
+
+  return exclusionZones.some(zone => {
+    const distance = position.distanceTo(zone.center);
+    return distance < zone.radius;
+  });
+}
+
+/**
  * Calculate positions for houses based on neighborhood formation type
  */
 export function calculateHousePositions(
@@ -19,6 +33,7 @@ export function calculateHousePositions(
     rowCount = 3,
     colCount = 3,
     randomVariation = 0.2,
+    exclusionZones,
   } = groupConfig;
 
   switch (formation) {
@@ -36,7 +51,12 @@ export function calculateHousePositions(
         const randomX = x + (Math.random() - 0.5) * variation;
         const randomZ = z + (Math.random() - 0.5) * variation * 0.5;
 
-        positions.push(new THREE.Vector3(randomX, center.y, randomZ));
+        const position = new THREE.Vector3(randomX, center.y, randomZ);
+
+        // Only add if not in exclusion zone
+        if (!isInExclusionZone(position, exclusionZones)) {
+          positions.push(position);
+        }
       }
       break;
 
@@ -48,7 +68,12 @@ export function calculateHousePositions(
         const houseRadius = radius + (Math.random() - 0.5) * spacing * randomVariation;
         const x = center.x + Math.cos(angle) * houseRadius;
         const z = center.z + Math.sin(angle) * houseRadius;
-        positions.push(new THREE.Vector3(x, center.y, z));
+        const position = new THREE.Vector3(x, center.y, z);
+
+        // Only add if not in exclusion zone
+        if (!isInExclusionZone(position, exclusionZones)) {
+          positions.push(position);
+        }
       }
       break;
 
@@ -68,7 +93,12 @@ export function calculateHousePositions(
         x += (Math.random() - 0.5) * variation;
         z += (Math.random() - 0.5) * variation;
 
-        positions.push(new THREE.Vector3(x, center.y, z));
+        const position = new THREE.Vector3(x, center.y, z);
+
+        // Only add if not in exclusion zone
+        if (!isInExclusionZone(position, exclusionZones)) {
+          positions.push(position);
+        }
       }
       break;
 
@@ -92,7 +122,12 @@ export function calculateHousePositions(
           const localRadius = spacing * 0.8 + Math.random() * spacing * 0.6;
           const x = sectorCenter.x + Math.cos(localAngle) * localRadius;
           const z = sectorCenter.z + Math.sin(localAngle) * localRadius;
-          positions.push(new THREE.Vector3(x, center.y, z));
+          const position = new THREE.Vector3(x, center.y, z);
+
+          // Only add if not in exclusion zone
+          if (!isInExclusionZone(position, exclusionZones)) {
+            positions.push(position);
+          }
           houseIndex++;
         }
       }
@@ -115,10 +150,14 @@ export function calculateHousePositions(
           attempts++;
         } while (
           attempts < 20 &&
-          positions.some(existingPos => existingPos.distanceTo(position) < spacing)
+          (positions.some(existingPos => existingPos.distanceTo(position) < spacing) ||
+           isInExclusionZone(position, exclusionZones))
         );
 
-        positions.push(position);
+        // Only add if not in exclusion zone (final check)
+        if (!isInExclusionZone(position, exclusionZones)) {
+          positions.push(position);
+        }
       }
       break;
 
@@ -135,10 +174,14 @@ export function calculateHousePositions(
           attempts++;
         } while (
           attempts < 30 &&
-          positions.some(existingPos => existingPos.distanceTo(position) < spacing * 0.8)
+          (positions.some(existingPos => existingPos.distanceTo(position) < spacing * 0.8) ||
+           isInExclusionZone(position, exclusionZones))
         );
 
-        positions.push(position);
+        // Only add if not in exclusion zone (final check)
+        if (!isInExclusionZone(position, exclusionZones)) {
+          positions.push(position);
+        }
       }
       break;
 

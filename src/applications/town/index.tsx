@@ -78,6 +78,25 @@ class TownWorkshop extends WorkshopDemoBase {
       // Set initial low-poly mode
       this.houseGroupCreator.setLowPolyMode(this.isLowPoly);
 
+      // Define exclusion zones for town squares and parks to prevent building overlap
+      const exclusionZones = [
+        // Central Square - 120x120 size, so radius ~85 (diagonal/2 + buffer)
+        { center: new THREE.Vector3(0, 0, 0), radius: 100 },
+        // West Square - 120x120 size
+        { center: new THREE.Vector3(-600, 0, 0), radius: 100 },
+        // Market Square - 120x120 size
+        { center: new THREE.Vector3(600, 0, -300), radius: 100 },
+        // North Central Park - 100x100 size
+        { center: new THREE.Vector3(-200, 0, 300), radius: 85 },
+        // South Central Park - 100x100 size
+        { center: new THREE.Vector3(200, 0, -300), radius: 85 },
+        // East Park - 100x100 size
+        { center: new THREE.Vector3(600, 0, 300), radius: 85 },
+      ];
+
+      // Set exclusion zones before creating neighborhoods
+      this.houseGroupCreator.setExclusionZones(exclusionZones);
+
       // Setup performance controls
       this.setupPerformanceControls(gui);
 

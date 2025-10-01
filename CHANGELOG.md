@@ -2,6 +2,18 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## [1.5.1] - 2025-10-01 12:16 UTC
+
+### Fixed
+- **Town Generation Exclusion Zones**: Implemented exclusion zones to prevent buildings from being placed over town squares and parks
+  - Added `ExclusionZone` interface to house-group-types with center and radius properties
+  - Extended `HouseGroupConfig` to support exclusion zones array
+  - Updated `calculateHousePositions` in house-group-utils to respect exclusion zones for all formation types (street, cul-de-sac, grid, suburban, rural, random)
+  - Added `setExclusionZones` method to HouseGroupCreator class
+  - All neighborhood creation methods now pass exclusion zones to house positioning logic
+  - Town application defines exclusion zones for all 3 town squares (radius 100) and 3 parks (radius 85)
+  - Buildings now avoid overlapping with Central Square (0,0,0), West Square (-600,0,0), Market Square (600,0,-300), and all parks
+
 ## [1.5.0] - 2025-09-30 UTC
 
 ### Refactored

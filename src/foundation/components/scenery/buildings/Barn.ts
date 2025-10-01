@@ -43,7 +43,7 @@ export class Barn extends SimpleThreeComponent {
     const barn = new THREE.Group();
     barn.name = 'Barn';
 
-    const options = this.options as BarnOptions;
+    const options = this._options as BarnOptions;
     const scale = options.scale || 1;
     const isLowPoly = options.lowPoly || false;
 

@@ -19,6 +19,14 @@ export interface HouseConfig {
 }
 
 /**
+ * Exclusion zone to prevent building placement
+ */
+export interface ExclusionZone {
+  center: THREE.Vector3;
+  radius: number;
+}
+
+/**
  * Configuration for house group positioning in neighborhoods
  */
 export interface HouseGroupConfig {
@@ -30,6 +38,7 @@ export interface HouseGroupConfig {
   rowCount?: number; // For grid formation
   colCount?: number; // For grid formation
   randomVariation?: number; // Amount of random positioning variation (0-1)
+  exclusionZones?: ExclusionZone[]; // Areas where buildings should not be placed
 }
 
 /**

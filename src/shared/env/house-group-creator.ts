@@ -37,10 +37,18 @@ export class HouseGroupCreator {
   private componentRegistry: ComponentRegistry;
   private lowPoly: boolean = false;
   private createdObjects: THREE.Object3D[] = []; // Track all created objects
+  private exclusionZones: Array<{ center: THREE.Vector3; radius: number }> = []; // Zones where buildings cannot be placed
 
   constructor(scene: THREE.Scene, componentRegistry: ComponentRegistry) {
     this.scene = scene;
     this.componentRegistry = componentRegistry;
+  }
+
+  /**
+   * Set exclusion zones where buildings should not be placed
+   */
+  setExclusionZones(zones: Array<{ center: THREE.Vector3; radius: number }>): void {
+    this.exclusionZones = zones;
   }
 
   /**
@@ -493,6 +501,7 @@ export class HouseGroupCreator {
       spacing: dynamicSpacing,
       neighborhoodSize: size === 'small' ? 120 : size === 'medium' ? 150 : 180,
       randomVariation: 0.3,
+      exclusionZones: this.exclusionZones,
     }, variation);
   }
 
@@ -514,6 +523,7 @@ export class HouseGroupCreator {
       spacing: dynamicSpacing,
       neighborhoodSize: density === 'compact' ? 140 : density === 'dense' ? 160 : 180,
       randomVariation: 0.15,
+      exclusionZones: this.exclusionZones,
     }, variation);
   }
 
@@ -534,6 +544,7 @@ export class HouseGroupCreator {
       spacing,
       neighborhoodSize: style === 'farmstead' ? 180 : style === 'village' ? 150 : 200,
       randomVariation: 0.4,
+      exclusionZones: this.exclusionZones,
     }, variation);
   }
 
@@ -551,6 +562,7 @@ export class HouseGroupCreator {
       spacing: 80,
       streetWidth,
       randomVariation: 0.2,
+      exclusionZones: this.exclusionZones,
     });
   }
 
@@ -568,6 +580,7 @@ export class HouseGroupCreator {
       spacing: 60,
       neighborhoodSize: radius * 2,
       randomVariation: 0.25,
+      exclusionZones: this.exclusionZones,
     });
   }
 
@@ -587,6 +600,7 @@ export class HouseGroupCreator {
       rowCount,
       colCount: Math.ceil(houses.length / rowCount),
       randomVariation: 0.15,
+      exclusionZones: this.exclusionZones,
     });
   }
 
@@ -609,6 +623,7 @@ export class HouseGroupCreator {
       spacing,
       neighborhoodSize: 120,
       randomVariation: 0.3,
+      exclusionZones: this.exclusionZones,
     }, variation);
   }
 
@@ -626,6 +641,7 @@ export class HouseGroupCreator {
       spacing: 70,
       neighborhoodSize: size,
       randomVariation: 0.5,
+      exclusionZones: this.exclusionZones,
     });
   }
 }
