@@ -1,7 +1,7 @@
 Implement the following tasks if any is added following the instructions described below:
 ---
 TASKS:
-
+- the dome is missing from the workshop application 
 ---
 
 ### Instructions

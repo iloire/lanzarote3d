@@ -10,6 +10,7 @@ import { disposeObject3D, disposeObjects } from './disposal-utils';
 import { GUI } from 'lil-gui';
 import { logger } from '../../foundation/utils/logger';
 import { Park, TownSquare } from '../../foundation/components/scenery';
+import { Hospital } from '../../foundation/components/scenery/buildings';
 
 /**
  * Town Workshop - Showcase of neighborhood generation using HouseGroupCreator
@@ -21,6 +22,7 @@ class TownWorkshop extends WorkshopDemoBase {
   private roadMeshes: THREE.Object3D[] = []; // Track roads separately
   private parkMeshes: THREE.Object3D[] = []; // Track parks separately
   private squareMeshes: THREE.Object3D[] = []; // Track town squares separately
+  private hospitalMesh: THREE.Object3D | null = null; // Track hospital
   private houseGroupCreator!: HouseGroupCreator;
   private componentRegistry!: ComponentRegistry;
   private currentScene!: THREE.Scene;
@@ -404,6 +406,12 @@ class TownWorkshop extends WorkshopDemoBase {
     // Properly dispose square meshes using imported utility
     disposeObjects(this.squareMeshes);
 
+    // Properly dispose hospital
+    if (this.hospitalMesh) {
+      disposeObject3D(this.hospitalMesh);
+      this.hospitalMesh = null;
+    }
+
     // Clear arrays
     this.neighborhoodMeshes.length = 0;
     this.labelMeshes.length = 0;
@@ -523,6 +531,9 @@ class TownWorkshop extends WorkshopDemoBase {
 
     // Add town squares to the town
     this.createTownSquares(scene);
+
+    // Add hospital to the town
+    this.createHospital(scene);
 
     // Update polygon count after loading all neighborhoods
     this.updatePolygonCount();
@@ -772,6 +783,38 @@ class TownWorkshop extends WorkshopDemoBase {
       } catch (error) {
         this.handleError(error as Error, `creating town square at ${location.position.toArray()}`);
       }
+    }
+  }
+
+  /**
+   * Create hospital building
+   */
+  private async createHospital(scene: THREE.Scene): Promise<void> {
+    try {
+      const hospital = new Hospital({
+        wallColor: '#F0F0F0',
+        roofColor: '#C0C0C0',
+        accentColor: '#FF0000',
+        scale: 1.5,
+        lowPoly: this.isLowPoly,
+        castShadow: true,
+        receiveShadow: true,
+      });
+
+      const hospitalMesh = await hospital.load();
+      // Place hospital in a strategic location away from town squares and neighborhoods
+      hospitalMesh.position.set(-850, 0, -550);
+      scene.add(hospitalMesh);
+      this.hospitalMesh = hospitalMesh;
+
+      // Add label for hospital
+      const label = createLabel('Medical Center', new THREE.Vector3(-850, 40, -550));
+      scene.add(label);
+      this.labelMeshes.push(label);
+
+      logger.info('✅ Created Hospital');
+    } catch (error) {
+      this.handleError(error as Error, 'creating hospital');
     }
   }
 
