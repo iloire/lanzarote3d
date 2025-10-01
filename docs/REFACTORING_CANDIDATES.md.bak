@@ -1,19 +1,14 @@
 # Large Files Refactoring Analysis
 **Generated**: October 1, 2025
-**Last Updated**: October 1, 2025
 **Analyst**: Claude Code
 **Scope**: TypeScript/TSX files >390 lines
-
-> **UPDATE (Oct 1, 2025)**: `location-editor` application has been **REMOVED** from codebase.
-> The superior `flyzone-editor` (at `src/applications/editor/`) replaces it.
-> See commit history for details. This reduces critical refactoring candidates from 6 to 5.
 
 ---
 
 ## 📊 Executive Summary
 
 Analyzed **55,355 total lines** across codebase. Found:
-- **5 critical files** requiring immediate refactoring (>600 lines) _(was 6, reduced by 1)_
+- **6 critical files** requiring immediate refactoring (>600 lines)
 - **15 medium files** to monitor (390-600 lines)
 - **30+ files** total flagged for size concerns
 

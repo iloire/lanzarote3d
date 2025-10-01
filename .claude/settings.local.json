@@ -5,7 +5,8 @@
       "Bash(rm:*)",
       "Bash(git reset:*)",
       "Bash(node:*)",
-      "Bash(npm run type-check:*)"
+      "Bash(npm run type-check:*)",
+      "Bash(for file in \"src/applications/editor/flyzone-editor.tsx\" \"src/applications/location-editor/state.ts\" \"src/applications/editor/flyzone-editor-ui.ts\" \"src/shared/env/environment.ts\" \"src/foundation/systems/behaviors/FlyingBehavior.ts\" \"src/foundation/components/environment/Sky.ts\")"
     ],
     "deny": [],
     "ask": []
