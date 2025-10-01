@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { StoryOptions } from '../../shared/types';
 import { TerrainBase } from '../../shared/TerrainBase';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { logger } from '../../foundation/utils/logger';
 import {
   Paraglider,
@@ -14,6 +13,8 @@ import {
   FlyingBehavior,
   FlightPattern,
 } from '../../foundation/systems/behaviors/FlyingBehavior';
+import { CameraTargetController, CameraMode } from '../../foundation/systems/scene/CameraTargetController';
+import { createCameraTargetUI } from '../../foundation/components/ui/CameraTargetUI';
 
 interface FlyingVehicle {
   mesh: THREE.Object3D;
@@ -28,6 +29,7 @@ interface FlyingVehicle {
 class IslandFlyingApp extends TerrainBase {
   private animationId: number | undefined;
   private vehicles: FlyingVehicle[] = [];
+  private targetController: CameraTargetController | null = null;
 
   constructor() {
     super({
@@ -45,15 +47,27 @@ class IslandFlyingApp extends TerrainBase {
     try {
       this.initializeCore(options);
       await this.initializeEnvironment(options);
-      const { camera, scene, renderer, controls } = options;
+      const { camera, scene, renderer, controls, gui } = options;
 
-      // Add flying vehicles
-      await this.addFlyingVehicles(scene);
+      // Replace camera with CameraTargetController
+      this.targetController = new CameraTargetController(
+        camera.fov,
+        camera.aspect,
+        camera.near,
+        camera.far
+      );
+      this.targetController.position.set(-21200, 3500, 23000);
+      this.targetController.rotation.copy(camera.rotation);
 
-      // Set camera to view the island from a distance
-      camera.position.set(-21200, 3500, 23000);
+      // Replace in scene
+      scene.remove(camera);
+      scene.add(this.targetController);
 
-      // Enable orbit controls for navigation
+      // Update options camera reference
+      options.camera = this.targetController;
+
+      // Update controls to use new camera
+      controls.object = this.targetController;
       controls.enabled = true;
       controls.enableDamping = true;
       controls.dampingFactor = 0.05;
@@ -75,7 +89,23 @@ class IslandFlyingApp extends TerrainBase {
       }
       controls.update();
 
-      this.startAnimationLoop(renderer, scene, camera, controls);
+      // Add flying vehicles
+      await this.addFlyingVehicles(scene);
+
+      // Add GUI controls for camera
+      this.targetController.addGui(gui);
+
+      // Create React UI for target switching
+      createCameraTargetUI(this.targetController, controls, (targetIndex, mode) => {
+        logger.info(`📷 Switched to target ${targetIndex} in ${mode} mode`);
+      });
+
+      // Set initial camera to follow first vehicle
+      if (this.vehicles.length > 0) {
+        this.targetController.switchToTarget(0, CameraMode.Follow, 0, controls);
+      }
+
+      this.startAnimationLoop(renderer, scene, controls);
 
       this.isLoaded = true;
       logger.info(
@@ -264,27 +294,54 @@ class IslandFlyingApp extends TerrainBase {
         behavior.start();
 
         this.vehicles.push({ mesh, behavior, type });
+
+        // Add to camera targets with emoji and type
+        const emoji = this.getVehicleEmoji(type);
+        this.targetController?.addTarget(mesh, `${emoji} ${type}`);
       }
     } catch (error) {
       logger.warn(`Failed to add ${type}:`, error);
     }
   }
 
+  /**
+   * Get emoji for vehicle type
+   */
+  private getVehicleEmoji(type: string): string {
+    const emojis: Record<string, string> = {
+      Paraglider: '🪂',
+      Hangglider: '🪂',
+      Cessna: '✈️',
+      Jet: '✈️',
+      Airliner: '✈️',
+    };
+    return emojis[type] || '✈️';
+  }
+
   private startAnimationLoop(
     renderer: THREE.WebGLRenderer,
     scene: THREE.Scene,
-    camera: THREE.Camera,
-    controls: OrbitControls
+    controls: any
   ): void {
     const animate = () => {
       try {
         this.updatePerformance();
 
+        // Update camera controller
+        if (this.targetController) {
+          this.targetController.update(0.016);
+        }
+
         // FlyingBehavior updates itself via its own animation loop
         // No need to manually update behaviors here
 
         controls.update();
-        renderer.render(scene, camera);
+
+        // Render with camera controller
+        if (this.targetController) {
+          renderer.render(scene, this.targetController);
+        }
+
         this.animationId = requestAnimationFrame(animate);
       } catch (error) {
         this.handleError(error as Error, 'animation loop');
@@ -301,8 +358,14 @@ class IslandFlyingApp extends TerrainBase {
       this.animationId = undefined;
     }
 
-    // Clean up vehicles
+    // Stop all flying behaviors to prevent memory leaks
+    for (const vehicle of this.vehicles) {
+      vehicle.behavior.stop();
+    }
     this.vehicles = [];
+
+    // Clean up camera controller
+    this.targetController = null;
 
     super.dispose();
   }
