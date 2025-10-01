@@ -6,6 +6,7 @@ export enum FlightPattern {
   PERCH_AND_FLY = 'perch_and_fly',
   CIRCULAR = 'circular',
   FIGURE_EIGHT = 'figure8',
+  WAYPOINT = 'waypoint',
 }
 
 export type ForwardAxis = 'x' | 'y' | 'z' | '-x' | '-y' | '-z';
@@ -24,6 +25,9 @@ export interface FlyingBehaviorOptions {
   faceDirection?: boolean;
   forwardAxis?: ForwardAxis;
   debugVectors?: boolean; // Show velocity and forward direction vectors
+  waypoints?: THREE.Vector3[]; // Predefined points for WAYPOINT pattern
+  waypointTension?: number; // Catmull-Rom spline tension (0 = sharp, 0.5 = smooth, default 0.5)
+  waypointLoop?: boolean; // Whether to loop back to start (default true)
 }
 
 export interface FlightState {
@@ -80,6 +84,13 @@ export class FlyingBehavior {
   private lastUpdate = 0;
   private debugLogCounter = 0; // For throttled debug logging
 
+  // Waypoint pattern state
+  private waypoints: THREE.Vector3[] = [];
+  private waypointCurve: THREE.CatmullRomCurve3 | null = null;
+  private waypointProgress = 0; // 0 to 1 along the curve
+  private waypointTension: number;
+  private waypointLoop: boolean;
+
   constructor(options: FlyingBehaviorOptions = {}) {
     this.pattern = options.pattern || FlightPattern.FREE_ROAM;
     this.speed = options.speed || 2.0;
@@ -95,6 +106,13 @@ export class FlyingBehavior {
     this.faceDirection = options.faceDirection !== false;
     this.forwardAxis = options.forwardAxis || 'z';
     this.debugVectors = options.debugVectors || false;
+    this.waypointTension = options.waypointTension ?? 0.5;
+    this.waypointLoop = options.waypointLoop ?? true;
+
+    // Setup waypoints if provided
+    if (options.waypoints && options.waypoints.length >= 2) {
+      this.setWaypoints(options.waypoints);
+    }
 
     // Initialize with random direction
     this.targetDirection.set(
@@ -167,6 +185,39 @@ export class FlyingBehavior {
    */
   public setPattern(pattern: FlightPattern): void {
     this.pattern = pattern;
+    if (pattern === FlightPattern.WAYPOINT && this.waypoints.length === 0) {
+      logger.warn('WAYPOINT pattern selected but no waypoints defined');
+    }
+  }
+
+  /**
+   * Set waypoints for WAYPOINT flight pattern
+   */
+  public setWaypoints(points: THREE.Vector3[]): void {
+    if (points.length < 2) {
+      logger.error('At least 2 waypoints required for WAYPOINT pattern');
+      return;
+    }
+
+    this.waypoints = points.map(p => p.clone());
+
+    // Create smooth Catmull-Rom spline curve through the waypoints
+    this.waypointCurve = new THREE.CatmullRomCurve3(
+      this.waypoints,
+      this.waypointLoop, // closed loop or open path
+      'catmullrom',
+      this.waypointTension
+    );
+
+    this.waypointProgress = 0;
+    logger.debug(`Waypoint curve created with ${points.length} points, loop: ${this.waypointLoop}`);
+  }
+
+  /**
+   * Get waypoints array
+   */
+  public getWaypoints(): THREE.Vector3[] {
+    return this.waypoints.map(p => p.clone());
   }
 
   /**
@@ -217,6 +268,12 @@ export class FlyingBehavior {
   protected updateFlight(deltaTime: number): void {
     if (!this.mesh) return;
 
+    // WAYPOINT pattern ignores physics and follows the curve directly
+    if (this.pattern === FlightPattern.WAYPOINT) {
+      this.updateWaypointFlight(deltaTime);
+      return;
+    }
+
     // Get desired direction based on pattern
     const desiredDirection = this.getDesiredDirection();
 
@@ -254,6 +311,56 @@ export class FlyingBehavior {
     // Orient the object if needed
     if (this.faceDirection) {
       this.orientToDirection(this.targetDirection);
+    }
+
+    // Update debug arrows if enabled
+    this.updateDebugArrows();
+
+    // Log debug information periodically
+    this.logDebugInfo();
+  }
+
+  /**
+   * Update flight following waypoint curve (no physics, smooth interpolation)
+   */
+  protected updateWaypointFlight(deltaTime: number): void {
+    if (!this.mesh || !this.waypointCurve) {
+      logger.warn('WAYPOINT pattern requires waypoints to be set');
+      return;
+    }
+
+    // Calculate curve length to convert speed to progress
+    const curveLength = this.waypointCurve.getLength();
+    const progressIncrement = (this.speed * deltaTime) / curveLength;
+
+    // Advance along the curve
+    this.waypointProgress += progressIncrement;
+
+    // Handle loop or stop at end
+    if (this.waypointLoop) {
+      this.waypointProgress = this.waypointProgress % 1.0;
+    } else {
+      this.waypointProgress = Math.min(1.0, this.waypointProgress);
+    }
+
+    // Get position on curve
+    const targetPosition = this.waypointCurve.getPoint(this.waypointProgress);
+
+    // Calculate direction for orientation
+    const direction = targetPosition.clone().sub(this.mesh.position).normalize();
+    this.targetDirection.copy(direction);
+
+    // Update velocity for debug visualization
+    this.currentVelocity.copy(direction).multiplyScalar(this.speed);
+
+    // Smoothly move to target position (direct positioning, no physics)
+    this.mesh.position.copy(targetPosition);
+
+    // Orient the object if needed
+    if (this.faceDirection) {
+      // Use tangent for more accurate forward direction
+      const tangent = this.waypointCurve.getTangent(this.waypointProgress);
+      this.orientToDirection(tangent);
     }
 
     // Update debug arrows if enabled

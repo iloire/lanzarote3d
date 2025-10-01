@@ -40,6 +40,9 @@ export type CessnaConfig = {
   maxHeight: number;
   obstacleAvoidanceDistance: number;
   forwardAxis: 'x' | 'y' | 'z' | '-x' | '-y' | '-z';
+  waypoints?: THREE.Vector3[];
+  waypointTension?: number;
+  waypointLoop?: boolean;
 };
 
 export type HerculesConfig = {
@@ -100,8 +103,8 @@ export const cessnaConfig: CessnaConfig = {
   propellerColor: '#2C3E50',
   windowColor: '#87CEEB',
   stripeColor: '#FF4500',
-  flightPattern: FlightPattern.CIRCULAR,
-  speed: 4.5,
+  flightPattern: FlightPattern.WAYPOINT,
+  speed: 50,
   turnSpeed: 5.0,
   flightRadius: 250,
   returnDistance: 300,
@@ -109,6 +112,25 @@ export const cessnaConfig: CessnaConfig = {
   maxHeight: 1500,
   obstacleAvoidanceDistance: 200,
   forwardAxis: 'x',
+  // Flight path over houses and boats
+  waypoints: [
+    // Start over paraglider area (suburban neighborhood)
+    new THREE.Vector3(6879, 1100, 545),
+    // Over Famara coastal village
+    new THREE.Vector3(6279, 1200, -3155),
+    // Over boats area 1 (marina/harbor)
+    new THREE.Vector3(7879, 1150, -5445),
+    // Over boats area 2 (open water)
+    new THREE.Vector3(8279, 1100, -6455),
+    // Over Noruegos rural settlement
+    new THREE.Vector3(7827, 1250, -3460),
+    // Over Teguise town center
+    new THREE.Vector3(5600, 1300, 1205),
+    // Return path back to start
+    new THREE.Vector3(6200, 1200, 200),
+  ],
+  waypointTension: 0.5,
+  waypointLoop: true,
 };
 
 export const herculesConfig: HerculesConfig = {
