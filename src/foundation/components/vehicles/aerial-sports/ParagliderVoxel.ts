@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import LegacyPilotVoxel, { PilotVoxelOptions } from '../../characters/LegacyPilotVoxel';
-import LegacyGlider, { GliderOptions } from '../components/Glider';
+import Glider, { GliderOptions } from '../components/Glider';
 import GuiHelper from '../../../utils/gui';
 import { IVehicleWithGUI } from '../../../types/IVehicle';
 
@@ -19,12 +19,12 @@ export interface ParagliderVoxelOptions {
  * Implements IVehicleWithGUI for consistent vehicle interface across the application.
  *
  * Note: This class doesn't extend a base component class because it's a composite
- * that assembles two different component types (LegacyGlider and LegacyPilotVoxel) with
+ * that assembles two different component types (Glider and LegacyPilotVoxel) with
  * different APIs. Instead, it implements the IVehicle interface for consistency.
  */
 export class ParagliderVoxel implements IVehicleWithGUI {
   private mesh?: THREE.Object3D;
-  private glider!: LegacyGlider;
+  private glider!: Glider;
   private pilot!: LegacyPilotVoxel;
   private pilotMesh!: THREE.Object3D;
   private options: ParagliderVoxelOptions;
@@ -41,7 +41,7 @@ export class ParagliderVoxel implements IVehicleWithGUI {
     this.mesh.name = 'ParagliderVoxel';
 
     // Create glider wing
-    this.glider = new LegacyGlider(this.options.glider);
+    this.glider = new Glider(this.options.glider);
     const wing = await this.glider.load();
     wing.translateY(-300);
     wing.translateX(300);

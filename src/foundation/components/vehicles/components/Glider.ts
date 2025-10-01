@@ -173,7 +173,7 @@ const createBand = (options: BandOptions) => {
   return group;
 };
 
-class LegacyGlider {
+class Glider {
   leftWing!: HalfWing;
   rightWing!: HalfWing;
   fullWing!: THREE.Mesh;
@@ -232,4 +232,4 @@ class LegacyGlider {
   }
 }
 
-export default LegacyGlider;
+export default Glider;

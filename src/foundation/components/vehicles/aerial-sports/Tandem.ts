@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import TandemPilot, { TandemPilotOptions } from '../../characters/TandemPilot';
-import LegacyGlider, { GliderOptions } from '../components/Glider';
+import Glider, { GliderOptions } from '../components/Glider';
 import { IVehicle } from '../../../types/IVehicle';
 
 export interface TandemOptions {
@@ -17,12 +17,12 @@ export interface TandemOptions {
  * into a single assembly. Implements IVehicle for consistent vehicle interface.
  *
  * Note: This class doesn't extend a base component class because it's a composite
- * that assembles two different component types (LegacyGlider and TandemPilot) with
+ * that assembles two different component types (Glider and TandemPilot) with
  * different configurations. Instead, it implements the IVehicle interface for consistency.
  */
 export class Tandem implements IVehicle {
   private mesh?: THREE.Object3D;
-  private glider!: LegacyGlider;
+  private glider!: Glider;
   private pilot!: TandemPilot;
   private pilotMesh!: THREE.Object3D;
   private options: TandemOptions;
@@ -39,7 +39,7 @@ export class Tandem implements IVehicle {
     this.mesh.name = 'Tandem';
 
     // Create glider wing
-    this.glider = new LegacyGlider(this.options.glider);
+    this.glider = new Glider(this.options.glider);
     const wing = this.glider.createWing();
     wing.position.y = 2800;
     wing.position.x = 300;

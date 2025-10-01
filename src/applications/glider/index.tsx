@@ -1,4 +1,4 @@
-import { LegacyGlider } from '../../foundation/components/vehicles';
+import { Glider } from '../../foundation/components/vehicles';
 import { StoryOptions } from '../../shared/types';
 import { WorkshopDemoBase } from '../../shared/WorkshopDemoBase';
 
@@ -46,7 +46,7 @@ class LegacyGliderWorkshopApp extends WorkshopDemoBase {
         carabinersSeparationMM: 300,
       };
 
-      const glider = new LegacyGlider(gliderOptions);
+      const glider = new Glider(gliderOptions);
       const mesh = await glider.load(gui);
       scene.add(mesh);
 
