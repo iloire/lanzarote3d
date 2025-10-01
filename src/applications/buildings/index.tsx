@@ -1,5 +1,11 @@
 import * as THREE from 'three';
-import { House, HouseType, BarnLegacy as Barn } from '../../foundation/components/scenery/buildings';
+import {
+  House,
+  HouseType,
+  BarnLegacy as Barn,
+  HospitalLegacy as Hospital,
+  DomeLegacy as Dome
+} from '../../foundation/components/scenery/buildings';
 import { VillaLegacy as Villa, TownhouseLegacy as Townhouse, DesertHouseLegacy as DesertHouse } from '../../foundation/components/scenery';
 import { StoryOptions } from '../../shared/types';
 import { WorkshopDemoBase } from '../../shared/WorkshopDemoBase';
@@ -95,16 +101,16 @@ interface HouseStats {
   reduction: number;
 }
 
-class HousesWorkshop extends WorkshopDemoBase {
+class BuildingsWorkshop extends WorkshopDemoBase {
   private statsOverlay?: HTMLDivElement;
   private toggleButton?: HTMLButtonElement;
-  private houseStats: HouseStats[] = [];
+  private buildingStats: HouseStats[] = [];
   private isOverlayVisible: boolean = true;
 
   constructor() {
     super({
-      name: 'Houses Workshop',
-      description: 'House component showcase comparing normal vs low-poly versions',
+      name: 'Buildings Workshop',
+      description: 'Building component showcase comparing normal vs low-poly versions',
       requiredComponents: ['scene', 'camera', 'renderer', 'gui'],
       ground: {
         create: true,
@@ -218,8 +224,8 @@ class HousesWorkshop extends WorkshopDemoBase {
   private updateStatsOverlay(): void {
     if (!this.statsOverlay) return;
 
-    const totalNormal = this.houseStats.reduce((sum, stat) => sum + stat.normalPolygons, 0);
-    const totalLowPoly = this.houseStats.reduce((sum, stat) => sum + stat.lowPolyPolygons, 0);
+    const totalNormal = this.buildingStats.reduce((sum, stat) => sum + stat.normalPolygons, 0);
+    const totalLowPoly = this.buildingStats.reduce((sum, stat) => sum + stat.lowPolyPolygons, 0);
     const overallReduction = Math.round(((totalNormal - totalLowPoly) / totalNormal) * 100);
 
     let html = `
@@ -234,7 +240,7 @@ class HousesWorkshop extends WorkshopDemoBase {
       </div>
     `;
 
-    this.houseStats.forEach((stat) => {
+    this.buildingStats.forEach((stat) => {
       html += `
         <div style="display: grid; grid-template-columns: 200px 120px 120px 80px; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.08);">
           <div style="color: #333; font-weight: 500;">${stat.name}</div>
@@ -321,7 +327,7 @@ class HousesWorkshop extends WorkshopDemoBase {
         logger.info(`✅ ${houseConfig.name} low-poly loaded: ${lowPolyPolygons} triangles (-${reduction}%)`);
 
         // Add to stats
-        this.houseStats.push({
+        this.buildingStats.push({
           name: houseConfig.name,
           normalPolygons,
           lowPolyPolygons,
@@ -361,7 +367,7 @@ class HousesWorkshop extends WorkshopDemoBase {
       logger.info(`✅ Villa low-poly loaded: ${lowPolyVillaPolygons} triangles (-${villaReduction}%)`);
 
       // Add to stats
-      this.houseStats.push({
+      this.buildingStats.push({
         name: 'Villa',
         normalPolygons: normalVillaPolygons,
         lowPolyPolygons: lowPolyVillaPolygons,
@@ -399,7 +405,7 @@ class HousesWorkshop extends WorkshopDemoBase {
       logger.info(`✅ Townhouse low-poly loaded: ${lowPolyTownhousePolygons} triangles (-${townhouseReduction}%)`);
 
       // Add to stats
-      this.houseStats.push({
+      this.buildingStats.push({
         name: 'Townhouse',
         normalPolygons: normalTownhousePolygons,
         lowPolyPolygons: lowPolyTownhousePolygons,
@@ -437,7 +443,7 @@ class HousesWorkshop extends WorkshopDemoBase {
       logger.info(`✅ Barn low-poly loaded: ${lowPolyBarnPolygons} triangles (-${barnReduction}%)`);
 
       // Add to stats
-      this.houseStats.push({
+      this.buildingStats.push({
         name: 'Barn',
         normalPolygons: normalBarnPolygons,
         lowPolyPolygons: lowPolyBarnPolygons,
@@ -475,7 +481,7 @@ class HousesWorkshop extends WorkshopDemoBase {
       logger.info(`✅ DesertHouse low-poly loaded: ${lowPolyDesertHousePolygons} triangles (-${desertHouseReduction}%)`);
 
       // Add to stats
-      this.houseStats.push({
+      this.buildingStats.push({
         name: 'Desert House',
         normalPolygons: normalDesertHousePolygons,
         lowPolyPolygons: lowPolyDesertHousePolygons,
@@ -487,7 +493,83 @@ class HousesWorkshop extends WorkshopDemoBase {
       scene.add(createLabel('Desert House (Error)', new THREE.Vector3(xPosition, 35, normalRow)));
     }
 
-    logger.info('🏠 Houses demo setup complete - all types loaded!');
+    xPosition += spacing;
+
+    // Dome
+    try {
+      // Normal Dome
+      const normalDome = new Dome({ lowPoly: false });
+      const normalDomeMesh = await normalDome.load();
+      normalDomeMesh.position.set(xPosition, 0, normalRow);
+      scene.add(normalDomeMesh);
+
+      const normalDomePolygons = countPolygons(normalDomeMesh);
+      scene.add(createLabel('Dome', new THREE.Vector3(xPosition, 35, normalRow), normalDomePolygons));
+      logger.info(`✅ Dome normal loaded: ${normalDomePolygons} triangles`);
+
+      // Low-poly Dome
+      const lowPolyDome = new Dome({ lowPoly: true });
+      const lowPolyDomeMesh = await lowPolyDome.load();
+      lowPolyDomeMesh.position.set(xPosition, 0, lowPolyRow);
+      scene.add(lowPolyDomeMesh);
+
+      const lowPolyDomePolygons = countPolygons(lowPolyDomeMesh);
+      const domeReduction = Math.round(((normalDomePolygons - lowPolyDomePolygons) / normalDomePolygons) * 100);
+      scene.add(createLabel(`Dome (-${domeReduction}%)`, new THREE.Vector3(xPosition, 35, lowPolyRow), lowPolyDomePolygons));
+      logger.info(`✅ Dome low-poly loaded: ${lowPolyDomePolygons} triangles (-${domeReduction}%)`);
+
+      // Add to stats
+      this.buildingStats.push({
+        name: 'Dome',
+        normalPolygons: normalDomePolygons,
+        lowPolyPolygons: lowPolyDomePolygons,
+        reduction: domeReduction
+      });
+      this.updateStatsOverlay();
+    } catch (error) {
+      logger.error('❌ Error loading Dome:', error);
+      scene.add(createLabel('Dome (Error)', new THREE.Vector3(xPosition, 35, normalRow)));
+    }
+
+    xPosition += spacing;
+
+    // Hospital
+    try {
+      // Normal Hospital
+      const normalHospital = new Hospital({ lowPoly: false });
+      const normalHospitalMesh = await normalHospital.load();
+      normalHospitalMesh.position.set(xPosition, 0, normalRow);
+      scene.add(normalHospitalMesh);
+
+      const normalHospitalPolygons = countPolygons(normalHospitalMesh);
+      scene.add(createLabel('Hospital', new THREE.Vector3(xPosition, 35, normalRow), normalHospitalPolygons));
+      logger.info(`✅ Hospital normal loaded: ${normalHospitalPolygons} triangles`);
+
+      // Low-poly Hospital
+      const lowPolyHospital = new Hospital({ lowPoly: true });
+      const lowPolyHospitalMesh = await lowPolyHospital.load();
+      lowPolyHospitalMesh.position.set(xPosition, 0, lowPolyRow);
+      scene.add(lowPolyHospitalMesh);
+
+      const lowPolyHospitalPolygons = countPolygons(lowPolyHospitalMesh);
+      const hospitalReduction = Math.round(((normalHospitalPolygons - lowPolyHospitalPolygons) / normalHospitalPolygons) * 100);
+      scene.add(createLabel(`Hospital (-${hospitalReduction}%)`, new THREE.Vector3(xPosition, 35, lowPolyRow), lowPolyHospitalPolygons));
+      logger.info(`✅ Hospital low-poly loaded: ${lowPolyHospitalPolygons} triangles (-${hospitalReduction}%)`);
+
+      // Add to stats
+      this.buildingStats.push({
+        name: 'Hospital',
+        normalPolygons: normalHospitalPolygons,
+        lowPolyPolygons: lowPolyHospitalPolygons,
+        reduction: hospitalReduction
+      });
+      this.updateStatsOverlay();
+    } catch (error) {
+      logger.error('❌ Error loading Hospital:', error);
+      scene.add(createLabel('Hospital (Error)', new THREE.Vector3(xPosition, 35, normalRow)));
+    }
+
+    logger.info('🏢 Buildings demo setup complete - all types loaded!');
 
     // Position camera to view the reorganized scene
     if (camera instanceof THREE.PerspectiveCamera) {
@@ -524,4 +606,4 @@ class HousesWorkshop extends WorkshopDemoBase {
   }
 }
 
-export default new HousesWorkshop();
+export default new BuildingsWorkshop();
