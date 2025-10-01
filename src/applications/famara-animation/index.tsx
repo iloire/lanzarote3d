@@ -333,7 +333,8 @@ class AnimationApp extends TerrainBase {
         }
 
         // Render with appropriate camera
-        const renderCamera = this.targetController || camera;
+        // Use original camera during initial animation, then switch to controller if available
+        const renderCamera = (this.isAnimating || !this.targetController) ? camera : this.targetController;
         renderer.render(scene, renderCamera);
         this.animationId = requestAnimationFrame(animate);
       } catch (error) {

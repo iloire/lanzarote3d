@@ -36,7 +36,7 @@ export async function loadParagliders(
       const paraglider = new ParagliderVoxel(p.pg);
       const mesh = await paraglider.load();
       mesh.position.copy(p.position);
-      const scale = 0.01;
+      const scale = 1.0; // Increased from 0.01 to make visible
       mesh.scale.set(scale, scale, scale);
       scene.add(mesh);
 
@@ -73,14 +73,17 @@ export async function loadParagliders(
       }
 
       results.push({ mesh, flyingBehavior });
+      logger.info(`✅ Paraglider voxel loaded at position (${p.position.x}, ${p.position.y}, ${p.position.z})`);
       return mesh;
     } catch (error) {
       errorHandler(error as Error, 'loading voxel paraglider');
+      logger.error('❌ Failed to load paraglider voxel:', error);
       return null;
     }
   });
 
   await Promise.all(voxelPromises);
+  logger.info(`🪂 Loaded ${results.length} paraglider(s)`);
   return results;
 }
 

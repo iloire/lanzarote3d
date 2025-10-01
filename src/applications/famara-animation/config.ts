@@ -228,7 +228,7 @@ export const SHOW_CESSNA = true;
 export const SHOW_HERCULES = true;
 
 // Camera Target Controller
-export const SHOW_CAMERA_TARGET_UI = false;
+export const SHOW_CAMERA_TARGET_UI = true;
 
 // Animation configuration
 export const ANIMATION_DURATION_MS = 6000; // 6 seconds
