@@ -61,6 +61,9 @@ export type HerculesConfig = {
   maxHeight: number;
   obstacleAvoidanceDistance: number;
   forwardAxis: 'x' | 'y' | 'z' | '-x' | '-y' | '-z';
+  waypoints?: THREE.Vector3[];
+  waypointTension?: number;
+  waypointLoop?: boolean;
 };
 
 export const paraglidersVoxel: ParagliderVoxelConfig[] = [
@@ -104,7 +107,7 @@ export const cessnaConfig: CessnaConfig = {
   windowColor: '#87CEEB',
   stripeColor: '#FF4500',
   flightPattern: FlightPattern.WAYPOINT,
-  speed: 50,
+  speed: 40,
   turnSpeed: 5.0,
   flightRadius: 250,
   returnDistance: 300,
@@ -112,24 +115,24 @@ export const cessnaConfig: CessnaConfig = {
   maxHeight: 1500,
   obstacleAvoidanceDistance: 200,
   forwardAxis: 'x',
-  // Flight path over houses and boats
+  // Tight, low-altitude flight path over houses and boats
   waypoints: [
     // Start over paraglider area (suburban neighborhood)
-    new THREE.Vector3(6879, 1100, 545),
+    new THREE.Vector3(6879, 950, 545),
     // Over Famara coastal village
-    new THREE.Vector3(6279, 1200, -3155),
+    new THREE.Vector3(6279, 1000, -3155),
     // Over boats area 1 (marina/harbor)
-    new THREE.Vector3(7879, 1150, -5445),
+    new THREE.Vector3(7879, 980, -5445),
     // Over boats area 2 (open water)
-    new THREE.Vector3(8279, 1100, -6455),
+    new THREE.Vector3(8279, 950, -6455),
     // Over Noruegos rural settlement
-    new THREE.Vector3(7827, 1250, -3460),
+    new THREE.Vector3(7827, 1050, -3460),
     // Over Teguise town center
-    new THREE.Vector3(5600, 1300, 1205),
+    new THREE.Vector3(5600, 1100, 1205),
     // Return path back to start
-    new THREE.Vector3(6200, 1200, 200),
+    new THREE.Vector3(6200, 1000, 200),
   ],
-  waypointTension: 0.5,
+  waypointTension: 0.6, // Tighter curves
   waypointLoop: true,
 };
 
@@ -140,8 +143,8 @@ export const herculesConfig: HerculesConfig = {
   wingColor: '#4B5563',
   propellerColor: '#1F2937',
   windowColor: '#3B82F6',
-  flightPattern: FlightPattern.FIGURE_EIGHT,
-  speed: 5.0,
+  flightPattern: FlightPattern.WAYPOINT,
+  speed: 60,
   turnSpeed: 4.0,
   flightRadius: 300,
   returnDistance: 350,
@@ -149,6 +152,27 @@ export const herculesConfig: HerculesConfig = {
   maxHeight: 1600,
   obstacleAvoidanceDistance: 250,
   forwardAxis: 'x',
+  // Wide, high-altitude perimeter patrol
+  waypoints: [
+    // North-east approach (high over Teguise)
+    new THREE.Vector3(5200, 1500, 2000),
+    // East side (over suburban area, high altitude)
+    new THREE.Vector3(7500, 1600, 1500),
+    // South-east (wide arc around boats)
+    new THREE.Vector3(9000, 1550, -4000),
+    // South (far over ocean)
+    new THREE.Vector3(8500, 1500, -7500),
+    // South-west (wide turn back)
+    new THREE.Vector3(6500, 1450, -8000),
+    // West approach (along coast)
+    new THREE.Vector3(4500, 1400, -5000),
+    // North-west (returning inland)
+    new THREE.Vector3(4000, 1450, -1000),
+    // Complete circle back to start
+    new THREE.Vector3(4800, 1500, 500),
+  ],
+  waypointTension: 0.3, // Wider, gentler curves for large aircraft
+  waypointLoop: true,
 };
 
 // Visibility flags for easy toggling
