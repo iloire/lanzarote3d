@@ -63,61 +63,6 @@ export class Paraglider {
     return this.mesh;
   }
 
-  // Control methods
-  public showAxesHelper(): void {
-    if (this.axesHelper) {
-      this.axesHelper.visible = true;
-    }
-  }
-
-  public toggleAxesHelper(): void {
-    if (this.axesHelper) {
-      this.axesHelper.visible = !this.axesHelper.visible;
-    }
-  }
-
-  public left(): void {
-    if (this.glider) {
-      this.glider.breakLeft();
-    }
-    if (this.pilot) {
-      this.pilot.breakLeft();
-    }
-  }
-
-  public leftRelease(): void {
-    if (this.pilot) {
-      this.pilot.breakLeftRelease();
-    }
-  }
-
-  public right(): void {
-    if (this.glider) {
-      this.glider.breakRight();
-    }
-    if (this.pilot) {
-      this.pilot.breakRight();
-    }
-  }
-
-  public rightRelease(): void {
-    if (this.pilot) {
-      this.pilot.breakRightRelease();
-    }
-  }
-
-  public speedBar(): void {
-    if (this.pilot) {
-      this.pilot.speedBar();
-    }
-  }
-
-  public releaseSpeedBar(): void {
-    if (this.pilot) {
-      this.pilot.releaseSpeedBar();
-    }
-  }
-
   /**
    * Get the mesh
    */

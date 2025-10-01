@@ -15,71 +15,68 @@ export interface HanggliderOptions {
 /**
  * Hangglider component - combines wing and pilot
  *
- * This component no longer extends AutoFlier - use FlyingBehavior when autonomous flight is needed.
- * Provides just the visual model without path-following logic.
+ * This component composes both the hangglider wing and pilot character into a single assembly.
+ * Note: This class doesn't extend a base component class because it needs to compose
+ * two different component types (HangGliderWing and Pilot) with different configurations.
+ * Use FlyingBehavior when autonomous flight is needed.
  */
-class HangGliderModel {
-  wing!: HangGliderWing;
-  pilot!: Pilot;
-  private pilotOptions?: PilotOptions;
-  private wingColor?: string;
-  private wingspan?: number;
-  private scale?: number;
-  private castShadow?: boolean;
-  private receiveShadow?: boolean;
+export class Hangglider {
   private mesh?: THREE.Group;
+  private wing!: HangGliderWing;
+  private pilot!: Pilot;
+  private pilotMesh!: THREE.Object3D;
+  private options: HanggliderOptions;
 
   constructor(options: HanggliderOptions = {}) {
-    this.pilotOptions = options.pilotOptions;
-    this.wingColor = options.wingColor;
-    this.wingspan = options.wingspan;
-    this.scale = options.scale || 1;
-    this.castShadow = options.castShadow;
-    this.receiveShadow = options.receiveShadow;
+    this.options = options;
   }
 
+  /**
+   * Load and assemble the hangglider
+   */
   async load(): Promise<THREE.Group> {
     const group = new THREE.Group();
+    group.name = 'Hangglider';
 
     // Create wing
     this.wing = new HangGliderWing({
-      wingColor: this.wingColor,
-      wingspan: this.wingspan,
+      wingColor: this.options.wingColor,
+      wingspan: this.options.wingspan,
     });
     const wingMesh = await this.wing.load();
     wingMesh.position.y = 10;
     wingMesh.position.x = -40;
+    group.add(wingMesh);
 
     // Create pilot
     this.pilot = new Pilot({
-      castShadow: this.castShadow,
-      receiveShadow: this.receiveShadow,
-      ...this.pilotOptions,
+      castShadow: this.options.castShadow,
+      receiveShadow: this.options.receiveShadow,
+      ...this.options.pilotOptions,
     });
-    const pilotMesh = await this.pilot.load();
+    this.pilotMesh = await this.pilot.load();
     const pilotScale = 0.03;
-    pilotMesh.scale.set(pilotScale, pilotScale, pilotScale);
-    pilotMesh.position.x = -5;
-    pilotMesh.position.z = -0.4;
-    pilotMesh.rotateY(Math.PI / 2);
-
-    group.add(pilotMesh);
-    group.add(wingMesh);
+    this.pilotMesh.scale.set(pilotScale, pilotScale, pilotScale);
+    this.pilotMesh.position.x = -5;
+    this.pilotMesh.position.z = -0.4;
+    this.pilotMesh.rotateY(Math.PI / 2);
+    group.add(this.pilotMesh);
 
     // Rotate the entire hangglider model 90 degrees to the left + 180 degrees (total 270 degrees)
     group.rotateY(-Math.PI / 2 + Math.PI);
 
     // Apply scale
-    if (this.scale !== 1) {
-      group.scale.set(this.scale, this.scale, this.scale);
+    const scale = this.options.scale || 1;
+    if (scale !== 1) {
+      group.scale.set(scale, scale, scale);
     }
 
     // Apply shadow settings
-    if (this.castShadow !== undefined || this.receiveShadow !== undefined) {
+    if (this.options.castShadow !== undefined || this.options.receiveShadow !== undefined) {
       group.traverse((child: THREE.Object3D) => {
         if (child instanceof THREE.Mesh) {
-          if (this.castShadow !== undefined) child.castShadow = this.castShadow;
-          if (this.receiveShadow !== undefined) child.receiveShadow = this.receiveShadow;
+          if (this.options.castShadow !== undefined) child.castShadow = this.options.castShadow;
+          if (this.options.receiveShadow !== undefined) child.receiveShadow = this.options.receiveShadow;
         }
       });
     }
@@ -89,36 +86,44 @@ class HangGliderModel {
   }
 
   /**
-   * Add GUI controls for this hangglider
+   * Get the mesh
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  addGuiControls(gui: any): void {
-    if (!this.mesh) return;
-
-    const pilot = this.mesh.children.find((child: THREE.Object3D) => child.name === 'pilot');
-    if (pilot) {
-      GuiHelper.addLocationGui(gui, 'Hanglider pilot', pilot);
+  public getMesh(): THREE.Group {
+    if (!this.mesh) {
+      throw Error('mesh not loaded - use load()');
     }
-    GuiHelper.addLocationGui(gui, 'Hanglider', this.mesh);
+    return this.mesh;
   }
 
   /**
-   * Dispose of resources
+   * Add GUI controls for this hangglider
    */
-  dispose(): void {
-    if (this.mesh) {
-      this.mesh.traverse((child: THREE.Object3D) => {
-        if (child instanceof THREE.Mesh) {
-          child.geometry?.dispose();
-          if (Array.isArray(child.material)) {
-            child.material.forEach(mat => mat.dispose());
-          } else if (child.material) {
-            child.material.dispose();
-          }
-        }
-      });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public addGuiControls(gui: any): void {
+    if (!this.mesh) return;
+
+    if (this.pilotMesh) {
+      GuiHelper.addLocationGui(gui, 'Hangglider pilot', this.pilotMesh);
     }
+    GuiHelper.addLocationGui(gui, 'Hangglider', this.mesh);
+  }
+
+  /**
+   * Clean up resources
+   */
+  public dispose(): void {
+    if (this.pilot) {
+      this.pilot.dispose();
+    }
+    if (this.wing) {
+      this.wing.dispose();
+    }
+    // Clear references
+    this.mesh = undefined;
+    this.wing = undefined as any;
+    this.pilot = undefined as any;
+    this.pilotMesh = undefined as any;
   }
 }
 
-export default HangGliderModel;
+export default Hangglider;
