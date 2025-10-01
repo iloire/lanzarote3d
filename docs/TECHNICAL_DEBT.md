@@ -4,6 +4,100 @@ This document tracks pending technical debt and issues that need to be addressed
 
 ## High Priority Issues
 
+### Confusing Component Base Class Naming
+**Status**: ⚠️ High Priority - Architecture Debt - Documented Oct 1, 2025
+**Files**: `src/foundation/components/base/SimpleThreeComponent.ts`, `AsyncThreeComponent.ts`
+**Issue**: Component base class names don't accurately reflect their actual behavior, causing developer confusion
+**Impact**: Reduced code clarity, harder onboarding, potential incorrect usage patterns
+
+**The Problem**:
+The naming is misleading because BOTH base classes are async:
+- `SimpleThreeComponent` - implies synchronous, but has `async load()` and `async createObject()`
+- `AsyncThreeComponent` - name is accurate, but makes SimpleThreeComponent seem synchronous by comparison
+
+**What They Actually Do**:
+- `SimpleThreeComponent` = **Procedural geometry generation** (creates THREE.js geometry in code)
+  - Uses `createGeometry()` and `createContent()` methods
+  - Still async because of lifecycle methods
+  - Used by: Cessna, Jet, Airliner, Truck, Car, Wing, HangGliderWing (20+ files)
+
+- `AsyncThreeComponent` = **External resource loading** (loads models/textures from files)
+  - Uses `getResourceDescriptors()` and `createObjectFromResources()`
+  - Loads GLTF/GLB models, textures, etc.
+  - Currently unused in codebase (all vehicles use procedural geometry)
+
+**Better Naming**:
+```typescript
+// Current (Confusing)
+SimpleThreeComponent    →  // Sounds sync but is async
+AsyncThreeComponent     →  // Accurate but creates confusion
+
+// Proposed (Clear)
+ProceduralComponent     →  // Creates geometry procedurally
+ResourceLoaderComponent →  // Loads external resources
+// OR
+GeometryComponent       →  // Procedural geometry
+AssetLoaderComponent    →  // External asset loading
+```
+
+**Migration Strategy**:
+
+**Phase 1: Add New Classes with Deprecation** (1 day)
+1. Create `ProceduralComponent` extending current `SimpleThreeComponent` functionality
+2. Create `ResourceLoaderComponent` extending current `AsyncThreeComponent` functionality
+3. Add `@deprecated` tags to old classes with migration instructions
+4. Export both old and new names for backward compatibility
+
+**Phase 2: Migrate Core Components** (2-3 days)
+1. Migrate all vehicles (20+ files):
+   - Aircraft: Cessna, Jet, Airliner, Hercules
+   - Ground: Car, Truck, AutonomousCar
+   - Components: Wing, HangGliderWing, Glider
+2. Migrate characters: Pilot, PilotVoxel, PilotHead
+3. Migrate environment: Water, Cloud, Tree, etc.
+4. Update all imports across codebase
+
+**Phase 3: Update Documentation** (1 day)
+1. Update all JSDoc comments
+2. Update architecture documentation
+3. Create migration guide for external users
+4. Update examples and tutorials
+
+**Phase 4: Remove Old Classes** (v2.0.0)
+1. Remove deprecated `SimpleThreeComponent`
+2. Remove deprecated `AsyncThreeComponent`
+3. Clean up any remaining references
+
+**Files Affected** (~35+ files):
+- `src/foundation/components/base/SimpleThreeComponent.ts` → `ProceduralComponent.ts`
+- `src/foundation/components/base/AsyncThreeComponent.ts` → `ResourceLoaderComponent.ts`
+- All 20+ vehicle files extending SimpleThreeComponent
+- All character components
+- All environment components
+- Type definitions and exports
+
+**Breaking Changes**:
+- Import statements need updates: `import { SimpleThreeComponent }` → `import { ProceduralComponent }`
+- Class extensions need updates: `extends SimpleThreeComponent` → `extends ProceduralComponent`
+- Can be mitigated with deprecation warnings and gradual migration
+
+**Benefits**:
+- ✅ Clear, self-documenting class names
+- ✅ Easier for new developers to understand architecture
+- ✅ Reduces cognitive load when choosing base class
+- ✅ More accurate representation of actual functionality
+- ✅ Better code organization and discoverability
+
+**Estimated Effort**: 4-5 days total
+- Day 1: Create new classes with deprecation
+- Days 2-3: Migrate all components
+- Day 4: Update documentation
+- v2.0.0: Remove old classes
+
+**Priority**: High - Should be done before v2.0.0 release
+**Complexity**: Medium (mostly mechanical refactoring)
+**Risk**: Low (backward compatible during migration)
+
 ### Multiple Render Loops - Memory Leak Risk
 **Status**: ⚠️ Critical Issue
 **Files**: 23+ files with `requestAnimationFrame` calls
