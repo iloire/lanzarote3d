@@ -1,9 +1,10 @@
 import * as THREE from 'three';
-import { LegacyPilot as Pilot } from '../../foundation/components/vehicles';
+import { Pilot } from '../../foundation/components/characters/Pilot';
 import TandemPilot from '../../foundation/components/characters/TandemPilot';
 import {
   GlassesType,
   PilotHeadType,
+  HelmetType,
 } from '../../foundation/components/characters/PilotHead';
 import { StoryOptions } from '../../shared/types';
 import { WorkshopDemoBase, WorkshopDemoConfig } from '../../shared/WorkshopDemoBase';
@@ -36,22 +37,18 @@ class PilotWorkshopApp extends WorkshopDemoBase {
 
       const pilots = [
         {
-          head: {
-            headType: PilotHeadType.Default,
-            helmetOptions: {
-              color: '#ffff00',
-              color2: '#cccccc',
-              color3: '#999999',
-            },
-          },
+          headType: PilotHeadType.Default,
+          helmetType: HelmetType.Default,
+          helmetColor: '#ffff00',
         },
         {
-          head: {
-            headType: PilotHeadType.Default,
-            glassesType: GlassesType.SunGlasses1,
-          },
+          headType: PilotHeadType.Default,
+          helmetType: HelmetType.Default,
         },
-        { head: { headType: PilotHeadType.Warrior } },
+        {
+          headType: PilotHeadType.Warrior,
+          helmetType: HelmetType.Default,
+        },
       ];
 
       // Load pilots
@@ -67,12 +64,12 @@ class PilotWorkshopApp extends WorkshopDemoBase {
       // Load tandem pilot
       const tandem = new TandemPilot({
         pilot: {
-          head: { headType: PilotHeadType.Default },
+          headType: PilotHeadType.Default,
           suitColor: 'green',
           shoesColor: 'black',
         },
         passenger: {
-          head: { headType: PilotHeadType.Default },
+          headType: PilotHeadType.Default,
           suitColor: 'orange',
           shoesColor: 'gray',
         },

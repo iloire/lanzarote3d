@@ -1,24 +1,10 @@
 import * as THREE from 'three';
-// TODO: Migrate to modern Pilot from '../../characters/Pilot' when updating Hangglider architecture
-import LegacyPilot from '../components/Pilot';
+import { Pilot, type PilotOptions } from '../../characters/Pilot';
 import HangGliderWing from '../components/HangGliderWing';
 import GuiHelper from '../../../utils/gui';
-import { PilotHeadType } from '../../characters/PilotHead';
-
-const DEFAULT_OPTIONS = {
-  head: {
-    headType: PilotHeadType.Default,
-    helmetOptions: {
-      color: '#ffffff',
-      color2: '#cccccc',
-      color3: '#999999',
-    },
-  },
-  // ... rest of options
-};
 
 export interface HanggliderOptions {
-  pilotOptions?: typeof DEFAULT_OPTIONS;
+  pilotOptions?: PilotOptions;
   wingColor?: string;
   wingspan?: number;
   scale?: number;
@@ -34,8 +20,8 @@ export interface HanggliderOptions {
  */
 class HangGliderModel {
   wing!: HangGliderWing;
-  pilot!: LegacyPilot;
-  private pilotOptions: typeof DEFAULT_OPTIONS;
+  pilot!: Pilot;
+  private pilotOptions?: PilotOptions;
   private wingColor?: string;
   private wingspan?: number;
   private scale?: number;
@@ -44,7 +30,7 @@ class HangGliderModel {
   private mesh?: THREE.Group;
 
   constructor(options: HanggliderOptions = {}) {
-    this.pilotOptions = options.pilotOptions || DEFAULT_OPTIONS;
+    this.pilotOptions = options.pilotOptions;
     this.wingColor = options.wingColor;
     this.wingspan = options.wingspan;
     this.scale = options.scale || 1;
@@ -65,7 +51,11 @@ class HangGliderModel {
     wingMesh.position.x = -40;
 
     // Create pilot
-    this.pilot = new LegacyPilot(this.pilotOptions);
+    this.pilot = new Pilot({
+      castShadow: this.castShadow,
+      receiveShadow: this.receiveShadow,
+      ...this.pilotOptions,
+    });
     const pilotMesh = await this.pilot.load();
     const pilotScale = 0.03;
     pilotMesh.scale.set(pilotScale, pilotScale, pilotScale);

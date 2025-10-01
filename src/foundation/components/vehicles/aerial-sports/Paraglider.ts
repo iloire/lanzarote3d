@@ -1,7 +1,5 @@
 import * as THREE from 'three';
-// Note: Pilot has been moved to ../characters/Pilot
-// This import is kept for backward compatibility with legacy Paraglider
-import Pilot, { LegacyPilotOptions as PilotOptions } from '../components/Pilot';
+import { Pilot, type PilotOptions } from '../../characters/Pilot';
 import LegacyGlider, { GliderOptions } from '../components/Glider';
 import GuiHelper from '../../../utils/gui';
 
