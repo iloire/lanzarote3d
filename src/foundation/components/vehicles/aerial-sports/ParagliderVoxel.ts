@@ -85,6 +85,33 @@ export class ParagliderVoxel implements IVehicleWithGUI {
   }
 
   /**
+   * Control methods - delegate to glider
+   */
+  public left(): void {
+    if (this.glider) {
+      this.glider.breakLeft();
+    }
+  }
+
+  public right(): void {
+    if (this.glider) {
+      this.glider.breakRight();
+    }
+  }
+
+  public leftRelease(): void {
+    if (this.glider) {
+      this.glider.handsUp();
+    }
+  }
+
+  public rightRelease(): void {
+    if (this.glider) {
+      this.glider.handsUp();
+    }
+  }
+
+  /**
    * Clean up resources
    */
   public dispose(): void {
