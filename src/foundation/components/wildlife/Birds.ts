@@ -32,7 +32,7 @@ class Birds extends AutoFlier {
     this.animationSpeed = options.animationSpeed ?? 1;
   }
 
-  async load(path: THREE.Vector3[], gui?: typeof GuiHelper): Promise<THREE.Mesh> {
+  async load(path: THREE.Vector3[], gui?: any): Promise<THREE.Mesh> {
     this.path = path;
     const gltf = await Models.loadGltf(model);
     this.mesh = gltf.scene.children[0] as THREE.Mesh;

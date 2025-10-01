@@ -14,8 +14,10 @@ import {
   paraglidersVoxel,
   hanggliderConfig,
   cessnaConfig,
+  herculesConfig,
   SHOW_HANGGLIDER,
   SHOW_CESSNA,
+  SHOW_HERCULES,
   ANIMATION_DURATION_MS,
   birdPath,
 } from './config';
@@ -23,6 +25,7 @@ import {
   loadParagliders,
   loadHangglider,
   loadCessna,
+  loadHercules,
   VehicleLoadResult,
 } from './vehicleLoader';
 import {
@@ -40,10 +43,12 @@ class AnimationApp extends TerrainBase {
   private paragliderMeshes: THREE.Object3D[] = [];
   private hanggliderMesh: THREE.Object3D | undefined;
   private cessnaMesh: THREE.Object3D | undefined;
+  private herculesMesh: THREE.Object3D | undefined;
   private isAnimating: boolean = false;
   private flyingBehavior: FlyingBehavior | undefined;
   private hanggliderFlyingBehavior: FlyingBehavior | undefined;
   private cessnaFlyingBehavior: FlyingBehavior | undefined;
+  private herculesFlyingBehavior: FlyingBehavior | undefined;
 
   constructor() {
     const appConfig = getAppConfig('animation');
@@ -128,6 +133,20 @@ class AnimationApp extends TerrainBase {
         }
       }
 
+      // Load Hercules if enabled
+      if (SHOW_HERCULES) {
+        const herculesResult = await loadHercules(
+          scene,
+          herculesConfig,
+          ANIMATION_DURATION_MS,
+          this.handleError.bind(this)
+        );
+        if (herculesResult) {
+          this.herculesMesh = herculesResult.mesh;
+          this.herculesFlyingBehavior = herculesResult.flyingBehavior;
+        }
+      }
+
       // must render before adding env
       renderer.render(scene, camera);
 
@@ -183,7 +202,8 @@ class AnimationApp extends TerrainBase {
       this.isLoaded = true;
       const vehicleCount = this.paragliderMeshes.length +
         (this.hanggliderMesh ? 1 : 0) +
-        (this.cessnaMesh ? 1 : 0);
+        (this.cessnaMesh ? 1 : 0) +
+        (this.herculesMesh ? 1 : 0);
       logger.info(
         `✅ ${this.config.name} loaded successfully with ${vehicleCount} flying vehicles`
       );
@@ -272,6 +292,12 @@ class AnimationApp extends TerrainBase {
       this.cessnaFlyingBehavior = undefined;
     }
 
+    // Stop Hercules flying behavior
+    if (this.herculesFlyingBehavior) {
+      this.herculesFlyingBehavior.dispose();
+      this.herculesFlyingBehavior = undefined;
+    }
+
     // Stop animator if running
     if (this.isAnimating) {
       this.isAnimating = false;
@@ -327,6 +353,23 @@ class AnimationApp extends TerrainBase {
         }
       });
       this.cessnaMesh = undefined;
+    }
+
+    // Dispose Hercules mesh
+    if (this.herculesMesh) {
+      this.herculesMesh.traverse(child => {
+        if (child instanceof THREE.Mesh) {
+          if (child.geometry) child.geometry.dispose();
+          if (child.material) {
+            if (Array.isArray(child.material)) {
+              child.material.forEach((material: THREE.Material) => material.dispose());
+            } else {
+              child.material.dispose();
+            }
+          }
+        }
+      });
+      this.herculesMesh = undefined;
     }
 
     // Dispose environment resources

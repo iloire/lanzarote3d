@@ -42,6 +42,24 @@ export type CessnaConfig = {
   forwardAxis: 'x' | 'y' | 'z' | '-x' | '-y' | '-z';
 };
 
+export type HerculesConfig = {
+  position: THREE.Vector3;
+  scale: number;
+  bodyColor: string;
+  wingColor: string;
+  propellerColor: string;
+  windowColor: string;
+  flightPattern: FlightPattern;
+  speed: number;
+  turnSpeed: number;
+  flightRadius: number;
+  returnDistance: number;
+  minHeight: number;
+  maxHeight: number;
+  obstacleAvoidanceDistance: number;
+  forwardAxis: 'x' | 'y' | 'z' | '-x' | '-y' | '-z';
+};
+
 export const paraglidersVoxel: ParagliderVoxelConfig[] = [
   {
     pg: {
@@ -93,9 +111,28 @@ export const cessnaConfig: CessnaConfig = {
   forwardAxis: 'x',
 };
 
+export const herculesConfig: HerculesConfig = {
+  position: new THREE.Vector3(6200, 1200, -1200),
+  scale: 2.5,
+  bodyColor: '#6B7280',
+  wingColor: '#4B5563',
+  propellerColor: '#1F2937',
+  windowColor: '#3B82F6',
+  flightPattern: FlightPattern.FIGURE_EIGHT,
+  speed: 5.0,
+  turnSpeed: 4.0,
+  flightRadius: 300,
+  returnDistance: 350,
+  minHeight: 1100,
+  maxHeight: 1600,
+  obstacleAvoidanceDistance: 250,
+  forwardAxis: 'x',
+};
+
 // Visibility flags for easy toggling
 export const SHOW_HANGGLIDER = true;
 export const SHOW_CESSNA = true;
+export const SHOW_HERCULES = true;
 
 // Animation configuration
 export const ANIMATION_DURATION_MS = 6000; // 6 seconds

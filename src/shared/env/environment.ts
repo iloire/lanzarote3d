@@ -80,7 +80,7 @@ class Environment {
     // Use FlyingBehavior composition for autonomous flight instead
   }
 
-  async addBirds(path: THREE.Vector3[], gui?: { addFolder: (name: string) => any }) {
+  async addBirds(path: THREE.Vector3[], gui?: any) {
     // Create birds with optimized flight parameters for the environment
     this.birds = new Birds({
       speed: 2,
@@ -95,7 +95,7 @@ class Environment {
     this.scene.add(birdsMesh);
   }
 
-  async addHangGlider(path: THREE.Vector3[], gui?: { addFolder: (name: string) => any }) {
+  async addHangGlider(path: THREE.Vector3[], gui?: any) {
     this.hg = new HangGlider();
     const hgMesh = await this.hg.load();
     this.scene.add(hgMesh);

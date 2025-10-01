@@ -2,6 +2,24 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## [1.5.2] - 2025-10-01 12:43 UTC
+
+### Added
+- **Hercules to Famara Animation**: Added Hercules military transport plane to Famara animation application
+  - Added `HerculesConfig` type to config.ts with flight pattern, speed, and positioning parameters
+  - Created `herculesConfig` constant with figure-eight flight pattern at 1200m altitude
+  - Added `SHOW_HERCULES` visibility toggle flag
+  - Implemented `loadHercules` function in vehicleLoader with FlyingBehavior integration
+  - Updated AnimationApp class with Hercules mesh and flying behavior properties
+  - Hercules starts flying 4 seconds after animation completes with figure-eight pattern
+  - Proper disposal of Hercules mesh and flying behavior on cleanup
+  - Vehicle count now includes Hercules in load success message
+
+### Fixed
+- **Type Errors**: Fixed TypeScript compilation errors
+  - Changed Birds.load gui parameter type from `typeof GuiHelper` to `any` to fix type mismatch
+  - Changed environment.ts addBirds and addHangGlider gui parameter types to `any` to fix incompatible type errors
+
 ## [1.5.1] - 2025-10-01 12:16 UTC
 
 ### Fixed
