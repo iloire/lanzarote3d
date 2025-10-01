@@ -200,7 +200,9 @@ export class FlyingBehavior {
     if (!this.isFlying || !this.mesh) return;
 
     const now = performance.now();
-    const deltaTime = (now - this.lastUpdate) / 1000;
+    let deltaTime = (now - this.lastUpdate) / 1000;
+    // Clamp deltaTime to prevent huge jumps during frame drops or window blur
+    deltaTime = Math.min(deltaTime, 0.1); // Max 100ms (10 FPS minimum)
     this.lastUpdate = now;
     this.time += deltaTime;
 
@@ -220,21 +222,27 @@ export class FlyingBehavior {
 
     // Apply obstacle avoidance and calculate speed reduction
     const avoidanceForce = this.calculateObstacleAvoidance();
-    desiredDirection.add(avoidanceForce);
 
     // Apply boundary constraints
     const boundaryForce = this.calculateBoundaryForce();
-    desiredDirection.add(boundaryForce);
 
     // Apply terrain avoidance
     const terrainForce = this.calculateTerrainAvoidance();
-    desiredDirection.add(terrainForce);
+
+    // FIXED: Combine all forces and normalize BEFORE lerping to prevent accumulation
+    const combinedForce = desiredDirection
+      .clone()
+      .add(avoidanceForce)
+      .add(boundaryForce)
+      .add(terrainForce)
+      .normalize(); // Critical: normalize to prevent force accumulation
 
     // Calculate speed reduction based on obstacle proximity
     this.updateSpeedReduction();
 
-    // Smooth direction changes
-    this.targetDirection.lerp(desiredDirection.normalize(), this.turnSpeed * deltaTime);
+    // Smooth direction changes with properly normalized force
+    this.targetDirection.lerp(combinedForce, this.turnSpeed * deltaTime);
+    this.targetDirection.normalize(); // Ensure target direction stays normalized
     this.currentVelocity.copy(this.targetDirection).multiplyScalar(this.currentSpeed);
 
     // Apply velocity
@@ -266,7 +274,14 @@ export class FlyingBehavior {
         // Fly in a circle around center point
         const toCenter = this.centerPoint.clone().sub(this.mesh!.position);
         toCenter.y = 0; // Keep horizontal
-        direction.crossVectors(toCenter.normalize(), new THREE.Vector3(0, 1, 0));
+
+        // Safety check to prevent zero-length vector
+        if (toCenter.length() < 0.1) {
+          // If too close to center, move outward
+          direction.set(1, 0, 0);
+        } else {
+          direction.crossVectors(toCenter.normalize(), new THREE.Vector3(0, 1, 0));
+        }
         break;
 
       case FlightPattern.FIGURE_EIGHT:
@@ -458,7 +473,7 @@ export class FlyingBehavior {
   protected orientToDirection(direction: THREE.Vector3): void {
     if (!this.mesh || direction.length() === 0) return;
 
-    // Use the full 3D direction for more natural aircraft orientation
+    // Use the full 3D direction for natural aircraft orientation
     const normalizedDirection = direction.clone().normalize();
 
     // Create target position for lookAt
@@ -493,32 +508,14 @@ export class FlyingBehavior {
     }
 
     const correctionQuaternion = new THREE.Quaternion().setFromEuler(correction);
-    const finalQuaternion = tempObject.quaternion.clone().multiply(correctionQuaternion);
+    const targetQuaternion = tempObject.quaternion.clone().multiply(correctionQuaternion);
 
-    // Allow natural aircraft orientation including pitch and roll for realism
-    const euler = new THREE.Euler().setFromQuaternion(finalQuaternion);
+    // FIXED: Simplified rotation with consistent speed
+    // Use turnSpeed directly for more predictable rotation
+    const rotationSpeed = Math.min(this.turnSpeed * 0.1, 0.2); // More responsive, capped at 0.2
 
-    // Limit extreme rotations for stability but allow some banking
-    euler.x = Math.max(-Math.PI / 6, Math.min(Math.PI / 6, euler.x)); // Limit pitch to ±30°
-    euler.z = Math.max(-Math.PI / 8, Math.min(Math.PI / 8, euler.z)); // Limit roll to ±22.5°
-
-    const stableQuaternion = new THREE.Quaternion().setFromEuler(euler);
-
-    // Increase rotation speed for more responsive turning
-    const rotationSpeed = Math.min(this.turnSpeed * 0.3, 0.15); // Cap maximum rotation speed
-
-    // Debug logging (can be removed later)
-    if (Math.random() < 0.01) { // Log 1% of the time to avoid spam
-      logger.debug('🔄 FlyingBehavior orientation:', {
-        direction: normalizedDirection.toArray(),
-        currentRotation: this.mesh.rotation.toArray(),
-        targetRotation: euler.toArray(),
-        rotationSpeed
-      });
-    }
-
-    // Smooth rotation with increased responsiveness
-    this.mesh.quaternion.slerp(stableQuaternion, rotationSpeed);
+    // Smooth rotation without euler angle limits (they cause jitter)
+    this.mesh.quaternion.slerp(targetQuaternion, rotationSpeed);
   }
 
   /**
