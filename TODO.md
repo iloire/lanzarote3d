@@ -1,7 +1,6 @@
 Implement the following tasks if any is added following the instructions described below:
 ---
 TASKS:
-- Rename wildlife/birds.ts to wildlife/flock-birds.ts to be more precise
 
 ---
 

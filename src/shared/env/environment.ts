@@ -17,7 +17,7 @@ import {
 import { Car } from '../../foundation/components/vehicles/ground/Car';
 import { AutonomousCar } from '../../foundation/components/vehicles/ground/AutonomousCar';
 import { MovementPattern } from '../../foundation/systems/behaviors/MovingBehavior';
-import Birds from '../../foundation/components/wildlife/Birds';
+import FlockBirds from '../../foundation/components/wildlife/FlockBirds';
 import { Hangglider as HangGlider } from '../../foundation/components/vehicles';
 import { addMeshAroundArea } from './mesh-utils';
 import { generateThermalPair, ThermalGenerationOptions } from './thermal-utils';
@@ -59,7 +59,7 @@ const DEFAULT_BOAT_WEIGHTS: BoatTypeWeights = {
 };
 
 class Environment {
-  birds!: Birds;
+  birds!: FlockBirds;
   hg!: HangGlider;
   thermals: Thermal[] = [];
   cloudInstances: Clouds[] = [];
@@ -82,7 +82,7 @@ class Environment {
 
   async addBirds(path: THREE.Vector3[], gui?: any) {
     // Create birds with optimized flight parameters for the environment
-    this.birds = new Birds({
+    this.birds = new FlockBirds({
       speed: 2,
       arrivalThreshold: 20,
       smoothRotation: true,

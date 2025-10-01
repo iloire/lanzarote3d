@@ -11,7 +11,7 @@ export interface BirdsOptions extends AutoFlierOptions {
   animationSpeed?: number;
 }
 
-class Birds extends AutoFlier {
+class FlockBirds extends AutoFlier {
   mixer: THREE.AnimationMixer | null = null;
   interval: number = 0;
   private scale: number = 1;
@@ -122,4 +122,4 @@ class Birds extends AutoFlier {
   }
 }
 
-export default Birds;
+export default FlockBirds;

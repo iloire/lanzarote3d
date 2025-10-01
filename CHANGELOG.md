@@ -2,6 +2,17 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## [1.5.5] - 2025-10-01 13:01 UTC
+
+### Refactored
+- **Birds to FlockBirds Rename**: Renamed wildlife/Birds.ts to wildlife/FlockBirds.ts for more precise naming
+  - Renamed file from Birds.ts to FlockBirds.ts using git mv
+  - Updated class name from Birds to FlockBirds throughout the file
+  - Updated all imports in environment.ts from Birds to FlockBirds
+  - Updated type declarations (birds property) from Birds to FlockBirds
+  - Updated wildlife/index.ts to export FlockBirds and maintain backwards compatibility with Birds alias
+  - No breaking changes - legacy Birds export still available for backwards compatibility
+
 ## [1.5.4] - 2025-10-01 13:08 UTC
 
 ### Added
