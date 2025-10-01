@@ -11,7 +11,7 @@
  * With:    import { CameraTargetController } from './CameraTargetController'
  */
 import * as THREE from 'three';
-import Flier from '../../types/flier';
+// Note: Flier import removed - this class is deprecated anyway
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { animator } from '../animation/SimpleAnimator';
 import GuiHelper from '../../utils/gui';
@@ -82,7 +82,7 @@ function onDocumentKeyUp(event: KeyboardEvent) {
 
 export class CameraController extends THREE.PerspectiveCamera {
   mode: CameraMode = CameraMode.FollowTarget;
-  target!: Flier;
+  target!: any; // Generic target - this class is deprecated anyway
   angle: number = DEFAULT_ANGLE;
   angleY: number = DEFAULT_ANGLE_Y;
   distance: number = DEFAULT_FOLLOW_DISTANCE;
@@ -137,7 +137,7 @@ export class CameraController extends THREE.PerspectiveCamera {
     isZoomOutViewing && this.zoomOut();
   }
 
-  setCameraMode(mode: CameraMode, target: Flier) {
+  setCameraMode(mode: CameraMode, target: any) {
     this.target = target;
     this.mode = mode;
   }

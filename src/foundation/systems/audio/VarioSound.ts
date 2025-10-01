@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import Flier from '../../types/flier';
 import { logger } from '../../utils/logger';
 
 // Define event types for Vario
@@ -8,9 +7,17 @@ export interface VarioEventMap {
   altitude: { altitude: any };
 }
 
+/**
+ * Interface for anything that can provide altitude information
+ * (used instead of tightly coupling to deprecated Flier class)
+ */
+export interface IAltitudeProvider {
+  getAltitude(): number;
+}
+
 class Vario extends THREE.EventDispatcher<VarioEventMap> {
   sound: THREE.Audio | null;
-  pg: Flier;
+  pg: IAltitudeProvider;
   status: string = 'off';
   paused: boolean = false;
   lastRecord: number = 0;
@@ -21,7 +28,7 @@ class Vario extends THREE.EventDispatcher<VarioEventMap> {
   loading: boolean = false;
   loaded: boolean = false;
 
-  constructor(pg: Flier) {
+  constructor(pg: IAltitudeProvider) {
     super();
     const listener = new THREE.AudioListener();
     this.sound = new THREE.Audio(listener);
