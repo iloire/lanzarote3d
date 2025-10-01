@@ -9,6 +9,7 @@ import { PerformanceUI, PerformanceSettings, PolygonBreakdown } from './performa
 import { disposeObject3D, disposeObjects } from './disposal-utils';
 import { GUI } from 'lil-gui';
 import { logger } from '../../foundation/utils/logger';
+import { Park } from '../../foundation/components/scenery';
 
 /**
  * Town Workshop - Showcase of neighborhood generation using HouseGroupCreator
@@ -18,6 +19,7 @@ class TownWorkshop extends WorkshopDemoBase {
   private neighborhoodMeshes: THREE.Object3D[] = [];
   private labelMeshes: THREE.Mesh[] = [];
   private roadMeshes: THREE.Object3D[] = []; // Track roads separately
+  private parkMeshes: THREE.Object3D[] = []; // Track parks separately
   private houseGroupCreator!: HouseGroupCreator;
   private componentRegistry!: ComponentRegistry;
   private currentScene!: THREE.Scene;
@@ -186,7 +188,7 @@ class TownWorkshop extends WorkshopDemoBase {
   }
 
   /**
-   * Count total polygons in all neighborhood meshes and roads with detailed breakdown
+   * Count total polygons in all neighborhood meshes, parks, and roads with detailed breakdown
    */
   private updatePolygonCount(): void {
     const polygonCounts = {
@@ -195,6 +197,7 @@ class TownWorkshop extends WorkshopDemoBase {
       stones: 0,
       pools: 0,
       roads: 0,
+      parks: 0,
       other: 0
     };
 
@@ -260,6 +263,23 @@ class TownWorkshop extends WorkshopDemoBase {
       });
     });
 
+    // Count park polygons
+    this.parkMeshes.forEach(obj => {
+      obj.traverse(child => {
+        if (child instanceof THREE.Mesh && child.geometry) {
+          const geometry = child.geometry;
+          if (geometry.index !== null) {
+            polygonCounts.parks += geometry.index.count / 3;
+          } else {
+            const positionAttribute = geometry.getAttribute('position');
+            if (positionAttribute) {
+              polygonCounts.parks += positionAttribute.count / 3;
+            }
+          }
+        }
+      });
+    });
+
     const totalPolygons = Object.values(polygonCounts).reduce((sum, count) => sum + count, 0);
     this.performanceSettings.polygonCount = Math.floor(totalPolygons);
 
@@ -270,6 +290,7 @@ class TownWorkshop extends WorkshopDemoBase {
       stones: ((polygonCounts.stones / totalPolygons) * 100).toFixed(1),
       pools: ((polygonCounts.pools / totalPolygons) * 100).toFixed(1),
       roads: ((polygonCounts.roads / totalPolygons) * 100).toFixed(1),
+      parks: ((polygonCounts.parks / totalPolygons) * 100).toFixed(1),
       other: ((polygonCounts.other / totalPolygons) * 100).toFixed(1)
     };
 
@@ -279,6 +300,7 @@ class TownWorkshop extends WorkshopDemoBase {
     logger.info(`  🪨 Stones: ${Math.floor(polygonCounts.stones).toLocaleString()} (${percentages.stones}%)`);
     logger.info(`  🏊 Pools: ${Math.floor(polygonCounts.pools).toLocaleString()} (${percentages.pools}%)`);
     logger.info(`  🛣️ Roads: ${Math.floor(polygonCounts.roads).toLocaleString()} (${percentages.roads}%)`);
+    logger.info(`  🌳 Parks: ${Math.floor(polygonCounts.parks).toLocaleString()} (${percentages.parks}%)`);
     logger.info(`  ❓ Other: ${Math.floor(polygonCounts.other).toLocaleString()} (${percentages.other}%)`);
     logger.info(`  📊 TOTAL: ${this.performanceSettings.polygonCount.toLocaleString()} polygons`);
 
@@ -311,10 +333,10 @@ class TownWorkshop extends WorkshopDemoBase {
   }
 
   /**
-   * Clear all existing neighborhood meshes and labels with proper memory cleanup
+   * Clear all existing neighborhood meshes, parks, and labels with proper memory cleanup
    */
   private clearNeighborhoods(): void {
-    logger.debug(`🧹 Clearing ${this.neighborhoodMeshes.length} neighborhood objects, ${this.labelMeshes.length} labels, and ${this.roadMeshes.length} roads`);
+    logger.debug(`🧹 Clearing ${this.neighborhoodMeshes.length} neighborhood objects, ${this.labelMeshes.length} labels, ${this.roadMeshes.length} roads, and ${this.parkMeshes.length} parks`);
 
     // Properly dispose neighborhood meshes using imported utility
     disposeObjects(this.neighborhoodMeshes);
@@ -325,10 +347,14 @@ class TownWorkshop extends WorkshopDemoBase {
     // Properly dispose road meshes using imported utility
     disposeObjects(this.roadMeshes);
 
+    // Properly dispose park meshes using imported utility
+    disposeObjects(this.parkMeshes);
+
     // Clear arrays
     this.neighborhoodMeshes.length = 0;
     this.labelMeshes.length = 0;
     this.roadMeshes.length = 0;
+    this.parkMeshes.length = 0;
 
     logger.debug('✅ Neighborhood cleanup completed');
   }
@@ -436,6 +462,9 @@ class TownWorkshop extends WorkshopDemoBase {
 
     // Add roads and infrastructure
     this.createRoads(scene);
+
+    // Add parks to the town
+    this.createParks(scene);
 
     // Update polygon count after loading all neighborhoods
     this.updatePolygonCount();
@@ -588,6 +617,41 @@ class TownWorkshop extends WorkshopDemoBase {
 
     // Add markings to road tracking
     this.roadMeshes.push(...markings);
+  }
+
+  /**
+   * Create parks throughout the town
+   */
+  private async createParks(scene: THREE.Scene): Promise<void> {
+    // Strategic park positions across the town
+    const parkLocations = [
+      { position: new THREE.Vector3(-200, 0, 300), name: 'North Central Park' },
+      { position: new THREE.Vector3(200, 0, -300), name: 'South Central Park' },
+      { position: new THREE.Vector3(600, 0, 300), name: 'East Park' },
+    ];
+
+    for (const location of parkLocations) {
+      try {
+        const park = new Park({
+          size: { width: 100, depth: 100 },
+          grassColor: '#4A7C59',
+          pathColor: '#8B7355',
+          treeCount: 10,
+          benchCount: 6,
+          hasFountain: true,
+          scale: 1,
+        });
+
+        const parkMesh = await park.load();
+        parkMesh.position.copy(location.position);
+        scene.add(parkMesh);
+        this.parkMeshes.push(parkMesh);
+
+        logger.info(`✅ Created ${location.name}`);
+      } catch (error) {
+        this.handleError(error as Error, `creating park at ${location.position.toArray()}`);
+      }
+    }
   }
 
   private setupCamera(camera: THREE.Camera): void {

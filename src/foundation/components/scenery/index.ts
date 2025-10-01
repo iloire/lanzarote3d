@@ -7,6 +7,8 @@ export { default as FanPalm } from './FanPalm';
 export { default as Pool } from './Pool';
 export { default as Stone } from './Stone';
 export { default as ProceduralRoad } from './ProceduralRoad';
+export { Park } from './Park';
+export type { ParkOptions } from './Park';
 
 // Tree Components (organized in trees subfolder)
 export { default as Tree } from './trees/Tree';
