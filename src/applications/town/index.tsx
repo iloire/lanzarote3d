@@ -9,7 +9,7 @@ import { PerformanceUI, PerformanceSettings, PolygonBreakdown } from './performa
 import { disposeObject3D, disposeObjects } from './disposal-utils';
 import { GUI } from 'lil-gui';
 import { logger } from '../../foundation/utils/logger';
-import { Park } from '../../foundation/components/scenery';
+import { Park, TownSquare } from '../../foundation/components/scenery';
 
 /**
  * Town Workshop - Showcase of neighborhood generation using HouseGroupCreator
@@ -20,6 +20,7 @@ class TownWorkshop extends WorkshopDemoBase {
   private labelMeshes: THREE.Mesh[] = [];
   private roadMeshes: THREE.Object3D[] = []; // Track roads separately
   private parkMeshes: THREE.Object3D[] = []; // Track parks separately
+  private squareMeshes: THREE.Object3D[] = []; // Track town squares separately
   private houseGroupCreator!: HouseGroupCreator;
   private componentRegistry!: ComponentRegistry;
   private currentScene!: THREE.Scene;
@@ -188,7 +189,7 @@ class TownWorkshop extends WorkshopDemoBase {
   }
 
   /**
-   * Count total polygons in all neighborhood meshes, parks, and roads with detailed breakdown
+   * Count total polygons in all neighborhood meshes, parks, squares, and roads with detailed breakdown
    */
   private updatePolygonCount(): void {
     const polygonCounts = {
@@ -198,6 +199,7 @@ class TownWorkshop extends WorkshopDemoBase {
       pools: 0,
       roads: 0,
       parks: 0,
+      squares: 0,
       other: 0
     };
 
@@ -280,6 +282,23 @@ class TownWorkshop extends WorkshopDemoBase {
       });
     });
 
+    // Count town square polygons
+    this.squareMeshes.forEach(obj => {
+      obj.traverse(child => {
+        if (child instanceof THREE.Mesh && child.geometry) {
+          const geometry = child.geometry;
+          if (geometry.index !== null) {
+            polygonCounts.squares += geometry.index.count / 3;
+          } else {
+            const positionAttribute = geometry.getAttribute('position');
+            if (positionAttribute) {
+              polygonCounts.squares += positionAttribute.count / 3;
+            }
+          }
+        }
+      });
+    });
+
     const totalPolygons = Object.values(polygonCounts).reduce((sum, count) => sum + count, 0);
     this.performanceSettings.polygonCount = Math.floor(totalPolygons);
 
@@ -291,6 +310,7 @@ class TownWorkshop extends WorkshopDemoBase {
       pools: ((polygonCounts.pools / totalPolygons) * 100).toFixed(1),
       roads: ((polygonCounts.roads / totalPolygons) * 100).toFixed(1),
       parks: ((polygonCounts.parks / totalPolygons) * 100).toFixed(1),
+      squares: ((polygonCounts.squares / totalPolygons) * 100).toFixed(1),
       other: ((polygonCounts.other / totalPolygons) * 100).toFixed(1)
     };
 
@@ -301,6 +321,7 @@ class TownWorkshop extends WorkshopDemoBase {
     logger.info(`  🏊 Pools: ${Math.floor(polygonCounts.pools).toLocaleString()} (${percentages.pools}%)`);
     logger.info(`  🛣️ Roads: ${Math.floor(polygonCounts.roads).toLocaleString()} (${percentages.roads}%)`);
     logger.info(`  🌳 Parks: ${Math.floor(polygonCounts.parks).toLocaleString()} (${percentages.parks}%)`);
+    logger.info(`  🏛️ Squares: ${Math.floor(polygonCounts.squares).toLocaleString()} (${percentages.squares}%)`);
     logger.info(`  ❓ Other: ${Math.floor(polygonCounts.other).toLocaleString()} (${percentages.other}%)`);
     logger.info(`  📊 TOTAL: ${this.performanceSettings.polygonCount.toLocaleString()} polygons`);
 
@@ -333,10 +354,10 @@ class TownWorkshop extends WorkshopDemoBase {
   }
 
   /**
-   * Clear all existing neighborhood meshes, parks, and labels with proper memory cleanup
+   * Clear all existing neighborhood meshes, parks, squares, and labels with proper memory cleanup
    */
   private clearNeighborhoods(): void {
-    logger.debug(`🧹 Clearing ${this.neighborhoodMeshes.length} neighborhood objects, ${this.labelMeshes.length} labels, ${this.roadMeshes.length} roads, and ${this.parkMeshes.length} parks`);
+    logger.debug(`🧹 Clearing ${this.neighborhoodMeshes.length} neighborhood objects, ${this.labelMeshes.length} labels, ${this.roadMeshes.length} roads, ${this.parkMeshes.length} parks, and ${this.squareMeshes.length} squares`);
 
     // Properly dispose neighborhood meshes using imported utility
     disposeObjects(this.neighborhoodMeshes);
@@ -350,11 +371,15 @@ class TownWorkshop extends WorkshopDemoBase {
     // Properly dispose park meshes using imported utility
     disposeObjects(this.parkMeshes);
 
+    // Properly dispose square meshes using imported utility
+    disposeObjects(this.squareMeshes);
+
     // Clear arrays
     this.neighborhoodMeshes.length = 0;
     this.labelMeshes.length = 0;
     this.roadMeshes.length = 0;
     this.parkMeshes.length = 0;
+    this.squareMeshes.length = 0;
 
     logger.debug('✅ Neighborhood cleanup completed');
   }
@@ -465,6 +490,9 @@ class TownWorkshop extends WorkshopDemoBase {
 
     // Add parks to the town
     this.createParks(scene);
+
+    // Add town squares to the town
+    this.createTownSquares(scene);
 
     // Update polygon count after loading all neighborhoods
     this.updatePolygonCount();
@@ -650,6 +678,41 @@ class TownWorkshop extends WorkshopDemoBase {
         logger.info(`✅ Created ${location.name}`);
       } catch (error) {
         this.handleError(error as Error, `creating park at ${location.position.toArray()}`);
+      }
+    }
+  }
+
+  /**
+   * Create town squares throughout the town
+   */
+  private async createTownSquares(scene: THREE.Scene): Promise<void> {
+    // Strategic town square positions
+    const squareLocations = [
+      { position: new THREE.Vector3(0, 0, 0), name: 'Central Square', monument: 'fountain' as const },
+      { position: new THREE.Vector3(-600, 0, 0), name: 'West Square', monument: 'obelisk' as const },
+      { position: new THREE.Vector3(600, 0, -300), name: 'Market Square', monument: 'statue' as const },
+    ];
+
+    for (const location of squareLocations) {
+      try {
+        const square = new TownSquare({
+          size: { width: 120, depth: 120 },
+          pavingColor: '#A8A8A8',
+          monumentType: location.monument,
+          benchCount: 8,
+          hasFlowerBeds: true,
+          hasLampPosts: true,
+          scale: 1,
+        });
+
+        const squareMesh = await square.load();
+        squareMesh.position.copy(location.position);
+        scene.add(squareMesh);
+        this.squareMeshes.push(squareMesh);
+
+        logger.info(`✅ Created ${location.name} with ${location.monument}`);
+      } catch (error) {
+        this.handleError(error as Error, `creating town square at ${location.position.toArray()}`);
       }
     }
   }

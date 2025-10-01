@@ -9,6 +9,8 @@ export { default as Stone } from './Stone';
 export { default as ProceduralRoad } from './ProceduralRoad';
 export { Park } from './Park';
 export type { ParkOptions } from './Park';
+export { TownSquare } from './TownSquare';
+export type { TownSquareOptions } from './TownSquare';
 
 // Tree Components (organized in trees subfolder)
 export { default as Tree } from './trees/Tree';
