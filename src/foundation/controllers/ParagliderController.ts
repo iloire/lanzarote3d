@@ -11,17 +11,6 @@ import { logger } from '../utils/logger';
 
 type ControllableVehicle = Paraglider | ParagliderVoxel;
 
-export interface ParagliderControllerOptions {
-  flyable: ControllableVehicle;
-  physics: ParagliderPhysicsOptions;
-  weather: Weather;
-  terrain: THREE.Mesh;
-  water: THREE.Mesh;
-  thermals: Thermal[];
-  trackTrajectory?: boolean;
-  antiCrashMode?: boolean;
-}
-
 export interface ParagliderState {
   isFlying: boolean;
   position: THREE.Vector3;
@@ -70,7 +59,16 @@ export class ParagliderController {
   // For compatibility with old event system
   private eventCallbacks: Map<string, Array<(data: any) => void>> = new Map();
 
-  constructor(options: ParagliderControllerOptions) {
+  constructor(options: {
+    flyable: ControllableVehicle;
+    physics: ParagliderPhysicsOptions;
+    weather: Weather;
+    terrain: THREE.Mesh;
+    water: THREE.Mesh;
+    thermals: Thermal[];
+    trackTrajectory?: boolean;
+    antiCrashMode?: boolean;
+  }) {
     const { flyable, physics, weather, terrain, water, thermals, trackTrajectory, antiCrashMode } = options;
 
     this.mesh = flyable.getMesh();
