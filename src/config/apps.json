@@ -103,6 +103,15 @@
       "visibility": "public",
       "priority": 3
     },
+    "islandflying": {
+      "name": "Island Flying",
+      "description": "Multiple aircraft flying freely around Lanzarote island with autonomous behavior",
+      "route": "/island-flying",
+      "category": "demo",
+      "requiresWebGL": true,
+      "visibility": "public",
+      "priority": 4
+    },
     "paraglidervoxel": {
       "name": "Voxel pilot",
       "description": "Voxel-based paraglider component showcase",
