@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { StaticSatelliteConfig } from '../types/Theme';
+import { logger } from './logger';
 
 export interface TileMapping {
   tiles: Array<{
@@ -184,11 +185,11 @@ export class SatelliteTextureManager {
     geometry.computeBoundingBox();
     const bbox = geometry.boundingBox!;
 
-    console.log('🗺️ Simple direct mapping approach');
-    console.log(
+    logger.info('🗺️ Simple direct mapping approach');
+    logger.info(
       `Terrain: X(${bbox.min.x.toFixed(2)} to ${bbox.max.x.toFixed(2)}) Z(${bbox.min.z.toFixed(2)} to ${bbox.max.z.toFixed(2)})`
     );
-    console.log(
+    logger.info(
       `Tiles: ${tileMapping.totalBounds.north}°N to ${tileMapping.totalBounds.south}°S, ${tileMapping.totalBounds.east}°E to ${tileMapping.totalBounds.west}°W`
     );
 
@@ -222,14 +223,14 @@ export class SatelliteTextureManager {
 
       if (i < 10) {
         const uvSuccess = uvCoords ? '✅' : '❌';
-        console.log(
+        logger.info(
           `Vertex ${i}: terrain(${x.toFixed(2)},${z.toFixed(2)}) → norm(${xNorm.toFixed(3)},${zNorm.toFixed(3)}) → geo(${latitude.toFixed(4)},${longitude.toFixed(4)}) → UV(${uvArray[i * 2].toFixed(3)},${uvArray[i * 2 + 1].toFixed(3)}) ${uvSuccess}`
         );
       }
     }
 
     geometry.setAttribute('uv', new THREE.BufferAttribute(uvArray, 2));
-    console.log(`✅ Direct UV mapping complete: ${positions.count} vertices`);
+    logger.info(`✅ Direct UV mapping complete: ${positions.count} vertices`);
   }
 
   /**

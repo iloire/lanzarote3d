@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { worldToGPS } from '../flyzones/helpers/gps';
+import { logger } from '../../foundation/utils/logger';
 
 export interface EditorState {
   locations: EditorLocation[];
@@ -269,7 +270,7 @@ export const copyToClipboard = (text: string): Promise<void> => {
           resolve();
         })
         .catch(err => {
-          console.error('Failed to copy text: ', err);
+          logger.error('Failed to copy text: ', err);
           reject(err);
         });
     } else {
@@ -289,11 +290,11 @@ export const copyToClipboard = (text: string): Promise<void> => {
           // Text copied to clipboard (fallback)
           resolve();
         } else {
-          console.error('Failed to copy text (fallback)');
+          logger.error('Failed to copy text (fallback)');
           reject(new Error('Failed to copy text'));
         }
       } catch (err) {
-        console.error('Failed to copy text (fallback): ', err);
+        logger.error('Failed to copy text (fallback): ', err);
         reject(err);
       }
     }
@@ -837,7 +838,7 @@ export const saveToLocalStorage = (state: EditorState): void => {
     localStorage.setItem('locationEditor', JSON.stringify(serializable));
     // State saved to localStorage
   } catch (error) {
-    console.error('Failed to save state to localStorage:', error);
+    logger.error('Failed to save state to localStorage:', error);
   }
 };
 
@@ -931,7 +932,7 @@ export const loadFromLocalStorage = (scene: THREE.Scene): EditorState | null => 
     // State loaded from localStorage
     return state;
   } catch (error) {
-    console.error('Failed to load state from localStorage:', error);
+    logger.error('Failed to load state from localStorage:', error);
     return null;
   }
 };

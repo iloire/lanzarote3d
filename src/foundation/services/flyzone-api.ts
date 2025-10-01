@@ -10,6 +10,7 @@ import {
   TakeoffRecommendation,
   TakeoffLocation,
 } from '../../types/flyzone-types';
+import { logger } from '../utils/logger';
 
 /**
  * FlyzoneAPI - Backend API for managing flyzone locations and weather analysis
@@ -33,10 +34,10 @@ export class FlyzoneAPI {
       // In a browser environment, we'll use localStorage for persistence
       // In a Node.js environment, we would use filesystem operations
       if (typeof window !== 'undefined') {
-        console.log('FlyzoneAPI initialized with localStorage persistence');
+        logger.info('FlyzoneAPI initialized with localStorage persistence');
       }
     } catch (error) {
-      console.error('Failed to initialize FlyzoneAPI:', error);
+      logger.error('Failed to initialize FlyzoneAPI:', error);
       throw error;
     }
   }
@@ -58,7 +59,7 @@ export class FlyzoneAPI {
         verified: location.verified,
       }));
     } catch (error) {
-      console.error('Failed to get location summaries:', error);
+      logger.error('Failed to get location summaries:', error);
       return [];
     }
   }
@@ -71,7 +72,7 @@ export class FlyzoneAPI {
       const locations = await this.loadLocations();
       return locations.find(location => location.id === id) || null;
     } catch (error) {
-      console.error(`Failed to get location ${id}:`, error);
+      logger.error(`Failed to get location ${id}:`, error);
       return null;
     }
   }
@@ -92,10 +93,10 @@ export class FlyzoneAPI {
       locations.push(newLocation);
       await this.saveLocations(locations);
 
-      console.log(`Saved new flyzone location: ${newLocation.title} (${newLocation.id})`);
+      logger.info(`Saved new flyzone location: ${newLocation.title} (${newLocation.id})`);
       return newLocation;
     } catch (error) {
-      console.error('Failed to save location:', error);
+      logger.error('Failed to save location:', error);
       throw error;
     }
   }
@@ -121,10 +122,10 @@ export class FlyzoneAPI {
       locations[index] = updatedLocation;
       await this.saveLocations(locations);
 
-      console.log(`Updated flyzone location: ${updatedLocation.title} (${updatedLocation.id})`);
+      logger.info(`Updated flyzone location: ${updatedLocation.title} (${updatedLocation.id})`);
       return updatedLocation;
     } catch (error) {
-      console.error(`Failed to update location ${request.id}:`, error);
+      logger.error(`Failed to update location ${request.id}:`, error);
       throw error;
     }
   }
@@ -143,10 +144,10 @@ export class FlyzoneAPI {
       }
 
       await this.saveLocations(filteredLocations);
-      console.log(`Deleted flyzone location: ${id}`);
+      logger.info(`Deleted flyzone location: ${id}`);
       return true;
     } catch (error) {
-      console.error(`Failed to delete location ${id}:`, error);
+      logger.error(`Failed to delete location ${id}:`, error);
       return false;
     }
   }
@@ -202,7 +203,7 @@ export class FlyzoneAPI {
 
       return analysis;
     } catch (error) {
-      console.error('Failed to get weather recommendations:', error);
+      logger.error('Failed to get weather recommendations:', error);
       throw error;
     }
   }
@@ -255,7 +256,7 @@ export class FlyzoneAPI {
       }
       return [];
     } catch (error) {
-      console.error('Failed to load locations:', error);
+      logger.error('Failed to load locations:', error);
       return [];
     }
   }
@@ -266,7 +267,7 @@ export class FlyzoneAPI {
         localStorage.setItem('flyzoneLocations', JSON.stringify(locations, null, 2));
       }
     } catch (error) {
-      console.error('Failed to save locations:', error);
+      logger.error('Failed to save locations:', error);
       throw error;
     }
   }

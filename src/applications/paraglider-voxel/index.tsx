@@ -6,6 +6,7 @@ import ivanModel from '../../../assets/foundation/models/characters/ivan/ivan.ob
 import ivanTextureImage from '../../../assets/foundation/models/characters/ivan/ivan.png';
 import { StoryOptions } from '../../shared/types';
 import { WorkshopDemoBase } from '../../shared/WorkshopDemoBase';
+import { logger } from '../../foundation/utils/logger';
 
 /**
  * Paraglider Voxel Workshop Demo - Showcases voxel-style paraglider components
@@ -34,7 +35,7 @@ class ParagliderVoxelWorkshopApp extends WorkshopDemoBase {
       this.initializeCore(options);
       const { camera, scene, renderer, gui, controls } = options;
 
-      console.log('🎭 Creating paragliders with both Adri and Ivan pilots...');
+      logger.info('🎭 Creating paragliders with both Adri and Ivan pilots...');
 
       // Define character configurations
       const characters = [
@@ -56,7 +57,7 @@ class ParagliderVoxelWorkshopApp extends WorkshopDemoBase {
 
       // Create paragliders for each character
       for (const char of characters) {
-        console.log(`📦 Creating paraglider for ${char.name}...`);
+        logger.info(`📦 Creating paraglider for ${char.name}...`);
 
         const gliderOptions = {
           wingColor1: char.wingColors.color1,
@@ -91,9 +92,9 @@ class ParagliderVoxelWorkshopApp extends WorkshopDemoBase {
           scene.add(mesh);
           this.paragliders.push({ paraglider, mesh, character: char.name });
 
-          console.log(`✅ ${char.name} paraglider loaded successfully`);
+          logger.info(`✅ ${char.name} paraglider loaded successfully`);
         } catch (error) {
-          console.error(`❌ Failed to load ${char.name} paraglider:`, error);
+          logger.error(`❌ Failed to load ${char.name} paraglider:`, error);
         }
       }
 
@@ -107,7 +108,7 @@ class ParagliderVoxelWorkshopApp extends WorkshopDemoBase {
       this.startAnimationLoop(renderer, scene, camera, controls);
 
       this.isLoaded = true;
-      console.log(
+      logger.info(
         `✅ ${this.config.name} loaded successfully with ${this.paragliders.length} paragliders`
       );
     } catch (error) {
@@ -167,7 +168,7 @@ class ParagliderVoxelWorkshopApp extends WorkshopDemoBase {
   }
 
   public override dispose(): void {
-    console.log(`🧹 Disposing ${this.config.name}`);
+    logger.info(`🧹 Disposing ${this.config.name}`);
     super.dispose();
   }
 }

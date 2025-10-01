@@ -8,6 +8,7 @@ import {
 import { ComponentOptions } from '../base/IThreeComponent';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { CharacterType, characterRegistry, CharacterDefinition, CharacterAssets } from './CharacterRegistry';
+import { logger } from '../../utils/logger';
 
 /**
  * Options for pilot voxel component
@@ -114,7 +115,7 @@ export class PilotVoxel extends AsyncThreeComponent {
         return;
       }
 
-      console.log(
+      logger.info(
         `🎭 Using character: ${this.characterDefinition.name} (${this.characterDefinition.id})`
       );
 
@@ -127,10 +128,10 @@ export class PilotVoxel extends AsyncThreeComponent {
       };
     } else if (options.objFile && options.textureFile) {
       // Use manual asset paths
-      console.log('🎭 Using manual asset paths for PilotVoxel');
+      logger.info('🎭 Using manual asset paths for PilotVoxel');
     } else {
       // No character specified, use default
-      console.log('🎭 No character specified, using default character (Adri)');
+      logger.info('🎭 No character specified, using default character (Adri)');
       this.characterDefinition = characterRegistry.getCharacter(CharacterType.ADRI);
       if (this.characterDefinition) {
         const assets = this.characterDefinition.assets;
@@ -526,7 +527,7 @@ export class PilotVoxel extends AsyncThreeComponent {
     characterType: CharacterType,
     options?: Partial<PilotVoxelOptions>
   ): Promise<THREE.Object3D> {
-    console.log(`🔄 Switching character to: ${characterType}`);
+    logger.info(`🔄 Switching character to: ${characterType}`);
 
     // Update options with new character
     const newOptions: PilotVoxelOptions = {
@@ -567,7 +568,7 @@ export class PilotVoxel extends AsyncThreeComponent {
       return;
     }
 
-    console.log(`🎨 Switching to alternative texture ${textureIndex}`);
+    logger.info(`🎨 Switching to alternative texture ${textureIndex}`);
 
     // Update options and reload
     this.pilotOptions.useAlternativeTexture = textureIndex;
