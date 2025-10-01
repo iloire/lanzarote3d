@@ -77,7 +77,10 @@ export async function loadHangglider(
       autoStart: true,
       faceDirection: true,
       forwardAxis: config.forwardAxis,
-      debugVectors: DEBUG_VECTORS
+      debugVectors: DEBUG_VECTORS,
+      waypoints: config.waypoints,
+      waypointTension: config.waypointTension,
+      waypointLoop: config.waypointLoop,
     });
 
     flyingBehavior.attachTo(mesh);

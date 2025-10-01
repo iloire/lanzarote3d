@@ -21,6 +21,9 @@ export type HanggliderConfig = {
   maxHeight: number;
   obstacleAvoidanceDistance: number;
   forwardAxis: 'x' | 'y' | 'z' | '-x' | '-y' | '-z';
+  waypoints?: THREE.Vector3[];
+  waypointTension?: number;
+  waypointLoop?: boolean;
 };
 
 export type CessnaConfig = {
@@ -87,8 +90,8 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
 export const hanggliderConfig: HanggliderConfig = {
   position: new THREE.Vector3(4800, 950, -500),
   scale: 1.0,
-  flightPattern: FlightPattern.FIGURE_EIGHT,
-  speed: 3.0,
+  flightPattern: FlightPattern.WAYPOINT,
+  speed: 25,
   turnSpeed: 7.0,
   flightRadius: 145,
   returnDistance: 155,
@@ -96,6 +99,23 @@ export const hanggliderConfig: HanggliderConfig = {
   maxHeight: 1225,
   obstacleAvoidanceDistance: 150,
   forwardAxis: 'x',
+  // Very low altitude, tight circles above boats
+  waypoints: [
+    // Tight loop around boat area 1 (marina/harbor)
+    new THREE.Vector3(7679, 800, -5245),
+    new THREE.Vector3(8079, 820, -5445),
+    new THREE.Vector3(8079, 800, -5645),
+    new THREE.Vector3(7679, 780, -5645),
+    // Move to boat area 2 (open water)
+    new THREE.Vector3(8079, 790, -6255),
+    new THREE.Vector3(8479, 800, -6455),
+    new THREE.Vector3(8479, 820, -6655),
+    new THREE.Vector3(8079, 800, -6655),
+    // Return path back to first area
+    new THREE.Vector3(7879, 810, -6055),
+  ],
+  waypointTension: 0.7, // Very tight curves for agile hangglider
+  waypointLoop: true,
 };
 
 export const cessnaConfig: CessnaConfig = {
