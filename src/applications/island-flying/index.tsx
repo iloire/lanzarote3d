@@ -152,8 +152,15 @@ class IslandFlyingApp extends TerrainBase {
           'Paraglider',
           Paraglider,
           {
-            scale: 15,
-            bodyColor: colors[i % colors.length],
+            glider: {
+              wingColor: colors[i % colors.length],
+              linesColor: '#333333',
+              wingspan: 240,
+            },
+            pilot: {
+              bodyColor: colors[(i + 1) % colors.length],
+              scale: 15,
+            },
           },
           flightPatterns[i % flightPatterns.length],
           {
@@ -172,8 +179,9 @@ class IslandFlyingApp extends TerrainBase {
           'Hangglider',
           Hangglider,
           {
+            wingColor: colors[i % colors.length],
+            wingspan: 200,
             scale: 12,
-            bodyColor: colors[i % colors.length],
           },
           flightPatterns[i % flightPatterns.length],
           {
@@ -300,7 +308,12 @@ class IslandFlyingApp extends TerrainBase {
         this.targetController?.addTarget(mesh, `${emoji} ${type}`);
       }
     } catch (error) {
-      logger.warn(`Failed to add ${type}:`, error);
+      logger.error(`❌ Failed to add ${type}:`, error);
+      // Re-throw to make failures visible during development
+      if (error instanceof Error) {
+        logger.error(`Error details: ${error.message}`);
+        logger.error(`Stack: ${error.stack}`);
+      }
     }
   }
 
