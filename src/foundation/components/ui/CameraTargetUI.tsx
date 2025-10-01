@@ -146,17 +146,16 @@ const CameraTargetUIComponent: React.FC<CameraTargetUIProps> = ({
                         ? 'rgba(100, 50, 200, 0.8)'
                         : 'rgba(100, 50, 200, 0.3)',
                     color: 'white',
-                    border: currentMode === mode ? '1px solid #fff' : '1px solid rgba(100, 50, 200, 0.3)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    outline: currentMode === mode ? '1px solid #fff' : 'none',
+                    outlineOffset: '-2px',
                     borderRadius: '3px',
                     padding: '4px',
                     fontSize: '10px',
                     fontWeight: currentMode === mode ? 'bold' : 'normal',
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    boxShadow:
-                      currentMode === mode
-                        ? '0 2px 8px rgba(100, 50, 200, 0.6)'
-                        : '0 1px 3px rgba(0,0,0,0.3)',
+                    transition: 'background 0.2s ease, outline 0.2s ease',
+                    boxShadow: 'none',
                   }}
                   onMouseEnter={e => {
                     e.currentTarget.style.filter = 'brightness(1.2)';
