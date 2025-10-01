@@ -621,30 +621,53 @@ class TownWorkshop extends WorkshopDemoBase {
       roughness: 0.8,
     });
 
-    // Main horizontal road
-    const mainRoadGeometry = new THREE.PlaneGeometry(1600, 40);
-    const mainRoad = new THREE.Mesh(mainRoadGeometry, roadMaterial);
-    mainRoad.rotation.x = -Math.PI / 2;
-    mainRoad.position.set(0, 0.1, 0);
-    scene.add(mainRoad);
+    // Create road segments that avoid town squares and parks
+    // Town squares at: (0, 0, 0), (-600, 0, 0), (600, 0, -300)
+    // Parks at: (-200, 0, 300), (200, 0, -300), (600, 0, 300)
 
-    // Vertical connecting roads
+    // Horizontal roads - split into segments to avoid town squares
+    // Left segment (avoids West Square at -600)
+    const leftSegment = new THREE.Mesh(new THREE.PlaneGeometry(300, 40), roadMaterial);
+    leftSegment.rotation.x = -Math.PI / 2;
+    leftSegment.position.set(-750, 0.1, 150);
+    scene.add(leftSegment);
+    this.roadMeshes.push(leftSegment);
+
+    // Center-left segment (between West Square and Central Square)
+    const centerLeftSegment = new THREE.Mesh(new THREE.PlaneGeometry(400, 40), roadMaterial);
+    centerLeftSegment.rotation.x = -Math.PI / 2;
+    centerLeftSegment.position.set(-300, 0.1, 150);
+    scene.add(centerLeftSegment);
+    this.roadMeshes.push(centerLeftSegment);
+
+    // Center-right segment (between Central Square and Market Square)
+    const centerRightSegment = new THREE.Mesh(new THREE.PlaneGeometry(400, 40), roadMaterial);
+    centerRightSegment.rotation.x = -Math.PI / 2;
+    centerRightSegment.position.set(300, 0.1, 150);
+    scene.add(centerRightSegment);
+    this.roadMeshes.push(centerRightSegment);
+
+    // Right segment (past Market Square)
+    const rightSegment = new THREE.Mesh(new THREE.PlaneGeometry(300, 40), roadMaterial);
+    rightSegment.rotation.x = -Math.PI / 2;
+    rightSegment.position.set(750, 0.1, 150);
+    scene.add(rightSegment);
+    this.roadMeshes.push(rightSegment);
+
+    // Vertical connecting roads (offset to avoid central zones)
     const verticalRoadGeometry = new THREE.PlaneGeometry(40, 600);
 
-    const leftRoad = new THREE.Mesh(verticalRoadGeometry, roadMaterial);
-    leftRoad.rotation.x = -Math.PI / 2;
-    leftRoad.position.set(-400, 0.1, 0);
-    scene.add(leftRoad);
+    const leftVerticalRoad = new THREE.Mesh(verticalRoadGeometry, roadMaterial);
+    leftVerticalRoad.rotation.x = -Math.PI / 2;
+    leftVerticalRoad.position.set(-450, 0.1, 0);
+    scene.add(leftVerticalRoad);
+    this.roadMeshes.push(leftVerticalRoad);
 
-    const centerRoad = new THREE.Mesh(verticalRoadGeometry, roadMaterial);
-    centerRoad.rotation.x = -Math.PI / 2;
-    centerRoad.position.set(0, 0.1, 0);
-    scene.add(centerRoad);
-
-    const rightRoad = new THREE.Mesh(verticalRoadGeometry, roadMaterial);
-    rightRoad.rotation.x = -Math.PI / 2;
-    rightRoad.position.set(400, 0.1, 0);
-    scene.add(rightRoad);
+    const rightVerticalRoad = new THREE.Mesh(verticalRoadGeometry, roadMaterial);
+    rightVerticalRoad.rotation.x = -Math.PI / 2;
+    rightVerticalRoad.position.set(450, 0.1, -100);
+    scene.add(rightVerticalRoad);
+    this.roadMeshes.push(rightVerticalRoad);
 
     // Road markings
     const markingMaterial = new THREE.MeshStandardMaterial({
@@ -652,26 +675,31 @@ class TownWorkshop extends WorkshopDemoBase {
       roughness: 0.9,
     });
 
-    // Road markings are now handled above with proper tracking
+    // Add markings to horizontal road segments
+    const roadSegments = [
+      { center: -750, length: 300 },
+      { center: -300, length: 400 },
+      { center: 300, length: 400 },
+      { center: 750, length: 300 },
+    ];
 
-    // Track roads separately so they can be properly disposed
-    this.roadMeshes.push(mainRoad, leftRoad, centerRoad, rightRoad);
-
-    // Also add road markings to tracking
     const markings: THREE.Mesh[] = [];
+    roadSegments.forEach(segment => {
+      const markingCount = Math.floor(segment.length / 50);
+      const startOffset = segment.center - (segment.length / 2);
 
-    // Dashed lines for main road
-    for (let i = -15; i <= 15; i++) {
-      if (i % 2 === 0) continue; // Create dashed effect
-      const marking = new THREE.Mesh(
-        new THREE.PlaneGeometry(40, 2),
-        markingMaterial
-      );
-      marking.rotation.x = -Math.PI / 2;
-      marking.position.set(i * 50, 0.11, 0);
-      scene.add(marking);
-      markings.push(marking);
-    }
+      for (let i = 0; i < markingCount; i++) {
+        if (i % 2 === 0) continue; // Create dashed effect
+        const marking = new THREE.Mesh(
+          new THREE.PlaneGeometry(40, 2),
+          markingMaterial
+        );
+        marking.rotation.x = -Math.PI / 2;
+        marking.position.set(startOffset + (i * 50), 0.11, 150);
+        scene.add(marking);
+        markings.push(marking);
+      }
+    });
 
     // Add markings to road tracking
     this.roadMeshes.push(...markings);

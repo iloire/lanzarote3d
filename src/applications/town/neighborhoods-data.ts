@@ -60,7 +60,7 @@ export const TOWN_NEIGHBORHOODS: NeighborhoodConfig[] = [
   },
   {
     name: 'Village Green',
-    center: new THREE.Vector3(-200, 0, 80),
+    center: new THREE.Vector3(-200, 0, 600),
     type: 'rural',
     style: 'village',
     houses: 15, // Increased from 10
@@ -168,14 +168,14 @@ export const TOWN_NEIGHBORHOODS: NeighborhoodConfig[] = [
   },
   {
     name: 'Midtown Residences',
-    center: new THREE.Vector3(100, 0, 100),
+    center: new THREE.Vector3(350, 0, -550),
     type: 'street',
     houses: 16, // Increased from 10
     variation: { ...DEFAULT_VARIATION, poolChance: 0.3 },
   },
   {
     name: 'Artisan Quarter',
-    center: new THREE.Vector3(-100, 0, -100),
+    center: new THREE.Vector3(-350, 0, -450),
     type: 'suburban',
     size: 'small',
     houses: 14, // Added - small suburban
@@ -227,7 +227,7 @@ export const TOWN_NEIGHBORHOODS: NeighborhoodConfig[] = [
   },
   {
     name: 'Canyon View',
-    center: new THREE.Vector3(200, 0, 200),
+    center: new THREE.Vector3(850, 0, 600),
     type: 'rural',
     style: 'scattered',
     houses: 9, // Increased from 5
