@@ -6,6 +6,7 @@ TASKS:
 - also add an hercules to the famara animation application
 - head is missing from the Pilot component
 - Pilot can use a single type of harness at the moment, the CocoonHarness . Create al least OpenHarness (looks like the pilot is not wearing a harness) and SubmarineHarness (it looks like the paragliding pilot is inside a submarine). Show case them in the pilot showcase application.
+- Rename wildlife/birds.ts to wildlife/flock-birds.ts to be more precise
 
 ---
 

@@ -61,9 +61,9 @@ export abstract class Bird extends SimpleThreeComponent {
     const scale = this.getModelScale();
     group.scale.setScalar(scale);
 
-    // Body (ellipsoid) - main body shape, more streamlined
-    const bodyGeometry = new THREE.SphereGeometry(0.4, 16, 12);
-    bodyGeometry.scale(1.2, 0.8, 1.8); // More realistic bird proportions
+    // Body (ellipsoid) - LEANER and THINNER body shape
+    const bodyGeometry = new THREE.SphereGeometry(0.3, 16, 12);
+    bodyGeometry.scale(0.9, 0.6, 1.6); // Leaner, thinner proportions
     const bodyMaterial = new THREE.MeshStandardMaterial({
       color: this.getSpeciesColor(),
       metalness: 0.1,
@@ -73,12 +73,12 @@ export abstract class Bird extends SimpleThreeComponent {
     body.position.set(0, 0, 0);
     group.add(body);
 
-    // Wings - more wing-like shape with better proportions
+    // Wings - BIGGER wings with more realistic shape
     const wingShape = new THREE.Shape();
     wingShape.moveTo(0, 0);
-    wingShape.quadraticCurveTo(0.8, 0.3, 1.4, 0);
-    wingShape.quadraticCurveTo(1.2, -0.2, 0.8, -0.4);
-    wingShape.quadraticCurveTo(0.4, -0.3, 0, 0);
+    wingShape.quadraticCurveTo(1.2, 0.4, 2.0, 0.1); // Extended wing tip
+    wingShape.quadraticCurveTo(1.8, -0.1, 1.4, -0.5); // Deeper curve
+    wingShape.quadraticCurveTo(0.7, -0.4, 0, 0);
 
     const wingGeometry = new THREE.ShapeGeometry(wingShape);
     const wingMaterial = new THREE.MeshStandardMaterial({
@@ -89,46 +89,46 @@ export abstract class Bird extends SimpleThreeComponent {
     });
 
     this.leftWing = new THREE.Mesh(wingGeometry, wingMaterial);
-    this.leftWing.position.set(-0.6, 0.1, -0.2);
-    this.leftWing.rotation.set(0, 0, Math.PI / 8);
+    this.leftWing.position.set(-0.4, 0.1, -0.15);
+    this.leftWing.rotation.set(0, 0, Math.PI / 12);
     this.leftWing.userData.originalRotation = this.leftWing.rotation.clone();
     group.add(this.leftWing);
 
     this.rightWing = new THREE.Mesh(wingGeometry, wingMaterial);
-    this.rightWing.position.set(0.6, 0.1, -0.2);
-    this.rightWing.rotation.set(0, Math.PI, -Math.PI / 8);
+    this.rightWing.position.set(0.4, 0.1, -0.15);
+    this.rightWing.rotation.set(0, Math.PI, -Math.PI / 12);
     this.rightWing.userData.originalRotation = this.rightWing.rotation.clone();
     group.add(this.rightWing);
 
-    // Tail - fan-shaped for better appearance
-    const tailGeometry = new THREE.ConeGeometry(0.3, 1.0, 8);
+    // Tail - more streamlined
+    const tailGeometry = new THREE.ConeGeometry(0.25, 0.9, 8);
     const tail = new THREE.Mesh(tailGeometry, bodyMaterial);
-    tail.position.set(0, 0, -1.0);
+    tail.position.set(0, 0, -0.9);
     tail.rotation.x = Math.PI / 2;
-    tail.scale.set(1, 0.3, 1); // Flatten for fan shape
+    tail.scale.set(1, 0.25, 1);
     group.add(tail);
 
-    // Head - slightly smaller and better positioned
-    const headGeometry = new THREE.SphereGeometry(0.2, 12, 10);
-    headGeometry.scale(1, 1, 1.1); // Slightly elongated
+    // Head - smaller to match leaner body
+    const headGeometry = new THREE.SphereGeometry(0.18, 12, 10);
+    headGeometry.scale(0.95, 0.95, 1.1);
     const head = new THREE.Mesh(headGeometry, bodyMaterial);
-    head.position.set(0, 0.15, 0.65);
+    head.position.set(0, 0.12, 0.6);
     group.add(head);
 
-    // Beak - species-specific later, but better proportions
-    const beakGeometry = new THREE.ConeGeometry(0.04, 0.25, 8);
+    // Beak - proportional to smaller head
+    const beakGeometry = new THREE.ConeGeometry(0.035, 0.22, 8);
     const beakMaterial = new THREE.MeshStandardMaterial({
-      color: 0xD2691E, // Saddle brown - more natural
+      color: 0xD2691E,
       metalness: 0.2,
       roughness: 0.6
     });
     const beak = new THREE.Mesh(beakGeometry, beakMaterial);
-    beak.position.set(0, 0.05, 0.85);
+    beak.position.set(0, 0.04, 0.78);
     beak.rotation.x = -Math.PI / 2;
     group.add(beak);
 
-    // Eyes for more character
-    const eyeGeometry = new THREE.SphereGeometry(0.03, 8, 6);
+    // Eyes
+    const eyeGeometry = new THREE.SphereGeometry(0.028, 8, 6);
     const eyeMaterial = new THREE.MeshStandardMaterial({
       color: 0x000000,
       metalness: 0,
@@ -136,11 +136,11 @@ export abstract class Bird extends SimpleThreeComponent {
     });
 
     const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-    leftEye.position.set(-0.12, 0.18, 0.7);
+    leftEye.position.set(-0.11, 0.15, 0.65);
     group.add(leftEye);
 
     const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-    rightEye.position.set(0.12, 0.18, 0.7);
+    rightEye.position.set(0.11, 0.15, 0.65);
     group.add(rightEye);
 
     this.birdModel = group;
@@ -173,25 +173,37 @@ export abstract class Bird extends SimpleThreeComponent {
     return this._object;
   }
 
-  // Wing animation
+  // Wing animation - proper flapping motion
   private updateWingAnimation(deltaTime: number): void {
     if (!this.leftWing || !this.rightWing) return;
 
     const frequency = (this._options as BirdOptions).wingBeatFrequency || 2.0;
     const amplitude = (this._options as BirdOptions).wingBeatAmplitude || 0.5;
 
-    this.wingBeatTime += deltaTime * frequency;
-    const wingAngle = Math.sin(this.wingBeatTime) * amplitude;
+    this.wingBeatTime += deltaTime * frequency * Math.PI * 2;
 
-    // Animate wings with opposite phases for realistic flapping
+    // Use sine wave for smooth up-down flapping
+    const flapCycle = Math.sin(this.wingBeatTime);
+
+    // Create natural flapping motion with ease-in/ease-out
+    // Wings move faster on downstroke (power stroke) than upstroke
+    const wingAngle = flapCycle > 0
+      ? Math.pow(flapCycle, 0.7) * amplitude  // Faster downstroke
+      : Math.pow(-flapCycle, 1.3) * -amplitude; // Slower upstroke
+
+    // Animate wings - flapping up and down
     if (this.leftWing.userData.originalRotation) {
       this.leftWing.rotation.copy(this.leftWing.userData.originalRotation);
       this.leftWing.rotation.z += wingAngle;
+      // Add slight forward/back motion for realism
+      this.leftWing.rotation.x = Math.sin(this.wingBeatTime * 0.5) * 0.1;
     }
 
     if (this.rightWing.userData.originalRotation) {
       this.rightWing.rotation.copy(this.rightWing.userData.originalRotation);
       this.rightWing.rotation.z -= wingAngle;
+      // Add slight forward/back motion for realism
+      this.rightWing.rotation.x = Math.sin(this.wingBeatTime * 0.5) * 0.1;
     }
   }
 
