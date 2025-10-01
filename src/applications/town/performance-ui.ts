@@ -15,6 +15,8 @@ export interface PolygonBreakdown {
   stones: number;
   pools: number;
   roads: number;
+  parks: number;
+  squares: number;
   other: number;
 }
 
@@ -154,6 +156,8 @@ export class PerformanceUI {
         stones: ((polygonBreakdown.stones / totalPolygons) * 100).toFixed(1),
         pools: ((polygonBreakdown.pools / totalPolygons) * 100).toFixed(1),
         roads: ((polygonBreakdown.roads / totalPolygons) * 100).toFixed(1),
+        parks: ((polygonBreakdown.parks / totalPolygons) * 100).toFixed(1),
+        squares: ((polygonBreakdown.squares / totalPolygons) * 100).toFixed(1),
         other: ((polygonBreakdown.other / totalPolygons) * 100).toFixed(1)
       };
 
@@ -166,6 +170,8 @@ export class PerformanceUI {
           <div>🪨 Stones: ${Math.floor(polygonBreakdown.stones).toLocaleString()} (${percentages.stones}%)</div>
           <div>🏊 Pools: ${Math.floor(polygonBreakdown.pools).toLocaleString()} (${percentages.pools}%)</div>
           <div>🛣️ Roads: ${Math.floor(polygonBreakdown.roads).toLocaleString()} (${percentages.roads}%)</div>
+          <div>🌳 Parks: ${Math.floor(polygonBreakdown.parks).toLocaleString()} (${percentages.parks}%)</div>
+          <div>🏛️ Squares: ${Math.floor(polygonBreakdown.squares).toLocaleString()} (${percentages.squares}%)</div>
           <div>❓ Other: ${Math.floor(polygonBreakdown.other).toLocaleString()} (${percentages.other}%)</div>
         </div>
       `;
