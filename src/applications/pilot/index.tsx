@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Pilot } from '../../foundation/components/characters/Pilot';
+import { Pilot, HarnessType } from '../../foundation/components/characters/Pilot';
 import TandemPilot from '../../foundation/components/characters/TandemPilot';
 import {
   GlassesType,
@@ -40,25 +40,46 @@ class PilotWorkshopApp extends WorkshopDemoBase {
           headType: PilotHeadType.Default,
           helmetType: HelmetType.Default,
           helmetColor: '#ffff00',
+          harnessType: HarnessType.Cocoon,
+          harnessColor1: '#333',
+          harnessColor2: '#666',
         },
         {
           headType: PilotHeadType.Default,
           helmetType: HelmetType.Default,
+          harnessType: HarnessType.Open,
+          harnessColor1: '#1a1a1a',
         },
         {
           headType: PilotHeadType.Warrior,
           helmetType: HelmetType.Default,
+          harnessType: HarnessType.Submarine,
+          harnessColor1: '#1a3a52',
+          harnessColor2: '#88ccff',
+        },
+        {
+          headType: PilotHeadType.Skeleton,
+          helmetType: HelmetType.FullFace,
+          harnessType: HarnessType.Open,
+          harnessColor1: '#2a2a2a',
+        },
+        {
+          headType: PilotHeadType.Devil,
+          helmetType: HelmetType.WithHorns,
+          harnessType: HarnessType.Submarine,
+          harnessColor1: '#8b0000',
+          harnessColor2: '#ff4444',
         },
       ];
 
       // Load pilots
-      let x = -1400;
+      let x = -1800;
       for (const pilotOptions of pilots) {
         const pilot = new Pilot(pilotOptions);
         const mesh = await pilot.load();
         mesh.position.set(x, -300, -500);
         scene.add(mesh);
-        x += 600;
+        x += 700;
       }
 
       // Load tandem pilot

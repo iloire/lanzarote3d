@@ -2,6 +2,19 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## [1.5.4] - 2025-10-01 13:08 UTC
+
+### Added
+- **Multiple Harness Types for Pilot**: Created OpenHarness and SubmarineHarness variants to provide visual diversity
+  - Created OpenHarness.ts with minimal strap-based harness design (climbing gear style)
+  - Created SubmarineHarness.ts with enclosed pod-like harness design (submarine/spaceship style)
+  - Added HarnessType enum (Cocoon, Open, Submarine) to Pilot component
+  - Extended PilotOptions with harnessType, harnessColor1, and harnessColor2 parameters
+  - Updated Pilot.createBody() to instantiate correct harness based on harnessType option
+  - OpenHarness features thin shoulder straps, chest strap, leg straps, small seat board, and minimal reserve handle
+  - SubmarineHarness features enclosed hull, transparent windows, stabilizer fins, thruster details, and emergency hatch
+  - Pilot showcase now displays 5 pilots with different harness types: Cocoon (Default), Open (Default), Submarine (Warrior), Open (Skeleton), Submarine (Devil)
+
 ## [1.5.3] - 2025-10-01 12:54 UTC
 
 ### Fixed

@@ -1,7 +1,6 @@
 Implement the following tasks if any is added following the instructions described below:
 ---
 TASKS:
-- Pilot can use a single type of harness at the moment, the CocoonHarness . Create al least OpenHarness (looks like the pilot is not wearing a harness) and SubmarineHarness (it looks like the paragliding pilot is inside a submarine). Show case them in the pilot showcase application.
 - Rename wildlife/birds.ts to wildlife/flock-birds.ts to be more precise
 
 ---

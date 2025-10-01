@@ -3,7 +3,15 @@ import { SimpleThreeComponent } from '../base/SimpleThreeComponent';
 import { resourceManager } from '../../systems/ResourceManager';
 import { PilotHead, PilotHeadType, HelmetType } from './PilotHead';
 import CocoonHarness from './CocoonHarness';
+import OpenHarness from './OpenHarness';
+import SubmarineHarness from './SubmarineHarness';
 import type { ComponentOptions } from '../base/BaseThreeComponent';
+
+export enum HarnessType {
+  Cocoon = 'cocoon',
+  Open = 'open',
+  Submarine = 'submarine',
+}
 
 export interface PilotOptions extends ComponentOptions {
   headType?: PilotHeadType;
@@ -16,6 +24,9 @@ export interface PilotOptions extends ComponentOptions {
   carabinerColor?: string;
   carabinerSeparationMM?: number;
   showHead?: boolean;
+  harnessType?: HarnessType;
+  harnessColor1?: string;
+  harnessColor2?: string;
 }
 
 export interface PilotState {
@@ -54,6 +65,9 @@ export class Pilot extends SimpleThreeComponent {
       carabinerColor: '#666666',
       carabinerSeparationMM: 300,
       showHead: true,
+      harnessType: HarnessType.Cocoon,
+      harnessColor1: '#333',
+      harnessColor2: '#666',
       ...options,
     });
   }
@@ -124,13 +138,36 @@ export class Pilot extends SimpleThreeComponent {
     const group = new THREE.Object3D();
     group.name = 'PilotBody';
 
-    // Create harness
-    const harness = new CocoonHarness({
-      color1: '#333',
-      color2: '#666',
-      carabinerColor: options.carabinerColor || '#666666',
-      carabinerSeparationMM: options.carabinerSeparationMM || 300,
-    });
+    // Create harness based on type
+    const harnessType = options.harnessType || HarnessType.Cocoon;
+    let harness: CocoonHarness | OpenHarness | SubmarineHarness;
+
+    switch (harnessType) {
+      case HarnessType.Open:
+        harness = new OpenHarness({
+          strapColor: options.harnessColor1 || '#222',
+          carabinerColor: options.carabinerColor || '#666666',
+          carabinerSeparationMM: options.carabinerSeparationMM || 300,
+        });
+        break;
+      case HarnessType.Submarine:
+        harness = new SubmarineHarness({
+          hullColor: options.harnessColor1 || '#1a3a52',
+          windowColor: options.harnessColor2 || '#88ccff',
+          carabinerColor: options.carabinerColor || '#666666',
+          carabinerSeparationMM: options.carabinerSeparationMM || 300,
+        });
+        break;
+      case HarnessType.Cocoon:
+      default:
+        harness = new CocoonHarness({
+          color1: options.harnessColor1 || '#333',
+          color2: options.harnessColor2 || '#666',
+          carabinerColor: options.carabinerColor || '#666666',
+          carabinerSeparationMM: options.carabinerSeparationMM || 300,
+        });
+        break;
+    }
 
     group.add(harness.load());
 
