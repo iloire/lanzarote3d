@@ -1,10 +1,8 @@
 // Aerial sports vehicle exports
-import Paraglider from './Paraglider';
-import Hangglider from './Hangglider';
-import ParagliderVoxel from './ParagliderVoxel';
-import Tandem from './Tandem';
-
-export { Paraglider, Hangglider, ParagliderVoxel, Tandem };
+export { Paraglider } from './Paraglider';
+export { default as Hangglider } from './Hangglider';
+export { default as ParagliderVoxel } from './ParagliderVoxel';
+export { default as Tandem } from './Tandem';
 
 export type { ParagliderOptions } from './Paraglider';
 export type { ParagliderVoxelOptions } from './ParagliderVoxel';

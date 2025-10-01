@@ -4,6 +4,31 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 
 ## [1.5.0] - 2025-09-30 UTC
 
+### Refactored
+- **Vehicle Folder Organization**: Reorganized vehicles into type-based folder structure
+  - Created `aircraft/` folder for planes (Airliner, Cessna, Hercules, Jet)
+  - Created `ground/` folder for ground vehicles (Car, AutonomousCar, Truck)
+  - Created `aerial-sports/` folder for aerial sports (Paraglider, ParagliderVoxel, Hangglider, Tandem)
+  - Created `components/` folder for vehicle parts (Wing, HangGliderWing, Glider)
+  - Unified exports through main vehicles/index.ts
+  - Updated all import paths throughout codebase (33 files affected)
+  - Benefits: better organization, cleaner imports, easier navigation
+
+- **Pilot Component Architecture**: Migrated from legacy to modern Pilot implementation
+  - Removed legacy Pilot class from vehicles/components/Pilot.ts (175 lines removed)
+  - All vehicles now use modern Pilot from characters/Pilot.ts
+  - Updated Hangglider and Paraglider to use flattened PilotOptions API
+  - Simplified pilot application options structure
+  - Modern Pilot extends SimpleThreeComponent with proper resource management
+  - Eliminated code duplication between legacy and modern implementations
+
+### Added
+- **Hercules Aircraft**: Added military transport plane to vehicle collection
+  - Four-engine turboprop design with military color scheme
+  - Displayed in planes application alongside Jet, Airliner, and Cessna
+  - Configurable body, wing, propeller, and window colors
+  - Scale option for size adjustment
+
 ### Added
 - **ProceduralRoad for famara-animation**: Added procedural road connecting neighborhoods
   - Modified Environment.addHouses() to return neighborhood center positions
