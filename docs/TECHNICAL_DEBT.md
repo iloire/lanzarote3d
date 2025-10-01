@@ -449,6 +449,75 @@ for (const vehicle of vehicles) {
 - See "Multiple Render Loops - Memory Leak Risk" (High Priority)
 - This app significantly worsens the existing render loop problem
 
+### Inconsistent Vehicle API Pattern
+**Status**: ⚠️ High Priority - Architecture Inconsistency
+**Files**: `src/foundation/components/vehicles/`, `src/applications/island-flying/index.tsx`
+**Issue**: Two different patterns for accessing vehicle meshes despite abstract base classes
+
+**Root Cause Analysis**:
+The inconsistency exists because legacy vehicles (Paraglider, Hangglider) pre-date the modern component architecture and don't extend BaseThreeComponent:
+
+1. **Modern Vehicles** (Cessna, Jet, Airliner):
+   - Extend `SimpleThreeComponent` → `BaseThreeComponent`
+   - Implement `IThreeComponent` interface
+   - Use `load()` returns `Promise<THREE.Object3D>`
+   - Use `getObject()` to retrieve mesh
+   - Proper lifecycle management, metrics, disposal
+
+2. **Legacy Vehicles** (Paraglider, Hangglider):
+   - Plain classes with no base (Paraglider)
+   - HangGliderModel doesn't extend anything
+   - Use `load()` returns `Promise<THREE.Object3D>` (direct return, not stored)
+   - Use `getMesh()` to retrieve mesh (Paraglider only)
+   - Manual lifecycle management
+   - Implement `IFlyable` interface (different from IThreeComponent)
+
+**Why Abstract Classes Didn't Prevent This**:
+Legacy vehicles were created before the modern architecture existed and were never migrated. They don't extend the base classes at all, so they're not subject to the interface constraints.
+
+**Current Workaround**:
+```typescript
+// island-flying/index.tsx lines 276-281
+const loadResult = await vehicle.load();
+const mesh = loadResult || (vehicle.getMesh ? vehicle.getMesh() : null);
+```
+
+**Recommended Solution**:
+
+**Phase 1: Migrate Legacy Vehicles to Modern Architecture** (High Priority)
+1. Create `ModernParaglider extends SimpleThreeComponent`
+2. Create `ModernHangglider extends SimpleThreeComponent`
+3. Keep legacy classes for backward compatibility with deprecation warnings
+4. Update all applications to use modern versions
+
+**Phase 2: Unified Interface** (After Phase 1)
+All vehicles will then use consistent API:
+```typescript
+const vehicle = new AnyVehicle(config);
+const mesh = await vehicle.load();  // Returns mesh directly
+// OR
+const object = vehicle.getObject();  // After load()
+```
+
+**Benefits**:
+- ✅ Single API pattern across all vehicles
+- ✅ Proper lifecycle management with metrics
+- ✅ Resource pooling via ResourceManager
+- ✅ Consistent disposal and memory management
+- ✅ Type safety through IThreeComponent interface
+- ✅ No more workarounds or special cases
+
+**Breaking Changes**:
+- Applications using Paraglider/Hangglider will need updates
+- Can be mitigated with deprecation warnings and migration guide
+
+**Estimated Effort**: 2-3 days
+- 1 day: Implement ModernParaglider and ModernHangglider
+- 1 day: Update applications and tests
+- 0.5 day: Documentation and deprecation warnings
+
+**Priority**: High - Should be done before adding more vehicles
+
 ### Island Flying App - Type Safety Issues
 **Status**: ⚠️ Needs Improvement - Introduced Oct 1, 2025
 **Files**: `src/applications/island-flying/index.tsx`
