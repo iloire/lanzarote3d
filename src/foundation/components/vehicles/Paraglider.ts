@@ -4,14 +4,13 @@ import * as THREE from 'three';
 import Pilot, { LegacyPilotOptions as PilotOptions } from './Pilot';
 import LegacyGlider, { GliderOptions } from './Glider';
 import GuiHelper from '../../utils/gui';
-import IFlyable from '../../types/IFlyable';
 
 export type ParagliderOptions = {
   glider: GliderOptions;
   pilot: PilotOptions;
 };
 
-class Paraglider implements IFlyable {
+class Paraglider {
   mesh!: THREE.Object3D;
   glider!: LegacyGlider;
   pilot!: Pilot;

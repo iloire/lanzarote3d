@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import IFlyable from '../types/IFlyable';
+import Paraglider from '../components/vehicles/Paraglider';
+import ParagliderVoxel from '../components/vehicles/ParagliderVoxel';
 import Weather from '../components/physics/Weather';
 import Thermal from '../components/physics/Thermal';
 import { ParagliderPhysics, ParagliderPhysicsOptions } from '../systems/physics/ParagliderPhysics';
@@ -8,8 +9,10 @@ import { TrajectoryTracker } from '../systems/tracking/TrajectoryTracker';
 import { TrajectoryPoint, TrajectoryPointType } from '../components/ui/Trajectory';
 import { logger } from '../utils/logger';
 
+type ControllableVehicle = Paraglider | ParagliderVoxel;
+
 export interface ParagliderControllerOptions {
-  flyable: IFlyable;
+  flyable: ControllableVehicle;
   physics: ParagliderPhysicsOptions;
   weather: Weather;
   terrain: THREE.Mesh;

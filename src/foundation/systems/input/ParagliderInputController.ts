@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import IFlyable from '../../types/IFlyable';
+import Paraglider from '../../components/vehicles/Paraglider';
+import ParagliderVoxel from '../../components/vehicles/ParagliderVoxel';
 
 export interface ParagliderInputState {
   directionInput: number; // -1 to 1 (left to right)
@@ -10,13 +11,19 @@ export interface ParagliderInputState {
 }
 
 /**
+ * Vehicles that support manual flight control
+ * Must have left(), right(), leftRelease(), rightRelease() methods
+ */
+type ControllableVehicle = Paraglider | ParagliderVoxel;
+
+/**
  * ParagliderInputController handles keyboard/gamepad input for paraglider control
  * and calculates rotation/banking based on input and inertia.
  *
  * Separate from physics - this only handles input and rotation visualization.
  */
 export class ParagliderInputController {
-  private flyable: IFlyable;
+  private flyable: ControllableVehicle;
   private mesh: THREE.Object3D;
 
   // Input state
@@ -32,7 +39,7 @@ export class ParagliderInputController {
   private wrapSpeed: number = 1;
   private maxRollAngle: number = 75; // degrees
 
-  constructor(flyable: IFlyable, mesh: THREE.Object3D) {
+  constructor(flyable: ControllableVehicle, mesh: THREE.Object3D) {
     this.flyable = flyable;
     this.mesh = mesh;
   }
