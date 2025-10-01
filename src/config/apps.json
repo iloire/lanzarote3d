@@ -145,7 +145,7 @@
       "route": "/pilot",
       "category": "demo",
       "requiresWebGL": true,
-      "visibility": "hidden",
+      "visibility": "private",
       "priority": 17
     },
     "terrain": {

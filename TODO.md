@@ -2,6 +2,11 @@ Implement the following tasks if any is added following the instructions describ
 ---
 TASKS:
 - town square is great but make sure we don't put any buildings over it when generating the town
+- add hercules planes to planes workshop application showcase.
+- also add an hercules to the famara animation application
+- head is missing from the Pilot component
+- Pilot can use a single type of harness at the moment, the CocoonHarness . Create al least OpenHarness (looks like the pilot is not wearing a harness) and SubmarineHarness (it looks like the paragliding pilot is inside a submarine). Show case them in the pilot showcase application.
+
 ---
 
 ### Instructions

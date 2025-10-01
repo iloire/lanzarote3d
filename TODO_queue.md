@@ -1,10 +1,13 @@
 - I want to introduce Next.js so I can make easy deployments in vercel, introduce server side rendering, API supports, Next.js routing, etc.. Do that work in a new branch, test throughly the app after is done, make sure it builds properly and finally commit to that new branch.
 - play with some ideas to use shaders on the water and sky
 - fix mess with category: 'experience' | 'tool' | 'demo'; and status. we need better granularity to show menu. also menu doesnt fit in window 
-- same thing we have a movingBehaviour or FloatingBehaviour, build a FlyingBehaviour that can be applied to a model and it can just fly around the scene. It must detect when terrain is close and slowly turn away from it. It shold also detect when has gone too far and return. To test the flyable behaviour, create an app that has a few walls and put the model with flyable behaviour in the middle. It should fly around and between the walls without going far away and without crash with the walls. Use the hangglider model for example to attach the flyable behaviour. We currently have the AutoFlier class but let's build the Flyable behavior and decide later what's best and remove the other option.
-- same way we added birds that implement FlyableBehaviour, let's also have planes. Create only one Plane class for now in the vehicles folders.
 - I want you to improve the typescript in the codebase doing batches of 5 fixes at the time. Start by removing usages of any. Then continue with other potential improvements. Look at docs/TECHNICAL_DEBT.md for ideas of what to fix. You will be identifying 5 fixes, you will fix them, then build the application and fix any building issues, then commit. And you will start over with other 5 things to fix. And again and again until all typescript fixes are done.
 
-
 done
-- we have some blender model for birds. Try creating some threejs based birds. Build a Crow class, an Eagle class and a Vulture class. All can inherit from a base class. Those birds should have an animation to move their wings. They should also implement the flyable behavior so they can fly around facing forward and avoid collisions with terrain. Don't forget to put them all in a new application showcase "animals"
+
+- I want to introduce Next.js so I can make easy deployments in vercel, introduce server side rendering, API supports, Next.js routing, etc.. Do that work in a new branch, test throughly the app after is done, make sure it builds properly and finally commit to that new branch.
+- play with some ideas to use shaders on the water and sky
+- fix mess with category: 'experience' | 'tool' | 'demo'; and status. we need better granularity to show menu. also menu doesnt fit in window 
+- the dome is missing from the workshop application 
+- keep improve typescript. Find technical debt and fix it 5 items at a time. Then build and commit, and repeat
+- Birds are actually ugly. Make them learner, thinner body and bigger wings. There is a weird oscillation effect with the wings. We want flapping wings.
