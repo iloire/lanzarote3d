@@ -4,7 +4,7 @@ import {
   TerrainFollowingBehavior,
   TerrainFollowingOptions,
   TerrainDrivingMode,
-} from '../../systems/behaviors/TerrainFollowingBehavior';
+} from '../../../systems/behaviors/TerrainFollowingBehavior';
 
 export interface AutonomousCarOptions extends Omit<CarOptions, 'pattern' | 'speed' | 'radius'> {
   // Autonomous driving options

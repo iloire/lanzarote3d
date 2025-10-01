@@ -2,9 +2,9 @@ import * as THREE from 'three';
 import {
   MovableCarComponent,
   MovableCarComponentOptions,
-} from '../base/MovableCarComponent';
-import { resourceManager } from '../../systems/ResourceManager';
-import { MovementPattern } from '../../systems/behaviors/MovingBehavior';
+} from '../../base/MovableCarComponent';
+import { resourceManager } from '../../../systems/ResourceManager';
+import { MovementPattern } from '../../../systems/behaviors/MovingBehavior';
 
 export interface CarOptions extends MovableCarComponentOptions {
   bodyColor?: string;

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { Car } from '../../foundation/components/vehicles/Car';
-import { AutonomousCar } from '../../foundation/components/vehicles/AutonomousCar';
+import { Car } from '../../foundation/components/vehicles/ground/Car';
+import { AutonomousCar } from '../../foundation/components/vehicles/ground/AutonomousCar';
 import { ComponentRegistry } from '../../foundation/systems/ComponentRegistry';
 import { CarConfig, CarGroupConfig } from './car-group-types';
 import { TerrainDrivingMode } from '../../foundation/systems/behaviors/TerrainFollowingBehavior';

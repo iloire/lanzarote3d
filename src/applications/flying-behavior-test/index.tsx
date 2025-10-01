@@ -4,7 +4,7 @@ import { GUI } from 'lil-gui';
 import { StoryOptions } from '../../shared/types';
 import { WorkshopDemoBase } from '../../shared/WorkshopDemoBase';
 import { FlyingBehavior, FlightPattern } from '../../foundation/systems/behaviors/FlyingBehavior';
-import HangGliderModel from '../../foundation/components/vehicles/Hangglider';
+import { Hangglider as HangGliderModel } from '../../foundation/components/vehicles';
 import { logger } from '../../foundation/utils/logger';
 
 /**

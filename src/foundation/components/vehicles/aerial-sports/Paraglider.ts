@@ -1,22 +1,24 @@
 import * as THREE from 'three';
-import LegacyPilotVoxel, { PilotVoxelOptions } from '../characters/LegacyPilotVoxel';
-import LegacyGlider, { GliderOptions } from './Glider';
-import GuiHelper from '../../utils/gui';
+// Note: Pilot has been moved to ../characters/Pilot
+// This import is kept for backward compatibility with legacy Paraglider
+import Pilot, { LegacyPilotOptions as PilotOptions } from '../components/Pilot';
+import LegacyGlider, { GliderOptions } from '../components/Glider';
+import GuiHelper from '../../../utils/gui';
 
-export type ParagliderVoxelOptions = {
+export type ParagliderOptions = {
   glider: GliderOptions;
-  pilot: PilotVoxelOptions;
+  pilot: PilotOptions;
 };
 
-class ParagliderVoxel {
-  mesh: THREE.Object3D;
-  glider: LegacyGlider;
-  pilot: LegacyPilotVoxel;
+class Paraglider {
+  mesh!: THREE.Object3D;
+  glider!: LegacyGlider;
+  pilot!: Pilot;
   pilotMesh!: THREE.Object3D;
   axesHelper!: THREE.AxesHelper;
-  options: ParagliderVoxelOptions;
+  options: ParagliderOptions;
 
-  constructor(options: ParagliderVoxelOptions) {
+  constructor(options: ParagliderOptions) {
     this.options = options;
   }
 
@@ -30,21 +32,31 @@ class ParagliderVoxel {
 
   left() {
     this.glider.breakLeft();
+    this.pilot.breakLeft();
     // Loading left wing model
   }
 
-  leftRelease() {}
+  leftRelease() {
+    this.pilot.breakLeftRelease();
+  }
 
   right() {
     this.glider.breakRight();
+    this.pilot.breakRight();
     // Loading right wing model
   }
 
-  rightRelease() {}
+  rightRelease() {
+    this.pilot.breakRightRelease();
+  }
 
-  speedBar() {}
+  speedBar() {
+    this.pilot.speedBar();
+  }
 
-  releaseSpeedBar() {}
+  releaseSpeedBar() {
+    this.pilot.releaseSpeedBar();
+  }
 
   getMesh() {
     if (!this.mesh) {
@@ -53,6 +65,7 @@ class ParagliderVoxel {
     return this.mesh;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async load(gui?: any): Promise<THREE.Object3D> {
     this.mesh = new THREE.Object3D();
 
@@ -63,14 +76,11 @@ class ParagliderVoxel {
     wing.translateX(300);
     this.mesh.add(wing);
 
-    this.pilot = new LegacyPilotVoxel(this.options.pilot);
+    this.pilot = new Pilot(this.options.pilot);
     this.pilotMesh = await this.pilot.load();
 
-    this.pilotMesh.position.x = 350;
-    this.pilotMesh.position.y = -600;
-    this.pilotMesh.position.z = 0;
-    const scale = 150;
-    this.pilotMesh.scale.set(scale, scale, scale);
+    this.pilotMesh.position.x = 17;
+    this.pilotMesh.position.z = -0.4;
     this.pilotMesh.rotateY(Math.PI / 2);
 
     this.mesh.add(this.pilotMesh);
@@ -87,4 +97,4 @@ class ParagliderVoxel {
   }
 }
 
-export default ParagliderVoxel;
+export default Paraglider;

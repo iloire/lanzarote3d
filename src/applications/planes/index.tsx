@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { StoryOptions } from '../../shared/types';
 import { WorkshopDemoBase } from '../../shared/WorkshopDemoBase';
-import { Jet, Airliner, Cessna } from '../../foundation/components/vehicles';
+import { Jet, Airliner, Cessna, Hercules } from '../../foundation/components/vehicles';
 import { logger } from '../../foundation/utils/logger';
 
 /**
@@ -96,10 +96,10 @@ class PlanesApp extends WorkshopDemoBase {
   constructor() {
     super({
       name: 'Planes',
-      description: 'Aircraft showcase - Jet, Airliner, and Cessna',
+      description: 'Aircraft showcase - Jet, Airliner, Cessna, and Hercules',
       ground: {
         create: true,
-        size: { width: 400, height: 200 },
+        size: { width: 500, height: 200 },
         color: 0x4a6741, // Dark green
         opacity: 0.8
       },
@@ -161,8 +161,8 @@ class PlanesApp extends WorkshopDemoBase {
         wingColor: '#2D3748',
         cockpitColor: '#3B82F6',
         scale: 2,
-        castShadow: true,
-        receiveShadow: true
+        
+        
       });
 
       const jetMesh = await jet.load();
@@ -191,8 +191,8 @@ class PlanesApp extends WorkshopDemoBase {
         windowColor: '#4169E1',
         stripeColor: '#DC143C',
         scale: 1.5,
-        castShadow: true,
-        receiveShadow: true
+        
+        
       });
 
       const airlinerMesh = await airliner.load();
@@ -221,8 +221,8 @@ class PlanesApp extends WorkshopDemoBase {
         propellerColor: '#2C3E50',
         stripeColor: '#FF4500',
         scale: 2,
-        castShadow: true,
-        receiveShadow: true
+        
+        
       });
 
       const cessnaMesh = await cessna.load();
@@ -239,6 +239,36 @@ class PlanesApp extends WorkshopDemoBase {
       logger.info(`✅ Cessna loaded: ${cessnaPolygons} triangles`);
     } catch (error) {
       console.error('❌ Error loading Cessna:', error);
+    }
+
+    xPosition += spacing;
+
+    // Create Hercules
+    try {
+      const hercules = new Hercules({
+        bodyColor: '#6B7280',
+        wingColor: '#4B5563',
+        propellerColor: '#1F2937',
+        windowColor: '#3B82F6',
+        scale: 1.2,
+        
+        
+      });
+
+      const herculesMesh = await hercules.load();
+      herculesMesh.position.set(xPosition, 5, 0);
+      herculesMesh.rotation.y = Math.PI / 4;
+      scene.add(herculesMesh);
+      this.aircraftMeshes.push(herculesMesh);
+
+      const herculesPolygons = countPolygons(herculesMesh);
+      const herculesLabel = createLabel('Hercules - Military Transport', new THREE.Vector3(xPosition, 25, 0), herculesPolygons);
+      scene.add(herculesLabel);
+      this.labelMeshes.push(herculesLabel);
+
+      logger.info(`✅ Hercules loaded: ${herculesPolygons} triangles`);
+    } catch (error) {
+      console.error('❌ Error loading Hercules:', error);
     }
 
     logger.info('✈️ Aircraft showcase complete');

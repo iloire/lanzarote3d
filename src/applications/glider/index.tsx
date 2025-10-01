@@ -1,4 +1,4 @@
-import LegacyGlider from '../../foundation/components/vehicles/Glider';
+import { LegacyGlider } from '../../foundation/components/vehicles';
 import { StoryOptions } from '../../shared/types';
 import { WorkshopDemoBase } from '../../shared/WorkshopDemoBase';
 

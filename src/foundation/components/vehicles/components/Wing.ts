@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { SimpleThreeComponent } from '../base/SimpleThreeComponent';
-import { resourceManager } from '../../systems/ResourceManager';
-import { SimpleComponentOptions } from '../base/SimpleThreeComponent';
+import { SimpleThreeComponent } from '../../base/SimpleThreeComponent';
+import { resourceManager } from '../../../systems/ResourceManager';
+import { SimpleComponentOptions } from '../../base/SimpleThreeComponent';
 
 export interface WingOptions extends SimpleComponentOptions {
   wingColor?: string;

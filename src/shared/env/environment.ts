@@ -14,8 +14,8 @@ import {
   SpeedBoat,
   PatrolBoat,
 } from '../../foundation/components/scenery';
-import { Car } from '../../foundation/components/vehicles/Car';
-import { AutonomousCar } from '../../foundation/components/vehicles/AutonomousCar';
+import { Car } from '../../foundation/components/vehicles/ground/Car';
+import { AutonomousCar } from '../../foundation/components/vehicles/ground/AutonomousCar';
 import { MovementPattern } from '../../foundation/systems/behaviors/MovingBehavior';
 import Birds from '../../foundation/components/wildlife/Birds';
 import { Hangglider as HangGlider } from '../../foundation/components/vehicles';

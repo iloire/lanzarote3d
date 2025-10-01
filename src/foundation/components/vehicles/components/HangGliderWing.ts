@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { SimpleThreeComponent, SimpleComponentOptions } from '../base/SimpleThreeComponent';
-import { resourceManager } from '../../systems/ResourceManager';
+import { SimpleThreeComponent, SimpleComponentOptions } from '../../base/SimpleThreeComponent';
+import { resourceManager } from '../../../systems/ResourceManager';
 
 export enum HangGliderDesignType {
   CLASSIC_BOXES = 'classic_boxes', // Original simple box design

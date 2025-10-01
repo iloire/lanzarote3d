@@ -61,7 +61,8 @@ class ParagliderWorkshopApp extends WorkshopDemoBase {
       };
 
       const paraglider = new Paraglider(paragliderOptions);
-      const mesh = await paraglider.load(gui);
+      const mesh = await paraglider.load();
+      paraglider.addGuiControls(gui);
       scene.add(mesh);
 
       // Set camera position for paraglider showcase

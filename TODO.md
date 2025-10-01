@@ -1,6 +1,10 @@
 Implement the following tasks if any is added following the instructions described below:
 ---
 TASKS:
+- refactor all the vehicles in the folder. Make a plan first. Some ideas:
+ -- different folders for vehicle types: planes, cars, trucks, etc..
+ -- make sure the way they are implemented is consistent (class inheritance, rendering functions, etc)
+- make sure the Hercules plane is added to the planes application
 ---
 
 ### Instructions

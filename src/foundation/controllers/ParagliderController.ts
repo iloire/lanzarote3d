@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import Paraglider from '../components/vehicles/Paraglider';
-import ParagliderVoxel from '../components/vehicles/ParagliderVoxel';
+import Paraglider from '../components/vehicles/aerial-sports/Paraglider';
+import ParagliderVoxel from '../components/vehicles/aerial-sports/ParagliderVoxel';
 import Weather from '../components/physics/Weather';
 import Thermal from '../components/physics/Thermal';
 import { ParagliderPhysics, ParagliderPhysicsOptions } from '../systems/physics/ParagliderPhysics';

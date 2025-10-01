@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import HangGlider from '../../foundation/components/vehicles/Hangglider';
+import { Hangglider } from '../../foundation/components/vehicles';
 import { StoryOptions } from '../../shared/types';
 import { WorkshopDemoBase } from '../../shared/WorkshopDemoBase';
 import { logger } from '../../foundation/utils/logger';
@@ -30,7 +30,7 @@ class HangGliderWorkshopApp extends WorkshopDemoBase {
       this.initializeCore(options);
       const { camera, scene, renderer, gui, controls } = options;
 
-      const hg = new HangGlider();
+      const hg = new Hangglider();
       const mesh = await hg.load();
 
       // Add GUI controls if needed

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { ParagliderVoxel } from '../../foundation/components/vehicles';
-import HangGlider from '../../foundation/components/vehicles/Hangglider';
-import Cessna from '../../foundation/components/vehicles/Cessna';
+import { Hangglider } from '../../foundation/components/vehicles';
+import { Cessna } from '../../foundation/components/vehicles';
 import { FlyingBehavior } from '../../foundation/systems/behaviors/FlyingBehavior';
 import { logger } from '../../foundation/utils/logger';
 import type {
@@ -57,7 +57,7 @@ export async function loadHangglider(
   errorHandler: (error: Error, context: string) => void
 ): Promise<VehicleLoadResult | null> {
   try {
-    const hangglider = new HangGlider({ scale: config.scale });
+    const hangglider = new Hangglider({ scale: config.scale });
     const mesh = await hangglider.load();
     mesh.position.copy(config.position);
     scene.add(mesh);

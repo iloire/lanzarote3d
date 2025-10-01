@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import ParagliderVoxel from '../../foundation/components/vehicles/ParagliderVoxel';
+import { ParagliderVoxel } from '../../foundation/components/vehicles';
 import adriModel from '../../../assets/foundation/models/characters/adri/adri.obj';
 import adriTextureImage from '../../../assets/foundation/models/characters/adri/adri.png';
 import ivanModel from '../../../assets/foundation/models/characters/ivan/ivan.obj';

@@ -1,44 +1,16 @@
-// Vehicle components exports
-import Paraglider from './Paraglider';
-import Hangglider from './Hangglider';
-import ParagliderVoxel from './ParagliderVoxel';
-import Tandem from './Tandem';
-import LegacyGlider from './Glider';
-import HangGliderWing from './HangGliderWing';
-import Car from './Car';
-import Truck from './Truck';
+// Vehicle components exports - organized by type
 
-// Modern vehicle components
+// Re-export all aircraft
+export * from './aircraft';
 
-export { Wing } from './Wing';
-export type { WingOptions } from './Wing';
+// Re-export all ground vehicles
+export * from './ground';
 
-export { Car } from './Car';
-export type { CarOptions } from './Car';
+// Re-export all aerial sports vehicles
+export * from './aerial-sports';
 
-export { Truck } from './Truck';
-export type { TruckOptions } from './Truck';
-
-export { AutonomousCar } from './AutonomousCar';
-export type { AutonomousCarOptions } from './AutonomousCar';
-
-// Aircraft components
-export { Jet } from './Jet';
-export type { JetOptions } from './Jet';
-
-export { Airliner } from './Airliner';
-export type { AirlinerOptions } from './Airliner';
-
-export { Cessna } from './Cessna';
-export type { CessnaOptions } from './Cessna';
-
-export { Hercules } from './Hercules';
-export type { HerculesOptions } from './Hercules';
+// Re-export vehicle components (wings, gliders, etc.)
+export * from './components';
 
 // Type exports
 export type { VehicleConfig } from '../../types';
-export type { ParagliderVoxelOptions } from './ParagliderVoxel';
-// Note: Pilot moved to characters folder - import from '../characters' instead
-
-// Legacy component exports
-export { Paraglider, Hangglider, ParagliderVoxel, Tandem, LegacyGlider, HangGliderWing };

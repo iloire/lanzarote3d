@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import TandemPilot, { TandemPilotOptions } from '../characters/TandemPilot';
-import LegacyGlider, { GliderOptions } from './Glider';
+import TandemPilot, { TandemPilotOptions } from '../../characters/TandemPilot';
+import LegacyGlider, { GliderOptions } from '../components/Glider';
 
 export type TandemOptions = {
   glider: GliderOptions;

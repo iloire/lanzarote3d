@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import Paraglider from '../../components/vehicles/Paraglider';
-import ParagliderVoxel from '../../components/vehicles/ParagliderVoxel';
+import Paraglider from '../../components/vehicles/aerial-sports/Paraglider';
+import ParagliderVoxel from '../../components/vehicles/aerial-sports/ParagliderVoxel';
 
 export interface ParagliderInputState {
   directionInput: number; // -1 to 1 (left to right)

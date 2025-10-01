@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import Pilot from '../../foundation/components/vehicles/Pilot';
+import { LegacyPilot as Pilot } from '../../foundation/components/vehicles';
 import TandemPilot from '../../foundation/components/characters/TandemPilot';
 import {
   GlassesType,
