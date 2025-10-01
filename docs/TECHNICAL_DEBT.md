@@ -17,28 +17,32 @@ This document tracks pending technical debt and issues that need to be addressed
 **Solution**: Implement centralized render loop manager with proper cleanup
 
 ### Legacy Flier Class - Architectural Debt
-**Status**: ⚠️ High Priority - Should be Deprecated
-**Files**: `src/foundation/types/flier.ts`
-**Issue**: Monolithic Flier class violates Single Responsibility Principle and modern architecture patterns
-**Impact**:
-- Uses `setInterval` instead of `requestAnimationFrame` (performance issues)
-- Tightly coupled to paragliding simulation (not reusable)
-- Mixed responsibilities (physics, input, GUI, animation, tracking)
-- Manual physics implementation (hard to maintain)
-- Uses `any` types (lines 32, 75, 287)
-- Complex event-driven architecture with unclear benefits
-**Current Usage**: 4 files (VarioSound.ts, flier-pg/index.tsx, CameraController.ts, Birds.ts)
-**Recommended Solution**:
-1. Migrate to **FlyingBehavior** (composition-based, modern, reusable)
-2. Create separate concerns:
-   - `FlyingBehavior` - autonomous movement patterns
-   - `ParagliderPhysics` - lift, thermals, weather (if needed)
-   - `InputController` - keyboard/gamepad input
-   - `TrajectoryTracker` - path tracking
-3. Benefits: Better performance, reusability, maintainability, type safety
+**Status**: ✅ Migrated (Oct 1, 2025) - Scheduled for Removal in v2.0.0
+**Files**: `src/foundation/types/flier.ts` (deprecated)
+**Issue**: Monolithic Flier class violated Single Responsibility Principle and modern architecture patterns
+**Impact**: Performance issues (setInterval), tight coupling, mixed responsibilities, 'any' types
+
+**New Architecture Created (Oct 1, 2025)**:
+1. **ParagliderPhysics.ts** (236 lines) - Pure physics calculations (lift, thermals, wind)
+2. **ParagliderInputController.ts** (177 lines) - Input handling with rotation inertia
+3. **TrajectoryTracker.ts** (194 lines) - Flight path recording and analysis
+4. **ParagliderController.ts** (328 lines) - Main controller using composition
+
+**Migrations Completed (Oct 1, 2025)**:
+- ✅ `src/applications/flier-pg/index.tsx` - Main paraglider demo
+- ✅ `src/foundation/systems/audio/VarioSound.ts` - Decoupled with IAltitudeProvider interface
+- ✅ `src/foundation/systems/scene/CameraController.ts` - Made generic (deprecated anyway)
+- ℹ️ Birds.ts uses AutoFlier, not Flier (no migration needed)
+
+**Benefits Achieved**:
+- ✅ Performance: requestAnimationFrame instead of setInterval
+- ✅ Type Safety: No 'any' types in new architecture
+- ✅ Single Responsibility: Each class has one clear purpose
+- ✅ Maintainability: Easier to modify individual components
+- ✅ Reusability: Physics and input systems can be used independently
+
 **Timeline**:
-- 📅 v1.6.0: Mark Flier as @deprecated, create ParagliderController using composition
-- 📅 v1.7.0: Migrate all 4 usages to new architecture
+- ✅ Oct 1, 2025: Flier marked @deprecated, ParagliderController created and migrated
 - 📅 v2.0.0: Remove Flier class entirely
 
 ### Legacy CameraController Removal
