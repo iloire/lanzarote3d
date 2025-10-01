@@ -168,7 +168,7 @@ class IslandFlyingApp extends TerrainBase {
           {
             altitude: 800 + Math.random() * 400,
             radius: 2000 + Math.random() * 3000,
-            speed: 25 + Math.random() * 15,
+            speed: 50 + Math.random() * 30, // Increased for visible movement at island scale
           }
         );
       }
@@ -189,7 +189,7 @@ class IslandFlyingApp extends TerrainBase {
           {
             altitude: 700 + Math.random() * 400,
             radius: 2500 + Math.random() * 3000,
-            speed: 30 + Math.random() * 15,
+            speed: 60 + Math.random() * 30, // Increased for visible movement
           }
         );
       }
@@ -209,7 +209,7 @@ class IslandFlyingApp extends TerrainBase {
           {
             altitude: 1000 + Math.random() * 500,
             radius: 3000 + Math.random() * 4000,
-            speed: 40 + Math.random() * 20,
+            speed: 80 + Math.random() * 40, // Increased for visible movement
           }
         );
       }
@@ -229,7 +229,7 @@ class IslandFlyingApp extends TerrainBase {
           {
             altitude: 1200 + Math.random() * 600,
             radius: 4000 + Math.random() * 5000,
-            speed: 60 + Math.random() * 30,
+            speed: 120 + Math.random() * 60, // Increased for visible movement
           }
         );
       }
@@ -249,7 +249,7 @@ class IslandFlyingApp extends TerrainBase {
           {
             altitude: 1500 + Math.random() * 800,
             radius: 5000 + Math.random() * 6000,
-            speed: 80 + Math.random() * 40,
+            speed: 150 + Math.random() * 80, // Increased for visible movement
           }
         );
       }
@@ -295,7 +295,7 @@ class IslandFlyingApp extends TerrainBase {
         const behavior = new FlyingBehavior({
           pattern: flightPattern,
           speed: flightParams.speed,
-          turnSpeed: 2 + Math.random() * 2,
+          turnSpeed: 0.5 + Math.random() * 0.3, // Reduced for gentle, smooth turns
           flightRadius: flightParams.radius,
           minHeight: flightParams.altitude - 200,
           maxHeight: flightParams.altitude + 200,
