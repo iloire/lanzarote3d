@@ -29,12 +29,12 @@ This document tracks pending technical debt and issues that need to be addressed
 **Migration**: All apps using CameraController should switch to CameraTargetController
 
 ### TypeScript Strict Mode Violations
-**Status**: ✅ Significantly Improved (20 batches completed)
-**Files**: Reduced from 30+ to minimal remaining instances
+**Status**: ✅ Significantly Improved (21 batches completed)
+**Files**: Reduced from 30+ to minimal remaining instances, ~230 console statements remaining
 **Issue**: TypeScript strict mode violations and excessive use of `any` type
 **Impact**: Runtime errors, poor developer experience, harder debugging, reduced type safety
 
-**Fixed Files** (Batches 1-20):
+**Fixed Files** (Batches 1-21):
 - ✅ Foundation components base classes (IThreeComponent, BaseThreeComponent, AsyncThreeComponent)
 - ✅ Resource management (ResourceManager, ComponentRegistry, ComponentBenchmark)
 - ✅ Physics components (Weather, Thermal, WindIndicator)
@@ -57,6 +57,42 @@ This document tracks pending technical debt and issues that need to be addressed
 - ✅ **Batch 18 (Sept 30, 2025)**: Audio & behaviors complete (ThemeManager complete, BackgroundAudio, VarioSound, EngineFlyingBehavior, CameraTargetController)
 - ✅ **Batch 19 (Sept 30, 2025)**: UI, environment, and house systems (ThemeSelector, environment.ts, house-group-creator.ts, FlyingBehavior, tile-debug)
 - ✅ **Batch 20 (Sept 30, 2025)**: Application demos (visualizer, famara-animation, roads, camera-switcher-demo, hangglider)
+- ✅ **Batch 21 (Oct 1, 2025)**: High-count application files (town, houses, animals, planes, island)
+
+**Batch 21 Completed (Oct 1, 2025)**:
+1. **src/applications/town/index.tsx**: Replaced console (25 statements)
+   - Changed 1 `console.log` to `logger.debug` (options received)
+   - Changed 1 `console.log` to `logger.info` (loaded successfully)
+   - Changed 2 `console.log` to `logger.info` (mode switch)
+   - Changed 1 `console.error` to `logger.error` (toggle error)
+   - Changed 2 `console.log` to `logger.debug` (GUI setup)
+   - Changed 1 `console.warn` to `logger.warn` (no GUI provided)
+   - Changed 1 `console.log` to `logger.debug` (object names)
+   - Changed 8 `console.log` to `logger.info` (polygon breakdown)
+   - Changed 1 `console.log` to `logger.debug` (HouseGroupCreator setting)
+   - Changed 1 `console.log` to `logger.info` (neighborhoods recreated)
+   - Changed 2 `console.log` to `logger.debug` (clearing/cleanup)
+   - Changed 1 `console.warn` to `logger.warn` (unknown neighborhood)
+   - Changed 1 `console.log` to `logger.info` (neighborhood created)
+   - Changed 1 `console.log` to `logger.debug` (disposal)
+   - Also fixed disposal-utils.ts (2 statements) and performance-ui.ts (1 statement)
+
+2. **src/applications/houses/index.tsx**: Replaced console (17 statements)
+   - Changed 1 `console.log` to `logger.info` (starting demo)
+   - Changed 10 `console.log` to `logger.info` (house types loaded with polygon counts)
+   - Changed 5 `console.error` to `logger.error` (loading errors)
+   - Changed 1 `console.log` to `logger.info` (demo complete)
+
+3. **src/applications/animals/index.tsx**: Replaced console (15 statements)
+   - Changed 11 `console.log` to `logger.info` (various loading messages)
+   - Changed 3 `console.error` to `logger.error` (mesh failures)
+   - Changed 1 `console.log` to `logger.info` (disposal)
+
+4. **src/applications/planes/index.tsx**: Replaced console (11 statements)
+   - Changed all `console.log` to `logger.info` (aircraft loading with polygon counts)
+
+5. **src/applications/island/index.tsx**: Replaced console (7 statements)
+   - Changed `console.log` to either `logger.info` or `logger.debug` appropriately
 
 **Batch 20 Completed (Sept 30, 2025)**:
 1. **src/applications/visualizer/flyzone-visualizer.tsx**: Replaced console (7 statements)

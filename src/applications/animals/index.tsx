@@ -4,6 +4,7 @@ import { WorkshopDemoBase } from '../../shared/WorkshopDemoBase';
 import { Crow, Eagle, Vulture } from '../../foundation/components/animals';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { GUI } from 'lil-gui';
+import { logger } from '../../foundation/utils/logger';
 
 /**
  * Animals Showcase - Display various bird species with wing animations
@@ -53,7 +54,7 @@ class AnimalsApp extends WorkshopDemoBase {
       });
 
       this.isLoaded = true;
-      console.log('✅ Animals Showcase loaded successfully');
+      logger.info('✅ Animals Showcase loaded successfully');
 
     } catch (error) {
       this.handleError(error as Error, 'load');
@@ -66,22 +67,22 @@ class AnimalsApp extends WorkshopDemoBase {
     // Position camera closer for better bird viewing
     camera.position.set(4, 3, 6);
     camera.lookAt(0, 2, 0);
-    console.log(`📷 Camera positioned at (4, 3, 6) looking at (0, 2, 0)`);
+    logger.info(`📷 Camera positioned at (4, 3, 6) looking at (0, 2, 0)`);
 
     if (controls) {
       controls.target.set(0, 2, 0);
       controls.enableDamping = true;
       controls.dampingFactor = 0.05;
       controls.update();
-      console.log(`🎮 Controls configured with target at (0, 2, 0)`);
+      logger.info(`🎮 Controls configured with target at (0, 2, 0)`);
     }
   }
 
   private async createBirds(scene: THREE.Scene, gui?: GUI): Promise<void> {
-    console.log('🐦 Starting bird creation...');
+    logger.info('🐦 Starting bird creation...');
 
     // Create Crow (left position)
-    console.log('Creating Crow...');
+    logger.info('Creating Crow...');
     this.crow = new Crow({
       wingBeatFrequency: 3.0,
       wingBeatAmplitude: 0.6
@@ -92,13 +93,13 @@ class AnimalsApp extends WorkshopDemoBase {
     if (crowMesh) {
       crowMesh.position.set(-4, 2, 0);
       scene.add(crowMesh);
-      console.log('✅ Crow added to scene at position (-4, 2, 0)');
+      logger.info('✅ Crow added to scene at position (-4, 2, 0)');
     } else {
-      console.error('❌ Failed to get Crow mesh');
+      logger.error('❌ Failed to get Crow mesh');
     }
 
     // Create Eagle (center position)
-    console.log('Creating Eagle...');
+    logger.info('Creating Eagle...');
     this.eagle = new Eagle({
       wingBeatFrequency: 1.5,
       wingBeatAmplitude: 0.8
@@ -109,13 +110,13 @@ class AnimalsApp extends WorkshopDemoBase {
     if (eagleMesh) {
       eagleMesh.position.set(0, 2, 0);
       scene.add(eagleMesh);
-      console.log('✅ Eagle added to scene at position (0, 2, 0)');
+      logger.info('✅ Eagle added to scene at position (0, 2, 0)');
     } else {
-      console.error('❌ Failed to get Eagle mesh');
+      logger.error('❌ Failed to get Eagle mesh');
     }
 
     // Create Vulture (right position)
-    console.log('Creating Vulture...');
+    logger.info('Creating Vulture...');
     this.vulture = new Vulture({
       wingBeatFrequency: 1.2,
       wingBeatAmplitude: 0.4
@@ -126,12 +127,12 @@ class AnimalsApp extends WorkshopDemoBase {
     if (vultureMesh) {
       vultureMesh.position.set(4, 2, 0);
       scene.add(vultureMesh);
-      console.log('✅ Vulture added to scene at position (4, 2, 0)');
+      logger.info('✅ Vulture added to scene at position (4, 2, 0)');
     } else {
-      console.error('❌ Failed to get Vulture mesh');
+      logger.error('❌ Failed to get Vulture mesh');
     }
 
-    console.log('🐦 All birds created and added to scene');
+    logger.info('🐦 All birds created and added to scene');
 
     // Add GUI controls if available
     if (gui) {
@@ -159,7 +160,7 @@ class AnimalsApp extends WorkshopDemoBase {
   }
 
   override dispose(): void {
-    console.log('🧹 Disposing Animals Showcase');
+    logger.info('🧹 Disposing Animals Showcase');
 
     // Dispose bird components
     if (this.crow) {

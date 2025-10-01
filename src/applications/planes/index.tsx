@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { StoryOptions } from '../../shared/types';
 import { WorkshopDemoBase } from '../../shared/WorkshopDemoBase';
 import { Jet, Airliner, Cessna } from '../../foundation/components/vehicles';
+import { logger } from '../../foundation/utils/logger';
 
 /**
  * Utility function to count polygons in a 3D object
@@ -139,7 +140,7 @@ class PlanesApp extends WorkshopDemoBase {
       });
 
       this.isLoaded = true;
-      console.log(`✅ Planes application loaded with ${this.aircraftMeshes.length} aircraft`);
+      logger.info(`✅ Planes application loaded with ${this.aircraftMeshes.length} aircraft`);
 
     } catch (error) {
       this.handleError(error as Error, 'load');
@@ -148,7 +149,7 @@ class PlanesApp extends WorkshopDemoBase {
   }
 
   private async createAircraft(scene: THREE.Scene): Promise<void> {
-    console.log('✈️ Creating aircraft showcase...');
+    logger.info('✈️ Creating aircraft showcase...');
 
     const spacing = 80;
     let xPosition = -spacing;
@@ -175,7 +176,7 @@ class PlanesApp extends WorkshopDemoBase {
       scene.add(jetLabel);
       this.labelMeshes.push(jetLabel);
 
-      console.log(`✅ Jet loaded: ${jetPolygons} triangles`);
+      logger.info(`✅ Jet loaded: ${jetPolygons} triangles`);
     } catch (error) {
       console.error('❌ Error loading Jet:', error);
     }
@@ -205,7 +206,7 @@ class PlanesApp extends WorkshopDemoBase {
       scene.add(airlinerLabel);
       this.labelMeshes.push(airlinerLabel);
 
-      console.log(`✅ Airliner loaded: ${airlinerPolygons} triangles`);
+      logger.info(`✅ Airliner loaded: ${airlinerPolygons} triangles`);
     } catch (error) {
       console.error('❌ Error loading Airliner:', error);
     }
@@ -235,19 +236,19 @@ class PlanesApp extends WorkshopDemoBase {
       scene.add(cessnaLabel);
       this.labelMeshes.push(cessnaLabel);
 
-      console.log(`✅ Cessna loaded: ${cessnaPolygons} triangles`);
+      logger.info(`✅ Cessna loaded: ${cessnaPolygons} triangles`);
     } catch (error) {
       console.error('❌ Error loading Cessna:', error);
     }
 
-    console.log('✈️ Aircraft showcase complete');
+    logger.info('✈️ Aircraft showcase complete');
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private setupCamera(camera: THREE.PerspectiveCamera, controls: any): void {
     camera.position.set(0, 50, 120);
     camera.lookAt(0, 10, 0);
-    console.log('📷 Camera positioned for aircraft showcase');
+    logger.info('📷 Camera positioned for aircraft showcase');
 
     if (controls) {
       controls.target.set(0, 10, 0);
@@ -284,7 +285,7 @@ class PlanesApp extends WorkshopDemoBase {
   }
 
   override dispose(): void {
-    console.log('🧹 Disposing Planes application');
+    logger.info('🧹 Disposing Planes application');
 
     this.aircraftMeshes.forEach(mesh => {
       if (mesh instanceof THREE.Mesh) {

@@ -3,6 +3,7 @@ import { StoryOptions } from '../../shared/types';
 import { TerrainBase } from '../../shared/TerrainBase';
 import Environment from '../../shared/env/environment';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { logger } from '../../foundation/utils/logger';
 
 /**
  * Island Workshop Demo - Simple island view demo with full terrain
@@ -69,7 +70,7 @@ class IslandWorkshopApp extends TerrainBase {
 
       this.isLoaded = true;
       const carStatus = this.showCars ? 'with cars enabled' : 'with cars disabled';
-      console.log(`✅ ${this.config.name} loaded successfully ${carStatus}`);
+      logger.info(`✅ ${this.config.name} loaded successfully ${carStatus}`);
     } catch (error) {
       this.handleError(error as Error, 'load');
       throw error;
@@ -81,7 +82,7 @@ class IslandWorkshopApp extends TerrainBase {
    */
   public setCarsEnabled(enabled: boolean): void {
     this.showCars = enabled;
-    console.log(`🚗 Cars ${enabled ? 'enabled' : 'disabled'} for ${this.config.name}`);
+    logger.debug(`🚗 Cars ${enabled ? 'enabled' : 'disabled'} for ${this.config.name}`);
   }
 
   /**
@@ -193,14 +194,14 @@ class IslandWorkshopApp extends TerrainBase {
         terrain,
       });
 
-      console.log('✅ Large-scale cars added to island terrain for visibility');
+      logger.info('✅ Large-scale cars added to island terrain for visibility');
 
       // Debug: Check if cars are moving after a delay
       setTimeout(() => {
         if (this.environment) {
           const stats = this.environment.getComponentStats();
-          console.log('🚗 Car components:', stats);
-          console.log('🎯 Environment should be updating cars in animation loop');
+          logger.info('🚗 Car components:', stats);
+          logger.info('🎯 Environment should be updating cars in animation loop');
         }
       }, 2000);
     } catch (error) {
@@ -237,7 +238,7 @@ class IslandWorkshopApp extends TerrainBase {
   }
 
   public override dispose(): void {
-    console.log(`🧹 Disposing ${this.config.name}`);
+    logger.debug(`🧹 Disposing ${this.config.name}`);
 
     // Cancel animation loop
     if (this.animationId) {

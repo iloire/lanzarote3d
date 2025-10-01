@@ -8,6 +8,7 @@ import { TOWN_NEIGHBORHOODS, NeighborhoodConfig } from './neighborhoods-data';
 import { PerformanceUI, PerformanceSettings, PolygonBreakdown } from './performance-ui';
 import { disposeObject3D, disposeObjects } from './disposal-utils';
 import { GUI } from 'lil-gui';
+import { logger } from '../../foundation/utils/logger';
 
 /**
  * Town Workshop - Showcase of neighborhood generation using HouseGroupCreator
@@ -53,7 +54,7 @@ class TownWorkshop extends WorkshopDemoBase {
 
       const { camera, scene, renderer, gui, controls } = options;
 
-      console.log('🐛 Town demo received options:', {
+      logger.debug('🐛 Town demo received options:', {
         hasCamera: !!camera,
         hasScene: !!scene,
         hasRenderer: !!renderer,
@@ -97,7 +98,7 @@ class TownWorkshop extends WorkshopDemoBase {
       });
 
       this.isLoaded = true;
-      console.log(
+      logger.info(
         `✅ ${this.config.name} loaded successfully with ${this.neighborhoodMeshes.length} houses`
       );
     } catch (error) {
@@ -116,7 +117,7 @@ class TownWorkshop extends WorkshopDemoBase {
     this.isLowPoly = !this.isLowPoly;
     this.performanceSettings.lowPoly = this.isLowPoly;
 
-    console.log(`🔄 Switching to ${this.isLowPoly ? 'Low-Poly' : 'High-Detail'} mode...`);
+    logger.info(`🔄 Switching to ${this.isLowPoly ? 'Low-Poly' : 'High-Detail'} mode...`);
 
     // Update UI to show loading state
     this.performanceUI.setLoading(true);
@@ -133,10 +134,10 @@ class TownWorkshop extends WorkshopDemoBase {
       const endTime = performance.now();
       const switchTime = Math.round(endTime - startTime);
 
-      console.log(`✅ Mode switch completed in ${switchTime}ms`);
+      logger.info(`✅ Mode switch completed in ${switchTime}ms`);
 
     } catch (error) {
-      console.error('❌ Error toggling low-poly mode:', error);
+      logger.error('❌ Error toggling low-poly mode:', error);
     } finally {
       // Re-enable button and update display
       this.performanceUI.setLoading(false);
@@ -148,17 +149,17 @@ class TownWorkshop extends WorkshopDemoBase {
    * Setup performance controls and monitoring
    */
   private setupPerformanceControls(gui: GUI): void {
-    console.log('🐛 Setting up performance controls, GUI:', gui);
+    logger.debug('🐛 Setting up performance controls, GUI:', gui);
 
     if (!gui) {
-      console.warn('⚠️ No GUI provided to setupPerformanceControls');
+      logger.warn('⚠️ No GUI provided to setupPerformanceControls');
       return;
     }
 
     const performanceFolder = gui.addFolder('Performance Settings');
     performanceFolder.open();
 
-    console.log('✅ Performance folder created successfully');
+    logger.debug('✅ Performance folder created successfully');
 
     // Low-poly toggle
     performanceFolder
@@ -166,7 +167,7 @@ class TownWorkshop extends WorkshopDemoBase {
       .name('Low-Poly Mode')
       .onChange(async (value: boolean) => {
         this.isLowPoly = value;
-        console.log(`🔄 Switching to ${value ? 'Low-Poly' : 'High-Detail'} mode...`);
+        logger.info(`🔄 Switching to ${value ? 'Low-Poly' : 'High-Detail'} mode...`);
         await this.recreateNeighborhoods();
         this.updatePolygonCount();
       });
@@ -220,7 +221,7 @@ class TownWorkshop extends WorkshopDemoBase {
 
           // Debug: log some names to see what we're working with
           if (Math.random() < 0.01) { // Log 1% of objects to avoid spam
-            console.log(`🔍 Object names: child="${name}", parent="${parentName}", grandParent="${grandParentName}"`);
+            logger.debug(`🔍 Object names: child="${name}", parent="${parentName}", grandParent="${grandParentName}"`);
           }
 
           if (name.includes('House') || name.includes('Villa') || name.includes('Desert') || name.includes('Barn') || name.includes('Townhouse') ||
@@ -272,14 +273,14 @@ class TownWorkshop extends WorkshopDemoBase {
       other: ((polygonCounts.other / totalPolygons) * 100).toFixed(1)
     };
 
-    console.log(`📊 Detailed Polygon Breakdown (LowPoly: ${this.isLowPoly}):`);
-    console.log(`  🏠 Houses: ${Math.floor(polygonCounts.houses).toLocaleString()} (${percentages.houses}%)`);
-    console.log(`  🌵 Cacti: ${Math.floor(polygonCounts.cacti).toLocaleString()} (${percentages.cacti}%)`);
-    console.log(`  🪨 Stones: ${Math.floor(polygonCounts.stones).toLocaleString()} (${percentages.stones}%)`);
-    console.log(`  🏊 Pools: ${Math.floor(polygonCounts.pools).toLocaleString()} (${percentages.pools}%)`);
-    console.log(`  🛣️ Roads: ${Math.floor(polygonCounts.roads).toLocaleString()} (${percentages.roads}%)`);
-    console.log(`  ❓ Other: ${Math.floor(polygonCounts.other).toLocaleString()} (${percentages.other}%)`);
-    console.log(`  📊 TOTAL: ${this.performanceSettings.polygonCount.toLocaleString()} polygons`);
+    logger.info(`📊 Detailed Polygon Breakdown (LowPoly: ${this.isLowPoly}):`);
+    logger.info(`  🏠 Houses: ${Math.floor(polygonCounts.houses).toLocaleString()} (${percentages.houses}%)`);
+    logger.info(`  🌵 Cacti: ${Math.floor(polygonCounts.cacti).toLocaleString()} (${percentages.cacti}%)`);
+    logger.info(`  🪨 Stones: ${Math.floor(polygonCounts.stones).toLocaleString()} (${percentages.stones}%)`);
+    logger.info(`  🏊 Pools: ${Math.floor(polygonCounts.pools).toLocaleString()} (${percentages.pools}%)`);
+    logger.info(`  🛣️ Roads: ${Math.floor(polygonCounts.roads).toLocaleString()} (${percentages.roads}%)`);
+    logger.info(`  ❓ Other: ${Math.floor(polygonCounts.other).toLocaleString()} (${percentages.other}%)`);
+    logger.info(`  📊 TOTAL: ${this.performanceSettings.polygonCount.toLocaleString()} polygons`);
 
     // Update on-screen display if available
     if (this.performanceUI) {
@@ -300,20 +301,20 @@ class TownWorkshop extends WorkshopDemoBase {
     }
 
     // Update house group creator with current low-poly setting
-    console.log(`🐛 Setting HouseGroupCreator to lowPoly: ${this.isLowPoly}`);
+    logger.debug(`🐛 Setting HouseGroupCreator to lowPoly: ${this.isLowPoly}`);
     this.houseGroupCreator.setLowPolyMode(this.isLowPoly);
 
     // Recreate with current low-poly setting
     await this.loadNeighborhoods(this.currentScene);
 
-    console.log(`✅ Neighborhoods recreated in ${this.isLowPoly ? 'Low-Poly' : 'High-Detail'} mode`);
+    logger.info(`✅ Neighborhoods recreated in ${this.isLowPoly ? 'Low-Poly' : 'High-Detail'} mode`);
   }
 
   /**
    * Clear all existing neighborhood meshes and labels with proper memory cleanup
    */
   private clearNeighborhoods(): void {
-    console.log(`🧹 Clearing ${this.neighborhoodMeshes.length} neighborhood objects, ${this.labelMeshes.length} labels, and ${this.roadMeshes.length} roads`);
+    logger.debug(`🧹 Clearing ${this.neighborhoodMeshes.length} neighborhood objects, ${this.labelMeshes.length} labels, and ${this.roadMeshes.length} roads`);
 
     // Properly dispose neighborhood meshes using imported utility
     disposeObjects(this.neighborhoodMeshes);
@@ -329,7 +330,7 @@ class TownWorkshop extends WorkshopDemoBase {
     this.labelMeshes.length = 0;
     this.roadMeshes.length = 0;
 
-    console.log('✅ Neighborhood cleanup completed');
+    logger.debug('✅ Neighborhood cleanup completed');
   }
 
 
@@ -415,7 +416,7 @@ class TownWorkshop extends WorkshopDemoBase {
             break;
 
           default:
-            console.warn(`Unknown neighborhood type: ${config.type}`);
+            logger.warn(`Unknown neighborhood type: ${config.type}`);
             continue;
         }
 
@@ -427,7 +428,7 @@ class TownWorkshop extends WorkshopDemoBase {
         scene.add(label);
         this.labelMeshes.push(label);
 
-        console.log(`✅ Created ${config.name} with ${houses.length} houses`);
+        logger.info(`✅ Created ${config.name} with ${houses.length} houses`);
       } catch (error) {
         this.handleError(error as Error, `loading ${config.name}`);
       }
@@ -596,7 +597,7 @@ class TownWorkshop extends WorkshopDemoBase {
   }
 
   public override dispose(): void {
-    console.log(`🧹 Disposing ${this.config.name}`);
+    logger.debug(`🧹 Disposing ${this.config.name}`);
 
     // Remove on-screen controls using PerformanceUI
     if (this.performanceUI) {
