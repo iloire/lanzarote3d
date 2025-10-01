@@ -24,7 +24,8 @@ const DEBUG_VECTORS = true;
 export async function loadParagliders(
   scene: THREE.Scene,
   configs: ParagliderVoxelConfig[],
-  errorHandler: (error: Error, context: string) => void
+  errorHandler: (error: Error, context: string) => void,
+  animationDurationMs: number = 0
 ): Promise<VehicleLoadResult[]> {
   const results: VehicleLoadResult[] = [];
 
@@ -37,7 +38,39 @@ export async function loadParagliders(
       mesh.scale.set(scale, scale, scale);
       scene.add(mesh);
 
-      results.push({ mesh });
+      let flyingBehavior: FlyingBehavior | undefined;
+
+      // Add flying behavior if pattern is defined
+      if (p.flightPattern && p.waypoints) {
+        flyingBehavior = new FlyingBehavior({
+          pattern: p.flightPattern,
+          speed: p.speed || 15,
+          turnSpeed: 5.0,
+          flightRadius: 100,
+          returnDistance: 150,
+          minHeight: 600,
+          maxHeight: 800,
+          obstacleAvoidanceDistance: 100,
+          centerPoint: p.position,
+          autoStart: true,
+          faceDirection: true,
+          forwardAxis: 'z',
+          debugVectors: DEBUG_VECTORS,
+          waypoints: p.waypoints,
+          waypointTension: p.waypointTension,
+          waypointLoop: p.waypointLoop,
+        });
+
+        flyingBehavior.attachTo(mesh);
+
+        // Start flying behavior after animation completes
+        setTimeout(() => {
+          flyingBehavior?.start();
+          logger.info('🪂 Flying behavior started for paraglider');
+        }, animationDurationMs + 1000);
+      }
+
+      results.push({ mesh, flyingBehavior });
       return mesh;
     } catch (error) {
       errorHandler(error as Error, 'loading voxel paraglider');

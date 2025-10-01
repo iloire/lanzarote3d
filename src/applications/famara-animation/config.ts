@@ -7,6 +7,11 @@ import { FlightPattern } from '../../foundation/systems/behaviors/FlyingBehavior
 export type ParagliderVoxelConfig = {
   pg: ParagliderVoxelOptions;
   position: THREE.Vector3;
+  flightPattern?: FlightPattern;
+  speed?: number;
+  waypoints?: THREE.Vector3[];
+  waypointTension?: number;
+  waypointLoop?: boolean;
 };
 
 export type HanggliderConfig = {
@@ -84,6 +89,28 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
       },
     },
     position: new THREE.Vector3(6897, 920, -705),
+    flightPattern: FlightPattern.WAYPOINT,
+    speed: 15,
+    // Slow, scenic flight over neighborhoods
+    waypoints: [
+      // Start over suburban area
+      new THREE.Vector3(6897, 700, -705),
+      new THREE.Vector3(6700, 720, 200),
+      // Over Teguise
+      new THREE.Vector3(5800, 750, 1000),
+      new THREE.Vector3(5400, 720, 1400),
+      // Back towards Famara
+      new THREE.Vector3(5800, 680, 500),
+      new THREE.Vector3(6200, 650, -1500),
+      // Along coast
+      new THREE.Vector3(6500, 680, -2800),
+      new THREE.Vector3(7000, 700, -2200),
+      // Return to start
+      new THREE.Vector3(7200, 720, -1000),
+      new THREE.Vector3(7000, 700, -200),
+    ],
+    waypointTension: 0.5,
+    waypointLoop: true,
   },
 ];
 
