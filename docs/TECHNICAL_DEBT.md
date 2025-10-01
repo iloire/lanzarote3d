@@ -414,6 +414,132 @@ This document tracks pending technical debt and issues that need to be addressed
 
 **Result**: Zero instances of loadSync() remain in codebase. Pure async architecture.
 
+### Island Flying App - Multiple Animation Loops Issue
+**Status**: ⚠️ Critical - Introduced Oct 1, 2025
+**Files**: `src/applications/island-flying/index.tsx`
+**Issue**: Creates 25-35 separate FlyingBehavior animation loops (each with its own requestAnimationFrame)
+**Impact**: Performance degradation, high CPU usage, potential frame drops with many aircraft
+
+**Problems**:
+1. **Multiple RAF Loops**: Each FlyingBehavior.start() creates independent requestAnimationFrame loop
+2. **No Coordination**: 25-35 loops running concurrently without synchronization
+3. **Random Counts**: Unpredictable performance (3-7 aircraft of each of 5 types = 15-35 total)
+4. **Memory Inefficiency**: Each behavior tracks its own timing state independently
+
+**Current Architecture**:
+```typescript
+// Each aircraft gets its own animation loop
+for (const vehicle of vehicles) {
+  behavior.attachTo(mesh);
+  behavior.start();  // Creates new RAF loop!
+}
+```
+
+**Recommended Solutions**:
+- **Option 1**: Single update loop that calls behavior.update() for all vehicles (requires FlyingBehavior refactor)
+- **Option 2**: Limit max aircraft count (e.g., max 15 total instead of up to 35)
+- **Option 3**: Use shared animation loop manager (relates to "Multiple Render Loops" issue above)
+
+**Temporary Mitigations**:
+- Reduce random count range from 3-7 to 2-4 per type
+- Add configurable max aircraft limit
+- Consider pooling behaviors or using single behavior for multiple objects
+
+**Related Issues**:
+- See "Multiple Render Loops - Memory Leak Risk" (High Priority)
+- This app significantly worsens the existing render loop problem
+
+### Island Flying App - Type Safety Issues
+**Status**: ⚠️ Needs Improvement - Introduced Oct 1, 2025
+**Files**: `src/applications/island-flying/index.tsx`
+**Issue**: Excessive use of `any` type in vehicle management
+
+**Problems**:
+1. **Line 231**: `VehicleClass: any` - Should be typed vehicle constructor interface
+2. **Line 232**: `vehicleConfig: any` - Should use union type of vehicle config interfaces
+3. **No Type Guards**: Vehicle instantiation not type-safe
+
+**Current Code**:
+```typescript
+private async addVehicle(
+  scene: THREE.Scene,
+  type: string,
+  VehicleClass: any,  // ❌ No type safety
+  vehicleConfig: any,  // ❌ No type safety
+  flightPattern: FlightPattern,
+  flightParams: { altitude: number; radius: number; speed: number }
+): Promise<void>
+```
+
+**Recommended Solution**:
+```typescript
+interface VehicleConstructor {
+  new (config: VehicleConfig): {
+    load(): Promise<void>;
+    getMesh(): THREE.Object3D | null;
+  };
+}
+
+type VehicleConfig =
+  | ParagliderConfig
+  | HanggliderConfig
+  | CessnaConfig
+  | JetConfig
+  | AirlinerConfig;
+
+private async addVehicle(
+  scene: THREE.Scene,
+  type: string,
+  VehicleClass: VehicleConstructor,
+  vehicleConfig: VehicleConfig,
+  // ... rest
+)
+```
+
+### Island Flying App - Missing Behavior Cleanup
+**Status**: ⚠️ Memory Leak Risk - Introduced Oct 1, 2025
+**Files**: `src/applications/island-flying/index.tsx`
+**Issue**: FlyingBehavior animation loops not stopped on dispose
+
+**Problem**:
+```typescript
+public override dispose(): void {
+  logger.debug(`🧹 Disposing ${this.config.name}`);
+
+  if (this.animationId) {
+    cancelAnimationFrame(this.animationId);  // Only cancels main loop
+    this.animationId = undefined;
+  }
+
+  // ❌ Missing: No cleanup of FlyingBehavior loops!
+  this.vehicles = [];  // Just clears array, behaviors keep running
+
+  super.dispose();
+}
+```
+
+**Impact**: 15-35 animation loops continue running after app disposal, causing memory leak
+
+**Recommended Solution**:
+```typescript
+public override dispose(): void {
+  logger.debug(`🧹 Disposing ${this.config.name}`);
+
+  if (this.animationId) {
+    cancelAnimationFrame(this.animationId);
+    this.animationId = undefined;
+  }
+
+  // Stop all flying behaviors
+  for (const vehicle of this.vehicles) {
+    vehicle.behavior.stop();  // Must call stop() to cancel RAF loop
+  }
+  this.vehicles = [];
+
+  super.dispose();
+}
+```
+
 ## Medium Priority Issues
 
 ### Testing Infrastructure Gap
