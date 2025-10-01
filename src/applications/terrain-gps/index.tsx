@@ -9,6 +9,7 @@ import {
 } from '../../foundation/utils/OrbitControlsHelper';
 import { getAppConfig } from '../../config/app-registry';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { logger } from '../../foundation/utils/logger';
 
 /**
  * Terrain GPS Coordinate Mapper - Interactive tool for mapping 3D terrain to GPS coordinates
@@ -141,11 +142,11 @@ class TerrainGPSMapperApp extends TerrainBase {
 
     scene.add(compassGroup);
 
-    console.log('🧭 Compass rose added:');
-    console.log('  🔴 Red circle = North (+Z direction)');
-    console.log('  🔵 Blue circle = South (-Z direction)');
-    console.log('  🟢 Green circle = East (+X direction)');
-    console.log('  🟡 Yellow circle = West (-X direction)');
+    logger.info('🧭 Compass rose added:');
+    logger.info('  🔴 Red circle = North (+Z direction)');
+    logger.info('  🔵 Blue circle = South (-Z direction)');
+    logger.info('  🟢 Green circle = East (+X direction)');
+    logger.info('  🟡 Yellow circle = West (-X direction)');
   }
 
   async load(options: StoryOptions): Promise<void> {
@@ -178,10 +179,10 @@ class TerrainGPSMapperApp extends TerrainBase {
         minPolarAngle: 0, // Allow full rotation
       });
 
-      console.log('📍 Camera positioned for north-facing top-down view:');
-      console.log(`  Position: (${initialPos.x}, ${initialPos.y}, ${initialPos.z})`);
-      console.log(`  Looking at: (${lookAtPos.x}, ${lookAtPos.y}, ${lookAtPos.z})`);
-      console.log('🧭 North = +Z (red circle), South = -Z (blue circle)');
+      logger.info('📍 Camera positioned for north-facing top-down view:');
+      logger.info(`  Position: (${initialPos.x}, ${initialPos.y}, ${initialPos.z})`);
+      logger.info(`  Looking at: (${lookAtPos.x}, ${lookAtPos.y}, ${lookAtPos.z})`);
+      logger.info('🧭 North = +Z (red circle), South = -Z (blue circle)');
 
       // Apply default theme
       const theme = getDefaultTheme();
@@ -208,8 +209,8 @@ class TerrainGPSMapperApp extends TerrainBase {
       renderer.render(scene, camera);
 
       this.isLoaded = true;
-      console.log(`✅ ${this.config.name} loaded successfully`);
-      console.log(
+      logger.info(`✅ ${this.config.name} loaded successfully`);
+      logger.info(
         '🎮 Click on terrain to get GPS coordinates, R to reset view, C to clear markers'
       );
     } catch (error) {
@@ -227,13 +228,13 @@ class TerrainGPSMapperApp extends TerrainBase {
     const canvas = renderer.domElement;
 
     // ANALYZE TERRAIN GEOMETRY FOR CORRECT BOUNDS AND ORIENTATION
-    console.log('🗺️ TERRAIN ANALYSIS:');
-    console.log('Terrain object:', terrain);
+    logger.info('🗺️ TERRAIN ANALYSIS:');
+    logger.info('Terrain object:', terrain);
 
     if (terrain && terrain.geometry) {
       terrain.geometry.computeBoundingBox();
       const bbox = terrain.geometry.boundingBox;
-      console.log('📐 Actual terrain bounds:', {
+      logger.info('📐 Actual terrain bounds:', {
         x: [bbox.min.x, bbox.max.x],
         y: [bbox.min.y, bbox.max.y],
         z: [bbox.min.z, bbox.max.z],
@@ -307,12 +308,12 @@ class TerrainGPSMapperApp extends TerrainBase {
     this.updateUI();
 
     // Log to console for debugging
-    console.log(`🎯 Terrain Point:`, {
+    logger.info(`🎯 Terrain Point:`, {
       x: terrainPoint.x.toFixed(2),
       y: terrainPoint.y.toFixed(2),
       z: terrainPoint.z.toFixed(2),
     });
-    console.log(`🌍 GPS Coordinates:`, {
+    logger.info(`🌍 GPS Coordinates:`, {
       lat: gpsCoords.lat.toFixed(6),
       lon: gpsCoords.lon.toFixed(6),
     });
@@ -353,7 +354,7 @@ class TerrainGPSMapperApp extends TerrainBase {
     const longitude = (ref1.lon * weight1 + ref2.lon * weight2 + ref3.lon * weight3) / totalWeight;
 
     // Debug logging for distance-weighted interpolation
-    console.log(`🔍 Distance-Weighted Interpolation:`, {
+    logger.info(`🔍 Distance-Weighted Interpolation:`, {
       terrain: { x: terrainPoint.x.toFixed(1), z: terrainPoint.z.toFixed(1) },
       distances: {
         ref1: dist1.toFixed(1),
@@ -396,12 +397,12 @@ class TerrainGPSMapperApp extends TerrainBase {
     this.markers.clear();
     this.coordinateList = [];
     this.updateUI();
-    console.log('🧹 Cleared all coordinate markers');
+    logger.info('🧹 Cleared all coordinate markers');
   }
 
   private resetCameraView(): void {
     if (!this.camera || !this.controls) {
-      console.warn('⚠️ Camera or controls not available for reset');
+      logger.warn('⚠️ Camera or controls not available for reset');
       return;
     }
 
@@ -423,8 +424,8 @@ class TerrainGPSMapperApp extends TerrainBase {
       minPolarAngle: 0,
     });
 
-    console.log('📍 Camera view reset to perfect top-down north-facing position');
-    console.log(`  Position: (${resetPos.x}, ${resetPos.y}, ${resetPos.z})`);
+    logger.info('📍 Camera view reset to perfect top-down north-facing position');
+    logger.info(`  Position: (${resetPos.x}, ${resetPos.y}, ${resetPos.z})`);
   }
 
   private exportCoordinateData(): void {
@@ -462,7 +463,7 @@ class TerrainGPSMapperApp extends TerrainBase {
       },
     };
 
-    console.log('📊 Coordinate Mapping Data for lanzarote-terrain-gps-mapping.json:', data);
+    logger.info('📊 Coordinate Mapping Data for lanzarote-terrain-gps-mapping.json:', data);
 
     // Copy to clipboard
     navigator.clipboard.writeText(JSON.stringify(data, null, 2)).then(() => {
@@ -557,7 +558,7 @@ class TerrainGPSMapperApp extends TerrainBase {
   }
 
   public override dispose(): void {
-    console.log(`🧹 Disposing ${this.config.name}`);
+    logger.debug(`🧹 Disposing ${this.config.name}`);
 
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);

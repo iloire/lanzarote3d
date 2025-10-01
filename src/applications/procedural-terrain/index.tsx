@@ -9,6 +9,7 @@ import {
   ORBIT_CONTROLS_PRESETS,
 } from '../../foundation/utils/OrbitControlsHelper';
 import { getAppConfig } from '../../config/app-registry';
+import { logger } from '../../foundation/utils/logger';
 
 /**
  * Procedural Terrain Demo
@@ -87,7 +88,7 @@ class ProceduralTerrainApp extends AppBase {
       this.startAnimationLoop(renderer, scene, camera, controls);
 
       this.isLoaded = true;
-      console.log(`✅ ${this.config.name} loaded successfully`);
+      logger.info(`✅ ${this.config.name} loaded successfully`);
     } catch (error) {
       this.handleError(error as Error, 'load');
       throw error;
@@ -249,7 +250,7 @@ class ProceduralTerrainApp extends AppBase {
     scene.add(terrain);
 
     this.updateInfoDisplay();
-    console.log(`✅ Applied preset: ${presetName}`);
+    logger.info(`✅ Applied preset: ${presetName}`);
   }
 
   private updateAndRegenerate(scene: THREE.Scene): void {
@@ -268,7 +269,7 @@ class ProceduralTerrainApp extends AppBase {
 
   private regenerateTerrain(scene: THREE.Scene): void {
     this.updateAndRegenerate(scene);
-    console.log('🔄 Terrain regenerated');
+    logger.info('🔄 Terrain regenerated');
   }
 
   private randomizeSeed(scene: THREE.Scene): void {
@@ -279,7 +280,7 @@ class ProceduralTerrainApp extends AppBase {
     this.terrainGenerator.updateConfig({ seed: config.seed });
 
     this.updateAndRegenerate(scene);
-    console.log('🎲 New random seed applied');
+    logger.info('🎲 New random seed applied');
   }
 
   private exportHeightmap(): void {
@@ -287,7 +288,7 @@ class ProceduralTerrainApp extends AppBase {
 
     const heightmap = this.terrainGenerator.exportHeightmap();
     if (!heightmap) {
-      console.warn('❌ No heightmap to export');
+      logger.warn('❌ No heightmap to export');
       return;
     }
 
@@ -300,7 +301,7 @@ class ProceduralTerrainApp extends AppBase {
     a.click();
     URL.revokeObjectURL(url);
 
-    console.log('💾 Heightmap exported');
+    logger.info('💾 Heightmap exported');
   }
 
   private createInfoDisplay(): void {
@@ -388,7 +389,7 @@ class ProceduralTerrainApp extends AppBase {
   }
 
   public override dispose(): void {
-    console.log(`🧹 Disposing ${this.config.name}`);
+    logger.debug(`🧹 Disposing ${this.config.name}`);
 
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);

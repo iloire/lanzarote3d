@@ -11,6 +11,7 @@ import {
 import { getAppConfig } from '../../config/app-registry';
 import SatelliteThemes from '../../foundation/utils/satellite-themes';
 import { Theme } from '../../foundation/types/Theme';
+import { logger } from '../../foundation/utils/logger';
 
 interface ThemeOption {
   name: string;
@@ -112,10 +113,10 @@ class SatelliteTerrainApp extends TerrainBase {
         minPolarAngle: 0, // Allow full rotation
       });
 
-      console.log('📍 Satellite Terrain: Perfect top-down north-facing view');
-      console.log(`  Camera position: (${initialPos.x}, ${initialPos.y}, ${initialPos.z})`);
-      console.log(`  Looking at: (${lookAtPos.x}, ${lookAtPos.y}, ${lookAtPos.z})`);
-      console.log('🧭 North = +Z direction, perfect for satellite texture mapping');
+      logger.info('📍 Satellite Terrain: Perfect top-down north-facing view');
+      logger.info(`  Camera position: (${initialPos.x}, ${initialPos.y}, ${initialPos.z})`);
+      logger.info(`  Looking at: (${lookAtPos.x}, ${lookAtPos.y}, ${lookAtPos.z})`);
+      logger.info('🧭 North = +Z direction, perfect for satellite texture mapping');
 
       // Apply initial satellite theme
       const initialTheme = this.availableThemes[0].theme;
@@ -147,8 +148,8 @@ class SatelliteTerrainApp extends TerrainBase {
       this.startAnimationLoop(renderer, scene, camera, controls);
 
       this.isLoaded = true;
-      console.log(`✅ ${this.config.name} loaded successfully`);
-      console.log('🎮 Controls: Press 1-5 to switch themes, mouse to navigate');
+      logger.info(`✅ ${this.config.name} loaded successfully`);
+      logger.info('🎮 Controls: Press 1-5 to switch themes, mouse to navigate');
     } catch (error) {
       this.handleError(error as Error, 'load');
       throw error;
@@ -164,7 +165,7 @@ class SatelliteTerrainApp extends TerrainBase {
       try {
         await options.terrainInstance.applyTheme(theme.terrain);
       } catch (error) {
-        console.warn('Failed to apply satellite theme to terrain, using fallback:', error);
+        logger.warn('Failed to apply satellite theme to terrain, using fallback:', error);
       }
     }
   }
@@ -228,14 +229,14 @@ class SatelliteTerrainApp extends TerrainBase {
         this.currentThemeIndex = themeIndex;
         const selectedTheme = this.availableThemes[themeIndex];
 
-        console.log(`🎨 Switching to theme: ${selectedTheme.name}`);
+        logger.info(`🎨 Switching to theme: ${selectedTheme.name}`);
 
         try {
           await this.applyThemeWithIslandSupport(options, selectedTheme.theme);
           this.updateThemeUI();
-          console.log(`✅ Theme applied: ${selectedTheme.name}`);
+          logger.info(`✅ Theme applied: ${selectedTheme.name}`);
         } catch (error) {
-          console.error(`❌ Failed to apply theme ${selectedTheme.name}:`, error);
+          logger.error(`❌ Failed to apply theme ${selectedTheme.name}:`, error);
         }
         return;
       }
@@ -248,54 +249,54 @@ class SatelliteTerrainApp extends TerrainBase {
         case 'w': // Move North
           this.debugParams.offsetY += step;
           updated = true;
-          console.log('🔧 Moved texture North');
+          logger.debug('🔧 Moved texture North');
           break;
         case 's': // Move South
           this.debugParams.offsetY -= step;
           updated = true;
-          console.log('🔧 Moved texture South');
+          logger.debug('🔧 Moved texture South');
           break;
         case 'a': // Move West
           this.debugParams.offsetX -= step;
           updated = true;
-          console.log('🔧 Moved texture West');
+          logger.debug('🔧 Moved texture West');
           break;
         case 'd': // Move East
           this.debugParams.offsetX += step;
           updated = true;
-          console.log('🔧 Moved texture East');
+          logger.debug('🔧 Moved texture East');
           break;
         case 'q': // Scale up
           this.debugParams.scaleX += 0.1;
           this.debugParams.scaleY += 0.1;
           updated = true;
-          console.log('🔧 Scaled texture up');
+          logger.debug('🔧 Scaled texture up');
           break;
         case 'e': // Scale down
           this.debugParams.scaleX = Math.max(0.1, this.debugParams.scaleX - 0.1);
           this.debugParams.scaleY = Math.max(0.1, this.debugParams.scaleY - 0.1);
           updated = true;
-          console.log('🔧 Scaled texture down');
+          logger.debug('🔧 Scaled texture down');
           break;
         case 'z': // Rotate left
           this.debugParams.rotation -= 15;
           updated = true;
-          console.log('🔧 Rotated texture left');
+          logger.debug('🔧 Rotated texture left');
           break;
         case 'x': // Rotate right
           this.debugParams.rotation += 15;
           updated = true;
-          console.log('🔧 Rotated texture right');
+          logger.debug('🔧 Rotated texture right');
           break;
         case 'f': // Flip horizontally
           this.debugParams.flipX = !this.debugParams.flipX;
           updated = true;
-          console.log(`🔧 Flipped texture horizontally: ${this.debugParams.flipX ? 'ON' : 'OFF'}`);
+          logger.debug(`🔧 Flipped texture horizontally: ${this.debugParams.flipX ? 'ON' : 'OFF'}`);
           break;
         case 'g': // Flip vertically
           this.debugParams.flipY = !this.debugParams.flipY;
           updated = true;
-          console.log(`🔧 Flipped texture vertically: ${this.debugParams.flipY ? 'ON' : 'OFF'}`);
+          logger.debug(`🔧 Flipped texture vertically: ${this.debugParams.flipY ? 'ON' : 'OFF'}`);
           break;
         case 'r': // Reset
           this.debugParams = {
@@ -308,7 +309,7 @@ class SatelliteTerrainApp extends TerrainBase {
             flipY: false,
           };
           updated = true;
-          console.log('🔧 Reset all texture adjustments');
+          logger.debug('🔧 Reset all texture adjustments');
           break;
       }
 
@@ -373,7 +374,7 @@ class SatelliteTerrainApp extends TerrainBase {
     `;
 
     document.body.appendChild(this.debugUI);
-    console.log('🔧 Debug UI created - use WASD, QE, ZX, FG, R keys to adjust texture');
+    logger.debug('🔧 Debug UI created - use WASD, QE, ZX, FG, R keys to adjust texture');
   }
 
   private updateDebugUI(): void {
@@ -398,11 +399,11 @@ class SatelliteTerrainApp extends TerrainBase {
       const currentTheme = this.availableThemes[this.currentThemeIndex];
       try {
         await this.applyThemeWithIslandSupport(options, currentTheme.theme);
-        console.log(
+        logger.debug(
           `🔧 Reapplied texture with debug params: offset(${this.debugParams.offsetX.toFixed(2)}, ${this.debugParams.offsetY.toFixed(2)}) scale(${this.debugParams.scaleX.toFixed(2)}, ${this.debugParams.scaleY.toFixed(2)}) rotation(${this.debugParams.rotation}°)`
         );
       } catch (error) {
-        console.error('❌ Failed to reapply texture:', error);
+        logger.error('❌ Failed to reapply texture:', error);
       }
     }
   }
@@ -428,7 +429,7 @@ class SatelliteTerrainApp extends TerrainBase {
   }
 
   public override dispose(): void {
-    console.log(`🧹 Disposing ${this.config.name}`);
+    logger.debug(`🧹 Disposing ${this.config.name}`);
 
     // Cancel animation loop
     if (this.animationId) {

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { StoryOptions } from '../../shared/types';
 import { WorkshopDemoBase } from '../../shared/WorkshopDemoBase';
 import { Jet } from '../../foundation/components/vehicles';
+import { logger } from '../../foundation/utils/logger';
 
 /**
  * Plane Application - Showcase of the Jet aircraft
@@ -51,7 +52,7 @@ class PlaneApp extends WorkshopDemoBase {
       this.startAnimationLoop(renderer, scene, camera, controls);
 
       this.isLoaded = true;
-      console.log('✅ Plane (Jet) application loaded successfully');
+      logger.info('✅ Plane (Jet) application loaded successfully');
 
     } catch (error) {
       this.handleError(error as Error, 'load');
@@ -60,7 +61,7 @@ class PlaneApp extends WorkshopDemoBase {
   }
 
   private async createJet(scene: THREE.Scene): Promise<void> {
-    console.log('✈️ Creating jet aircraft...');
+    logger.info('✈️ Creating jet aircraft...');
 
     try {
       const jet = new Jet({
@@ -78,11 +79,11 @@ class PlaneApp extends WorkshopDemoBase {
         this.jetMesh.position.set(0, 5, 0);
         this.jetMesh.rotation.y = Math.PI / 4; // Angle for better viewing
         scene.add(this.jetMesh);
-        console.log('✅ Jet added to scene');
+        logger.info('✅ Jet added to scene');
       }
 
     } catch (error) {
-      console.error('❌ Error creating jet:', error);
+      logger.error('❌ Error creating jet:', error);
     }
   }
 
@@ -90,7 +91,7 @@ class PlaneApp extends WorkshopDemoBase {
   private setupCamera(camera: THREE.PerspectiveCamera, controls: any): void {
     camera.position.set(40, 20, 40);
     camera.lookAt(0, 5, 0);
-    console.log('📷 Camera positioned for jet viewing');
+    logger.info('📷 Camera positioned for jet viewing');
 
     if (controls) {
       controls.target.set(0, 5, 0);
@@ -128,7 +129,7 @@ class PlaneApp extends WorkshopDemoBase {
   }
 
   override dispose(): void {
-    console.log('🧹 Disposing Plane application');
+    logger.debug('🧹 Disposing Plane application');
     this.jetMesh = undefined;
     super.dispose();
   }

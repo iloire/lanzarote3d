@@ -14,6 +14,7 @@ import {
 } from '../../types/flyzone-types';
 import { FlyzoneEditorUI } from './flyzone-editor-ui';
 import { FlyzoneMarkers } from './flyzone-markers';
+import { logger } from '../../foundation/utils/logger';
 import './flyzone-editor.css';
 
 /**
@@ -214,7 +215,7 @@ class FlyzoneEditorApp extends TerrainBase {
       this.startAnimationLoop(scene, camera, renderer, controls);
 
       this.isLoaded = true;
-      console.log(`✅ ${this.config.name} loaded successfully`);
+      logger.info(`✅ ${this.config.name} loaded successfully`);
     } catch (error) {
       this.handleError(error as Error, 'load');
       throw error;
@@ -392,7 +393,7 @@ class FlyzoneEditorApp extends TerrainBase {
     this.markAsDirty();
     this.editorUI?.refresh();
 
-    console.log(`Added takeoff at GPS: ${gps.latitude.toFixed(6)}, ${gps.longitude.toFixed(6)}`);
+    logger.info(`Added takeoff at GPS: ${gps.latitude.toFixed(6)}, ${gps.longitude.toFixed(6)}`);
   }
 
   private addLandingZone(position: THREE.Vector3, gps: GPS): void {
@@ -434,7 +435,7 @@ class FlyzoneEditorApp extends TerrainBase {
     this.markAsDirty();
     this.editorUI?.refresh();
 
-    console.log(
+    logger.info(
       `Added landing zone at GPS: ${gps.latitude.toFixed(6)}, ${gps.longitude.toFixed(6)}`
     );
   }
@@ -476,7 +477,7 @@ class FlyzoneEditorApp extends TerrainBase {
     this.markAsDirty();
     this.editorUI?.refresh();
 
-    console.log(
+    logger.info(
       `Added ${phaseType} phase at GPS: ${gps.latitude.toFixed(6)}, ${gps.longitude.toFixed(6)}`
     );
   }
@@ -576,7 +577,7 @@ class FlyzoneEditorApp extends TerrainBase {
         // Update UI
         this.editorUI?.refresh();
 
-        console.log(`Selected ${type}: ${data.title || data.description || id}`);
+        logger.info(`Selected ${type}: ${data.title || data.description || id}`);
         return true;
       }
     }
@@ -649,9 +650,9 @@ class FlyzoneEditorApp extends TerrainBase {
       this.markLocationDirty();
       this.editorUI?.refresh();
 
-      console.log(`Deleted ${item.type}: ${item.data.title || item.id}`);
+      logger.info(`Deleted ${item.type}: ${item.data.title || item.id}`);
     } catch (error) {
-      console.error('Failed to delete item:', error);
+      logger.error('Failed to delete item:', error);
       alert('Failed to delete item. Please try again.');
     }
   }
@@ -690,9 +691,9 @@ class FlyzoneEditorApp extends TerrainBase {
       this.markLocationDirty();
       this.editorUI?.refresh();
 
-      console.log(`Saved changes to ${item.type}: ${item.data.title || item.id}`);
+      logger.info(`Saved changes to ${item.type}: ${item.data.title || item.id}`);
     } catch (error) {
-      console.error('Failed to save item changes:', error);
+      logger.error('Failed to save item changes:', error);
       alert('Failed to save changes. Please try again.');
     }
   }
@@ -719,7 +720,7 @@ class FlyzoneEditorApp extends TerrainBase {
         const z = -(lat - 29.0) * 111320; // Rough conversion (negative for Three.js Z-axis)
         position = new THREE.Vector3(x, item.data.elevation || 0, z);
       } else {
-        console.warn('No position data found for item:', item);
+        logger.warn('No position data found for item:', item);
         return;
       }
 
@@ -758,9 +759,9 @@ class FlyzoneEditorApp extends TerrainBase {
       };
 
       animateCamera();
-      console.log(`Focused camera on ${item.type}: ${item.data.title || item.id}`);
+      logger.info(`Focused camera on ${item.type}: ${item.data.title || item.id}`);
     } catch (error) {
-      console.error('Failed to focus on item:', error);
+      logger.error('Failed to focus on item:', error);
     }
   }
 
@@ -816,9 +817,9 @@ class FlyzoneEditorApp extends TerrainBase {
         }
       }
 
-      console.log(`Loaded ${this.editorState.locations.length} existing locations`);
+      logger.info(`Loaded ${this.editorState.locations.length} existing locations`);
     } catch (error) {
-      console.error('Failed to load existing locations:', error);
+      logger.error('Failed to load existing locations:', error);
     }
   }
 
@@ -861,7 +862,7 @@ class FlyzoneEditorApp extends TerrainBase {
 
   private async saveCurrentLocation(): Promise<void> {
     if (!this.editorState?.currentLocation) {
-      console.warn('No location to save');
+      logger.warn('No location to save');
       return;
     }
 
@@ -871,15 +872,15 @@ class FlyzoneEditorApp extends TerrainBase {
       });
 
       this.editorState.isDirty = false;
-      console.log(`Saved location: ${saved.title}`);
+      logger.info(`Saved location: ${saved.title}`);
     } catch (error) {
-      console.error('Failed to save location:', error);
+      logger.error('Failed to save location:', error);
     }
   }
 
   private loadLocationDialog(): void {
     // Implementation would show a dialog to select from existing locations
-    console.log('Load location dialog - to be implemented');
+    logger.info('Load location dialog - to be implemented');
   }
 
   private clearEditor(): void {
@@ -891,7 +892,7 @@ class FlyzoneEditorApp extends TerrainBase {
     this.editorState.isDirty = false;
     this.editorUI?.refresh();
 
-    console.log('Editor cleared');
+    logger.info('Editor cleared');
   }
 
   private setupEventHandlers(renderer: THREE.WebGLRenderer): void {
@@ -1040,10 +1041,10 @@ class FlyzoneEditorApp extends TerrainBase {
 
       URL.revokeObjectURL(url);
 
-      console.log(`✅ Exported flyzone data to ${filename}`);
+      logger.info(`✅ Exported flyzone data to ${filename}`);
       alert(`Successfully exported flyzone data to ${filename}`);
     } catch (error) {
-      console.error('Failed to export JSON:', error);
+      logger.error('Failed to export JSON:', error);
       alert('Failed to export data. Please check the console for details.');
     }
   }
@@ -1092,10 +1093,10 @@ class FlyzoneEditorApp extends TerrainBase {
           // Import the data
           this.processImportData(importData);
 
-          console.log(`✅ Imported flyzone data from ${file.name}`);
+          logger.info(`✅ Imported flyzone data from ${file.name}`);
           alert(`Successfully imported flyzone data from ${file.name}`);
         } catch (error) {
-          console.error('Failed to import JSON:', error);
+          logger.error('Failed to import JSON:', error);
           alert("Failed to import file. Please check that it's a valid JSON file.");
         }
       };
@@ -1244,9 +1245,9 @@ class FlyzoneEditorApp extends TerrainBase {
       this.updateCursor();
       this.editorUI?.refresh();
 
-      console.log(`Imported ${this.editorState.locations.length} locations`);
+      logger.info(`Imported ${this.editorState.locations.length} locations`);
     } catch (error) {
-      console.error('Error processing import data:', error);
+      logger.error('Error processing import data:', error);
       throw error;
     }
   }
@@ -1283,7 +1284,7 @@ class FlyzoneEditorApp extends TerrainBase {
   }
 
   public override dispose(): void {
-    console.log(`🧹 Disposing ${this.config.name}`);
+    logger.debug(`🧹 Disposing ${this.config.name}`);
 
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
