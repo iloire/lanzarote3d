@@ -63,15 +63,15 @@ export class Pilot extends SimpleThreeComponent {
     return new THREE.BoxGeometry(1, 1, 1);
   }
 
-  protected override createContent(): THREE.Object3D {
+  protected override async createObject(): Promise<THREE.Object3D> {
     const container = new THREE.Object3D();
     container.name = 'PilotContainer';
 
     const options = this.options as PilotOptions;
 
     try {
-      // Create pilot head
-      this.head = this.createHead(options);
+      // Create pilot head asynchronously
+      this.head = await this.createHead(options);
       this.head.visible = options.showHead ?? true;
       container.add(this.head);
 
@@ -86,7 +86,7 @@ export class Pilot extends SimpleThreeComponent {
     }
   }
 
-  private createHead(options: PilotOptions): THREE.Object3D {
+  private async createHead(options: PilotOptions): Promise<THREE.Object3D> {
     try {
       const pilotHead = new PilotHead({
         headType: options.headType || PilotHeadType.Default,
@@ -97,7 +97,8 @@ export class Pilot extends SimpleThreeComponent {
         receiveShadow: this.options.receiveShadow,
       });
 
-      return pilotHead.getObject() || new THREE.Object3D();
+      // Load the head asynchronously
+      return await pilotHead.load();
     } catch (error) {
       console.warn('Failed to create pilot head, using placeholder:', error);
       // Create a simple placeholder head

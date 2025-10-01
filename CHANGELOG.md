@@ -2,6 +2,15 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## [1.5.3] - 2025-10-01 12:54 UTC
+
+### Fixed
+- **Pilot Head Loading**: Fixed missing head from Pilot component by properly handling async PilotHead loading
+  - Changed `createContent()` to `createObject()` override to support async operations
+  - Made `createHead()` method async to properly await PilotHead.load()
+  - PilotHead now loads correctly instead of returning empty object from synchronous getObject() call
+  - Pilot heads (Default, Warrior, Skeleton, Devil) now render properly with helmets and customization options
+
 ## [1.5.2] - 2025-10-01 12:43 UTC
 
 ### Added
