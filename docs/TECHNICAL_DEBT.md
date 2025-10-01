@@ -46,24 +46,30 @@ This document tracks pending technical debt and issues that need to be addressed
 - 📅 v2.0.0: Remove Flier class entirely
 
 ### Legacy CameraController Removal
-**Status**: ⚠️ Deprecated - Schedule for Removal
-**Files**: `src/foundation/systems/scene/CameraController.ts`
-**Issue**: Legacy CameraController deprecated in favor of CameraTargetController
-**Impact**: Maintenance burden, Flier dependency prevents full type safety
-**Dependencies**: Only app.tsx uses it (already migrated to CameraTargetController)
-**Solution**: Remove in next major version (v2.0.0)
+**Status**: ✅ Removed (Oct 1, 2025)
+**Files**: `src/foundation/systems/scene/CameraController.ts` (removed)
+**Issue**: Legacy CameraController was deprecated in favor of CameraTargetController
+**Impact**: Reduced maintenance burden, improved type safety
+
+**Actions Completed (Oct 1, 2025)**:
+- ✅ Removed CameraController.ts (267 lines)
+- ✅ Updated foundation/systems/scene/index.ts (removed exports)
+- ✅ Updated foundation/index.ts (removed from public API)
+- ✅ Updated shared/types.ts (removed import, updated comment)
+- ✅ Build verification: All 31 applications compile successfully
+
 **Timeline**:
 - ✅ v1.5.0: CameraTargetController created, CameraController deprecated
-- 📅 v2.0.0: Remove CameraController entirely
-**Migration**: All apps using CameraController should switch to CameraTargetController
+- ✅ Oct 1, 2025: CameraController removed entirely
+**Migration**: Complete - All apps now use CameraTargetController or standard THREE.PerspectiveCamera
 
 ### TypeScript Strict Mode Violations
-**Status**: ✅ Significantly Improved (21 batches completed)
-**Files**: Reduced from 30+ to minimal remaining instances, ~230 console statements remaining
+**Status**: ✅ Significantly Improved (22 batches completed)
+**Files**: Reduced from 30+ to minimal remaining instances, ~148 console statements remaining
 **Issue**: TypeScript strict mode violations and excessive use of `any` type
 **Impact**: Runtime errors, poor developer experience, harder debugging, reduced type safety
 
-**Fixed Files** (Batches 1-21):
+**Fixed Files** (Batches 1-22):
 - ✅ Foundation components base classes (IThreeComponent, BaseThreeComponent, AsyncThreeComponent)
 - ✅ Resource management (ResourceManager, ComponentRegistry, ComponentBenchmark)
 - ✅ Physics components (Weather, Thermal, WindIndicator)
@@ -87,6 +93,15 @@ This document tracks pending technical debt and issues that need to be addressed
 - ✅ **Batch 19 (Sept 30, 2025)**: UI, environment, and house systems (ThemeSelector, environment.ts, house-group-creator.ts, FlyingBehavior, tile-debug)
 - ✅ **Batch 20 (Sept 30, 2025)**: Application demos (visualizer, famara-animation, roads, camera-switcher-demo, hangglider)
 - ✅ **Batch 21 (Oct 1, 2025)**: High-count application files (town, houses, animals, planes, island)
+- ✅ **Batch 22 (Oct 1, 2025)**: High-complexity application files (flyzone-editor, satellite-terrain, terrain-gps, procedural-terrain, plane)
+
+**Batch 22 Completed (Oct 1, 2025)**:
+1. **src/applications/editor/flyzone-editor.tsx**: 26 console statements → logger (info/warn/error/debug)
+2. **src/applications/satellite-terrain/index.tsx**: 25 console statements → logger (info/warn/error/debug)
+3. **src/applications/terrain-gps/index.tsx**: 23 console statements → logger (info/warn)
+4. **src/applications/procedural-terrain/index.tsx**: 7 console statements → logger (info/warn)
+5. **src/applications/plane/index.tsx**: 6 console statements → logger (info/error)
+**Total**: 81 console statements replaced with structured logging
 
 **Batch 21 Completed (Oct 1, 2025)**:
 1. **src/applications/town/index.tsx**: Replaced console (25 statements)

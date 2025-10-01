@@ -9,7 +9,7 @@ export * from './components/ui'; // Trajectories, 3D UI elements
 
 // Core systems
 export * from './systems/assets/AssetManager'; // Asset loading & caching
-export { SceneManager, CameraController } from './systems/scene'; // Scene management, camera controls
+export { SceneManager } from './systems/scene'; // Scene management
 export * from './systems/audio'; // Sound management, positional audio
 export * from './systems/analytics'; // Performance monitoring, user analytics
 

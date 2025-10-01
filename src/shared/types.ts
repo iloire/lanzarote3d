@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { CameraController } from '../foundation/systems/scene/CameraController';
 import { Sky } from '../foundation/components/environment';
 import { Island } from '../foundation/components/scenery/Island';
 import { GUI } from 'lil-gui';
@@ -8,7 +7,7 @@ import { Theme } from '../foundation/types/Theme';
 import Environment from './env/environment';
 
 export interface StoryOptions {
-  camera: THREE.PerspectiveCamera; // Changed from CameraController to base class for flexibility
+  camera: THREE.PerspectiveCamera; // Standard THREE.js camera for flexibility
   scene: THREE.Scene;
   renderer: THREE.WebGLRenderer;
   gui: GUI;
