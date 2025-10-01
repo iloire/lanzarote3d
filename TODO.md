@@ -1,7 +1,6 @@
 Implement the following tasks if any is added following the instructions described below:
 ---
 TASKS:
-- we have environment helpers to create houses and we use that in animation-famara and others. Instead of just adding houses we are going to use in those animations a new helper function addTown. Add that function so we can easily populate towns of different types and sizes in a certain point.
 ---
 
 ### Instructions

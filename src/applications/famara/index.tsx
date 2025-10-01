@@ -87,28 +87,28 @@ class FamaraApp extends TerrainBase {
 
       // Add environment elements using theme
       await this.environment.addCloudsFromTheme(thermals, theme);
-      this.environment.addTrees(terrain);
+
 
       // Create towns using the new addTown helper
       await this.environment.addTown(
         new THREE.Vector3(6879, 0, 545),
         terrain,
-        { type: 'suburban', size: 'medium' }
+        { type: 'suburban', size: 'large' }
       );
       await this.environment.addTown(
         new THREE.Vector3(6279, 0, -3155),
         terrain,
-        { type: 'town', size: 'medium' }
+        { type: 'town', size: 'large' }
       );
       await this.environment.addTown(
         new THREE.Vector3(7827, 0, -3460),
         terrain,
-        { type: 'village', size: 'small' }
+        { type: 'village', size: 'large' }
       );
       await this.environment.addTown(
         new THREE.Vector3(5600, 0, 1205),
         terrain,
-        { type: 'city', size: 'medium' }
+        { type: 'city', size: 'large' }
       );
 
       this.environment.addBoats(water);
