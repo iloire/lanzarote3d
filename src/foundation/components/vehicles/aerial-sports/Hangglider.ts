@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { Pilot, type PilotOptions } from '../../characters/Pilot';
 import HangGliderWing from '../components/HangGliderWing';
 import GuiHelper from '../../../utils/gui';
+import { IVehicleWithGUI } from '../../../types/IVehicle';
 
 export interface HanggliderOptions {
   pilotOptions?: PilotOptions;
@@ -16,11 +17,14 @@ export interface HanggliderOptions {
  * Hangglider component - combines wing and pilot
  *
  * This component composes both the hangglider wing and pilot character into a single assembly.
- * Note: This class doesn't extend a base component class because it needs to compose
- * two different component types (HangGliderWing and Pilot) with different configurations.
+ * Implements IVehicleWithGUI for consistent vehicle interface across the application.
+ *
+ * Note: This class doesn't extend a base component class because it's a composite
+ * that assembles two different component types (HangGliderWing and Pilot) with
+ * different configurations. Instead, it implements the IVehicle interface for consistency.
  * Use FlyingBehavior when autonomous flight is needed.
  */
-export class Hangglider {
+export class Hangglider implements IVehicleWithGUI {
   private mesh?: THREE.Group;
   private wing!: HangGliderWing;
   private pilot!: Pilot;

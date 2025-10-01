@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import TandemPilot, { TandemPilotOptions } from '../../characters/TandemPilot';
 import LegacyGlider, { GliderOptions } from '../components/Glider';
+import { IVehicle } from '../../../types/IVehicle';
 
 export interface TandemOptions {
   glider: GliderOptions;
@@ -13,11 +14,13 @@ export interface TandemOptions {
  * Tandem - tandem paraglider with two pilots
  *
  * This component composes both the glider wing and tandem pilot (pilot + passenger)
- * into a single assembly.
- * Note: This class doesn't extend a base component class because it needs to compose
- * two different component types (LegacyGlider and TandemPilot) with different configurations.
+ * into a single assembly. Implements IVehicle for consistent vehicle interface.
+ *
+ * Note: This class doesn't extend a base component class because it's a composite
+ * that assembles two different component types (LegacyGlider and TandemPilot) with
+ * different configurations. Instead, it implements the IVehicle interface for consistency.
  */
-export class Tandem {
+export class Tandem implements IVehicle {
   private mesh?: THREE.Object3D;
   private glider!: LegacyGlider;
   private pilot!: TandemPilot;
