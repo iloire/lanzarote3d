@@ -275,10 +275,9 @@ class IslandFlyingApp extends TerrainBase {
       const vehicle = new VehicleClass(vehicleConfig);
       const loadResult = await vehicle.load();
 
-      // Handle different vehicle APIs:
-      // - Modern vehicles (Cessna, Jet, Airliner): load() returns void, call getMesh()
-      // - Legacy vehicles (Paraglider, Hangglider): load() returns mesh directly
-      const mesh = loadResult || (vehicle.getMesh ? vehicle.getMesh() : null);
+      // Get mesh - unified approach works for all vehicle types
+      // Both modern (SimpleThreeComponent) and legacy return mesh from load()
+      const mesh = loadResult;
 
       if (mesh) {
         // Random starting position around the island
