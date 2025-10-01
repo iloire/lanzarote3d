@@ -15,6 +15,7 @@ export interface VehicleLoadResult {
   flyingBehavior?: FlyingBehavior;
 }
 
+const DEBUG_VECTORS = true;
 /**
  * Loads paraglider vehicles into the scene
  */
@@ -74,6 +75,7 @@ export async function loadHangglider(
       autoStart: true,
       faceDirection: true,
       forwardAxis: config.forwardAxis,
+      debugVectors: DEBUG_VECTORS
     });
 
     flyingBehavior.attachTo(mesh);
@@ -129,6 +131,7 @@ export async function loadCessna(
       autoStart: true,
       faceDirection: true,
       forwardAxis: config.forwardAxis,
+      debugVectors: DEBUG_VECTORS
     });
 
     flyingBehavior.attachTo(mesh);
