@@ -220,9 +220,11 @@ class AnimationApp extends TerrainBase {
         this.targetController.setMode(CameraMode.Static);
 
         // Add all flying vehicles as targets
+        logger.info(`🎯 Adding ${this.paragliderMeshes.length} paraglider(s) to camera targets`);
         if (this.paragliderMeshes.length > 0) {
           this.paragliderMeshes.forEach((mesh, index) => {
             this.targetController?.addTarget(mesh, `🪂 Paraglider ${index + 1}`);
+            logger.info(`✅ Added Paraglider ${index + 1} as camera target`);
           });
         }
         if (this.cessnaMesh) {
