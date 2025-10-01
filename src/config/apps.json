@@ -175,15 +175,6 @@
       "visibility": "private",
       "priority": 20
     },
-    "flierpg": {
-      "name": "flier pg",
-      "description": "Workshop demo showcasing paraglider physics simulation with weather system",
-      "route": "/flier-pg",
-      "category": "demo",
-      "requiresWebGL": true,
-      "visibility": "private",
-      "priority": 21
-    },
     "animals": {
       "name": "Animals",
       "description": "Showcase of bird species with realistic wing animations including Crow, Eagle, and Vulture",
