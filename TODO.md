@@ -1,21 +1,9 @@
 Implement the following tasks if any is added following the instructions described below:
 ---
 TASKS:
-<<<<<<< HEAD
-- the dome is missing from the workshop application 
-=======
-<<<<<<< HEAD
+- the dome is missing from the workshop application
 - town square is great but make sure we don't put any buildings over it when generating the town
-=======
-- Migrate legacy vehicles to modern architecture (see docs/COMPONENT_COMPOSITION.md):
- -- Hangglider: Extend SimpleThreeComponent, override createObject() for async composition
- -- Paraglider: Same pattern as Hangglider
- -- ParagliderVoxel: Same pattern as Hangglider
- -- Tandem: Same pattern as Hangglider
- -- Update all to use getObject() instead of getMesh() for API consistency
 - make sure the Hercules plane is added to the planes application
->>>>>>> a8cece9 (docs: add comprehensive component composition architecture guide)
->>>>>>> 42bb1a3 (docs: add comprehensive component composition architecture guide)
 ---
 
 ### Instructions
