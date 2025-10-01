@@ -7,6 +7,7 @@ import ivanTextureImage from '../../../assets/foundation/models/characters/ivan/
 import { StoryOptions } from '../../shared/types';
 import { WorkshopDemoBase } from '../../shared/WorkshopDemoBase';
 import { logger } from '../../foundation/utils/logger';
+import GuiHelper from '../../foundation/utils/gui';
 
 /**
  * Paraglider Voxel Workshop Demo - Showcases voxel-style paraglider components
@@ -84,7 +85,12 @@ class ParagliderVoxelWorkshopApp extends WorkshopDemoBase {
         try {
           const paraglider = new ParagliderVoxel(paragliderOptions);
           const mesh = await paraglider.load();
-          paraglider.addGuiControls(gui);
+          if (gui) {
+        const mesh = paraglider.getObject();
+        if (mesh) {
+          GuiHelper.addLocationGui(gui, 'ParagliderVoxel', mesh);
+        }
+      }
 
           // Scale and position each paraglider
           mesh.scale.set(0.01, 0.01, 0.01);

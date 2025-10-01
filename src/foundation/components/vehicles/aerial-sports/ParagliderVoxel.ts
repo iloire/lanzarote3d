@@ -1,54 +1,64 @@
 import * as THREE from 'three';
-import { PilotVoxel, PilotVoxelOptions } from '../../characters/PilotVoxel';
+import { SimpleThreeComponent, SimpleComponentOptions } from '../../base/SimpleThreeComponent';
+import { ComponentMetadata } from '../../base/IThreeComponent';
+import LegacyPilotVoxel, { PilotVoxelOptions } from '../../characters/LegacyPilotVoxel';
 import Glider, { GliderOptions } from '../components/Glider';
-import GuiHelper from '../../../utils/gui';
-import { IVehicleWithGUI } from '../../../types/IVehicle';
 
-export interface ParagliderVoxelOptions {
+export interface ParagliderVoxelOptions extends SimpleComponentOptions {
   glider: GliderOptions;
   pilot: PilotVoxelOptions;
-  castShadow?: boolean;
-  receiveShadow?: boolean;
 }
 
 /**
  * ParagliderVoxel - voxel-style paraglider with simplified pilot
  *
- * This component composes both the glider wing and voxel pilot into a single assembly.
+ * This component uses Pattern B (SimpleThreeComponent + createObject override)
+ * for async composition of multiple sub-components (Glider + LegacyPilotVoxel).
  * Uses voxel-based (blocky/Minecraft-style) graphics for the pilot character.
- * Implements IVehicleWithGUI for consistent vehicle interface across the application.
  *
- * Note: This class doesn't extend a base component class because it's a composite
- * that assembles two different component types (Glider and PilotVoxel) with
- * different APIs. Instead, it implements the IVehicle interface for consistency.
+ * See docs/COMPONENT_COMPOSITION.md for architecture details.
  */
-export class ParagliderVoxel implements IVehicleWithGUI {
-  private mesh?: THREE.Object3D;
-  private glider!: Glider;
-  private pilot!: PilotVoxel;
-  private pilotMesh!: THREE.Object3D;
-  private options: ParagliderVoxelOptions;
+export class ParagliderVoxel extends SimpleThreeComponent {
+  private glider?: Glider;
+  private pilot?: LegacyPilotVoxel;
+  private pilotMesh?: THREE.Object3D;
 
   constructor(options: ParagliderVoxelOptions) {
-    this.options = options;
+    const metadata: ComponentMetadata = {
+      name: 'ParagliderVoxel',
+      version: '2.0.0',
+      description: 'Voxel-style paraglider with blocky pilot graphics',
+      tags: ['vehicle', 'aircraft', 'paraglider', 'aerial-sports', 'voxel', 'composite'],
+    };
+
+    super(metadata, options);
+  }
+
+  protected createGeometry(): THREE.BufferGeometry {
+    // Placeholder - not used since we override createObject for async composition
+    return new THREE.BoxGeometry(1, 1, 1);
   }
 
   /**
-   * Load and assemble the voxel paraglider
+   * Override createObject to compose async sub-components.
+   * This is Pattern B from COMPONENT_COMPOSITION.md - the standard pattern
+   * for vehicles that combine multiple loadable components.
    */
-  async load(): Promise<THREE.Object3D> {
-    this.mesh = new THREE.Object3D();
-    this.mesh.name = 'ParagliderVoxel';
+  protected override async createObject(): Promise<THREE.Object3D> {
+    const group = new THREE.Object3D();
+    group.name = 'ParagliderVoxel';
 
-    // Create glider wing
-    this.glider = new Glider(this.options.glider);
+    const options = this.options as ParagliderVoxelOptions;
+
+    // Create and load glider wing
+    this.glider = new Glider(options.glider);
     const wing = await this.glider.load();
     wing.translateY(-300);
     wing.translateX(300);
-    this.mesh.add(wing);
+    group.add(wing);
 
     // Create voxel pilot
-    this.pilot = new PilotVoxel(this.options.pilot);
+    this.pilot = new LegacyPilotVoxel(options.pilot);
     this.pilotMesh = await this.pilot.load();
     this.pilotMesh.position.x = 350;
     this.pilotMesh.position.y = -600;
@@ -56,36 +66,14 @@ export class ParagliderVoxel implements IVehicleWithGUI {
     const scale = 150;
     this.pilotMesh.scale.set(scale, scale, scale);
     this.pilotMesh.rotateY(Math.PI / 2);
-    this.mesh.add(this.pilotMesh);
+    group.add(this.pilotMesh);
 
-    return this.mesh;
+    return group;
   }
 
   /**
-   * Get the mesh
-   */
-  public getMesh(): THREE.Object3D {
-    if (!this.mesh) {
-      throw Error('mesh not loaded - use load()');
-    }
-    return this.mesh;
-  }
-
-  /**
-   * Add GUI controls for this paraglider
-   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public addGuiControls(gui: any): void {
-    if (!this.mesh) return;
-
-    if (this.pilotMesh) {
-      GuiHelper.addLocationGui(gui, 'Pilot model', this.pilotMesh);
-    }
-    GuiHelper.addLocationGui(gui, 'Paraglider model', this.mesh);
-  }
-
-  /**
-   * Control methods - delegate to glider
+   * Control methods - delegate to glider for brake inputs.
+   * These methods are called by ParagliderInputController.
    */
   public left(): void {
     if (this.glider) {
@@ -111,15 +99,52 @@ export class ParagliderVoxel implements IVehicleWithGUI {
     }
   }
 
-  /**
-   * Clean up resources
-   */
-  public dispose(): void {
+  public override validate(): string[] {
+    const issues: string[] = [];
+    const options = this.options as ParagliderVoxelOptions;
+
+    if (!options.glider) {
+      issues.push('Glider configuration is required');
+    }
+
+    if (!options.pilot) {
+      issues.push('Pilot configuration is required');
+    }
+
+    return issues;
+  }
+
+  public override dispose(): void {
+    // Dispose sub-components first
+    if (this.pilot) {
+      // LegacyPilotVoxel doesn't have dispose, just clear reference
+      this.pilot = undefined;
+    }
+    if (this.glider) {
+      // Glider doesn't have dispose, just clear reference
+      this.glider = undefined;
+    }
+
     // Clear references
-    this.mesh = undefined;
-    this.glider = undefined as any;
-    this.pilot = undefined as any;
-    this.pilotMesh = undefined as any;
+    this.pilotMesh = undefined;
+
+    // Call parent dispose
+    super.dispose();
+  }
+
+  public getInfo(): Record<string, unknown> {
+    const options = this.options as ParagliderVoxelOptions;
+
+    return {
+      name: 'ParagliderVoxel',
+      version: '2.0.0',
+      type: 'vehicle',
+      subtype: 'aircraft',
+      category: 'aerial_sports',
+      style: 'voxel',
+      gliderConfig: options.glider,
+      pilotConfig: options.pilot,
+    };
   }
 }
 
