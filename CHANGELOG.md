@@ -11,6 +11,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Three size options (small, medium, large) that scale house counts proportionally
   - Automatically maps town type to appropriate formation (village→random, rural→rural, suburban→suburban, town→street, city→grid)
   - Updated addHouses() to use addTown internally for better code reusability
+  - Updated famara application to use addTown helper directly instead of addHouses
   - Examples: addTown(center, terrain, { type: 'village', size: 'small' }) creates 5 houses in random formation
   - Examples: addTown(center, terrain, { type: 'city', size: 'large' }) creates 30 houses in grid formation
 
