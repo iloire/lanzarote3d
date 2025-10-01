@@ -2,6 +2,17 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## [1.5.9] - 2025-10-01 14:45 UTC
+
+### Fixed
+- **PilotVoxel Asset Resolution**: Fixed character asset resolution to happen before validateOptions is called
+  - Created static prepareOptions() method to resolve character assets before super() call
+  - Moved asset resolution from instance method to static method to avoid accessing undefined state
+  - Fixed validateOptions() to work correctly during construction when pilotOptions isn't set yet
+  - Updated paraglider-voxel app to use CharacterType enum instead of direct file imports
+  - Removed redundant manual asset imports in favor of CharacterRegistry
+  - Character switching now properly prepares options before reloading
+
 ## [1.5.8] - 2025-10-01 14:30 UTC
 
 ### Added

@@ -1,9 +1,6 @@
 import * as THREE from 'three';
 import { ParagliderVoxel } from '../../foundation/components/vehicles';
-import adriModel from '../../../assets/foundation/models/characters/adri/adri.obj';
-import adriTextureImage from '../../../assets/foundation/models/characters/adri/adri.png';
-import ivanModel from '../../../assets/foundation/models/characters/ivan/ivan.obj';
-import ivanTextureImage from '../../../assets/foundation/models/characters/ivan/ivan.png';
+import { CharacterType } from '../../foundation/components/characters/CharacterRegistry';
 import { StoryOptions } from '../../shared/types';
 import { WorkshopDemoBase } from '../../shared/WorkshopDemoBase';
 import { logger } from '../../foundation/utils/logger';
@@ -42,15 +39,13 @@ class ParagliderVoxelWorkshopApp extends WorkshopDemoBase {
       const characters = [
         {
           name: 'Adri',
-          objFile: adriModel,
-          textureFile: adriTextureImage,
+          characterType: CharacterType.ADRI,
           position: { x: -30, y: 0, z: 0 },
           wingColors: { color1: '#ff4444', color2: '#44ff44' },
         },
         {
           name: 'Ivan',
-          objFile: ivanModel,
-          textureFile: ivanTextureImage,
+          characterType: CharacterType.IVAN,
           position: { x: 30, y: 0, z: 0 },
           wingColors: { color1: '#4444ff', color2: '#ff44ff' },
         },
@@ -73,8 +68,7 @@ class ParagliderVoxelWorkshopApp extends WorkshopDemoBase {
         };
 
         const pilotOptions = {
-          objFile: char.objFile,
-          textureFile: char.textureFile,
+          characterType: char.characterType,
         };
 
         const paragliderOptions = {

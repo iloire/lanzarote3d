@@ -65,10 +65,32 @@ export class PilotVoxel extends AsyncThreeComponent {
       tags: ['character', 'pilot', 'voxel', 'model', 'async', 'multi-character'],
     };
 
-    super(metadata, options, callbacks);
+    // Prepare options with resolved assets BEFORE calling super (which calls validateOptions)
+    const preparedOptions = PilotVoxel.prepareOptions(options);
 
-    // Set default options first
-    this.pilotOptions = {
+    // Now call super with the prepared options
+    super(metadata, preparedOptions, callbacks);
+
+    // Set pilot options after super
+    this.pilotOptions = preparedOptions;
+
+    // Resolve character definition for later use
+    if (preparedOptions.characterType) {
+      this.characterDefinition = characterRegistry.getCharacter(preparedOptions.characterType);
+    }
+
+    // Apply character-specific defaults if available
+    if (this.characterDefinition) {
+      this.applyCharacterDefaults();
+    }
+  }
+
+  /**
+   * Static method to prepare options before construction
+   * This resolves character assets from the registry
+   */
+  private static prepareOptions(options: PilotVoxelOptions): PilotVoxelOptions {
+    const preparedOptions: PilotVoxelOptions = {
       characterType: CharacterType.ADRI, // Default character
       materialOptions: {
         roughness: 0.8,
@@ -88,95 +110,90 @@ export class PilotVoxel extends AsyncThreeComponent {
       ...options,
     };
 
-    // Resolve character definition and assets (this will update pilotOptions with objFile/textureFile)
-    this.resolveCharacterAssets(this.pilotOptions);
+    // Resolve character assets
+    logger.info(`🔍 Resolving character assets. CharacterType: ${preparedOptions.characterType}`);
 
-    // Apply character-specific defaults if available
-    if (this.characterDefinition) {
-      this.applyCharacterDefaults();
-    }
+    if (preparedOptions.characterType) {
+      const characterDefinition = characterRegistry.getCharacter(preparedOptions.characterType);
 
-    // Validate required options
-    this.validateOptions();
-  }
+      if (characterDefinition) {
+        logger.info(`🎭 Using character: ${characterDefinition.name} (${characterDefinition.id})`);
 
-  /**
-   * Resolve character assets from character type or manual paths
-   */
-  private resolveCharacterAssets(options: PilotVoxelOptions): void {
-    logger.info(`🔍 Resolving character assets. CharacterType: ${options.characterType}`);
-    logger.info(`🔍 Registry has ${characterRegistry ? 'INITIALIZED' : 'NOT INITIALIZED'}`);
+        const assets = characterDefinition.assets;
+        logger.info(`🔍 Character assets: ${assets ? 'FOUND' : 'MISSING'}`);
 
-    if (options.characterType) {
-      // Use character registry
-      this.characterDefinition = characterRegistry.getCharacter(options.characterType);
+        if (assets) {
+          logger.info(`   - objFile: ${assets.objFile || 'MISSING'}`);
+          logger.info(`   - textureFile: ${assets.textureFile || 'MISSING'}`);
 
-      logger.info(`🔍 Character definition found: ${this.characterDefinition ? 'YES' : 'NO'}`);
+          // Get selected model and texture
+          const objFile = PilotVoxel.getSelectedModelStatic(
+            assets,
+            preparedOptions.useAlternativeModel
+          );
+          const textureFile = PilotVoxel.getSelectedTextureStatic(
+            assets,
+            preparedOptions.useAlternativeTexture
+          );
 
-      if (!this.characterDefinition) {
+          if (!objFile || !textureFile) {
+            throw new Error(
+              `Character ${characterDefinition.name} has incomplete assets (objFile: ${!!objFile}, textureFile: ${!!textureFile})`
+            );
+          }
+
+          logger.info(`✅ Assets resolved - objFile: ${objFile}, textureFile: ${textureFile}`);
+
+          preparedOptions.objFile = objFile;
+          preparedOptions.textureFile = textureFile;
+        }
+      } else {
         console.warn(
-          `Character type ${options.characterType} not found in registry, falling back to manual assets`
+          `Character type ${preparedOptions.characterType} not found in registry, falling back to manual assets`
         );
-        return;
       }
-
-      logger.info(
-        `🎭 Using character: ${this.characterDefinition.name} (${this.characterDefinition.id})`
-      );
-
-      // Set asset paths from character definition
-      const assets = this.characterDefinition.assets;
-      this.pilotOptions = {
-        ...options,
-        objFile: this.getSelectedModel(assets),
-        textureFile: this.getSelectedTexture(assets),
-      };
-    } else if (options.objFile && options.textureFile) {
-      // Use manual asset paths
-      logger.info('🎭 Using manual asset paths for PilotVoxel');
-    } else {
-      // No character specified, use default
+    } else if (!preparedOptions.objFile || !preparedOptions.textureFile) {
+      // No character type and no manual assets - use default
       logger.info('🎭 No character specified, using default character (Adri)');
-      this.characterDefinition = characterRegistry.getCharacter(CharacterType.ADRI);
-      if (this.characterDefinition) {
-        const assets = this.characterDefinition.assets;
-        this.pilotOptions = {
-          ...options,
-          characterType: CharacterType.ADRI,
-          objFile: assets.objFile,
-          textureFile: assets.textureFile,
-        };
+      const defaultChar = characterRegistry.getCharacter(CharacterType.ADRI);
+      if (defaultChar) {
+        preparedOptions.characterType = CharacterType.ADRI;
+        preparedOptions.objFile = defaultChar.assets.objFile;
+        preparedOptions.textureFile = defaultChar.assets.textureFile;
       }
     }
+
+    return preparedOptions;
   }
 
   /**
-   * Get selected model based on options
+   * Static helper to get selected model
    */
-  private getSelectedModel(assets: CharacterAssets): string {
-    if (this.pilotOptions.useAlternativeModel !== undefined && assets.alternativeModels) {
-      const altIndex = Math.min(
-        this.pilotOptions.useAlternativeModel,
-        assets.alternativeModels.length - 1
-      );
+  private static getSelectedModelStatic(
+    assets: CharacterAssets,
+    useAlternativeModel?: number
+  ): string {
+    if (useAlternativeModel !== undefined && assets.alternativeModels) {
+      const altIndex = Math.min(useAlternativeModel, assets.alternativeModels.length - 1);
       return assets.alternativeModels[altIndex];
     }
     return assets.objFile;
   }
 
   /**
-   * Get selected texture based on options
+   * Static helper to get selected texture
    */
-  private getSelectedTexture(assets: CharacterAssets): string {
-    if (this.pilotOptions.useAlternativeTexture !== undefined && assets.alternativeTextures) {
-      const altIndex = Math.min(
-        this.pilotOptions.useAlternativeTexture,
-        assets.alternativeTextures.length - 1
-      );
+  private static getSelectedTextureStatic(
+    assets: CharacterAssets,
+    useAlternativeTexture?: number
+  ): string {
+    if (useAlternativeTexture !== undefined && assets.alternativeTextures) {
+      const altIndex = Math.min(useAlternativeTexture, assets.alternativeTextures.length - 1);
       return assets.alternativeTextures[altIndex];
     }
     return assets.textureFile;
   }
+
 
   /**
    * Apply character-specific defaults
@@ -202,10 +219,16 @@ export class PilotVoxel extends AsyncThreeComponent {
    * Validate options and requirements
    */
   protected override validateOptions(): void {
-    if (!this.pilotOptions.objFile) {
+    // Use _options from parent class since pilotOptions isn't set yet during super() call
+    const options = (this.pilotOptions || this._options) as PilotVoxelOptions;
+
+    if (!options) {
+      throw new Error('PilotVoxel requires options');
+    }
+    if (!options.objFile) {
       throw new Error('PilotVoxel requires objFile option or characterType');
     }
-    if (!this.pilotOptions.textureFile) {
+    if (!options.textureFile) {
       throw new Error('PilotVoxel requires textureFile option or characterType');
     }
   }
@@ -534,25 +557,26 @@ export class PilotVoxel extends AsyncThreeComponent {
   ): Promise<THREE.Object3D> {
     logger.info(`🔄 Switching character to: ${characterType}`);
 
-    // Update options with new character
-    const newOptions: PilotVoxelOptions = {
-      ...this.pilotOptions,
-      characterType,
-      ...options,
-    };
-
     // Dispose current object
     this.dispose();
 
-    // Re-initialize with new character
-    this.resolveCharacterAssets(newOptions);
+    // Prepare new options with resolved assets
+    const newOptions = PilotVoxel.prepareOptions({
+      ...this.pilotOptions,
+      characterType,
+      ...options,
+    });
+
     this.pilotOptions = newOptions;
+
+    // Update character definition
+    if (newOptions.characterType) {
+      this.characterDefinition = characterRegistry.getCharacter(newOptions.characterType);
+    }
 
     if (this.characterDefinition) {
       this.applyCharacterDefaults();
     }
-
-    this.validateOptions();
 
     // Reload with new character
     return await this.load();
