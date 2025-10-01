@@ -17,7 +17,6 @@ export {
 export type { CharacterDefinition, CharacterAssets } from './CharacterRegistry';
 
 // Legacy character components (will be gradually replaced)
-export { default as LegacyPilotVoxel } from './LegacyPilotVoxel';
 export { default as TandemPilot } from './TandemPilot';
 export { default as CocoonHarness } from './CocoonHarness';
 

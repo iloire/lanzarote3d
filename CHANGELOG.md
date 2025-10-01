@@ -2,6 +2,27 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## [1.5.7] - 2025-10-01 13:17 UTC
+
+### Refactored
+- **Remove LegacyPilotVoxel**: Replaced legacy implementation with modern AsyncThreeComponent-based PilotVoxel
+  - Updated ParagliderVoxel to use modern PilotVoxel instead of LegacyPilotVoxel
+  - Changed import from LegacyPilotVoxel to PilotVoxel in ParagliderVoxel.ts
+  - Updated type references and instance variables to use PilotVoxel
+  - Removed LegacyPilotVoxel.ts file (44 lines removed)
+  - Removed LegacyPilotVoxel export from characters/index.ts
+  - Modern PilotVoxel provides better architecture with async loading, resource management, character registry support, and proper lifecycle management
+
+### Fixed
+- **SubmarineHarness Scaling**: Made all dimensions proportional to DEFAULT_HEIGHT parameter for dynamic resizing
+  - Changed DEFAULT_HEIGHT from 450 to 200 for shorter, sleeker profile
+  - Changed DEFAULT_DEPTH from 800 to 1200 for longer pod-like appearance
+  - All Y positions now calculated relative to height parameter (centerY = -height * 2.0)
+  - All geometry sizes use proportional multipliers (width * 0.13, height * 0.32, depth * 0.0625, etc)
+  - Lowered center position to -height * 2.0 to make pilot head more visible above harness
+  - Harness now properly scales when DEFAULT_HEIGHT is adjusted
+  - Window sizes, fins, panels, carabiners, and thruster all scale proportionally
+
 ## [1.5.6] - 2025-10-01 13:05 UTC
 
 ### Fixed
