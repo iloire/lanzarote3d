@@ -52,24 +52,28 @@ export class Pilot extends SimpleThreeComponent {
   private static readonly BREAK_Y_MOVE = 180; // mm
 
   constructor(options: PilotOptions = {}) {
-    super({
-      name: 'Pilot',
-      version: '1.0.0',
-      headType: PilotHeadType.Default,
-      helmetType: HelmetType.Default,
-      helmetColor: '#ffffff',
-      skinColor: '#e0bea5',
-      suitColor: '#ff0000',
-      suitColor2: '#cc0000',
-      shoesColor: '#333333',
-      carabinerColor: '#666666',
-      carabinerSeparationMM: 300,
-      showHead: true,
-      harnessType: HarnessType.Cocoon,
-      harnessColor1: '#333',
-      harnessColor2: '#666',
-      ...options,
-    });
+    super(
+      {
+        name: 'Pilot',
+        version: '1.0.0',
+      },
+      {
+        headType: PilotHeadType.Default,
+        helmetType: HelmetType.Default,
+        helmetColor: '#ffffff',
+        skinColor: '#e0bea5',
+        suitColor: '#ff0000',
+        suitColor2: '#cc0000',
+        shoesColor: '#333333',
+        carabinerColor: '#666666',
+        carabinerSeparationMM: 300,
+        showHead: true,
+        harnessType: HarnessType.Cocoon,
+        harnessColor1: '#333',
+        harnessColor2: '#666',
+        ...options,
+      }
+    );
   }
 
   protected createGeometry(): THREE.BufferGeometry {

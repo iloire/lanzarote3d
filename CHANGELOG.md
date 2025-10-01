@@ -2,6 +2,16 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## [1.5.6] - 2025-10-01 13:05 UTC
+
+### Fixed
+- **Pilot Options Not Applied**: Fixed Pilot constructor to properly pass metadata and options as separate parameters
+  - Changed super() call from single object to two parameters: metadata and options
+  - Metadata object now contains only name and version
+  - Options object contains all Pilot-specific configuration including headType, helmetType, harnessType, colors, etc.
+  - Options spreading (...options) now correctly overrides defaults
+  - Pilot showcase now properly displays different head types, helmet types, and harness types for each pilot
+
 ## [1.5.5] - 2025-10-01 13:01 UTC
 
 ### Refactored
