@@ -1,62 +1,76 @@
 import * as THREE from 'three';
+import { SimpleThreeComponent, SimpleComponentOptions } from '../../base/SimpleThreeComponent';
+import { ComponentMetadata } from '../../base/IThreeComponent';
 import { Pilot, type PilotOptions } from '../../characters/Pilot';
 import HangGliderWing from '../components/HangGliderWing';
-import GuiHelper from '../../../utils/gui';
-import { IVehicleWithGUI } from '../../../types/IVehicle';
 
-export interface HanggliderOptions {
+export interface HanggliderOptions extends SimpleComponentOptions {
   pilotOptions?: PilotOptions;
   wingColor?: string;
   wingspan?: number;
   scale?: number;
-  castShadow?: boolean;
-  receiveShadow?: boolean;
 }
 
 /**
- * Hangglider component - combines wing and pilot
+ * Hangglider - combines wing and pilot into a single aircraft
  *
- * This component composes both the hangglider wing and pilot character into a single assembly.
- * Implements IVehicleWithGUI for consistent vehicle interface across the application.
+ * This component uses Pattern B (SimpleThreeComponent + createObject override)
+ * for async composition of multiple sub-components (HangGliderWing + Pilot).
  *
- * Note: This class doesn't extend a base component class because it's a composite
- * that assembles two different component types (HangGliderWing and Pilot) with
- * different configurations. Instead, it implements the IVehicle interface for consistency.
- * Use FlyingBehavior when autonomous flight is needed.
+ * See docs/COMPONENT_COMPOSITION.md for architecture details.
  */
-export class Hangglider implements IVehicleWithGUI {
-  private mesh?: THREE.Group;
-  private wing!: HangGliderWing;
-  private pilot!: Pilot;
-  private pilotMesh!: THREE.Object3D;
-  private options: HanggliderOptions;
+export class Hangglider extends SimpleThreeComponent {
+  private wing?: HangGliderWing;
+  private pilot?: Pilot;
+  private pilotMesh?: THREE.Object3D;
 
   constructor(options: HanggliderOptions = {}) {
-    this.options = options;
+    const metadata: ComponentMetadata = {
+      name: 'Hangglider',
+      version: '2.0.0',
+      description: 'Recreational hangglider with pilot in prone flying position',
+      tags: ['vehicle', 'aircraft', 'hangglider', 'aerial-sports', 'composite'],
+    };
+
+    super(metadata, {
+      wingColor: '#FF6B35', // Orange
+      wingspan: 100,
+      scale: 1,
+      ...options,
+    });
+  }
+
+  protected createGeometry(): THREE.BufferGeometry {
+    // Placeholder - not used since we override createObject for async composition
+    return new THREE.BoxGeometry(1, 1, 1);
   }
 
   /**
-   * Load and assemble the hangglider
+   * Override createObject to compose async sub-components.
+   * This is Pattern B from COMPONENT_COMPOSITION.md - the standard pattern
+   * for vehicles that combine multiple loadable components.
    */
-  async load(): Promise<THREE.Group> {
+  protected override async createObject(): Promise<THREE.Object3D> {
     const group = new THREE.Group();
     group.name = 'Hangglider';
 
-    // Create wing
+    const options = this.options as HanggliderOptions;
+
+    // Create and load wing component
     this.wing = new HangGliderWing({
-      wingColor: this.options.wingColor,
-      wingspan: this.options.wingspan,
+      wingColor: options.wingColor,
+      wingspan: options.wingspan,
     });
     const wingMesh = await this.wing.load();
     wingMesh.position.y = 10;
     wingMesh.position.x = -40;
     group.add(wingMesh);
 
-    // Create pilot
+    // Create and load pilot component
     this.pilot = new Pilot({
       castShadow: this.options.castShadow,
       receiveShadow: this.options.receiveShadow,
-      ...this.options.pilotOptions,
+      ...options.pilotOptions,
     });
     this.pilotMesh = await this.pilot.load();
     const pilotScale = 0.03;
@@ -70,63 +84,83 @@ export class Hangglider implements IVehicleWithGUI {
     group.rotateY(-Math.PI / 2 + Math.PI);
 
     // Apply scale
-    const scale = this.options.scale || 1;
+    const scale = options.scale || 1;
     if (scale !== 1) {
       group.scale.set(scale, scale, scale);
     }
 
-    // Apply shadow settings
-    if (this.options.castShadow !== undefined || this.options.receiveShadow !== undefined) {
-      group.traverse((child: THREE.Object3D) => {
-        if (child instanceof THREE.Mesh) {
-          if (this.options.castShadow !== undefined) child.castShadow = this.options.castShadow;
-          if (this.options.receiveShadow !== undefined) child.receiveShadow = this.options.receiveShadow;
-        }
-      });
-    }
+    // Apply shadow settings via helper method from base class
+    this.applyShadows(group);
 
-    this.mesh = group;
     return group;
   }
 
-  /**
-   * Get the mesh
-   */
-  public getMesh(): THREE.Group {
-    if (!this.mesh) {
-      throw Error('mesh not loaded - use load()');
+  public override validate(): string[] {
+    const issues: string[] = [];
+    const options = this.options as HanggliderOptions;
+
+    if (options.scale && options.scale <= 0) {
+      issues.push('Scale must be greater than 0');
     }
-    return this.mesh;
+
+    if (options.wingspan && options.wingspan <= 0) {
+      issues.push('Wingspan must be greater than 0');
+    }
+
+    return issues;
   }
 
-  /**
-   * Add GUI controls for this hangglider
-   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public addGuiControls(gui: any): void {
-    if (!this.mesh) return;
-
-    if (this.pilotMesh) {
-      GuiHelper.addLocationGui(gui, 'Hangglider pilot', this.pilotMesh);
-    }
-    GuiHelper.addLocationGui(gui, 'Hangglider', this.mesh);
-  }
-
-  /**
-   * Clean up resources
-   */
-  public dispose(): void {
+  public override dispose(): void {
+    // Dispose sub-components first
     if (this.pilot) {
       this.pilot.dispose();
     }
     if (this.wing) {
       this.wing.dispose();
     }
+
     // Clear references
-    this.mesh = undefined;
-    this.wing = undefined as any;
-    this.pilot = undefined as any;
-    this.pilotMesh = undefined as any;
+    this.wing = undefined;
+    this.pilot = undefined;
+    this.pilotMesh = undefined;
+
+    // Call parent dispose
+    super.dispose();
+  }
+
+  /**
+   * Add GUI controls for this hangglider
+   * Part of IVehicleWithGUI interface for compatibility
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public addGuiControls(gui: any): void {
+    const object = this.getObject();
+    if (!object) return;
+
+    if (this.pilotMesh) {
+      // Add pilot controls if gui helper is available
+      const GuiHelper = require('../../../utils/gui').default;
+      GuiHelper.addLocationGui(gui, 'Hangglider pilot', this.pilotMesh);
+    }
+
+    // Add main hangglider controls
+    const GuiHelper = require('../../../utils/gui').default;
+    GuiHelper.addLocationGui(gui, 'Hangglider', object);
+  }
+
+  public getInfo(): Record<string, unknown> {
+    const options = this.options as HanggliderOptions;
+
+    return {
+      name: 'Hangglider',
+      version: '2.0.0',
+      type: 'vehicle',
+      subtype: 'aircraft',
+      category: 'aerial_sports',
+      wingColor: options.wingColor,
+      wingspan: options.wingspan,
+      scale: options.scale,
+    };
   }
 }
 
