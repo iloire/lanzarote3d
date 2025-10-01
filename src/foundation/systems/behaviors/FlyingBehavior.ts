@@ -757,6 +757,13 @@ export class FlyingBehavior {
   }
 
   /**
+   * Get the current velocity vector
+   */
+  public getVelocity(): THREE.Vector3 {
+    return this.currentVelocity.clone();
+  }
+
+  /**
    * Update the center point for flight patterns
    */
   public updateCenterPoint(point: THREE.Vector3): void {

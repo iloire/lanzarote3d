@@ -7,6 +7,8 @@ import { TerrainBase } from '../../shared/TerrainBase';
 import { OrbitControlsHelper } from '../../foundation/utils/OrbitControlsHelper';
 import { getAppConfig } from '../../config/app-registry';
 import { FlyingBehavior } from '../../foundation/systems/behaviors/FlyingBehavior';
+import { CameraTargetController, CameraMode } from '../../foundation/systems/scene/CameraTargetController';
+import { createCameraTargetUI } from '../../foundation/components/ui/CameraTargetUI';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { ProceduralRoad } from '../../foundation/components/scenery';
 import { logger } from '../../foundation/utils/logger';
@@ -18,6 +20,7 @@ import {
   SHOW_HANGGLIDER,
   SHOW_CESSNA,
   SHOW_HERCULES,
+  SHOW_CAMERA_TARGET_UI,
   ANIMATION_DURATION_MS,
   birdPath,
 } from './config';
@@ -49,6 +52,9 @@ class AnimationApp extends TerrainBase {
   private hanggliderFlyingBehavior: FlyingBehavior | undefined;
   private cessnaFlyingBehavior: FlyingBehavior | undefined;
   private herculesFlyingBehavior: FlyingBehavior | undefined;
+  private cessnaSmokeTrail: any | undefined;
+  private herculesSmokeTrail: any | undefined;
+  private targetController: CameraTargetController | null = null;
 
   constructor() {
     const appConfig = getAppConfig('animation');
@@ -131,6 +137,7 @@ class AnimationApp extends TerrainBase {
         if (cessnaResult) {
           this.cessnaMesh = cessnaResult.mesh;
           this.cessnaFlyingBehavior = cessnaResult.flyingBehavior;
+          this.cessnaSmokeTrail = cessnaResult.smokeTrail;
         }
       }
 
@@ -145,6 +152,7 @@ class AnimationApp extends TerrainBase {
         if (herculesResult) {
           this.herculesMesh = herculesResult.mesh;
           this.herculesFlyingBehavior = herculesResult.flyingBehavior;
+          this.herculesSmokeTrail = herculesResult.smokeTrail;
         }
       }
 
@@ -197,6 +205,35 @@ class AnimationApp extends TerrainBase {
 
       await this.environment.addBirds(birdPath);
 
+      // Setup Camera Target Controller if enabled
+      if (SHOW_CAMERA_TARGET_UI) {
+        this.targetController = new CameraTargetController(
+          camera.fov,
+          (camera as THREE.PerspectiveCamera).aspect,
+          camera.near,
+          camera.far
+        );
+        this.targetController.position.copy(camera.position);
+        this.targetController.rotation.copy(camera.rotation);
+
+        // Set to Static mode by default
+        this.targetController.setMode(CameraMode.Static);
+
+        // Add all flying vehicles as targets
+        if (this.cessnaMesh) {
+          this.targetController.addTarget(this.cessnaMesh, '✈️ Cessna');
+        }
+        if (this.herculesMesh) {
+          this.targetController.addTarget(this.herculesMesh, '✈️ Hercules');
+        }
+        if (this.hanggliderMesh) {
+          this.targetController.addTarget(this.hanggliderMesh, '🪂 Hangglider');
+        }
+
+        // Create UI for camera controls
+        createCameraTargetUI(this.targetController, controls);
+      }
+
       // Setup camera animation sequence
       this.setupCameraAnimation(camera, controls, renderer, scene);
 
@@ -245,19 +282,59 @@ class AnimationApp extends TerrainBase {
     controls: OrbitControls
   ): void {
     const startTime = Date.now();
+    let lastTime = Date.now();
 
     const animate = () => {
       try {
+        // Calculate deltaTime
+        const currentTime = Date.now();
+        const deltaTime = (currentTime - lastTime) / 1000; // Convert to seconds
+        lastTime = currentTime;
+
         // Update performance monitoring
         this.updatePerformance();
 
-        // Apply floating motion
-        applyFloatingMotion(camera, startTime, this.isAnimating);
+        // Update Camera Target Controller if enabled
+        if (this.targetController) {
+          this.targetController.update(deltaTime);
+        }
+
+        // Apply floating motion (only if not using camera controller)
+        if (!this.targetController) {
+          applyFloatingMotion(camera, startTime, this.isAnimating);
+        }
 
         // Update controls for damping to work
         OrbitControlsHelper.update(controls);
 
-        renderer.render(scene, camera);
+        // Update smoke trails
+        if (this.cessnaSmokeTrail && this.cessnaMesh && this.cessnaFlyingBehavior) {
+          const velocity = this.cessnaFlyingBehavior.getVelocity();
+          // Get engine position (front of the plane)
+          const enginePos = new THREE.Vector3();
+          this.cessnaMesh.getWorldPosition(enginePos);
+          // Offset to engine exhaust position (behind the engine)
+          const direction = new THREE.Vector3(1, 0, 0); // Forward direction
+          direction.applyQuaternion(this.cessnaMesh.quaternion);
+          enginePos.sub(direction.multiplyScalar(3)); // Offset behind
+
+          this.cessnaSmokeTrail.update(deltaTime, enginePos, velocity);
+        }
+
+        if (this.herculesSmokeTrail && this.herculesMesh && this.herculesFlyingBehavior) {
+          const velocity = this.herculesFlyingBehavior.getVelocity();
+          const enginePos = new THREE.Vector3();
+          this.herculesMesh.getWorldPosition(enginePos);
+          const direction = new THREE.Vector3(1, 0, 0);
+          direction.applyQuaternion(this.herculesMesh.quaternion);
+          enginePos.sub(direction.multiplyScalar(5)); // Larger offset for bigger plane
+
+          this.herculesSmokeTrail.update(deltaTime, enginePos, velocity);
+        }
+
+        // Render with appropriate camera
+        const renderCamera = this.targetController || camera;
+        renderer.render(scene, renderCamera);
         this.animationId = requestAnimationFrame(animate);
       } catch (error) {
         this.handleError(error as Error, 'animation loop');
@@ -293,10 +370,22 @@ class AnimationApp extends TerrainBase {
       this.cessnaFlyingBehavior = undefined;
     }
 
+    // Dispose Cessna smoke trail
+    if (this.cessnaSmokeTrail) {
+      this.cessnaSmokeTrail.dispose();
+      this.cessnaSmokeTrail = undefined;
+    }
+
     // Stop Hercules flying behavior
     if (this.herculesFlyingBehavior) {
       this.herculesFlyingBehavior.dispose();
       this.herculesFlyingBehavior = undefined;
+    }
+
+    // Dispose Hercules smoke trail
+    if (this.herculesSmokeTrail) {
+      this.herculesSmokeTrail.dispose();
+      this.herculesSmokeTrail = undefined;
     }
 
     // Stop animator if running

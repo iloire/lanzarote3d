@@ -13,6 +13,7 @@ import {
   FlyingBehavior,
   FlightPattern,
 } from '../../foundation/systems/behaviors/FlyingBehavior';
+import { SmokeTrail } from '../../foundation/components/effects/SmokeTrail';
 import { CameraTargetController, CameraMode } from '../../foundation/systems/scene/CameraTargetController';
 import { createCameraTargetUI } from '../../foundation/components/ui/CameraTargetUI';
 
@@ -20,6 +21,7 @@ interface FlyingVehicle {
   mesh: THREE.Object3D;
   behavior: FlyingBehavior;
   type: string;
+  smokeTrail?: SmokeTrail;
 }
 
 /**
@@ -166,7 +168,7 @@ class IslandFlyingApp extends TerrainBase {
           {
             altitude: 800 + Math.random() * 400,
             radius: 2000 + Math.random() * 3000,
-            speed: 3 + Math.random() * 2,
+            speed: 25 + Math.random() * 15,
           }
         );
       }
@@ -187,7 +189,7 @@ class IslandFlyingApp extends TerrainBase {
           {
             altitude: 700 + Math.random() * 400,
             radius: 2500 + Math.random() * 3000,
-            speed: 4 + Math.random() * 2,
+            speed: 30 + Math.random() * 15,
           }
         );
       }
@@ -207,7 +209,7 @@ class IslandFlyingApp extends TerrainBase {
           {
             altitude: 1000 + Math.random() * 500,
             radius: 3000 + Math.random() * 4000,
-            speed: 5 + Math.random() * 3,
+            speed: 40 + Math.random() * 20,
           }
         );
       }
@@ -227,7 +229,7 @@ class IslandFlyingApp extends TerrainBase {
           {
             altitude: 1200 + Math.random() * 600,
             radius: 4000 + Math.random() * 5000,
-            speed: 8 + Math.random() * 4,
+            speed: 60 + Math.random() * 30,
           }
         );
       }
@@ -247,7 +249,7 @@ class IslandFlyingApp extends TerrainBase {
           {
             altitude: 1500 + Math.random() * 800,
             radius: 5000 + Math.random() * 6000,
-            speed: 10 + Math.random() * 5,
+            speed: 80 + Math.random() * 40,
           }
         );
       }
@@ -304,7 +306,16 @@ class IslandFlyingApp extends TerrainBase {
         behavior.attachTo(mesh);
         behavior.start();
 
-        this.vehicles.push({ mesh, behavior, type });
+        // Add smoke trail for aircraft (not paragliders/hanggliders)
+        let smokeTrail: SmokeTrail | undefined;
+        if (type === 'Cessna' || type === 'Jet' || type === 'Airliner') {
+          const smokeConfig = this.getSmokeTrailConfig(type);
+          smokeTrail = new SmokeTrail(smokeConfig);
+          scene.add(smokeTrail.getGroup());
+          smokeTrail.setEnabled(true);
+        }
+
+        this.vehicles.push({ mesh, behavior, type, smokeTrail });
 
         // Add to camera targets with emoji and type
         const emoji = this.getVehicleEmoji(type);
@@ -334,18 +345,78 @@ class IslandFlyingApp extends TerrainBase {
     return emojis[type] || '✈️';
   }
 
+  /**
+   * Get smoke trail configuration for aircraft type
+   */
+  private getSmokeTrailConfig(type: string): any {
+    const configs: Record<string, any> = {
+      Cessna: {
+        emissionRate: 4,
+        particleLifetime: 5,
+        initialSize: 20,
+        finalSize: 100,
+        color: new THREE.Color(0xdddddd),
+        maxParticles: 100,
+        turbulence: 15,
+      },
+      Jet: {
+        emissionRate: 6,
+        particleLifetime: 6,
+        initialSize: 30,
+        finalSize: 120,
+        color: new THREE.Color(0xcccccc),
+        maxParticles: 120,
+        turbulence: 20,
+      },
+      Airliner: {
+        emissionRate: 8,
+        particleLifetime: 7,
+        initialSize: 40,
+        finalSize: 150,
+        color: new THREE.Color(0xcccccc),
+        maxParticles: 150,
+        turbulence: 25,
+      },
+    };
+    return configs[type] || configs.Cessna;
+  }
+
   private startAnimationLoop(
     renderer: THREE.WebGLRenderer,
     scene: THREE.Scene,
     controls: any
   ): void {
+    let lastTime = Date.now();
+
     const animate = () => {
       try {
+        // Calculate deltaTime
+        const currentTime = Date.now();
+        const deltaTime = (currentTime - lastTime) / 1000;
+        lastTime = currentTime;
+
         this.updatePerformance();
 
         // Update camera controller
         if (this.targetController) {
           this.targetController.update(0.016);
+        }
+
+        // Update smoke trails for aircraft
+        for (const vehicle of this.vehicles) {
+          if (vehicle.smokeTrail && vehicle.mesh && vehicle.behavior) {
+            const velocity = vehicle.behavior.getVelocity();
+            const enginePos = new THREE.Vector3();
+            vehicle.mesh.getWorldPosition(enginePos);
+
+            // Offset to engine exhaust (behind the aircraft)
+            const direction = new THREE.Vector3(1, 0, 0);
+            direction.applyQuaternion(vehicle.mesh.quaternion);
+            const offset = vehicle.type === 'Airliner' ? 100 : vehicle.type === 'Jet' ? 80 : 60;
+            enginePos.sub(direction.multiplyScalar(offset));
+
+            vehicle.smokeTrail.update(deltaTime, enginePos, velocity);
+          }
         }
 
         // FlyingBehavior updates itself via its own animation loop
@@ -374,9 +445,12 @@ class IslandFlyingApp extends TerrainBase {
       this.animationId = undefined;
     }
 
-    // Stop all flying behaviors to prevent memory leaks
+    // Stop all flying behaviors and dispose smoke trails to prevent memory leaks
     for (const vehicle of this.vehicles) {
       vehicle.behavior.stop();
+      if (vehicle.smokeTrail) {
+        vehicle.smokeTrail.dispose();
+      }
     }
     this.vehicles = [];
 

@@ -4,6 +4,7 @@ import { Hangglider } from '../../foundation/components/vehicles';
 import { Cessna } from '../../foundation/components/vehicles';
 import { Hercules } from '../../foundation/components/vehicles';
 import { FlyingBehavior } from '../../foundation/systems/behaviors/FlyingBehavior';
+import { SmokeTrail } from '../../foundation/components/effects/SmokeTrail';
 import { logger } from '../../foundation/utils/logger';
 import type {
   ParagliderVoxelConfig,
@@ -15,6 +16,7 @@ import type {
 export interface VehicleLoadResult {
   mesh: THREE.Object3D;
   flyingBehavior?: FlyingBehavior;
+  smokeTrail?: SmokeTrail;
 }
 
 const DEBUG_VECTORS = true;
@@ -177,15 +179,29 @@ export async function loadCessna(
 
     flyingBehavior.attachTo(mesh);
 
+    // Create smoke trail
+    const smokeTrail = new SmokeTrail({
+      emissionRate: 4,
+      particleLifetime: 5,
+      initialSize: 1,
+      finalSize: 5,
+      color: new THREE.Color(0xdddddd),
+      maxParticles: 100,
+      turbulence: 0.6,
+      enabled: false, // Will be enabled when flying starts
+    });
+    scene.add(smokeTrail.getGroup());
+
     // Start flying behavior after animation completes
     setTimeout(() => {
       flyingBehavior.start();
-      logger.info('✈️ Flying behavior started for Cessna');
+      smokeTrail.setEnabled(true);
+      logger.info('✈️ Flying behavior and smoke trail started for Cessna');
     }, animationDurationMs + 3000); // Start 3 seconds after animation ends
 
-    logger.info('✅ Cessna loaded successfully with flying behavior');
+    logger.info('✅ Cessna loaded successfully with flying behavior and smoke trail');
 
-    return { mesh, flyingBehavior };
+    return { mesh, flyingBehavior, smokeTrail };
   } catch (error) {
     errorHandler(error as Error, 'loading Cessna');
     return null;
@@ -235,15 +251,29 @@ export async function loadHercules(
 
     flyingBehavior.attachTo(mesh);
 
+    // Create smoke trail for Hercules (larger aircraft, more smoke)
+    const smokeTrail = new SmokeTrail({
+      emissionRate: 6,
+      particleLifetime: 6,
+      initialSize: 1.5,
+      finalSize: 7,
+      color: new THREE.Color(0xcccccc),
+      maxParticles: 120,
+      turbulence: 0.8,
+      enabled: false, // Will be enabled when flying starts
+    });
+    scene.add(smokeTrail.getGroup());
+
     // Start flying behavior after animation completes
     setTimeout(() => {
       flyingBehavior.start();
-      logger.info('✈️ Flying behavior started for Hercules');
+      smokeTrail.setEnabled(true);
+      logger.info('✈️ Flying behavior and smoke trail started for Hercules');
     }, animationDurationMs + 4000); // Start 4 seconds after animation ends
 
-    logger.info('✅ Hercules loaded successfully with flying behavior');
+    logger.info('✅ Hercules loaded successfully with flying behavior and smoke trail');
 
-    return { mesh, flyingBehavior };
+    return { mesh, flyingBehavior, smokeTrail };
   } catch (error) {
     errorHandler(error as Error, 'loading Hercules');
     return null;
