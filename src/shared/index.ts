@@ -1,5 +1,5 @@
 import { StoryOptions } from './types';
-import { APP_REGISTRY, getRouteToStoryMap, AppMetadata } from '../config/app-registry';
+import { APP_REGISTRY, getRouteToStoryMap } from '../config/app-registry';
 import { logger } from '../foundation/utils/logger';
 
 // Export specialized base classes

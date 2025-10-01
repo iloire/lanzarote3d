@@ -23,7 +23,10 @@ export interface AppMetadata {
 }
 
 // Generate APP_REGISTRY from JSON (now flat structure under 'apps')
-export const APP_REGISTRY: Record<string, AppMetadata> = appsConfig.apps as Record<string, AppMetadata>;
+export const APP_REGISTRY: Record<string, AppMetadata> = appsConfig.apps as Record<
+  string,
+  AppMetadata
+>;
 
 /**
  * Get all apps in a specific category
@@ -58,8 +61,7 @@ export function getAppsByVisibility(
   visibility: 'public' | 'private' | 'hidden',
   category?: 'experience' | 'tool' | 'demo'
 ): AppMetadata[] {
-  let apps = getAllApps()
-    .filter(app => app.visibility === visibility);
+  let apps = getAllApps().filter(app => app.visibility === visibility);
   if (category) {
     apps = apps.filter(app => app.category === category);
   }
@@ -71,19 +73,16 @@ export function getAppsByVisibility(
  * In development: shows 'public' and 'private' apps
  * In production: shows only 'public' apps
  */
-export function getVisibleApps(
-  category?: 'experience' | 'tool' | 'demo'
-): AppMetadata[] {
+export function getVisibleApps(category?: 'experience' | 'tool' | 'demo'): AppMetadata[] {
   const isDevelopment =
     typeof window !== 'undefined' &&
     (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
-  let apps = getAllApps()
-    .filter(app => {
-      if (app.visibility === 'hidden') return false;
-      if (app.visibility === 'private') return isDevelopment;
-      return true; // public apps always visible
-    });
+  let apps = getAllApps().filter(app => {
+    if (app.visibility === 'hidden') return false;
+    if (app.visibility === 'private') return isDevelopment;
+    return true; // public apps always visible
+  });
 
   if (category) {
     apps = apps.filter(app => app.category === category);

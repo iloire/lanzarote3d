@@ -3,6 +3,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import Helpers from '../foundation/utils/helpers';
 import { AppBase, AppConfig } from './AppBase';
 import { StoryOptions } from './types';
+import Sky from '../foundation/components/environment/Sky';
 
 export interface WorkshopDemoConfig extends Omit<AppConfig, 'scene' | 'requiredComponents'> {
   requiredComponents?: string[]; // Allow custom required components
@@ -15,12 +16,14 @@ export interface WorkshopDemoConfig extends Omit<AppConfig, 'scene' | 'requiredC
   lighting?: {
     sunPosition?: number;
   };
-  helpers?: {
-    axes?: boolean; // Show axis helper with directional labels
-    grid?: boolean; // Show grid helper
-    lighting?: boolean; // Show lighting helpers (sun position, etc)
-    scale?: number; // Scale factor for helpers (default: 100)
-  } | boolean; // Can be boolean for simple enable/disable or object for granular control
+  helpers?:
+    | {
+        axes?: boolean; // Show axis helper with directional labels
+        grid?: boolean; // Show grid helper
+        lighting?: boolean; // Show lighting helpers (sun position, etc)
+        scale?: number; // Scale factor for helpers (default: 100)
+      }
+    | boolean; // Can be boolean for simple enable/disable or object for granular control
 }
 
 /**
@@ -80,7 +83,6 @@ export abstract class WorkshopDemoBase extends AppBase {
     // Create sky for lighting
     const sunPosition = config?.lighting?.sunPosition ?? 12;
     if (!options.sky) {
-      const Sky = require('../foundation/components/environment/Sky').default;
       const sky = new Sky(19, 3);
       sky.addToScene(scene);
       sky.updateSunPosition(sunPosition);
