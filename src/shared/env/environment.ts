@@ -306,8 +306,74 @@ class Environment {
     }
   }
 
+  /**
+   * Add a town with houses at a specific position
+   * @param center - Center position of the town
+   * @param terrain - Terrain mesh for height adaptation
+   * @param options - Configuration options for the town
+   */
+  async addTown(
+    center: THREE.Vector3,
+    terrain: THREE.Mesh,
+    options?: {
+      type?: 'village' | 'town' | 'city' | 'suburban' | 'rural';
+      size?: 'small' | 'medium' | 'large';
+      lowPoly?: boolean;
+    }
+  ): Promise<THREE.Object3D[]> {
+    const {
+      type = 'town',
+      size = 'medium',
+      lowPoly = true
+    } = options || {};
+
+    // Map town type and size to house count and formation
+    let houseCount: number;
+    let formation: 'street' | 'cul-de-sac' | 'grid' | 'suburban' | 'rural' | 'random';
+
+    // Determine house count based on size
+    const sizeToCount = {
+      small: { village: 5, rural: 6, suburban: 8, town: 10, city: 15 },
+      medium: { village: 8, rural: 10, suburban: 12, town: 15, city: 20 },
+      large: { village: 12, rural: 15, suburban: 18, town: 20, city: 30 },
+    };
+
+    houseCount = sizeToCount[size][type];
+
+    // Determine formation based on town type
+    switch (type) {
+      case 'village':
+        formation = 'random';
+        break;
+      case 'rural':
+        formation = 'rural';
+        break;
+      case 'suburban':
+        formation = 'suburban';
+        break;
+      case 'town':
+        formation = 'street';
+        break;
+      case 'city':
+        formation = 'grid';
+        break;
+      default:
+        formation = 'random';
+    }
+
+    logger.info(`🏘️ Creating ${size} ${type} with ${houseCount} houses at position (${center.x}, ${center.z})`);
+
+    return this.createHouseNeighborhood(
+      center,
+      houseCount,
+      formation,
+      terrain,
+      lowPoly
+    );
+  }
+
   async addHouses(terrain: THREE.Mesh, lowPoly: boolean = true): Promise<THREE.Vector3[]> {
-    // Create multiple neighborhoods at the same locations as before but with proper town structure
+    // Create multiple neighborhoods at the same locations as before but using the new addTown helper
     const mode = lowPoly ? 'LOW-POLY' : 'HIGH-DETAIL';
     logger.info(`🏘️ Creating ${mode} neighborhoods for ${lowPoly ? 'optimized performance' : 'maximum detail'}...`);
 
@@ -316,46 +382,22 @@ class Environment {
     try {
       // Near paraglider area - suburban neighborhood
       const center1 = new THREE.Vector3(6879, 0, 545);
-      await this.createHouseNeighborhood(
-        center1,
-        12,
-        'suburban',
-        terrain,
-        lowPoly // Use low-poly for performance
-      );
+      await this.addTown(center1, terrain, { type: 'suburban', size: 'medium', lowPoly });
       neighborhoodCenters.push(center1);
 
-      // Famara - coastal village with street formation
+      // Famara - coastal town
       const center2 = new THREE.Vector3(6279, 0, -3155);
-      await this.createHouseNeighborhood(
-        center2,
-        15,
-        'street',
-        terrain,
-        lowPoly
-      );
+      await this.addTown(center2, terrain, { type: 'town', size: 'medium', lowPoly });
       neighborhoodCenters.push(center2);
 
-      // Noruegos - small rural settlement
+      // Noruegos - small rural village
       const center3 = new THREE.Vector3(7827, 0, -3460);
-      await this.createHouseNeighborhood(
-        center3,
-        8,
-        'rural',
-        terrain,
-        lowPoly
-      );
+      await this.addTown(center3, terrain, { type: 'village', size: 'small', lowPoly });
       neighborhoodCenters.push(center3);
 
-      // Teguise - historic town center with grid layout
+      // Teguise - historic city center
       const center4 = new THREE.Vector3(5600, 0, 1205);
-      await this.createHouseNeighborhood(
-        center4,
-        18,
-        'grid',
-        terrain,
-        lowPoly
-      );
+      await this.addTown(center4, terrain, { type: 'city', size: 'medium', lowPoly });
       neighborhoodCenters.push(center4);
 
       logger.info('✅ All neighborhoods created successfully');
