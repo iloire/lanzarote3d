@@ -16,6 +16,31 @@ This document tracks pending technical debt and issues that need to be addressed
 - `src/foundation/components/environment/Cloud.ts` - Uses expensive Date.now() in loop
 **Solution**: Implement centralized render loop manager with proper cleanup
 
+### Legacy Flier Class - Architectural Debt
+**Status**: ⚠️ High Priority - Should be Deprecated
+**Files**: `src/foundation/types/flier.ts`
+**Issue**: Monolithic Flier class violates Single Responsibility Principle and modern architecture patterns
+**Impact**:
+- Uses `setInterval` instead of `requestAnimationFrame` (performance issues)
+- Tightly coupled to paragliding simulation (not reusable)
+- Mixed responsibilities (physics, input, GUI, animation, tracking)
+- Manual physics implementation (hard to maintain)
+- Uses `any` types (lines 32, 75, 287)
+- Complex event-driven architecture with unclear benefits
+**Current Usage**: 4 files (VarioSound.ts, flier-pg/index.tsx, CameraController.ts, Birds.ts)
+**Recommended Solution**:
+1. Migrate to **FlyingBehavior** (composition-based, modern, reusable)
+2. Create separate concerns:
+   - `FlyingBehavior` - autonomous movement patterns
+   - `ParagliderPhysics` - lift, thermals, weather (if needed)
+   - `InputController` - keyboard/gamepad input
+   - `TrajectoryTracker` - path tracking
+3. Benefits: Better performance, reusability, maintainability, type safety
+**Timeline**:
+- 📅 v1.6.0: Mark Flier as @deprecated, create ParagliderController using composition
+- 📅 v1.7.0: Migrate all 4 usages to new architecture
+- 📅 v2.0.0: Remove Flier class entirely
+
 ### Legacy CameraController Removal
 **Status**: ⚠️ Deprecated - Schedule for Removal
 **Files**: `src/foundation/systems/scene/CameraController.ts`

@@ -11,6 +11,25 @@ import IFlyable from './IFlyable';
 const ANTI_CRASH_ENABLED = false;
 const TICK_INTERVAL = 25;
 
+/**
+ * @deprecated This Flier class is deprecated and will be removed in v2.0.0
+ *
+ * **Issues with this class:**
+ * - Uses setInterval instead of requestAnimationFrame (performance issues)
+ * - Violates Single Responsibility Principle (physics + input + GUI + animation)
+ * - Tightly coupled to paragliding simulation (not reusable)
+ * - Uses 'any' types (poor type safety)
+ *
+ * **Migration path:**
+ * Use the new composition-based architecture:
+ * - FlyingBehavior for autonomous movement patterns
+ * - ParagliderPhysics for lift/thermals/weather (if needed)
+ * - InputController for keyboard/gamepad input
+ * - TrajectoryTracker for path recording
+ *
+ * See ParagliderController for the modern replacement.
+ */
+
 const getRotationValue = (wrapSpeed: number): number => {
   const multiplier = THREE.MathUtils.smoothstep(wrapSpeed, 1, 10);
   return Math.PI / (60 - 50 * multiplier);
@@ -32,7 +51,9 @@ export interface EnvOptions {
   perfStats?: any; //stats
 }
 
-// Define event types for Flier
+/**
+ * @deprecated Use the new composition-based architecture instead
+ */
 export interface FlierEventMap {
   touchedGround: { groundTouches: number };
   crashed: {};
@@ -46,6 +67,9 @@ export interface FlierEventMap {
   lift: { lift: number };
 }
 
+/**
+ * @deprecated This class will be removed in v2.0.0. Use ParagliderController instead.
+ */
 class Flier extends THREE.EventDispatcher<FlierEventMap> {
   options: FlierConstructor;
   weather: Weather;
