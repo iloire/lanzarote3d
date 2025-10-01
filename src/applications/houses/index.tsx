@@ -88,7 +88,17 @@ const createLabel = (text: string, position: THREE.Vector3, polygonCount?: numbe
   return sprite;
 };
 
+interface HouseStats {
+  name: string;
+  normalPolygons: number;
+  lowPolyPolygons: number;
+  reduction: number;
+}
+
 class HousesWorkshop extends WorkshopDemoBase {
+  private statsOverlay?: HTMLDivElement;
+  private houseStats: HouseStats[] = [];
+
   constructor() {
     super({
       name: 'Houses Workshop',
@@ -108,7 +118,78 @@ class HousesWorkshop extends WorkshopDemoBase {
     this.setupCleanEnvironment(options);
 
     const { scene, camera, renderer, controls, gui } = options;
+    this.createStatsOverlay();
     await this.init(scene, camera, renderer, controls, gui);
+  }
+
+  private createStatsOverlay(): void {
+    this.statsOverlay = document.createElement('div');
+    this.statsOverlay.style.cssText = `
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      max-height: 80vh;
+      overflow-y: auto;
+      min-width: 500px;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    `;
+    document.body.appendChild(this.statsOverlay);
+  }
+
+  private updateStatsOverlay(): void {
+    if (!this.statsOverlay) return;
+
+    const totalNormal = this.houseStats.reduce((sum, stat) => sum + stat.normalPolygons, 0);
+    const totalLowPoly = this.houseStats.reduce((sum, stat) => sum + stat.lowPolyPolygons, 0);
+    const overallReduction = Math.round(((totalNormal - totalLowPoly) / totalNormal) * 100);
+
+    let html = `
+      <div style="font-size: 16px; font-weight: bold; margin-bottom: 15px; border-bottom: 2px solid #00ff88; padding-bottom: 10px;">
+        🏠 House Polygon Comparison
+      </div>
+      <div style="display: grid; grid-template-columns: 200px 120px 120px 80px; gap: 10px; font-weight: bold; color: #00ff88; margin-bottom: 10px;">
+        <div>House Type</div>
+        <div>Normal</div>
+        <div>Low-Poly</div>
+        <div>Reduction</div>
+      </div>
+    `;
+
+    this.houseStats.forEach((stat) => {
+      html += `
+        <div style="display: grid; grid-template-columns: 200px 120px 120px 80px; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+          <div style="color: #ffffff;">${stat.name}</div>
+          <div style="color: #ff6b6b;">${formatPolygonCount(stat.normalPolygons)}</div>
+          <div style="color: #4ecdc4;">${formatPolygonCount(stat.lowPolyPolygons)}</div>
+          <div style="color: #00ff88; font-weight: bold;">-${stat.reduction}%</div>
+        </div>
+      `;
+    });
+
+    html += `
+      <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #00ff88; font-weight: bold;">
+        <div style="display: grid; grid-template-columns: 200px 120px 120px 80px; gap: 10px;">
+          <div style="color: #ffffff;">TOTAL</div>
+          <div style="color: #ff6b6b;">${formatPolygonCount(totalNormal)}</div>
+          <div style="color: #4ecdc4;">${formatPolygonCount(totalLowPoly)}</div>
+          <div style="color: #00ff88; font-size: 16px;">-${overallReduction}%</div>
+        </div>
+      </div>
+      <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.2); font-size: 11px; color: #aaa;">
+        💡 Low-poly versions save ${formatPolygonCount(totalNormal - totalLowPoly)} triangles overall
+      </div>
+    `;
+
+    this.statsOverlay.innerHTML = html;
   }
 
   async init(scene: THREE.Scene, camera: THREE.Camera, renderer: THREE.WebGLRenderer, controls: OrbitControls, gui: GUI): Promise<void> {
@@ -168,6 +249,15 @@ class HousesWorkshop extends WorkshopDemoBase {
         const reduction = Math.round(((normalPolygons - lowPolyPolygons) / normalPolygons) * 100);
         scene.add(createLabel(`${houseConfig.name} (-${reduction}%)`, new THREE.Vector3(xPosition, 35, lowPolyRow), lowPolyPolygons));
         logger.info(`✅ ${houseConfig.name} low-poly loaded: ${lowPolyPolygons} triangles (-${reduction}%)`);
+
+        // Add to stats
+        this.houseStats.push({
+          name: houseConfig.name,
+          normalPolygons,
+          lowPolyPolygons,
+          reduction
+        });
+        this.updateStatsOverlay();
       } catch (error) {
         logger.error(`❌ Error loading ${houseConfig.name}:`, error);
         scene.add(createLabel(`${houseConfig.name} (Error)`, new THREE.Vector3(xPosition, 25, normalRow)));
@@ -199,6 +289,15 @@ class HousesWorkshop extends WorkshopDemoBase {
       const villaReduction = Math.round(((normalVillaPolygons - lowPolyVillaPolygons) / normalVillaPolygons) * 100);
       scene.add(createLabel(`Villa (-${villaReduction}%)`, new THREE.Vector3(xPosition, 35, lowPolyRow), lowPolyVillaPolygons));
       logger.info(`✅ Villa low-poly loaded: ${lowPolyVillaPolygons} triangles (-${villaReduction}%)`);
+
+      // Add to stats
+      this.houseStats.push({
+        name: 'Villa',
+        normalPolygons: normalVillaPolygons,
+        lowPolyPolygons: lowPolyVillaPolygons,
+        reduction: villaReduction
+      });
+      this.updateStatsOverlay();
     } catch (error) {
       logger.error('❌ Error loading Villa:', error);
       scene.add(createLabel('Villa (Error)', new THREE.Vector3(xPosition, 35, normalRow)));
@@ -228,6 +327,15 @@ class HousesWorkshop extends WorkshopDemoBase {
       const townhouseReduction = Math.round(((normalTownhousePolygons - lowPolyTownhousePolygons) / normalTownhousePolygons) * 100);
       scene.add(createLabel(`Townhouse (-${townhouseReduction}%)`, new THREE.Vector3(xPosition, 35, lowPolyRow), lowPolyTownhousePolygons));
       logger.info(`✅ Townhouse low-poly loaded: ${lowPolyTownhousePolygons} triangles (-${townhouseReduction}%)`);
+
+      // Add to stats
+      this.houseStats.push({
+        name: 'Townhouse',
+        normalPolygons: normalTownhousePolygons,
+        lowPolyPolygons: lowPolyTownhousePolygons,
+        reduction: townhouseReduction
+      });
+      this.updateStatsOverlay();
     } catch (error) {
       logger.error('❌ Error loading Townhouse:', error);
       scene.add(createLabel('Townhouse (Error)', new THREE.Vector3(xPosition, 35, normalRow)));
@@ -257,6 +365,15 @@ class HousesWorkshop extends WorkshopDemoBase {
       const barnReduction = Math.round(((normalBarnPolygons - lowPolyBarnPolygons) / normalBarnPolygons) * 100);
       scene.add(createLabel(`Barn (-${barnReduction}%)`, new THREE.Vector3(xPosition, 35, lowPolyRow), lowPolyBarnPolygons));
       logger.info(`✅ Barn low-poly loaded: ${lowPolyBarnPolygons} triangles (-${barnReduction}%)`);
+
+      // Add to stats
+      this.houseStats.push({
+        name: 'Barn',
+        normalPolygons: normalBarnPolygons,
+        lowPolyPolygons: lowPolyBarnPolygons,
+        reduction: barnReduction
+      });
+      this.updateStatsOverlay();
     } catch (error) {
       logger.error('❌ Error loading Barn:', error);
       scene.add(createLabel('Barn (Error)', new THREE.Vector3(xPosition, 35, normalRow)));
@@ -286,6 +403,15 @@ class HousesWorkshop extends WorkshopDemoBase {
       const desertHouseReduction = Math.round(((normalDesertHousePolygons - lowPolyDesertHousePolygons) / normalDesertHousePolygons) * 100);
       scene.add(createLabel(`Desert House (-${desertHouseReduction}%)`, new THREE.Vector3(xPosition, 35, lowPolyRow), lowPolyDesertHousePolygons));
       logger.info(`✅ DesertHouse low-poly loaded: ${lowPolyDesertHousePolygons} triangles (-${desertHouseReduction}%)`);
+
+      // Add to stats
+      this.houseStats.push({
+        name: 'Desert House',
+        normalPolygons: normalDesertHousePolygons,
+        lowPolyPolygons: lowPolyDesertHousePolygons,
+        reduction: desertHouseReduction
+      });
+      this.updateStatsOverlay();
     } catch (error) {
       logger.error('❌ Error loading DesertHouse:', error);
       scene.add(createLabel('Desert House (Error)', new THREE.Vector3(xPosition, 35, normalRow)));
@@ -310,6 +436,16 @@ class HousesWorkshop extends WorkshopDemoBase {
 
     // Start animation loop
     this.startAnimationLoop(renderer, scene, camera, controls);
+  }
+
+  public override dispose(): void {
+    // Remove stats overlay
+    if (this.statsOverlay && this.statsOverlay.parentElement) {
+      this.statsOverlay.parentElement.removeChild(this.statsOverlay);
+    }
+
+    // Call parent dispose
+    super.dispose();
   }
 }
 
