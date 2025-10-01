@@ -52,8 +52,8 @@ const formatPolygonCount = (count: number): string => {
 const createLabel = (text: string, position: THREE.Vector3, polygonCount?: number) => {
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d');
-  canvas.width = 400;
-  canvas.height = 100;
+  canvas.width = 500;
+  canvas.height = 140;
 
   if (context) {
     // Background with rounded corners
@@ -63,20 +63,20 @@ const createLabel = (text: string, position: THREE.Vector3, polygonCount?: numbe
 
     // Border
     context.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-    context.lineWidth = 1;
+    context.lineWidth = 2;
     context.stroke();
 
-    // Main title
+    // Main title - BIGGER FONT
     context.fillStyle = '#ffffff';
-    context.font = 'bold 20px Arial';
+    context.font = 'bold 32px Arial';
     context.textAlign = 'center';
-    context.fillText(text, canvas.width / 2, 35);
+    context.fillText(text, canvas.width / 2, 50);
 
-    // Polygon count with better styling
+    // Polygon count with better styling - BIGGER FONT
     if (polygonCount !== undefined) {
       context.fillStyle = '#00ff88'; // Bright green
-      context.font = 'bold 14px Arial';
-      context.fillText(`${formatPolygonCount(polygonCount)} triangles`, canvas.width / 2, 65);
+      context.font = 'bold 22px Arial';
+      context.fillText(`${formatPolygonCount(polygonCount)} triangles`, canvas.width / 2, 95);
     }
   }
 
@@ -89,7 +89,7 @@ const createLabel = (text: string, position: THREE.Vector3, polygonCount?: numbe
   const sprite = new THREE.Sprite(spriteMaterial);
 
   sprite.position.copy(position);
-  sprite.scale.set(12, 3, 1); // Larger labels
+  sprite.scale.set(16, 4.5, 1); // Much larger labels
 
   return sprite;
 };

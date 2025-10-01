@@ -60,16 +60,9 @@ const CameraTargetUIComponent: React.FC<CameraTargetUIProps> = ({
     return targetColors.default;
   };
 
-  const modeIcons: Record<CameraMode, string> = {
-    [CameraMode.Follow]: '🎥',
-    [CameraMode.FirstPerson]: '👁️',
-    [CameraMode.Orbit]: '🔄',
-    [CameraMode.Static]: '📌',
-  };
-
   const modeLabels: Record<CameraMode, string> = {
     [CameraMode.Follow]: 'Follow',
-    [CameraMode.FirstPerson]: 'First Person',
+    [CameraMode.FirstPerson]: 'FPV',
     [CameraMode.Orbit]: 'Orbit',
     [CameraMode.Static]: 'Static',
   };
@@ -95,21 +88,21 @@ const CameraTargetUIComponent: React.FC<CameraTargetUIProps> = ({
         onClick={() => setIsMenuVisible(!isMenuVisible)}
         style={{
           width: '100%',
-          marginBottom: '10px',
-          padding: '10px',
+          marginBottom: '6px',
+          padding: '6px',
           background: isMenuVisible ? '#4CAF50' : '#f44336',
           color: 'white',
           fontWeight: 'bold',
           border: 'none',
-          borderRadius: '6px',
+          borderRadius: '4px',
           cursor: 'pointer',
-          fontSize: '14px',
+          fontSize: '12px',
           transition: 'all 0.2s ease',
           boxShadow: '0 2px 6px rgba(0,0,0,0.4)',
         }}
         title={isMenuVisible ? 'Hide Camera Controls' : 'Show Camera Controls'}
       >
-        {isMenuVisible ? '📷 Hide Camera Controls' : '📷 Show Camera Controls'}
+        {isMenuVisible ? 'Hide Controls' : 'Show Controls'}
       </button>
 
       {/* Menu content */}
@@ -118,28 +111,28 @@ const CameraTargetUIComponent: React.FC<CameraTargetUIProps> = ({
           {/* Camera Modes Section */}
           <div
             style={{
-              marginBottom: '15px',
-              padding: '12px',
+              marginBottom: '6px',
+              padding: '6px',
               background: 'rgba(100, 50, 200, 0.15)',
               border: '1px solid rgba(100, 50, 200, 0.4)',
-              borderRadius: '6px',
+              borderRadius: '4px',
               boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
             }}
           >
             <div
               style={{
                 color: 'white',
-                fontSize: '12px',
+                fontSize: '10px',
                 fontWeight: 'bold',
-                marginBottom: '10px',
+                marginBottom: '4px',
                 textAlign: 'center',
                 textTransform: 'uppercase',
                 letterSpacing: '1px',
               }}
             >
-              🎬 Camera Mode
+              Camera Mode
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
               {Object.values(CameraMode).map(mode => (
                 <button
                   key={mode}
@@ -151,9 +144,9 @@ const CameraTargetUIComponent: React.FC<CameraTargetUIProps> = ({
                         : 'rgba(100, 50, 200, 0.3)',
                     color: 'white',
                     border: currentMode === mode ? '2px solid #fff' : '2px solid transparent',
-                    borderRadius: '4px',
-                    padding: '8px 6px',
-                    fontSize: '11px',
+                    borderRadius: '3px',
+                    padding: '4px',
+                    fontSize: '10px',
                     fontWeight: currentMode === mode ? 'bold' : 'normal',
                     cursor: 'pointer',
                     transition: 'all 0.2s ease',
@@ -169,7 +162,7 @@ const CameraTargetUIComponent: React.FC<CameraTargetUIProps> = ({
                     e.currentTarget.style.filter = 'brightness(1)';
                   }}
                 >
-                  {modeIcons[mode]} {modeLabels[mode]}
+                  {modeLabels[mode]}
                 </button>
               ))}
             </div>
@@ -178,27 +171,29 @@ const CameraTargetUIComponent: React.FC<CameraTargetUIProps> = ({
           {/* Targets Section */}
           <div
             style={{
-              padding: '12px',
+              padding: '6px',
               background: 'rgba(0, 150, 255, 0.15)',
               border: '1px solid rgba(0, 150, 255, 0.4)',
-              borderRadius: '6px',
+              borderRadius: '4px',
               boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+              maxHeight: '400px',
+              overflowY: 'auto',
             }}
           >
             <div
               style={{
                 color: 'white',
-                fontSize: '12px',
+                fontSize: '10px',
                 fontWeight: 'bold',
-                marginBottom: '10px',
+                marginBottom: '4px',
                 textAlign: 'center',
                 textTransform: 'uppercase',
                 letterSpacing: '1px',
               }}
             >
-              🎯 Targets ({targets.length})
+              Targets ({targets.length})
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
               {targets.map((target, index) => {
                 const color = getTargetColor(target);
                 const isActive = index === currentTargetIndex;
@@ -210,17 +205,17 @@ const CameraTargetUIComponent: React.FC<CameraTargetUIProps> = ({
                     style={{
                       background: isActive ? color : `${color}80`,
                       color: 'white',
-                      border: isActive ? '2px solid white' : '2px solid transparent',
-                      borderRadius: '4px',
-                      padding: '10px 12px',
-                      fontSize: '13px',
+                      border: isActive ? '1px solid white' : '1px solid transparent',
+                      borderRadius: '3px',
+                      padding: '4px 6px',
+                      fontSize: '11px',
                       fontWeight: isActive ? 'bold' : 'normal',
                       width: '100%',
                       cursor: 'pointer',
                       transition: 'all 0.2s ease',
                       boxShadow: isActive
-                        ? `0 4px 12px ${color}80`
-                        : '0 2px 4px rgba(0,0,0,0.3)',
+                        ? `0 2px 6px ${color}80`
+                        : '0 1px 2px rgba(0,0,0,0.3)',
                       textAlign: 'left',
                       display: 'flex',
                       alignItems: 'center',
@@ -228,7 +223,7 @@ const CameraTargetUIComponent: React.FC<CameraTargetUIProps> = ({
                     }}
                     onMouseEnter={e => {
                       if (!isActive) {
-                        e.currentTarget.style.transform = 'translateX(4px)';
+                        e.currentTarget.style.transform = 'translateX(2px)';
                         e.currentTarget.style.filter = 'brightness(1.2)';
                       }
                     }}
@@ -238,7 +233,7 @@ const CameraTargetUIComponent: React.FC<CameraTargetUIProps> = ({
                     }}
                   >
                     <span>{target.name}</span>
-                    {isActive && <span style={{ fontSize: '16px' }}>●</span>}
+                    {isActive && <span style={{ fontSize: '10px' }}>●</span>}
                   </button>
                 );
               })}
