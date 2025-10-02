@@ -2,6 +2,36 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## [1.6.0] - 2025-10-02 00:00 UTC
+
+### Added
+- **Comprehensive LOD (Level of Detail) System**: Implemented a flexible 4-level LOD system for optimal rendering performance
+  - Created LevelOfDetail enum with ULTRA_LOW, LOW, MEDIUM, HIGH levels
+  - Defined polygon budgets: ULTRA_LOW (10-100), LOW (100-500), MEDIUM (500-2000), HIGH (2000+)
+  - Distance thresholds for automatic LOD selection (500, 200, 50 units)
+  - Utility functions for LOD selection, budget validation, and level management
+  - Abstract LODComponent base class for easy LOD implementation
+  - Backward compatibility with legacy lowPoly boolean parameter
+
+- **LOD-Enabled Buildings**: Updated TownSquare and Dome with 4-level LOD support
+  - **TownSquare LOD levels**:
+    - ULTRA_LOW (~30-50 polys): Single plane + simple box monument
+    - LOW (~60-150 polys): Simple ground + basic monument + 4 benches
+    - MEDIUM (~500-800 polys): Basic pattern + benches + simplified decorations
+    - HIGH (~1000-5500 polys): Full detail with grid pattern, flowers, lamps
+  - **Dome LOD levels**:
+    - ULTRA_LOW (~20-40 polys): Simple cylinder + 4-segment sphere
+    - LOW (~100-200 polys): 8-segment hemisphere + basic furniture
+    - MEDIUM (~600-1000 polys): 12-segment geodesic with 6×12 panels
+    - HIGH (~2000-3000 polys): Full geodesic with 8×16 panels
+
+### Changed
+- **Building Architecture**: Migrated TownSquare and Dome from SimpleThreeComponent to LODComponent
+  - Replaces lowPoly boolean with levelOfDetail enum for finer control
+  - Dynamic LOD switching support via setLOD() method
+  - Built-in polygon counting for monitoring/debugging
+  - Maintains full backward compatibility with existing code using lowPoly
+
 ## [1.5.10] - 2025-10-01 15:00 UTC
 
 ### Added
