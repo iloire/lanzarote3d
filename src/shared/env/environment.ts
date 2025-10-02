@@ -287,29 +287,12 @@ class Environment {
     houseGroupCreator.setLowPolyMode(lowPoly);
 
     try {
-      // Use the appropriate neighborhood creation method based on formation
-      let meshes: THREE.Object3D[] = [];
-
-      switch (formation) {
-        case 'suburban':
-          meshes = await houseGroupCreator.createSuburbanNeighborhood(terrainAdaptedCenter, 'medium');
-          break;
-        case 'rural':
-          meshes = await houseGroupCreator.createRuralNeighborhood(terrainAdaptedCenter, 'village');
-          break;
-        case 'grid':
-          meshes = await houseGroupCreator.createMixedNeighborhood(terrainAdaptedCenter, houseCount, 'grid');
-          break;
-        case 'street':
-          meshes = await houseGroupCreator.createMixedNeighborhood(terrainAdaptedCenter, houseCount, 'street');
-          break;
-        case 'cul-de-sac':
-          meshes = await houseGroupCreator.createMixedNeighborhood(terrainAdaptedCenter, houseCount, 'cul-de-sac');
-          break;
-        default:
-          meshes = await houseGroupCreator.createMixedNeighborhood(terrainAdaptedCenter, houseCount, 'random');
-          break;
-      }
+      // Use createMixedNeighborhood for all formations with the specified house count
+      const meshes = await houseGroupCreator.createMixedNeighborhood(
+        terrainAdaptedCenter,
+        houseCount,
+        formation
+      );
 
       // Adapt all created houses to terrain height
       meshes.forEach((mesh: THREE.Object3D) => {
