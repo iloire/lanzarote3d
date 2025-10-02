@@ -152,6 +152,9 @@ export class PilotVoxel extends SimpleThreeComponent {
       }
     });
 
+    // Rotate model 90 degrees left (counter-clockwise) to align with forward axis
+    model.rotation.y = Math.PI / 2;
+
     // Apply transforms and shadows (inherited from SimpleThreeComponent)
     this.applyTransforms(model);
     this.applyShadows(model);
