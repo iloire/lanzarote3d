@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import Environment from '../../shared/env/environment';
+import Environment, { LANZAROTE_TOWNS } from '../../shared/env/environment';
 import { StoryOptions } from '../../shared/types';
 import { getDefaultTheme } from '../../foundation/themes';
 import { ThemeEngine } from '../../foundation/systems/ThemeEngine';
@@ -167,36 +167,35 @@ class AnimationApp extends TerrainBase {
       // Add environment elements using theme
       await this.environment.addCloudsFromTheme(thermals, theme);
       // this.environment.addTrees(terrain);
-      const housePositions = await this.environment.addHouses(terrain);
+
+      // Create Lanzarote towns using the predefined configuration
+      await this.environment.addTownsFromConfig(LANZAROTE_TOWNS, terrain);
 
       // Create road connecting the neighborhoods
-      if (housePositions.length >= 2) {
-        // Add intermediate waypoints for better road routing
-        const roadControlPoints = [
-          housePositions[0], // Suburban area near paraglider
-          housePositions[1], // Famara coastal village
-          new THREE.Vector3(6705.5, 0, -3263.7), // Intermediate point 1
-          housePositions[2], // Noruegos rural settlement
-          housePositions[3], // Teguise town center
-        ];
+      const roadControlPoints = [
+        LANZAROTE_TOWNS[0].position, // Suburban area near paraglider
+        LANZAROTE_TOWNS[1].position, // Famara coastal village
+        new THREE.Vector3(6705.5, 0, -3263.7), // Intermediate point 1
+        LANZAROTE_TOWNS[2].position, // Noruegos rural settlement
+        LANZAROTE_TOWNS[3].position, // Teguise town center
+      ];
 
-        const road = new ProceduralRoad({
-          controlPoints: roadControlPoints,
-          terrain,
-          width: 8,
-          segments: 150,
-          roadColor: '#f2f2f2',
-          showCenterLine: true,
-          showEdgeLines: true,
-          heightOffset: 5,
-          opacity: 0.2,
-          transparent: true
-        });
+      const road = new ProceduralRoad({
+        controlPoints: roadControlPoints,
+        terrain,
+        width: 8,
+        segments: 150,
+        roadColor: '#f2f2f2',
+        showCenterLine: true,
+        showEdgeLines: true,
+        heightOffset: 5,
+        opacity: 0.2,
+        transparent: true
+      });
 
-        const roadMesh = await road.load();
-        scene.add(roadMesh);
-        logger.info('✅ Road connecting neighborhoods created');
-      }
+      const roadMesh = await road.load();
+      scene.add(roadMesh);
+      logger.info('✅ Road connecting neighborhoods created');
 
       this.environment.addRandomBoats(water); // Use randomized boat types for variety
 

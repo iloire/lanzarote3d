@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import Environment from '../../shared/env/environment';
+import Environment, { LANZAROTE_TOWNS } from '../../shared/env/environment';
 import { StoryOptions } from '../../shared/types';
 import { getDefaultTheme } from '../../foundation/themes';
 import { ThemeEngine } from '../../foundation/systems/ThemeEngine';
@@ -88,7 +88,10 @@ class BoatsAnimationApp extends TerrainBase {
             // Add environment elements using theme (same as original)
             await this.environment.addCloudsFromTheme(thermals, theme);
             this.environment.addTrees(terrain);
-            this.environment.addHouses(terrain);
+
+            // Create Lanzarote towns using the predefined configuration
+            await this.environment.addTownsFromConfig(LANZAROTE_TOWNS, terrain);
+
             logger.info('Adding boats to the scene...');
             this.environment.addMixedBoats(water);
             logger.info('Boats added. Component stats:', this.environment.getComponentStats());
