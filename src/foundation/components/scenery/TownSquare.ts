@@ -11,6 +11,7 @@ export interface TownSquareOptions extends SimpleComponentOptions {
   hasFlowerBeds?: boolean;
   hasLampPosts?: boolean;
   scale?: number;
+  lowPoly?: boolean;
 }
 
 /**
@@ -22,6 +23,7 @@ export interface TownSquareOptions extends SimpleComponentOptions {
  * - Benches around perimeter
  * - Optional flower beds
  * - Optional decorative lamp posts
+ * - Low-poly mode for performance (~60-150 polygons vs ~1000-5500)
  *
  * @example
  * ```typescript
@@ -30,7 +32,14 @@ export interface TownSquareOptions extends SimpleComponentOptions {
  *   monumentType: 'fountain',
  *   benchCount: 8,
  *   hasFlowerBeds: true,
- *   hasLampPosts: true
+ *   hasLampPosts: true,
+ *   lowPoly: false // High detail
+ * });
+ *
+ * // Low-poly version
+ * const squareLowPoly = new TownSquare({
+ *   monumentType: 'obelisk',
+ *   lowPoly: true // <200 polygons
  * });
  * ```
  */
@@ -51,6 +60,7 @@ export class TownSquare extends SimpleThreeComponent {
       hasFlowerBeds: true,
       hasLampPosts: true,
       scale: 1,
+      lowPoly: false,
       ...options,
     });
   }
@@ -72,10 +82,16 @@ export class TownSquare extends SimpleThreeComponent {
       hasFlowerBeds = true,
       hasLampPosts = true,
       scale = 1,
+      lowPoly = false,
     } = this.options as TownSquareOptions;
 
     const width = size.width * scale;
     const depth = size.depth * scale;
+
+    // Use low-poly version if requested
+    if (lowPoly) {
+      return this.createLowPolyContent(width, depth, pavingColor, monumentType);
+    }
 
     // Materials
     const pavingMaterial = resourceManager.getOrCreateMaterial(
@@ -587,5 +603,183 @@ export class TownSquare extends SimpleThreeComponent {
     lamp.add(light);
 
     return lamp;
+  }
+
+  /**
+   * Create low-poly version of town square (<200 polygons)
+   */
+  private createLowPolyContent(
+    width: number,
+    depth: number,
+    pavingColor: string,
+    monumentType: 'obelisk' | 'statue' | 'fountain'
+  ): THREE.Object3D {
+    const square = new THREE.Group();
+    square.name = 'TownSquareLowPoly';
+
+    const pavingMaterial = resourceManager.getOrCreateMaterial(
+      `townSquareLowPoly_paving_${pavingColor}`,
+      () => new THREE.MeshStandardMaterial({
+        color: pavingColor,
+        roughness: 0.7,
+        metalness: 0.1,
+      })
+    );
+
+    const benchMaterial = resourceManager.getOrCreateMaterial(
+      'townSquareLowPoly_bench',
+      () => new THREE.MeshStandardMaterial({
+        color: '#8B4513',
+        roughness: 0.8,
+      })
+    );
+
+    // 1. Simple paved ground (2 triangles)
+    const pavingGeometry = new THREE.PlaneGeometry(width, depth);
+    const paving = new THREE.Mesh(pavingGeometry, pavingMaterial);
+    paving.rotation.x = -Math.PI / 2;
+    paving.position.y = 0.1;
+    paving.receiveShadow = true;
+    square.add(paving);
+
+    // 2. Central monument (12-24 triangles)
+    const monument = this.createLowPolyMonument(monumentType);
+    monument.position.set(0, 0, 0);
+    square.add(monument);
+
+    // 3. Four simple benches at corners (48 tris total = 4 benches * 12 tris each)
+    const benchPositions = [
+      { pos: new THREE.Vector3(width / 2 - 15, 0, depth / 2 - 15), rot: -Math.PI / 4 },
+      { pos: new THREE.Vector3(-width / 2 + 15, 0, depth / 2 - 15), rot: Math.PI / 4 },
+      { pos: new THREE.Vector3(width / 2 - 15, 0, -depth / 2 + 15), rot: -Math.PI * 3 / 4 },
+      { pos: new THREE.Vector3(-width / 2 + 15, 0, -depth / 2 + 15), rot: Math.PI * 3 / 4 },
+    ];
+
+    benchPositions.forEach(({ pos, rot }) => {
+      const bench = this.createLowPolyBench(benchMaterial);
+      bench.position.copy(pos);
+      bench.rotation.y = rot;
+      square.add(bench);
+    });
+
+    return square;
+  }
+
+  /**
+   * Create low-poly monument (12-36 triangles)
+   */
+  private createLowPolyMonument(type: 'obelisk' | 'statue' | 'fountain'): THREE.Group {
+    const monument = new THREE.Group();
+
+    const stoneMaterial = resourceManager.getOrCreateMaterial(
+      'townSquareLowPoly_stone',
+      () => new THREE.MeshStandardMaterial({
+        color: '#D3D3D3',
+        roughness: 0.6,
+        metalness: 0.1,
+      })
+    );
+
+    switch (type) {
+      case 'obelisk':
+        // Box base (12 tris) + pyramid top (8 tris) = 20 tris
+        const baseGeometry = new THREE.BoxGeometry(8, 2, 8);
+        const base = new THREE.Mesh(baseGeometry, stoneMaterial);
+        base.position.y = 1;
+        base.castShadow = true;
+        monument.add(base);
+
+        const shaftGeometry = new THREE.BoxGeometry(2, 15, 2);
+        const shaft = new THREE.Mesh(shaftGeometry, stoneMaterial);
+        shaft.position.y = 10;
+        shaft.castShadow = true;
+        monument.add(shaft);
+
+        const topGeometry = new THREE.ConeGeometry(2, 4, 4);
+        const top = new THREE.Mesh(topGeometry, stoneMaterial);
+        top.position.y = 19.5;
+        top.castShadow = true;
+        monument.add(top);
+        break;
+
+      case 'statue':
+        // Simple abstract statue (3 boxes = 36 tris)
+        const pedestalGeometry = new THREE.BoxGeometry(6, 3, 6);
+        const pedestal = new THREE.Mesh(pedestalGeometry, stoneMaterial);
+        pedestal.position.y = 1.5;
+        pedestal.castShadow = true;
+        monument.add(pedestal);
+
+        const bodyGeometry = new THREE.BoxGeometry(2, 8, 2);
+        const body = new THREE.Mesh(bodyGeometry, stoneMaterial);
+        body.position.y = 7.5;
+        body.castShadow = true;
+        monument.add(body);
+
+        const headGeometry = new THREE.BoxGeometry(2, 2, 2);
+        const head = new THREE.Mesh(headGeometry, stoneMaterial);
+        head.position.y = 12.5;
+        head.castShadow = true;
+        monument.add(head);
+        break;
+
+      case 'fountain':
+        // Simple fountain (2 cylinders = 24 tris with 6 segments)
+        const waterMaterial = resourceManager.getOrCreateMaterial(
+          'townSquareLowPoly_water',
+          () => new THREE.MeshStandardMaterial({
+            color: '#4FC3F7',
+            roughness: 0.1,
+            metalness: 0.3,
+            transparent: true,
+            opacity: 0.7,
+          })
+        );
+
+        const poolGeometry = new THREE.CylinderGeometry(8, 8, 1.5, 6);
+        const pool = new THREE.Mesh(poolGeometry, stoneMaterial);
+        pool.position.y = 0.85;
+        pool.castShadow = true;
+        monument.add(pool);
+
+        const waterGeometry = new THREE.CylinderGeometry(7.5, 7.5, 0.5, 6);
+        const water = new THREE.Mesh(waterGeometry, waterMaterial);
+        water.position.y = 1.35;
+        monument.add(water);
+
+        const pillarGeometry = new THREE.CylinderGeometry(1.5, 2, 8, 6);
+        const pillar = new THREE.Mesh(pillarGeometry, stoneMaterial);
+        pillar.position.y = 5.6;
+        pillar.castShadow = true;
+        monument.add(pillar);
+        break;
+    }
+
+    return monument;
+  }
+
+  /**
+   * Create ultra low-poly bench (24 triangles = 2 boxes without legs)
+   */
+  private createLowPolyBench(material: THREE.Material): THREE.Group {
+    const bench = new THREE.Group();
+
+    // Seat (12 tris)
+    const seatGeometry = new THREE.BoxGeometry(4, 0.3, 1.5);
+    const seat = new THREE.Mesh(seatGeometry, material);
+    seat.position.y = 1;
+    seat.castShadow = true;
+    bench.add(seat);
+
+    // Backrest (12 tris)
+    const backrestGeometry = new THREE.BoxGeometry(4, 1.5, 0.2);
+    const backrest = new THREE.Mesh(backrestGeometry, material);
+    backrest.position.set(0, 1.75, -0.65);
+    backrest.castShadow = true;
+    bench.add(backrest);
+
+    // No legs in low-poly version to save triangles
+
+    return bench;
   }
 }

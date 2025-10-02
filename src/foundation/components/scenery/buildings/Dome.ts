@@ -11,10 +11,15 @@ export interface DomeOptions extends SimpleComponentOptions {
   scale?: number;
   panelRows?: number;
   panelColumns?: number;
+  lowPoly?: boolean;
 }
 
 /**
  * Dome building component - Glass panel geodesic dome for glamping/sleeping
+ *
+ * Polygon count:
+ * - High detail (lowPoly: false): ~1000-3000 polygons with 8 rows × 16 columns
+ * - Low poly (lowPoly: true): <500 polygons with simple hemisphere + base
  */
 export class Dome extends SimpleThreeComponent {
   constructor(options: DomeOptions = {}) {
@@ -33,6 +38,7 @@ export class Dome extends SimpleThreeComponent {
       scale: 1,
       panelRows: 8,
       panelColumns: 16,
+      lowPoly: false,
       ...options,
     });
   }
@@ -49,6 +55,13 @@ export class Dome extends SimpleThreeComponent {
     const options = this.options as DomeOptions;
     const scale = options.scale || 1;
     const radius = options.radius || 8;
+    const lowPoly = options.lowPoly ?? false;
+
+    // Use low-poly version if requested
+    if (lowPoly) {
+      return this.createLowPolyDome(radius, scale, options);
+    }
+
     const panelRows = Math.max(4, Math.min(12, options.panelRows || 8));
     const panelColumns = Math.max(8, Math.min(24, options.panelColumns || 16));
 
@@ -378,7 +391,134 @@ export class Dome extends SimpleThreeComponent {
         columns: options.panelColumns
       },
       scale: options.scale,
+      lowPoly: options.lowPoly,
     };
+  }
+
+  /**
+   * Create low-poly dome (<500 polygons)
+   * - Simple hemisphere (16 segments) ~256 tris
+   * - Base platform (16 segments) ~32 tris
+   * - Simple bed (24 tris)
+   * - Door (12 tris)
+   * - Floor (32 tris)
+   * Total: ~356 polygons
+   */
+  private createLowPolyDome(radius: number, scale: number, options: DomeOptions): THREE.Object3D {
+    const dome = new THREE.Group();
+    dome.name = 'DomeLowPoly';
+
+    // Create materials
+    const frameMaterial = resourceManager.getOrCreateMaterial(
+      `domeLowPoly_frame_${options.frameColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.frameColor })
+    );
+
+    const glassMaterial = resourceManager.getOrCreateMaterial(
+      `domeLowPoly_glass_${options.glassColor}`,
+      () => new THREE.MeshLambertMaterial({
+        color: options.glassColor,
+        transparent: true,
+        opacity: 0.3,
+        side: THREE.DoubleSide
+      })
+    );
+
+    const baseMaterial = resourceManager.getOrCreateMaterial(
+      `domeLowPoly_base_${options.baseColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.baseColor })
+    );
+
+    // Base platform (16 segments = 32 tris)
+    const baseGeometry = resourceManager.getOrCreateGeometry(
+      `domeLowPoly_base_${radius}`,
+      () => new THREE.CylinderGeometry(radius * 1.1, radius * 1.2, 0.5, 16)
+    );
+    const base = new THREE.Mesh(baseGeometry, baseMaterial);
+    base.position.y = -0.25;
+    base.castShadow = this.options.castShadow ?? true;
+    base.receiveShadow = this.options.receiveShadow ?? true;
+    dome.add(base);
+
+    // Simple hemisphere dome (16 segments, 8 rings = 256 tris)
+    const domeGeometry = resourceManager.getOrCreateGeometry(
+      `domeLowPoly_hemisphere_${radius}`,
+      () => new THREE.SphereGeometry(radius, 16, 8, 0, Math.PI * 2, 0, Math.PI * 0.6)
+    );
+    const domeShell = new THREE.Mesh(domeGeometry, glassMaterial);
+    domeShell.position.y = 0;
+    dome.add(domeShell);
+
+    // Simple door frame (12 tris box)
+    const doorWidth = 2;
+    const doorHeight = 2.5;
+    const doorFrameGeometry = resourceManager.getOrCreateGeometry(
+      'domeLowPoly_door_frame',
+      () => new THREE.BoxGeometry(doorWidth + 0.4, doorHeight, 0.4)
+    );
+
+    const doorFrame = new THREE.Mesh(doorFrameGeometry, frameMaterial);
+    doorFrame.position.set(0, doorHeight/2, radius);
+    doorFrame.castShadow = this.options.castShadow ?? true;
+    dome.add(doorFrame);
+
+    // Interior floor (16 segments = 32 tris)
+    const floorGeometry = resourceManager.getOrCreateGeometry(
+      `domeLowPoly_floor_${radius}`,
+      () => new THREE.CircleGeometry(radius * 0.95, 16)
+    );
+
+    const floorMaterial = resourceManager.getOrCreateMaterial(
+      'domeLowPoly_floor',
+      () => new THREE.MeshLambertMaterial({ color: '#8B7355' })
+    );
+
+    const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = 0.1;
+    floor.receiveShadow = this.options.receiveShadow ?? true;
+    dome.add(floor);
+
+    // Simple bed (2 boxes = 24 tris)
+    const bedFrameGeometry = resourceManager.getOrCreateGeometry(
+      'domeLowPoly_bed_frame',
+      () => new THREE.BoxGeometry(4, 0.8, 6)
+    );
+
+    const bedMaterial = resourceManager.getOrCreateMaterial(
+      'domeLowPoly_bed',
+      () => new THREE.MeshLambertMaterial({ color: '#8B4513' })
+    );
+
+    const bedFrame = new THREE.Mesh(bedFrameGeometry, bedMaterial);
+    bedFrame.position.set(0, 0.4, 0);
+    bedFrame.castShadow = this.options.castShadow ?? true;
+    bedFrame.receiveShadow = this.options.receiveShadow ?? true;
+    dome.add(bedFrame);
+
+    // Mattress
+    const mattressGeometry = resourceManager.getOrCreateGeometry(
+      'domeLowPoly_mattress',
+      () => new THREE.BoxGeometry(3.8, 0.5, 5.8)
+    );
+
+    const mattressMaterial = resourceManager.getOrCreateMaterial(
+      'domeLowPoly_mattress',
+      () => new THREE.MeshLambertMaterial({ color: '#FFFFFF' })
+    );
+
+    const mattress = new THREE.Mesh(mattressGeometry, mattressMaterial);
+    mattress.position.set(0, 1.05, 0);
+    mattress.castShadow = this.options.castShadow ?? true;
+    mattress.receiveShadow = this.options.receiveShadow ?? true;
+    dome.add(mattress);
+
+    // Apply scale
+    if (scale !== 1) {
+      dome.scale.setScalar(scale);
+    }
+
+    return dome;
   }
 }
 

@@ -2,6 +2,18 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## [1.5.10] - 2025-10-01 15:00 UTC
+
+### Added
+- **Low-Poly Building Options**: Added lowPoly option to TownSquare and Dome buildings for performance optimization
+  - TownSquare lowPoly mode reduces from ~1000-5500 to ~60-150 polygons
+  - Dome lowPoly mode reduces from ~1000-3000 to ~356 polygons
+  - Low-poly versions maintain visual structure while dramatically reducing geometry
+  - TownSquare low-poly: simple ground plane, minimal monument, 4 basic benches (no flowers/lamps/grid pattern)
+  - Dome low-poly: simple hemisphere (16 segments), basic bed, door frame, floor
+  - Both buildings follow the same pattern as other buildings (lowPoly option instead of separate components)
+  - Example: `new TownSquare({ lowPoly: true })` or `new Dome({ lowPoly: true })`
+
 ## [1.5.9] - 2025-10-01 14:45 UTC
 
 ### Fixed
