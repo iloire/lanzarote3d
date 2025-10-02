@@ -16,111 +16,14 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { GUI } from 'lil-gui';
 import { logger } from '../../foundation/utils/logger';
 import { LevelOfDetail } from '../../foundation/types/lod';
-
-/**
- * Count the total number of triangles/polygons in a 3D object
- */
-const countPolygons = (object: THREE.Object3D): number => {
-  let totalTriangles = 0;
-
-  object.traverse((child) => {
-    if (child instanceof THREE.Mesh && child.geometry) {
-      const geometry = child.geometry;
-
-      if (geometry.index !== null) {
-        // Indexed geometry
-        totalTriangles += geometry.index.count / 3;
-      } else {
-        // Non-indexed geometry
-        const positionAttribute = geometry.getAttribute('position');
-        if (positionAttribute) {
-          totalTriangles += positionAttribute.count / 3;
-        }
-      }
-    }
-  });
-
-  return Math.floor(totalTriangles);
-};
-
-/**
- * Format polygon count for display
- */
-const formatPolygonCount = (count: number): string => {
-  if (count >= 1000) {
-    return `${(count / 1000).toFixed(1)}k`;
-  }
-  return count.toString();
-};
-
-const createLabel = (text: string, position: THREE.Vector3, polygonCount?: number) => {
-  const canvas = document.createElement('canvas');
-  const context = canvas.getContext('2d');
-  canvas.width = 500;
-  canvas.height = 140;
-
-  if (context) {
-    // Background with rounded corners
-    context.fillStyle = 'rgba(0, 0, 0, 0.85)';
-    context.roundRect(5, 5, canvas.width - 10, canvas.height - 10, 8);
-    context.fill();
-
-    // Border
-    context.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-    context.lineWidth = 2;
-    context.stroke();
-
-    // Main title - BIGGER FONT
-    context.fillStyle = '#ffffff';
-    context.font = 'bold 32px Arial';
-    context.textAlign = 'center';
-    context.fillText(text, canvas.width / 2, 50);
-
-    // Polygon count with better styling - BIGGER FONT
-    if (polygonCount !== undefined) {
-      context.fillStyle = '#00ff88'; // Bright green
-      context.font = 'bold 22px Arial';
-      context.fillText(`${formatPolygonCount(polygonCount)} triangles`, canvas.width / 2, 95);
-    }
-  }
-
-  const texture = new THREE.CanvasTexture(canvas);
-  const spriteMaterial = new THREE.SpriteMaterial({
-    map: texture,
-    transparent: true,
-    alphaTest: 0.1
-  });
-  const sprite = new THREE.Sprite(spriteMaterial);
-
-  sprite.position.copy(position);
-  sprite.scale.set(16, 4.5, 1); // Much larger labels
-
-  return sprite;
-};
-
-interface BuildingStats {
-  name: string;
-  ultraLowPolygons: number;
-  lowPolygons: number;
-  mediumPolygons: number;
-  highPolygons: number;
-}
-
-interface CameraPosition {
-  name: string;
-  position: THREE.Vector3;
-  lookAt: THREE.Vector3;
-}
+import { countPolygons } from './utils/polygonCounter';
+import { createLabel } from './utils/labelCreator';
+import { BuildingStatsTracker } from './utils/buildingStatsTracker';
+import { ShowcaseCameraController } from '../../foundation/systems/scene/ShowcaseCameraController';
 
 class BuildingsWorkshop extends WorkshopDemoBase {
-  private statsOverlay?: HTMLDivElement;
-  private toggleButton?: HTMLButtonElement;
-  private buildingStats: BuildingStats[] = [];
-  private isOverlayVisible: boolean = false;
-  private cameraPositions: CameraPosition[] = [];
-  private currentCameraIndex: number = 0;
-  private camera?: THREE.Camera;
-  private controls?: OrbitControls;
+  private statsTracker: BuildingStatsTracker;
+  private cameraController: ShowcaseCameraController;
 
   constructor() {
     super({
@@ -134,6 +37,10 @@ class BuildingsWorkshop extends WorkshopDemoBase {
         opacity: 0.8
       }
     });
+
+    // Initialize utilities
+    this.statsTracker = new BuildingStatsTracker();
+    this.cameraController = new ShowcaseCameraController();
   }
 
   async load(options: StoryOptions): Promise<void> {
@@ -141,198 +48,12 @@ class BuildingsWorkshop extends WorkshopDemoBase {
     this.setupCleanEnvironment(options);
 
     const { scene, camera, renderer, controls, gui } = options;
-    this.createStatsOverlay();
     await this.init(scene, camera, renderer, controls, gui);
   }
 
-  private createStatsOverlay(): void {
-    // Create toggle button - more visible with clear instructions
-    this.toggleButton = document.createElement('button');
-    this.toggleButton.innerHTML = '📊 Show Stats<br><span style="font-size: 10px; opacity: 0.8;">(Click to toggle)</span>';
-    this.toggleButton.style.cssText = `
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      padding: 14px 24px;
-      border-radius: 10px;
-      font-family: Arial, sans-serif;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-      z-index: 1001;
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-      transition: all 0.3s ease;
-      line-height: 1.3;
-      text-align: center;
-    `;
-    this.toggleButton.addEventListener('click', () => this.toggleStatsVisibility());
-    this.toggleButton.addEventListener('mouseenter', () => {
-      if (this.toggleButton) {
-        this.toggleButton.style.transform = 'scale(1.05)';
-        this.toggleButton.style.boxShadow = '0 8px 24px rgba(102, 126, 234, 0.8)';
-        this.toggleButton.style.borderColor = 'rgba(255, 255, 255, 0.6)';
-      }
-    });
-    this.toggleButton.addEventListener('mouseleave', () => {
-      if (this.toggleButton) {
-        this.toggleButton.style.transform = 'scale(1)';
-        this.toggleButton.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.6)';
-        this.toggleButton.style.borderColor = 'rgba(255, 255, 255, 0.3)';
-      }
-    });
-    document.body.appendChild(this.toggleButton);
-
-    // Create stats overlay (lighter theme) - positioned on the right, starts hidden
-    this.statsOverlay = document.createElement('div');
-    this.statsOverlay.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: rgba(255, 255, 255, 0.95);
-      color: #333;
-      padding: 20px;
-      border-radius: 10px;
-      font-family: 'Courier New', monospace;
-      font-size: 13px;
-      line-height: 1.6;
-      max-height: 90vh;
-      overflow-y: auto;
-      min-width: 500px;
-      z-index: 1000;
-      backdrop-filter: blur(10px);
-      border: 2px solid rgba(102, 126, 234, 0.3);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-      transition: all 0.3s ease;
-      display: none;
-      opacity: 0;
-    `;
-    document.body.appendChild(this.statsOverlay);
-  }
-
-  private toggleStatsVisibility(): void {
-    this.isOverlayVisible = !this.isOverlayVisible;
-
-    if (this.statsOverlay) {
-      if (this.isOverlayVisible) {
-        this.statsOverlay.style.display = 'block';
-        this.statsOverlay.style.opacity = '1';
-        this.statsOverlay.style.transform = 'translateY(0)';
-      } else {
-        this.statsOverlay.style.opacity = '0';
-        this.statsOverlay.style.transform = 'translateY(20px)';
-        setTimeout(() => {
-          if (this.statsOverlay) {
-            this.statsOverlay.style.display = 'none';
-          }
-        }, 300);
-      }
-    }
-
-    if (this.toggleButton) {
-      this.toggleButton.innerHTML = this.isOverlayVisible
-        ? '📊 Hide Stats<br><span style="font-size: 10px; opacity: 0.8;">(Click to toggle)</span>'
-        : '📊 Show Stats<br><span style="font-size: 10px; opacity: 0.8;">(Click to toggle)</span>';
-    }
-  }
-
-  private addCameraPosition(name: string, xPos: number, zPos: number): void {
-    this.cameraPositions.push({
-      name,
-      position: new THREE.Vector3(xPos, 40, zPos + 80),
-      lookAt: new THREE.Vector3(xPos, 15, zPos)
-    });
-  }
-
-  private moveCameraToPosition(index: number): void {
-    if (!this.camera || !this.controls || index < 0 || index >= this.cameraPositions.length) return;
-
-    const target = this.cameraPositions[index];
-    this.currentCameraIndex = index;
-
-    // Smooth camera transition
-    if (this.camera instanceof THREE.PerspectiveCamera) {
-      this.camera.position.copy(target.position);
-      this.camera.lookAt(target.lookAt);
-
-      if (this.controls) {
-        this.controls.target.copy(target.lookAt);
-        this.controls.update();
-      }
-    }
-
-    logger.info(`📷 Camera moved to: ${target.name}`);
-  }
-
-  private nextCamera(): void {
-    const nextIndex = (this.currentCameraIndex + 1) % this.cameraPositions.length;
-    this.moveCameraToPosition(nextIndex);
-  }
-
-  private previousCamera(): void {
-    const prevIndex = (this.currentCameraIndex - 1 + this.cameraPositions.length) % this.cameraPositions.length;
-    this.moveCameraToPosition(prevIndex);
-  }
-
-  private updateStatsOverlay(): void {
-    if (!this.statsOverlay) return;
-
-    const totalUltraLow = this.buildingStats.reduce((sum, stat) => sum + stat.ultraLowPolygons, 0);
-    const totalLow = this.buildingStats.reduce((sum, stat) => sum + stat.lowPolygons, 0);
-    const totalMedium = this.buildingStats.reduce((sum, stat) => sum + stat.mediumPolygons, 0);
-    const totalHigh = this.buildingStats.reduce((sum, stat) => sum + stat.highPolygons, 0);
-
-    let html = `
-      <div style="font-size: 18px; font-weight: bold; margin-bottom: 15px; border-bottom: 3px solid #667eea; padding-bottom: 10px; color: #667eea;">
-        🏠 LOD System - Polygon Comparison
-      </div>
-      <div style="display: grid; grid-template-columns: 160px 90px 90px 90px 90px; gap: 8px; font-weight: bold; color: #667eea; margin-bottom: 10px; font-size: 11px;">
-        <div>Building</div>
-        <div>ULTRA_LOW</div>
-        <div>LOW</div>
-        <div>MEDIUM</div>
-        <div>HIGH</div>
-      </div>
-    `;
-
-    this.buildingStats.forEach((stat) => {
-      html += `
-        <div style="display: grid; grid-template-columns: 160px 90px 90px 90px 90px; gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,0.08);">
-          <div style="color: #333; font-weight: 500; font-size: 12px;">${stat.name}</div>
-          <div style="color: #9b59b6; font-weight: 600; font-size: 12px;">${formatPolygonCount(stat.ultraLowPolygons)}</div>
-          <div style="color: #3498db; font-weight: 600; font-size: 12px;">${formatPolygonCount(stat.lowPolygons)}</div>
-          <div style="color: #f39c12; font-weight: 600; font-size: 12px;">${formatPolygonCount(stat.mediumPolygons)}</div>
-          <div style="color: #e74c3c; font-weight: 600; font-size: 12px;">${formatPolygonCount(stat.highPolygons)}</div>
-        </div>
-      `;
-    });
-
-    html += `
-      <div style="margin-top: 15px; padding-top: 15px; border-top: 3px solid #667eea; font-weight: bold;">
-        <div style="display: grid; grid-template-columns: 160px 90px 90px 90px 90px; gap: 8px;">
-          <div style="color: #667eea; font-size: 14px;">TOTAL</div>
-          <div style="color: #9b59b6; font-size: 14px;">${formatPolygonCount(totalUltraLow)}</div>
-          <div style="color: #3498db; font-size: 14px;">${formatPolygonCount(totalLow)}</div>
-          <div style="color: #f39c12; font-size: 14px;">${formatPolygonCount(totalMedium)}</div>
-          <div style="color: #e74c3c; font-size: 14px;">${formatPolygonCount(totalHigh)}</div>
-        </div>
-      </div>
-      <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 11px; color: #666; background: rgba(102, 126, 234, 0.08); padding: 10px; border-radius: 5px;">
-        💡 <strong style="color: #27ae60;">ULTRA_LOW saves ${Math.round((1 - totalUltraLow/totalHigh) * 100)}%</strong> •
-        <strong style="color: #3498db;">LOW saves ${Math.round((1 - totalLow/totalHigh) * 100)}%</strong> •
-        <strong style="color: #f39c12;">MEDIUM saves ${Math.round((1 - totalMedium/totalHigh) * 100)}%</strong> vs HIGH
-      </div>
-    `;
-
-    this.statsOverlay.innerHTML = html;
-  }
-
   async init(scene: THREE.Scene, camera: THREE.Camera, renderer: THREE.WebGLRenderer, controls: OrbitControls, gui: GUI): Promise<void> {
-    // Store references for camera navigation
-    this.camera = camera;
-    this.controls = controls;
+    // Initialize camera controller
+    this.cameraController.setCamera(camera, controls);
 
     // Set up lighting
     const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
@@ -415,17 +136,17 @@ class BuildingsWorkshop extends WorkshopDemoBase {
         logger.info(`✅ ${houseConfig.name} HIGH loaded: ${highPolygons} triangles`);
 
         // Add to stats
-        this.buildingStats.push({
+        this.statsTracker.addBuilding({
           name: houseConfig.name,
           ultraLowPolygons,
           lowPolygons,
           mediumPolygons,
           highPolygons
         });
-        this.updateStatsOverlay();
+        
 
         // Add camera position for this building
-        this.addCameraPosition(houseConfig.name, xPosition, 0);
+        this.cameraController.addViewpoint(houseConfig.name, new THREE.Vector3(xPosition, 40, 80), new THREE.Vector3(xPosition, 15, 0));
       } catch (error) {
         logger.error(`❌ Error loading ${houseConfig.name}:`, error);
         scene.add(createLabel(`${houseConfig.name} (Error)`, new THREE.Vector3(xPosition, 25, ultraLowRow)));
@@ -478,17 +199,17 @@ class BuildingsWorkshop extends WorkshopDemoBase {
       logger.info(`✅ Villa HIGH loaded: ${highPolygons} triangles`);
 
       // Add to stats
-      this.buildingStats.push({
+      this.statsTracker.addBuilding({
         name: 'Villa',
         ultraLowPolygons,
         lowPolygons,
         mediumPolygons,
         highPolygons
       });
-      this.updateStatsOverlay();
+      
 
       // Add camera position for Villa
-      this.addCameraPosition('Villa', xPosition, 0);
+      this.cameraController.addViewpoint('Villa', new THREE.Vector3(xPosition, 40, 80), new THREE.Vector3(xPosition, 15, 0));
     } catch (error) {
       logger.error('❌ Error loading Villa:', error);
       scene.add(createLabel('Villa (Error)', new THREE.Vector3(xPosition, 35, ultraLowRow)));
@@ -539,17 +260,17 @@ class BuildingsWorkshop extends WorkshopDemoBase {
       logger.info(`✅ Townhouse HIGH loaded: ${highPolygons} triangles`);
 
       // Add to stats
-      this.buildingStats.push({
+      this.statsTracker.addBuilding({
         name: 'Townhouse',
         ultraLowPolygons,
         lowPolygons,
         mediumPolygons,
         highPolygons
       });
-      this.updateStatsOverlay();
+      
 
       // Add camera position for Townhouse
-      this.addCameraPosition('Townhouse', xPosition, 0);
+      this.cameraController.addViewpoint('Townhouse', new THREE.Vector3(xPosition, 40, 80), new THREE.Vector3(xPosition, 15, 0));
     } catch (error) {
       logger.error('❌ Error loading Townhouse:', error);
       scene.add(createLabel('Townhouse (Error)', new THREE.Vector3(xPosition, 35, ultraLowRow)));
@@ -600,17 +321,17 @@ class BuildingsWorkshop extends WorkshopDemoBase {
       logger.info(`✅ Barn HIGH loaded: ${highPolygons} triangles`);
 
       // Add to stats
-      this.buildingStats.push({
+      this.statsTracker.addBuilding({
         name: 'Barn',
         ultraLowPolygons,
         lowPolygons,
         mediumPolygons,
         highPolygons
       });
-      this.updateStatsOverlay();
+      
 
       // Add camera position for Barn
-      this.addCameraPosition('Barn', xPosition, 0);
+      this.cameraController.addViewpoint('Barn', new THREE.Vector3(xPosition, 40, 80), new THREE.Vector3(xPosition, 15, 0));
     } catch (error) {
       logger.error('❌ Error loading Barn:', error);
       scene.add(createLabel('Barn (Error)', new THREE.Vector3(xPosition, 35, ultraLowRow)));
@@ -661,17 +382,17 @@ class BuildingsWorkshop extends WorkshopDemoBase {
       logger.info(`✅ DesertHouse HIGH loaded: ${highPolygons} triangles`);
 
       // Add to stats
-      this.buildingStats.push({
+      this.statsTracker.addBuilding({
         name: 'Desert House',
         ultraLowPolygons,
         lowPolygons,
         mediumPolygons,
         highPolygons
       });
-      this.updateStatsOverlay();
+      
 
       // Add camera position for Desert House
-      this.addCameraPosition('Desert House', xPosition, 0);
+      this.cameraController.addViewpoint('Desert House', new THREE.Vector3(xPosition, 40, 80), new THREE.Vector3(xPosition, 15, 0));
     } catch (error) {
       logger.error('❌ Error loading DesertHouse:', error);
       scene.add(createLabel('Desert House (Error)', new THREE.Vector3(xPosition, 35, ultraLowRow)));
@@ -722,17 +443,17 @@ class BuildingsWorkshop extends WorkshopDemoBase {
       logger.info(`✅ Dome HIGH loaded: ${highPolygons} triangles`);
 
       // Add to stats
-      this.buildingStats.push({
+      this.statsTracker.addBuilding({
         name: 'Dome',
         ultraLowPolygons,
         lowPolygons,
         mediumPolygons,
         highPolygons
       });
-      this.updateStatsOverlay();
+      
 
       // Add camera position for Dome
-      this.addCameraPosition('Dome', xPosition, 0);
+      this.cameraController.addViewpoint('Dome', new THREE.Vector3(xPosition, 40, 80), new THREE.Vector3(xPosition, 15, 0));
     } catch (error) {
       logger.error('❌ Error loading Dome:', error);
       scene.add(createLabel('Dome (Error)', new THREE.Vector3(xPosition, 35, ultraLowRow)));
@@ -783,17 +504,17 @@ class BuildingsWorkshop extends WorkshopDemoBase {
       logger.info(`✅ Hospital HIGH loaded: ${highPolygons} triangles`);
 
       // Add to stats
-      this.buildingStats.push({
+      this.statsTracker.addBuilding({
         name: 'Hospital',
         ultraLowPolygons,
         lowPolygons,
         mediumPolygons,
         highPolygons
       });
-      this.updateStatsOverlay();
+      
 
       // Add camera position for Hospital
-      this.addCameraPosition('Hospital', xPosition, 0);
+      this.cameraController.addViewpoint('Hospital', new THREE.Vector3(xPosition, 40, 80), new THREE.Vector3(xPosition, 15, 0));
     } catch (error) {
       logger.error('❌ Error loading Hospital:', error);
       scene.add(createLabel('Hospital (Error)', new THREE.Vector3(xPosition, 35, ultraLowRow)));
@@ -860,17 +581,17 @@ class BuildingsWorkshop extends WorkshopDemoBase {
       logger.info(`✅ TownSquare HIGH loaded: ${highPolygons} triangles`);
 
       // Add to stats
-      this.buildingStats.push({
+      this.statsTracker.addBuilding({
         name: 'Town Square',
         ultraLowPolygons,
         lowPolygons,
         mediumPolygons,
         highPolygons
       });
-      this.updateStatsOverlay();
+      
 
       // Add camera position for Town Square
-      this.addCameraPosition('Town Square', xPosition, 0);
+      this.cameraController.addViewpoint('Town Square', new THREE.Vector3(xPosition, 40, 80), new THREE.Vector3(xPosition, 15, 0));
     } catch (error) {
       logger.error('❌ Error loading TownSquare:', error);
       scene.add(createLabel('Town Square (Error)', new THREE.Vector3(xPosition, 35, ultraLowRow)));
@@ -878,11 +599,9 @@ class BuildingsWorkshop extends WorkshopDemoBase {
 
     logger.info('🏢 Buildings demo setup complete - all types loaded!');
 
-    // Position camera to view the reorganized scene with 4 rows
-    if (camera instanceof THREE.PerspectiveCamera) {
-      camera.position.set(0, 80, 100); // Higher and further back to view all 4 rows
-      camera.lookAt(0, 15, 0); // Look at the middle height of labels
-    }
+    // Set overview position and move camera there
+    this.cameraController.setOverview(new THREE.Vector3(0, 80, 100), new THREE.Vector3(0, 15, 0));
+    this.cameraController.moveToOverview();
 
     // Add GUI controls for camera
     if (gui) {
@@ -890,43 +609,10 @@ class BuildingsWorkshop extends WorkshopDemoBase {
       cameraFolder.add(camera.position, 'x', -100, 100).name('Camera X');
       cameraFolder.add(camera.position, 'y', 5, 80).name('Camera Y');
       cameraFolder.add(camera.position, 'z', -100, 100).name('Camera Z');
+      cameraFolder.open();
 
       // Camera navigation controls
-      const navigationFolder = gui.addFolder('Building Navigation');
-
-      const navControls = {
-        building: 'Overview',
-        previous: () => this.previousCamera(),
-        next: () => this.nextCamera()
-      };
-
-      // Create dropdown with building names
-      const buildingNames = ['Overview', ...this.cameraPositions.map(pos => pos.name)];
-      navigationFolder.add(navControls, 'building', buildingNames).name('Jump to Building')
-        .onChange((value: string) => {
-          if (value === 'Overview') {
-            // Return to overview position
-            if (camera instanceof THREE.PerspectiveCamera) {
-              camera.position.set(0, 80, 100);
-              camera.lookAt(0, 15, 0);
-              if (controls) {
-                controls.target.set(0, 15, 0);
-                controls.update();
-              }
-            }
-          } else {
-            const index = this.cameraPositions.findIndex(pos => pos.name === value);
-            if (index !== -1) {
-              this.moveCameraToPosition(index);
-            }
-          }
-        });
-
-      navigationFolder.add(navControls, 'previous').name('⬅ Previous Building');
-      navigationFolder.add(navControls, 'next').name('Next Building ➡');
-      navigationFolder.open();
-
-      cameraFolder.open();
+      this.cameraController.createGUI(gui);
     }
 
     // Start animation loop
@@ -934,15 +620,8 @@ class BuildingsWorkshop extends WorkshopDemoBase {
   }
 
   public override dispose(): void {
-    // Remove stats overlay
-    if (this.statsOverlay && this.statsOverlay.parentElement) {
-      this.statsOverlay.parentElement.removeChild(this.statsOverlay);
-    }
-
-    // Remove toggle button
-    if (this.toggleButton && this.toggleButton.parentElement) {
-      this.toggleButton.parentElement.removeChild(this.toggleButton);
-    }
+    // Dispose stats tracker
+    this.statsTracker.dispose();
 
     // Call parent dispose
     super.dispose();
