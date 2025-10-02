@@ -58,6 +58,12 @@ module.exports = {
     open: {
       target: ['famara-animation.html'], // Open default app instead of file browser
     },
+    static: [
+      {
+        directory: path.join(__dirname, 'assets'),
+        publicPath: '/assets',
+      },
+    ],
   },
   module: {
     rules: [
