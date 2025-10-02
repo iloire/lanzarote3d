@@ -65,7 +65,8 @@ const DEFAULT_BOAT_WEIGHTS: BoatTypeWeights = {
 export interface TownConfig {
   position: THREE.Vector3;
   houseCount: number;
-  formation: 'street' | 'cul-de-sac' | 'grid' | 'suburban' | 'rural' | 'random';
+  formation: 'street' | 'grid' | 'suburban' | 'rural' | 'random';
+  spacing?: number; // Optional spacing multiplier (default: 1.0, higher = more spread out)
 }
 
 /**
@@ -274,9 +275,10 @@ class Environment {
   async createHouseNeighborhood(
     center: THREE.Vector3,
     houseCount: number,
-    formation: 'street' | 'cul-de-sac' | 'grid' | 'suburban' | 'rural' | 'random',
+    formation: 'street' | 'grid' | 'suburban' | 'rural' | 'random',
     terrain: THREE.Mesh,
-    lowPoly: boolean = false
+    lowPoly: boolean = false,
+    spacingMultiplier: number = 1.0
   ): Promise<THREE.Object3D[]> {
     // Get terrain height for the center position
     const terrainHeight = this.getTerrainHeight(center.x, center.z, terrain);
@@ -297,7 +299,10 @@ class Environment {
       const meshes = await houseGroupCreator.createMixedNeighborhood(
         terrainAdaptedCenter,
         houseCount,
-        formation
+        formation,
+        undefined,
+        undefined,
+        spacingMultiplier
       );
 
       // Adapt all created houses to terrain height
@@ -344,13 +349,15 @@ class Environment {
     terrain: THREE.Mesh,
     options?: {
       houseCount?: number;
-      formation?: 'street' | 'cul-de-sac' | 'grid' | 'suburban' | 'rural' | 'random';
+      formation?: 'street' | 'grid' | 'suburban' | 'rural' | 'random';
+      spacing?: number;
       lowPoly?: boolean;
     }
   ): Promise<THREE.Object3D[]> {
     const {
       houseCount = 20,
       formation = 'random',
+      spacing = 1.0,
       lowPoly = true
     } = options || {};
 
@@ -361,7 +368,8 @@ class Environment {
       houseCount,
       formation,
       terrain,
-      lowPoly
+      lowPoly,
+      spacing
     );
   }
 
@@ -383,6 +391,7 @@ class Environment {
       const houses = await this.addTown(town.position, terrain, {
         houseCount: town.houseCount,
         formation: town.formation,
+        spacing: town.spacing,
         lowPoly,
       });
       allHouses.push(...houses);

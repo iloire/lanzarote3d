@@ -612,10 +612,12 @@ export class HouseGroupCreator {
     count: number,
     formation: HouseGroupConfig['formation'] = 'suburban',
     houseDistribution?: Partial<Record<HouseConfig['type'], number>>,
-    variation: NeighborhoodVariation = DEFAULT_VARIATION
+    variation: NeighborhoodVariation = DEFAULT_VARIATION,
+    spacingMultiplier: number = 1.0
   ): Promise<THREE.Object3D[]> {
     const houses = generateMixedNeighborhood(count, houseDistribution, variation);
-    const spacing = formation === 'rural' ? 250 : 90;
+    const baseSpacing = formation === 'rural' ? 250 : 90;
+    const spacing = baseSpacing * spacingMultiplier;
 
     // Scale neighborhood size based on house count
     // Base size 120 for ~20 houses, scale up for more houses
