@@ -74,10 +74,10 @@ export interface TownConfig {
  * Real locations of major settlements on the island
  */
 export const LANZAROTE_TOWNS: TownConfig[] = [
-  { position: new THREE.Vector3(6879, 0, 545), houseCount: 50, formation: 'rural' }, // tequise top
+  { position: new THREE.Vector3(6879, 0, 545), houseCount: 50, formation: 'rural', spacing: 2.0 }, // tequise top
 
 
-  { position: new THREE.Vector3(6279, 0, -3155), houseCount: 120, formation: 'rural' }, // famara
+  { position: new THREE.Vector3(6279, 0, -3155), houseCount: 120, formation: 'rural', spacing: 2.0 }, // famara
 
 
 

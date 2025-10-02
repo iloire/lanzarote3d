@@ -567,24 +567,6 @@ export class HouseGroupCreator {
   }
 
   /**
-   * Create houses in a cul-de-sac formation
-   */
-  async createCulDeSac(
-    center: THREE.Vector3,
-    houses: HouseConfig[],
-    radius: number = 100
-  ): Promise<THREE.Object3D[]> {
-    return this.createNeighborhood(houses, {
-      center,
-      formation: 'cul-de-sac',
-      spacing: 60,
-      neighborhoodSize: radius * 2,
-      randomVariation: 0.25,
-      exclusionZones: this.exclusionZones,
-    });
-  }
-
-  /**
    * Create houses in a grid formation
    */
   async createGridNeighborhood(
@@ -615,15 +597,20 @@ export class HouseGroupCreator {
     variation: NeighborhoodVariation = DEFAULT_VARIATION,
     spacingMultiplier: number = 1.0
   ): Promise<THREE.Object3D[]> {
+    // Validate spacing multiplier
+    if (spacingMultiplier < 0.1 || spacingMultiplier > 10) {
+      throw new Error(`Invalid spacing multiplier: ${spacingMultiplier}. Must be between 0.1 and 10.0`);
+    }
+
     const houses = generateMixedNeighborhood(count, houseDistribution, variation);
     const baseSpacing = formation === 'rural' ? 250 : 90;
     const spacing = baseSpacing * spacingMultiplier;
 
     // Scale neighborhood size based on house count
-    // Base size 120 for ~20 houses, scale up for more houses
+    // Base size 120 for ~20 houses, scale up for more houses and spacing
     const baseSize = 120;
     const baseCount = 20;
-    const neighborhoodSize = baseSize * Math.sqrt(count / baseCount);
+    const neighborhoodSize = baseSize * Math.sqrt(count / baseCount) * spacingMultiplier;
 
     return this.createNeighborhood(houses, {
       center,
