@@ -103,128 +103,13 @@ export class CharacterRegistry {
         textureFile: '/assets/foundation/models/characters/ivan/ivan.png',
         thumbnailFile: '/assets/foundation/models/characters/ivan/ivan.png',
       },
-      defaultScale: 0.01,
+      defaultScale: 0.001,
       defaultMaterialOptions: {
         roughness: 0.7,
         metalness: 0.15,
         side: THREE.DoubleSide,
       },
       tags: ['pilot', 'personal', 'ivan', 'voxel'],
-      author: 'Lanzarote3D',
-      version: '1.0.0',
-    });
-
-    // Additional character types with placeholder assets
-    this.registerCharacter({
-      id: CharacterType.PILOT_CLASSIC,
-      name: 'Classic Pilot',
-      description: 'Traditional aviator with vintage gear',
-      assets: {
-        objFile: '/assets/foundation/models/characters/pilot-classic/model.obj',
-        textureFile: '/assets/foundation/models/characters/pilot-classic/texture.png',
-        thumbnailFile: '/assets/foundation/models/characters/pilot-classic/thumbnail.png',
-      },
-      defaultScale: 0.01,
-      defaultMaterialOptions: {
-        roughness: 0.7,
-        metalness: 0.2,
-      },
-      tags: ['pilot', 'classic', 'aviator'],
-      author: 'Lanzarote3D',
-      version: '1.0.0',
-    });
-
-    this.registerCharacter({
-      id: CharacterType.PILOT_MODERN,
-      name: 'Modern Pilot',
-      description: 'Contemporary pilot with advanced equipment',
-      assets: {
-        objFile: '/assets/foundation/models/characters/pilot-modern/model.obj',
-        textureFile: '/assets/foundation/models/characters/pilot-modern/texture.png',
-        thumbnailFile: '/assets/foundation/models/characters/pilot-modern/thumbnail.png',
-      },
-      defaultScale: 0.01,
-      defaultMaterialOptions: {
-        roughness: 0.5,
-        metalness: 0.4,
-      },
-      tags: ['pilot', 'modern', 'technology'],
-      author: 'Lanzarote3D',
-      version: '1.0.0',
-    });
-
-    this.registerCharacter({
-      id: CharacterType.WARRIOR,
-      name: 'Sky Warrior',
-      description: 'Battle-hardened aerial combatant',
-      assets: {
-        objFile: '/assets/foundation/models/characters/warrior/model.obj',
-        textureFile: '/assets/foundation/models/characters/warrior/texture.png',
-        thumbnailFile: '/assets/foundation/models/characters/warrior/thumbnail.png',
-      },
-      defaultScale: 0.01,
-      defaultMaterialOptions: {
-        roughness: 0.9,
-        metalness: 0.7,
-      },
-      tags: ['warrior', 'combat', 'armor'],
-      author: 'Lanzarote3D',
-      version: '1.0.0',
-    });
-
-    this.registerCharacter({
-      id: CharacterType.EXPLORER,
-      name: 'Sky Explorer',
-      description: 'Adventurous explorer of aerial territories',
-      assets: {
-        objFile: '/assets/foundation/models/characters/explorer/model.obj',
-        textureFile: '/assets/foundation/models/characters/explorer/texture.png',
-        thumbnailFile: '/assets/foundation/models/characters/explorer/thumbnail.png',
-      },
-      defaultScale: 0.01,
-      defaultMaterialOptions: {
-        roughness: 0.6,
-        metalness: 0.3,
-      },
-      tags: ['explorer', 'adventure', 'gear'],
-      author: 'Lanzarote3D',
-      version: '1.0.0',
-    });
-
-    this.registerCharacter({
-      id: CharacterType.SCIENTIST,
-      name: 'Aerial Scientist',
-      description: 'Research specialist for atmospheric studies',
-      assets: {
-        objFile: '/assets/foundation/models/characters/scientist/model.obj',
-        textureFile: '/assets/foundation/models/characters/scientist/texture.png',
-        thumbnailFile: '/assets/foundation/models/characters/scientist/thumbnail.png',
-      },
-      defaultScale: 0.01,
-      defaultMaterialOptions: {
-        roughness: 0.4,
-        metalness: 0.5,
-      },
-      tags: ['scientist', 'research', 'instruments'],
-      author: 'Lanzarote3D',
-      version: '1.0.0',
-    });
-
-    this.registerCharacter({
-      id: CharacterType.ADVENTURER,
-      name: 'Free Spirit',
-      description: 'Carefree adventurer exploring the skies',
-      assets: {
-        objFile: '/assets/foundation/models/characters/adventurer/model.obj',
-        textureFile: '/assets/foundation/models/characters/adventurer/texture.png',
-        thumbnailFile: '/assets/foundation/models/characters/adventurer/thumbnail.png',
-      },
-      defaultScale: 0.01,
-      defaultMaterialOptions: {
-        roughness: 0.7,
-        metalness: 0.1,
-      },
-      tags: ['adventurer', 'freedom', 'spirit'],
       author: 'Lanzarote3D',
       version: '1.0.0',
     });
