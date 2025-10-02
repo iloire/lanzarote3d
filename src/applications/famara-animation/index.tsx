@@ -242,17 +242,36 @@ class AnimationApp extends TerrainBase {
         transparent: true
       });
 
+      // Road 4: New settlement to Famara
+      const road4 = new ProceduralRoad({
+        controlPoints: [
+          new THREE.Vector3(LANZAROTE_TOWNS[4].position.x + roadOffset, 0, LANZAROTE_TOWNS[4].position.z),
+          new THREE.Vector3(LANZAROTE_TOWNS[1].position.x - roadOffset, 0, LANZAROTE_TOWNS[1].position.z),
+        ],
+        terrain,
+        width: 8,
+        segments: 60,
+        roadColor: '#f2f2f2',
+        showCenterLine: true,
+        showEdgeLines: true,
+        heightOffset: 5,
+        opacity: 0.2,
+        transparent: true
+      });
+
       // Load and add all roads to scene
-      const [roadMesh1, roadMesh2, roadMesh3] = await Promise.all([
+      const [roadMesh1, roadMesh2, roadMesh3, roadMesh4] = await Promise.all([
         road1.load(),
         road2.load(),
         road3.load(),
+        road4.load(),
       ]);
 
       scene.add(roadMesh1);
       scene.add(roadMesh2);
       scene.add(roadMesh3);
-      logger.info('✅ 3 roads connecting neighborhoods created');
+      scene.add(roadMesh4);
+      logger.info('✅ 4 roads connecting neighborhoods created');
 
       this.environment.addRandomBoats(water); // Use randomized boat types for variety
 
