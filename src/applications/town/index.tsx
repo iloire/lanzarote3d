@@ -176,7 +176,7 @@ class TownWorkshop extends WorkshopDemoBase {
       });
 
     neighborhoodFolder
-      .add(this.neighborhoodSettings, 'houseCount', 1, 100, 1)
+      .add(this.neighborhoodSettings, 'houseCount', 1, 2000, 1)
       .name('House Count')
       .onChange(async () => {
         logger.info(`🏘️ Changing house count to ${this.neighborhoodSettings.houseCount}...`);
