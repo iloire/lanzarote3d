@@ -29,7 +29,6 @@ import {
   loadHangglider,
   loadCessna,
   loadHercules,
-  VehicleLoadResult,
 } from './vehicleLoader';
 import {
   setupCameraAnimation,

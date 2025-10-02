@@ -221,7 +221,7 @@ export const herculesConfig: HerculesConfig = {
 };
 
 // Visibility flags for easy toggling
-export const SHOW_HANGGLIDER = true;
+export const SHOW_HANGGLIDER = false;
 export const SHOW_CESSNA = true;
 export const SHOW_HERCULES = true;
 
