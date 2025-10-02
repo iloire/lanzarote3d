@@ -152,7 +152,7 @@ export const cessnaConfig: CessnaConfig = {
   windowColor: '#87CEEB',
   stripeColor: '#FF4500',
   flightPattern: FlightPattern.WAYPOINT,
-  speed: 80, // Faster to reach paraglider in ~2 seconds
+  speed: 120, // Very fast to reach paraglider quickly
   turnSpeed: 5.0,
   flightRadius: 250,
   returnDistance: 300,
