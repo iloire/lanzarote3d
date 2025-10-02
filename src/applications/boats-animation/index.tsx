@@ -80,6 +80,11 @@ class BoatsAnimationApp extends TerrainBase {
 
             const { terrain, water } = options;
 
+            // Hide canvas during loading to prevent visual pop-in
+            const canvas = renderer.domElement;
+            const originalOpacity = canvas.style.opacity;
+            canvas.style.opacity = '0';
+
             // Render once with theme applied for terrain height calculations
             renderer.render(scene, camera);
 
@@ -115,6 +120,9 @@ class BoatsAnimationApp extends TerrainBase {
 
             // Setup camera animation sequence - ONLY DIFFERENCE from original
             this.setupCameraAnimation(camera, controls, renderer, scene);
+
+            // Restore canvas visibility after everything is loaded
+            canvas.style.opacity = originalOpacity || '1';
 
             this.isLoaded = true;
             logger.info(
