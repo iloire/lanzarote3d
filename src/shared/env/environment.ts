@@ -418,41 +418,6 @@ class Environment {
     return allHouses;
   }
 
-  async addHouses(terrain: THREE.Mesh, lowPoly: boolean = true): Promise<THREE.Vector3[]> {
-    // Create multiple neighborhoods at the same locations as before but using the new addTown helper
-    const mode = lowPoly ? 'LOW-POLY' : 'HIGH-DETAIL';
-    logger.info(`🏘️ Creating ${mode} neighborhoods for ${lowPoly ? 'optimized performance' : 'maximum detail'}...`);
-
-    const neighborhoodCenters: THREE.Vector3[] = [];
-
-    try {
-      // Near paraglider area - suburban neighborhood
-      const center1 = new THREE.Vector3(6879, 0, 545);
-      await this.addTown(center1, terrain, { type: 'suburban', size: 'medium', lowPoly });
-      neighborhoodCenters.push(center1);
-
-      // Famara - coastal town
-      const center2 = new THREE.Vector3(6279, 0, -3155);
-      await this.addTown(center2, terrain, { type: 'village', size: 'medium', lowPoly });
-      neighborhoodCenters.push(center2);
-
-      // Noruegos - small rural village
-      const center3 = new THREE.Vector3(7827, 0, -3460);
-      await this.addTown(center3, terrain, { type: 'village', size: 'small', lowPoly });
-      neighborhoodCenters.push(center3);
-
-      // Teguise - historic city center
-      const center4 = new THREE.Vector3(5600, 0, 1205);
-      await this.addTown(center4, terrain, { type: 'city', size: 'medium', lowPoly });
-      neighborhoodCenters.push(center4);
-
-      logger.info('✅ All neighborhoods created successfully');
-      return neighborhoodCenters;
-    } catch (error) {
-      logger.error('❌ Error creating neighborhoods:', error);
-      return neighborhoodCenters;
-    }
-  }
 
   async addStones(terrain: THREE.Mesh) {
     const stone = await this.componentRegistry.register(new Stone({}), 'stone');
