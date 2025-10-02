@@ -110,7 +110,7 @@ class BuildingsWorkshop extends WorkshopDemoBase {
   private statsOverlay?: HTMLDivElement;
   private toggleButton?: HTMLButtonElement;
   private buildingStats: BuildingStats[] = [];
-  private isOverlayVisible: boolean = true;
+  private isOverlayVisible: boolean = false;
 
   constructor() {
     super({
@@ -138,7 +138,7 @@ class BuildingsWorkshop extends WorkshopDemoBase {
   private createStatsOverlay(): void {
     // Create toggle button - more visible with clear instructions
     this.toggleButton = document.createElement('button');
-    this.toggleButton.innerHTML = '📊 Hide Stats<br><span style="font-size: 10px; opacity: 0.8;">(Click to toggle)</span>';
+    this.toggleButton.innerHTML = '📊 Show Stats<br><span style="font-size: 10px; opacity: 0.8;">(Click to toggle)</span>';
     this.toggleButton.style.cssText = `
       position: fixed;
       bottom: 20px;
@@ -175,12 +175,12 @@ class BuildingsWorkshop extends WorkshopDemoBase {
     });
     document.body.appendChild(this.toggleButton);
 
-    // Create stats overlay (lighter theme)
+    // Create stats overlay (lighter theme) - positioned on the right, starts hidden
     this.statsOverlay = document.createElement('div');
     this.statsOverlay.style.cssText = `
       position: fixed;
-      bottom: 80px;
-      left: 20px;
+      top: 20px;
+      right: 20px;
       background: rgba(255, 255, 255, 0.95);
       color: #333;
       padding: 20px;
@@ -188,7 +188,7 @@ class BuildingsWorkshop extends WorkshopDemoBase {
       font-family: 'Courier New', monospace;
       font-size: 13px;
       line-height: 1.6;
-      max-height: 75vh;
+      max-height: 90vh;
       overflow-y: auto;
       min-width: 500px;
       z-index: 1000;
@@ -196,6 +196,8 @@ class BuildingsWorkshop extends WorkshopDemoBase {
       border: 2px solid rgba(102, 126, 234, 0.3);
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
       transition: all 0.3s ease;
+      display: none;
+      opacity: 0;
     `;
     document.body.appendChild(this.statsOverlay);
   }
