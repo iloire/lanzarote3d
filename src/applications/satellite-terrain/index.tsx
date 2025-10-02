@@ -129,10 +129,6 @@ class SatelliteTerrainApp extends TerrainBase {
       this.environment = new Environment(scene);
       const weather = this.environment.createWeatherFromTheme(initialTheme);
 
-      // Add minimal environment elements to not distract from terrain
-      this.environment.addTrees(terrain); // Trees for context
-      this.environment.addHouses(terrain); // Houses for scale reference
-
       options.environment = this.environment;
 
       // Create UI for theme switching
@@ -206,11 +202,11 @@ class SatelliteTerrainApp extends TerrainBase {
       <div style="margin-bottom: 10px; border-top: 1px solid #555; padding-top: 10px;">
         <strong>Controls:</strong><br>
         ${this.availableThemes
-          .map(
-            (theme, index) =>
-              `${index + 1}: ${theme.name}${index === this.currentThemeIndex ? ' ★' : ''}`
-          )
-          .join('<br>')}
+        .map(
+          (theme, index) =>
+            `${index + 1}: ${theme.name}${index === this.currentThemeIndex ? ' ★' : ''}`
+        )
+        .join('<br>')}
       </div>
       <div style="border-top: 1px solid #555; padding-top: 10px; font-size: 11px; color: #ccc;">
         Mouse: Orbit/Zoom/Pan<br>

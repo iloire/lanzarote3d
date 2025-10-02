@@ -38,7 +38,7 @@ export async function loadParagliders(
       logger.info('🪂 Paraglider created, loading...');
       const mesh = await paraglider.load();
       mesh.position.copy(p.position);
-      const scale = 1.0; // Increased from 0.01 to make visible
+      const scale = 0.01;
       mesh.scale.set(scale, scale, scale);
       scene.add(mesh);
 
