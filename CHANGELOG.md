@@ -72,6 +72,16 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Performance benefits: Reduced polygon count for distant buildings improves frame rate
   - Supports explicit LOD control via levelOfDetail parameter for fine-tuned performance
 
+- **Buildings Showcase Application**: Updated to display all 4 LOD levels for comprehensive visualization
+  - Changed from 2-row layout (normal vs low-poly) to 4-row layout (all LOD levels)
+  - Shows 44 building instances total: 11 building types × 4 LOD levels each
+  - Row 1: ULTRA_LOW (10-100 polys), Row 2: LOW (100-500 polys), Row 3: MEDIUM (500-2000 polys), Row 4: HIGH (2000+ polys)
+  - Stats overlay shows 4-column comparison with color-coded polygon counts and percentage savings
+  - Removed legacy building imports in favor of new LOD-enabled classes
+  - Camera positioned higher (0, 80, 100) to view all 4 rows simultaneously
+  - Expanded ground size to 1200×200 units for better layout
+  - Each building labeled with name and polygon count for easy comparison
+
 ## [1.5.10] - 2025-10-01 15:00 UTC
 
 ### Added
