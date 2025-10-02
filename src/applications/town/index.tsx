@@ -4,13 +4,10 @@ import { WorkshopDemoBase } from '../../shared/WorkshopDemoBase';
 import { HouseGroupCreator } from '../../shared/env/house-group-creator';
 import { ComponentRegistry } from '../../foundation/systems/ComponentRegistry';
 import { createLabel } from './label-utils';
-import { TOWN_NEIGHBORHOODS, NeighborhoodConfig } from './neighborhoods-data';
 import { PerformanceUI, PerformanceSettings, PolygonBreakdown } from './performance-ui';
-import { disposeObject3D, disposeObjects } from './disposal-utils';
+import { disposeObjects } from './disposal-utils';
 import { GUI } from 'lil-gui';
 import { logger } from '../../foundation/utils/logger';
-import { Park, TownSquare } from '../../foundation/components/scenery';
-import { Hospital } from '../../foundation/components/scenery/buildings';
 
 /**
  * Town Workshop - Showcase of neighborhood generation using HouseGroupCreator
@@ -19,10 +16,6 @@ import { Hospital } from '../../foundation/components/scenery/buildings';
 class TownWorkshop extends WorkshopDemoBase {
   private neighborhoodMeshes: THREE.Object3D[] = [];
   private labelMeshes: THREE.Mesh[] = [];
-  private roadMeshes: THREE.Object3D[] = []; // Track roads separately
-  private parkMeshes: THREE.Object3D[] = []; // Track parks separately
-  private squareMeshes: THREE.Object3D[] = []; // Track town squares separately
-  private hospitalMesh: THREE.Object3D | null = null; // Track hospital
   private houseGroupCreator!: HouseGroupCreator;
   private componentRegistry!: ComponentRegistry;
   private currentScene!: THREE.Scene;
@@ -33,6 +26,10 @@ class TownWorkshop extends WorkshopDemoBase {
     lowPoly: true, // Start in low-poly mode by default
     polygonCount: 0,
     lastRenderTime: 0,
+  };
+  private neighborhoodSettings = {
+    formation: 'suburban' as 'street' | 'cul-de-sac' | 'grid' | 'suburban' | 'rural' | 'random',
+    houseCount: 20,
   };
 
   constructor() {
@@ -80,27 +77,8 @@ class TownWorkshop extends WorkshopDemoBase {
       // Set initial low-poly mode
       this.houseGroupCreator.setLowPolyMode(this.isLowPoly);
 
-      // Define exclusion zones for town squares and parks to prevent building overlap
-      const exclusionZones = [
-        // Central Square - 120x120 size, so radius ~85 (diagonal/2 + buffer)
-        { center: new THREE.Vector3(0, 0, 0), radius: 100 },
-        // West Square - 120x120 size
-        { center: new THREE.Vector3(-600, 0, 0), radius: 100 },
-        // Market Square - 120x120 size
-        { center: new THREE.Vector3(600, 0, -300), radius: 100 },
-        // North Central Park - 100x100 size
-        { center: new THREE.Vector3(-200, 0, 300), radius: 85 },
-        // South Central Park - 100x100 size
-        { center: new THREE.Vector3(200, 0, -300), radius: 85 },
-        // East Park - 100x100 size
-        { center: new THREE.Vector3(600, 0, 300), radius: 85 },
-      ];
-
-      // Set exclusion zones before creating neighborhoods
-      this.houseGroupCreator.setExclusionZones(exclusionZones);
-
-      // Setup performance controls
-      this.setupPerformanceControls(gui);
+      // Setup neighborhood and performance controls
+      this.setupControls(gui);
 
       // Setup on-screen HTML controls
       this.performanceUI = new PerformanceUI(
@@ -170,22 +148,47 @@ class TownWorkshop extends WorkshopDemoBase {
 
 
   /**
-   * Setup performance controls and monitoring
+   * Setup neighborhood and performance controls
    */
-  private setupPerformanceControls(gui: GUI): void {
-    logger.debug('🐛 Setting up performance controls, GUI:', gui);
-
+  private setupControls(gui: GUI): void {
     if (!gui) {
-      logger.warn('⚠️ No GUI provided to setupPerformanceControls');
+      logger.warn('⚠️ No GUI provided to setupControls');
       return;
     }
 
+    // Neighborhood Settings
+    const neighborhoodFolder = gui.addFolder('Neighborhood Settings');
+    neighborhoodFolder.open();
+
+    neighborhoodFolder
+      .add(this.neighborhoodSettings, 'formation', [
+        'suburban',
+        'rural',
+        'grid',
+        'street',
+        'cul-de-sac',
+        'random',
+      ])
+      .name('Formation Type')
+      .onChange(async () => {
+        logger.info(`🏘️ Changing formation to ${this.neighborhoodSettings.formation}...`);
+        await this.recreateNeighborhoods();
+        this.updatePolygonCount();
+      });
+
+    neighborhoodFolder
+      .add(this.neighborhoodSettings, 'houseCount', 1, 100, 1)
+      .name('House Count')
+      .onChange(async () => {
+        logger.info(`🏘️ Changing house count to ${this.neighborhoodSettings.houseCount}...`);
+        await this.recreateNeighborhoods();
+        this.updatePolygonCount();
+      });
+
+    // Performance Settings
     const performanceFolder = gui.addFolder('Performance Settings');
     performanceFolder.open();
 
-    logger.debug('✅ Performance folder created successfully');
-
-    // Low-poly toggle
     performanceFolder
       .add(this.performanceSettings, 'lowPoly')
       .name('Low-Poly Mode')
@@ -196,13 +199,11 @@ class TownWorkshop extends WorkshopDemoBase {
         this.updatePolygonCount();
       });
 
-    // Polygon count display (read-only)
     performanceFolder
       .add(this.performanceSettings, 'polygonCount')
       .name('Total Polygons')
       .listen();
 
-    // Render time display (read-only)
     performanceFolder
       .add(this.performanceSettings, 'lastRenderTime')
       .name('Last Frame (ms)')
@@ -210,7 +211,7 @@ class TownWorkshop extends WorkshopDemoBase {
   }
 
   /**
-   * Count total polygons in all neighborhood meshes, parks, squares, and roads with detailed breakdown
+   * Count total polygons in all neighborhood meshes with detailed breakdown
    */
   private updatePolygonCount(): void {
     const polygonCounts = {
@@ -218,9 +219,6 @@ class TownWorkshop extends WorkshopDemoBase {
       cacti: 0,
       stones: 0,
       pools: 0,
-      roads: 0,
-      parks: 0,
-      squares: 0,
       other: 0
     };
 
@@ -277,62 +275,8 @@ class TownWorkshop extends WorkshopDemoBase {
       });
     });
 
-    // Count road polygons (infrastructure that doesn't change)
-    this.roadMeshes.forEach(obj => {
-      obj.traverse(child => {
-        if (child instanceof THREE.Mesh && child.geometry) {
-          const geometry = child.geometry;
-          if (geometry.index !== null) {
-            polygonCounts.roads += geometry.index.count / 3;
-          } else {
-            const positionAttribute = geometry.getAttribute('position');
-            if (positionAttribute) {
-              polygonCounts.roads += positionAttribute.count / 3;
-            }
-          }
-        }
-      });
-    });
-
-    // Count park polygons
-    this.parkMeshes.forEach(obj => {
-      obj.traverse(child => {
-        if (child instanceof THREE.Mesh && child.geometry) {
-          const geometry = child.geometry;
-          if (geometry.index !== null) {
-            polygonCounts.parks += geometry.index.count / 3;
-          } else {
-            const positionAttribute = geometry.getAttribute('position');
-            if (positionAttribute) {
-              polygonCounts.parks += positionAttribute.count / 3;
-            }
-          }
-        }
-      });
-    });
-
-    // Count town square polygons
-    this.squareMeshes.forEach(obj => {
-      obj.traverse(child => {
-        if (child instanceof THREE.Mesh && child.geometry) {
-          const geometry = child.geometry;
-          if (geometry.index !== null) {
-            polygonCounts.squares += geometry.index.count / 3;
-          } else {
-            const positionAttribute = geometry.getAttribute('position');
-            if (positionAttribute) {
-              polygonCounts.squares += positionAttribute.count / 3;
-            }
-          }
-        }
-      });
-    });
-
     const totalPolygons = Object.values(polygonCounts).reduce((sum, count) => sum + count, 0);
     this.performanceSettings.polygonCount = Math.floor(totalPolygons);
-
-    // Debug: Log array sizes to diagnose zero counts
-    logger.debug(`📊 Array sizes: neighborhoods=${this.neighborhoodMeshes.length}, parks=${this.parkMeshes.length}, squares=${this.squareMeshes.length}, roads=${this.roadMeshes.length}`);
 
     // Calculate percentages
     const percentages = {
@@ -340,9 +284,6 @@ class TownWorkshop extends WorkshopDemoBase {
       cacti: ((polygonCounts.cacti / totalPolygons) * 100).toFixed(1),
       stones: ((polygonCounts.stones / totalPolygons) * 100).toFixed(1),
       pools: ((polygonCounts.pools / totalPolygons) * 100).toFixed(1),
-      roads: ((polygonCounts.roads / totalPolygons) * 100).toFixed(1),
-      parks: ((polygonCounts.parks / totalPolygons) * 100).toFixed(1),
-      squares: ((polygonCounts.squares / totalPolygons) * 100).toFixed(1),
       other: ((polygonCounts.other / totalPolygons) * 100).toFixed(1)
     };
 
@@ -351,9 +292,6 @@ class TownWorkshop extends WorkshopDemoBase {
     logger.info(`  🌵 Cacti: ${Math.floor(polygonCounts.cacti).toLocaleString()} (${percentages.cacti}%)`);
     logger.info(`  🪨 Stones: ${Math.floor(polygonCounts.stones).toLocaleString()} (${percentages.stones}%)`);
     logger.info(`  🏊 Pools: ${Math.floor(polygonCounts.pools).toLocaleString()} (${percentages.pools}%)`);
-    logger.info(`  🛣️ Roads: ${Math.floor(polygonCounts.roads).toLocaleString()} (${percentages.roads}%)`);
-    logger.info(`  🌳 Parks: ${Math.floor(polygonCounts.parks).toLocaleString()} (${percentages.parks}%) [${this.parkMeshes.length} parks]`);
-    logger.info(`  🏛️ Squares: ${Math.floor(polygonCounts.squares).toLocaleString()} (${percentages.squares}%) [${this.squareMeshes.length} squares]`);
     logger.info(`  ❓ Other: ${Math.floor(polygonCounts.other).toLocaleString()} (${percentages.other}%)`);
     logger.info(`  📊 TOTAL: ${this.performanceSettings.polygonCount.toLocaleString()} polygons`);
 
@@ -386,10 +324,12 @@ class TownWorkshop extends WorkshopDemoBase {
   }
 
   /**
-   * Clear all existing neighborhood meshes, parks, squares, and labels with proper memory cleanup
+   * Clear all existing neighborhood meshes and labels with proper memory cleanup
    */
   private clearNeighborhoods(): void {
-    logger.debug(`🧹 Clearing ${this.neighborhoodMeshes.length} neighborhood objects, ${this.labelMeshes.length} labels, ${this.roadMeshes.length} roads, ${this.parkMeshes.length} parks, and ${this.squareMeshes.length} squares`);
+    logger.debug(
+      `🧹 Clearing ${this.neighborhoodMeshes.length} neighborhood objects and ${this.labelMeshes.length} labels`
+    );
 
     // Properly dispose neighborhood meshes using imported utility
     disposeObjects(this.neighborhoodMeshes);
@@ -397,426 +337,46 @@ class TownWorkshop extends WorkshopDemoBase {
     // Properly dispose label meshes using imported utility
     disposeObjects(this.labelMeshes);
 
-    // Properly dispose road meshes using imported utility
-    disposeObjects(this.roadMeshes);
-
-    // Properly dispose park meshes using imported utility
-    disposeObjects(this.parkMeshes);
-
-    // Properly dispose square meshes using imported utility
-    disposeObjects(this.squareMeshes);
-
-    // Properly dispose hospital
-    if (this.hospitalMesh) {
-      disposeObject3D(this.hospitalMesh);
-      this.hospitalMesh = null;
-    }
-
     // Clear arrays
     this.neighborhoodMeshes.length = 0;
     this.labelMeshes.length = 0;
-    this.roadMeshes.length = 0;
-    this.parkMeshes.length = 0;
-    this.squareMeshes.length = 0;
 
     logger.debug('✅ Neighborhood cleanup completed');
   }
 
 
   private async loadNeighborhoods(scene: THREE.Scene): Promise<void> {
-    // Create each neighborhood using imported configuration
-    for (const config of TOWN_NEIGHBORHOODS) {
-      try {
-        let houses: THREE.Object3D[] = [];
-
-        switch (config.type) {
-          case 'suburban':
-            houses = await this.houseGroupCreator.createSuburbanNeighborhood(
-              config.center,
-              config.size || 'medium',
-              config.variation
-            );
-            break;
-
-          case 'urban':
-            houses = await this.houseGroupCreator.createUrbanNeighborhood(
-              config.center,
-              config.density || 'dense',
-              config.variation
-            );
-            break;
-
-          case 'rural':
-            houses = await this.houseGroupCreator.createRuralNeighborhood(
-              config.center,
-              config.style || 'village',
-              config.variation
-            );
-            break;
-
-          case 'cul-de-sac':
-            const culDeSacHouses = this.generateMixedHouses(config.houses || 8);
-            houses = await this.houseGroupCreator.createCulDeSac(
-              config.center,
-              culDeSacHouses
-            );
-            break;
-
-          case 'street':
-            const streetHouses = this.generateMixedHouses(config.houses || 12);
-            houses = await this.houseGroupCreator.createStreetNeighborhood(
-              config.center,
-              streetHouses
-            );
-            break;
-
-          case 'grid':
-            const gridHouses = this.generateMixedHouses(config.houses || 15);
-            houses = await this.houseGroupCreator.createGridNeighborhood(
-              config.center,
-              gridHouses,
-              80,
-              3
-            );
-            break;
-
-          case 'luxury':
-            houses = await this.houseGroupCreator.createMixedNeighborhood(
-              config.center,
-              12,
-              'suburban',
-              {
-                'Villa': 0.4,
-                'DesertHouseWithPool': 0.3,
-                'House': 0.2,
-                'Townhouse': 0.1,
-              },
-              config.variation
-            );
-            break;
-
-          case 'random':
-            const randomHouses = this.generateMixedHouses(config.houses || 18);
-            houses = await this.houseGroupCreator.createRandomNeighborhood(
-              config.center,
-              randomHouses,
-              250
-            );
-            break;
-
-          default:
-            logger.warn(`Unknown neighborhood type: ${config.type}`);
-            continue;
-        }
-
-        // Track all house meshes
-        this.neighborhoodMeshes.push(...houses);
-
-        // Create label for this neighborhood
-        const label = createLabel(config.name, config.center);
-        scene.add(label);
-        this.labelMeshes.push(label);
-
-        logger.info(`✅ Created ${config.name} with ${houses.length} houses`);
-      } catch (error) {
-        this.handleError(error as Error, `loading ${config.name}`);
-      }
-    }
-
-    // Add roads and infrastructure
-    this.createRoads(scene);
-
-    // Add parks to the town
-    this.createParks(scene);
-
-    // Add town squares to the town
-    this.createTownSquares(scene);
-
-    // Add hospital to the town
-    this.createHospital(scene);
-
-    // Update polygon count after loading all neighborhoods
-    this.updatePolygonCount();
-  }
-
-  /**
-   * Generate a land plot for a house based on type and scale
-   */
-  private generateLandPlot(houseType: string, scale: number) {
-    const baseWidths: Record<string, number> = {
-      'House': 60,
-      'Villa': 100,
-      'Townhouse': 50,
-      'Barn': 80,
-      'DesertHouse': 70,
-      'DesertHouseWithPool': 90,
-    };
-
-    const baseDepths: Record<string, number> = {
-      'House': 60,
-      'Villa': 90,
-      'Townhouse': 70,
-      'Barn': 100,
-      'DesertHouse': 80,
-      'DesertHouseWithPool': 100,
-    };
-
-    const landColors = ['#7CFC00', '#90EE90', '#98FB98', '#ADFF2F', '#9ACD32'];
-
-    // Add some random variation to land plot size
-    const widthVariation = 1 + (Math.random() - 0.5) * 0.4; // ±20% variation
-    const depthVariation = 1 + (Math.random() - 0.5) * 0.4; // ±20% variation
-
-    return {
-      width: Math.max(40, (baseWidths[houseType] || 60) * scale * widthVariation),
-      depth: Math.max(40, (baseDepths[houseType] || 60) * scale * depthVariation),
-      color: landColors[Math.floor(Math.random() * landColors.length)],
-    };
-  }
-
-  /**
-   * Generate a mixed set of houses for custom neighborhoods
-   */
-  private generateMixedHouses(count: number) {
-    const houses = [];
-    const houseTypes = [
-      { type: 'House' as const, weight: 0.4 },
-      { type: 'Villa' as const, weight: 0.15 },
-      { type: 'Townhouse' as const, weight: 0.15 },
-      { type: 'Barn' as const, weight: 0.1 },
-      { type: 'DesertHouse' as const, weight: 0.1 },
-      { type: 'DesertHouseWithPool' as const, weight: 0.05 },
-    ];
-
-    for (let i = 0; i < count; i++) {
-      const totalWeight = houseTypes.reduce((sum, t) => sum + t.weight, 0);
-      const random = Math.random() * totalWeight;
-      let accumulated = 0;
-      let selectedType = houseTypes[0].type;
-
-      for (const typeOption of houseTypes) {
-        accumulated += typeOption.weight;
-        if (random <= accumulated) {
-          selectedType = typeOption.type;
-          break;
-        }
-      }
-
-      // Generate 90-degree increment rotation
-      const rotations = [0, Math.PI / 2, Math.PI, Math.PI * 1.5];
-      const rotation = rotations[Math.floor(Math.random() * rotations.length)];
-
-      const scale = 0.8 + Math.random() * 0.4;
-
-      // Generate land plot based on house type and scale
-      const landPlot = this.generateLandPlot(selectedType, scale);
-
-      houses.push({
-        type: selectedType,
-        scale,
-        includePool: Math.random() < 0.3,
-        rotation,
-        landPlot,
-      });
-    }
-
-    return houses;
-  }
-
-  /**
-   * Create roads and pathways between neighborhoods
-   */
-  private createRoads(scene: THREE.Scene): void {
-    const roadMaterial = new THREE.MeshStandardMaterial({
-      color: 0x404040,
-      roughness: 0.8,
-    });
-
-    // Create road segments that avoid town squares and parks
-    // Town squares at: (0, 0, 0), (-600, 0, 0), (600, 0, -300)
-    // Parks at: (-200, 0, 300), (200, 0, -300), (600, 0, 300)
-
-    // Horizontal roads - split into segments to avoid town squares
-    // Left segment (avoids West Square at -600)
-    const leftSegment = new THREE.Mesh(new THREE.PlaneGeometry(300, 40), roadMaterial);
-    leftSegment.rotation.x = -Math.PI / 2;
-    leftSegment.position.set(-750, 0.1, 150);
-    scene.add(leftSegment);
-    this.roadMeshes.push(leftSegment);
-
-    // Center-left segment (between West Square and Central Square)
-    const centerLeftSegment = new THREE.Mesh(new THREE.PlaneGeometry(400, 40), roadMaterial);
-    centerLeftSegment.rotation.x = -Math.PI / 2;
-    centerLeftSegment.position.set(-300, 0.1, 150);
-    scene.add(centerLeftSegment);
-    this.roadMeshes.push(centerLeftSegment);
-
-    // Center-right segment (between Central Square and Market Square)
-    const centerRightSegment = new THREE.Mesh(new THREE.PlaneGeometry(400, 40), roadMaterial);
-    centerRightSegment.rotation.x = -Math.PI / 2;
-    centerRightSegment.position.set(300, 0.1, 150);
-    scene.add(centerRightSegment);
-    this.roadMeshes.push(centerRightSegment);
-
-    // Right segment (past Market Square)
-    const rightSegment = new THREE.Mesh(new THREE.PlaneGeometry(300, 40), roadMaterial);
-    rightSegment.rotation.x = -Math.PI / 2;
-    rightSegment.position.set(750, 0.1, 150);
-    scene.add(rightSegment);
-    this.roadMeshes.push(rightSegment);
-
-    // Vertical connecting roads (offset to avoid central zones)
-    const verticalRoadGeometry = new THREE.PlaneGeometry(40, 600);
-
-    const leftVerticalRoad = new THREE.Mesh(verticalRoadGeometry, roadMaterial);
-    leftVerticalRoad.rotation.x = -Math.PI / 2;
-    leftVerticalRoad.position.set(-450, 0.1, 0);
-    scene.add(leftVerticalRoad);
-    this.roadMeshes.push(leftVerticalRoad);
-
-    const rightVerticalRoad = new THREE.Mesh(verticalRoadGeometry, roadMaterial);
-    rightVerticalRoad.rotation.x = -Math.PI / 2;
-    rightVerticalRoad.position.set(450, 0.1, -100);
-    scene.add(rightVerticalRoad);
-    this.roadMeshes.push(rightVerticalRoad);
-
-    // Road markings
-    const markingMaterial = new THREE.MeshStandardMaterial({
-      color: 0xFFFFFF,
-      roughness: 0.9,
-    });
-
-    // Add markings to horizontal road segments
-    const roadSegments = [
-      { center: -750, length: 300 },
-      { center: -300, length: 400 },
-      { center: 300, length: 400 },
-      { center: 750, length: 300 },
-    ];
-
-    const markings: THREE.Mesh[] = [];
-    roadSegments.forEach(segment => {
-      const markingCount = Math.floor(segment.length / 50);
-      const startOffset = segment.center - (segment.length / 2);
-
-      for (let i = 0; i < markingCount; i++) {
-        if (i % 2 === 0) continue; // Create dashed effect
-        const marking = new THREE.Mesh(
-          new THREE.PlaneGeometry(40, 2),
-          markingMaterial
-        );
-        marking.rotation.x = -Math.PI / 2;
-        marking.position.set(startOffset + (i * 50), 0.11, 150);
-        scene.add(marking);
-        markings.push(marking);
-      }
-    });
-
-    // Add markings to road tracking
-    this.roadMeshes.push(...markings);
-  }
-
-  /**
-   * Create parks throughout the town
-   */
-  private async createParks(scene: THREE.Scene): Promise<void> {
-    // Strategic park positions across the town
-    const parkLocations = [
-      { position: new THREE.Vector3(-200, 0, 300), name: 'North Central Park' },
-      { position: new THREE.Vector3(200, 0, -300), name: 'South Central Park' },
-      { position: new THREE.Vector3(600, 0, 300), name: 'East Park' },
-    ];
-
-    for (const location of parkLocations) {
-      try {
-        const park = new Park({
-          size: { width: 100, depth: 100 },
-          grassColor: '#4A7C59',
-          pathColor: '#8B7355',
-          treeCount: 10,
-          benchCount: 6,
-          hasFountain: true,
-          scale: 1,
-        });
-
-        const parkMesh = await park.load();
-        parkMesh.position.copy(location.position);
-        scene.add(parkMesh);
-        this.parkMeshes.push(parkMesh);
-
-        logger.info(`✅ Created ${location.name}`);
-      } catch (error) {
-        this.handleError(error as Error, `creating park at ${location.position.toArray()}`);
-      }
-    }
-  }
-
-  /**
-   * Create town squares throughout the town
-   */
-  private async createTownSquares(scene: THREE.Scene): Promise<void> {
-    // Strategic town square positions
-    const squareLocations = [
-      { position: new THREE.Vector3(0, 0, 0), name: 'Central Square', monument: 'fountain' as const },
-      { position: new THREE.Vector3(-600, 0, 0), name: 'West Square', monument: 'obelisk' as const },
-      { position: new THREE.Vector3(600, 0, -300), name: 'Market Square', monument: 'statue' as const },
-    ];
-
-    for (const location of squareLocations) {
-      try {
-        const square = new TownSquare({
-          size: { width: 120, depth: 120 },
-          pavingColor: '#A8A8A8',
-          monumentType: location.monument,
-          benchCount: 8,
-          hasFlowerBeds: true,
-          hasLampPosts: true,
-          scale: 1,
-        });
-
-        const squareMesh = await square.load();
-        squareMesh.position.copy(location.position);
-        scene.add(squareMesh);
-        this.squareMeshes.push(squareMesh);
-
-        logger.info(`✅ Created ${location.name} with ${location.monument}`);
-      } catch (error) {
-        this.handleError(error as Error, `creating town square at ${location.position.toArray()}`);
-      }
-    }
-  }
-
-  /**
-   * Create hospital building
-   */
-  private async createHospital(scene: THREE.Scene): Promise<void> {
     try {
-      const hospital = new Hospital({
-        wallColor: '#F0F0F0',
-        roofColor: '#C0C0C0',
-        accentColor: '#FF0000',
-        scale: 1.5,
-        lowPoly: this.isLowPoly,
-        castShadow: true,
-        receiveShadow: true,
-      });
+      // Create a single neighborhood at the center with current settings
+      const center = new THREE.Vector3(0, 0, 0);
+      const houses = await this.houseGroupCreator.createMixedNeighborhood(
+        center,
+        this.neighborhoodSettings.houseCount,
+        this.neighborhoodSettings.formation
+      );
 
-      const hospitalMesh = await hospital.load();
-      // Place hospital in a strategic location away from town squares and neighborhoods
-      hospitalMesh.position.set(-850, 0, -550);
-      scene.add(hospitalMesh);
-      this.hospitalMesh = hospitalMesh;
+      // Track all house meshes
+      this.neighborhoodMeshes.push(...houses);
 
-      // Add label for hospital
-      const label = createLabel('Medical Center', new THREE.Vector3(-850, 40, -550));
+      // Create label
+      const label = createLabel(
+        `${this.neighborhoodSettings.formation} (${this.neighborhoodSettings.houseCount} houses)`,
+        new THREE.Vector3(0, 50, 0)
+      );
       scene.add(label);
       this.labelMeshes.push(label);
 
-      logger.info('✅ Created Hospital');
+      logger.info(
+        `✅ Created ${this.neighborhoodSettings.formation} neighborhood with ${houses.length} houses`
+      );
     } catch (error) {
-      this.handleError(error as Error, 'creating hospital');
+      this.handleError(error as Error, 'loading neighborhood');
     }
+
+    // Update polygon count
+    this.updatePolygonCount();
   }
+
 
   private setupCamera(camera: THREE.Camera): void {
     const lookAt = new THREE.Vector3(0, 0, 0); // Center of town
