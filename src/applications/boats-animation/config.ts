@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import type { ParagliderVoxelOptions } from '../../foundation/components/vehicles';
-import adriModel from '../../../assets/foundation/models/characters/adri/adri.obj';
-import adriTextureImage from '../../../assets/foundation/models/characters/adri/adri.png';
+import { CharacterType } from '../../foundation/components/characters/CharacterRegistry';
 import { FlightPattern } from '../../foundation/systems/behaviors/FlyingBehavior';
 
 export type ParagliderVoxelConfig = {
@@ -189,8 +188,7 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
         numeroCajones: 35,
       },
       pilot: {
-        objFile: adriModel,
-        textureFile: adriTextureImage,
+        characterType: CharacterType.ADRI,
       },
     },
     position: new THREE.Vector3(6897, 920, -705),
