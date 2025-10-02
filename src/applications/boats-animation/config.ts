@@ -2,10 +2,33 @@ import * as THREE from 'three';
 import type { ParagliderVoxelOptions } from '../../foundation/components/vehicles';
 import adriModel from '../../../assets/foundation/models/characters/adri/adri.obj';
 import adriTextureImage from '../../../assets/foundation/models/characters/adri/adri.png';
+import { FlightPattern } from '../../foundation/systems/behaviors/FlyingBehavior';
 
 export type ParagliderVoxelConfig = {
   pg: ParagliderVoxelOptions;
   position: THREE.Vector3;
+};
+
+export type CessnaConfig = {
+  position: THREE.Vector3;
+  scale: number;
+  bodyColor: string;
+  wingColor: string;
+  propellerColor: string;
+  windowColor: string;
+  stripeColor: string;
+  flightPattern: FlightPattern;
+  speed: number;
+  turnSpeed: number;
+  flightRadius: number;
+  returnDistance: number;
+  minHeight: number;
+  maxHeight: number;
+  obstacleAvoidanceDistance: number;
+  forwardAxis: 'x' | 'y' | 'z' | '-x' | '-y' | '-z';
+  waypoints?: THREE.Vector3[];
+  waypointTension?: number;
+  waypointLoop?: boolean;
 };
 
 export type CameraPositionPreset = 'closeUp' | 'overhead' | 'waterLevel' | 'custom';
@@ -85,7 +108,7 @@ export interface AnimationConfig {
 // 4. Set staticMode.enableControls: true to allow manual camera navigation
 export const ANIMATION_CONFIG: AnimationConfig = {
   // Enable/disable camera animation
-  enableAnimation: false, // Set to false for static camera positioned close to boats
+  enableAnimation: true, // Set to false for static camera positioned close to boats
 
   // Static camera configuration (used when enableAnimation = false)
   staticMode: {
@@ -182,3 +205,40 @@ export const birdPath = [
   new THREE.Vector3(8000, 1000, -500),
   new THREE.Vector3(7000, 900, 0),
 ];
+
+// Cessna configuration - fast flyby near paraglider
+export const cessnaConfig: CessnaConfig = {
+  position: new THREE.Vector3(7200, 1000, 500), // Start behind and to the right of paraglider
+  scale: 3.0,
+  bodyColor: '#F4F4F4',
+  wingColor: '#E8E8E8',
+  propellerColor: '#2C3E50',
+  windowColor: '#87CEEB',
+  stripeColor: '#FF4500',
+  flightPattern: FlightPattern.WAYPOINT,
+  speed: 120, // Very fast to reach paraglider quickly
+  turnSpeed: 5.0,
+  flightRadius: 250,
+  returnDistance: 300,
+  minHeight: 1000,
+  maxHeight: 1500,
+  obstacleAvoidanceDistance: 200,
+  forwardAxis: 'x',
+  // Fast pass by paraglider, then touring path over boats
+  waypoints: [
+    // Pass left of paraglider
+    new THREE.Vector3(6600, 950, -705),
+    // Head towards boats area
+    new THREE.Vector3(7879, 980, -5445),
+    // Over boats area 2 (open water)
+    new THREE.Vector3(8279, 950, -6455),
+    // Return path
+    new THREE.Vector3(7200, 1000, -3000),
+    new THREE.Vector3(6200, 1000, 200),
+  ],
+  waypointTension: 0.5,
+  waypointLoop: true,
+};
+
+// Visibility flags
+export const SHOW_CESSNA = true;

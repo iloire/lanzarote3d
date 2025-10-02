@@ -8,10 +8,14 @@ import { OrbitControlsHelper } from '../../foundation/utils/OrbitControlsHelper'
 import { getAppConfig } from '../../config/app-registry';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { logger } from '../../foundation/utils/logger';
+import { Cessna } from '../../foundation/components/vehicles';
+import { EngineFlyingBehavior } from '../../foundation/systems/behaviors/EngineFlyingBehavior';
 import {
   ANIMATION_CONFIG,
   paraglidersVoxel,
   birdPath,
+  cessnaConfig,
+  SHOW_CESSNA,
 } from './config';
 import { loadParagliders } from './vehicleLoader';
 import {
@@ -30,6 +34,8 @@ class BoatsAnimationApp extends TerrainBase {
     private paragliderMeshes: THREE.Object3D[] = [];
     private isAnimating: boolean = false;
     private animationCleanup: (() => void) | undefined;
+    private cessnaMesh: THREE.Object3D | undefined;
+    private cessnaFlyingBehavior: EngineFlyingBehavior | undefined;
 
     constructor() {
         const appConfig = getAppConfig('boats');
@@ -118,6 +124,11 @@ class BoatsAnimationApp extends TerrainBase {
             // Add birds
             await this.environment.addBirds(birdPath);
 
+            // Add Cessna if enabled
+            if (SHOW_CESSNA) {
+                await this.addCessna(scene, terrain);
+            }
+
             // Setup camera animation sequence - ONLY DIFFERENCE from original
             this.setupCameraAnimation(camera, controls, renderer, scene);
 
@@ -168,6 +179,56 @@ class BoatsAnimationApp extends TerrainBase {
         }).cleanup;
     }
 
+    /**
+     * Add Cessna aircraft with waypoint-based flight behavior
+     */
+    private async addCessna(scene: THREE.Scene, terrain: THREE.Mesh): Promise<void> {
+        try {
+            const cessna = new Cessna({
+                bodyColor: cessnaConfig.bodyColor,
+                wingColor: cessnaConfig.wingColor,
+                propellerColor: cessnaConfig.propellerColor,
+                windowColor: cessnaConfig.windowColor,
+                stripeColor: cessnaConfig.stripeColor,
+                scale: cessnaConfig.scale,
+                castShadow: true,
+            });
+
+            this.cessnaMesh = await cessna.load();
+            this.cessnaMesh.position.copy(cessnaConfig.position);
+            scene.add(this.cessnaMesh);
+
+            // Create engine flying behavior with waypoints
+            this.cessnaFlyingBehavior = new EngineFlyingBehavior({
+                speed: cessnaConfig.speed,
+                turnSpeed: cessnaConfig.turnSpeed,
+                flightRadius: cessnaConfig.flightRadius,
+                cruiseAltitude: cessnaConfig.position.y,
+                minHeight: cessnaConfig.minHeight,
+                maxHeight: cessnaConfig.maxHeight,
+                terrainClearance: 100,
+                lookAheadDistance: 200,
+                centerPoint: cessnaConfig.position,
+                obstacleAvoidanceDistance: cessnaConfig.obstacleAvoidanceDistance,
+                autoStart: true,
+                faceDirection: true,
+                forwardAxis: cessnaConfig.forwardAxis,
+                debugVectors: false,
+                pattern: cessnaConfig.flightPattern,
+                waypoints: cessnaConfig.waypoints,
+                waypointTension: cessnaConfig.waypointTension,
+                waypointLoop: cessnaConfig.waypointLoop,
+            });
+
+            this.cessnaFlyingBehavior.attachTo(this.cessnaMesh);
+            this.cessnaFlyingBehavior.setTerrain(terrain);
+
+            logger.info('✈️  Cessna added with waypoint flight behavior');
+        } catch (error) {
+            logger.error('Failed to add Cessna:', error);
+        }
+    }
+
     private startAnimationLoop(
         renderer: THREE.WebGLRenderer,
         scene: THREE.Scene,
@@ -213,6 +274,13 @@ class BoatsAnimationApp extends TerrainBase {
         }
 
         this.isAnimating = false;
+
+        // Dispose Cessna flying behavior
+        if (this.cessnaFlyingBehavior) {
+            this.cessnaFlyingBehavior.dispose();
+            this.cessnaFlyingBehavior = undefined;
+        }
+        this.cessnaMesh = undefined;
 
         this.paragliderMeshes.forEach(mesh => {
             mesh.traverse(child => {
