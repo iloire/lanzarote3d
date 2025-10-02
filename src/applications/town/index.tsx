@@ -218,6 +218,9 @@ class TownWorkshop extends WorkshopDemoBase {
       cacti: 0,
       stones: 0,
       pools: 0,
+      roads: 0,
+      parks: 0,
+      squares: 0,
       other: 0
     };
 
@@ -266,6 +269,20 @@ class TownWorkshop extends WorkshopDemoBase {
           else if (allNames.includes('pool') || allNames.includes('water')) {
             polygonCounts.pools += childPolygons;
           }
+          // Road patterns
+          else if (allNames.includes('road') || allNames.includes('street') ||
+                   allNames.includes('path')) {
+            polygonCounts.roads += childPolygons;
+          }
+          // Park patterns
+          else if (allNames.includes('park') || allNames.includes('garden')) {
+            polygonCounts.parks += childPolygons;
+          }
+          // Square patterns
+          else if (allNames.includes('square') || allNames.includes('plaza') ||
+                   allNames.includes('townsquare')) {
+            polygonCounts.squares += childPolygons;
+          }
           // Everything else
           else {
             polygonCounts.other += childPolygons;
@@ -277,13 +294,21 @@ class TownWorkshop extends WorkshopDemoBase {
     const totalPolygons = Object.values(polygonCounts).reduce((sum, count) => sum + count, 0);
     this.performanceSettings.polygonCount = Math.floor(totalPolygons);
 
-    // Calculate percentages
+    // Calculate percentages (handle division by zero)
+    const calculatePercentage = (value: number) => {
+      if (totalPolygons === 0) return '0.0';
+      return ((value / totalPolygons) * 100).toFixed(1);
+    };
+
     const percentages = {
-      houses: ((polygonCounts.houses / totalPolygons) * 100).toFixed(1),
-      cacti: ((polygonCounts.cacti / totalPolygons) * 100).toFixed(1),
-      stones: ((polygonCounts.stones / totalPolygons) * 100).toFixed(1),
-      pools: ((polygonCounts.pools / totalPolygons) * 100).toFixed(1),
-      other: ((polygonCounts.other / totalPolygons) * 100).toFixed(1)
+      houses: calculatePercentage(polygonCounts.houses),
+      cacti: calculatePercentage(polygonCounts.cacti),
+      stones: calculatePercentage(polygonCounts.stones),
+      pools: calculatePercentage(polygonCounts.pools),
+      roads: calculatePercentage(polygonCounts.roads),
+      parks: calculatePercentage(polygonCounts.parks),
+      squares: calculatePercentage(polygonCounts.squares),
+      other: calculatePercentage(polygonCounts.other)
     };
 
     logger.info(`📊 Detailed Polygon Breakdown (LowPoly: ${this.isLowPoly}):`);
@@ -291,6 +316,9 @@ class TownWorkshop extends WorkshopDemoBase {
     logger.info(`  🌵 Cacti: ${Math.floor(polygonCounts.cacti).toLocaleString()} (${percentages.cacti}%)`);
     logger.info(`  🪨 Stones: ${Math.floor(polygonCounts.stones).toLocaleString()} (${percentages.stones}%)`);
     logger.info(`  🏊 Pools: ${Math.floor(polygonCounts.pools).toLocaleString()} (${percentages.pools}%)`);
+    logger.info(`  🛣️ Roads: ${Math.floor(polygonCounts.roads).toLocaleString()} (${percentages.roads}%)`);
+    logger.info(`  🌳 Parks: ${Math.floor(polygonCounts.parks).toLocaleString()} (${percentages.parks}%)`);
+    logger.info(`  🏛️ Squares: ${Math.floor(polygonCounts.squares).toLocaleString()} (${percentages.squares}%)`);
     logger.info(`  ❓ Other: ${Math.floor(polygonCounts.other).toLocaleString()} (${percentages.other}%)`);
     logger.info(`  📊 TOTAL: ${this.performanceSettings.polygonCount.toLocaleString()} polygons`);
 

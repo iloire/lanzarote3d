@@ -147,32 +147,37 @@ export class PerformanceUI {
     let polygonInfo = '';
 
     if (polygonBreakdown) {
-      const totalPolygons = Object.values(polygonBreakdown).reduce((sum, count) => sum + count, 0);
+      const totalPolygons = Object.values(polygonBreakdown).reduce((sum, count) => sum + (count || 0), 0);
 
-      // Calculate percentages
+      // Calculate percentages (handle division by zero)
+      const calculatePercentage = (value: number) => {
+        if (totalPolygons === 0) return '0.0';
+        return ((value / totalPolygons) * 100).toFixed(1);
+      };
+
       const percentages = {
-        houses: ((polygonBreakdown.houses / totalPolygons) * 100).toFixed(1),
-        cacti: ((polygonBreakdown.cacti / totalPolygons) * 100).toFixed(1),
-        stones: ((polygonBreakdown.stones / totalPolygons) * 100).toFixed(1),
-        pools: ((polygonBreakdown.pools / totalPolygons) * 100).toFixed(1),
-        roads: ((polygonBreakdown.roads / totalPolygons) * 100).toFixed(1),
-        parks: ((polygonBreakdown.parks / totalPolygons) * 100).toFixed(1),
-        squares: ((polygonBreakdown.squares / totalPolygons) * 100).toFixed(1),
-        other: ((polygonBreakdown.other / totalPolygons) * 100).toFixed(1)
+        houses: calculatePercentage(polygonBreakdown.houses || 0),
+        cacti: calculatePercentage(polygonBreakdown.cacti || 0),
+        stones: calculatePercentage(polygonBreakdown.stones || 0),
+        pools: calculatePercentage(polygonBreakdown.pools || 0),
+        roads: calculatePercentage(polygonBreakdown.roads || 0),
+        parks: calculatePercentage(polygonBreakdown.parks || 0),
+        squares: calculatePercentage(polygonBreakdown.squares || 0),
+        other: calculatePercentage(polygonBreakdown.other || 0)
       };
 
       polygonInfo = `
         <div><strong>Total Polygons:</strong> ${Math.floor(totalPolygons).toLocaleString()}</div>
         <div style="margin-top: 8px; font-size: 11px; color: #ddd; border-top: 1px solid #333; padding-top: 6px;">
           <div style="margin-bottom: 3px; font-weight: bold;">📊 Breakdown:</div>
-          <div>🏠 Houses: ${Math.floor(polygonBreakdown.houses).toLocaleString()} (${percentages.houses}%)</div>
-          <div>🌵 Cacti: ${Math.floor(polygonBreakdown.cacti).toLocaleString()} (${percentages.cacti}%)</div>
-          <div>🪨 Stones: ${Math.floor(polygonBreakdown.stones).toLocaleString()} (${percentages.stones}%)</div>
-          <div>🏊 Pools: ${Math.floor(polygonBreakdown.pools).toLocaleString()} (${percentages.pools}%)</div>
-          <div>🛣️ Roads: ${Math.floor(polygonBreakdown.roads).toLocaleString()} (${percentages.roads}%)</div>
-          <div>🌳 Parks: ${Math.floor(polygonBreakdown.parks).toLocaleString()} (${percentages.parks}%)</div>
-          <div>🏛️ Squares: ${Math.floor(polygonBreakdown.squares).toLocaleString()} (${percentages.squares}%)</div>
-          <div>❓ Other: ${Math.floor(polygonBreakdown.other).toLocaleString()} (${percentages.other}%)</div>
+          <div>🏠 Houses: ${Math.floor(polygonBreakdown.houses || 0).toLocaleString()} (${percentages.houses}%)</div>
+          <div>🌵 Cacti: ${Math.floor(polygonBreakdown.cacti || 0).toLocaleString()} (${percentages.cacti}%)</div>
+          <div>🪨 Stones: ${Math.floor(polygonBreakdown.stones || 0).toLocaleString()} (${percentages.stones}%)</div>
+          <div>🏊 Pools: ${Math.floor(polygonBreakdown.pools || 0).toLocaleString()} (${percentages.pools}%)</div>
+          <div>🛣️ Roads: ${Math.floor(polygonBreakdown.roads || 0).toLocaleString()} (${percentages.roads}%)</div>
+          <div>🌳 Parks: ${Math.floor(polygonBreakdown.parks || 0).toLocaleString()} (${percentages.parks}%)</div>
+          <div>🏛️ Squares: ${Math.floor(polygonBreakdown.squares || 0).toLocaleString()} (${percentages.squares}%)</div>
+          <div>❓ Other: ${Math.floor(polygonBreakdown.other || 0).toLocaleString()} (${percentages.other}%)</div>
         </div>
       `;
     } else {

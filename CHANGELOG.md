@@ -21,6 +21,12 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Added position validation check before creating houses
   - Added warning log when houses can't be placed due to exclusion zones
   - Prevents "Cannot read properties of undefined (reading 'x')" errors
+- **Performance Metrics NaN Values**: Fixed NaN percentage display in town application performance UI
+  - Added division by zero protection in PerformanceUI.updatePerformanceInfo()
+  - Added null/undefined checks for all polygon breakdown values
+  - Fixed town application polygon counting to include roads, parks, and squares properties
+  - Added pattern matching for roads, parks, and squares in updatePolygonCount()
+  - Now correctly displays "0.0%" instead of "NaN%" for empty categories
 
 ### Refactored
 - **Building Content Methods**: Separated low-poly and high-poly content creation for better code organization
