@@ -615,7 +615,7 @@ export class HouseGroupCreator {
     variation: NeighborhoodVariation = DEFAULT_VARIATION
   ): Promise<THREE.Object3D[]> {
     const houses = generateMixedNeighborhood(count, houseDistribution, variation);
-    const spacing = formation === 'rural' ? 150 : 90;
+    const spacing = formation === 'rural' ? 250 : 90;
 
     return this.createNeighborhood(houses, {
       center,
