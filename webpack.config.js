@@ -1,5 +1,6 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 /**
  * Build configuration from apps.json
@@ -152,6 +153,15 @@ module.exports = {
       title: 'Lanzarote - Famara animation',
       inject: 'body',
       minify: false
+    }),
+    // Copy assets folder to dist for production deployment
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: 'assets',
+          to: 'assets',
+        },
+      ],
     }),
   ],
 }; 
