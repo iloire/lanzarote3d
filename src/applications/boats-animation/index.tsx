@@ -69,6 +69,16 @@ class BoatsAnimationApp extends TerrainBase {
             const theme = options.theme ?? getDefaultTheme();
             await ThemeEngine.apply(options, theme);
 
+            // Set camera to initial position to avoid jarring transition
+            const initialCameraPosition = new THREE.Vector3(8055, 220, -6155);
+            camera.position.copy(initialCameraPosition);
+            const boatCenterPosition = new THREE.Vector3(8400, 0, -6100);
+            camera.lookAt(boatCenterPosition);
+            if (controls) {
+                controls.target.copy(boatCenterPosition);
+                controls.update();
+            }
+
             // Load voxel paragliders with proper tracking
             const paragliderResults = await loadParagliders(
                 scene,

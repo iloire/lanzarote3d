@@ -103,6 +103,16 @@ class AnimationApp extends TerrainBase {
         12000     // End fog sooner for denser effect
       );
 
+      // Set camera to initial animation position to avoid jarring transition
+      const initialCameraPosition = new THREE.Vector3(-2000, 2200, 5000);
+      camera.position.copy(initialCameraPosition);
+      const pgPos = paraglidersVoxel[0]?.position.clone() || new THREE.Vector3();
+      camera.lookAt(pgPos);
+      if (controls) {
+        controls.target.copy(pgPos);
+        controls.update();
+      }
+
       // Load voxel paragliders with proper tracking
       const paragliderResults = await loadParagliders(
         scene,
