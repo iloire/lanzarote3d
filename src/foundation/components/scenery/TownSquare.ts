@@ -71,9 +71,6 @@ export class TownSquare extends SimpleThreeComponent {
   }
 
   protected override createContent(): THREE.Object3D {
-    const square = new THREE.Group();
-    square.name = 'TownSquare';
-
     const {
       size = { width: 120, depth: 120 },
       pavingColor = '#A8A8A8',
@@ -88,10 +85,28 @@ export class TownSquare extends SimpleThreeComponent {
     const width = size.width * scale;
     const depth = size.depth * scale;
 
-    // Use low-poly version if requested
+    // Use appropriate version based on lowPoly flag
     if (lowPoly) {
       return this.createLowPolyContent(width, depth, pavingColor, monumentType);
+    } else {
+      return this.createHighPolyContent(width, depth, pavingColor, monumentType, benchCount, hasFlowerBeds, hasLampPosts);
     }
+  }
+
+  /**
+   * Create high-poly version of town square (~1000-5500 polygons)
+   */
+  private createHighPolyContent(
+    width: number,
+    depth: number,
+    pavingColor: string,
+    monumentType: 'obelisk' | 'statue' | 'fountain',
+    benchCount: number,
+    hasFlowerBeds: boolean,
+    hasLampPosts: boolean
+  ): THREE.Object3D {
+    const square = new THREE.Group();
+    square.name = 'TownSquare';
 
     // Materials
     const pavingMaterial = resourceManager.getOrCreateMaterial(

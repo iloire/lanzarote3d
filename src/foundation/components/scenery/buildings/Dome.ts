@@ -49,18 +49,25 @@ export class Dome extends SimpleThreeComponent {
   }
 
   protected override createContent(): THREE.Object3D {
-    const dome = new THREE.Group();
-    dome.name = 'Dome';
-
     const options = this.options as DomeOptions;
     const scale = options.scale || 1;
     const radius = options.radius || 8;
     const lowPoly = options.lowPoly ?? false;
 
-    // Use low-poly version if requested
+    // Use appropriate version based on lowPoly flag
     if (lowPoly) {
       return this.createLowPolyDome(radius, scale, options);
+    } else {
+      return this.createHighPolyDome(radius, scale, options);
     }
+  }
+
+  /**
+   * Create high-poly geodesic dome (~1000-3000 polygons)
+   */
+  private createHighPolyDome(radius: number, scale: number, options: DomeOptions): THREE.Object3D {
+    const dome = new THREE.Group();
+    dome.name = 'Dome';
 
     const panelRows = Math.max(4, Math.min(12, options.panelRows || 8));
     const panelColumns = Math.max(8, Math.min(24, options.panelColumns || 16));

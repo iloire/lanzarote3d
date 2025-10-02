@@ -14,6 +14,13 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Both buildings follow the same pattern as other buildings (lowPoly option instead of separate components)
   - Example: `new TownSquare({ lowPoly: true })` or `new Dome({ lowPoly: true })`
 
+### Refactored
+- **Building Content Methods**: Separated low-poly and high-poly content creation for better code organization
+  - TownSquare now has `createLowPolyContent()` and `createHighPolyContent()` methods
+  - Dome now has `createLowPolyDome()` and `createHighPolyDome()` methods
+  - Main `createContent()` method delegates to appropriate method based on lowPoly flag
+  - Improves code readability and maintainability
+
 ## [1.5.9] - 2025-10-01 14:45 UTC
 
 ### Fixed
