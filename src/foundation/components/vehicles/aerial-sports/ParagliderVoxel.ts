@@ -55,6 +55,7 @@ export class ParagliderVoxel extends SimpleThreeComponent {
     const wing = await this.glider.load();
     wing.translateY(-300);
     wing.translateX(300);
+    wing.rotateY(Math.PI / 2); // Rotate 90 degrees left to align with forward axis
     group.add(wing);
 
     // Create voxel pilot
@@ -65,7 +66,7 @@ export class ParagliderVoxel extends SimpleThreeComponent {
     this.pilotMesh.position.z = 0;
     const scale = 150;
     this.pilotMesh.scale.set(scale, scale, scale);
-    this.pilotMesh.rotateY(Math.PI / 2);
+    // Rotation now handled inside PilotVoxel class
     group.add(this.pilotMesh);
 
     return group;
