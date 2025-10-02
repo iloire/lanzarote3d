@@ -617,11 +617,17 @@ export class HouseGroupCreator {
     const houses = generateMixedNeighborhood(count, houseDistribution, variation);
     const spacing = formation === 'rural' ? 250 : 90;
 
+    // Scale neighborhood size based on house count
+    // Base size 120 for ~20 houses, scale up for more houses
+    const baseSize = 120;
+    const baseCount = 20;
+    const neighborhoodSize = baseSize * Math.sqrt(count / baseCount);
+
     return this.createNeighborhood(houses, {
       center,
       formation,
       spacing,
-      neighborhoodSize: 120,
+      neighborhoodSize,
       randomVariation: 0.3,
       exclusionZones: this.exclusionZones,
     }, variation);

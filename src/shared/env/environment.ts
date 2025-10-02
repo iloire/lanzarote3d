@@ -73,14 +73,14 @@ export interface TownConfig {
  * Real locations of major settlements on the island
  */
 export const LANZAROTE_TOWNS: TownConfig[] = [
-  { position: new THREE.Vector3(6879, 0, 545), houseCount: 50, formation: 'suburban' }, // tequise top
+  { position: new THREE.Vector3(6879, 0, 545), houseCount: 50, formation: 'rural' }, // tequise top
 
 
-  { position: new THREE.Vector3(6279, 0, -3155), houseCount: 220, formation: 'suburban' }, // famara
+  { position: new THREE.Vector3(6279, 0, -3155), houseCount: 220, formation: 'rural' }, // famara
 
 
 
-  { position: new THREE.Vector3(7827, 0, -3460), houseCount: 50, formation: 'suburban' }, // noruegos
+  { position: new THREE.Vector3(7827, 0, -3460), houseCount: 50, formation: 'grid' }, // noruegos
 
   { position: new THREE.Vector3(5600, 0, 1205), houseCount: 51, formation: 'suburban' }, // teguise
 ];
@@ -301,10 +301,28 @@ class Environment {
       );
 
       // Adapt all created houses to terrain height
+      // AND update associated land plots, cacti, and stones at the same location
       meshes.forEach((mesh: THREE.Object3D) => {
         const meshTerrainHeight = this.getTerrainHeight(mesh.position.x, mesh.position.z, terrain);
         if (!isNaN(meshTerrainHeight)) {
+          const oldY = mesh.position.y;
+          const deltaY = meshTerrainHeight - oldY;
           mesh.position.y = meshTerrainHeight;
+
+          // Update all scene objects near this house (land plots, cacti, stones, pools)
+          // that were positioned relative to the house's old position
+          this.scene.traverse((obj: THREE.Object3D) => {
+            if (obj !== mesh && obj.position.y === (oldY - 0.5)) {
+              // Check if object is within 200 units of the house (land plot range)
+              const dx = obj.position.x - mesh.position.x;
+              const dz = obj.position.z - mesh.position.z;
+              const distance = Math.sqrt(dx * dx + dz * dz);
+
+              if (distance < 200) {
+                obj.position.y += deltaY;
+              }
+            }
+          });
         }
       });
 
