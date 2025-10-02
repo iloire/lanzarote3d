@@ -186,33 +186,19 @@ class AnimationApp extends TerrainBase {
       // Create Lanzarote towns using the predefined configuration
       await this.environment.addTownsFromConfig(LANZAROTE_TOWNS, terrain);
 
-      // Create road connecting the neighborhoods
+      // Create individual roads connecting each pair of towns
       // Roads stop ~200 units before town centers to avoid passing through houses
       const roadOffset = 200;
-      const roadControlPoints = [
-        // Start: approach Tequise top from south
-        new THREE.Vector3(LANZAROTE_TOWNS[0].position.x, 0, LANZAROTE_TOWNS[0].position.z + roadOffset),
-        // End: leave Tequise top towards Famara
-        new THREE.Vector3(LANZAROTE_TOWNS[0].position.x, 0, LANZAROTE_TOWNS[0].position.z - roadOffset),
-        // Approach Famara from north
-        new THREE.Vector3(LANZAROTE_TOWNS[1].position.x, 0, LANZAROTE_TOWNS[1].position.z + roadOffset),
-        // Leave Famara towards intermediate point
-        new THREE.Vector3(LANZAROTE_TOWNS[1].position.x + roadOffset, 0, LANZAROTE_TOWNS[1].position.z),
-        // Intermediate point between Famara and Noruegos
-        new THREE.Vector3(6705.5, 0, -3263.7),
-        // Approach Noruegos from west
-        new THREE.Vector3(LANZAROTE_TOWNS[2].position.x - roadOffset, 0, LANZAROTE_TOWNS[2].position.z),
-        // Leave Noruegos towards Teguise
-        new THREE.Vector3(LANZAROTE_TOWNS[2].position.x, 0, LANZAROTE_TOWNS[2].position.z + roadOffset),
-        // Approach final Teguise from east
-        new THREE.Vector3(LANZAROTE_TOWNS[3].position.x + roadOffset, 0, LANZAROTE_TOWNS[3].position.z),
-      ];
 
-      const road = new ProceduralRoad({
-        controlPoints: roadControlPoints,
+      // Road 1: Tequise top to Famara
+      const road1 = new ProceduralRoad({
+        controlPoints: [
+          new THREE.Vector3(LANZAROTE_TOWNS[0].position.x, 0, LANZAROTE_TOWNS[0].position.z - roadOffset),
+          new THREE.Vector3(LANZAROTE_TOWNS[1].position.x, 0, LANZAROTE_TOWNS[1].position.z + roadOffset),
+        ],
         terrain,
         width: 8,
-        segments: 150,
+        segments: 50,
         roadColor: '#f2f2f2',
         showCenterLine: true,
         showEdgeLines: true,
@@ -221,9 +207,52 @@ class AnimationApp extends TerrainBase {
         transparent: true
       });
 
-      const roadMesh = await road.load();
-      scene.add(roadMesh);
-      logger.info('✅ Road connecting neighborhoods created');
+      // Road 2: Famara to Noruegos (via intermediate point)
+      const road2 = new ProceduralRoad({
+        controlPoints: [
+          new THREE.Vector3(LANZAROTE_TOWNS[1].position.x + roadOffset, 0, LANZAROTE_TOWNS[1].position.z),
+          new THREE.Vector3(6705.5, 0, -3263.7), // Intermediate point
+          new THREE.Vector3(LANZAROTE_TOWNS[2].position.x - roadOffset, 0, LANZAROTE_TOWNS[2].position.z),
+        ],
+        terrain,
+        width: 8,
+        segments: 80,
+        roadColor: '#f2f2f2',
+        showCenterLine: true,
+        showEdgeLines: true,
+        heightOffset: 5,
+        opacity: 0.2,
+        transparent: true
+      });
+
+      // Road 3: Noruegos to Teguise
+      const road3 = new ProceduralRoad({
+        controlPoints: [
+          new THREE.Vector3(LANZAROTE_TOWNS[2].position.x, 0, LANZAROTE_TOWNS[2].position.z + roadOffset),
+          new THREE.Vector3(LANZAROTE_TOWNS[3].position.x + roadOffset, 0, LANZAROTE_TOWNS[3].position.z),
+        ],
+        terrain,
+        width: 8,
+        segments: 50,
+        roadColor: '#f2f2f2',
+        showCenterLine: true,
+        showEdgeLines: true,
+        heightOffset: 5,
+        opacity: 0.2,
+        transparent: true
+      });
+
+      // Load and add all roads to scene
+      const [roadMesh1, roadMesh2, roadMesh3] = await Promise.all([
+        road1.load(),
+        road2.load(),
+        road3.load(),
+      ]);
+
+      scene.add(roadMesh1);
+      scene.add(roadMesh2);
+      scene.add(roadMesh3);
+      logger.info('✅ 3 roads connecting neighborhoods created');
 
       this.environment.addRandomBoats(water); // Use randomized boat types for variety
 
