@@ -205,18 +205,18 @@ export class HouseGroupCreator {
         houseMesh.rotation.y = rotations[Math.floor(Math.random() * rotations.length)];
       }
 
-      // Add land plot if specified
+      // Add land plot if specified (use houseMesh.position to handle invalid positions)
       if (houseConfig.landPlot) {
-        await this.addLandPlot(position, houseConfig.landPlot, houseMesh.rotation.y);
+        await this.addLandPlot(houseMesh.position, houseConfig.landPlot, houseMesh.rotation.y);
       }
 
       // Add to scene and track
       this.scene.add(houseMesh);
       this.createdObjects.push(houseMesh);
 
-      // Add pool if specified and house doesn't already include one
+      // Add pool if specified and house doesn't already include one (use houseMesh.position)
       if (houseConfig.includePool && houseConfig.type !== 'DesertHouseWithPool') {
-        await this.addPoolToHouse(position, scale);
+        await this.addPoolToHouse(houseMesh.position, scale);
       }
 
       return houseMesh;
@@ -437,14 +437,24 @@ export class HouseGroupCreator {
     const positions = calculateHousePositions(houses.length, groupConfig);
 
     // Create each house with its specific configuration
-    for (let i = 0; i < houses.length; i++) {
+    // Note: positions.length might be less than houses.length if some were excluded
+    const actualHouseCount = Math.min(houses.length, positions.length);
+
+    for (let i = 0; i < actualHouseCount; i++) {
       const houseConfig = houses[i];
       const position = positions[i];
 
-      const houseMesh = await this.createSingleHouse(houseConfig, position);
-      if (houseMesh) {
-        houseMeshes.push(houseMesh);
+      if (position) {
+        const houseMesh = await this.createSingleHouse(houseConfig, position);
+        if (houseMesh) {
+          houseMeshes.push(houseMesh);
+        }
       }
+    }
+
+    // Log warning if some houses couldn't be placed
+    if (positions.length < houses.length) {
+      logger.warn(`Only placed ${positions.length} of ${houses.length} houses due to exclusion zones`);
     }
 
     return houseMeshes;

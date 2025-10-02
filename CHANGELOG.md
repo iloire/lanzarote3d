@@ -14,6 +14,14 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Both buildings follow the same pattern as other buildings (lowPoly option instead of separate components)
   - Example: `new TownSquare({ lowPoly: true })` or `new Dome({ lowPoly: true })`
 
+### Fixed
+- **HouseGroupCreator Position Errors**: Fixed undefined position errors when creating houses
+  - Fixed addLandPlot() and addPoolToHouse() to use houseMesh.position instead of invalid position parameter
+  - Fixed createNeighborhood() to handle cases where positions.length < houses.length due to exclusion zones
+  - Added position validation check before creating houses
+  - Added warning log when houses can't be placed due to exclusion zones
+  - Prevents "Cannot read properties of undefined (reading 'x')" errors
+
 ### Refactored
 - **Building Content Methods**: Separated low-poly and high-poly content creation for better code organization
   - TownSquare now has `createLowPolyContent()` and `createHighPolyContent()` methods
