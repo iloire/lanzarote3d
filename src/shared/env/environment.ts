@@ -64,8 +64,8 @@ const DEFAULT_BOAT_WEIGHTS: BoatTypeWeights = {
  */
 export interface TownConfig {
   position: THREE.Vector3;
-  type: 'village' | 'town' | 'city' | 'suburban' | 'rural';
-  size: 'small' | 'medium' | 'large';
+  houseCount: number;
+  formation: 'street' | 'cul-de-sac' | 'grid' | 'suburban' | 'rural' | 'random';
 }
 
 /**
@@ -73,10 +73,10 @@ export interface TownConfig {
  * Real locations of major settlements on the island
  */
 export const LANZAROTE_TOWNS: TownConfig[] = [
-  { position: new THREE.Vector3(6879, 0, 545), type: 'suburban', size: 'large' },
-  { position: new THREE.Vector3(6279, 0, -3155), type: 'village', size: 'large' },
-  { position: new THREE.Vector3(7827, 0, -3460), type: 'village', size: 'large' },
-  { position: new THREE.Vector3(5600, 0, 1205), type: 'city', size: 'large' },
+  { position: new THREE.Vector3(6879, 0, 545), houseCount: 30, formation: 'suburban' },
+  { position: new THREE.Vector3(6279, 0, -3155), houseCount: 21, formation: 'random' },
+  { position: new THREE.Vector3(7827, 0, -3460), houseCount: 21, formation: 'random' },
+  { position: new THREE.Vector3(5600, 0, 1205), houseCount: 51, formation: 'grid' },
 ];
 
 class Environment {
@@ -336,52 +336,18 @@ class Environment {
     center: THREE.Vector3,
     terrain: THREE.Mesh,
     options?: {
-      type?: 'village' | 'town' | 'city' | 'suburban' | 'rural';
-      size?: 'small' | 'medium' | 'large';
+      houseCount?: number;
+      formation?: 'street' | 'cul-de-sac' | 'grid' | 'suburban' | 'rural' | 'random';
       lowPoly?: boolean;
     }
   ): Promise<THREE.Object3D[]> {
     const {
-      type = 'town',
-      size = 'medium',
+      houseCount = 20,
+      formation = 'random',
       lowPoly = true
     } = options || {};
 
-    // Map town type and size to house count and formation
-    let houseCount: number;
-    let formation: 'street' | 'cul-de-sac' | 'grid' | 'suburban' | 'rural' | 'random';
-
-    // Determine house count based on size
-    const sizeToCount = {
-      small: { village: 9, rural: 10, suburban: 13, town: 17, city: 26 },
-      medium: { village: 13, rural: 17, suburban: 21, town: 26, city: 34 },
-      large: { village: 21, rural: 26, suburban: 30, town: 34, city: 51 },
-    };
-
-    houseCount = sizeToCount[size][type];
-
-    // Determine formation based on town type
-    switch (type) {
-      case 'village':
-        formation = 'random';
-        break;
-      case 'rural':
-        formation = 'rural';
-        break;
-      case 'suburban':
-        formation = 'suburban';
-        break;
-      case 'town':
-        formation = 'street';
-        break;
-      case 'city':
-        formation = 'grid';
-        break;
-      default:
-        formation = 'random';
-    }
-
-    logger.info(`🏘️ Creating ${size} ${type} with ${houseCount} houses at position (${center.x}, ${center.z})`);
+    logger.info(`🏘️ Creating ${formation} neighborhood with ${houseCount} houses at position (${center.x}, ${center.z})`);
 
     return this.createHouseNeighborhood(
       center,
@@ -408,8 +374,8 @@ class Environment {
 
     for (const town of towns) {
       const houses = await this.addTown(town.position, terrain, {
-        type: town.type,
-        size: town.size,
+        houseCount: town.houseCount,
+        formation: town.formation,
         lowPoly,
       });
       allHouses.push(...houses);
