@@ -59,6 +59,26 @@ const DEFAULT_BOAT_WEIGHTS: BoatTypeWeights = {
   PatrolBoat: 0.8, // Rare but visible - official/security vessels
 };
 
+/**
+ * Town configuration for placing settlements
+ */
+export interface TownConfig {
+  position: THREE.Vector3;
+  type: 'village' | 'town' | 'city' | 'suburban' | 'rural';
+  size: 'small' | 'medium' | 'large';
+}
+
+/**
+ * Lanzarote island town configuration
+ * Real locations of major settlements on the island
+ */
+export const LANZAROTE_TOWNS: TownConfig[] = [
+  { position: new THREE.Vector3(6879, 0, 545), type: 'suburban', size: 'large' },
+  { position: new THREE.Vector3(6279, 0, -3155), type: 'village', size: 'large' },
+  { position: new THREE.Vector3(7827, 0, -3460), type: 'village', size: 'large' },
+  { position: new THREE.Vector3(5600, 0, 1205), type: 'city', size: 'large' },
+];
+
 class Environment {
   birds!: FlockBirds;
   hg!: HangGlider;
@@ -333,9 +353,9 @@ class Environment {
 
     // Determine house count based on size
     const sizeToCount = {
-      small: { village: 5, rural: 6, suburban: 8, town: 10, city: 15 },
-      medium: { village: 8, rural: 10, suburban: 12, town: 15, city: 20 },
-      large: { village: 12, rural: 15, suburban: 18, town: 20, city: 30 },
+      small: { village: 9, rural: 10, suburban: 13, town: 17, city: 26 },
+      medium: { village: 13, rural: 17, suburban: 21, town: 26, city: 34 },
+      large: { village: 21, rural: 26, suburban: 30, town: 34, city: 51 },
     };
 
     houseCount = sizeToCount[size][type];
@@ -372,6 +392,32 @@ class Environment {
     );
   }
 
+  /**
+   * Add multiple towns from a configuration array
+   * @param towns - Array of town configurations
+   * @param terrain - Terrain mesh for height adaptation
+   * @param lowPoly - Whether to use low-poly models (default: true)
+   * @returns Array of all created house meshes
+   */
+  async addTownsFromConfig(
+    towns: TownConfig[],
+    terrain: THREE.Mesh,
+    lowPoly: boolean = true
+  ): Promise<THREE.Object3D[]> {
+    const allHouses: THREE.Object3D[] = [];
+
+    for (const town of towns) {
+      const houses = await this.addTown(town.position, terrain, {
+        type: town.type,
+        size: town.size,
+        lowPoly,
+      });
+      allHouses.push(...houses);
+    }
+
+    return allHouses;
+  }
+
   async addHouses(terrain: THREE.Mesh, lowPoly: boolean = true): Promise<THREE.Vector3[]> {
     // Create multiple neighborhoods at the same locations as before but using the new addTown helper
     const mode = lowPoly ? 'LOW-POLY' : 'HIGH-DETAIL';
@@ -387,7 +433,7 @@ class Environment {
 
       // Famara - coastal town
       const center2 = new THREE.Vector3(6279, 0, -3155);
-      await this.addTown(center2, terrain, { type: 'town', size: 'medium', lowPoly });
+      await this.addTown(center2, terrain, { type: 'village', size: 'medium', lowPoly });
       neighborhoodCenters.push(center2);
 
       // Noruegos - small rural village

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import Environment from '../../shared/env/environment';
+import Environment, { LANZAROTE_TOWNS } from '../../shared/env/environment';
 import { StoryOptions } from '../../shared/types';
 import { getDefaultTheme } from '../../foundation/themes';
 import { ThemeEngine } from '../../foundation/systems/ThemeEngine';
@@ -89,27 +89,8 @@ class FamaraApp extends TerrainBase {
       await this.environment.addCloudsFromTheme(thermals, theme);
 
 
-      // Create towns using the new addTown helper
-      await this.environment.addTown(
-        new THREE.Vector3(6879, 0, 545),
-        terrain,
-        { type: 'suburban', size: 'large' }
-      );
-      await this.environment.addTown(
-        new THREE.Vector3(6279, 0, -3155),
-        terrain,
-        { type: 'town', size: 'large' }
-      );
-      await this.environment.addTown(
-        new THREE.Vector3(7827, 0, -3460),
-        terrain,
-        { type: 'village', size: 'large' }
-      );
-      await this.environment.addTown(
-        new THREE.Vector3(5600, 0, 1205),
-        terrain,
-        { type: 'city', size: 'large' }
-      );
+      // Create Lanzarote towns using the predefined configuration
+      await this.environment.addTownsFromConfig(LANZAROTE_TOWNS, terrain);
 
       this.environment.addBoats(water);
 
