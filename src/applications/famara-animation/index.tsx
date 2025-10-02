@@ -1,5 +1,12 @@
 import * as THREE from 'three';
-import Environment, { LANZAROTE_TOWNS } from '../../shared/env/environment';
+import Environment, {
+  LANZAROTE_TOWNS,
+  TOWN_TEGUISE_TOP,
+  TOWN_FAMARA,
+  TOWN_NORUEGOS,
+  TOWN_TEGUISE,
+  TOWN_LA_CALETA,
+} from '../../shared/env/environment';
 import { StoryOptions } from '../../shared/types';
 import { getDefaultTheme } from '../../foundation/themes';
 import { ThemeEngine } from '../../foundation/systems/ThemeEngine';
@@ -190,11 +197,11 @@ class AnimationApp extends TerrainBase {
       // Roads stop ~200 units before town centers to avoid passing through houses
       const roadOffset = 200;
 
-      // Road 1: Tequise top to Famara
+      // Road 1: Teguise top to Famara
       const road1 = new ProceduralRoad({
         controlPoints: [
-          new THREE.Vector3(LANZAROTE_TOWNS[0].position.x, 0, LANZAROTE_TOWNS[0].position.z - roadOffset),
-          new THREE.Vector3(LANZAROTE_TOWNS[1].position.x, 0, LANZAROTE_TOWNS[1].position.z + roadOffset),
+          new THREE.Vector3(TOWN_TEGUISE_TOP.x, 0, TOWN_TEGUISE_TOP.z - roadOffset),
+          new THREE.Vector3(TOWN_FAMARA.x, 0, TOWN_FAMARA.z + roadOffset),
         ],
         terrain,
         width: 8,
@@ -210,9 +217,9 @@ class AnimationApp extends TerrainBase {
       // Road 2: Famara to Noruegos (via intermediate point)
       const road2 = new ProceduralRoad({
         controlPoints: [
-          new THREE.Vector3(LANZAROTE_TOWNS[1].position.x + roadOffset, 0, LANZAROTE_TOWNS[1].position.z),
+          new THREE.Vector3(TOWN_FAMARA.x + roadOffset, 0, TOWN_FAMARA.z),
           new THREE.Vector3(6705.5, 0, -3263.7), // Intermediate point
-          new THREE.Vector3(LANZAROTE_TOWNS[2].position.x - roadOffset, 0, LANZAROTE_TOWNS[2].position.z),
+          new THREE.Vector3(TOWN_NORUEGOS.x - roadOffset, 0, TOWN_NORUEGOS.z),
         ],
         terrain,
         width: 8,
@@ -228,8 +235,8 @@ class AnimationApp extends TerrainBase {
       // Road 3: Noruegos to Teguise
       const road3 = new ProceduralRoad({
         controlPoints: [
-          new THREE.Vector3(LANZAROTE_TOWNS[2].position.x, 0, LANZAROTE_TOWNS[2].position.z + roadOffset),
-          new THREE.Vector3(LANZAROTE_TOWNS[3].position.x + roadOffset, 0, LANZAROTE_TOWNS[3].position.z),
+          new THREE.Vector3(TOWN_NORUEGOS.x, 0, TOWN_NORUEGOS.z + roadOffset),
+          new THREE.Vector3(TOWN_TEGUISE.x + roadOffset, 0, TOWN_TEGUISE.z),
         ],
         terrain,
         width: 8,
@@ -242,11 +249,11 @@ class AnimationApp extends TerrainBase {
         transparent: true
       });
 
-      // Road 4: New settlement to Famara
+      // Road 4: La Caleta to Famara
       const road4 = new ProceduralRoad({
         controlPoints: [
-          new THREE.Vector3(LANZAROTE_TOWNS[4].position.x + roadOffset, 0, LANZAROTE_TOWNS[4].position.z),
-          new THREE.Vector3(LANZAROTE_TOWNS[1].position.x - roadOffset, 0, LANZAROTE_TOWNS[1].position.z),
+          new THREE.Vector3(TOWN_LA_CALETA.x + roadOffset, 0, TOWN_LA_CALETA.z),
+          new THREE.Vector3(TOWN_FAMARA.x - roadOffset, 0, TOWN_FAMARA.z),
         ],
         terrain,
         width: 8,

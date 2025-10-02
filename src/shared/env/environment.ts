@@ -70,19 +70,25 @@ export interface TownConfig {
 }
 
 /**
+ * Lanzarote island landmark positions
+ * Named locations for major settlements on the island
+ */
+export const TOWN_TEGUISE_TOP = new THREE.Vector3(6879, 0, 545);
+export const TOWN_FAMARA = new THREE.Vector3(6279, 0, -3155);
+export const TOWN_NORUEGOS = new THREE.Vector3(7827, 0, -3460);
+export const TOWN_TEGUISE = new THREE.Vector3(5600, 0, 1205);
+export const TOWN_LA_CALETA = new THREE.Vector3(2866.8, 270.8, -2598.7);
+
+/**
  * Lanzarote island town configuration
  * Real locations of major settlements on the island
  */
 export const LANZAROTE_TOWNS: TownConfig[] = [
-  { position: new THREE.Vector3(6879, 0, 545), houseCount: 50, formation: 'rural', spacing: 2.0 }, // tequise top
-
-  { position: new THREE.Vector3(6279, 0, -3155), houseCount: 120, formation: 'rural', spacing: 2.0 }, // famara
-
-  { position: new THREE.Vector3(7827, 0, -3460), houseCount: 50, formation: 'grid' }, // noruegos
-
-  { position: new THREE.Vector3(5600, 0, 1205), houseCount: 51, formation: 'suburban' }, // teguise
-
-  { position: new THREE.Vector3(2866.8, 270.8, -2598.7), houseCount: 40, formation: 'rural' }, // new settlement
+  { position: TOWN_TEGUISE_TOP, houseCount: 50, formation: 'rural', spacing: 2.0 },
+  { position: TOWN_FAMARA, houseCount: 120, formation: 'rural', spacing: 2.0 },
+  { position: TOWN_NORUEGOS, houseCount: 50, formation: 'grid' },
+  { position: TOWN_TEGUISE, houseCount: 51, formation: 'suburban' },
+  { position: TOWN_LA_CALETA, houseCount: 40, formation: 'rural' },
 ];
 
 class Environment {
