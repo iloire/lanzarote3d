@@ -232,25 +232,8 @@ class AnimationApp extends TerrainBase {
         transparent: true
       });
 
-      // Road 3: Noruegos to Teguise
+      // Road 3: La Caleta to Famara
       const road3 = new ProceduralRoad({
-        controlPoints: [
-          new THREE.Vector3(TOWN_NORUEGOS.x, 0, TOWN_NORUEGOS.z + roadOffset),
-          new THREE.Vector3(TOWN_TEGUISE.x + roadOffset, 0, TOWN_TEGUISE.z),
-        ],
-        terrain,
-        width: 8,
-        segments: 50,
-        roadColor: '#f2f2f2',
-        showCenterLine: true,
-        showEdgeLines: true,
-        heightOffset: 5,
-        opacity: 0.2,
-        transparent: true
-      });
-
-      // Road 4: La Caleta to Famara
-      const road4 = new ProceduralRoad({
         controlPoints: [
           new THREE.Vector3(TOWN_LA_CALETA.x + roadOffset, 0, TOWN_LA_CALETA.z),
           new THREE.Vector3(TOWN_FAMARA.x - roadOffset, 0, TOWN_FAMARA.z),
@@ -267,18 +250,16 @@ class AnimationApp extends TerrainBase {
       });
 
       // Load and add all roads to scene
-      const [roadMesh1, roadMesh2, roadMesh3, roadMesh4] = await Promise.all([
+      const [roadMesh1, roadMesh2, roadMesh3] = await Promise.all([
         road1.load(),
         road2.load(),
         road3.load(),
-        road4.load(),
       ]);
 
       scene.add(roadMesh1);
       scene.add(roadMesh2);
       scene.add(roadMesh3);
-      scene.add(roadMesh4);
-      logger.info('✅ 4 roads connecting neighborhoods created');
+      logger.info('✅ 3 roads connecting neighborhoods created');
 
       this.environment.addRandomBoats(water); // Use randomized boat types for variety
 
