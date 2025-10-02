@@ -187,12 +187,25 @@ class AnimationApp extends TerrainBase {
       await this.environment.addTownsFromConfig(LANZAROTE_TOWNS, terrain);
 
       // Create road connecting the neighborhoods
+      // Roads stop ~200 units before town centers to avoid passing through houses
+      const roadOffset = 200;
       const roadControlPoints = [
-        LANZAROTE_TOWNS[0].position, // Suburban area near paraglider
-        LANZAROTE_TOWNS[1].position, // Famara coastal village
-        new THREE.Vector3(6705.5, 0, -3263.7), // Intermediate point 1
-        LANZAROTE_TOWNS[2].position, // Noruegos rural settlement
-        LANZAROTE_TOWNS[3].position, // Teguise town center
+        // Start: approach Tequise top from south
+        new THREE.Vector3(LANZAROTE_TOWNS[0].position.x, 0, LANZAROTE_TOWNS[0].position.z + roadOffset),
+        // End: leave Tequise top towards Famara
+        new THREE.Vector3(LANZAROTE_TOWNS[0].position.x, 0, LANZAROTE_TOWNS[0].position.z - roadOffset),
+        // Approach Famara from north
+        new THREE.Vector3(LANZAROTE_TOWNS[1].position.x, 0, LANZAROTE_TOWNS[1].position.z + roadOffset),
+        // Leave Famara towards intermediate point
+        new THREE.Vector3(LANZAROTE_TOWNS[1].position.x + roadOffset, 0, LANZAROTE_TOWNS[1].position.z),
+        // Intermediate point between Famara and Noruegos
+        new THREE.Vector3(6705.5, 0, -3263.7),
+        // Approach Noruegos from west
+        new THREE.Vector3(LANZAROTE_TOWNS[2].position.x - roadOffset, 0, LANZAROTE_TOWNS[2].position.z),
+        // Leave Noruegos towards Teguise
+        new THREE.Vector3(LANZAROTE_TOWNS[2].position.x, 0, LANZAROTE_TOWNS[2].position.z + roadOffset),
+        // Approach final Teguise from east
+        new THREE.Vector3(LANZAROTE_TOWNS[3].position.x + roadOffset, 0, LANZAROTE_TOWNS[3].position.z),
       ];
 
       const road = new ProceduralRoad({
