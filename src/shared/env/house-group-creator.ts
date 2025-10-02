@@ -68,6 +68,7 @@ export class HouseGroupCreator {
   setLOD(lod: LevelOfDetail): void {
     this.levelOfDetail = lod;
     this.lowPoly = (lod === LevelOfDetail.LOW || lod === LevelOfDetail.ULTRA_LOW);
+    logger.info(`🏠 HouseGroupCreator LOD set to: ${lod} (lowPoly: ${this.lowPoly})`);
   }
 
   /**
