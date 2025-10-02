@@ -13,7 +13,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Abstract LODComponent base class for easy LOD implementation
   - Backward compatibility with legacy lowPoly boolean parameter
 
-- **LOD-Enabled Buildings**: Updated TownSquare and Dome with 4-level LOD support
+- **LOD-Enabled Buildings**: Migrated 9 building components to 4-level LOD system for optimal performance
   - **TownSquare LOD levels**:
     - ULTRA_LOW (~30-50 polys): Single plane + simple box monument
     - LOW (~60-150 polys): Simple ground + basic monument + 4 benches
@@ -24,13 +24,53 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
     - LOW (~100-200 polys): 8-segment hemisphere + basic furniture
     - MEDIUM (~600-1000 polys): 12-segment geodesic with 6×12 panels
     - HIGH (~2000-3000 polys): Full geodesic with 8×16 panels
+  - **House LOD levels** (supports Small/Medium/Large/Modern types):
+    - ULTRA_LOW (~20-50 polys): Single box + roof
+    - LOW (~100-300 polys): Main wing + roof + simple door
+    - MEDIUM (~500-1000 polys): All wings + roofs + simple windows (no frames)
+    - HIGH (~2000+ polys): Full detail with frames, modern features
+  - **Villa LOD levels**:
+    - ULTRA_LOW (~20-50 polys): Single box + roof
+    - LOW (~100-300 polys): Main building + roof + 2 columns
+    - MEDIUM (~500-1000 polys): Main + wings + roofs + simple windows
+    - HIGH (~2000+ polys): Full luxury with pool, terrace, cylindrical columns
+  - **Barn LOD levels**:
+    - ULTRA_LOW (~24 polys): Box body + flat roof
+    - LOW (~36 polys): Body + angled roof + door
+    - MEDIUM (~60 polys): Body + roof + door + 2 windows
+    - HIGH (~60 polys): Full detail with trim
+  - **Townhouse LOD levels**:
+    - ULTRA_LOW (~20-50 polys): Single box + roof
+    - LOW (~100-200 polys): Body + simple roof + door
+    - MEDIUM (~500-800 polys): Body + roof + peak + simplified windows
+    - HIGH (~1500-2000 polys): Full detail with frames, cornices, chimney
+  - **DesertHouse LOD levels**:
+    - ULTRA_LOW (~20-50 polys): Box + flat roof
+    - LOW (~100-200 polys): Body + roof + door + 1 window
+    - MEDIUM (~500-800 polys): Body + parapet + door + 3 windows
+    - HIGH (~1500-2000 polys): Full adobe detail with cactus, courtyard, shade
+  - **DesertHouseWithPool LOD levels**:
+    - ULTRA_LOW (~30-60 polys): Simple house + pool boxes
+    - LOW (~150-300 polys): House structure + pool
+    - MEDIUM (~800-1200 polys): House + pool + minimal landscaping
+    - HIGH (~2500+ polys): Full detail with async-loaded components, all amenities
+  - **Hospital LOD levels**:
+    - ULTRA_LOW (~24 polys): Single box + roof
+    - LOW (~72 polys): Main body + simple cross + 3 windows
+    - MEDIUM (~144 polys): Main + wings + cross + 6 windows
+    - HIGH (~2500-3000 polys): Full medical facility with helipad, emergency entrance
 
 ### Changed
-- **Building Architecture**: Migrated TownSquare and Dome from SimpleThreeComponent to LODComponent
-  - Replaces lowPoly boolean with levelOfDetail enum for finer control
+- **Building Architecture**: Migrated 9 building components from SimpleThreeComponent to LODComponent
+  - Buildings: TownSquare, Dome, House, Villa, Barn, Townhouse, DesertHouse, DesertHouseWithPool, Hospital
+  - Replaces lowPoly boolean with levelOfDetail enum for finer control (4 levels)
   - Dynamic LOD switching support via setLOD() method
   - Built-in polygon counting for monitoring/debugging
+  - LOD-specific material/geometry naming prevents resource conflicts
   - Maintains full backward compatibility with existing code using lowPoly
+  - Total changes: +1684 insertions, -557 deletions across 7 building files
+  - Performance benefits: Reduced polygon count for distant buildings improves frame rate
+  - Supports explicit LOD control via levelOfDetail parameter for fine-tuned performance
 
 ## [1.5.10] - 2025-10-01 15:00 UTC
 
