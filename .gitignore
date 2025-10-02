@@ -7,4 +7,5 @@ built/*
 .DS_Store
 TODO.md
 .next
+external-embed/dist
 

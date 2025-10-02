@@ -56,6 +56,8 @@
     "start": "webpack serve --mode development --open --hot",
     "dev": "yarn start",
     "build": "webpack --mode production",
+    "build-external-embed": "webpack --mode production && mkdir -p external-embed/dist && cp dist/*.bundle.js dist/*.glb dist/*.LICENSE.txt external-embed/dist/ 2>/dev/null || true && cp -r dist/assets external-embed/dist/ && npx serve external-embed -p 8081",
+    "run-external-embed": "npx serve external-embed -p 8081",
     "pre-build": "yarn lint:check && yarn format:check",
     "pre-deploy": "yarn lint:check && yarn format:check",
     "test": "jest --watch",
