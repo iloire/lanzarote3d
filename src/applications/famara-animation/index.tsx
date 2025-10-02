@@ -84,13 +84,24 @@ class AnimationApp extends TerrainBase {
 
   async load(options: StoryOptions): Promise<void> {
     try {
+      // Set camera to initial animation position FIRST to avoid jarring transition
+      const { camera, controls } = options;
+      const initialCameraPosition = new THREE.Vector3(-2000, 2200, 5000);
+      camera.position.copy(initialCameraPosition);
+      const pgPos = paraglidersVoxel[0]?.position.clone() || new THREE.Vector3();
+      camera.lookAt(pgPos);
+      if (controls) {
+        controls.target.copy(pgPos);
+        controls.update();
+      }
+
       // Initialize core systems from DemoBase
       this.initializeCore(options);
 
       // Load full environment (island, water, sky) from DemoBase
       await this.initializeEnvironment(options);
 
-      const { camera, scene, renderer, terrain, water, controls } = options;
+      const { scene, renderer, terrain, water } = options;
 
       // Apply theme to scene
       const theme = options.theme ?? getDefaultTheme();
@@ -102,16 +113,6 @@ class AnimationApp extends TerrainBase {
         3000,     // Start fog closer for more atmosphere
         12000     // End fog sooner for denser effect
       );
-
-      // Set camera to initial animation position to avoid jarring transition
-      const initialCameraPosition = new THREE.Vector3(-2000, 2200, 5000);
-      camera.position.copy(initialCameraPosition);
-      const pgPos = paraglidersVoxel[0]?.position.clone() || new THREE.Vector3();
-      camera.lookAt(pgPos);
-      if (controls) {
-        controls.target.copy(pgPos);
-        controls.update();
-      }
 
       // Load voxel paragliders with proper tracking
       const paragliderResults = await loadParagliders(
