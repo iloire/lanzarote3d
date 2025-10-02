@@ -114,6 +114,9 @@ class AnimationApp extends TerrainBase {
 
       const { terrain, water } = options;
 
+      // Render once with theme/fog applied for terrain height calculations
+      renderer.render(scene, camera);
+
       // Load voxel paragliders with proper tracking
       const paragliderResults = await loadParagliders(
         scene,
