@@ -144,7 +144,7 @@ export const hanggliderConfig: HanggliderConfig = {
 };
 
 export const cessnaConfig: CessnaConfig = {
-  position: new THREE.Vector3(5500, 1100, -800),
+  position: new THREE.Vector3(7200, 1000, 500), // Start behind and to the right of paraglider
   scale: 3.0,
   bodyColor: '#F4F4F4',
   wingColor: '#E8E8E8',
@@ -152,7 +152,7 @@ export const cessnaConfig: CessnaConfig = {
   windowColor: '#87CEEB',
   stripeColor: '#FF4500',
   flightPattern: FlightPattern.WAYPOINT,
-  speed: 40,
+  speed: 80, // Faster to reach paraglider in ~2 seconds
   turnSpeed: 5.0,
   flightRadius: 250,
   returnDistance: 300,
@@ -160,11 +160,11 @@ export const cessnaConfig: CessnaConfig = {
   maxHeight: 1500,
   obstacleAvoidanceDistance: 200,
   forwardAxis: 'x',
-  // Tight, low-altitude flight path over houses and boats
+  // Fast pass by paraglider, then touring path
   waypoints: [
-    // Start over paraglider area (suburban neighborhood)
-    new THREE.Vector3(6879, 950, 545),
-    // Over Famara coastal village
+    // Pass left of paraglider (~2 seconds after start at speed 80)
+    new THREE.Vector3(6600, 950, -705), // Left of paraglider
+    // Continue towards Famara coastal village
     new THREE.Vector3(6279, 1000, -3155),
     // Over boats area 1 (marina/harbor)
     new THREE.Vector3(7879, 980, -5445),
