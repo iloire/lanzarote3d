@@ -2,16 +2,20 @@ import * as THREE from 'three';
 import {
   House,
   HouseType,
-  BarnLegacy as Barn,
-  HospitalLegacy as Hospital,
-  DomeLegacy as Dome
+  Barn,
+  Hospital,
+  Dome,
+  Villa,
+  Townhouse,
+  DesertHouse
 } from '../../foundation/components/scenery/buildings';
-import { VillaLegacy as Villa, TownhouseLegacy as Townhouse, DesertHouseLegacy as DesertHouse, TownSquare } from '../../foundation/components/scenery';
+import { TownSquare } from '../../foundation/components/scenery';
 import { StoryOptions } from '../../shared/types';
 import { WorkshopDemoBase } from '../../shared/WorkshopDemoBase';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { GUI } from 'lil-gui';
 import { logger } from '../../foundation/utils/logger';
+import { LevelOfDetail } from '../../foundation/types/lod';
 
 /**
  * Count the total number of triangles/polygons in a 3D object
@@ -94,27 +98,28 @@ const createLabel = (text: string, position: THREE.Vector3, polygonCount?: numbe
   return sprite;
 };
 
-interface HouseStats {
+interface BuildingStats {
   name: string;
-  normalPolygons: number;
-  lowPolyPolygons: number;
-  reduction: number;
+  ultraLowPolygons: number;
+  lowPolygons: number;
+  mediumPolygons: number;
+  highPolygons: number;
 }
 
 class BuildingsWorkshop extends WorkshopDemoBase {
   private statsOverlay?: HTMLDivElement;
   private toggleButton?: HTMLButtonElement;
-  private buildingStats: HouseStats[] = [];
+  private buildingStats: BuildingStats[] = [];
   private isOverlayVisible: boolean = true;
 
   constructor() {
     super({
-      name: 'Buildings Workshop',
-      description: 'Building component showcase comparing normal vs low-poly versions',
+      name: 'Buildings Workshop - LOD System',
+      description: 'Building component showcase with 4 LOD levels (ULTRA_LOW, LOW, MEDIUM, HIGH)',
       requiredComponents: ['scene', 'camera', 'renderer', 'gui'],
       ground: {
         create: true,
-        size: { width: 1000, height: 150 }, // Much larger ground for all buildings
+        size: { width: 1200, height: 200 }, // Even larger ground for 4 rows
         color: 0x90EE90,
         opacity: 0.8
       }
@@ -224,44 +229,50 @@ class BuildingsWorkshop extends WorkshopDemoBase {
   private updateStatsOverlay(): void {
     if (!this.statsOverlay) return;
 
-    const totalNormal = this.buildingStats.reduce((sum, stat) => sum + stat.normalPolygons, 0);
-    const totalLowPoly = this.buildingStats.reduce((sum, stat) => sum + stat.lowPolyPolygons, 0);
-    const overallReduction = Math.round(((totalNormal - totalLowPoly) / totalNormal) * 100);
+    const totalUltraLow = this.buildingStats.reduce((sum, stat) => sum + stat.ultraLowPolygons, 0);
+    const totalLow = this.buildingStats.reduce((sum, stat) => sum + stat.lowPolygons, 0);
+    const totalMedium = this.buildingStats.reduce((sum, stat) => sum + stat.mediumPolygons, 0);
+    const totalHigh = this.buildingStats.reduce((sum, stat) => sum + stat.highPolygons, 0);
 
     let html = `
       <div style="font-size: 18px; font-weight: bold; margin-bottom: 15px; border-bottom: 3px solid #667eea; padding-bottom: 10px; color: #667eea;">
-        🏠 House Polygon Comparison
+        🏠 LOD System - Polygon Comparison
       </div>
-      <div style="display: grid; grid-template-columns: 200px 120px 120px 80px; gap: 10px; font-weight: bold; color: #667eea; margin-bottom: 10px; font-size: 12px;">
-        <div>House Type</div>
-        <div>Normal</div>
-        <div>Low-Poly</div>
-        <div>Reduction</div>
+      <div style="display: grid; grid-template-columns: 160px 90px 90px 90px 90px; gap: 8px; font-weight: bold; color: #667eea; margin-bottom: 10px; font-size: 11px;">
+        <div>Building</div>
+        <div>ULTRA_LOW</div>
+        <div>LOW</div>
+        <div>MEDIUM</div>
+        <div>HIGH</div>
       </div>
     `;
 
     this.buildingStats.forEach((stat) => {
       html += `
-        <div style="display: grid; grid-template-columns: 200px 120px 120px 80px; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.08);">
-          <div style="color: #333; font-weight: 500;">${stat.name}</div>
-          <div style="color: #e74c3c; font-weight: 600;">${formatPolygonCount(stat.normalPolygons)}</div>
-          <div style="color: #3498db; font-weight: 600;">${formatPolygonCount(stat.lowPolyPolygons)}</div>
-          <div style="color: #27ae60; font-weight: bold;">-${stat.reduction}%</div>
+        <div style="display: grid; grid-template-columns: 160px 90px 90px 90px 90px; gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,0.08);">
+          <div style="color: #333; font-weight: 500; font-size: 12px;">${stat.name}</div>
+          <div style="color: #9b59b6; font-weight: 600; font-size: 12px;">${formatPolygonCount(stat.ultraLowPolygons)}</div>
+          <div style="color: #3498db; font-weight: 600; font-size: 12px;">${formatPolygonCount(stat.lowPolygons)}</div>
+          <div style="color: #f39c12; font-weight: 600; font-size: 12px;">${formatPolygonCount(stat.mediumPolygons)}</div>
+          <div style="color: #e74c3c; font-weight: 600; font-size: 12px;">${formatPolygonCount(stat.highPolygons)}</div>
         </div>
       `;
     });
 
     html += `
       <div style="margin-top: 15px; padding-top: 15px; border-top: 3px solid #667eea; font-weight: bold;">
-        <div style="display: grid; grid-template-columns: 200px 120px 120px 80px; gap: 10px;">
-          <div style="color: #667eea; font-size: 15px;">TOTAL</div>
-          <div style="color: #e74c3c; font-size: 15px;">${formatPolygonCount(totalNormal)}</div>
-          <div style="color: #3498db; font-size: 15px;">${formatPolygonCount(totalLowPoly)}</div>
-          <div style="color: #27ae60; font-size: 17px;">-${overallReduction}%</div>
+        <div style="display: grid; grid-template-columns: 160px 90px 90px 90px 90px; gap: 8px;">
+          <div style="color: #667eea; font-size: 14px;">TOTAL</div>
+          <div style="color: #9b59b6; font-size: 14px;">${formatPolygonCount(totalUltraLow)}</div>
+          <div style="color: #3498db; font-size: 14px;">${formatPolygonCount(totalLow)}</div>
+          <div style="color: #f39c12; font-size: 14px;">${formatPolygonCount(totalMedium)}</div>
+          <div style="color: #e74c3c; font-size: 14px;">${formatPolygonCount(totalHigh)}</div>
         </div>
       </div>
-      <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 12px; color: #666; background: rgba(102, 126, 234, 0.08); padding: 10px; border-radius: 5px;">
-        💡 Low-poly versions save <strong style="color: #27ae60;">${formatPolygonCount(totalNormal - totalLowPoly)}</strong> triangles overall
+      <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 11px; color: #666; background: rgba(102, 126, 234, 0.08); padding: 10px; border-radius: 5px;">
+        💡 <strong style="color: #27ae60;">ULTRA_LOW saves ${Math.round((1 - totalUltraLow/totalHigh) * 100)}%</strong> •
+        <strong style="color: #3498db;">LOW saves ${Math.round((1 - totalLow/totalHigh) * 100)}%</strong> •
+        <strong style="color: #f39c12;">MEDIUM saves ${Math.round((1 - totalMedium/totalHigh) * 100)}%</strong> vs HIGH
       </div>
     `;
 
@@ -282,13 +293,17 @@ class BuildingsWorkshop extends WorkshopDemoBase {
 
     // Ground is created automatically by WorkshopDemoBase
 
-    // House showcase positions - organized in a more spacious grid
-    const normalRow = -30; // z position for normal houses (moved further back)
-    const lowPolyRow = 30; // z position for low-poly houses (moved further forward)
+    // House showcase positions - organized in 4 rows for LOD levels
+    const ultraLowRow = -60; // z position for ultra-low LOD (furthest back)
+    const lowRow = -20; // z position for low LOD
+    const mediumRow = 20; // z position for medium LOD
+    const highRow = 60; // z position for high LOD (furthest forward)
 
     // Row labels with better positioning
-    scene.add(createLabel('🏠 Normal Detail Houses', new THREE.Vector3(0, 15, normalRow - 20)));
-    scene.add(createLabel('⚡ Low-Poly Optimized', new THREE.Vector3(0, 15, lowPolyRow + 20)));
+    scene.add(createLabel('ULTRA_LOW (10-100 polys)', new THREE.Vector3(0, 15, ultraLowRow - 20)));
+    scene.add(createLabel('LOW (100-500 polys)', new THREE.Vector3(0, 15, lowRow - 20)));
+    scene.add(createLabel('MEDIUM (500-2000 polys)', new THREE.Vector3(0, 15, mediumRow + 20)));
+    scene.add(createLabel('HIGH (2000+ polys)', new THREE.Vector3(0, 15, highRow + 20)));
 
     let xPosition = -350; // Start much further left for better distribution
     const spacing = 90; // Increase spacing for better visibility
@@ -305,38 +320,58 @@ class BuildingsWorkshop extends WorkshopDemoBase {
 
     for (const houseConfig of houseTypes) {
       try {
-        // Normal version
-        const normalHouse = new House({ type: houseConfig.type, lowPoly: false });
-        const normalHouseMesh = await normalHouse.load();
-        normalHouseMesh.position.set(xPosition, 0, normalRow);
-        scene.add(normalHouseMesh);
+        // Ultra-low version
+        const ultraLowHouse = new House({ type: houseConfig.type, levelOfDetail: LevelOfDetail.ULTRA_LOW });
+        const ultraLowHouseMesh = await ultraLowHouse.load();
+        ultraLowHouseMesh.position.set(xPosition, 0, ultraLowRow);
+        scene.add(ultraLowHouseMesh);
 
-        const normalPolygons = countPolygons(normalHouseMesh);
-        scene.add(createLabel(houseConfig.name, new THREE.Vector3(xPosition, 35, normalRow), normalPolygons));
-        logger.info(`✅ ${houseConfig.name} normal loaded: ${normalPolygons} triangles`);
+        const ultraLowPolygons = countPolygons(ultraLowHouseMesh);
+        scene.add(createLabel(houseConfig.name, new THREE.Vector3(xPosition, 35, ultraLowRow), ultraLowPolygons));
+        logger.info(`✅ ${houseConfig.name} ULTRA_LOW loaded: ${ultraLowPolygons} triangles`);
 
-        // Low-poly version
-        const lowPolyHouse = new House({ type: houseConfig.type, lowPoly: true });
-        const lowPolyHouseMesh = await lowPolyHouse.load();
-        lowPolyHouseMesh.position.set(xPosition, 0, lowPolyRow);
-        scene.add(lowPolyHouseMesh);
+        // Low version
+        const lowHouse = new House({ type: houseConfig.type, levelOfDetail: LevelOfDetail.LOW });
+        const lowHouseMesh = await lowHouse.load();
+        lowHouseMesh.position.set(xPosition, 0, lowRow);
+        scene.add(lowHouseMesh);
 
-        const lowPolyPolygons = countPolygons(lowPolyHouseMesh);
-        const reduction = Math.round(((normalPolygons - lowPolyPolygons) / normalPolygons) * 100);
-        scene.add(createLabel(`${houseConfig.name} (-${reduction}%)`, new THREE.Vector3(xPosition, 35, lowPolyRow), lowPolyPolygons));
-        logger.info(`✅ ${houseConfig.name} low-poly loaded: ${lowPolyPolygons} triangles (-${reduction}%)`);
+        const lowPolygons = countPolygons(lowHouseMesh);
+        scene.add(createLabel(houseConfig.name, new THREE.Vector3(xPosition, 35, lowRow), lowPolygons));
+        logger.info(`✅ ${houseConfig.name} LOW loaded: ${lowPolygons} triangles`);
+
+        // Medium version
+        const mediumHouse = new House({ type: houseConfig.type, levelOfDetail: LevelOfDetail.MEDIUM });
+        const mediumHouseMesh = await mediumHouse.load();
+        mediumHouseMesh.position.set(xPosition, 0, mediumRow);
+        scene.add(mediumHouseMesh);
+
+        const mediumPolygons = countPolygons(mediumHouseMesh);
+        scene.add(createLabel(houseConfig.name, new THREE.Vector3(xPosition, 35, mediumRow), mediumPolygons));
+        logger.info(`✅ ${houseConfig.name} MEDIUM loaded: ${mediumPolygons} triangles`);
+
+        // High version
+        const highHouse = new House({ type: houseConfig.type, levelOfDetail: LevelOfDetail.HIGH });
+        const highHouseMesh = await highHouse.load();
+        highHouseMesh.position.set(xPosition, 0, highRow);
+        scene.add(highHouseMesh);
+
+        const highPolygons = countPolygons(highHouseMesh);
+        scene.add(createLabel(houseConfig.name, new THREE.Vector3(xPosition, 35, highRow), highPolygons));
+        logger.info(`✅ ${houseConfig.name} HIGH loaded: ${highPolygons} triangles`);
 
         // Add to stats
         this.buildingStats.push({
           name: houseConfig.name,
-          normalPolygons,
-          lowPolyPolygons,
-          reduction
+          ultraLowPolygons,
+          lowPolygons,
+          mediumPolygons,
+          highPolygons
         });
         this.updateStatsOverlay();
       } catch (error) {
         logger.error(`❌ Error loading ${houseConfig.name}:`, error);
-        scene.add(createLabel(`${houseConfig.name} (Error)`, new THREE.Vector3(xPosition, 25, normalRow)));
+        scene.add(createLabel(`${houseConfig.name} (Error)`, new THREE.Vector3(xPosition, 25, ultraLowRow)));
       }
 
       xPosition += spacing;
@@ -345,281 +380,429 @@ class BuildingsWorkshop extends WorkshopDemoBase {
     // Villa
     xPosition += 40; // Extra spacing for visual separation
     try {
-      // Normal Villa
-      const normalVilla = new Villa({ lowPoly: false });
-      const normalVillaMesh = await normalVilla.load();
-      normalVillaMesh.position.set(xPosition, 0, normalRow);
-      scene.add(normalVillaMesh);
+      // Ultra-low Villa
+      const ultraLowVilla = new Villa({ levelOfDetail: LevelOfDetail.ULTRA_LOW });
+      const ultraLowVillaMesh = await ultraLowVilla.load();
+      ultraLowVillaMesh.position.set(xPosition, 0, ultraLowRow);
+      scene.add(ultraLowVillaMesh);
 
-      const normalVillaPolygons = countPolygons(normalVillaMesh);
-      scene.add(createLabel('Villa', new THREE.Vector3(xPosition, 35, normalRow), normalVillaPolygons));
-      logger.info(`✅ Villa normal loaded: ${normalVillaPolygons} triangles`);
+      const ultraLowPolygons = countPolygons(ultraLowVillaMesh);
+      scene.add(createLabel('Villa', new THREE.Vector3(xPosition, 35, ultraLowRow), ultraLowPolygons));
+      logger.info(`✅ Villa ULTRA_LOW loaded: ${ultraLowPolygons} triangles`);
 
-      // Low-poly Villa
-      const lowPolyVilla = new Villa({ lowPoly: true });
-      const lowPolyVillaMesh = await lowPolyVilla.load();
-      lowPolyVillaMesh.position.set(xPosition, 0, lowPolyRow);
-      scene.add(lowPolyVillaMesh);
+      // Low Villa
+      const lowVilla = new Villa({ levelOfDetail: LevelOfDetail.LOW });
+      const lowVillaMesh = await lowVilla.load();
+      lowVillaMesh.position.set(xPosition, 0, lowRow);
+      scene.add(lowVillaMesh);
 
-      const lowPolyVillaPolygons = countPolygons(lowPolyVillaMesh);
-      const villaReduction = Math.round(((normalVillaPolygons - lowPolyVillaPolygons) / normalVillaPolygons) * 100);
-      scene.add(createLabel(`Villa (-${villaReduction}%)`, new THREE.Vector3(xPosition, 35, lowPolyRow), lowPolyVillaPolygons));
-      logger.info(`✅ Villa low-poly loaded: ${lowPolyVillaPolygons} triangles (-${villaReduction}%)`);
+      const lowPolygons = countPolygons(lowVillaMesh);
+      scene.add(createLabel('Villa', new THREE.Vector3(xPosition, 35, lowRow), lowPolygons));
+      logger.info(`✅ Villa LOW loaded: ${lowPolygons} triangles`);
+
+      // Medium Villa
+      const mediumVilla = new Villa({ levelOfDetail: LevelOfDetail.MEDIUM });
+      const mediumVillaMesh = await mediumVilla.load();
+      mediumVillaMesh.position.set(xPosition, 0, mediumRow);
+      scene.add(mediumVillaMesh);
+
+      const mediumPolygons = countPolygons(mediumVillaMesh);
+      scene.add(createLabel('Villa', new THREE.Vector3(xPosition, 35, mediumRow), mediumPolygons));
+      logger.info(`✅ Villa MEDIUM loaded: ${mediumPolygons} triangles`);
+
+      // High Villa
+      const highVilla = new Villa({ levelOfDetail: LevelOfDetail.HIGH });
+      const highVillaMesh = await highVilla.load();
+      highVillaMesh.position.set(xPosition, 0, highRow);
+      scene.add(highVillaMesh);
+
+      const highPolygons = countPolygons(highVillaMesh);
+      scene.add(createLabel('Villa', new THREE.Vector3(xPosition, 35, highRow), highPolygons));
+      logger.info(`✅ Villa HIGH loaded: ${highPolygons} triangles`);
 
       // Add to stats
       this.buildingStats.push({
         name: 'Villa',
-        normalPolygons: normalVillaPolygons,
-        lowPolyPolygons: lowPolyVillaPolygons,
-        reduction: villaReduction
+        ultraLowPolygons,
+        lowPolygons,
+        mediumPolygons,
+        highPolygons
       });
       this.updateStatsOverlay();
     } catch (error) {
       logger.error('❌ Error loading Villa:', error);
-      scene.add(createLabel('Villa (Error)', new THREE.Vector3(xPosition, 35, normalRow)));
+      scene.add(createLabel('Villa (Error)', new THREE.Vector3(xPosition, 35, ultraLowRow)));
     }
 
     xPosition += spacing;
 
     // Townhouse
     try {
-      // Normal Townhouse
-      const normalTownhouse = new Townhouse({ lowPoly: false });
-      const normalTownhouseMesh = await normalTownhouse.load();
-      normalTownhouseMesh.position.set(xPosition, 0, normalRow);
-      scene.add(normalTownhouseMesh);
+      // Ultra-low Townhouse
+      const ultraLowTownhouse = new Townhouse({ levelOfDetail: LevelOfDetail.ULTRA_LOW });
+      const ultraLowTownhouseMesh = await ultraLowTownhouse.load();
+      ultraLowTownhouseMesh.position.set(xPosition, 0, ultraLowRow);
+      scene.add(ultraLowTownhouseMesh);
 
-      const normalTownhousePolygons = countPolygons(normalTownhouseMesh);
-      scene.add(createLabel('Townhouse', new THREE.Vector3(xPosition, 35, normalRow), normalTownhousePolygons));
-      logger.info(`✅ Townhouse normal loaded: ${normalTownhousePolygons} triangles`);
+      const ultraLowPolygons = countPolygons(ultraLowTownhouseMesh);
+      scene.add(createLabel('Townhouse', new THREE.Vector3(xPosition, 35, ultraLowRow), ultraLowPolygons));
+      logger.info(`✅ Townhouse ULTRA_LOW loaded: ${ultraLowPolygons} triangles`);
 
-      // Low-poly Townhouse
-      const lowPolyTownhouse = new Townhouse({ lowPoly: true });
-      const lowPolyTownhouseMesh = await lowPolyTownhouse.load();
-      lowPolyTownhouseMesh.position.set(xPosition, 0, lowPolyRow);
-      scene.add(lowPolyTownhouseMesh);
+      // Low Townhouse
+      const lowTownhouse = new Townhouse({ levelOfDetail: LevelOfDetail.LOW });
+      const lowTownhouseMesh = await lowTownhouse.load();
+      lowTownhouseMesh.position.set(xPosition, 0, lowRow);
+      scene.add(lowTownhouseMesh);
 
-      const lowPolyTownhousePolygons = countPolygons(lowPolyTownhouseMesh);
-      const townhouseReduction = Math.round(((normalTownhousePolygons - lowPolyTownhousePolygons) / normalTownhousePolygons) * 100);
-      scene.add(createLabel(`Townhouse (-${townhouseReduction}%)`, new THREE.Vector3(xPosition, 35, lowPolyRow), lowPolyTownhousePolygons));
-      logger.info(`✅ Townhouse low-poly loaded: ${lowPolyTownhousePolygons} triangles (-${townhouseReduction}%)`);
+      const lowPolygons = countPolygons(lowTownhouseMesh);
+      scene.add(createLabel('Townhouse', new THREE.Vector3(xPosition, 35, lowRow), lowPolygons));
+      logger.info(`✅ Townhouse LOW loaded: ${lowPolygons} triangles`);
+
+      // Medium Townhouse
+      const mediumTownhouse = new Townhouse({ levelOfDetail: LevelOfDetail.MEDIUM });
+      const mediumTownhouseMesh = await mediumTownhouse.load();
+      mediumTownhouseMesh.position.set(xPosition, 0, mediumRow);
+      scene.add(mediumTownhouseMesh);
+
+      const mediumPolygons = countPolygons(mediumTownhouseMesh);
+      scene.add(createLabel('Townhouse', new THREE.Vector3(xPosition, 35, mediumRow), mediumPolygons));
+      logger.info(`✅ Townhouse MEDIUM loaded: ${mediumPolygons} triangles`);
+
+      // High Townhouse
+      const highTownhouse = new Townhouse({ levelOfDetail: LevelOfDetail.HIGH });
+      const highTownhouseMesh = await highTownhouse.load();
+      highTownhouseMesh.position.set(xPosition, 0, highRow);
+      scene.add(highTownhouseMesh);
+
+      const highPolygons = countPolygons(highTownhouseMesh);
+      scene.add(createLabel('Townhouse', new THREE.Vector3(xPosition, 35, highRow), highPolygons));
+      logger.info(`✅ Townhouse HIGH loaded: ${highPolygons} triangles`);
 
       // Add to stats
       this.buildingStats.push({
         name: 'Townhouse',
-        normalPolygons: normalTownhousePolygons,
-        lowPolyPolygons: lowPolyTownhousePolygons,
-        reduction: townhouseReduction
+        ultraLowPolygons,
+        lowPolygons,
+        mediumPolygons,
+        highPolygons
       });
       this.updateStatsOverlay();
     } catch (error) {
       logger.error('❌ Error loading Townhouse:', error);
-      scene.add(createLabel('Townhouse (Error)', new THREE.Vector3(xPosition, 35, normalRow)));
+      scene.add(createLabel('Townhouse (Error)', new THREE.Vector3(xPosition, 35, ultraLowRow)));
     }
 
     xPosition += spacing;
 
     // Barn
     try {
-      // Normal Barn
-      const normalBarn = new Barn({ lowPoly: false });
-      const normalBarnMesh = await normalBarn.load();
-      normalBarnMesh.position.set(xPosition, 0, normalRow);
-      scene.add(normalBarnMesh);
+      // Ultra-low Barn
+      const ultraLowBarn = new Barn({ levelOfDetail: LevelOfDetail.ULTRA_LOW });
+      const ultraLowBarnMesh = await ultraLowBarn.load();
+      ultraLowBarnMesh.position.set(xPosition, 0, ultraLowRow);
+      scene.add(ultraLowBarnMesh);
 
-      const normalBarnPolygons = countPolygons(normalBarnMesh);
-      scene.add(createLabel('Barn', new THREE.Vector3(xPosition, 35, normalRow), normalBarnPolygons));
-      logger.info(`✅ Barn normal loaded: ${normalBarnPolygons} triangles`);
+      const ultraLowPolygons = countPolygons(ultraLowBarnMesh);
+      scene.add(createLabel('Barn', new THREE.Vector3(xPosition, 35, ultraLowRow), ultraLowPolygons));
+      logger.info(`✅ Barn ULTRA_LOW loaded: ${ultraLowPolygons} triangles`);
 
-      // Low-poly Barn
-      const lowPolyBarn = new Barn({ lowPoly: true });
-      const lowPolyBarnMesh = await lowPolyBarn.load();
-      lowPolyBarnMesh.position.set(xPosition, 0, lowPolyRow);
-      scene.add(lowPolyBarnMesh);
+      // Low Barn
+      const lowBarn = new Barn({ levelOfDetail: LevelOfDetail.LOW });
+      const lowBarnMesh = await lowBarn.load();
+      lowBarnMesh.position.set(xPosition, 0, lowRow);
+      scene.add(lowBarnMesh);
 
-      const lowPolyBarnPolygons = countPolygons(lowPolyBarnMesh);
-      const barnReduction = Math.round(((normalBarnPolygons - lowPolyBarnPolygons) / normalBarnPolygons) * 100);
-      scene.add(createLabel(`Barn (-${barnReduction}%)`, new THREE.Vector3(xPosition, 35, lowPolyRow), lowPolyBarnPolygons));
-      logger.info(`✅ Barn low-poly loaded: ${lowPolyBarnPolygons} triangles (-${barnReduction}%)`);
+      const lowPolygons = countPolygons(lowBarnMesh);
+      scene.add(createLabel('Barn', new THREE.Vector3(xPosition, 35, lowRow), lowPolygons));
+      logger.info(`✅ Barn LOW loaded: ${lowPolygons} triangles`);
+
+      // Medium Barn
+      const mediumBarn = new Barn({ levelOfDetail: LevelOfDetail.MEDIUM });
+      const mediumBarnMesh = await mediumBarn.load();
+      mediumBarnMesh.position.set(xPosition, 0, mediumRow);
+      scene.add(mediumBarnMesh);
+
+      const mediumPolygons = countPolygons(mediumBarnMesh);
+      scene.add(createLabel('Barn', new THREE.Vector3(xPosition, 35, mediumRow), mediumPolygons));
+      logger.info(`✅ Barn MEDIUM loaded: ${mediumPolygons} triangles`);
+
+      // High Barn
+      const highBarn = new Barn({ levelOfDetail: LevelOfDetail.HIGH });
+      const highBarnMesh = await highBarn.load();
+      highBarnMesh.position.set(xPosition, 0, highRow);
+      scene.add(highBarnMesh);
+
+      const highPolygons = countPolygons(highBarnMesh);
+      scene.add(createLabel('Barn', new THREE.Vector3(xPosition, 35, highRow), highPolygons));
+      logger.info(`✅ Barn HIGH loaded: ${highPolygons} triangles`);
 
       // Add to stats
       this.buildingStats.push({
         name: 'Barn',
-        normalPolygons: normalBarnPolygons,
-        lowPolyPolygons: lowPolyBarnPolygons,
-        reduction: barnReduction
+        ultraLowPolygons,
+        lowPolygons,
+        mediumPolygons,
+        highPolygons
       });
       this.updateStatsOverlay();
     } catch (error) {
       logger.error('❌ Error loading Barn:', error);
-      scene.add(createLabel('Barn (Error)', new THREE.Vector3(xPosition, 35, normalRow)));
+      scene.add(createLabel('Barn (Error)', new THREE.Vector3(xPosition, 35, ultraLowRow)));
     }
 
     xPosition += spacing;
 
     // DesertHouse
     try {
-      // Normal DesertHouse
-      const normalDesertHouse = new DesertHouse({ lowPoly: false });
-      const normalDesertHouseMesh = await normalDesertHouse.load();
-      normalDesertHouseMesh.position.set(xPosition, 0, normalRow);
-      scene.add(normalDesertHouseMesh);
+      // Ultra-low DesertHouse
+      const ultraLowDesertHouse = new DesertHouse({ levelOfDetail: LevelOfDetail.ULTRA_LOW });
+      const ultraLowDesertHouseMesh = await ultraLowDesertHouse.load();
+      ultraLowDesertHouseMesh.position.set(xPosition, 0, ultraLowRow);
+      scene.add(ultraLowDesertHouseMesh);
 
-      const normalDesertHousePolygons = countPolygons(normalDesertHouseMesh);
-      scene.add(createLabel('Desert House', new THREE.Vector3(xPosition, 35, normalRow), normalDesertHousePolygons));
-      logger.info(`✅ DesertHouse normal loaded: ${normalDesertHousePolygons} triangles`);
+      const ultraLowPolygons = countPolygons(ultraLowDesertHouseMesh);
+      scene.add(createLabel('Desert House', new THREE.Vector3(xPosition, 35, ultraLowRow), ultraLowPolygons));
+      logger.info(`✅ DesertHouse ULTRA_LOW loaded: ${ultraLowPolygons} triangles`);
 
-      // Low-poly DesertHouse
-      const lowPolyDesertHouse = new DesertHouse({ lowPoly: true });
-      const lowPolyDesertHouseMesh = await lowPolyDesertHouse.load();
-      lowPolyDesertHouseMesh.position.set(xPosition, 0, lowPolyRow);
-      scene.add(lowPolyDesertHouseMesh);
+      // Low DesertHouse
+      const lowDesertHouse = new DesertHouse({ levelOfDetail: LevelOfDetail.LOW });
+      const lowDesertHouseMesh = await lowDesertHouse.load();
+      lowDesertHouseMesh.position.set(xPosition, 0, lowRow);
+      scene.add(lowDesertHouseMesh);
 
-      const lowPolyDesertHousePolygons = countPolygons(lowPolyDesertHouseMesh);
-      const desertHouseReduction = Math.round(((normalDesertHousePolygons - lowPolyDesertHousePolygons) / normalDesertHousePolygons) * 100);
-      scene.add(createLabel(`Desert House (-${desertHouseReduction}%)`, new THREE.Vector3(xPosition, 35, lowPolyRow), lowPolyDesertHousePolygons));
-      logger.info(`✅ DesertHouse low-poly loaded: ${lowPolyDesertHousePolygons} triangles (-${desertHouseReduction}%)`);
+      const lowPolygons = countPolygons(lowDesertHouseMesh);
+      scene.add(createLabel('Desert House', new THREE.Vector3(xPosition, 35, lowRow), lowPolygons));
+      logger.info(`✅ DesertHouse LOW loaded: ${lowPolygons} triangles`);
+
+      // Medium DesertHouse
+      const mediumDesertHouse = new DesertHouse({ levelOfDetail: LevelOfDetail.MEDIUM });
+      const mediumDesertHouseMesh = await mediumDesertHouse.load();
+      mediumDesertHouseMesh.position.set(xPosition, 0, mediumRow);
+      scene.add(mediumDesertHouseMesh);
+
+      const mediumPolygons = countPolygons(mediumDesertHouseMesh);
+      scene.add(createLabel('Desert House', new THREE.Vector3(xPosition, 35, mediumRow), mediumPolygons));
+      logger.info(`✅ DesertHouse MEDIUM loaded: ${mediumPolygons} triangles`);
+
+      // High DesertHouse
+      const highDesertHouse = new DesertHouse({ levelOfDetail: LevelOfDetail.HIGH });
+      const highDesertHouseMesh = await highDesertHouse.load();
+      highDesertHouseMesh.position.set(xPosition, 0, highRow);
+      scene.add(highDesertHouseMesh);
+
+      const highPolygons = countPolygons(highDesertHouseMesh);
+      scene.add(createLabel('Desert House', new THREE.Vector3(xPosition, 35, highRow), highPolygons));
+      logger.info(`✅ DesertHouse HIGH loaded: ${highPolygons} triangles`);
 
       // Add to stats
       this.buildingStats.push({
         name: 'Desert House',
-        normalPolygons: normalDesertHousePolygons,
-        lowPolyPolygons: lowPolyDesertHousePolygons,
-        reduction: desertHouseReduction
+        ultraLowPolygons,
+        lowPolygons,
+        mediumPolygons,
+        highPolygons
       });
       this.updateStatsOverlay();
     } catch (error) {
       logger.error('❌ Error loading DesertHouse:', error);
-      scene.add(createLabel('Desert House (Error)', new THREE.Vector3(xPosition, 35, normalRow)));
+      scene.add(createLabel('Desert House (Error)', new THREE.Vector3(xPosition, 35, ultraLowRow)));
     }
 
     xPosition += spacing;
 
     // Dome
     try {
-      // Normal Dome
-      const normalDome = new Dome({ lowPoly: false });
-      const normalDomeMesh = await normalDome.load();
-      normalDomeMesh.position.set(xPosition, 0, normalRow);
-      scene.add(normalDomeMesh);
+      // Ultra-low Dome
+      const ultraLowDome = new Dome({ levelOfDetail: LevelOfDetail.ULTRA_LOW });
+      const ultraLowDomeMesh = await ultraLowDome.load();
+      ultraLowDomeMesh.position.set(xPosition, 0, ultraLowRow);
+      scene.add(ultraLowDomeMesh);
 
-      const normalDomePolygons = countPolygons(normalDomeMesh);
-      scene.add(createLabel('Dome', new THREE.Vector3(xPosition, 35, normalRow), normalDomePolygons));
-      logger.info(`✅ Dome normal loaded: ${normalDomePolygons} triangles`);
+      const ultraLowPolygons = countPolygons(ultraLowDomeMesh);
+      scene.add(createLabel('Dome', new THREE.Vector3(xPosition, 35, ultraLowRow), ultraLowPolygons));
+      logger.info(`✅ Dome ULTRA_LOW loaded: ${ultraLowPolygons} triangles`);
 
-      // Low-poly Dome
-      const lowPolyDome = new Dome({ lowPoly: true });
-      const lowPolyDomeMesh = await lowPolyDome.load();
-      lowPolyDomeMesh.position.set(xPosition, 0, lowPolyRow);
-      scene.add(lowPolyDomeMesh);
+      // Low Dome
+      const lowDome = new Dome({ levelOfDetail: LevelOfDetail.LOW });
+      const lowDomeMesh = await lowDome.load();
+      lowDomeMesh.position.set(xPosition, 0, lowRow);
+      scene.add(lowDomeMesh);
 
-      const lowPolyDomePolygons = countPolygons(lowPolyDomeMesh);
-      const domeReduction = Math.round(((normalDomePolygons - lowPolyDomePolygons) / normalDomePolygons) * 100);
-      scene.add(createLabel(`Dome (-${domeReduction}%)`, new THREE.Vector3(xPosition, 35, lowPolyRow), lowPolyDomePolygons));
-      logger.info(`✅ Dome low-poly loaded: ${lowPolyDomePolygons} triangles (-${domeReduction}%)`);
+      const lowPolygons = countPolygons(lowDomeMesh);
+      scene.add(createLabel('Dome', new THREE.Vector3(xPosition, 35, lowRow), lowPolygons));
+      logger.info(`✅ Dome LOW loaded: ${lowPolygons} triangles`);
+
+      // Medium Dome
+      const mediumDome = new Dome({ levelOfDetail: LevelOfDetail.MEDIUM });
+      const mediumDomeMesh = await mediumDome.load();
+      mediumDomeMesh.position.set(xPosition, 0, mediumRow);
+      scene.add(mediumDomeMesh);
+
+      const mediumPolygons = countPolygons(mediumDomeMesh);
+      scene.add(createLabel('Dome', new THREE.Vector3(xPosition, 35, mediumRow), mediumPolygons));
+      logger.info(`✅ Dome MEDIUM loaded: ${mediumPolygons} triangles`);
+
+      // High Dome
+      const highDome = new Dome({ levelOfDetail: LevelOfDetail.HIGH });
+      const highDomeMesh = await highDome.load();
+      highDomeMesh.position.set(xPosition, 0, highRow);
+      scene.add(highDomeMesh);
+
+      const highPolygons = countPolygons(highDomeMesh);
+      scene.add(createLabel('Dome', new THREE.Vector3(xPosition, 35, highRow), highPolygons));
+      logger.info(`✅ Dome HIGH loaded: ${highPolygons} triangles`);
 
       // Add to stats
       this.buildingStats.push({
         name: 'Dome',
-        normalPolygons: normalDomePolygons,
-        lowPolyPolygons: lowPolyDomePolygons,
-        reduction: domeReduction
+        ultraLowPolygons,
+        lowPolygons,
+        mediumPolygons,
+        highPolygons
       });
       this.updateStatsOverlay();
     } catch (error) {
       logger.error('❌ Error loading Dome:', error);
-      scene.add(createLabel('Dome (Error)', new THREE.Vector3(xPosition, 35, normalRow)));
+      scene.add(createLabel('Dome (Error)', new THREE.Vector3(xPosition, 35, ultraLowRow)));
     }
 
     xPosition += spacing;
 
     // Hospital
     try {
-      // Normal Hospital
-      const normalHospital = new Hospital({ lowPoly: false });
-      const normalHospitalMesh = await normalHospital.load();
-      normalHospitalMesh.position.set(xPosition, 0, normalRow);
-      scene.add(normalHospitalMesh);
+      // Ultra-low Hospital
+      const ultraLowHospital = new Hospital({ levelOfDetail: LevelOfDetail.ULTRA_LOW });
+      const ultraLowHospitalMesh = await ultraLowHospital.load();
+      ultraLowHospitalMesh.position.set(xPosition, 0, ultraLowRow);
+      scene.add(ultraLowHospitalMesh);
 
-      const normalHospitalPolygons = countPolygons(normalHospitalMesh);
-      scene.add(createLabel('Hospital', new THREE.Vector3(xPosition, 35, normalRow), normalHospitalPolygons));
-      logger.info(`✅ Hospital normal loaded: ${normalHospitalPolygons} triangles`);
+      const ultraLowPolygons = countPolygons(ultraLowHospitalMesh);
+      scene.add(createLabel('Hospital', new THREE.Vector3(xPosition, 35, ultraLowRow), ultraLowPolygons));
+      logger.info(`✅ Hospital ULTRA_LOW loaded: ${ultraLowPolygons} triangles`);
 
-      // Low-poly Hospital
-      const lowPolyHospital = new Hospital({ lowPoly: true });
-      const lowPolyHospitalMesh = await lowPolyHospital.load();
-      lowPolyHospitalMesh.position.set(xPosition, 0, lowPolyRow);
-      scene.add(lowPolyHospitalMesh);
+      // Low Hospital
+      const lowHospital = new Hospital({ levelOfDetail: LevelOfDetail.LOW });
+      const lowHospitalMesh = await lowHospital.load();
+      lowHospitalMesh.position.set(xPosition, 0, lowRow);
+      scene.add(lowHospitalMesh);
 
-      const lowPolyHospitalPolygons = countPolygons(lowPolyHospitalMesh);
-      const hospitalReduction = Math.round(((normalHospitalPolygons - lowPolyHospitalPolygons) / normalHospitalPolygons) * 100);
-      scene.add(createLabel(`Hospital (-${hospitalReduction}%)`, new THREE.Vector3(xPosition, 35, lowPolyRow), lowPolyHospitalPolygons));
-      logger.info(`✅ Hospital low-poly loaded: ${lowPolyHospitalPolygons} triangles (-${hospitalReduction}%)`);
+      const lowPolygons = countPolygons(lowHospitalMesh);
+      scene.add(createLabel('Hospital', new THREE.Vector3(xPosition, 35, lowRow), lowPolygons));
+      logger.info(`✅ Hospital LOW loaded: ${lowPolygons} triangles`);
+
+      // Medium Hospital
+      const mediumHospital = new Hospital({ levelOfDetail: LevelOfDetail.MEDIUM });
+      const mediumHospitalMesh = await mediumHospital.load();
+      mediumHospitalMesh.position.set(xPosition, 0, mediumRow);
+      scene.add(mediumHospitalMesh);
+
+      const mediumPolygons = countPolygons(mediumHospitalMesh);
+      scene.add(createLabel('Hospital', new THREE.Vector3(xPosition, 35, mediumRow), mediumPolygons));
+      logger.info(`✅ Hospital MEDIUM loaded: ${mediumPolygons} triangles`);
+
+      // High Hospital
+      const highHospital = new Hospital({ levelOfDetail: LevelOfDetail.HIGH });
+      const highHospitalMesh = await highHospital.load();
+      highHospitalMesh.position.set(xPosition, 0, highRow);
+      scene.add(highHospitalMesh);
+
+      const highPolygons = countPolygons(highHospitalMesh);
+      scene.add(createLabel('Hospital', new THREE.Vector3(xPosition, 35, highRow), highPolygons));
+      logger.info(`✅ Hospital HIGH loaded: ${highPolygons} triangles`);
 
       // Add to stats
       this.buildingStats.push({
         name: 'Hospital',
-        normalPolygons: normalHospitalPolygons,
-        lowPolyPolygons: lowPolyHospitalPolygons,
-        reduction: hospitalReduction
+        ultraLowPolygons,
+        lowPolygons,
+        mediumPolygons,
+        highPolygons
       });
       this.updateStatsOverlay();
     } catch (error) {
       logger.error('❌ Error loading Hospital:', error);
-      scene.add(createLabel('Hospital (Error)', new THREE.Vector3(xPosition, 35, normalRow)));
+      scene.add(createLabel('Hospital (Error)', new THREE.Vector3(xPosition, 35, ultraLowRow)));
     }
 
     xPosition += spacing;
 
     // TownSquare
     try {
-      // Normal TownSquare
-      const normalTownSquare = new TownSquare({
+      // Ultra-low TownSquare
+      const ultraLowTownSquare = new TownSquare({
         size: { width: 25, depth: 25 },
         monumentType: 'fountain',
-        lowPoly: false
+        levelOfDetail: LevelOfDetail.ULTRA_LOW
       });
-      const normalTownSquareMesh = await normalTownSquare.load();
-      normalTownSquareMesh.position.set(xPosition, 0, normalRow);
-      scene.add(normalTownSquareMesh);
+      const ultraLowTownSquareMesh = await ultraLowTownSquare.load();
+      ultraLowTownSquareMesh.position.set(xPosition, 0, ultraLowRow);
+      scene.add(ultraLowTownSquareMesh);
 
-      const normalTownSquarePolygons = countPolygons(normalTownSquareMesh);
-      scene.add(createLabel('Town Square', new THREE.Vector3(xPosition, 35, normalRow), normalTownSquarePolygons));
-      logger.info(`✅ TownSquare normal loaded: ${normalTownSquarePolygons} triangles`);
+      const ultraLowPolygons = countPolygons(ultraLowTownSquareMesh);
+      scene.add(createLabel('Town Square', new THREE.Vector3(xPosition, 35, ultraLowRow), ultraLowPolygons));
+      logger.info(`✅ TownSquare ULTRA_LOW loaded: ${ultraLowPolygons} triangles`);
 
-      // Low-poly TownSquare
-      const lowPolyTownSquare = new TownSquare({
+      // Low TownSquare
+      const lowTownSquare = new TownSquare({
         size: { width: 25, depth: 25 },
         monumentType: 'fountain',
-        lowPoly: true
+        levelOfDetail: LevelOfDetail.LOW
       });
-      const lowPolyTownSquareMesh = await lowPolyTownSquare.load();
-      lowPolyTownSquareMesh.position.set(xPosition, 0, lowPolyRow);
-      scene.add(lowPolyTownSquareMesh);
+      const lowTownSquareMesh = await lowTownSquare.load();
+      lowTownSquareMesh.position.set(xPosition, 0, lowRow);
+      scene.add(lowTownSquareMesh);
 
-      const lowPolyTownSquarePolygons = countPolygons(lowPolyTownSquareMesh);
-      const townSquareReduction = Math.round(((normalTownSquarePolygons - lowPolyTownSquarePolygons) / normalTownSquarePolygons) * 100);
-      scene.add(createLabel(`Town Square (-${townSquareReduction}%)`, new THREE.Vector3(xPosition, 35, lowPolyRow), lowPolyTownSquarePolygons));
-      logger.info(`✅ TownSquare low-poly loaded: ${lowPolyTownSquarePolygons} triangles (-${townSquareReduction}%)`);
+      const lowPolygons = countPolygons(lowTownSquareMesh);
+      scene.add(createLabel('Town Square', new THREE.Vector3(xPosition, 35, lowRow), lowPolygons));
+      logger.info(`✅ TownSquare LOW loaded: ${lowPolygons} triangles`);
+
+      // Medium TownSquare
+      const mediumTownSquare = new TownSquare({
+        size: { width: 25, depth: 25 },
+        monumentType: 'fountain',
+        levelOfDetail: LevelOfDetail.MEDIUM
+      });
+      const mediumTownSquareMesh = await mediumTownSquare.load();
+      mediumTownSquareMesh.position.set(xPosition, 0, mediumRow);
+      scene.add(mediumTownSquareMesh);
+
+      const mediumPolygons = countPolygons(mediumTownSquareMesh);
+      scene.add(createLabel('Town Square', new THREE.Vector3(xPosition, 35, mediumRow), mediumPolygons));
+      logger.info(`✅ TownSquare MEDIUM loaded: ${mediumPolygons} triangles`);
+
+      // High TownSquare
+      const highTownSquare = new TownSquare({
+        size: { width: 25, depth: 25 },
+        monumentType: 'fountain',
+        levelOfDetail: LevelOfDetail.HIGH
+      });
+      const highTownSquareMesh = await highTownSquare.load();
+      highTownSquareMesh.position.set(xPosition, 0, highRow);
+      scene.add(highTownSquareMesh);
+
+      const highPolygons = countPolygons(highTownSquareMesh);
+      scene.add(createLabel('Town Square', new THREE.Vector3(xPosition, 35, highRow), highPolygons));
+      logger.info(`✅ TownSquare HIGH loaded: ${highPolygons} triangles`);
 
       // Add to stats
       this.buildingStats.push({
         name: 'Town Square',
-        normalPolygons: normalTownSquarePolygons,
-        lowPolyPolygons: lowPolyTownSquarePolygons,
-        reduction: townSquareReduction
+        ultraLowPolygons,
+        lowPolygons,
+        mediumPolygons,
+        highPolygons
       });
       this.updateStatsOverlay();
     } catch (error) {
       logger.error('❌ Error loading TownSquare:', error);
-      scene.add(createLabel('Town Square (Error)', new THREE.Vector3(xPosition, 35, normalRow)));
+      scene.add(createLabel('Town Square (Error)', new THREE.Vector3(xPosition, 35, ultraLowRow)));
     }
 
     logger.info('🏢 Buildings demo setup complete - all types loaded!');
 
-    // Position camera to view the reorganized scene
+    // Position camera to view the reorganized scene with 4 rows
     if (camera instanceof THREE.PerspectiveCamera) {
-      camera.position.set(0, 50, 80); // Higher and further back for better overview
+      camera.position.set(0, 80, 100); // Higher and further back to view all 4 rows
       camera.lookAt(0, 15, 0); // Look at the middle height of labels
     }
 
