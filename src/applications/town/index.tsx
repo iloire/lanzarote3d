@@ -28,7 +28,7 @@ class TownWorkshop extends WorkshopDemoBase {
     lastRenderTime: 0,
   };
   private neighborhoodSettings = {
-    formation: 'suburban' as 'street' | 'cul-de-sac' | 'grid' | 'suburban' | 'rural' | 'random',
+    formation: 'suburban' as 'street' | 'grid' | 'suburban' | 'rural' | 'random',
     houseCount: 20,
   };
 
@@ -166,7 +166,6 @@ class TownWorkshop extends WorkshopDemoBase {
         'rural',
         'grid',
         'street',
-        'cul-de-sac',
         'random',
       ])
       .name('Formation Type')
