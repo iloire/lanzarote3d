@@ -1,9 +1,10 @@
 import * as THREE from 'three';
-import { SimpleThreeComponent, SimpleComponentOptions } from '../base/SimpleThreeComponent';
+import { LODComponent, LODComponentOptions } from '../base/LODComponent';
 import { ComponentMetadata } from '../base/IThreeComponent';
+import { LevelOfDetail } from '../../types/lod';
 import { resourceManager } from '../../systems/ResourceManager';
 
-export interface TownSquareOptions extends SimpleComponentOptions {
+export interface TownSquareOptions extends LODComponentOptions {
   size?: { width: number; depth: number };
   pavingColor?: string;
   monumentType?: 'obelisk' | 'statue' | 'fountain';
@@ -11,7 +12,6 @@ export interface TownSquareOptions extends SimpleComponentOptions {
   hasFlowerBeds?: boolean;
   hasLampPosts?: boolean;
   scale?: number;
-  lowPoly?: boolean;
 }
 
 /**
@@ -23,33 +23,38 @@ export interface TownSquareOptions extends SimpleComponentOptions {
  * - Benches around perimeter
  * - Optional flower beds
  * - Optional decorative lamp posts
- * - Low-poly mode for performance (~60-150 polygons vs ~1000-5500)
+ *
+ * LOD Levels:
+ * - ULTRA_LOW (~30-50 polys): Single plane + simple box monument
+ * - LOW (~60-150 polys): Simple ground + basic monument + 4 benches
+ * - MEDIUM (~500-800 polys): Basic pattern + benches + simplified decorations
+ * - HIGH (~1000-5500 polys): Full detail with grid pattern, flowers, lamps
  *
  * @example
  * ```typescript
+ * // Using LOD
  * const square = new TownSquare({
- *   size: { width: 120, depth: 120 },
+ *   levelOfDetail: LevelOfDetail.HIGH,
  *   monumentType: 'fountain',
  *   benchCount: 8,
  *   hasFlowerBeds: true,
- *   hasLampPosts: true,
- *   lowPoly: false // High detail
+ *   hasLampPosts: true
  * });
  *
- * // Low-poly version
+ * // Legacy lowPoly support (backward compatible)
  * const squareLowPoly = new TownSquare({
  *   monumentType: 'obelisk',
- *   lowPoly: true // <200 polygons
+ *   lowPoly: true // Maps to LevelOfDetail.LOW
  * });
  * ```
  */
-export class TownSquare extends SimpleThreeComponent {
+export class TownSquare extends LODComponent {
   constructor(options: TownSquareOptions = {}) {
     const metadata: ComponentMetadata = {
       name: 'TownSquare',
-      version: '1.0.0',
-      description: 'A town square with paved area, monument, benches, and decorative elements',
-      tags: ['scenery', 'square', 'urban', 'monument'],
+      version: '2.0.0',
+      description: 'A town square with paved area, monument, benches, and decorative elements. Supports 4 LOD levels.',
+      tags: ['scenery', 'square', 'urban', 'monument', 'lod'],
     };
 
     super(metadata, {
@@ -60,41 +65,113 @@ export class TownSquare extends SimpleThreeComponent {
       hasFlowerBeds: true,
       hasLampPosts: true,
       scale: 1,
-      lowPoly: false,
       ...options,
     });
   }
 
   protected createGeometry(): THREE.BufferGeometry {
-    // Return placeholder - actual geometry created in createContent
+    // Return placeholder - actual geometry created in LOD methods
     return new THREE.BoxGeometry(1, 1, 1);
   }
 
-  protected override createContent(): THREE.Object3D {
-    const {
-      size = { width: 120, depth: 120 },
-      pavingColor = '#A8A8A8',
-      monumentType = 'obelisk',
-      benchCount = 8,
-      hasFlowerBeds = true,
-      hasLampPosts = true,
-      scale = 1,
-      lowPoly = false,
-    } = this.options as TownSquareOptions;
+  /**
+   * ULTRA_LOW LOD: ~30-50 polygons
+   * Single ground plane + simple box monument (for very distant viewing >500 units)
+   */
+  protected createUltraLowLODContent(): THREE.Object3D {
+    const square = new THREE.Group();
+    square.name = 'TownSquareUltraLow';
 
-    const width = size.width * scale;
-    const depth = size.depth * scale;
+    const options = this.options as TownSquareOptions;
+    const width = (options.size?.width || 120) * (options.scale || 1);
+    const depth = (options.size?.depth || 120) * (options.scale || 1);
+    const pavingColor = options.pavingColor || '#A8A8A8';
 
-    // Use appropriate version based on lowPoly flag
-    if (lowPoly) {
-      return this.createLowPolyContent(width, depth, pavingColor, monumentType);
-    } else {
-      return this.createHighPolyContent(width, depth, pavingColor, monumentType, benchCount, hasFlowerBeds, hasLampPosts);
-    }
+    // Materials
+    const pavingMaterial = resourceManager.getOrCreateMaterial(
+      `townSquareUltraLow_paving_${pavingColor}`,
+      () => new THREE.MeshStandardMaterial({ color: pavingColor, roughness: 0.7 })
+    );
+
+    const monumentMaterial = resourceManager.getOrCreateMaterial(
+      'townSquareUltraLow_monument',
+      () => new THREE.MeshStandardMaterial({ color: '#D3D3D3', roughness: 0.6 })
+    );
+
+    // Single plane ground (2 tris)
+    const groundGeometry = new THREE.PlaneGeometry(width, depth);
+    const ground = new THREE.Mesh(groundGeometry, pavingMaterial);
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = 0.1;
+    ground.receiveShadow = true;
+    square.add(ground);
+
+    // Simple box monument (12 tris)
+    const monumentGeometry = new THREE.BoxGeometry(8, 12, 8);
+    const monument = new THREE.Mesh(monumentGeometry, monumentMaterial);
+    monument.position.y = 6;
+    monument.castShadow = true;
+    square.add(monument);
+
+    return square;
+  }
+
+  /**
+   * LOW LOD: ~60-150 polygons
+   * Simple ground + basic monument + 4 benches (for medium distance 200-500 units)
+   */
+  protected createLowLODContent(): THREE.Object3D {
+    const square = new THREE.Group();
+    square.name = 'TownSquareLow';
+
+    const options = this.options as TownSquareOptions;
+    const width = (options.size?.width || 120) * (options.scale || 1);
+    const depth = (options.size?.depth || 120) * (options.scale || 1);
+    const pavingColor = options.pavingColor || '#A8A8A8';
+    const monumentType = options.monumentType || 'obelisk';
+
+    return this.createLowPolyContent(width, depth, pavingColor, monumentType);
+  }
+
+  /**
+   * MEDIUM LOD: ~500-800 polygons
+   * Basic pattern + benches + simplified decorations (for normal viewing 50-200 units)
+   */
+  protected createMediumLODContent(): THREE.Object3D {
+    const square = new THREE.Group();
+    square.name = 'TownSquareMedium';
+
+    const options = this.options as TownSquareOptions;
+    const width = (options.size?.width || 120) * (options.scale || 1);
+    const depth = (options.size?.depth || 120) * (options.scale || 1);
+    const pavingColor = options.pavingColor || '#A8A8A8';
+    const monumentType = options.monumentType || 'obelisk';
+    const benchCount = Math.min(options.benchCount || 8, 6); // Limit to 6 benches for medium
+
+    // Use high poly method but with reduced features
+    return this.createHighPolyContent(width, depth, pavingColor, monumentType, benchCount, false, false);
+  }
+
+  /**
+   * HIGH LOD: ~1000-5500 polygons
+   * Full detail with grid pattern, flowers, lamps (for close-up viewing <50 units)
+   */
+  protected createHighLODContent(): THREE.Object3D {
+    const options = this.options as TownSquareOptions;
+    const width = (options.size?.width || 120) * (options.scale || 1);
+    const depth = (options.size?.depth || 120) * (options.scale || 1);
+    const pavingColor = options.pavingColor || '#A8A8A8';
+    const monumentType = options.monumentType || 'obelisk';
+    const benchCount = options.benchCount || 8;
+    const hasFlowerBeds = options.hasFlowerBeds ?? true;
+    const hasLampPosts = options.hasLampPosts ?? true;
+
+    return this.createHighPolyContent(width, depth, pavingColor, monumentType, benchCount, hasFlowerBeds, hasLampPosts);
   }
 
   /**
    * Create high-poly version of town square (~1000-5500 polygons)
+   * Shared implementation for MEDIUM and HIGH LODs
    */
   private createHighPolyContent(
     width: number,
