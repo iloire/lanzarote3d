@@ -16,9 +16,9 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { GUI } from 'lil-gui';
 import { logger } from '../../foundation/utils/logger';
 import { LevelOfDetail } from '../../foundation/types/lod';
-import { countPolygons } from './utils/polygonCounter';
-import { createLabel } from './utils/labelCreator';
-import { BuildingStatsTracker } from './utils/buildingStatsTracker';
+import { countPolygons } from '../../shared/showcase/polygonCounter';
+import { createLabel } from '../../shared/showcase/labelCreator';
+import { BuildingStatsTracker } from '../../shared/showcase/buildingStatsTracker';
 import { ShowcaseCameraController } from '../../foundation/systems/scene/ShowcaseCameraController';
 
 class BuildingsWorkshop extends WorkshopDemoBase {
