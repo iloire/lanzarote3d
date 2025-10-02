@@ -92,6 +92,18 @@ export const LANZAROTE_TOWNS: TownConfig[] = [
   { position: TOWN_LA_CALETA, houseCount: 40, formation: 'rural' },
 ];
 
+/**
+ * Reduced building configuration optimized for animations
+ * Total: 105 buildings (was 311) - ~70% reduction for better performance
+ */
+export const LANZAROTE_TOWNS_ANIMATION: TownConfig[] = [
+  { position: TOWN_TEGUISE_TOP, houseCount: 15, formation: 'rural', spacing: 2.5 },  // was 50
+  { position: TOWN_FAMARA, houseCount: 40, formation: 'rural', spacing: 2.5 },      // was 120
+  { position: TOWN_NORUEGOS, houseCount: 15, formation: 'grid', spacing: 2.0 },     // was 50
+  { position: TOWN_TEGUISE, houseCount: 20, formation: 'suburban', spacing: 2.0 },  // was 51
+  { position: TOWN_LA_CALETA, houseCount: 15, formation: 'rural', spacing: 2.5 },   // was 40
+];
+
 class Environment {
   birds!: FlockBirds;
   hg!: HangGlider;

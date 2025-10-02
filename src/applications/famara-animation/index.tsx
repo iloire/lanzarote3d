@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import Environment, {
-  LANZAROTE_TOWNS,
+  LANZAROTE_TOWNS_ANIMATION,
   TOWN_TEGUISE_TOP,
   TOWN_FAMARA,
   TOWN_NORUEGOS,
@@ -191,8 +191,8 @@ class AnimationApp extends TerrainBase {
       await this.environment.addCloudsFromTheme(thermals, theme);
       // this.environment.addTrees(terrain);
 
-      // Create Lanzarote towns using ULTRA_LOW LOD for optimal animation performance
-      await this.environment.addTownsFromConfig(LANZAROTE_TOWNS, terrain, true, LevelOfDetail.ULTRA_LOW);
+      // Create Lanzarote towns using ULTRA_LOW LOD and reduced count for optimal animation performance
+      await this.environment.addTownsFromConfig(LANZAROTE_TOWNS_ANIMATION, terrain, true, LevelOfDetail.ULTRA_LOW);
 
       // Create individual roads connecting each pair of towns
       // Roads stop ~200 units before town centers to avoid passing through houses
