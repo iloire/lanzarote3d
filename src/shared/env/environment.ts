@@ -76,7 +76,7 @@ export const LANZAROTE_TOWNS: TownConfig[] = [
   { position: new THREE.Vector3(6879, 0, 545), houseCount: 50, formation: 'rural' }, // tequise top
 
 
-  { position: new THREE.Vector3(6279, 0, -3155), houseCount: 220, formation: 'rural' }, // famara
+  { position: new THREE.Vector3(6279, 0, -3155), houseCount: 120, formation: 'rural' }, // famara
 
 
 
