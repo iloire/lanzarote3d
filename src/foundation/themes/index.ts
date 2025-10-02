@@ -50,7 +50,9 @@ export const THEMES: Record<string, Theme> = {
     sky: {
       timeOfDay: 17.5,
       sunIntensity: 2.0,
-      fogEnabled: false,
+      fogEnabled: true,
+      fogColor: 'white',
+      fogDensity: 0.0001
     },
     clouds: {
       colors: [

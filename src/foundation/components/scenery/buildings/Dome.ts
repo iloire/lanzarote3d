@@ -1,9 +1,10 @@
 import * as THREE from 'three';
-import { SimpleThreeComponent, SimpleComponentOptions } from '../../base/SimpleThreeComponent';
+import { LODComponent, LODComponentOptions } from '../../base/LODComponent';
 import { ComponentMetadata } from '../../base/IThreeComponent';
+import { LevelOfDetail } from '../../../types/lod';
 import { resourceManager } from '../../../systems/ResourceManager';
 
-export interface DomeOptions extends SimpleComponentOptions {
+export interface DomeOptions extends LODComponentOptions {
   frameColor?: string;
   glassColor?: string;
   baseColor?: string;
@@ -11,23 +12,24 @@ export interface DomeOptions extends SimpleComponentOptions {
   scale?: number;
   panelRows?: number;
   panelColumns?: number;
-  lowPoly?: boolean;
 }
 
 /**
  * Dome building component - Glass panel geodesic dome for glamping/sleeping
  *
- * Polygon count:
- * - High detail (lowPoly: false): ~1000-3000 polygons with 8 rows × 16 columns
- * - Low poly (lowPoly: true): <500 polygons with simple hemisphere + base
+ * LOD Levels:
+ * - ULTRA_LOW (~20-40 polys): Simple cylinder + low-res sphere (4 segments)
+ * - LOW (~100-200 polys): Hemisphere with 8 segments + basic furniture
+ * - MEDIUM (~600-1000 polys): 12 segments with basic geodesic frame
+ * - HIGH (~2000-3000 polys): Full geodesic structure with detailed frame
  */
-export class Dome extends SimpleThreeComponent {
+export class Dome extends LODComponent {
   constructor(options: DomeOptions = {}) {
     const metadata: ComponentMetadata = {
       name: 'Dome',
-      version: '1.0.0',
-      description: 'Glass panel geodesic dome structure for glamping and accommodation',
-      tags: ['scenery', 'building', 'dome', 'geodesic', 'accommodation', 'modern'],
+      version: '2.0.0',
+      description: 'Glass panel geodesic dome structure for glamping and accommodation. Supports 4 LOD levels.',
+      tags: ['scenery', 'building', 'dome', 'geodesic', 'accommodation', 'modern', 'lod'],
     };
 
     super(metadata, {
@@ -38,28 +40,91 @@ export class Dome extends SimpleThreeComponent {
       scale: 1,
       panelRows: 8,
       panelColumns: 16,
-      lowPoly: false,
       ...options,
     });
   }
 
   protected createGeometry(): THREE.BufferGeometry {
-    // Return placeholder - actual geometry created in createSyncContent
+    // Return placeholder - actual geometry created in LOD methods
     return new THREE.BoxGeometry(1, 1, 1);
   }
 
-  protected override createContent(): THREE.Object3D {
-    const options = this.options as DomeOptions;
-    const scale = options.scale || 1;
-    const radius = options.radius || 8;
-    const lowPoly = options.lowPoly ?? false;
+  /**
+   * ULTRA_LOW LOD: ~20-40 polygons
+   * Simple cylinder base + very low-res sphere dome (for very distant viewing >500 units)
+   */
+  protected createUltraLowLODContent(): THREE.Object3D {
+    const dome = new THREE.Group();
+    dome.name = 'DomeUltraLow';
 
-    // Use appropriate version based on lowPoly flag
-    if (lowPoly) {
-      return this.createLowPolyDome(radius, scale, options);
-    } else {
-      return this.createHighPolyDome(radius, scale, options);
-    }
+    const options = this.options as DomeOptions;
+    const radius = (options.radius || 8) * (options.scale || 1);
+
+    const glassMaterial = resourceManager.getOrCreateMaterial(
+      `domeUltraLow_glass_${options.glassColor}`,
+      () => new THREE.MeshLambertMaterial({
+        color: options.glassColor,
+        transparent: true,
+        opacity: 0.3,
+      })
+    );
+
+    const baseMaterial = resourceManager.getOrCreateMaterial(
+      `domeUltraLow_base_${options.baseColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.baseColor })
+    );
+
+    // Simple cylinder base (12 tris with 6 segments)
+    const baseGeometry = new THREE.CylinderGeometry(radius * 1.1, radius * 1.2, 0.5, 6);
+    const base = new THREE.Mesh(baseGeometry, baseMaterial);
+    base.position.y = -0.25;
+    dome.add(base);
+
+    // Very low-res hemisphere (16 tris with 4 segments)
+    const domeGeometry = new THREE.SphereGeometry(radius, 4, 3, 0, Math.PI * 2, 0, Math.PI * 0.6);
+    const domeShell = new THREE.Mesh(domeGeometry, glassMaterial);
+    domeShell.position.y = 0;
+    dome.add(domeShell);
+
+    return dome;
+  }
+
+  /**
+   * LOW LOD: ~100-200 polygons
+   * Hemisphere with 8 segments + basic furniture (for medium distance 200-500 units)
+   */
+  protected createLowLODContent(): THREE.Object3D {
+    const options = this.options as DomeOptions;
+    const radius = (options.radius || 8) * (options.scale || 1);
+    return this.createLowPolyDome(radius, options.scale || 1, options);
+  }
+
+  /**
+   * MEDIUM LOD: ~600-1000 polygons
+   * 12 segments with basic geodesic frame (for normal viewing 50-200 units)
+   */
+  protected createMediumLODContent(): THREE.Object3D {
+    const options = this.options as DomeOptions;
+    const radius = (options.radius || 8) * (options.scale || 1);
+
+    // Create a simplified geodesic with fewer panels
+    const mediumOptions = {
+      ...options,
+      panelRows: 6,
+      panelColumns: 12,
+    };
+
+    return this.createHighPolyDome(radius, options.scale || 1, mediumOptions);
+  }
+
+  /**
+   * HIGH LOD: ~2000-3000 polygons
+   * Full geodesic structure with detailed frame (for close-up viewing <50 units)
+   */
+  protected createHighLODContent(): THREE.Object3D {
+    const options = this.options as DomeOptions;
+    const radius = (options.radius || 8) * (options.scale || 1);
+    return this.createHighPolyDome(radius, options.scale || 1, options);
   }
 
   /**
