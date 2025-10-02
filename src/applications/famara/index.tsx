@@ -52,17 +52,9 @@ class FamaraApp extends TerrainBase {
 
   async load(options: StoryOptions): Promise<void> {
     try {
-      // Initialize core systems from DemoBase
-      this.initializeCore(options);
+      const { camera, scene, renderer, controls } = options;
 
-      // Load full environment (island, water, sky) from DemoBase
-      await this.initializeEnvironment(options);
-
-      const { camera, scene, renderer, terrain, water, controls } = options;
-
-      controls.enabled = true;
-
-      // Apply theme to scene
+      // Apply theme BEFORE loading environment to ensure visual consistency
       const theme = options.theme ?? getDefaultTheme();
       await ThemeEngine.apply(options, theme);
 
@@ -74,10 +66,25 @@ class FamaraApp extends TerrainBase {
       camera.position.copy(initialPos);
       camera.lookAt(lookAtPos);
 
+      // Initialize core systems from DemoBase
+      this.initializeCore(options);
+
+      // Load full environment (island, water, sky) from DemoBase
+      await this.initializeEnvironment(options);
+
+      const { terrain, water } = options;
+
+      controls.enabled = true;
+
       // Apply landscape viewing controls for Famara beach exploration
       OrbitControlsHelper.focusOnTarget(controls, lookAtPos, ORBIT_CONTROLS_PRESETS['landscape']);
 
-      // must render before adding env
+      // Hide canvas during loading to prevent visual pop-in
+      const canvas = renderer.domElement;
+      const originalOpacity = canvas.style.opacity;
+      canvas.style.opacity = '0';
+
+      // Render once with theme applied for terrain height calculations
       renderer.render(scene, camera);
 
       // Set up environment using theme
@@ -112,6 +119,9 @@ class FamaraApp extends TerrainBase {
 
       // Start animation loop
       this.startAnimationLoop(renderer, scene, camera, controls);
+
+      // Restore canvas visibility after everything is loaded
+      canvas.style.opacity = originalOpacity || '1';
 
       this.isLoaded = true;
       console.log(`✅ ${this.config.name} loaded successfully`);
