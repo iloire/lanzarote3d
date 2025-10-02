@@ -58,7 +58,7 @@ class BoatsAnimationApp extends TerrainBase {
     async load(options: StoryOptions): Promise<void> {
         try {
             // Set camera to initial position FIRST to avoid jarring transition
-            const { camera, controls } = options;
+            const { camera, controls, scene, renderer } = options;
             const initialCameraPosition = new THREE.Vector3(8055, 220, -6155);
             camera.position.copy(initialCameraPosition);
             const boatCenterPosition = new THREE.Vector3(8400, 0, -6100);
@@ -68,17 +68,17 @@ class BoatsAnimationApp extends TerrainBase {
                 controls.update();
             }
 
+            // Apply theme BEFORE loading environment to ensure visual consistency
+            const theme = options.theme ?? getDefaultTheme();
+            await ThemeEngine.apply(options, theme);
+
             // Initialize core systems from TerrainBase
             this.initializeCore(options);
 
             // Load full environment (island, water, sky) from TerrainBase
             await this.initializeEnvironment(options);
 
-            const { scene, renderer, terrain, water } = options;
-
-            // Apply theme to scene (same as original)
-            const theme = options.theme ?? getDefaultTheme();
-            await ThemeEngine.apply(options, theme);
+            const { terrain, water } = options;
 
             // Load voxel paragliders with proper tracking
             const paragliderResults = await loadParagliders(
@@ -87,9 +87,6 @@ class BoatsAnimationApp extends TerrainBase {
                 this.handleError.bind(this)
             );
             this.paragliderMeshes = paragliderResults.map((r) => r.mesh);
-
-            // must render before adding env
-            renderer.render(scene, camera);
 
             // Set up environment using theme (same as original)
             this.environment = new Environment(scene);

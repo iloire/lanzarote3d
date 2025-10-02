@@ -85,7 +85,7 @@ class AnimationApp extends TerrainBase {
   async load(options: StoryOptions): Promise<void> {
     try {
       // Set camera to initial animation position FIRST to avoid jarring transition
-      const { camera, controls } = options;
+      const { camera, controls, scene, renderer } = options;
       const initialCameraPosition = new THREE.Vector3(-2000, 2200, 5000);
       camera.position.copy(initialCameraPosition);
       const pgPos = paraglidersVoxel[0]?.position.clone() || new THREE.Vector3();
@@ -95,24 +95,24 @@ class AnimationApp extends TerrainBase {
         controls.update();
       }
 
+      // Apply theme and fog BEFORE loading environment to ensure visual consistency
+      const theme = options.theme ?? getDefaultTheme();
+      await ThemeEngine.apply(options, theme);
+
+      // Set fog early to avoid visual pop-in
+      scene.fog = new THREE.Fog(
+        0x87CEEB, // Sky blue color
+        3000,     // Start fog closer for more atmosphere
+        12000     // End fog sooner for denser effect
+      );
+
       // Initialize core systems from DemoBase
       this.initializeCore(options);
 
       // Load full environment (island, water, sky) from DemoBase
       await this.initializeEnvironment(options);
 
-      const { scene, renderer, terrain, water } = options;
-
-      // Apply theme to scene
-      const theme = options.theme ?? getDefaultTheme();
-      await ThemeEngine.apply(options, theme);
-
-      // Increase fog for more atmospheric effect
-      scene.fog = new THREE.Fog(
-        0x87CEEB, // Sky blue color
-        3000,     // Start fog closer for more atmosphere
-        12000     // End fog sooner for denser effect
-      );
+      const { terrain, water } = options;
 
       // Load voxel paragliders with proper tracking
       const paragliderResults = await loadParagliders(
@@ -166,9 +166,6 @@ class AnimationApp extends TerrainBase {
           this.herculesSmokeTrail = herculesResult.smokeTrail;
         }
       }
-
-      // must render before adding env
-      renderer.render(scene, camera);
 
       // Set up environment using theme
       this.environment = new Environment(scene);
