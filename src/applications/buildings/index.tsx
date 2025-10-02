@@ -106,11 +106,21 @@ interface BuildingStats {
   highPolygons: number;
 }
 
+interface CameraPosition {
+  name: string;
+  position: THREE.Vector3;
+  lookAt: THREE.Vector3;
+}
+
 class BuildingsWorkshop extends WorkshopDemoBase {
   private statsOverlay?: HTMLDivElement;
   private toggleButton?: HTMLButtonElement;
   private buildingStats: BuildingStats[] = [];
   private isOverlayVisible: boolean = false;
+  private cameraPositions: CameraPosition[] = [];
+  private currentCameraIndex: number = 0;
+  private camera?: THREE.Camera;
+  private controls?: OrbitControls;
 
   constructor() {
     super({
@@ -228,6 +238,44 @@ class BuildingsWorkshop extends WorkshopDemoBase {
     }
   }
 
+  private addCameraPosition(name: string, xPos: number, zPos: number): void {
+    this.cameraPositions.push({
+      name,
+      position: new THREE.Vector3(xPos, 40, zPos + 80),
+      lookAt: new THREE.Vector3(xPos, 15, zPos)
+    });
+  }
+
+  private moveCameraToPosition(index: number): void {
+    if (!this.camera || !this.controls || index < 0 || index >= this.cameraPositions.length) return;
+
+    const target = this.cameraPositions[index];
+    this.currentCameraIndex = index;
+
+    // Smooth camera transition
+    if (this.camera instanceof THREE.PerspectiveCamera) {
+      this.camera.position.copy(target.position);
+      this.camera.lookAt(target.lookAt);
+
+      if (this.controls) {
+        this.controls.target.copy(target.lookAt);
+        this.controls.update();
+      }
+    }
+
+    logger.info(`📷 Camera moved to: ${target.name}`);
+  }
+
+  private nextCamera(): void {
+    const nextIndex = (this.currentCameraIndex + 1) % this.cameraPositions.length;
+    this.moveCameraToPosition(nextIndex);
+  }
+
+  private previousCamera(): void {
+    const prevIndex = (this.currentCameraIndex - 1 + this.cameraPositions.length) % this.cameraPositions.length;
+    this.moveCameraToPosition(prevIndex);
+  }
+
   private updateStatsOverlay(): void {
     if (!this.statsOverlay) return;
 
@@ -282,6 +330,10 @@ class BuildingsWorkshop extends WorkshopDemoBase {
   }
 
   async init(scene: THREE.Scene, camera: THREE.Camera, renderer: THREE.WebGLRenderer, controls: OrbitControls, gui: GUI): Promise<void> {
+    // Store references for camera navigation
+    this.camera = camera;
+    this.controls = controls;
+
     // Set up lighting
     const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
     scene.add(ambientLight);
@@ -371,6 +423,9 @@ class BuildingsWorkshop extends WorkshopDemoBase {
           highPolygons
         });
         this.updateStatsOverlay();
+
+        // Add camera position for this building
+        this.addCameraPosition(houseConfig.name, xPosition, 0);
       } catch (error) {
         logger.error(`❌ Error loading ${houseConfig.name}:`, error);
         scene.add(createLabel(`${houseConfig.name} (Error)`, new THREE.Vector3(xPosition, 25, ultraLowRow)));
@@ -431,6 +486,9 @@ class BuildingsWorkshop extends WorkshopDemoBase {
         highPolygons
       });
       this.updateStatsOverlay();
+
+      // Add camera position for Villa
+      this.addCameraPosition('Villa', xPosition, 0);
     } catch (error) {
       logger.error('❌ Error loading Villa:', error);
       scene.add(createLabel('Villa (Error)', new THREE.Vector3(xPosition, 35, ultraLowRow)));
@@ -489,6 +547,9 @@ class BuildingsWorkshop extends WorkshopDemoBase {
         highPolygons
       });
       this.updateStatsOverlay();
+
+      // Add camera position for Townhouse
+      this.addCameraPosition('Townhouse', xPosition, 0);
     } catch (error) {
       logger.error('❌ Error loading Townhouse:', error);
       scene.add(createLabel('Townhouse (Error)', new THREE.Vector3(xPosition, 35, ultraLowRow)));
@@ -547,6 +608,9 @@ class BuildingsWorkshop extends WorkshopDemoBase {
         highPolygons
       });
       this.updateStatsOverlay();
+
+      // Add camera position for Barn
+      this.addCameraPosition('Barn', xPosition, 0);
     } catch (error) {
       logger.error('❌ Error loading Barn:', error);
       scene.add(createLabel('Barn (Error)', new THREE.Vector3(xPosition, 35, ultraLowRow)));
@@ -605,6 +669,9 @@ class BuildingsWorkshop extends WorkshopDemoBase {
         highPolygons
       });
       this.updateStatsOverlay();
+
+      // Add camera position for Desert House
+      this.addCameraPosition('Desert House', xPosition, 0);
     } catch (error) {
       logger.error('❌ Error loading DesertHouse:', error);
       scene.add(createLabel('Desert House (Error)', new THREE.Vector3(xPosition, 35, ultraLowRow)));
@@ -663,6 +730,9 @@ class BuildingsWorkshop extends WorkshopDemoBase {
         highPolygons
       });
       this.updateStatsOverlay();
+
+      // Add camera position for Dome
+      this.addCameraPosition('Dome', xPosition, 0);
     } catch (error) {
       logger.error('❌ Error loading Dome:', error);
       scene.add(createLabel('Dome (Error)', new THREE.Vector3(xPosition, 35, ultraLowRow)));
@@ -721,6 +791,9 @@ class BuildingsWorkshop extends WorkshopDemoBase {
         highPolygons
       });
       this.updateStatsOverlay();
+
+      // Add camera position for Hospital
+      this.addCameraPosition('Hospital', xPosition, 0);
     } catch (error) {
       logger.error('❌ Error loading Hospital:', error);
       scene.add(createLabel('Hospital (Error)', new THREE.Vector3(xPosition, 35, ultraLowRow)));
@@ -795,6 +868,9 @@ class BuildingsWorkshop extends WorkshopDemoBase {
         highPolygons
       });
       this.updateStatsOverlay();
+
+      // Add camera position for Town Square
+      this.addCameraPosition('Town Square', xPosition, 0);
     } catch (error) {
       logger.error('❌ Error loading TownSquare:', error);
       scene.add(createLabel('Town Square (Error)', new THREE.Vector3(xPosition, 35, ultraLowRow)));
@@ -814,6 +890,42 @@ class BuildingsWorkshop extends WorkshopDemoBase {
       cameraFolder.add(camera.position, 'x', -100, 100).name('Camera X');
       cameraFolder.add(camera.position, 'y', 5, 80).name('Camera Y');
       cameraFolder.add(camera.position, 'z', -100, 100).name('Camera Z');
+
+      // Camera navigation controls
+      const navigationFolder = gui.addFolder('Building Navigation');
+
+      const navControls = {
+        building: 'Overview',
+        previous: () => this.previousCamera(),
+        next: () => this.nextCamera()
+      };
+
+      // Create dropdown with building names
+      const buildingNames = ['Overview', ...this.cameraPositions.map(pos => pos.name)];
+      navigationFolder.add(navControls, 'building', buildingNames).name('Jump to Building')
+        .onChange((value: string) => {
+          if (value === 'Overview') {
+            // Return to overview position
+            if (camera instanceof THREE.PerspectiveCamera) {
+              camera.position.set(0, 80, 100);
+              camera.lookAt(0, 15, 0);
+              if (controls) {
+                controls.target.set(0, 15, 0);
+                controls.update();
+              }
+            }
+          } else {
+            const index = this.cameraPositions.findIndex(pos => pos.name === value);
+            if (index !== -1) {
+              this.moveCameraToPosition(index);
+            }
+          }
+        });
+
+      navigationFolder.add(navControls, 'previous').name('⬅ Previous Building');
+      navigationFolder.add(navControls, 'next').name('Next Building ➡');
+      navigationFolder.open();
+
       cameraFolder.open();
     }
 
