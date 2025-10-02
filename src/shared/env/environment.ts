@@ -76,14 +76,13 @@ export interface TownConfig {
 export const LANZAROTE_TOWNS: TownConfig[] = [
   { position: new THREE.Vector3(6879, 0, 545), houseCount: 50, formation: 'rural', spacing: 2.0 }, // tequise top
 
-
   { position: new THREE.Vector3(6279, 0, -3155), houseCount: 120, formation: 'rural', spacing: 2.0 }, // famara
-
-
 
   { position: new THREE.Vector3(7827, 0, -3460), houseCount: 50, formation: 'grid' }, // noruegos
 
   { position: new THREE.Vector3(5600, 0, 1205), houseCount: 51, formation: 'suburban' }, // teguise
+
+  { position: new THREE.Vector3(2866.8, 270.8, -2598.7), houseCount: 40, formation: 'rural' }, // new settlement
 ];
 
 class Environment {
