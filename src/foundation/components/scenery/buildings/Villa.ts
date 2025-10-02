@@ -1,7 +1,9 @@
 import * as THREE from 'three';
-import { SimpleThreeComponent, SimpleComponentOptions } from '../../base/SimpleThreeComponent';
+import { LODComponent } from '../../base/LODComponent';
+import { SimpleComponentOptions } from '../../base/SimpleThreeComponent';
 import { ComponentMetadata } from '../../base/IThreeComponent';
 import { resourceManager } from '../../../systems/ResourceManager';
+import { LevelOfDetail, getLODFromLegacy } from '../../../types/lod';
 
 export interface VillaOptions extends SimpleComponentOptions {
   wallColor?: string;
@@ -10,6 +12,7 @@ export interface VillaOptions extends SimpleComponentOptions {
   windowColor?: string;
   scale?: number;
   lowPoly?: boolean;
+  levelOfDetail?: LevelOfDetail;
   rooms?: {
     bedrooms?: number;
     bathrooms?: number;
@@ -23,7 +26,7 @@ export interface VillaOptions extends SimpleComponentOptions {
 /**
  * Villa building component - Large luxury house with modern amenities
  */
-export class Villa extends SimpleThreeComponent {
+export class Villa extends LODComponent {
   private villaSize: 'small' | 'medium' | 'large' | 'mansion';
   private roomConfig: {
     bedrooms: number;
@@ -59,6 +62,8 @@ export class Villa extends SimpleThreeComponent {
       ...defaultRooms,
       ...options.rooms,
     };
+
+    this.currentLOD = options.levelOfDetail ?? getLODFromLegacy(options.lowPoly);
   }
 
   private getDefaultRoomConfiguration(size: 'small' | 'medium' | 'large' | 'mansion') {
@@ -76,13 +81,256 @@ export class Villa extends SimpleThreeComponent {
     return new THREE.BoxGeometry(1, 1, 1);
   }
 
-  protected override createContent(): THREE.Object3D {
+  protected createUltraLowLODContent(): THREE.Object3D {
+    // ULTRA_LOW: ~20-50 polygons
+    // Single box + roof, no columns, no windows, no wings
     const villa = new THREE.Group();
-    villa.name = 'Villa';
+    villa.name = 'Villa (Ultra Low LOD)';
 
     const options = this.options as VillaOptions;
     const scale = options.scale || 1;
-    const isLowPoly = options.lowPoly || false;
+
+    // Single wall material
+    const wallMaterial = resourceManager.getOrCreateMaterial(
+      `villa_wall_ultra_low_${options.wallColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.wallColor })
+    );
+
+    const roofMaterial = resourceManager.getOrCreateMaterial(
+      `villa_roof_ultra_low_${options.roofColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.roofColor })
+    );
+
+    // Single box representing entire villa
+    const mainBodyGeometry = resourceManager.getOrCreateGeometry(
+      'villa_ultra_low_body',
+      () => new THREE.BoxGeometry(30, 20, 25)
+    );
+    const mainBody = new THREE.Mesh(mainBodyGeometry, wallMaterial);
+    mainBody.position.set(0, 10, 0);
+    mainBody.castShadow = this.options.castShadow ?? true;
+    mainBody.receiveShadow = this.options.receiveShadow ?? true;
+    villa.add(mainBody);
+
+    // Single simple roof
+    const mainRoofGeometry = resourceManager.getOrCreateGeometry(
+      'villa_ultra_low_roof',
+      () => new THREE.BoxGeometry(32, 1, 27)
+    );
+    const mainRoof = new THREE.Mesh(mainRoofGeometry, roofMaterial);
+    mainRoof.position.set(0, 20.5, 0);
+    mainRoof.castShadow = this.options.castShadow ?? true;
+    villa.add(mainRoof);
+
+    // Apply scale
+    if (scale !== 1) {
+      villa.scale.setScalar(scale);
+    }
+
+    return villa;
+  }
+
+  protected createLowLODContent(): THREE.Object3D {
+    // LOW: ~100-300 polygons
+    // Main building + simple roof, 2 simple columns, no windows or decorative elements
+    const villa = new THREE.Group();
+    villa.name = 'Villa (Low LOD)';
+
+    const options = this.options as VillaOptions;
+    const scale = options.scale || 1;
+
+    const wallMaterial = resourceManager.getOrCreateMaterial(
+      `villa_wall_low_${options.wallColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.wallColor })
+    );
+
+    const accentMaterial = resourceManager.getOrCreateMaterial(
+      `villa_accent_low_${options.accentColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.accentColor })
+    );
+
+    const roofMaterial = resourceManager.getOrCreateMaterial(
+      `villa_roof_low_${options.roofColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.roofColor })
+    );
+
+    // Main villa structure
+    const mainBodyGeometry = resourceManager.getOrCreateGeometry(
+      'villa_low_main_body',
+      () => new THREE.BoxGeometry(30, 20, 25)
+    );
+    const mainBody = new THREE.Mesh(mainBodyGeometry, wallMaterial);
+    mainBody.position.set(0, 10, 0);
+    mainBody.castShadow = this.options.castShadow ?? true;
+    mainBody.receiveShadow = this.options.receiveShadow ?? true;
+    villa.add(mainBody);
+
+    // Main roof
+    const mainRoofGeometry = resourceManager.getOrCreateGeometry(
+      'villa_low_main_roof',
+      () => new THREE.BoxGeometry(32, 1, 27)
+    );
+    const mainRoof = new THREE.Mesh(mainRoofGeometry, roofMaterial);
+    mainRoof.position.set(0, 20.5, 0);
+    mainRoof.castShadow = this.options.castShadow ?? true;
+    villa.add(mainRoof);
+
+    // Simple box columns (2 columns only)
+    const columnGeometry = resourceManager.getOrCreateGeometry(
+      'villa_low_column',
+      () => new THREE.BoxGeometry(1.5, 20, 1.5)
+    );
+
+    for (let i = 0; i < 2; i++) {
+      const column = new THREE.Mesh(columnGeometry, accentMaterial);
+      column.position.set(-3 + i * 6, 10, 12.5);
+      column.castShadow = this.options.castShadow ?? true;
+      villa.add(column);
+    }
+
+    // Apply scale
+    if (scale !== 1) {
+      villa.scale.setScalar(scale);
+    }
+
+    return villa;
+  }
+
+  protected createMediumLODContent(): THREE.Object3D {
+    // MEDIUM: ~500-1000 polygons
+    // Main building + wings + roofs, simple columns (boxes instead of cylinders), simple windows (no frames)
+    const villa = new THREE.Group();
+    villa.name = 'Villa (Medium LOD)';
+
+    const options = this.options as VillaOptions;
+    const scale = options.scale || 1;
+
+    const wallMaterial = resourceManager.getOrCreateMaterial(
+      `villa_wall_medium_${options.wallColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.wallColor })
+    );
+
+    const accentMaterial = resourceManager.getOrCreateMaterial(
+      `villa_accent_medium_${options.accentColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.accentColor })
+    );
+
+    const roofMaterial = resourceManager.getOrCreateMaterial(
+      `villa_roof_medium_${options.roofColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.roofColor })
+    );
+
+    const windowMaterial = resourceManager.getOrCreateMaterial(
+      `villa_window_medium_${options.windowColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.windowColor })
+    );
+
+    // Main villa structure
+    const mainBodyGeometry = resourceManager.getOrCreateGeometry(
+      'villa_medium_main_body',
+      () => new THREE.BoxGeometry(30, 20, 25)
+    );
+    const mainBody = new THREE.Mesh(mainBodyGeometry, wallMaterial);
+    mainBody.position.set(0, 10, 0);
+    mainBody.castShadow = this.options.castShadow ?? true;
+    mainBody.receiveShadow = this.options.receiveShadow ?? true;
+    villa.add(mainBody);
+
+    // Left wing
+    const leftWingGeometry = resourceManager.getOrCreateGeometry(
+      'villa_medium_left_wing',
+      () => new THREE.BoxGeometry(20, 16, 20)
+    );
+    const leftWing = new THREE.Mesh(leftWingGeometry, wallMaterial);
+    leftWing.position.set(-25, 8, 0);
+    leftWing.castShadow = this.options.castShadow ?? true;
+    leftWing.receiveShadow = this.options.receiveShadow ?? true;
+    villa.add(leftWing);
+
+    // Right wing
+    const rightWingGeometry = resourceManager.getOrCreateGeometry(
+      'villa_medium_right_wing',
+      () => new THREE.BoxGeometry(20, 16, 20)
+    );
+    const rightWing = new THREE.Mesh(rightWingGeometry, wallMaterial);
+    rightWing.position.set(25, 8, 0);
+    rightWing.castShadow = this.options.castShadow ?? true;
+    rightWing.receiveShadow = this.options.receiveShadow ?? true;
+    villa.add(rightWing);
+
+    // Roofs
+    const mainRoofGeometry = resourceManager.getOrCreateGeometry(
+      'villa_medium_main_roof',
+      () => new THREE.BoxGeometry(32, 1, 27)
+    );
+    const mainRoof = new THREE.Mesh(mainRoofGeometry, roofMaterial);
+    mainRoof.position.set(0, 20.5, 0);
+    mainRoof.castShadow = this.options.castShadow ?? true;
+    villa.add(mainRoof);
+
+    const wingRoofGeometry = resourceManager.getOrCreateGeometry(
+      'villa_medium_wing_roof',
+      () => new THREE.BoxGeometry(22, 1, 22)
+    );
+    const leftRoof = new THREE.Mesh(wingRoofGeometry, roofMaterial);
+    leftRoof.position.set(-25, 16.5, 0);
+    leftRoof.castShadow = this.options.castShadow ?? true;
+    villa.add(leftRoof);
+
+    const rightRoof = new THREE.Mesh(wingRoofGeometry, roofMaterial);
+    rightRoof.position.set(25, 16.5, 0);
+    rightRoof.castShadow = this.options.castShadow ?? true;
+    villa.add(rightRoof);
+
+    // Simple box columns (no cylinders)
+    const columnGeometry = resourceManager.getOrCreateGeometry(
+      'villa_medium_column',
+      () => new THREE.BoxGeometry(1.5, 20, 1.5)
+    );
+
+    for (let i = 0; i < 2; i++) {
+      const column = new THREE.Mesh(columnGeometry, accentMaterial);
+      column.position.set(-3 + i * 6, 10, 12.5);
+      column.castShadow = this.options.castShadow ?? true;
+      villa.add(column);
+    }
+
+    // Simple windows (no frames)
+    const windowGeometry = resourceManager.getOrCreateGeometry(
+      'villa_medium_window',
+      () => new THREE.BoxGeometry(8, 4, 0.3)
+    );
+
+    // Main building - one central window
+    const frontWindow = new THREE.Mesh(windowGeometry, windowMaterial);
+    frontWindow.position.set(0, 12, 12.65);
+    villa.add(frontWindow);
+
+    // Wings - front-facing windows
+    const leftWindow = new THREE.Mesh(windowGeometry, windowMaterial);
+    leftWindow.position.set(-25, 10, 10.15);
+    villa.add(leftWindow);
+
+    const rightWindow = new THREE.Mesh(windowGeometry, windowMaterial);
+    rightWindow.position.set(25, 10, 10.15);
+    villa.add(rightWindow);
+
+    // Apply scale
+    if (scale !== 1) {
+      villa.scale.setScalar(scale);
+    }
+
+    return villa;
+  }
+
+  protected createHighLODContent(): THREE.Object3D {
+    // HIGH: ~2000+ polygons
+    // Full detail (current implementation with all features)
+    const villa = new THREE.Group();
+    villa.name = 'Villa (High LOD)';
+
+    const options = this.options as VillaOptions;
+    const scale = options.scale || 1;
 
     // Create materials with resource sharing
     const wallMaterial = resourceManager.getOrCreateMaterial(
@@ -167,128 +415,85 @@ export class Villa extends SimpleThreeComponent {
     rightRoof.castShadow = this.options.castShadow ?? true;
     villa.add(rightRoof);
 
-    // Grand entrance columns (simplified for low-poly)
-    if (isLowPoly) {
-      // Use simple box columns instead of cylinders
-      const columnGeometry = resourceManager.getOrCreateGeometry(
-        'villa_column_lowpoly',
-        () => new THREE.BoxGeometry(1.5, 20, 1.5)
-      );
+    // Grand entrance columns (full detail cylinders)
+    const columnGeometry = resourceManager.getOrCreateGeometry(
+      'villa_column',
+      () => new THREE.CylinderGeometry(1, 1, 20)
+    );
 
-      // Reduce number of columns from 4 to 2
-      for (let i = 0; i < 2; i++) {
-        const column = new THREE.Mesh(columnGeometry, accentMaterial);
-        column.position.set(-3 + i * 6, 10, 12.5);
-        column.castShadow = this.options.castShadow ?? true;
-        villa.add(column);
-      }
-    } else {
-      // Full detail cylinders
-      const columnGeometry = resourceManager.getOrCreateGeometry(
-        'villa_column',
-        () => new THREE.CylinderGeometry(1, 1, 20)
-      );
-
-      for (let i = 0; i < 4; i++) {
-        const column = new THREE.Mesh(columnGeometry, accentMaterial);
-        column.position.set(-6 + i * 4, 10, 12.5); // Adjusted for main body repositioning
-        column.castShadow = this.options.castShadow ?? true;
-        villa.add(column);
-      }
+    for (let i = 0; i < 4; i++) {
+      const column = new THREE.Mesh(columnGeometry, accentMaterial);
+      column.position.set(-6 + i * 4, 10, 12.5);
+      column.castShadow = this.options.castShadow ?? true;
+      villa.add(column);
     }
 
-    // Windows (simplified for low-poly)
-    if (isLowPoly) {
-      // Just essential windows, no frames
-      const windowGeometry = resourceManager.getOrCreateGeometry(
-        'villa_window_lowpoly',
-        () => new THREE.BoxGeometry(8, 4, 0.3)
-      );
+    // Full detail windows with frames
+    const panoramicWindowGeometry = resourceManager.getOrCreateGeometry(
+      'villa_panoramic_window',
+      () => new THREE.BoxGeometry(20, 8, 0.5)
+    );
+    const frontWindow = new THREE.Mesh(panoramicWindowGeometry, windowMaterial);
+    frontWindow.position.set(0, 12, 12.75);
+    villa.add(frontWindow);
 
-      // Main building - just one central window
-      const frontWindow = new THREE.Mesh(windowGeometry, windowMaterial);
-      frontWindow.position.set(0, 12, 12.65);
-      villa.add(frontWindow);
+    // Window frames
+    const panoramicFrameGeometry = resourceManager.getOrCreateGeometry(
+      'villa_panoramic_frame',
+      () => new THREE.BoxGeometry(21, 9, 1)
+    );
+    const frontFrame = new THREE.Mesh(panoramicFrameGeometry, frameMaterial);
+    frontFrame.position.set(0, 12, 12.5);
+    villa.add(frontFrame);
 
-      // Wings - just front-facing windows
-      const leftWindow = new THREE.Mesh(windowGeometry, windowMaterial);
-      leftWindow.position.set(-25, 10, 10.15);
-      villa.add(leftWindow);
+    // Side windows for wings
+    const sideWindowGeometry = resourceManager.getOrCreateGeometry(
+      'villa_side_window',
+      () => new THREE.BoxGeometry(12, 6, 0.5)
+    );
 
-      const rightWindow = new THREE.Mesh(windowGeometry, windowMaterial);
-      rightWindow.position.set(25, 10, 10.15);
-      villa.add(rightWindow);
+    // Left wing windows
+    const leftFrontWindow = new THREE.Mesh(sideWindowGeometry, windowMaterial);
+    leftFrontWindow.position.set(-25, 10, 10.25);
+    villa.add(leftFrontWindow);
 
-    } else {
-      // Full detail windows with frames
-      const panoramicWindowGeometry = resourceManager.getOrCreateGeometry(
-        'villa_panoramic_window',
-        () => new THREE.BoxGeometry(20, 8, 0.5)
-      );
-      const frontWindow = new THREE.Mesh(panoramicWindowGeometry, windowMaterial);
-      frontWindow.position.set(0, 12, 12.75); // Adjusted for main body repositioning
-      villa.add(frontWindow);
+    const leftSideWindow = new THREE.Mesh(sideWindowGeometry, windowMaterial);
+    leftSideWindow.rotation.y = Math.PI / 2;
+    leftSideWindow.position.set(-35.25, 10, 0);
+    villa.add(leftSideWindow);
 
-      // Window frames
-      const panoramicFrameGeometry = resourceManager.getOrCreateGeometry(
-        'villa_panoramic_frame',
-        () => new THREE.BoxGeometry(21, 9, 1)
-      );
-      const frontFrame = new THREE.Mesh(panoramicFrameGeometry, frameMaterial);
-      frontFrame.position.set(0, 12, 12.5); // Adjusted for main body repositioning
-      villa.add(frontFrame);
+    // Right wing windows
+    const rightFrontWindow = new THREE.Mesh(sideWindowGeometry, windowMaterial);
+    rightFrontWindow.position.set(25, 10, 10.25);
+    villa.add(rightFrontWindow);
 
-      // Side windows for wings
-      const sideWindowGeometry = resourceManager.getOrCreateGeometry(
-        'villa_side_window',
-        () => new THREE.BoxGeometry(12, 6, 0.5)
-      );
+    const rightSideWindow = new THREE.Mesh(sideWindowGeometry, windowMaterial);
+    rightSideWindow.rotation.y = Math.PI / 2;
+    rightSideWindow.position.set(35.25, 10, 0);
+    villa.add(rightSideWindow);
 
-      // Left wing windows
-      const leftFrontWindow = new THREE.Mesh(sideWindowGeometry, windowMaterial);
-      leftFrontWindow.position.set(-25, 10, 10.25); // Adjusted for wing repositioning
-      villa.add(leftFrontWindow);
+    // Decorative elements
+    // Swimming pool (decorative)
+    const poolGeometry = resourceManager.getOrCreateGeometry(
+      'villa_pool',
+      () => new THREE.BoxGeometry(15, 1, 8)
+    );
+    const poolMaterial = resourceManager.getOrCreateMaterial(
+      'villa_pool_water',
+      () => new THREE.MeshLambertMaterial({ color: '#0077BE', transparent: true, opacity: 0.8 })
+    );
+    const pool = new THREE.Mesh(poolGeometry, poolMaterial);
+    pool.position.set(0, 0.5, -20);
+    villa.add(pool);
 
-      const leftSideWindow = new THREE.Mesh(sideWindowGeometry, windowMaterial);
-      leftSideWindow.rotation.y = Math.PI / 2;
-      leftSideWindow.position.set(-35.25, 10, 0); // Adjusted for wing repositioning
-      villa.add(leftSideWindow);
-
-      // Right wing windows
-      const rightFrontWindow = new THREE.Mesh(sideWindowGeometry, windowMaterial);
-      rightFrontWindow.position.set(25, 10, 10.25); // Adjusted for wing repositioning
-      villa.add(rightFrontWindow);
-
-      const rightSideWindow = new THREE.Mesh(sideWindowGeometry, windowMaterial);
-      rightSideWindow.rotation.y = Math.PI / 2;
-      rightSideWindow.position.set(35.25, 10, 0); // Adjusted for wing repositioning
-      villa.add(rightSideWindow);
-    }
-
-    // Decorative elements (skip for low-poly)
-    if (!isLowPoly) {
-      // Swimming pool (decorative)
-      const poolGeometry = resourceManager.getOrCreateGeometry(
-        'villa_pool',
-        () => new THREE.BoxGeometry(15, 1, 8)
-      );
-      const poolMaterial = resourceManager.getOrCreateMaterial(
-        'villa_pool_water',
-        () => new THREE.MeshLambertMaterial({ color: '#0077BE', transparent: true, opacity: 0.8 })
-      );
-      const pool = new THREE.Mesh(poolGeometry, poolMaterial);
-      pool.position.set(0, 0.5, -20); // Adjusted for ground level positioning
-      villa.add(pool);
-
-      // Garden terrace
-      const terraceGeometry = resourceManager.getOrCreateGeometry(
-        'villa_terrace',
-        () => new THREE.BoxGeometry(40, 1, 15)
-      );
-      const terrace = new THREE.Mesh(terraceGeometry, accentMaterial);
-      terrace.position.set(0, 0.5, 20); // Adjusted for ground level positioning
-      villa.add(terrace);
-    }
+    // Garden terrace
+    const terraceGeometry = resourceManager.getOrCreateGeometry(
+      'villa_terrace',
+      () => new THREE.BoxGeometry(40, 1, 15)
+    );
+    const terrace = new THREE.Mesh(terraceGeometry, accentMaterial);
+    terrace.position.set(0, 0.5, 20);
+    villa.add(terrace);
 
     // Apply scale
     if (scale !== 1) {

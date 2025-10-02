@@ -1,7 +1,9 @@
 import * as THREE from 'three';
-import { SimpleThreeComponent, SimpleComponentOptions } from '../../base/SimpleThreeComponent';
+import { LODComponent } from '../../base/LODComponent';
+import { SimpleComponentOptions } from '../../base/SimpleThreeComponent';
 import { ComponentMetadata } from '../../base/IThreeComponent';
 import { resourceManager } from '../../../systems/ResourceManager';
+import { LevelOfDetail, getLODFromLegacy } from '../../../types/lod';
 
 export interface DesertHouseOptions extends SimpleComponentOptions {
   wallColor?: string;
@@ -11,12 +13,13 @@ export interface DesertHouseOptions extends SimpleComponentOptions {
   accentColor?: string;
   scale?: number;
   lowPoly?: boolean;
+  levelOfDetail?: LevelOfDetail;
 }
 
 /**
  * Desert House building component - Simple adobe-style house typical of desert regions
  */
-export class DesertHouse extends SimpleThreeComponent {
+export class DesertHouse extends LODComponent {
   constructor(options: DesertHouseOptions = {}) {
     const metadata: ComponentMetadata = {
       name: 'DesertHouse',
@@ -34,6 +37,8 @@ export class DesertHouse extends SimpleThreeComponent {
       scale: 1,
       ...options,
     });
+
+    this.currentLOD = options.levelOfDetail ?? getLODFromLegacy(options.lowPoly);
   }
 
   protected createGeometry(): THREE.BufferGeometry {
@@ -41,17 +46,241 @@ export class DesertHouse extends SimpleThreeComponent {
     return new THREE.BoxGeometry(1, 1, 1);
   }
 
-  protected override createContent(): THREE.Object3D {
-    const desertHouse = new THREE.Group();
-    desertHouse.name = 'DesertHouse';
+  /**
+   * ULTRA_LOW LOD: ~20-50 polygons
+   * Single box body + simple roof, no windows, no door, no decorative elements
+   */
+  protected createUltraLowLODContent(): THREE.Object3D {
+    const house = new THREE.Group();
+    house.name = 'DesertHouse (Ultra Low LOD)';
 
     const options = this.options as DesertHouseOptions;
     const scale = options.scale || 1;
-    const isLowPoly = options.lowPoly || false;
 
-    if (isLowPoly) {
-      return this.createLowPolyDesertHouse(options, scale);
+    // Single material for walls
+    const wallMaterial = resourceManager.getOrCreateMaterial(
+      `desert_house_wall_ultra_low_${options.wallColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.wallColor })
+    );
+
+    const roofMaterial = resourceManager.getOrCreateMaterial(
+      `desert_house_roof_ultra_low_${options.roofColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.roofColor })
+    );
+
+    // Single box for main structure
+    const bodyGeometry = resourceManager.getOrCreateGeometry(
+      'desert_house_ultra_low_body',
+      () => new THREE.BoxGeometry(18, 14, 16)
+    );
+    const body = new THREE.Mesh(bodyGeometry, wallMaterial);
+    body.position.set(0, 7, 0);
+    body.castShadow = this.options.castShadow ?? true;
+    body.receiveShadow = this.options.receiveShadow ?? true;
+    house.add(body);
+
+    // Simple flat roof
+    const roofGeometry = resourceManager.getOrCreateGeometry(
+      'desert_house_ultra_low_roof',
+      () => new THREE.BoxGeometry(19, 1, 17)
+    );
+    const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+    roof.position.set(0, 14.5, 0);
+    roof.castShadow = this.options.castShadow ?? true;
+    house.add(roof);
+
+    // Apply scale
+    if (scale !== 1) {
+      house.scale.setScalar(scale);
     }
+
+    return house;
+  }
+
+  /**
+   * LOW LOD: ~100-200 polygons
+   * Body + roof + simple door, minimal windows (no frames, no decorative elements)
+   */
+  protected createLowLODContent(): THREE.Object3D {
+    const house = new THREE.Group();
+    house.name = 'DesertHouse (Low LOD)';
+
+    const options = this.options as DesertHouseOptions;
+    const scale = options.scale || 1;
+
+    // Simplified materials
+    const materials = {
+      wall: resourceManager.getOrCreateMaterial(
+        `desert_house_wall_low_${options.wallColor}`,
+        () => new THREE.MeshLambertMaterial({ color: options.wallColor })
+      ),
+      roof: resourceManager.getOrCreateMaterial(
+        `desert_house_roof_low_${options.roofColor}`,
+        () => new THREE.MeshLambertMaterial({ color: options.roofColor })
+      ),
+      door: resourceManager.getOrCreateMaterial(
+        `desert_house_door_low_${options.doorColor}`,
+        () => new THREE.MeshLambertMaterial({ color: options.doorColor })
+      ),
+      window: resourceManager.getOrCreateMaterial(
+        `desert_house_window_low_${options.windowColor}`,
+        () => new THREE.MeshLambertMaterial({ color: options.windowColor })
+      )
+    };
+
+    // Main house structure
+    const mainBodyGeometry = resourceManager.getOrCreateGeometry(
+      'desert_house_main_body_low',
+      () => new THREE.BoxGeometry(18, 14, 16)
+    );
+    const mainBody = new THREE.Mesh(mainBodyGeometry, materials.wall);
+    mainBody.position.set(0, 7, 0);
+    mainBody.castShadow = this.options.castShadow ?? true;
+    mainBody.receiveShadow = this.options.receiveShadow ?? true;
+    house.add(mainBody);
+
+    // Simple flat roof - no parapet
+    const roofGeometry = resourceManager.getOrCreateGeometry(
+      'desert_house_roof_low',
+      () => new THREE.BoxGeometry(19, 1, 17)
+    );
+    const roof = new THREE.Mesh(roofGeometry, materials.roof);
+    roof.position.set(0, 14.5, 0);
+    roof.castShadow = this.options.castShadow ?? true;
+    house.add(roof);
+
+    // Simple door - no arch
+    const doorGeometry = resourceManager.getOrCreateGeometry(
+      'desert_house_door_low',
+      () => new THREE.BoxGeometry(3, 6, 0.3)
+    );
+    const door = new THREE.Mesh(doorGeometry, materials.door);
+    door.position.set(0, 3, 8.15);
+    house.add(door);
+
+    // Single simple window - no frames
+    const windowGeometry = resourceManager.getOrCreateGeometry(
+      'desert_house_window_low',
+      () => new THREE.BoxGeometry(2, 2, 0.2)
+    );
+    const window = new THREE.Mesh(windowGeometry, materials.window);
+    window.position.set(0, 8, 8.1);
+    house.add(window);
+
+    // Apply scale
+    if (scale !== 1) {
+      house.scale.setScalar(scale);
+    }
+
+    return house;
+  }
+
+  /**
+   * MEDIUM LOD: ~500-800 polygons
+   * Body + roof + parapet + door + windows (no frames), no decorative elements
+   */
+  protected createMediumLODContent(): THREE.Object3D {
+    const house = new THREE.Group();
+    house.name = 'DesertHouse (Medium LOD)';
+
+    const options = this.options as DesertHouseOptions;
+    const scale = options.scale || 1;
+
+    // Create materials
+    const materials = {
+      wall: resourceManager.getOrCreateMaterial(
+        `desert_house_wall_medium_${options.wallColor}`,
+        () => new THREE.MeshLambertMaterial({ color: options.wallColor })
+      ),
+      roof: resourceManager.getOrCreateMaterial(
+        `desert_house_roof_medium_${options.roofColor}`,
+        () => new THREE.MeshLambertMaterial({ color: options.roofColor })
+      ),
+      door: resourceManager.getOrCreateMaterial(
+        `desert_house_door_medium_${options.doorColor}`,
+        () => new THREE.MeshLambertMaterial({ color: options.doorColor })
+      ),
+      window: resourceManager.getOrCreateMaterial(
+        `desert_house_window_medium_${options.windowColor}`,
+        () => new THREE.MeshLambertMaterial({ color: options.windowColor })
+      )
+    };
+
+    // Main house structure
+    const mainBodyGeometry = resourceManager.getOrCreateGeometry(
+      'desert_house_main_body_medium',
+      () => new THREE.BoxGeometry(18, 14, 16)
+    );
+    const mainBody = new THREE.Mesh(mainBodyGeometry, materials.wall);
+    mainBody.position.set(0, 7, 0);
+    mainBody.castShadow = this.options.castShadow ?? true;
+    mainBody.receiveShadow = this.options.receiveShadow ?? true;
+    house.add(mainBody);
+
+    // Flat roof
+    const roofGeometry = resourceManager.getOrCreateGeometry(
+      'desert_house_roof_medium',
+      () => new THREE.BoxGeometry(20, 1.5, 18)
+    );
+    const roof = new THREE.Mesh(roofGeometry, materials.roof);
+    roof.position.set(0, 14.75, 0);
+    roof.castShadow = this.options.castShadow ?? true;
+    house.add(roof);
+
+    // Parapet wall around roof edge
+    const parapetGeometry = resourceManager.getOrCreateGeometry(
+      'desert_house_parapet_medium',
+      () => new THREE.BoxGeometry(20.5, 2, 18.5)
+    );
+    const parapet = new THREE.Mesh(parapetGeometry, materials.wall);
+    parapet.position.set(0, 15.5, 0);
+    house.add(parapet);
+
+    // Simple arched doorway
+    const doorGeometry = resourceManager.getOrCreateGeometry(
+      'desert_house_door_medium',
+      () => new THREE.BoxGeometry(4, 8, 0.5)
+    );
+    const door = new THREE.Mesh(doorGeometry, materials.door);
+    door.position.set(0, 4, 8.25);
+    house.add(door);
+
+    // Windows - no frames
+    const windowGeometry = resourceManager.getOrCreateGeometry(
+      'desert_house_window_medium',
+      () => new THREE.BoxGeometry(2.5, 2.5, 0.3)
+    );
+
+    const leftWindow = new THREE.Mesh(windowGeometry, materials.window);
+    leftWindow.position.set(-6, 9, 8.15);
+    house.add(leftWindow);
+
+    const rightWindow = new THREE.Mesh(windowGeometry, materials.window);
+    rightWindow.position.set(6, 8, 8.15);
+    house.add(rightWindow);
+
+    const sideWindow = new THREE.Mesh(windowGeometry, materials.window);
+    sideWindow.position.set(9.15, 7, 0);
+    house.add(sideWindow);
+
+    // Apply scale
+    if (scale !== 1) {
+      house.scale.setScalar(scale);
+    }
+
+    return house;
+  }
+
+  /**
+   * HIGH LOD: ~1500-2000 polygons
+   * Full detail with all structures and decorative elements
+   */
+  protected createHighLODContent(): THREE.Object3D {
+    const desertHouse = new THREE.Group();
+    desertHouse.name = 'DesertHouse (High LOD)';
+
+    const options = this.options as DesertHouseOptions;
+    const scale = options.scale || 1;
 
     // Create materials
     const materials = this.createMaterials(options);
@@ -278,81 +507,6 @@ export class DesertHouse extends SimpleThreeComponent {
     });
   }
 
-  /**
-   * Create low-poly version of the desert house
-   */
-  private createLowPolyDesertHouse(options: DesertHouseOptions, scale: number): THREE.Object3D {
-    const house = new THREE.Group();
-    house.name = 'DesertHouse (Low-Poly)';
-
-    // Simplified materials
-    const materials = {
-      wall: resourceManager.getOrCreateMaterial(
-        `desert_house_wall_lowpoly_${options.wallColor}`,
-        () => new THREE.MeshLambertMaterial({ color: options.wallColor })
-      ),
-      roof: resourceManager.getOrCreateMaterial(
-        `desert_house_roof_lowpoly_${options.roofColor}`,
-        () => new THREE.MeshLambertMaterial({ color: options.roofColor })
-      ),
-      door: resourceManager.getOrCreateMaterial(
-        `desert_house_door_lowpoly_${options.doorColor}`,
-        () => new THREE.MeshLambertMaterial({ color: options.doorColor })
-      ),
-      window: resourceManager.getOrCreateMaterial(
-        `desert_house_window_lowpoly_${options.windowColor}`,
-        () => new THREE.MeshLambertMaterial({ color: options.windowColor })
-      )
-    };
-
-    // Main house structure - simplified
-    const mainBodyGeometry = resourceManager.getOrCreateGeometry(
-      'desert_house_main_body_lowpoly',
-      () => new THREE.BoxGeometry(18, 14, 16)
-    );
-    const mainBody = new THREE.Mesh(mainBodyGeometry, materials.wall);
-    mainBody.position.set(0, 7, 0);
-    mainBody.castShadow = this.options.castShadow ?? true;
-    mainBody.receiveShadow = this.options.receiveShadow ?? true;
-    house.add(mainBody);
-
-    // Simple flat roof - no parapet
-    const roofGeometry = resourceManager.getOrCreateGeometry(
-      'desert_house_roof_lowpoly',
-      () => new THREE.BoxGeometry(19, 1, 17)
-    );
-    const roof = new THREE.Mesh(roofGeometry, materials.roof);
-    roof.position.set(0, 14.5, 0);
-    roof.castShadow = this.options.castShadow ?? true;
-    house.add(roof);
-
-    // Simple door - no arch
-    const doorGeometry = resourceManager.getOrCreateGeometry(
-      'desert_house_door_lowpoly',
-      () => new THREE.BoxGeometry(3, 6, 0.3)
-    );
-    const door = new THREE.Mesh(doorGeometry, materials.door);
-    door.position.set(0, 3, 8.15);
-    house.add(door);
-
-    // Single simple window - no frames
-    const windowGeometry = resourceManager.getOrCreateGeometry(
-      'desert_house_window_lowpoly',
-      () => new THREE.BoxGeometry(2, 2, 0.2)
-    );
-    const window = new THREE.Mesh(windowGeometry, materials.window);
-    window.position.set(0, 8, 8.1);
-    house.add(window);
-
-    // No decorative elements in low-poly version
-
-    // Apply scale
-    if (scale !== 1) {
-      house.scale.setScalar(scale);
-    }
-
-    return house;
-  }
 
   public override validate(): string[] {
     const issues: string[] = [];

@@ -1,6 +1,8 @@
 import * as THREE from 'three';
-import { SimpleThreeComponent, SimpleComponentOptions } from '../../base/SimpleThreeComponent';
+import { LODComponent } from '../../base/LODComponent';
+import { SimpleComponentOptions } from '../../base/SimpleThreeComponent';
 import { ComponentMetadata } from '../../base/IThreeComponent';
+import { LevelOfDetail, getLODFromLegacy } from '../../../types/lod';
 import DesertHouse from './DesertHouse';
 import Pool from '../Pool';
 
@@ -15,6 +17,7 @@ export interface DesertHouseWithPoolOptions extends SimpleComponentOptions {
   poolDeckColor?: string;
   scale?: number;
   lowPoly?: boolean;
+  levelOfDetail?: LevelOfDetail;
 }
 
 interface LandscapingMaterials {
@@ -31,13 +34,13 @@ interface LandscapingMaterials {
 /**
  * Desert House with Pool component - Luxury desert house with swimming pool and landscaping
  */
-export class DesertHouseWithPool extends SimpleThreeComponent {
+export class DesertHouseWithPool extends LODComponent {
   constructor(options: DesertHouseWithPoolOptions = {}) {
     const metadata: ComponentMetadata = {
       name: 'DesertHouseWithPool',
-      version: '1.0.0',
+      version: '2.0.0',
       description: 'Luxury desert house with swimming pool, landscaping, and modern amenities',
-      tags: ['scenery', 'building', 'desert', 'luxury', 'pool', 'residential'],
+      tags: ['scenery', 'building', 'desert', 'luxury', 'pool', 'residential', 'lod'],
     };
 
     super(metadata, {
@@ -52,26 +55,234 @@ export class DesertHouseWithPool extends SimpleThreeComponent {
       scale: 1,
       ...options,
     });
+
+    this.currentLOD = options.levelOfDetail ?? getLODFromLegacy(options.lowPoly);
   }
 
   protected createGeometry(): THREE.BufferGeometry {
-    // Return placeholder - actual geometry created in createSyncContent
+    // Return placeholder - actual geometry created in LOD methods
     return new THREE.BoxGeometry(1, 1, 1);
   }
 
-  protected override createContent(): THREE.Object3D {
+  protected createUltraLowLODContent(): THREE.Object3D {
+    // ULTRA_LOW: ~30-60 polygons
+    // Single box house + roof + simple pool (2 boxes), no landscaping
     const compound = new THREE.Group();
-    compound.name = 'DesertHouseWithPool';
+    compound.name = 'DesertHouseWithPool (Ultra Low LOD)';
 
     const options = this.options as DesertHouseWithPoolOptions;
     const scale = options.scale || 1;
-    const isLowPoly = options.lowPoly || false;
 
-    if (isLowPoly) {
-      return this.createLowPolyDesertHouseWithPool(options, scale);
+    // Simplified materials
+    const wallMaterial = new THREE.MeshLambertMaterial({
+      color: options.wallColor,
+      name: 'desert_house_wall_ultra_low'
+    });
+    const roofMaterial = new THREE.MeshLambertMaterial({
+      color: options.roofColor,
+      name: 'desert_house_roof_ultra_low'
+    });
+    const poolWaterMaterial = new THREE.MeshLambertMaterial({
+      color: options.poolWaterColor,
+      name: 'pool_water_ultra_low'
+    });
+
+    // Simple main house - single box
+    const houseGeometry = new THREE.BoxGeometry(18, 14, 16);
+    const house = new THREE.Mesh(houseGeometry, wallMaterial);
+    house.position.set(0, 7, 0);
+    house.castShadow = this.options.castShadow ?? true;
+    house.receiveShadow = this.options.receiveShadow ?? true;
+    compound.add(house);
+
+    // Simple flat roof
+    const roofGeometry = new THREE.BoxGeometry(19, 1, 17);
+    const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+    roof.position.set(0, 14.5, 0);
+    roof.castShadow = this.options.castShadow ?? true;
+    compound.add(roof);
+
+    // Simple pool - just water box
+    const poolWaterGeometry = new THREE.BoxGeometry(10, 0.5, 5);
+    const poolWater = new THREE.Mesh(poolWaterGeometry, poolWaterMaterial);
+    poolWater.position.set(0, 0.25, -20);
+    compound.add(poolWater);
+
+    // Apply scale
+    if (scale !== 1) {
+      compound.scale.setScalar(scale);
     }
 
-    // Create materials
+    return compound;
+  }
+
+  protected createLowLODContent(): THREE.Object3D {
+    // LOW: ~150-300 polygons
+    // Simple house (body+roof+door+window) + simple pool, no landscaping or amenities
+    const compound = new THREE.Group();
+    compound.name = 'DesertHouseWithPool (Low LOD)';
+
+    const options = this.options as DesertHouseWithPoolOptions;
+    const scale = options.scale || 1;
+
+    // Simplified materials
+    const materials = {
+      wall: new THREE.MeshLambertMaterial({ color: options.wallColor, name: 'desert_house_wall_low' }),
+      roof: new THREE.MeshLambertMaterial({ color: options.roofColor, name: 'desert_house_roof_low' }),
+      door: new THREE.MeshLambertMaterial({ color: options.doorColor, name: 'desert_house_door_low' }),
+      window: new THREE.MeshLambertMaterial({ color: options.windowColor, name: 'desert_house_window_low' }),
+      poolWater: new THREE.MeshLambertMaterial({ color: options.poolWaterColor, name: 'pool_water_low' }),
+      poolTile: new THREE.MeshLambertMaterial({ color: options.poolTileColor, name: 'pool_tile_low' }),
+    };
+
+    // Simple main house - just main structure
+    const houseGeometry = new THREE.BoxGeometry(18, 14, 16);
+    const house = new THREE.Mesh(houseGeometry, materials.wall);
+    house.position.set(0, 7, 0);
+    house.castShadow = this.options.castShadow ?? true;
+    house.receiveShadow = this.options.receiveShadow ?? true;
+    compound.add(house);
+
+    // Simple flat roof
+    const roofGeometry = new THREE.BoxGeometry(19, 1, 17);
+    const roof = new THREE.Mesh(roofGeometry, materials.roof);
+    roof.position.set(0, 14.5, 0);
+    roof.castShadow = this.options.castShadow ?? true;
+    compound.add(roof);
+
+    // Simple door
+    const doorGeometry = new THREE.BoxGeometry(3, 6, 0.3);
+    const door = new THREE.Mesh(doorGeometry, materials.door);
+    door.position.set(0, 3, 8.15);
+    compound.add(door);
+
+    // Single simple window
+    const windowGeometry = new THREE.BoxGeometry(2, 2, 0.2);
+    const window = new THREE.Mesh(windowGeometry, materials.window);
+    window.position.set(-4, 8, 8.1);
+    compound.add(window);
+
+    // Simple pool - water and basic structure
+    const poolWaterGeometry = new THREE.BoxGeometry(10, 0.5, 5);
+    const poolWater = new THREE.Mesh(poolWaterGeometry, materials.poolWater);
+    poolWater.position.set(0, 0.25, -20);
+    compound.add(poolWater);
+
+    const poolEdgeGeometry = new THREE.BoxGeometry(12, 1, 7);
+    const poolEdge = new THREE.Mesh(poolEdgeGeometry, materials.poolTile);
+    poolEdge.position.set(0, 0, -20);
+    compound.add(poolEdge);
+
+    // Apply scale
+    if (scale !== 1) {
+      compound.scale.setScalar(scale);
+    }
+
+    return compound;
+  }
+
+  protected createMediumLODContent(): THREE.Object3D {
+    // MEDIUM: ~800-1200 polygons
+    // House + pool + simplified landscaping (few plants), no amenities
+    const compound = new THREE.Group();
+    compound.name = 'DesertHouseWithPool (Medium LOD)';
+
+    const options = this.options as DesertHouseWithPoolOptions;
+    const scale = options.scale || 1;
+
+    // Materials
+    const materials = {
+      wall: new THREE.MeshLambertMaterial({ color: options.wallColor, name: 'desert_house_wall_medium' }),
+      roof: new THREE.MeshLambertMaterial({ color: options.roofColor, name: 'desert_house_roof_medium' }),
+      door: new THREE.MeshLambertMaterial({ color: options.doorColor, name: 'desert_house_door_medium' }),
+      window: new THREE.MeshLambertMaterial({ color: options.windowColor, name: 'desert_house_window_medium' }),
+      poolWater: new THREE.MeshLambertMaterial({ color: options.poolWaterColor, name: 'pool_water_medium' }),
+      poolTile: new THREE.MeshLambertMaterial({ color: options.poolTileColor, name: 'pool_tile_medium' }),
+      plant: new THREE.MeshLambertMaterial({ color: '#228B22', name: 'plant_medium' }),
+      rock: new THREE.MeshLambertMaterial({ color: '#696969', name: 'rock_medium' }),
+    };
+
+    // Main house
+    const houseGeometry = new THREE.BoxGeometry(18, 14, 16);
+    const house = new THREE.Mesh(houseGeometry, materials.wall);
+    house.position.set(0, 7, 0);
+    house.castShadow = this.options.castShadow ?? true;
+    house.receiveShadow = this.options.receiveShadow ?? true;
+    compound.add(house);
+
+    // Flat roof
+    const roofGeometry = new THREE.BoxGeometry(19, 1, 17);
+    const roof = new THREE.Mesh(roofGeometry, materials.roof);
+    roof.position.set(0, 14.5, 0);
+    roof.castShadow = this.options.castShadow ?? true;
+    compound.add(roof);
+
+    // Door
+    const doorGeometry = new THREE.BoxGeometry(3, 6, 0.3);
+    const door = new THREE.Mesh(doorGeometry, materials.door);
+    door.position.set(0, 3, 8.15);
+    compound.add(door);
+
+    // Windows (2-3 windows)
+    const windowGeometry = new THREE.BoxGeometry(2, 2, 0.2);
+    const windowPositions = [
+      new THREE.Vector3(-4, 8, 8.1),
+      new THREE.Vector3(4, 8, 8.1),
+      new THREE.Vector3(0, 10, 8.1),
+    ];
+    windowPositions.forEach(pos => {
+      const window = new THREE.Mesh(windowGeometry, materials.window);
+      window.position.copy(pos);
+      compound.add(window);
+    });
+
+    // Pool
+    const poolWaterGeometry = new THREE.BoxGeometry(12, 1.5, 6);
+    const poolWater = new THREE.Mesh(poolWaterGeometry, materials.poolWater);
+    poolWater.position.set(0, 0.75, -25);
+    compound.add(poolWater);
+
+    const poolEdgeGeometry = new THREE.BoxGeometry(14, 0.5, 8);
+    const poolEdge = new THREE.Mesh(poolEdgeGeometry, materials.poolTile);
+    poolEdge.position.set(0, 0, -25);
+    compound.add(poolEdge);
+
+    // Simplified landscaping - just a few plants
+    const plantPositions = [
+      new THREE.Vector3(-10, 0, -30),
+      new THREE.Vector3(10, 0, -30),
+      new THREE.Vector3(0, 0, -35),
+    ];
+
+    plantPositions.forEach(pos => {
+      // Desert shrubs
+      const shrubGeometry = new THREE.SphereGeometry(1.5, 6, 4);
+      const shrub = new THREE.Mesh(shrubGeometry, materials.plant);
+      shrub.position.copy(pos);
+      shrub.position.y = 1;
+      shrub.scale.set(1, 0.6, 1);
+      shrub.castShadow = this.options.castShadow ?? true;
+      compound.add(shrub);
+    });
+
+    // Apply scale
+    if (scale !== 1) {
+      compound.scale.setScalar(scale);
+    }
+
+    return compound;
+  }
+
+  protected createHighLODContent(): THREE.Object3D {
+    // HIGH: ~2500+ polygons
+    // Returns synchronous content only; house and pool loaded async in load() override
+    const compound = new THREE.Group();
+    compound.name = 'DesertHouseWithPool (High LOD)';
+
+    const options = this.options as DesertHouseWithPoolOptions;
+    const scale = options.scale || 1;
+
+    // Create materials for landscaping and amenities
     const materials = this.createMaterials(options);
 
     // Add landscaping (synchronous geometry only)
@@ -89,17 +300,16 @@ export class DesertHouseWithPool extends SimpleThreeComponent {
   }
 
   /**
-   * Override async load to add house and pool after base content
+   * Override async load to add house and pool for HIGH LOD only
    */
   override async load(): Promise<THREE.Object3D> {
     // Load base synchronous content first
     const baseObject = await super.load();
 
     const options = this.options as DesertHouseWithPoolOptions;
-    const isLowPoly = options.lowPoly || false;
 
-    // Skip async loading for low-poly mode (everything is synchronous)
-    if (!isLowPoly && baseObject instanceof THREE.Group) {
+    // Only load async components for HIGH LOD
+    if (this.currentLOD === LevelOfDetail.HIGH && baseObject instanceof THREE.Group) {
       // Load house and pool in parallel
       await Promise.all([
         this.addDesertHouse(baseObject, options),
@@ -345,68 +555,6 @@ export class DesertHouseWithPool extends SimpleThreeComponent {
     return parasol;
   }
 
-  /**
-   * Create low-poly version of the desert house with pool
-   */
-  private createLowPolyDesertHouseWithPool(options: DesertHouseWithPoolOptions, scale: number): THREE.Object3D {
-    const compound = new THREE.Group();
-    compound.name = 'DesertHouseWithPool (Low-Poly)';
-
-    // Simplified materials
-    const materials = {
-      wall: new THREE.MeshLambertMaterial({ color: options.wallColor }),
-      roof: new THREE.MeshLambertMaterial({ color: options.roofColor }),
-      door: new THREE.MeshLambertMaterial({ color: options.doorColor }),
-      window: new THREE.MeshLambertMaterial({ color: options.windowColor }),
-      poolWater: new THREE.MeshLambertMaterial({ color: options.poolWaterColor }),
-      poolTile: new THREE.MeshLambertMaterial({ color: options.poolTileColor }),
-    };
-
-    // Simple main house - just main structure, no decorations
-    const houseGeometry = new THREE.BoxGeometry(18, 14, 16);
-    const house = new THREE.Mesh(houseGeometry, materials.wall);
-    house.position.set(0, 7, 0);
-    house.castShadow = this.options.castShadow ?? true;
-    house.receiveShadow = this.options.receiveShadow ?? true;
-    compound.add(house);
-
-    // Simple flat roof
-    const roofGeometry = new THREE.BoxGeometry(19, 1, 17);
-    const roof = new THREE.Mesh(roofGeometry, materials.roof);
-    roof.position.set(0, 14.5, 0);
-    roof.castShadow = this.options.castShadow ?? true;
-    compound.add(roof);
-
-    // Simple door
-    const doorGeometry = new THREE.BoxGeometry(3, 6, 0.3);
-    const door = new THREE.Mesh(doorGeometry, materials.door);
-    door.position.set(0, 3, 8.15);
-    compound.add(door);
-
-    // Single simple window
-    const windowGeometry = new THREE.BoxGeometry(2, 2, 0.2);
-    const window = new THREE.Mesh(windowGeometry, materials.window);
-    window.position.set(-4, 8, 8.1);
-    compound.add(window);
-
-    // Simple pool - just water and basic structure
-    const poolWaterGeometry = new THREE.BoxGeometry(10, 0.5, 5);
-    const poolWater = new THREE.Mesh(poolWaterGeometry, materials.poolWater);
-    poolWater.position.set(0, 0.25, -20);
-    compound.add(poolWater);
-
-    const poolEdgeGeometry = new THREE.BoxGeometry(12, 1, 7);
-    const poolEdge = new THREE.Mesh(poolEdgeGeometry, materials.poolTile);
-    poolEdge.position.set(0, 0, -20);
-    compound.add(poolEdge);
-
-    // Apply scale
-    if (scale !== 1) {
-      compound.scale.setScalar(scale);
-    }
-
-    return compound;
-  }
 
   public override validate(): string[] {
     const issues: string[] = [];
@@ -424,7 +572,7 @@ export class DesertHouseWithPool extends SimpleThreeComponent {
 
     return {
       name: 'DesertHouseWithPool',
-      version: '1.0.0',
+      version: '2.0.0',
       type: 'building',
       subtype: 'luxury_residential',
       style: 'desert_modern',
@@ -432,6 +580,7 @@ export class DesertHouseWithPool extends SimpleThreeComponent {
       wallColor: options.wallColor,
       poolWaterColor: options.poolWaterColor,
       scale: options.scale,
+      levelOfDetail: LevelOfDetail[this.currentLOD],
     };
   }
 }

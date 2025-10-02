@@ -1,7 +1,9 @@
 import * as THREE from 'three';
-import { SimpleThreeComponent, SimpleComponentOptions } from '../../base/SimpleThreeComponent';
+import { LODComponent } from '../../base/LODComponent';
+import { SimpleComponentOptions } from '../../base/SimpleThreeComponent';
 import { ComponentMetadata } from '../../base/IThreeComponent';
 import { resourceManager } from '../../../systems/ResourceManager';
+import { LevelOfDetail, getLODFromLegacy } from '../../../types/lod';
 
 export interface HospitalOptions extends SimpleComponentOptions {
   wallColor?: string;
@@ -12,6 +14,7 @@ export interface HospitalOptions extends SimpleComponentOptions {
   signColor?: string;
   scale?: number;
   lowPoly?: boolean;
+  levelOfDetail?: LevelOfDetail;
 }
 
 /**
@@ -29,7 +32,7 @@ interface HospitalMaterials {
 /**
  * Hospital building component - Modern medical facility with distinctive architecture
  */
-export class Hospital extends SimpleThreeComponent {
+export class Hospital extends LODComponent {
   constructor(options: HospitalOptions = {}) {
     const metadata: ComponentMetadata = {
       name: 'Hospital',
@@ -48,6 +51,8 @@ export class Hospital extends SimpleThreeComponent {
       scale: 1,
       ...options,
     });
+
+    this.currentLOD = options.levelOfDetail ?? getLODFromLegacy(options.lowPoly);
   }
 
   protected createGeometry(): THREE.BufferGeometry {
@@ -55,17 +60,264 @@ export class Hospital extends SimpleThreeComponent {
     return new THREE.BoxGeometry(1, 1, 1);
   }
 
-  protected override createContent(): THREE.Object3D {
+  /**
+   * Create ultra-low detail version (~20-50 polygons)
+   * Single box body + roof, no wings, no cross, no windows
+   */
+  protected createUltraLowLODContent(): THREE.Object3D {
     const hospital = new THREE.Group();
-    hospital.name = 'Hospital';
+    hospital.name = 'Hospital (Ultra Low LOD)';
 
     const options = this.options as HospitalOptions;
     const scale = options.scale || 1;
-    const isLowPoly = options.lowPoly || false;
 
-    if (isLowPoly) {
-      return this.createLowPolyHospital(options, scale);
+    // Simple materials
+    const wallMaterial = resourceManager.getOrCreateMaterial(
+      `hospital_wall_ultra_low_${options.wallColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.wallColor })
+    );
+
+    const roofMaterial = resourceManager.getOrCreateMaterial(
+      `hospital_roof_ultra_low_${options.roofColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.roofColor })
+    );
+
+    // Single box body
+    const bodyGeometry = resourceManager.getOrCreateGeometry(
+      'hospital_ultra_low_body',
+      () => new THREE.BoxGeometry(20, 24, 18)
+    );
+    const body = new THREE.Mesh(bodyGeometry, wallMaterial);
+    body.position.set(0, 12, 0);
+    body.castShadow = this.options.castShadow ?? true;
+    body.receiveShadow = this.options.receiveShadow ?? true;
+    hospital.add(body);
+
+    // Simple flat roof
+    const roofGeometry = resourceManager.getOrCreateGeometry(
+      'hospital_ultra_low_roof',
+      () => new THREE.BoxGeometry(21, 1, 19)
+    );
+    const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+    roof.position.set(0, 24.5, 0);
+    roof.castShadow = this.options.castShadow ?? true;
+    hospital.add(roof);
+
+    // Apply scale
+    if (scale !== 1) {
+      hospital.scale.setScalar(scale);
     }
+
+    return hospital;
+  }
+
+  /**
+   * Create low detail version (~100-300 polygons)
+   * Main body + roof + simple red cross, no wings, minimal windows
+   */
+  protected createLowLODContent(): THREE.Object3D {
+    const hospital = new THREE.Group();
+    hospital.name = 'Hospital (Low LOD)';
+
+    const options = this.options as HospitalOptions;
+    const scale = options.scale || 1;
+
+    // Simplified materials
+    const wallMaterial = resourceManager.getOrCreateMaterial(
+      `hospital_wall_low_${options.wallColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.wallColor })
+    );
+
+    const roofMaterial = resourceManager.getOrCreateMaterial(
+      `hospital_roof_low_${options.roofColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.roofColor })
+    );
+
+    const accentMaterial = resourceManager.getOrCreateMaterial(
+      `hospital_accent_low_${options.accentColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.accentColor })
+    );
+
+    const windowMaterial = resourceManager.getOrCreateMaterial(
+      `hospital_window_low_${options.windowColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.windowColor })
+    );
+
+    // Main structure
+    const mainBodyGeometry = resourceManager.getOrCreateGeometry(
+      'hospital_main_body_low',
+      () => new THREE.BoxGeometry(20, 24, 18)
+    );
+    const mainBody = new THREE.Mesh(mainBodyGeometry, wallMaterial);
+    mainBody.position.set(0, 12, 0);
+    mainBody.castShadow = this.options.castShadow ?? true;
+    mainBody.receiveShadow = this.options.receiveShadow ?? true;
+    hospital.add(mainBody);
+
+    // Simple flat roof
+    const roofGeometry = resourceManager.getOrCreateGeometry(
+      'hospital_roof_low',
+      () => new THREE.BoxGeometry(21, 1, 19)
+    );
+    const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+    roof.position.set(0, 24.5, 0);
+    roof.castShadow = this.options.castShadow ?? true;
+    hospital.add(roof);
+
+    // Simple red cross - single box
+    const crossGeometry = resourceManager.getOrCreateGeometry(
+      'hospital_cross_low',
+      () => new THREE.BoxGeometry(4, 4, 0.2)
+    );
+    const cross = new THREE.Mesh(crossGeometry, accentMaterial);
+    cross.position.set(0, 18, 9.15);
+    hospital.add(cross);
+
+    // Minimal windows - just 3
+    const windowGeometry = resourceManager.getOrCreateGeometry(
+      'hospital_window_low',
+      () => new THREE.BoxGeometry(2, 2, 0.2)
+    );
+
+    for (let i = 0; i < 3; i++) {
+      const window = new THREE.Mesh(windowGeometry, windowMaterial);
+      window.position.set(-5 + i * 5, 12, 9.1);
+      hospital.add(window);
+    }
+
+    // Apply scale
+    if (scale !== 1) {
+      hospital.scale.setScalar(scale);
+    }
+
+    return hospital;
+  }
+
+  /**
+   * Create medium detail version (~800-1200 polygons)
+   * Main body + wings + roofs + simple cross + simplified windows (no frames), no helipad
+   */
+  protected createMediumLODContent(): THREE.Object3D {
+    const hospital = new THREE.Group();
+    hospital.name = 'Hospital (Medium LOD)';
+
+    const options = this.options as HospitalOptions;
+    const scale = options.scale || 1;
+
+    const wallMaterial = resourceManager.getOrCreateMaterial(
+      `hospital_wall_medium_${options.wallColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.wallColor })
+    );
+
+    const roofMaterial = resourceManager.getOrCreateMaterial(
+      `hospital_roof_medium_${options.roofColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.roofColor })
+    );
+
+    const accentMaterial = resourceManager.getOrCreateMaterial(
+      `hospital_accent_medium_${options.accentColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.accentColor })
+    );
+
+    const windowMaterial = resourceManager.getOrCreateMaterial(
+      `hospital_window_medium_${options.windowColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.windowColor })
+    );
+
+    // Main hospital building
+    const mainBodyGeometry = resourceManager.getOrCreateGeometry(
+      'hospital_main_body_medium',
+      () => new THREE.BoxGeometry(20, 24, 18)
+    );
+    const mainBody = new THREE.Mesh(mainBodyGeometry, wallMaterial);
+    mainBody.position.set(0, 12, 0);
+    mainBody.castShadow = this.options.castShadow ?? true;
+    mainBody.receiveShadow = this.options.receiveShadow ?? true;
+    hospital.add(mainBody);
+
+    // Left wing
+    const leftWingGeometry = resourceManager.getOrCreateGeometry(
+      'hospital_left_wing_medium',
+      () => new THREE.BoxGeometry(12, 16, 12)
+    );
+    const leftWing = new THREE.Mesh(leftWingGeometry, wallMaterial);
+    leftWing.position.set(-16, 8, 3);
+    leftWing.castShadow = this.options.castShadow ?? true;
+    leftWing.receiveShadow = this.options.receiveShadow ?? true;
+    hospital.add(leftWing);
+
+    // Right wing
+    const rightWingGeometry = resourceManager.getOrCreateGeometry(
+      'hospital_right_wing_medium',
+      () => new THREE.BoxGeometry(12, 16, 12)
+    );
+    const rightWing = new THREE.Mesh(rightWingGeometry, wallMaterial);
+    rightWing.position.set(16, 8, 3);
+    rightWing.castShadow = this.options.castShadow ?? true;
+    rightWing.receiveShadow = this.options.receiveShadow ?? true;
+    hospital.add(rightWing);
+
+    // Flat roof on main building
+    const roofGeometry = resourceManager.getOrCreateGeometry(
+      'hospital_roof_medium',
+      () => new THREE.BoxGeometry(21, 1, 19)
+    );
+    const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+    roof.position.set(0, 24.5, 0);
+    roof.castShadow = this.options.castShadow ?? true;
+    hospital.add(roof);
+
+    // Simple red cross - vertical and horizontal bars
+    const verticalBarGeometry = resourceManager.getOrCreateGeometry(
+      'hospital_cross_vertical_medium',
+      () => new THREE.BoxGeometry(1.5, 6, 0.3)
+    );
+    const verticalBar = new THREE.Mesh(verticalBarGeometry, accentMaterial);
+    verticalBar.position.set(0, 18, 9.2);
+    hospital.add(verticalBar);
+
+    const horizontalBarGeometry = resourceManager.getOrCreateGeometry(
+      'hospital_cross_horizontal_medium',
+      () => new THREE.BoxGeometry(6, 1.5, 0.3)
+    );
+    const horizontalBar = new THREE.Mesh(horizontalBarGeometry, accentMaterial);
+    horizontalBar.position.set(0, 18, 9.2);
+    hospital.add(horizontalBar);
+
+    // Simplified windows (no frames) - 2 floors, 3 windows per floor
+    const windowGeometry = resourceManager.getOrCreateGeometry(
+      'hospital_window_medium',
+      () => new THREE.BoxGeometry(2, 3, 0.3)
+    );
+
+    for (let floor = 0; floor < 2; floor++) {
+      const y = 10 + floor * 7;
+      for (let i = 0; i < 3; i++) {
+        const x = -5 + i * 5;
+        const window = new THREE.Mesh(windowGeometry, windowMaterial);
+        window.position.set(x, y, 9.15);
+        hospital.add(window);
+      }
+    }
+
+    // Apply scale
+    if (scale !== 1) {
+      hospital.scale.setScalar(scale);
+    }
+
+    return hospital;
+  }
+
+  /**
+   * Create high detail version (~2500-3000 polygons)
+   * Full detail using existing helper methods
+   */
+  protected createHighLODContent(): THREE.Object3D {
+    const hospital = new THREE.Group();
+    hospital.name = 'Hospital (High LOD)';
+
+    const options = this.options as HospitalOptions;
+    const scale = options.scale || 1;
 
     // Create materials
     const materials = this.createMaterials(options);
@@ -327,104 +579,6 @@ export class Hospital extends SimpleThreeComponent {
     hospital.add(hVertical2);
   }
 
-  /**
-   * Create low-poly version of the hospital
-   */
-  private createLowPolyHospital(options: HospitalOptions, scale: number): THREE.Object3D {
-    const hospital = new THREE.Group();
-    hospital.name = 'Hospital (Low-Poly)';
-
-    // Simplified materials
-    const materials = {
-      wall: resourceManager.getOrCreateMaterial(
-        `hospital_wall_lowpoly_${options.wallColor}`,
-        () => new THREE.MeshLambertMaterial({ color: options.wallColor })
-      ),
-      roof: resourceManager.getOrCreateMaterial(
-        `hospital_roof_lowpoly_${options.roofColor}`,
-        () => new THREE.MeshLambertMaterial({ color: options.roofColor })
-      ),
-      accent: resourceManager.getOrCreateMaterial(
-        `hospital_accent_lowpoly_${options.accentColor}`,
-        () => new THREE.MeshLambertMaterial({ color: options.accentColor })
-      ),
-      window: resourceManager.getOrCreateMaterial(
-        `hospital_window_lowpoly_${options.windowColor}`,
-        () => new THREE.MeshLambertMaterial({ color: options.windowColor })
-      )
-    };
-
-    // Main structure - simplified single box (same size as high-poly)
-    const mainBodyGeometry = resourceManager.getOrCreateGeometry(
-      'hospital_main_body_lowpoly',
-      () => new THREE.BoxGeometry(20, 24, 18)
-    );
-    const mainBody = new THREE.Mesh(mainBodyGeometry, materials.wall);
-    mainBody.position.set(0, 12, 0);
-    mainBody.castShadow = this.options.castShadow ?? true;
-    mainBody.receiveShadow = this.options.receiveShadow ?? true;
-    hospital.add(mainBody);
-
-    // Left wing - simplified (same size as high-poly)
-    const leftWingGeometry = resourceManager.getOrCreateGeometry(
-      'hospital_left_wing_lowpoly',
-      () => new THREE.BoxGeometry(12, 16, 12)
-    );
-    const leftWing = new THREE.Mesh(leftWingGeometry, materials.wall);
-    leftWing.position.set(-16, 8, 3);
-    leftWing.castShadow = this.options.castShadow ?? true;
-    leftWing.receiveShadow = this.options.receiveShadow ?? true;
-    hospital.add(leftWing);
-
-    // Right wing - simplified (same size as high-poly)
-    const rightWingGeometry = resourceManager.getOrCreateGeometry(
-      'hospital_right_wing_lowpoly',
-      () => new THREE.BoxGeometry(12, 16, 12)
-    );
-    const rightWing = new THREE.Mesh(rightWingGeometry, materials.wall);
-    rightWing.position.set(16, 8, 3);
-    rightWing.castShadow = this.options.castShadow ?? true;
-    rightWing.receiveShadow = this.options.receiveShadow ?? true;
-    hospital.add(rightWing);
-
-    // Simple flat roof (same size as high-poly)
-    const roofGeometry = resourceManager.getOrCreateGeometry(
-      'hospital_roof_lowpoly',
-      () => new THREE.BoxGeometry(21, 1, 19)
-    );
-    const roof = new THREE.Mesh(roofGeometry, materials.roof);
-    roof.position.set(0, 24.5, 0);
-    roof.castShadow = this.options.castShadow ?? true;
-    hospital.add(roof);
-
-    // Simple red cross
-    const crossGeometry = resourceManager.getOrCreateGeometry(
-      'hospital_cross_lowpoly',
-      () => new THREE.BoxGeometry(4, 4, 0.2)
-    );
-    const cross = new THREE.Mesh(crossGeometry, materials.accent);
-    cross.position.set(0, 18, 9.15);
-    hospital.add(cross);
-
-    // Minimal windows - just 3
-    const windowLowPolyGeometry = resourceManager.getOrCreateGeometry(
-      'hospital_window_lowpoly',
-      () => new THREE.BoxGeometry(2, 2, 0.2)
-    );
-
-    for (let i = 0; i < 3; i++) {
-      const window = new THREE.Mesh(windowLowPolyGeometry, materials.window);
-      window.position.set(-5 + i * 5, 12, 9.1);
-      hospital.add(window);
-    }
-
-    // Apply scale
-    if (scale !== 1) {
-      hospital.scale.setScalar(scale);
-    }
-
-    return hospital;
-  }
 
   public override validate(): string[] {
     const issues: string[] = [];

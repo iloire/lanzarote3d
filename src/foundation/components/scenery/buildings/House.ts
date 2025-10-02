@@ -1,8 +1,10 @@
 import * as THREE from 'three';
 import GuiHelper from '../../../utils/gui';
-import { SimpleThreeComponent, SimpleComponentOptions } from '../../base/SimpleThreeComponent';
+import { LODComponent } from '../../base/LODComponent';
+import { SimpleComponentOptions } from '../../base/SimpleThreeComponent';
 import { ComponentMetadata } from '../../base/IThreeComponent';
 import { resourceManager } from '../../../systems/ResourceManager';
+import { LevelOfDetail, getLODFromLegacy } from '../../../types/lod';
 
 export enum HouseType {
   Small,   // 2 wings
@@ -19,12 +21,13 @@ export interface HouseOptions extends SimpleComponentOptions {
   windowColor?: string;
   scale?: number;
   lowPoly?: boolean;
+  levelOfDetail?: LevelOfDetail;
 }
 
 /**
  * House building component - Villa-based architecture with configurable wing count
  */
-class House extends SimpleThreeComponent {
+class House extends LODComponent {
   private type: HouseType;
 
   constructor(options: HouseOptions = { type: HouseType.Small }) {
@@ -45,6 +48,7 @@ class House extends SimpleThreeComponent {
     });
 
     this.type = options.type;
+    this.currentLOD = options.levelOfDetail ?? getLODFromLegacy(options.lowPoly);
   }
 
   protected createGeometry(): THREE.BufferGeometry {
@@ -92,15 +96,208 @@ class House extends SimpleThreeComponent {
     }
   }
 
-  protected override createContent(): THREE.Object3D {
+  protected createUltraLowLODContent(): THREE.Object3D {
+    // ULTRA_LOW: ~20-50 polygons
+    // Single box with single color - no wings, no windows, minimal detail
     const house = new THREE.Group();
-    house.name = 'House';
+    house.name = 'House (Ultra Low LOD)';
 
     const options = this.options as HouseOptions;
     const scale = options.scale || 1;
-    const isLowPoly = options.lowPoly || false;
 
-    // Create materials with resource sharing
+    // Single material
+    const wallMaterial = resourceManager.getOrCreateMaterial(
+      `house_wall_ultra_low_${options.wallColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.wallColor })
+    );
+
+    const roofMaterial = resourceManager.getOrCreateMaterial(
+      `house_roof_ultra_low_${options.roofColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.roofColor })
+    );
+
+    // Single combined box representing entire house
+    const bodyGeometry = resourceManager.getOrCreateGeometry(
+      'house_ultra_low_body',
+      () => new THREE.BoxGeometry(20, 20, 20)
+    );
+
+    const body = new THREE.Mesh(bodyGeometry, wallMaterial);
+    body.position.set(0, 10, 0);
+    body.castShadow = this.options.castShadow ?? true;
+    body.receiveShadow = this.options.receiveShadow ?? true;
+    house.add(body);
+
+    // Single simple roof
+    const roofGeometry = resourceManager.getOrCreateGeometry(
+      'house_ultra_low_roof',
+      () => new THREE.BoxGeometry(22, 1, 22)
+    );
+
+    const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+    roof.position.set(0, 20.5, 0);
+    roof.castShadow = this.options.castShadow ?? true;
+    house.add(roof);
+
+    // Apply scale
+    if (scale !== 1) {
+      house.scale.setScalar(scale);
+    }
+
+    return house;
+  }
+
+  protected createLowLODContent(): THREE.Object3D {
+    // LOW: ~100-300 polygons
+    // Main wing only + simple roof + single door, no windows
+    const house = new THREE.Group();
+    house.name = 'House (Low LOD)';
+
+    const options = this.options as HouseOptions;
+    const scale = options.scale || 1;
+
+    const wallMaterial = resourceManager.getOrCreateMaterial(
+      `house_wall_low_${options.wallColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.wallColor })
+    );
+
+    const accentMaterial = resourceManager.getOrCreateMaterial(
+      `house_accent_low_${options.accentColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.accentColor })
+    );
+
+    const roofMaterial = resourceManager.getOrCreateMaterial(
+      `house_roof_low_${options.roofColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.roofColor })
+    );
+
+    // Get main wing only
+    const wings = this.getWingConfiguration();
+    const mainWing = wings[0];
+
+    // Main body
+    const bodyGeometry = resourceManager.getOrCreateGeometry(
+      'house_low_main_body',
+      () => new THREE.BoxGeometry(mainWing.size[0], mainWing.size[1], mainWing.size[2])
+    );
+
+    const body = new THREE.Mesh(bodyGeometry, wallMaterial);
+    body.position.set(mainWing.position[0], mainWing.position[1], mainWing.position[2]);
+    body.castShadow = this.options.castShadow ?? true;
+    body.receiveShadow = this.options.receiveShadow ?? true;
+    house.add(body);
+
+    // Roof
+    const roofGeometry = resourceManager.getOrCreateGeometry(
+      'house_low_roof',
+      () => new THREE.BoxGeometry(mainWing.size[0] + 2, 1, mainWing.size[2] + 2)
+    );
+
+    const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+    roof.position.set(
+      mainWing.position[0],
+      mainWing.position[1] + mainWing.size[1]/2 + 0.5,
+      mainWing.position[2]
+    );
+    roof.castShadow = this.options.castShadow ?? true;
+    house.add(roof);
+
+    // Simple door only
+    this.addEntranceLowPoly(house, mainWing, accentMaterial);
+
+    // Apply scale
+    if (scale !== 1) {
+      house.scale.setScalar(scale);
+    }
+
+    return house;
+  }
+
+  protected createMediumLODContent(): THREE.Object3D {
+    // MEDIUM: ~500-1000 polygons
+    // All wings + simple windows (no frames) + door
+    const house = new THREE.Group();
+    house.name = 'House (Medium LOD)';
+
+    const options = this.options as HouseOptions;
+    const scale = options.scale || 1;
+
+    const wallMaterial = resourceManager.getOrCreateMaterial(
+      `house_wall_medium_${options.wallColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.wallColor })
+    );
+
+    const accentMaterial = resourceManager.getOrCreateMaterial(
+      `house_accent_medium_${options.accentColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.accentColor })
+    );
+
+    const roofMaterial = resourceManager.getOrCreateMaterial(
+      `house_roof_medium_${options.roofColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.roofColor })
+    );
+
+    const windowMaterial = resourceManager.getOrCreateMaterial(
+      `house_window_medium_${options.windowColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.windowColor })
+    );
+
+    // Get wing configuration based on house type
+    const wings = this.getWingConfiguration();
+
+    // Create each wing
+    wings.forEach((wing, index) => {
+      // Main body
+      const bodyGeometry = resourceManager.getOrCreateGeometry(
+        `house_medium_wing_${index}`,
+        () => new THREE.BoxGeometry(wing.size[0], wing.size[1], wing.size[2])
+      );
+
+      const body = new THREE.Mesh(bodyGeometry, wallMaterial);
+      body.position.set(wing.position[0], wing.position[1], wing.position[2]);
+      body.castShadow = this.options.castShadow ?? true;
+      body.receiveShadow = this.options.receiveShadow ?? true;
+      house.add(body);
+
+      // Roof for each wing
+      const roofGeometry = resourceManager.getOrCreateGeometry(
+        `house_medium_roof_${index}`,
+        () => new THREE.BoxGeometry(wing.size[0] + 2, 1, wing.size[2] + 2)
+      );
+
+      const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+      roof.position.set(
+        wing.position[0],
+        wing.position[1] + wing.size[1]/2 + 0.5,
+        wing.position[2]
+      );
+      roof.castShadow = this.options.castShadow ?? true;
+      house.add(roof);
+
+      // Add windows to each wing (simplified - no frames)
+      this.addWindowsToWingLowPoly(house, wing, windowMaterial);
+    });
+
+    // Add entrance door (simplified)
+    this.addEntranceLowPoly(house, wings[0], accentMaterial);
+
+    // Apply scale
+    if (scale !== 1) {
+      house.scale.setScalar(scale);
+    }
+
+    return house;
+  }
+
+  protected createHighLODContent(): THREE.Object3D {
+    // HIGH: ~2000+ polygons
+    // Full detail with all wings, windows with frames, door with frame, modern features
+    const house = new THREE.Group();
+    house.name = 'House (High LOD)';
+
+    const options = this.options as HouseOptions;
+    const scale = options.scale || 1;
+
     const wallMaterial = resourceManager.getOrCreateMaterial(
       `house_wall_${options.wallColor}`,
       () => new THREE.MeshLambertMaterial({ color: options.wallColor })
@@ -158,23 +355,15 @@ class House extends SimpleThreeComponent {
       roof.castShadow = this.options.castShadow ?? true;
       house.add(roof);
 
-      // Add windows to each wing (simplified for low-poly)
-      if (isLowPoly) {
-        this.addWindowsToWingLowPoly(house, wing, windowMaterial);
-      } else {
-        this.addWindowsToWing(house, wing, windowMaterial, frameMaterial);
-      }
+      // Add windows to each wing with frames
+      this.addWindowsToWing(house, wing, windowMaterial, frameMaterial);
     });
 
-    // Add entrance door on main wing (simplified for low-poly)
-    if (isLowPoly) {
-      this.addEntranceLowPoly(house, wings[0], accentMaterial);
-    } else {
-      this.addEntrance(house, wings[0], accentMaterial, frameMaterial);
-    }
+    // Add entrance door with frame
+    this.addEntrance(house, wings[0], accentMaterial, frameMaterial);
 
-    // Add special features based on type (skip for low-poly except essential elements)
-    if (this.type === HouseType.Modern && !isLowPoly) {
+    // Add special features based on type
+    if (this.type === HouseType.Modern) {
       this.addModernFeatures(house, wings, windowMaterial, frameMaterial, accentMaterial);
     }
 

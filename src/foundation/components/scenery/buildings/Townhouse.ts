@@ -1,7 +1,9 @@
 import * as THREE from 'three';
-import { SimpleThreeComponent, SimpleComponentOptions } from '../../base/SimpleThreeComponent';
+import { LODComponent } from '../../base/LODComponent';
+import { SimpleComponentOptions } from '../../base/SimpleThreeComponent';
 import { ComponentMetadata } from '../../base/IThreeComponent';
 import { resourceManager } from '../../../systems/ResourceManager';
+import { LevelOfDetail, getLODFromLegacy } from '../../../types/lod';
 
 export interface TownhouseOptions extends SimpleComponentOptions {
   wallColor?: string;
@@ -11,6 +13,7 @@ export interface TownhouseOptions extends SimpleComponentOptions {
   trimColor?: string;
   scale?: number;
   lowPoly?: boolean;
+  levelOfDetail?: LevelOfDetail;
 }
 
 /**
@@ -27,13 +30,13 @@ interface TownhouseMaterials {
 /**
  * Townhouse building component - Multi-story urban building
  */
-export class Townhouse extends SimpleThreeComponent {
+export class Townhouse extends LODComponent {
   constructor(options: TownhouseOptions = {}) {
     const metadata: ComponentMetadata = {
       name: 'Townhouse',
-      version: '1.0.0',
-      description: 'Multi-story urban townhouse with traditional brick architecture',
-      tags: ['scenery', 'building', 'urban', 'multi-story', 'residential'],
+      version: '2.0.0',
+      description: 'Multi-story urban townhouse with traditional brick architecture. Supports 4 LOD levels.',
+      tags: ['scenery', 'building', 'urban', 'multi-story', 'residential', 'lod'],
     };
 
     super(metadata, {
@@ -45,6 +48,8 @@ export class Townhouse extends SimpleThreeComponent {
       scale: 1,
       ...options,
     });
+
+    this.currentLOD = options.levelOfDetail ?? getLODFromLegacy(options.lowPoly);
   }
 
   protected createGeometry(): THREE.BufferGeometry {
@@ -52,17 +57,234 @@ export class Townhouse extends SimpleThreeComponent {
     return new THREE.BoxGeometry(1, 1, 1);
   }
 
-  protected override createContent(): THREE.Object3D {
+  /**
+   * ULTRA_LOW LOD: ~20-50 polygons
+   * Single box body + roof, no door, no windows
+   */
+  protected createUltraLowLODContent(): THREE.Object3D {
     const townhouse = new THREE.Group();
-    townhouse.name = 'Townhouse';
+    townhouse.name = 'Townhouse (Ultra Low LOD)';
 
     const options = this.options as TownhouseOptions;
     const scale = options.scale || 1;
-    const isLowPoly = options.lowPoly || false;
 
-    if (isLowPoly) {
-      return this.createLowPolyTownhouse(options, scale);
+    // Materials
+    const wallMaterial = resourceManager.getOrCreateMaterial(
+      `townhouse_wall_ultra_low_${options.wallColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.wallColor })
+    );
+
+    const roofMaterial = resourceManager.getOrCreateMaterial(
+      `townhouse_roof_ultra_low_${options.roofColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.roofColor })
+    );
+
+    // Single box representing entire building body
+    const bodyGeometry = resourceManager.getOrCreateGeometry(
+      'townhouse_ultra_low_body',
+      () => new THREE.BoxGeometry(12, 16, 15)
+    );
+    const body = new THREE.Mesh(bodyGeometry, wallMaterial);
+    body.position.set(0, 8, 0);
+    body.castShadow = this.options.castShadow ?? true;
+    body.receiveShadow = this.options.receiveShadow ?? true;
+    townhouse.add(body);
+
+    // Single simple roof
+    const roofGeometry = resourceManager.getOrCreateGeometry(
+      'townhouse_ultra_low_roof',
+      () => new THREE.BoxGeometry(14, 3, 17)
+    );
+    const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+    roof.position.set(0, 17.5, 0);
+    roof.castShadow = this.options.castShadow ?? true;
+    townhouse.add(roof);
+
+    // Apply scale
+    if (scale !== 1) {
+      townhouse.scale.setScalar(scale);
     }
+
+    return townhouse;
+  }
+
+  /**
+   * LOW LOD: ~100-200 polygons
+   * Body + simple roof + door, no windows
+   */
+  protected createLowLODContent(): THREE.Object3D {
+    const townhouse = new THREE.Group();
+    townhouse.name = 'Townhouse (Low LOD)';
+
+    const options = this.options as TownhouseOptions;
+    const scale = options.scale || 1;
+
+    // Materials
+    const wallMaterial = resourceManager.getOrCreateMaterial(
+      `townhouse_wall_low_${options.wallColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.wallColor })
+    );
+
+    const roofMaterial = resourceManager.getOrCreateMaterial(
+      `townhouse_roof_low_${options.roofColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.roofColor })
+    );
+
+    const doorMaterial = resourceManager.getOrCreateMaterial(
+      `townhouse_door_low_${options.doorColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.doorColor })
+    );
+
+    // Main building body
+    const bodyGeometry = resourceManager.getOrCreateGeometry(
+      'townhouse_low_body',
+      () => new THREE.BoxGeometry(12, 16, 15)
+    );
+    const body = new THREE.Mesh(bodyGeometry, wallMaterial);
+    body.position.set(0, 8, 0);
+    body.castShadow = this.options.castShadow ?? true;
+    body.receiveShadow = this.options.receiveShadow ?? true;
+    townhouse.add(body);
+
+    // Simple roof - no peak
+    const roofGeometry = resourceManager.getOrCreateGeometry(
+      'townhouse_low_roof',
+      () => new THREE.BoxGeometry(13, 2, 16)
+    );
+    const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+    roof.position.set(0, 17, 0);
+    roof.castShadow = this.options.castShadow ?? true;
+    townhouse.add(roof);
+
+    // Simple door - no frame or steps
+    const doorGeometry = resourceManager.getOrCreateGeometry(
+      'townhouse_low_door',
+      () => new THREE.BoxGeometry(2.5, 6, 0.3)
+    );
+    const door = new THREE.Mesh(doorGeometry, doorMaterial);
+    door.position.set(0, 3, 7.65);
+    townhouse.add(door);
+
+    // Apply scale
+    if (scale !== 1) {
+      townhouse.scale.setScalar(scale);
+    }
+
+    return townhouse;
+  }
+
+  /**
+   * MEDIUM LOD: ~500-800 polygons
+   * Body + roof + peak + door + simplified windows (no frames), no decorative elements
+   */
+  protected createMediumLODContent(): THREE.Object3D {
+    const townhouse = new THREE.Group();
+    townhouse.name = 'Townhouse (Medium LOD)';
+
+    const options = this.options as TownhouseOptions;
+    const scale = options.scale || 1;
+
+    // Materials
+    const wallMaterial = resourceManager.getOrCreateMaterial(
+      `townhouse_wall_medium_${options.wallColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.wallColor })
+    );
+
+    const roofMaterial = resourceManager.getOrCreateMaterial(
+      `townhouse_roof_medium_${options.roofColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.roofColor })
+    );
+
+    const doorMaterial = resourceManager.getOrCreateMaterial(
+      `townhouse_door_medium_${options.doorColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.doorColor })
+    );
+
+    const windowMaterial = resourceManager.getOrCreateMaterial(
+      `townhouse_window_medium_${options.windowColor}`,
+      () => new THREE.MeshLambertMaterial({ color: options.windowColor })
+    );
+
+    // Main building body
+    const bodyGeometry = resourceManager.getOrCreateGeometry(
+      'townhouse_medium_body',
+      () => new THREE.BoxGeometry(12, 16, 15)
+    );
+    const body = new THREE.Mesh(bodyGeometry, wallMaterial);
+    body.position.set(0, 8, 0);
+    body.castShadow = this.options.castShadow ?? true;
+    body.receiveShadow = this.options.receiveShadow ?? true;
+    townhouse.add(body);
+
+    // Roof
+    const roofGeometry = resourceManager.getOrCreateGeometry(
+      'townhouse_medium_roof',
+      () => new THREE.BoxGeometry(14, 3, 17)
+    );
+    const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+    roof.position.set(0, 17.5, 0);
+    roof.castShadow = this.options.castShadow ?? true;
+    townhouse.add(roof);
+
+    // Roof peak
+    const peakGeometry = resourceManager.getOrCreateGeometry(
+      'townhouse_medium_peak',
+      () => new THREE.BoxGeometry(2, 4, 17)
+    );
+    const peak = new THREE.Mesh(peakGeometry, roofMaterial);
+    peak.position.set(0, 20, 0);
+    peak.castShadow = this.options.castShadow ?? true;
+    townhouse.add(peak);
+
+    // Door (no frame or steps)
+    const doorGeometry = resourceManager.getOrCreateGeometry(
+      'townhouse_medium_door',
+      () => new THREE.BoxGeometry(3, 7, 0.5)
+    );
+    const door = new THREE.Mesh(doorGeometry, doorMaterial);
+    door.position.set(0, 3.5, 7.75);
+    townhouse.add(door);
+
+    // Simplified windows (no frames) - fewer windows than high LOD
+    const windowGeometry = resourceManager.getOrCreateGeometry(
+      'townhouse_medium_window',
+      () => new THREE.BoxGeometry(2.5, 3, 0.3)
+    );
+
+    // Ground floor windows (2 windows)
+    for (let i = 0; i < 2; i++) {
+      const x = -4 + i * 8;
+      const window = new THREE.Mesh(windowGeometry, windowMaterial);
+      window.position.set(x, 4, 7.65);
+      townhouse.add(window);
+    }
+
+    // Second floor windows (2 windows)
+    for (let i = 0; i < 2; i++) {
+      const x = -3 + i * 6;
+      const window = new THREE.Mesh(windowGeometry, windowMaterial);
+      window.position.set(x, 12, 7.65);
+      townhouse.add(window);
+    }
+
+    // Apply scale
+    if (scale !== 1) {
+      townhouse.scale.setScalar(scale);
+    }
+
+    return townhouse;
+  }
+
+  /**
+   * HIGH LOD: ~1500-2000 polygons
+   * Full detail with all features
+   */
+  protected createHighLODContent(): THREE.Object3D {
+    const townhouse = new THREE.Group();
+    townhouse.name = 'Townhouse (High LOD)';
+
+    const options = this.options as TownhouseOptions;
+    const scale = options.scale || 1;
 
     // Create materials
     const materials = this.createMaterials(options);
@@ -277,88 +499,6 @@ export class Townhouse extends SimpleThreeComponent {
     townhouse.add(chimney);
   }
 
-  /**
-   * Create low-poly version of the townhouse
-   */
-  private createLowPolyTownhouse(options: TownhouseOptions, scale: number): THREE.Object3D {
-    const townhouse = new THREE.Group();
-    townhouse.name = 'Townhouse (Low-Poly)';
-
-    // Simplified materials
-    const materials = {
-      wall: resourceManager.getOrCreateMaterial(
-        `townhouse_wall_lowpoly_${options.wallColor}`,
-        () => new THREE.MeshLambertMaterial({ color: options.wallColor })
-      ),
-      roof: resourceManager.getOrCreateMaterial(
-        `townhouse_roof_lowpoly_${options.roofColor}`,
-        () => new THREE.MeshLambertMaterial({ color: options.roofColor })
-      ),
-      door: resourceManager.getOrCreateMaterial(
-        `townhouse_door_lowpoly_${options.doorColor}`,
-        () => new THREE.MeshLambertMaterial({ color: options.doorColor })
-      ),
-      window: resourceManager.getOrCreateMaterial(
-        `townhouse_window_lowpoly_${options.windowColor}`,
-        () => new THREE.MeshLambertMaterial({ color: options.windowColor })
-      )
-    };
-
-    // Main structure - simplified
-    const mainBodyGeometry = resourceManager.getOrCreateGeometry(
-      'townhouse_main_body_lowpoly',
-      () => new THREE.BoxGeometry(12, 16, 15)
-    );
-    const mainBody = new THREE.Mesh(mainBodyGeometry, materials.wall);
-    mainBody.position.set(0, 8, 0);
-    mainBody.castShadow = this.options.castShadow ?? true;
-    mainBody.receiveShadow = this.options.receiveShadow ?? true;
-    townhouse.add(mainBody);
-
-    // Simple roof - no peak
-    const roofGeometry = resourceManager.getOrCreateGeometry(
-      'townhouse_roof_lowpoly',
-      () => new THREE.BoxGeometry(13, 2, 16)
-    );
-    const roof = new THREE.Mesh(roofGeometry, materials.roof);
-    roof.position.set(0, 17, 0);
-    roof.castShadow = this.options.castShadow ?? true;
-    townhouse.add(roof);
-
-    // Simple door - no frame or steps
-    const doorGeometry = resourceManager.getOrCreateGeometry(
-      'townhouse_door_lowpoly',
-      () => new THREE.BoxGeometry(2.5, 6, 0.3)
-    );
-    const door = new THREE.Mesh(doorGeometry, materials.door);
-    door.position.set(0, 3, 7.65);
-    townhouse.add(door);
-
-    // Minimal windows - just 2 simple windows, no frames
-    const windowLowPolyGeometry = resourceManager.getOrCreateGeometry(
-      'townhouse_window_lowpoly',
-      () => new THREE.BoxGeometry(2, 2, 0.2)
-    );
-
-    // One ground floor window
-    const groundWindow = new THREE.Mesh(windowLowPolyGeometry, materials.window);
-    groundWindow.position.set(-3, 4, 7.6);
-    townhouse.add(groundWindow);
-
-    // One second floor window
-    const secondWindow = new THREE.Mesh(windowLowPolyGeometry, materials.window);
-    secondWindow.position.set(0, 12, 7.6);
-    townhouse.add(secondWindow);
-
-    // No decorative elements in low-poly version
-
-    // Apply scale
-    if (scale !== 1) {
-      townhouse.scale.setScalar(scale);
-    }
-
-    return townhouse;
-  }
 
   public override validate(): string[] {
     const issues: string[] = [];
