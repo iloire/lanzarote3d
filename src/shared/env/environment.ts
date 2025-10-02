@@ -27,6 +27,7 @@ import { Theme } from '../../foundation/types/Theme';
 import { ThemeEngine } from '../../foundation/systems/ThemeEngine';
 import { IThreeComponent } from '../../foundation/components/base/IThreeComponent';
 import { ComponentRegistry } from '../../foundation/systems/ComponentRegistry';
+import { LevelOfDetail } from '../../foundation/types/lod';
 
 interface MovableComponent extends IThreeComponent {
   updateMovementOrigin?(): void;
@@ -283,7 +284,8 @@ class Environment {
     formation: 'street' | 'grid' | 'suburban' | 'rural' | 'random',
     terrain: THREE.Mesh,
     lowPoly: boolean = false,
-    spacingMultiplier: number = 1.0
+    spacingMultiplier: number = 1.0,
+    levelOfDetail?: LevelOfDetail
   ): Promise<THREE.Object3D[]> {
     // Get terrain height for the center position
     const terrainHeight = this.getTerrainHeight(center.x, center.z, terrain);
@@ -297,7 +299,13 @@ class Environment {
 
     // Create house group creator
     const houseGroupCreator = new HouseGroupCreator(this.scene, this.componentRegistry);
-    houseGroupCreator.setLowPolyMode(lowPoly);
+
+    // Use levelOfDetail if provided, otherwise fall back to lowPoly for backward compatibility
+    if (levelOfDetail !== undefined) {
+      houseGroupCreator.setLOD(levelOfDetail);
+    } else {
+      houseGroupCreator.setLowPolyMode(lowPoly);
+    }
 
     try {
       // Use createMixedNeighborhood for all formations with the specified house count
@@ -357,16 +365,18 @@ class Environment {
       formation?: 'street' | 'grid' | 'suburban' | 'rural' | 'random';
       spacing?: number;
       lowPoly?: boolean;
+      levelOfDetail?: LevelOfDetail;
     }
   ): Promise<THREE.Object3D[]> {
     const {
       houseCount = 20,
       formation = 'random',
       spacing = 1.0,
-      lowPoly = true
+      lowPoly = true,
+      levelOfDetail
     } = options || {};
 
-    logger.info(`🏘️ Creating ${formation} neighborhood with ${houseCount} houses at position (${center.x}, ${center.z})`);
+    logger.info(`🏘️ Creating ${formation} neighborhood with ${houseCount} houses, LOD: ${levelOfDetail ?? 'legacy'}`);
 
     return this.createHouseNeighborhood(
       center,
@@ -374,7 +384,8 @@ class Environment {
       formation,
       terrain,
       lowPoly,
-      spacing
+      spacing,
+      levelOfDetail
     );
   }
 
@@ -383,12 +394,14 @@ class Environment {
    * @param towns - Array of town configurations
    * @param terrain - Terrain mesh for height adaptation
    * @param lowPoly - Whether to use low-poly models (default: true)
+   * @param levelOfDetail - LOD level for houses (optional, overrides lowPoly if provided)
    * @returns Array of all created house meshes
    */
   async addTownsFromConfig(
     towns: TownConfig[],
     terrain: THREE.Mesh,
-    lowPoly: boolean = true
+    lowPoly: boolean = true,
+    levelOfDetail?: LevelOfDetail
   ): Promise<THREE.Object3D[]> {
     const allHouses: THREE.Object3D[] = [];
 
@@ -398,6 +411,7 @@ class Environment {
         formation: town.formation,
         spacing: town.spacing,
         lowPoly,
+        levelOfDetail,
       });
       allHouses.push(...houses);
     }

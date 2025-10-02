@@ -16,6 +16,7 @@ import {
   DesertHouse,
   DesertHouseWithPool,
 } from '../../foundation/components/scenery/buildings';
+import { LevelOfDetail, getLODFromLegacy } from '../../foundation/types/lod';
 import { ComponentRegistry } from '../../foundation/systems/ComponentRegistry';
 import { HouseConfig, HouseGroupConfig, NeighborhoodVariation, DEFAULT_VARIATION } from './house-group-types';
 import { logger } from '../../foundation/utils/logger';
@@ -35,7 +36,8 @@ type HouseComponent = InstanceType<typeof House> | InstanceType<typeof Villa> | 
 export class HouseGroupCreator {
   private scene: THREE.Scene;
   private componentRegistry: ComponentRegistry;
-  private lowPoly: boolean = false;
+  private lowPoly: boolean = false; // Deprecated - kept for backward compatibility
+  private levelOfDetail: LevelOfDetail = LevelOfDetail.HIGH;
   private createdObjects: THREE.Object3D[] = []; // Track all created objects
   private exclusionZones: Array<{ center: THREE.Vector3; radius: number }> = []; // Zones where buildings cannot be placed
 
@@ -53,9 +55,19 @@ export class HouseGroupCreator {
 
   /**
    * Set low-poly mode for all future house creation
+   * @deprecated Use setLOD() instead for finer control
    */
   setLowPolyMode(lowPoly: boolean): void {
     this.lowPoly = lowPoly;
+    this.levelOfDetail = getLODFromLegacy(lowPoly);
+  }
+
+  /**
+   * Set LOD level for all future house creation
+   */
+  setLOD(lod: LevelOfDetail): void {
+    this.levelOfDetail = lod;
+    this.lowPoly = (lod === LevelOfDetail.LOW || lod === LevelOfDetail.ULTRA_LOW);
   }
 
   /**
@@ -118,50 +130,50 @@ export class HouseGroupCreator {
     try {
       switch (houseConfig.type) {
         case 'House':
-          logger.debug(`✅ Creating House with lowPoly: ${this.lowPoly}`);
+          logger.debug(`✅ Creating House with levelOfDetail: ${this.levelOfDetail}`);
           house = new House({
             type: houseConfig.houseType || HouseType.Medium,
-            lowPoly: this.lowPoly,
+            levelOfDetail: this.levelOfDetail,
             ...(houseConfig.colors || {}),
           });
           houseMesh = await house.load();
           break;
 
         case 'Villa':
-          logger.debug(`✅ Creating Villa with lowPoly: ${this.lowPoly}`);
+          logger.debug(`✅ Creating Villa with levelOfDetail: ${this.levelOfDetail}`);
           house = new Villa({
             scale: scale,
-            lowPoly: this.lowPoly,
+            levelOfDetail: this.levelOfDetail,
             ...(houseConfig.colors || {}),
           });
           houseMesh = await house.load();
           break;
 
         case 'Townhouse':
-          logger.debug(`✅ Creating Townhouse with lowPoly: ${this.lowPoly}`);
+          logger.debug(`✅ Creating Townhouse with levelOfDetail: ${this.levelOfDetail}`);
           house = new Townhouse({
             scale: scale,
-            lowPoly: this.lowPoly,
+            levelOfDetail: this.levelOfDetail,
             ...(houseConfig.colors || {}),
           });
           houseMesh = await house.load();
           break;
 
         case 'Barn':
-          logger.debug(`✅ Creating Barn with lowPoly: ${this.lowPoly}`);
+          logger.debug(`✅ Creating Barn with levelOfDetail: ${this.levelOfDetail}`);
           house = new Barn({
             scale: scale,
-            lowPoly: this.lowPoly,
+            levelOfDetail: this.levelOfDetail,
             ...(houseConfig.colors || {}),
           });
           houseMesh = await house.load();
           break;
 
         case 'DesertHouse':
-          logger.debug(`✅ Creating DesertHouse with lowPoly: ${this.lowPoly}`);
+          logger.debug(`✅ Creating DesertHouse with levelOfDetail: ${this.levelOfDetail}`);
           house = new DesertHouse({
             scale: scale,
-            lowPoly: this.lowPoly,
+            levelOfDetail: this.levelOfDetail,
             ...(houseConfig.colors || {}),
           });
           houseMesh = await house.load();
@@ -169,10 +181,10 @@ export class HouseGroupCreator {
 
 
         case 'DesertHouseWithPool':
-          logger.debug(`✅ Creating DesertHouseWithPool with lowPoly: ${this.lowPoly}`);
+          logger.debug(`✅ Creating DesertHouseWithPool with levelOfDetail: ${this.levelOfDetail}`);
           house = new DesertHouseWithPool({
             scale: scale,
-            lowPoly: this.lowPoly,
+            levelOfDetail: this.levelOfDetail,
             ...(houseConfig.colors || {}),
           });
           houseMesh = await house.load();
@@ -335,10 +347,10 @@ export class HouseGroupCreator {
   }
 
   private async addBarrelCactus(position: THREE.Vector3): Promise<void> {
-    logger.debug(`🌵 Creating BarrelCactus with lowPoly: ${this.lowPoly}`);
+    logger.debug(`🌵 Creating BarrelCactus with levelOfDetail: ${this.levelOfDetail}`);
     const cactus = new BarrelCactus({
       scale: 0.4 + Math.random() * 0.3,
-      lowPoly: this.lowPoly
+      levelOfDetail: this.levelOfDetail
     });
     const cactusMesh = await cactus.load();
     cactusMesh.position.copy(position);
@@ -358,7 +370,7 @@ export class HouseGroupCreator {
         }
       }
     });
-    logger.debug(`🌵 BarrelCactus created with ${Math.floor(polygons)} polygons (lowPoly: ${this.lowPoly})`);
+    logger.debug(`🌵 BarrelCactus created with ${Math.floor(polygons)} polygons (levelOfDetail: ${this.levelOfDetail})`);
 
     this.scene.add(cactusMesh);
     this.createdObjects.push(cactusMesh);
@@ -367,7 +379,7 @@ export class HouseGroupCreator {
   private async addPricklyPearCactus(position: THREE.Vector3): Promise<void> {
     const cactus = new PricklyPearCactus({
       scale: 0.3 + Math.random() * 0.4,
-      lowPoly: this.lowPoly
+      levelOfDetail: this.levelOfDetail
     });
     const cactusMesh = await cactus.load();
     cactusMesh.position.copy(position);
@@ -378,7 +390,7 @@ export class HouseGroupCreator {
   private async addSaguaroCactus(position: THREE.Vector3): Promise<void> {
     const cactus = new SaguaroCactus({
       scale: 0.2 + Math.random() * 0.3,
-      lowPoly: this.lowPoly
+      levelOfDetail: this.levelOfDetail
     });
     const cactusMesh = await cactus.load();
     cactusMesh.position.copy(position);
@@ -389,7 +401,7 @@ export class HouseGroupCreator {
   private async addOrganPipeCactus(position: THREE.Vector3): Promise<void> {
     const cactus = new OrganPipeCactus({
       scale: 0.3 + Math.random() * 0.3,
-      lowPoly: this.lowPoly
+      levelOfDetail: this.levelOfDetail
     });
     const cactusMesh = await cactus.load();
     cactusMesh.position.copy(position);

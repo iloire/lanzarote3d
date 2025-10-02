@@ -18,6 +18,7 @@ import { CameraTargetController, CameraMode } from '../../foundation/systems/sce
 import { createCameraTargetUI } from '../../foundation/components/ui/CameraTargetUI';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { ProceduralRoad } from '../../foundation/components/scenery';
+import { LevelOfDetail } from '../../foundation/types/lod';
 import { logger } from '../../foundation/utils/logger';
 import {
   paraglidersVoxel,
@@ -190,8 +191,8 @@ class AnimationApp extends TerrainBase {
       await this.environment.addCloudsFromTheme(thermals, theme);
       // this.environment.addTrees(terrain);
 
-      // Create Lanzarote towns using the predefined configuration
-      await this.environment.addTownsFromConfig(LANZAROTE_TOWNS, terrain);
+      // Create Lanzarote towns using ULTRA_LOW LOD for optimal animation performance
+      await this.environment.addTownsFromConfig(LANZAROTE_TOWNS, terrain, true, LevelOfDetail.ULTRA_LOW);
 
       // Create individual roads connecting each pair of towns
       // Roads stop ~200 units before town centers to avoid passing through houses

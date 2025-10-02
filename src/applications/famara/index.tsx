@@ -12,6 +12,7 @@ import { getAppConfig } from '../../config/app-registry';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { Cessna } from '../../foundation/components/vehicles';
 import { EngineFlyingBehavior } from '../../foundation/systems/behaviors/EngineFlyingBehavior';
+import { LevelOfDetail } from '../../foundation/types/lod';
 
 /**
  * Famara Demo - Based on PhotoBooth but without paragliders
@@ -96,8 +97,8 @@ class FamaraApp extends TerrainBase {
       await this.environment.addCloudsFromTheme(thermals, theme);
 
 
-      // Create Lanzarote towns using the predefined configuration
-      await this.environment.addTownsFromConfig(LANZAROTE_TOWNS, terrain);
+      // Create Lanzarote towns using ULTRA_LOW LOD for optimal performance
+      await this.environment.addTownsFromConfig(LANZAROTE_TOWNS, terrain, true, LevelOfDetail.ULTRA_LOW);
 
       this.environment.addBoats(water);
 
