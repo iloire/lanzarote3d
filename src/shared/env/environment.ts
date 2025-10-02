@@ -73,10 +73,16 @@ export interface TownConfig {
  * Real locations of major settlements on the island
  */
 export const LANZAROTE_TOWNS: TownConfig[] = [
-  { position: new THREE.Vector3(6879, 0, 545), houseCount: 30, formation: 'suburban' },
-  { position: new THREE.Vector3(6279, 0, -3155), houseCount: 21, formation: 'random' },
-  { position: new THREE.Vector3(7827, 0, -3460), houseCount: 21, formation: 'random' },
-  { position: new THREE.Vector3(5600, 0, 1205), houseCount: 51, formation: 'grid' },
+  { position: new THREE.Vector3(6879, 0, 545), houseCount: 50, formation: 'suburban' }, // tequise top
+
+
+  { position: new THREE.Vector3(6279, 0, -3155), houseCount: 220, formation: 'suburban' }, // famara
+
+
+
+  { position: new THREE.Vector3(7827, 0, -3460), houseCount: 50, formation: 'suburban' }, // noruegos
+
+  { position: new THREE.Vector3(5600, 0, 1205), houseCount: 51, formation: 'suburban' }, // teguise
 ];
 
 class Environment {
