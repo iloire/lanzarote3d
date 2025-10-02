@@ -109,22 +109,24 @@ export function setupCameraAnimation(
       () => {
         // Animation complete
         if (controls) {
+          // Ensure target is exactly at pgPos (animation might not have fully reached it)
+          controls.target.copy(pgPos);
+          controls.update();
+
           controls.enabled = true;
 
-          OrbitControlsHelper.focusOnTarget(
-            controls,
-            pgPos,
-            OrbitControlsHelper.createCenteredLimits(pgPos, {
-              ...ORBIT_CONTROLS_PRESETS['closeSubject'],
-              minDistance: 50,
-              maxDistance: 1500,
-              panBoundary: {
-                center: pgPos,
-                radius: 500,
-                verticalScale: 0.5,
-              },
-            })
-          );
+          // Apply limits without changing target position
+          const limits = OrbitControlsHelper.createCenteredLimits(pgPos, {
+            ...ORBIT_CONTROLS_PRESETS['closeSubject'],
+            minDistance: 50,
+            maxDistance: 1500,
+            panBoundary: {
+              center: pgPos,
+              radius: 500,
+              verticalScale: 0.5,
+            },
+          });
+          OrbitControlsHelper.applyLimits(controls, limits);
         }
 
         state.isAnimating = false;
