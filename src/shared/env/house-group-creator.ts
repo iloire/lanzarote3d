@@ -261,11 +261,12 @@ export class HouseGroupCreator {
       landMesh.userData.isLandPlot = true;
       landMesh.userData.parentHousePosition = housePosition.clone();
 
-      // Position the land plot at ground level, following terrain height
+      // Position the land plot at the same level as cacti/stones
+      // Cacti are positioned at centerPosition.y (line 319 in addLandscapeElements)
+      // Land plot must be at SAME Y to be on ground with them
       landMesh.position.copy(housePosition);
-      // FIX Z-FIGHTING: Offset land plot slightly above terrain (0.5 units) instead of arbitrary offset
-      // This prevents flickering while keeping land plot visible above terrain
-      landMesh.position.y = housePosition.y + 0.5;
+      // Add tiny offset (0.1) to prevent z-fighting with terrain, much smaller than before
+      landMesh.position.y = housePosition.y + 0.1;
 
       // Rotate to lie flat and match house rotation if needed
       landMesh.rotation.x = -Math.PI / 2; // Lie flat
