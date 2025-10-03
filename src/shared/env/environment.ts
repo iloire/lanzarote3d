@@ -330,13 +330,20 @@ class Environment {
           // Update all scene objects near this house (land plots, cacti, stones, pools)
           // that were positioned relative to the house's old position
           this.scene.traverse((obj: THREE.Object3D) => {
-            if (obj !== mesh && obj.position.y === (oldY - 0.5)) {
-              // Check if object is within 200 units of the house (land plot range)
-              const dx = obj.position.x - mesh.position.x;
-              const dz = obj.position.z - mesh.position.z;
-              const distance = Math.sqrt(dx * dx + dz * dz);
+            if (obj === mesh) return; // Skip the house itself
 
-              if (distance < 200) {
+            // Check if object is within land plot range of this house
+            const dx = obj.position.x - mesh.position.x;
+            const dz = obj.position.z - mesh.position.z;
+            const distance = Math.sqrt(dx * dx + dz * dz);
+
+            if (distance < 200) {
+              // Update land plots (positioned at oldY + 0.5)
+              // and landscape elements like cacti/stones (positioned at oldY)
+              const isLandPlot = Math.abs(obj.position.y - (oldY + 0.5)) < 0.1;
+              const isLandscapeElement = Math.abs(obj.position.y - oldY) < 0.1;
+
+              if (isLandPlot || isLandscapeElement) {
                 obj.position.y += deltaY;
               }
             }
