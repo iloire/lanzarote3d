@@ -76,7 +76,9 @@ export class SmokeTrail {
     );
 
     for (let i = 0; i < this.options.maxParticles; i++) {
-      const mesh = new THREE.Mesh(geometry, this.material.clone());
+      // CRITICAL FIX: Share material across all particles instead of cloning
+      // Was creating 100-120 unique materials per smoke trail, now shares 1 material
+      const mesh = new THREE.Mesh(geometry, this.material);
       mesh.visible = false;
       mesh.scale.set(0, 0, 0);
       this.group.add(mesh);

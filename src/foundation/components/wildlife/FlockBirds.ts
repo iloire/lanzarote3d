@@ -4,8 +4,6 @@ import Models from '../../utils/models';
 import model from '../../../../assets/foundation/models/environment/birds.glb';
 import AutoFlier, { AutoFlierOptions } from '../../types/auto-flier';
 
-const clock = new THREE.Clock();
-
 export interface BirdsOptions extends AutoFlierOptions {
   scale?: number;
   animationSpeed?: number;
@@ -56,8 +54,6 @@ class FlockBirds extends AutoFlier {
       this.resetPath();
     }
 
-    this.animate();
-
     if (gui) {
       GuiHelper.addLocationGui(gui, 'Birds', this.mesh, {
         min: -10000,
@@ -68,41 +64,22 @@ class FlockBirds extends AutoFlier {
     return this.mesh;
   }
 
-  private animationId: number | null = null;
-  private isAnimating: boolean = false;
+  /**
+   * Update bird animation and movement
+   * PERFORMANCE FIX: Called from main animation loop instead of separate RAF
+   * @param deltaTime Time since last frame in seconds
+   */
+  public update(deltaTime: number): void {
+    // Update animation mixer
+    this.mixer?.update(deltaTime);
 
-  animate() {
-    if (!this.isAnimating) {
-      this.isAnimating = true;
-      this.startAnimation();
-    }
-  }
-
-  private startAnimation() {
-    const animateLoop = () => {
-      if (!this.isAnimating) return;
-
-      const delta = clock.getDelta();
-      this.mixer?.update(delta);
-      if (this.path.length) {
-        this.move();
-      }
-
-      this.animationId = requestAnimationFrame(animateLoop);
-    };
-    animateLoop();
-  }
-
-  stop() {
-    this.isAnimating = false;
-    if (this.animationId !== null) {
-      cancelAnimationFrame(this.animationId);
-      this.animationId = null;
+    // Update movement along path
+    if (this.path.length) {
+      this.move();
     }
   }
 
   dispose() {
-    this.stop();
     // Clean up mixer and mesh
     if (this.mixer) {
       this.mixer.stopAllAction();

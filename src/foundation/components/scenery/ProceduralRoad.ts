@@ -301,10 +301,14 @@ export class ProceduralRoad extends SimpleThreeComponent {
           const geometry = new THREE.BufferGeometry();
           geometry.setAttribute('position', new THREE.Float32BufferAttribute([...lineVertices], 3));
 
-          const material = new THREE.LineBasicMaterial({
-            color: options.lineColor,
-            linewidth: 2,
-          });
+          // Share material across all roads
+          const material = resourceManager.getOrCreateMaterial(
+            `road_centerline_${options.lineColor}_2`,
+            () => new THREE.LineBasicMaterial({
+              color: options.lineColor,
+              linewidth: 2,
+            })
+          );
 
           const line = new THREE.Line(geometry, material);
           return line; // Simplified: return first dash segment
@@ -321,10 +325,14 @@ export class ProceduralRoad extends SimpleThreeComponent {
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(allVertices, 3));
 
-    const material = new THREE.LineBasicMaterial({
-      color: options.lineColor,
-      linewidth: 2,
-    });
+    // Share material across all roads
+    const material = resourceManager.getOrCreateMaterial(
+      `road_centerline_${options.lineColor}_2`,
+      () => new THREE.LineBasicMaterial({
+        color: options.lineColor,
+        linewidth: 2,
+      })
+    );
 
     return new THREE.Line(geometry, material);
   }
@@ -341,6 +349,15 @@ export class ProceduralRoad extends SimpleThreeComponent {
     const width = options.width || 6;
     const halfWidth = width / 2;
     const lines: THREE.Line[] = [];
+
+    // Share material across all edge lines
+    const edgeMaterial = resourceManager.getOrCreateMaterial(
+      'road_edgeline_white_1',
+      () => new THREE.LineBasicMaterial({
+        color: '#FFFFFF', // White edge lines
+        linewidth: 1,
+      })
+    );
 
     // Create left and right edge lines
     for (const side of [-1, 1]) {
@@ -365,12 +382,7 @@ export class ProceduralRoad extends SimpleThreeComponent {
       const geometry = new THREE.BufferGeometry();
       geometry.setAttribute('position', new THREE.Float32BufferAttribute(edgeVertices, 3));
 
-      const material = new THREE.LineBasicMaterial({
-        color: '#FFFFFF', // White edge lines
-        linewidth: 1,
-      });
-
-      lines.push(new THREE.Line(geometry, material));
+      lines.push(new THREE.Line(geometry, edgeMaterial));
     }
 
     return lines;

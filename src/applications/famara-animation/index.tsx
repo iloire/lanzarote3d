@@ -286,7 +286,9 @@ class AnimationApp extends TerrainBase {
       // Make environment available for theme switching
       options.environment = this.environment;
 
+      // Add birds with shared animation loop
       await this.environment.addBirds(birdPath);
+      // Birds animation will be driven from main loop via environment.updateBirds()
 
       // Setup Camera Target Controller if enabled
       if (SHOW_CAMERA_TARGET_UI) {
@@ -399,6 +401,11 @@ class AnimationApp extends TerrainBase {
 
         // Update controls for damping to work
         OrbitControlsHelper.update(controls);
+
+        // PERFORMANCE FIX: Update birds in main loop instead of separate RAF
+        if (this.environment && this.environment.birds) {
+          this.environment.birds.update(deltaTime);
+        }
 
         // Update smoke trails
         if (this.cessnaSmokeTrail && this.cessnaMesh && this.cessnaFlyingBehavior) {
