@@ -45,7 +45,9 @@ export class OrganPipeCactus extends SimpleThreeComponent {
 
     const options = this.options as OrganPipeCactusOptions;
     const scale = options.scale || 1;
-    const isLowPoly = options.lowPoly || false;
+
+    // Check both lowPoly (legacy) and levelOfDetail (new)
+    const isLowPoly = options.lowPoly || (options.levelOfDetail !== undefined && options.levelOfDetail <= 1);
 
     if (isLowPoly) {
       return this.createLowPolyOrganPipeCactus(options, scale);
@@ -90,22 +92,47 @@ export class OrganPipeCactus extends SimpleThreeComponent {
       });
     }
 
+    // Create shared geometries for pipe segments with different radii
+    const pipeGeometries = new Map<string, THREE.BufferGeometry>();
+    const segmentHeight = 2;
+
+    // Pre-create geometries for common radius values
+    for (let r = 0.6; r <= 1.4; r += 0.1) {
+      const key = r.toFixed(1);
+      pipeGeometries.set(key, resourceManager.getOrCreateGeometry(
+        `organ_pipe_r${key}`,
+        () => new THREE.CylinderGeometry(r * 0.9, r, segmentHeight, 12)
+      ));
+    }
+
+    const ribGeometry = resourceManager.getOrCreateGeometry(
+      'organ_rib',
+      () => new THREE.BoxGeometry(0.08, segmentHeight, 0.2)
+    );
+
+    const spineGeometry = resourceManager.getOrCreateGeometry(
+      'organ_spine',
+      () => new THREE.ConeGeometry(0.05, 0.4, 4)
+    );
+
+    const flowerGeometry = resourceManager.getOrCreateGeometry(
+      'organ_flower',
+      () => new THREE.ConeGeometry(0.25, 0.6, 5)
+    );
+
     // Create each pipe
     pipePositions.forEach((pipe, index) => {
       const segments = Math.floor(pipe.height / 2);
-      
+
       // Create pipe with slight taper
       for (let i = 0; i < segments; i++) {
         const t = i / segments;
-        const segmentHeight = 2;
         const radiusBottom = pipe.radius * (1 - t * 0.2);
-        const radiusTop = pipe.radius * (1 - (t + 1/segments) * 0.2);
-        
-        const pipeGeometry = resourceManager.getOrCreateGeometry(
-          `organ_pipe_${index}_${i}`,
-          () => new THREE.CylinderGeometry(radiusTop, radiusBottom, segmentHeight, 12)
-        );
-        
+
+        // Use shared geometry based on radius (rounded to nearest 0.1)
+        const radiusKey = (Math.round(radiusBottom * 10) / 10).toFixed(1);
+        const pipeGeometry = pipeGeometries.get(radiusKey) || pipeGeometries.get('1.0')!;
+
         const pipeSegment = new THREE.Mesh(pipeGeometry, cactusMaterial);
         pipeSegment.position.set(
           pipe.x,
@@ -115,17 +142,12 @@ export class OrganPipeCactus extends SimpleThreeComponent {
         pipeSegment.castShadow = this.options.castShadow ?? true;
         pipeSegment.receiveShadow = this.options.receiveShadow ?? true;
         cactus.add(pipeSegment);
-        
+
         // Add vertical ribs
         const ribCount = 12;
         for (let j = 0; j < ribCount; j++) {
           const ribAngle = (j / ribCount) * Math.PI * 2;
-          
-          const ribGeometry = resourceManager.getOrCreateGeometry(
-            `organ_rib_${index}_${i}_${j}`,
-            () => new THREE.BoxGeometry(0.08, segmentHeight, 0.2)
-          );
-          
+
           const rib = new THREE.Mesh(ribGeometry, cactusMaterial);
           rib.position.set(
             pipe.x + Math.cos(ribAngle) * (radiusBottom + 0.05),
@@ -134,14 +156,9 @@ export class OrganPipeCactus extends SimpleThreeComponent {
           );
           rib.rotation.y = ribAngle;
           cactus.add(rib);
-          
+
           // Add spines along ribs
           if (i % 2 === 0 && j % 3 === 0) {
-            const spineGeometry = resourceManager.getOrCreateGeometry(
-              `organ_spine_${index}_${i}_${j}`,
-              () => new THREE.ConeGeometry(0.05, 0.4, 4)
-            );
-            
             const spine = new THREE.Mesh(spineGeometry, spineMaterial);
             spine.position.copy(rib.position);
             spine.position.x += Math.cos(ribAngle) * 0.1;
@@ -152,19 +169,13 @@ export class OrganPipeCactus extends SimpleThreeComponent {
           }
         }
       }
-      
+
       // Add flowers at the top of some pipes
       if (index % 2 === 0) {
         const flowerCount = 3 + Math.floor(Math.random() * 3);
         for (let i = 0; i < flowerCount; i++) {
           const flowerAngle = (i / flowerCount) * Math.PI * 2;
-          
-          // Flower petals
-          const flowerGeometry = resourceManager.getOrCreateGeometry(
-            `organ_flower_${index}_${i}`,
-            () => new THREE.ConeGeometry(0.25, 0.6, 5)
-          );
-          
+
           const flower = new THREE.Mesh(flowerGeometry, flowerMaterial);
           flower.position.set(
             pipe.x + Math.cos(flowerAngle) * pipe.radius * 0.6,
@@ -183,16 +194,16 @@ export class OrganPipeCactus extends SimpleThreeComponent {
       () => new THREE.MeshLambertMaterial({ color: '#8B7355' }) // Tan/sandy color
     );
 
+    const rockGeometry = resourceManager.getOrCreateGeometry(
+      'organ_rock',
+      () => new THREE.DodecahedronGeometry(0.4)
+    );
+
     for (let i = 0; i < 8; i++) {
-      const rockGeometry = resourceManager.getOrCreateGeometry(
-        `organ_rock_${i}`,
-        () => new THREE.DodecahedronGeometry(0.3 + Math.random() * 0.3)
-      );
-      
       const rock = new THREE.Mesh(rockGeometry, baseDetailMaterial);
       const angle = Math.random() * Math.PI * 2;
       const distance = 3 + Math.random() * 2;
-      
+
       rock.position.set(
         Math.cos(angle) * distance,
         Math.random() * 0.2,

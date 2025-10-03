@@ -45,7 +45,9 @@ export class PricklyPearCactus extends SimpleThreeComponent {
 
     const options = this.options as PricklyPearCactusOptions;
     const scale = options.scale || 1;
-    const isLowPoly = options.lowPoly || false;
+
+    // Check both lowPoly (legacy) and levelOfDetail (new)
+    const isLowPoly = options.lowPoly || (options.levelOfDetail !== undefined && options.levelOfDetail <= 1);
 
     if (isLowPoly) {
       return this.createLowPolyPricklyPearCactus(options, scale);
@@ -130,13 +132,13 @@ export class PricklyPearCactus extends SimpleThreeComponent {
 
       // Add fruit on some pads
       if (i % 3 === 0) {
+        const fruitGeometry = resourceManager.getOrCreateGeometry(
+          'prickly_fruit',
+          () => new THREE.SphereGeometry(0.3, 8, 6)
+        );
+
         const fruitCount = 2 + Math.floor(Math.random() * 3);
         for (let j = 0; j < fruitCount; j++) {
-          const fruitGeometry = resourceManager.getOrCreateGeometry(
-            `prickly_fruit_${i}_${j}`,
-            () => new THREE.SphereGeometry(0.3, 8, 6)
-          );
-
           const fruit = new THREE.Mesh(fruitGeometry, fruitMaterial);
           const fruitAngle = (j / fruitCount) * Math.PI * 2;
           const fruitRadius = config.width * 0.3;
@@ -235,12 +237,13 @@ export class PricklyPearCactus extends SimpleThreeComponent {
   }
 
   private addSpinesToPad(pad: THREE.Mesh, spineMaterial: THREE.Material, spineCount: number): void {
-    for (let i = 0; i < spineCount; i++) {
-      const spineGeometry = resourceManager.getOrCreateGeometry(
-        `prickly_spine_${Math.random()}`,
-        () => new THREE.ConeGeometry(0.03, 0.2, 3)
-      );
+    // CRITICAL FIX: Create shared geometry instead of unique per spine
+    const spineGeometry = resourceManager.getOrCreateGeometry(
+      'prickly_spine',
+      () => new THREE.ConeGeometry(0.03, 0.2, 3)
+    );
 
+    for (let i = 0; i < spineCount; i++) {
       const spine = new THREE.Mesh(spineGeometry, spineMaterial);
 
       // Random position on pad surface

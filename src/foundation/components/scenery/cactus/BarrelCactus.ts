@@ -45,7 +45,9 @@ export class BarrelCactus extends SimpleThreeComponent {
 
     const options = this.options as BarrelCactusOptions;
     const scale = options.scale || 1;
-    const isLowPoly = options.lowPoly || false;
+
+    // Check both lowPoly (legacy) and levelOfDetail (new)
+    const isLowPoly = options.lowPoly || (options.levelOfDetail !== undefined && options.levelOfDetail <= 1);
 
     if (isLowPoly) {
       return this.createLowPolyBarrelCactus(options, scale);
@@ -90,15 +92,20 @@ export class BarrelCactus extends SimpleThreeComponent {
     body.receiveShadow = this.options.receiveShadow ?? true;
     cactus.add(body);
 
+    // Create shared geometries for ribs and spines
+    const ribGeometry = resourceManager.getOrCreateGeometry(
+      'barrel_rib',
+      () => new THREE.BoxGeometry(0.2, 4, 0.5)
+    );
+
+    const spineGeometry = resourceManager.getOrCreateGeometry(
+      'barrel_spine',
+      () => new THREE.ConeGeometry(0.08, 0.5, 4)
+    );
+
     // Add vertical ribs
     for (let i = 0; i < ribCount; i++) {
       const angle = (i / ribCount) * Math.PI * 2;
-
-      // Rib geometry
-      const ribGeometry = resourceManager.getOrCreateGeometry(
-        `barrel_rib_${i}`,
-        () => new THREE.BoxGeometry(0.2, 4, 0.5)
-      );
 
       const rib = new THREE.Mesh(ribGeometry, cactusMaterial);
       rib.position.set(
@@ -112,11 +119,6 @@ export class BarrelCactus extends SimpleThreeComponent {
 
       // Add spines along ribs
       for (let j = -3; j <= 3; j++) {
-        const spineGeometry = resourceManager.getOrCreateGeometry(
-          `barrel_spine_${i}_${j}`,
-          () => new THREE.ConeGeometry(0.08, 0.5, 4)
-        );
-
         const spine = new THREE.Mesh(spineGeometry, spineMaterial);
         spine.position.set(
           Math.cos(angle) * 3.2,
@@ -129,16 +131,31 @@ export class BarrelCactus extends SimpleThreeComponent {
       }
     }
 
+    // Create shared flower geometries
+    const petalGeometry = resourceManager.getOrCreateGeometry(
+      'barrel_flower_petal',
+      () => new THREE.ConeGeometry(0.3, 0.8, 6)
+    );
+
+    const centerGeometry = resourceManager.getOrCreateGeometry(
+      'barrel_flower_center',
+      () => new THREE.SphereGeometry(0.2, 6, 4)
+    );
+
+    const centerMaterial = resourceManager.getOrCreateMaterial(
+      'barrel_flower_center',
+      () => new THREE.MeshLambertMaterial({ color: '#FFFF00' }) // Yellow center
+    );
+
+    const groundSpineGeometry = resourceManager.getOrCreateGeometry(
+      'barrel_ground_spine',
+      () => new THREE.CylinderGeometry(0.03, 0.05, 0.4)
+    );
+
     // Add crown of flowers at top
     const flowerCount = 8;
     for (let i = 0; i < flowerCount; i++) {
       const angle = (i / flowerCount) * Math.PI * 2;
-
-      // Flower petals
-      const petalGeometry = resourceManager.getOrCreateGeometry(
-        `barrel_flower_${i}`,
-        () => new THREE.ConeGeometry(0.3, 0.8, 6)
-      );
 
       const flower = new THREE.Mesh(petalGeometry, flowerMaterial);
       flower.position.set(
@@ -149,17 +166,6 @@ export class BarrelCactus extends SimpleThreeComponent {
       flower.rotation.z = angle * 0.3;
       cactus.add(flower);
 
-      // Flower center
-      const centerGeometry = resourceManager.getOrCreateGeometry(
-        `barrel_flower_center_${i}`,
-        () => new THREE.SphereGeometry(0.2, 6, 4)
-      );
-
-      const centerMaterial = resourceManager.getOrCreateMaterial(
-        'barrel_flower_center',
-        () => new THREE.MeshLambertMaterial({ color: '#FFFF00' }) // Yellow center
-      );
-
       const center = new THREE.Mesh(centerGeometry, centerMaterial);
       center.position.copy(flower.position);
       center.position.y += 0.2;
@@ -168,11 +174,6 @@ export class BarrelCactus extends SimpleThreeComponent {
 
     // Add some ground spines that have fallen
     for (let i = 0; i < 10; i++) {
-      const groundSpineGeometry = resourceManager.getOrCreateGeometry(
-        `barrel_ground_spine_${i}`,
-        () => new THREE.CylinderGeometry(0.03, 0.05, 0.4)
-      );
-
       const groundSpine = new THREE.Mesh(groundSpineGeometry, spineMaterial);
       const angle = Math.random() * Math.PI * 2;
       const distance = 3.5 + Math.random() * 1;

@@ -43,7 +43,9 @@ export class SaguaroCactus extends SimpleThreeComponent {
 
     const options = this.options as SaguaroCactusOptions;
     const scale = options.scale || 1;
-    const isLowPoly = options.lowPoly || false;
+
+    // Check both lowPoly (legacy) and levelOfDetail (new)
+    const isLowPoly = options.lowPoly || (options.levelOfDetail !== undefined && options.levelOfDetail <= 1);
 
     if (isLowPoly) {
       return this.createLowPolySaguaroCactus(options, scale);
@@ -67,16 +69,30 @@ export class SaguaroCactus extends SimpleThreeComponent {
     const trunkHeight = 20;
     const segmentHeight = trunkHeight / trunkSegments;
 
+    // Create shared geometries for trunk segments with different radii
+    const trunkGeometries: THREE.BufferGeometry[] = [];
     for (let i = 0; i < trunkSegments; i++) {
       const t = i / (trunkSegments - 1);
       const radius = 1.5 - t * 0.3; // Slight taper
 
-      const segmentGeometry = resourceManager.getOrCreateGeometry(
-        `saguaro_trunk_segment_${i}`,
-        () => new THREE.CylinderGeometry(radius, radius + 0.1, segmentHeight, 12)
+      trunkGeometries.push(
+        resourceManager.getOrCreateGeometry(
+          `saguaro_trunk_segment_r${radius.toFixed(2)}`,
+          () => new THREE.CylinderGeometry(radius, radius + 0.1, segmentHeight, 12)
+        )
       );
+    }
 
-      const segment = new THREE.Mesh(segmentGeometry, cactusMaterial);
+    const ribGeometry = resourceManager.getOrCreateGeometry(
+      'saguaro_rib',
+      () => new THREE.BoxGeometry(0.1, segmentHeight, 0.3)
+    );
+
+    for (let i = 0; i < trunkSegments; i++) {
+      const t = i / (trunkSegments - 1);
+      const radius = 1.5 - t * 0.3; // Slight taper
+
+      const segment = new THREE.Mesh(trunkGeometries[i], cactusMaterial);
       segment.position.y = i * segmentHeight + segmentHeight/2; // Adjusted for ground level positioning
       segment.castShadow = this.options.castShadow ?? true;
       segment.receiveShadow = this.options.receiveShadow ?? true;
@@ -85,10 +101,6 @@ export class SaguaroCactus extends SimpleThreeComponent {
       // Add vertical ribs
       for (let j = 0; j < 12; j++) {
         const angle = (j / 12) * Math.PI * 2;
-        const ribGeometry = resourceManager.getOrCreateGeometry(
-          `saguaro_rib_${i}_${j}`,
-          () => new THREE.BoxGeometry(0.1, segmentHeight, 0.3)
-        );
 
         const rib = new THREE.Mesh(ribGeometry, cactusMaterial);
         rib.position.set(
@@ -100,6 +112,40 @@ export class SaguaroCactus extends SimpleThreeComponent {
         cactus.add(rib);
       }
     }
+
+    // Create shared arm geometries (varied lengths)
+    const armHorizontalGeometries = [
+      resourceManager.getOrCreateGeometry('saguaro_arm_h3', () => new THREE.CylinderGeometry(0.8, 0.9, 3, 10)),
+      resourceManager.getOrCreateGeometry('saguaro_arm_h4', () => new THREE.CylinderGeometry(0.8, 0.9, 4, 10)),
+      resourceManager.getOrCreateGeometry('saguaro_arm_h5', () => new THREE.CylinderGeometry(0.8, 0.9, 5, 10))
+    ];
+
+    const armVerticalGeometries = [
+      resourceManager.getOrCreateGeometry('saguaro_arm_v5', () => new THREE.CylinderGeometry(0.7, 0.8, 5, 10)),
+      resourceManager.getOrCreateGeometry('saguaro_arm_v6', () => new THREE.CylinderGeometry(0.7, 0.8, 6, 10)),
+      resourceManager.getOrCreateGeometry('saguaro_arm_v7', () => new THREE.CylinderGeometry(0.7, 0.8, 7, 10)),
+      resourceManager.getOrCreateGeometry('saguaro_arm_v8', () => new THREE.CylinderGeometry(0.7, 0.8, 8, 10))
+    ];
+
+    const elbowGeometry = resourceManager.getOrCreateGeometry(
+      'saguaro_elbow',
+      () => new THREE.SphereGeometry(0.9, 8, 6)
+    );
+
+    const spineGeometry = resourceManager.getOrCreateGeometry(
+      'saguaro_spine',
+      () => new THREE.ConeGeometry(0.05, 0.3, 4)
+    );
+
+    const flowerGeometry = resourceManager.getOrCreateGeometry(
+      'saguaro_flower',
+      () => new THREE.SphereGeometry(0.4, 6, 4)
+    );
+
+    const flowerMaterial = resourceManager.getOrCreateMaterial(
+      'saguaro_flower',
+      () => new THREE.MeshLambertMaterial({ color: '#FFFACD' }) // Light yellow
+    );
 
     // Add arms
     const armPositions = [
@@ -113,24 +159,18 @@ export class SaguaroCactus extends SimpleThreeComponent {
       const arm = armPositions[i];
       const armGroup = new THREE.Group();
 
-      // Horizontal part of arm
-      const horizontalLength = 3 + Math.random() * 2;
-      const horizontalGeometry = resourceManager.getOrCreateGeometry(
-        `saguaro_arm_horizontal_${i}`,
-        () => new THREE.CylinderGeometry(0.8, 0.9, horizontalLength, 10)
-      );
+      // Horizontal part of arm - use shared geometries
+      const horizontalLength = 3 + Math.floor(Math.random() * 3);
+      const horizontalGeometry = armHorizontalGeometries[Math.min(horizontalLength - 3, 2)];
 
       const horizontal = new THREE.Mesh(horizontalGeometry, cactusMaterial);
       horizontal.rotation.z = Math.PI / 2;
       horizontal.position.x = arm.side * horizontalLength / 2;
       armGroup.add(horizontal);
 
-      // Vertical part of arm
-      const verticalHeight = 5 + Math.random() * 3;
-      const verticalGeometry = resourceManager.getOrCreateGeometry(
-        `saguaro_arm_vertical_${i}`,
-        () => new THREE.CylinderGeometry(0.7, 0.8, verticalHeight, 10)
-      );
+      // Vertical part of arm - use shared geometries
+      const verticalHeight = 5 + Math.floor(Math.random() * 4);
+      const verticalGeometry = armVerticalGeometries[Math.min(verticalHeight - 5, 3)];
 
       const vertical = new THREE.Mesh(verticalGeometry, cactusMaterial);
       vertical.position.x = arm.side * horizontalLength;
@@ -138,11 +178,6 @@ export class SaguaroCactus extends SimpleThreeComponent {
       armGroup.add(vertical);
 
       // Elbow joint
-      const elbowGeometry = resourceManager.getOrCreateGeometry(
-        `saguaro_elbow_${i}`,
-        () => new THREE.SphereGeometry(0.9, 8, 6)
-      );
-
       const elbow = new THREE.Mesh(elbowGeometry, cactusMaterial);
       elbow.position.x = arm.side * horizontalLength;
       armGroup.add(elbow);
@@ -156,11 +191,6 @@ export class SaguaroCactus extends SimpleThreeComponent {
     // Add spines as small cones
     const spineCount = 50;
     for (let i = 0; i < spineCount; i++) {
-      const spineGeometry = resourceManager.getOrCreateGeometry(
-        `saguaro_spine_${i}`,
-        () => new THREE.ConeGeometry(0.05, 0.3, 4)
-      );
-
       const spine = new THREE.Mesh(spineGeometry, spineMaterial);
       const y = Math.random() * trunkHeight; // Adjusted for ground level positioning
       const angle = Math.random() * Math.PI * 2;
@@ -177,17 +207,7 @@ export class SaguaroCactus extends SimpleThreeComponent {
     }
 
     // Add flowers at top (seasonal)
-    const flowerMaterial = resourceManager.getOrCreateMaterial(
-      'saguaro_flower',
-      () => new THREE.MeshLambertMaterial({ color: '#FFFACD' }) // Light yellow
-    );
-
     for (let i = 0; i < 3; i++) {
-      const flowerGeometry = resourceManager.getOrCreateGeometry(
-        `saguaro_flower_${i}`,
-        () => new THREE.SphereGeometry(0.4, 6, 4)
-      );
-
       const flower = new THREE.Mesh(flowerGeometry, flowerMaterial);
       const angle = (i / 3) * Math.PI * 2;
       flower.position.set(
