@@ -104,7 +104,9 @@ export function calculateHousePositions(
 
     case 'suburban':
       // Mixed layout with curved streets and varied positioning
-      const sectors = Math.min(4, Math.ceil(houseCount / 6));
+      // Scale sectors based on house count for better distribution
+      const sectors = Math.max(4, Math.ceil(houseCount / 8));
+      const housesPerSector = Math.ceil(houseCount / sectors);
       let houseIndex = 0;
 
       for (let sector = 0; sector < sectors && houseIndex < houseCount; sector++) {
@@ -116,8 +118,12 @@ export function calculateHousePositions(
           center.z + Math.sin(sectorAngle) * sectorRadius
         );
 
-        const housesInSector = Math.min(8, houseCount - houseIndex);
-        for (let h = 0; h < housesInSector; h++) {
+        // Distribute remaining houses evenly across remaining sectors
+        const remainingHouses = houseCount - houseIndex;
+        const remainingSectors = sectors - sector;
+        const housesInSector = Math.ceil(remainingHouses / remainingSectors);
+
+        for (let h = 0; h < housesInSector && houseIndex < houseCount; h++) {
           const localAngle = (h / housesInSector) * Math.PI + sectorAngle - Math.PI / 2;
           const localRadius = spacing * 0.8 + Math.random() * spacing * 0.6;
           const x = sectorCenter.x + Math.cos(localAngle) * localRadius;
