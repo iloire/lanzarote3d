@@ -257,6 +257,10 @@ export class HouseGroupCreator {
 
       const landMesh = new THREE.Mesh(landGeometry, landMaterial);
 
+      // Tag object for terrain adaptation - proper way to identify objects
+      landMesh.userData.isLandPlot = true;
+      landMesh.userData.parentHousePosition = housePosition.clone();
+
       // Position the land plot at ground level, following terrain height
       landMesh.position.copy(housePosition);
       // FIX Z-FIGHTING: Offset land plot slightly above terrain (0.5 units) instead of arbitrary offset
@@ -344,6 +348,11 @@ export class HouseGroupCreator {
   private async addStone(position: THREE.Vector3): Promise<void> {
     const stone = new Stone();
     const stoneMesh = await stone.load();
+
+    // Tag as landscape element for terrain adaptation
+    stoneMesh.userData.isLandscapeElement = true;
+    stoneMesh.userData.parentHousePosition = position.clone();
+
     stoneMesh.position.copy(position);
     stoneMesh.scale.setScalar(0.3 + Math.random() * 0.4); // Random scale 0.3-0.7
     stoneMesh.rotation.y = Math.random() * Math.PI * 2; // Random rotation
@@ -358,6 +367,11 @@ export class HouseGroupCreator {
       levelOfDetail: this.levelOfDetail
     });
     const cactusMesh = await cactus.load();
+
+    // Tag as landscape element for terrain adaptation
+    cactusMesh.userData.isLandscapeElement = true;
+    cactusMesh.userData.parentHousePosition = position.clone();
+
     cactusMesh.position.copy(position);
 
     // Count polygons for debugging
@@ -387,6 +401,11 @@ export class HouseGroupCreator {
       levelOfDetail: this.levelOfDetail
     });
     const cactusMesh = await cactus.load();
+
+    // Tag as landscape element for terrain adaptation
+    cactusMesh.userData.isLandscapeElement = true;
+    cactusMesh.userData.parentHousePosition = position.clone();
+
     cactusMesh.position.copy(position);
     this.scene.add(cactusMesh);
     this.createdObjects.push(cactusMesh);
@@ -398,6 +417,11 @@ export class HouseGroupCreator {
       levelOfDetail: this.levelOfDetail
     });
     const cactusMesh = await cactus.load();
+
+    // Tag as landscape element for terrain adaptation
+    cactusMesh.userData.isLandscapeElement = true;
+    cactusMesh.userData.parentHousePosition = position.clone();
+
     cactusMesh.position.copy(position);
     this.scene.add(cactusMesh);
     this.createdObjects.push(cactusMesh);
@@ -409,6 +433,11 @@ export class HouseGroupCreator {
       levelOfDetail: this.levelOfDetail
     });
     const cactusMesh = await cactus.load();
+
+    // Tag as landscape element for terrain adaptation
+    cactusMesh.userData.isLandscapeElement = true;
+    cactusMesh.userData.parentHousePosition = position.clone();
+
     cactusMesh.position.copy(position);
     this.scene.add(cactusMesh);
     this.createdObjects.push(cactusMesh);
