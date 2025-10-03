@@ -249,25 +249,29 @@ export class HouseGroupCreator {
   ): Promise<void> {
     try {
       const landGeometry = new THREE.PlaneGeometry(landPlot.width, landPlot.depth);
-      const landMaterial = new THREE.MeshStandardMaterial({
+      const landMaterial = new THREE.MeshBasicMaterial({
         color: landPlot.color || '#7CFC00',
-        roughness: 0.8,
         transparent: true,
-        opacity: 0.7,
+        opacity: 0.8,
       });
 
       const landMesh = new THREE.Mesh(landGeometry, landMaterial);
 
       // Position the land plot at ground level, following terrain height
       landMesh.position.copy(housePosition);
-      landMesh.position.y = housePosition.y - 0.5; // Slightly below house to avoid z-fighting
+      // FIX Z-FIGHTING: Offset land plot slightly above terrain (0.5 units) instead of arbitrary offset
+      // This prevents flickering while keeping land plot visible above terrain
+      landMesh.position.y = housePosition.y + 0.5;
 
       // Rotate to lie flat and match house rotation if needed
       landMesh.rotation.x = -Math.PI / 2; // Lie flat
       landMesh.rotation.z = houseRotation; // Match house rotation
 
-      // Set rendering order to render behind other objects
-      landMesh.renderOrder = -1;
+      // Set rendering order to render behind other objects but in front of terrain
+      landMesh.renderOrder = 1;
+
+      // Disable depth write to prevent z-fighting with terrain
+      landMaterial.depthWrite = false;
 
       this.scene.add(landMesh);
       this.createdObjects.push(landMesh);
