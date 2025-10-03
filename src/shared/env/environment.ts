@@ -343,7 +343,14 @@ class Environment {
               const distance = Math.sqrt(dx * dx + dz * dz);
 
               if (distance < 200) {
+                const oldObjY = obj.position.y;
                 obj.position.y += deltaY;
+
+                // Add small offset to land plots AFTER terrain adaptation to prevent z-fighting
+                if (isLandPlot) {
+                  obj.position.y += 0.1; // Tiny offset above terrain
+                  logger.debug(`Land plot adapted: ${oldObjY.toFixed(1)} → ${obj.position.y.toFixed(1)} (deltaY: ${deltaY.toFixed(1)}, +0.1 offset)`);
+                }
               }
             }
           });
