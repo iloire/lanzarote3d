@@ -28,8 +28,8 @@ class TownWorkshop extends WorkshopDemoBase {
     lastRenderTime: 0,
   };
   private neighborhoodSettings = {
-    formation: 'suburban' as 'street' | 'grid' | 'suburban' | 'rural' | 'random',
-    houseCount: 20,
+    formation: 'rural' as 'street' | 'grid' | 'suburban' | 'rural' | 'random',
+    houseCount: 400,
   };
 
   constructor() {
