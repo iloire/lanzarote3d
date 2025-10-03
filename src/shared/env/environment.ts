@@ -344,12 +344,17 @@ class Environment {
 
               if (distance < 200) {
                 const oldObjY = obj.position.y;
-                obj.position.y += deltaY;
 
-                // Add small offset to land plots AFTER terrain adaptation to prevent z-fighting
-                if (isLandPlot) {
-                  obj.position.y += 0.1; // Tiny offset above terrain
-                  logger.debug(`Land plot adapted: ${oldObjY.toFixed(1)} → ${obj.position.y.toFixed(1)} (deltaY: ${deltaY.toFixed(1)}, +0.1 offset)`);
+                // Get terrain height at THIS object's actual position
+                const objTerrainHeight = this.getTerrainHeight(obj.position.x, obj.position.z, terrain);
+
+                if (!isNaN(objTerrainHeight)) {
+                  // Position at terrain height with small offset for land plots
+                  obj.position.y = objTerrainHeight + (isLandPlot ? 0.1 : 0);
+
+                  if (isLandPlot) {
+                    logger.debug(`Land plot adapted: ${oldObjY.toFixed(1)} → ${obj.position.y.toFixed(1)} (terrain: ${objTerrainHeight.toFixed(1)})`);
+                  }
                 }
               }
             }
