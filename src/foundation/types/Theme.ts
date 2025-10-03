@@ -17,9 +17,6 @@ export interface SkyTheme {
       bottom?: number;
     };
   };
-  fogEnabled?: boolean; // Whether to apply fog at all
-  fogColor?: string;
-  fogDensity?: number;
 }
 
 export interface CloudTheme {
@@ -61,14 +58,14 @@ export interface SatelliteImageryConfig {
 
 export interface TerrainTheme {
   style:
-    | 'volcanic'
-    | 'arctic'
-    | 'desert'
-    | 'alien'
-    | 'crystal'
-    | 'wireframe'
-    | 'plasma'
-    | 'satellite';
+  | 'volcanic'
+  | 'arctic'
+  | 'desert'
+  | 'alien'
+  | 'crystal'
+  | 'wireframe'
+  | 'plasma'
+  | 'satellite';
   satelliteImagery?: SatelliteImageryConfig;
   customMaterial?: {
     color?: string;

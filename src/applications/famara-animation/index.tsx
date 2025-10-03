@@ -78,9 +78,6 @@ class AnimationApp extends TerrainBase {
         environment: 'lanzarote',
         lighting: 'dynamic',
         physics: false,
-        fog: {
-          enabled: true, // Fog handled by theme system
-        },
       },
       performance: {
         monitoring: true,
@@ -107,11 +104,11 @@ class AnimationApp extends TerrainBase {
       await ThemeEngine.apply(options, theme);
 
       // Set fog early to avoid visual pop-in
-      scene.fog = new THREE.Fog(
-        0x87CEEB, // Sky blue color
-        3000,     // Start fog closer for more atmosphere
-        12000     // End fog sooner for denser effect
-      );
+      // scene.fog = new THREE.Fog(
+      //   0x87CEEB, // Sky blue color
+      //   1000,     // Start fog closer for more atmosphere
+      //   2000     // End fog sooner for denser effect
+      // );
 
       // Initialize core systems from DemoBase
       this.initializeCore(options);

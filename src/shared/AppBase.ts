@@ -11,12 +11,6 @@ export interface AppConfig {
     environment?: 'lanzarote' | 'custom';
     lighting?: 'dynamic' | 'static';
     physics?: boolean;
-    fog?: {
-      enabled: boolean;
-      color?: number;
-      near?: number;
-      far?: number;
-    };
   };
   performance?: {
     monitoring?: boolean;

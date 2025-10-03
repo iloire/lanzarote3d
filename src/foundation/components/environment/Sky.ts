@@ -611,8 +611,6 @@ export default class Sky extends THREE.Object3D {
 
     // Apply specific directional light configuration
     this.applyDirectionalLightTheme(skyTheme.directionalLight);
-
-    // Note: Fog is handled by ThemeEngine to avoid conflicts
   }
 
   /**

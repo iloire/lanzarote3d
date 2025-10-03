@@ -147,9 +147,6 @@ class FlyzoneEditorApp extends TerrainBase {
         environment: 'lanzarote',
         lighting: 'dynamic',
         physics: false,
-        fog: {
-          enabled: false, // Clear visibility for precise editing
-        },
       },
       performance: {
         monitoring: true,
@@ -1080,9 +1077,9 @@ class FlyzoneEditorApp extends TerrainBase {
           // Confirm import (this will replace current data)
           const confirmed = confirm(
             'This will replace all current data. Are you sure you want to import this file?\n\n' +
-              `File: ${file.name}\n` +
-              `Export Date: ${importData.metadata?.exportDate || 'Unknown'}\n` +
-              `Locations: ${importData.allLocations?.length || 0}`
+            `File: ${file.name}\n` +
+            `Export Date: ${importData.metadata?.exportDate || 'Unknown'}\n` +
+            `Locations: ${importData.allLocations?.length || 0}`
           );
 
           if (!confirmed) return;

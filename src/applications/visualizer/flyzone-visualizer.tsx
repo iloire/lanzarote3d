@@ -65,9 +65,6 @@ class FlyzoneVisualizerApp extends TerrainBase {
         environment: 'lanzarote',
         lighting: 'dynamic',
         physics: false,
-        fog: {
-          enabled: false, // Clear visibility for analysis
-        },
       },
       performance: {
         monitoring: true,

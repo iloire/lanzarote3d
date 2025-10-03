@@ -33,12 +33,7 @@ class ProceduralTerrainApp extends AppBase {
         environment: 'custom',
         lighting: 'dynamic',
         physics: false,
-        fog: {
-          enabled: true,
-          color: 0x87ceeb,
-          near: 1000,
-          far: 15000,
-        },
+
       },
       performance: {
         monitoring: true,

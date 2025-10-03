@@ -24,7 +24,6 @@ interface TerrainSettings {
   metalness: number;
   emissiveIntensity: number;
   animateVertices: boolean;
-  fogDensity: number;
 }
 
 // Create procedural noise texture
@@ -236,7 +235,6 @@ const TerrainWorkshop = {
       metalness: 0.0,
       emissiveIntensity: 0.5,
       animateVertices: false,
-      fogDensity: 0.001,
     };
 
     let currentTerrain: THREE.Mesh | null = null;
@@ -251,8 +249,6 @@ const TerrainWorkshop = {
     const displacement = loader.load(textureImg);
     const proceduralNoise = createNoiseTexture(512, 512, 0.02);
 
-    // Note: Fog is handled by ThemeEngine to avoid conflicts
-    // Remove manual fog application to prevent conflicts with theme system
 
     const createTerrain = (styleKey: string, useProceduralNoise = false) => {
       // Remove existing terrain
@@ -281,9 +277,6 @@ const TerrainWorkshop = {
       if (style.postProcess) {
         style.postProcess(mesh, settings);
       }
-
-      // Note: Fog color is handled by ThemeEngine to avoid conflicts
-      // Remove manual fog color updates to prevent conflicts with theme system
 
       return mesh;
     };
@@ -384,7 +377,6 @@ const TerrainWorkshop = {
             metalness: 0.0,
             emissiveIntensity: 0.5,
             animateVertices: false,
-            fogDensity: 0.001,
           });
           createTerrain(terrainControl.style, terrainControl.useProceduralNoise);
         },
@@ -454,14 +446,6 @@ const TerrainWorkshop = {
         .add(settings, 'animateVertices')
         .name('Dynamic Animation')
         .onChange(() => createTerrain(currentStyle, terrainControl.useProceduralNoise));
-
-      visualFolder
-        .add(settings, 'fogDensity', 0, 0.005)
-        .name('Fog Density (Read-only - controlled by theme)')
-        .onChange((value: number) => {
-          // Note: Fog density is controlled by ThemeEngine
-          console.log('Fog density setting changed but not applied - controlled by theme system');
-        });
 
       // Action buttons
       terrainFolder.add(terrainControl, 'regenerate').name('🔄 Regenerate');

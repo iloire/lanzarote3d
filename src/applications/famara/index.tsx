@@ -40,9 +40,6 @@ class FamaraApp extends TerrainBase {
         environment: 'lanzarote',
         lighting: 'dynamic',
         physics: false,
-        fog: {
-          enabled: false, // Fog handled by theme system
-        },
       },
       performance: {
         monitoring: true,

@@ -92,21 +92,6 @@ export class ThemeEngine {
     if (options.sky && sky.timeOfDay !== undefined) {
       options.sky.updateSunPosition(sky.timeOfDay);
     }
-
-    // Apply fog settings - check if fog is explicitly enabled/disabled
-    if (sky.fogEnabled === false) {
-      // Explicitly disable fog
-      options.scene.fog = null;
-    } else if (
-      sky.fogEnabled === true ||
-      (sky.fogEnabled === undefined && sky.fogColor && sky.fogDensity !== undefined)
-    ) {
-      // Apply fog if explicitly enabled OR if fog properties are defined (backward compatibility)
-      const fogColor = new THREE.Color(sky.fogColor || '#000000');
-      const fogDensity = sky.fogDensity !== undefined ? sky.fogDensity : 0.001;
-      const fog = new THREE.Fog(fogColor, 1000, Math.min(20000, 20000 / (1 + fogDensity * 100)));
-      options.scene.fog = fog;
-    }
   }
 
   /**

@@ -27,9 +27,6 @@ class VoxelDemoApp extends AppBase {
         environment: 'custom',
         lighting: 'static',
         physics: false,
-        fog: {
-          enabled: false, // Fog handled by theme system
-        },
       },
       performance: {
         monitoring: true,
@@ -57,9 +54,6 @@ class VoxelDemoApp extends AppBase {
 
       // Setup camera and controls
       this.setupCamera(camera, controls);
-
-      // Setup fog
-      this.setupFog(scene);
 
       // Add download functionality
       this.setupDownloadButton();
@@ -143,11 +137,6 @@ class VoxelDemoApp extends AppBase {
     controls.minDistance = 100;
     controls.maxDistance = 5000;
     controls.update();
-  }
-
-  private setupFog(scene: THREE.Scene): void {
-    // Note: Fog is handled by ThemeEngine to avoid conflicts
-    // Remove manual fog application to prevent conflicts with theme system
   }
 
   private setupDownloadButton(): void {

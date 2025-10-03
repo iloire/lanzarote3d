@@ -59,7 +59,6 @@ export class SmokeTrail {
       opacity: 0.6,
       depthWrite: false,
       side: THREE.DoubleSide,
-      fog: true,
     });
 
     // Pre-create particle pool

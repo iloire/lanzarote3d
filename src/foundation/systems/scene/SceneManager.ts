@@ -6,7 +6,6 @@ export interface SceneConfig {
   environment?: 'lanzarote' | 'custom';
   lighting?: 'dynamic' | 'static';
   physics?: boolean;
-  // Note: fog is handled by ThemeEngine to avoid conflicts
 }
 
 export interface SceneComponents {
@@ -45,8 +44,6 @@ export class SceneManager {
 
     this.scene.add(ambientLight);
     this.scene.add(directionalLight);
-
-    // Note: Fog is handled by ThemeEngine to avoid conflicts
 
     this.components = {
       scene: this.scene,
@@ -99,9 +96,6 @@ export class SceneManager {
   remove(...objects: THREE.Object3D[]): void {
     objects.forEach(obj => this.scene.remove(obj));
   }
-
-  // Note: setFog method removed - fog is handled by ThemeEngine to avoid conflicts
-  // Use ThemeEngine.apply() to manage fog settings consistently
 
   updateLighting(timeOfDay: number): void {
     if (this.components.sky) {

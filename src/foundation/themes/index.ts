@@ -8,7 +8,6 @@ export const THEMES: Record<string, Theme> = {
     sky: {
       timeOfDay: 15,
       sunIntensity: 1.9,
-      fogEnabled: true,
     },
     clouds: {
       colors: ['#FFFFFF', '#F5F5F5', '#E8E8E8', '#D0D0D0'],
@@ -50,9 +49,6 @@ export const THEMES: Record<string, Theme> = {
     sky: {
       timeOfDay: 17.5,
       sunIntensity: 2.0,
-      fogEnabled: true,
-      fogColor: 'white',
-      fogDensity: 0.0001
     },
     clouds: {
       colors: [
@@ -103,7 +99,6 @@ export const THEMES: Record<string, Theme> = {
     sky: {
       timeOfDay: 14,
       sunIntensity: 1.8,
-      fogEnabled: false,
       directionalLight: {
         intensity: 1.2,
         color: '#E6F3FF',
@@ -159,7 +154,6 @@ export const THEMES: Record<string, Theme> = {
     sky: {
       timeOfDay: 15,
       sunIntensity: 1.2,
-      fogEnabled: false,
       directionalLight: {
         intensity: 0.4,
         color: '#404040',
@@ -208,7 +202,6 @@ export const THEMES: Record<string, Theme> = {
     sky: {
       timeOfDay: 16,
       sunIntensity: 1.8,
-      fogEnabled: false,
     },
     clouds: {
       colors: ['#CD853F', '#DEB887', '#F5DEB3', '#D2691E', '#BC8F8F', '#F4A460'],
@@ -250,7 +243,6 @@ export const THEMES: Record<string, Theme> = {
     sky: {
       timeOfDay: 13,
       sunIntensity: 2.2,
-      fogEnabled: false,
     },
     clouds: {
       colors: ['#FFFFFF', '#E6F3FF', '#87CEEB'],

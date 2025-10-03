@@ -11,17 +11,17 @@ import { logger } from '../../foundation/utils/logger';
 import { Cessna } from '../../foundation/components/vehicles';
 import { EngineFlyingBehavior } from '../../foundation/systems/behaviors/EngineFlyingBehavior';
 import {
-  ANIMATION_CONFIG,
-  paraglidersVoxel,
-  birdPath,
-  cessnaConfig,
-  SHOW_CESSNA,
+    ANIMATION_CONFIG,
+    paraglidersVoxel,
+    birdPath,
+    cessnaConfig,
+    SHOW_CESSNA,
 } from './config';
 import { loadParagliders } from './vehicleLoader';
 import {
-  setupStaticCamera,
-  setupAnimatedCamera,
-  applyFloatingMotion,
+    setupStaticCamera,
+    setupAnimatedCamera,
+    applyFloatingMotion,
 } from './cameraAnimation';
 
 /**
@@ -50,9 +50,6 @@ class BoatsAnimationApp extends TerrainBase {
                 environment: 'lanzarote',
                 lighting: 'dynamic',
                 physics: false,
-                fog: {
-                    enabled: false, // Fog handled by theme system
-                },
             },
             performance: {
                 monitoring: true,

@@ -16,7 +16,6 @@ export class SatelliteThemes {
       sky: {
         timeOfDay: 13,
         sunIntensity: 2.0,
-        fogEnabled: false,
         directionalLight: {
           intensity: 1.5,
           color: '#ffffff',

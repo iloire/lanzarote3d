@@ -17,13 +17,13 @@ export interface WorkshopDemoConfig extends Omit<AppConfig, 'scene' | 'requiredC
     sunPosition?: number;
   };
   helpers?:
-    | {
-        axes?: boolean; // Show axis helper with directional labels
-        grid?: boolean; // Show grid helper
-        lighting?: boolean; // Show lighting helpers (sun position, etc)
-        scale?: number; // Scale factor for helpers (default: 100)
-      }
-    | boolean; // Can be boolean for simple enable/disable or object for granular control
+  | {
+    axes?: boolean; // Show axis helper with directional labels
+    grid?: boolean; // Show grid helper
+    lighting?: boolean; // Show lighting helpers (sun position, etc)
+    scale?: number; // Scale factor for helpers (default: 100)
+  }
+  | boolean; // Can be boolean for simple enable/disable or object for granular control
 }
 
 /**
@@ -58,9 +58,6 @@ export abstract class WorkshopDemoBase extends AppBase {
         environment: 'custom',
         lighting: 'static',
         physics: false,
-        fog: {
-          enabled: false, // Workshop demos focus on clear component visibility
-        },
       },
       performance: {
         monitoring: true,

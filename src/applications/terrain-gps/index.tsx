@@ -61,7 +61,6 @@ class TerrainGPSMapperApp extends TerrainBase {
         environment: 'lanzarote',
         lighting: 'dynamic',
         physics: false,
-        fog: { enabled: true },
       },
       performance: {
         monitoring: true,
@@ -519,16 +518,16 @@ class TerrainGPSMapperApp extends TerrainBase {
       <div style="margin-bottom: 10px; border-top: 1px solid #555; padding-top: 10px;">
         <strong>Marked Points (${this.coordinateList.length}):</strong><br>
         ${this.coordinateList
-          .map(
-            (coord, i) => `
+        .map(
+          (coord, i) => `
           <div style="font-size: 10px; margin: 5px 0; padding: 5px; background: rgba(255,255,255,0.1); border-radius: 3px;">
             <strong>Point ${i + 1}:</strong><br>
             Terrain: (${coord.terrain.x.toFixed(1)}, ${coord.terrain.y.toFixed(1)}, ${coord.terrain.z.toFixed(1)})<br>
             GPS: ${coord.gps.lat.toFixed(6)}°N, ${coord.gps.lon.toFixed(6)}°W
           </div>
         `
-          )
-          .join('')}
+        )
+        .join('')}
       </div>
 
       <div style="border-top: 1px solid #555; padding-top: 10px; font-size: 11px; color: #ccc;">

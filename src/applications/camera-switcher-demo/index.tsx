@@ -44,7 +44,6 @@ class CameraSwitcherDemo extends TerrainBase {
         environment: 'lanzarote',
         lighting: 'dynamic',
         physics: false,
-        fog: { enabled: true },
       },
     });
   }

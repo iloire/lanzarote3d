@@ -10,12 +10,6 @@ export interface TerrainConfig extends Omit<AppConfig, 'scene'> {
     environment?: 'lanzarote' | 'custom';
     lighting?: 'dynamic' | 'static';
     physics?: boolean;
-    fog?: {
-      enabled: boolean;
-      color?: number;
-      near?: number;
-      far?: number;
-    };
   };
 }
 
@@ -40,9 +34,6 @@ export abstract class TerrainBase extends AppBase {
         environment: 'lanzarote',
         lighting: 'dynamic',
         physics: false,
-        fog: {
-          enabled: true, // Demos often benefit from atmospheric fog
-        },
         ...config.scene,
       },
       performance: {

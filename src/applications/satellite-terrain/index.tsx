@@ -65,9 +65,7 @@ class SatelliteTerrainApp extends TerrainBase {
         environment: 'lanzarote',
         lighting: 'dynamic',
         physics: false,
-        fog: {
-          enabled: false, // Clear visibility for satellite imagery
-        },
+
       },
       performance: {
         monitoring: true,
