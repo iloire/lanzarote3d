@@ -20,8 +20,8 @@ THREE.Cache.enabled = true;
  * Extract story name from URL
  * - From query parameter: ?story=boats-animation
  * - From HTML path: /boats-animation.html -> boats-animation
- * - From root path or index: famara-animation
- * - Default: famara-animation
+ * - From root path or index: home
+ * - Default: home
  */
 function getStoryName(): string {
   const params = new URLSearchParams(window.location.search);
@@ -37,11 +37,11 @@ function getStoryName(): string {
 
   // Root path or index.html -> default
   if (currentPath === '/' || currentPath === '/index.html') {
-    return 'famara-animation';
+    return 'home';
   }
 
   // Fallback
-  return 'famara-animation';
+  return 'home';
 }
 
 /**
