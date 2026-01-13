@@ -1,0 +1,9 @@
+# Robots.txt for lanzaroteparagliding.com
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://lanzaroteparagliding.com/sitemap.xml
+
+# Crawl-delay (optional, be kind to crawlers)
+Crawl-delay: 1

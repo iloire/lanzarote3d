@@ -1,5 +1,9 @@
 import ReactGA from 'react-ga4';
-ReactGA.initialize('G-EMLJN9ZJ6H');
+
+const gaId = process.env.GOOGLE_ANALYTICS_ID;
+if (gaId) {
+  ReactGA.initialize(gaId);
+}
 
 const category = 'game';
 const version = 'v0.06';

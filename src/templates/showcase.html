@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
   <!-- Google tag (gtag.js) -->
@@ -13,9 +13,39 @@
 
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>
-    <%= htmlWebpackPlugin.options.title %>
-  </title>
+
+  <!-- Primary Meta Tags -->
+  <title><%= htmlWebpackPlugin.options.title %></title>
+  <meta name="title" content="<%= htmlWebpackPlugin.options.title %>" />
+  <meta name="description" content="<%= htmlWebpackPlugin.options.description %>" />
+  <meta name="keywords" content="paragliding, Lanzarote, Famara, 3D visualization, flying, Canary Islands" />
+  <meta name="author" content="Lanzarote Paragliding" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://lanzaroteparagliding.com/<%= htmlWebpackPlugin.options.filename %>" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://lanzaroteparagliding.com/<%= htmlWebpackPlugin.options.filename %>" />
+  <meta property="og:title" content="<%= htmlWebpackPlugin.options.title %>" />
+  <meta property="og:description" content="<%= htmlWebpackPlugin.options.description %>" />
+  <meta property="og:image" content="https://lanzaroteparagliding.com/assets/og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:site_name" content="Lanzarote Paragliding" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://lanzaroteparagliding.com/<%= htmlWebpackPlugin.options.filename %>" />
+  <meta name="twitter:title" content="<%= htmlWebpackPlugin.options.title %>" />
+  <meta name="twitter:description" content="<%= htmlWebpackPlugin.options.description %>" />
+  <meta name="twitter:image" content="https://lanzaroteparagliding.com/assets/og-image.jpg" />
+
+  <!-- Additional SEO -->
+  <meta name="theme-color" content="#000000" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

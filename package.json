@@ -28,6 +28,7 @@
     "babel-loader": "^9.2.1",
     "copy-webpack-plugin": "^13.0.1",
     "css-loader": "^6.11.0",
+    "dotenv-webpack": "^8.1.1",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.2",
     "eslint-plugin-prettier": "^5.5.4",
@@ -52,10 +53,10 @@
     "webpack-dev-server": "^5.2.2"
   },
   "scripts": {
-    "clean": "rm -R dist || true",
-    "start": "webpack serve --mode development --open --hot",
+    "clean": "rm -rf dist || true",
+    "start": "yarn clean && webpack serve --mode development --open --hot",
     "dev": "yarn start",
-    "build": "webpack --mode production",
+    "build": "yarn clean && webpack --mode production",
     "build-external-embed": "webpack --mode production && mkdir -p external-embed/dist && cp dist/*.bundle.js dist/*.glb dist/*.LICENSE.txt external-embed/dist/ 2>/dev/null || true && cp -r dist/assets external-embed/dist/ && npx serve external-embed -p 8081",
     "run-external-embed": "npx serve external-embed -p 8081",
     "pre-build": "yarn lint:check && yarn format:check",
