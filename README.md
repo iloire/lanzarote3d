@@ -66,6 +66,22 @@ localStorage.removeItem('lanzarote_dev_mode')
 
 When dev mode is enabled in production, you'll see "🔓 Secret dev mode enabled" in the console and have access to all private apps (workshop-demo, location-editor, tile-debug, etc.).
 
+#### Show Sidebar on Home App
+
+The sidebar is hidden by default on the home app for a cleaner presentation. To force-show it:
+
+**Enable:**
+```javascript
+localStorage.setItem('lanzarote_show_menu', 'true')
+```
+
+**Disable:**
+```javascript
+localStorage.removeItem('lanzarote_show_menu')
+```
+
+Reload the page after changing this setting.
+
 ### Deployment
 
 The project can be deployed to different S3 buckets:

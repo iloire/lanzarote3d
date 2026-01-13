@@ -27,14 +27,28 @@ class Menu extends React.Component<MenuProps> {
   };
 
   getInitialMenuVisibility(): boolean {
+    // Check for localStorage override to force show menu
+    const forceShowMenu = localStorage.getItem('lanzarote_show_menu') === 'true';
+    if (forceShowMenu) {
+      return true;
+    }
+
     // Hide menu by default for home app
+    // Check query param
     const params = new URLSearchParams(window.location.search);
     const story = params.get('story');
     if (story === 'home') {
       return false;
     }
-    // Also check for production URL pattern
+    // Check for production URL pattern
     if (window.location.pathname.includes('home.html')) {
+      return false;
+    }
+    // Check for root path in development (no story param means home is default)
+    const isRootPath =
+      window.location.pathname === '/' || window.location.pathname === '/index.html';
+    const hasNoStoryParam = !story;
+    if (isRootPath && hasNoStoryParam) {
       return false;
     }
     return true;

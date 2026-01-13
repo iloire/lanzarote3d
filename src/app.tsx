@@ -71,6 +71,34 @@ const createRenderer = (sizes: { width: number; height: number }) => {
   return renderer;
 };
 
+/**
+ * Check if the sidebar should be shown for the current app.
+ * Sidebar is hidden by default for the home app unless overridden via localStorage.
+ */
+function shouldShowSidebar(story?: string): boolean {
+  // Check for localStorage override to force show menu
+  const forceShowMenu = localStorage.getItem('lanzarote_show_menu') === 'true';
+  if (forceShowMenu) {
+    return true;
+  }
+
+  // Hide for home app
+  if (story === 'home') {
+    return false;
+  }
+
+  // Check for root path with no story (development default = home)
+  const params = new URLSearchParams(window.location.search);
+  const urlStory = params.get('story');
+  const isRootPath =
+    window.location.pathname === '/' || window.location.pathname === '/index.html';
+  if (isRootPath && !urlStory) {
+    return false;
+  }
+
+  return true;
+}
+
 const App: React.FC<AppProps> = ({
   initialStory,
   showAppSelection: initialShowAppSelection = false,
@@ -195,7 +223,7 @@ const App: React.FC<AppProps> = ({
           <span className="progress">LOADING {loadingProcess} %</span>
         </div>
       )}
-      {showAppSelection && (
+      {showAppSelection && shouldShowSidebar(initialStory) && (
         <Menu
           showPublic={typeof showPublic === 'undefined' ? true : showPublic}
           showDev={typeof showDev === 'undefined' ? false : showDev}
