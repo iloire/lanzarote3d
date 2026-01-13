@@ -26,15 +26,29 @@ const NavigationBox: React.FC<NavigationBoxProps> = ({ link }) => {
   );
 };
 
+const VoxelTitle: React.FC = () => {
+  return (
+    <div className="voxel-title-container">
+      <h1 className="voxel-title">
+        <span className="voxel-title-main">Lanzarote</span>
+        <span className="voxel-title-sub">Paragliding</span>
+      </h1>
+    </div>
+  );
+};
+
 const NavigationBoxes: React.FC = () => {
   return (
-    <div className="navigation-boxes-container">
-      <div className="navigation-boxes">
-        {NAVIGATION_LINKS.map((link) => (
-          <NavigationBox key={link.id} link={link} />
-        ))}
+    <>
+      <VoxelTitle />
+      <div className="navigation-boxes-container">
+        <div className="navigation-boxes">
+          {NAVIGATION_LINKS.map((link) => (
+            <NavigationBox key={link.id} link={link} />
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

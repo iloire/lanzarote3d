@@ -3,6 +3,151 @@
 /* Import a pixel-style font */
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+/* =============================================
+   VOXEL TITLE STYLES
+   ============================================= */
+
+.voxel-title-container {
+  position: fixed;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.voxel-title {
+  font-family: 'Press Start 2P', monospace;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  /* Entrance animation */
+  animation: titleFadeIn 1.5s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes titleFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.voxel-title-main {
+  font-size: 48px;
+  font-weight: bold;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #ffffff;
+
+  /* Voxel-style 3D text effect */
+  text-shadow:
+    /* Main shadow layers for 3D depth */
+    4px 4px 0 #1a3a5c,
+    8px 8px 0 #0d1f33,
+    /* Glow effect */
+    0 0 40px rgba(74, 158, 255, 0.6),
+    0 0 80px rgba(74, 158, 255, 0.3),
+    /* Inner highlight */
+    -1px -1px 0 rgba(255, 255, 255, 0.3);
+
+  /* Subtle floating animation */
+  animation: titleFloat 4s ease-in-out infinite;
+}
+
+@keyframes titleFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.voxel-title-sub {
+  font-size: 24px;
+  font-weight: bold;
+  letter-spacing: 8px;
+  text-transform: uppercase;
+  color: #4aff9e;
+
+  /* Voxel-style 3D text effect */
+  text-shadow:
+    /* Main shadow layers for 3D depth */
+    3px 3px 0 #1a4a3c,
+    6px 6px 0 #0d2b22,
+    /* Glow effect */
+    0 0 30px rgba(74, 255, 158, 0.5),
+    0 0 60px rgba(74, 255, 158, 0.2),
+    /* Inner highlight */
+    -1px -1px 0 rgba(255, 255, 255, 0.2);
+
+  /* Delayed floating animation */
+  animation: titleFloat 4s ease-in-out infinite;
+  animation-delay: 0.5s;
+}
+
+/* Responsive adjustments for title */
+@media (max-width: 800px) {
+  .voxel-title-main {
+    font-size: 32px;
+    letter-spacing: 2px;
+    text-shadow:
+      3px 3px 0 #1a3a5c,
+      6px 6px 0 #0d1f33,
+      0 0 30px rgba(74, 158, 255, 0.5);
+  }
+
+  .voxel-title-sub {
+    font-size: 16px;
+    letter-spacing: 4px;
+    text-shadow:
+      2px 2px 0 #1a4a3c,
+      4px 4px 0 #0d2b22,
+      0 0 20px rgba(74, 255, 158, 0.4);
+  }
+}
+
+@media (max-width: 500px) {
+  .voxel-title-container {
+    top: 20px;
+  }
+
+  .voxel-title-main {
+    font-size: 20px;
+    letter-spacing: 1px;
+    text-shadow:
+      2px 2px 0 #1a3a5c,
+      4px 4px 0 #0d1f33,
+      0 0 20px rgba(74, 158, 255, 0.4);
+  }
+
+  .voxel-title-sub {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-shadow:
+      1px 1px 0 #1a4a3c,
+      2px 2px 0 #0d2b22,
+      0 0 15px rgba(74, 255, 158, 0.3);
+  }
+
+  .voxel-title {
+    gap: 8px;
+  }
+}
+
+/* =============================================
+   NAVIGATION BOXES STYLES
+   ============================================= */
+
 .navigation-boxes-container {
   position: fixed;
   bottom: 40px;
