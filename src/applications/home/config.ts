@@ -227,21 +227,21 @@ export const NAVIGATION_LINKS: NavigationLink[] = [
     id: 'wind',
     label: 'Wind',
     description: 'Wind Forecast',
-    url: 'https://wind.lanzaroteparagliding.com',
+    url: 'https://wind.lanzaroteparagliding.com?ref=home',
     icon: '\uD83C\uDF2C\uFE0F', // wind emoji
   },
   {
     id: 'guide',
     label: 'Guide',
     description: 'Flying Guide',
-    url: 'https://guide.lanzaroteparagliding.com',
+    url: 'https://guide.lanzaroteparagliding.com?ref=home',
     icon: '\uD83D\uDDFA\uFE0F', // map emoji
   },
   {
     id: 'tandem',
     label: 'Tandem',
     description: 'Tandem Flights',
-    url: 'https://tandem.lanzaroteparagliding.com',
+    url: 'https://venturilanzarote.com?ref=home',
     icon: '\uD83E\uDE82', // parachute emoji
   },
 ];
