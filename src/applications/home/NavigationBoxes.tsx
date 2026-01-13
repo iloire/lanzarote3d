@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import { NAVIGATION_LINKS, NavigationLink } from './config';
 import './navigation-boxes.css';
@@ -27,18 +27,9 @@ const NavigationBox: React.FC<NavigationBoxProps> = ({ link }) => {
 };
 
 const NavigationBoxes: React.FC = () => {
-  const [isVisible, setIsVisible] = useState(false);
-
   return (
     <div className="navigation-boxes-container">
-      <button
-        className="nav-toggle-btn"
-        onClick={() => setIsVisible(!isVisible)}
-        aria-label={isVisible ? 'Hide navigation' : 'Show navigation'}
-      >
-        {isVisible ? '\u2715' : '\u2630'}
-      </button>
-      <div className={`navigation-boxes ${isVisible ? 'visible' : 'hidden'}`}>
+      <div className="navigation-boxes">
         {NAVIGATION_LINKS.map((link) => (
           <NavigationBox key={link.id} link={link} />
         ))}

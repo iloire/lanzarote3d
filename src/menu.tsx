@@ -20,11 +20,25 @@ class Menu extends React.Component<MenuProps> {
     hoveredRoute: null as string | null,
     isMobile: false,
     isMenuOpen: false,
-    isMenuVisible: true, // New state for menu visibility
+    isMenuVisible: this.getInitialMenuVisibility(),
     currentTheme: null as Theme | null,
     availableThemes: [] as Theme[],
     isApplyingTheme: false,
   };
+
+  getInitialMenuVisibility(): boolean {
+    // Hide menu by default for home app
+    const params = new URLSearchParams(window.location.search);
+    const story = params.get('story');
+    if (story === 'home') {
+      return false;
+    }
+    // Also check for production URL pattern
+    if (window.location.pathname.includes('home.html')) {
+      return false;
+    }
+    return true;
+  }
 
   override componentDidMount() {
     this.checkIfMobile();
