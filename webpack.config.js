@@ -161,6 +161,10 @@ module.exports = {
           from: 'assets',
           to: 'assets',
         },
+        {
+          from: 'assets/favicon.svg',
+          to: 'favicon.svg',
+        },
       ],
     }),
   ],
