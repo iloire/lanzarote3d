@@ -62,7 +62,7 @@ const MusicToggle: React.FC = () => {
 
   useEffect(() => {
     // Don't initialize audio on mobile
-    if (isMobile) return;
+    if (isMobile) return undefined;
 
     const audio = new Audio();
     audio.loop = true;
