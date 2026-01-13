@@ -45,38 +45,81 @@ const VoxelTitle: React.FC = () => {
 const MusicToggle: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [pendingAutoplay, setPendingAutoplay] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    const audio = new Audio(MUSIC_URL);
+    const audio = new Audio();
     audio.loop = true;
     audio.volume = 0.2;
+    audio.preload = 'auto';
     audioRef.current = audio;
 
-    audio.addEventListener('canplaythrough', () => {
+    const tryAutoplay = () => {
+      // Check localStorage for saved preference (default to enabled)
+      const savedPreference = localStorage.getItem(MUSIC_ENABLED_KEY);
+      if (savedPreference !== 'false') {
+        audio.play().then(() => {
+          setIsPlaying(true);
+        }).catch(() => {
+          // Autoplay blocked - wait for user interaction
+          setPendingAutoplay(true);
+        });
+      }
+    };
+
+    const handleCanPlay = () => {
       setIsLoaded(true);
-    });
+      tryAutoplay();
+    };
+
+    audio.addEventListener('canplaythrough', handleCanPlay);
 
     audio.addEventListener('error', () => {
       console.error('Failed to load background music');
     });
 
-    // Check localStorage for saved preference (default to enabled)
-    const savedPreference = localStorage.getItem(MUSIC_ENABLED_KEY);
-    if (savedPreference !== 'false') {
-      audio.play().then(() => {
-        setIsPlaying(true);
-      }).catch((err) => {
-        console.log('Autoplay blocked, user interaction required:', err);
-      });
+    // Set src after adding listeners to ensure we catch the event
+    audio.src = MUSIC_URL;
+
+    // If audio is already ready (cached), trigger manually
+    if (audio.readyState >= 3) {
+      setIsLoaded(true);
+      tryAutoplay();
     }
 
     return () => {
+      audio.removeEventListener('canplaythrough', handleCanPlay);
       audio.pause();
       audio.src = '';
       audioRef.current = null;
     };
   }, []);
+
+  // Handle autoplay after user interaction with the page
+  useEffect(() => {
+    if (!pendingAutoplay || !audioRef.current) return undefined;
+
+    const handleInteraction = () => {
+      const audio = audioRef.current;
+      if (audio && pendingAutoplay) {
+        audio.play().then(() => {
+          setIsPlaying(true);
+          setPendingAutoplay(false);
+        }).catch(() => {
+          // Still blocked, keep waiting
+        });
+      }
+    };
+
+    document.addEventListener('click', handleInteraction, { once: true });
+    document.addEventListener('keydown', handleInteraction, { once: true });
+
+    return () => {
+      document.removeEventListener('click', handleInteraction);
+      document.removeEventListener('keydown', handleInteraction);
+    };
+  }, [pendingAutoplay]);
 
   const toggleMusic = useCallback(() => {
     const audio = audioRef.current;
@@ -100,11 +143,14 @@ const MusicToggle: React.FC = () => {
     .filter(Boolean)
     .join(' ');
 
+  const musicTitle = isPlaying ? 'Disable Music' : 'Enable Music';
+  const creditTitle = `${musicTitle} | Music by patrickdearteaga.com`;
+
   return (
     <button
       className={className}
       onClick={toggleMusic}
-      title={isPlaying ? 'Disable Music' : 'Enable Music'}
+      title={creditTitle}
       aria-label={isPlaying ? 'Disable background music' : 'Enable background music'}
       disabled={!isLoaded}
     >
