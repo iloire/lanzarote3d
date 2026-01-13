@@ -22,7 +22,7 @@ const showcaseApps = Object.entries(appsConfig.apps)
   .map(([appKey, app]) => ({
     name: appKey,
     title: `Lanzarote - ${app.name}`,
-    description: app.description || 'Experience paragliding in Lanzarote through immersive 3D visualization',
+    description: app.description || 'Experience paragliding in Lanzarote!. Tandem flights, pilot guides, real time wind conditions and more!',
     filename: app.route.replace(/^\//, '') + '.html',
     // Use custom webpack entry if specified (e.g., tile-debug), otherwise use standard index.tsx
     entry: app.webpackEntry
@@ -153,8 +153,8 @@ module.exports = {
       template: path.join(__dirname, 'src/templates/showcase.html'),
       chunks: ['home'],
       filename: 'index.html',
-      title: 'Lanzarote Paragliding - 3D Flight Experience',
-      description: 'Experience paragliding in Lanzarote through stunning 3D visualization. Explore Famara beach, watch pilots soar over volcanic landscapes of the Canary Islands.',
+      title: 'Lanzarote Paragliding',
+      description: 'Experience paragliding in Lanzarote with all your senses!. Tandem flights, pilot guides, real time wind conditions and more!',
       inject: 'body',
       minify: false
     }),
