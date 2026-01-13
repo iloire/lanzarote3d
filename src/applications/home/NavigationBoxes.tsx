@@ -42,13 +42,28 @@ const VoxelTitle: React.FC = () => {
   );
 };
 
+const isMobileDevice = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    || window.innerWidth < 768;
+};
+
 const MusicToggle: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [pendingAutoplay, setPendingAutoplay] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  // Check for mobile on mount
   useEffect(() => {
+    setIsMobile(isMobileDevice());
+  }, []);
+
+  useEffect(() => {
+    // Don't initialize audio on mobile
+    if (isMobile) return;
+
     const audio = new Audio();
     audio.loop = true;
     audio.volume = 0.2;
@@ -94,7 +109,7 @@ const MusicToggle: React.FC = () => {
       audio.src = '';
       audioRef.current = null;
     };
-  }, []);
+  }, [isMobile]);
 
   // Handle autoplay after user interaction with the page
   useEffect(() => {
@@ -142,6 +157,11 @@ const MusicToggle: React.FC = () => {
   const className = ['music-toggle', isLoaded && 'music-loaded', isPlaying && 'music-playing']
     .filter(Boolean)
     .join(' ');
+
+  // Don't render on mobile
+  if (isMobile) {
+    return null;
+  }
 
   const musicTitle = isPlaying ? 'Disable Music' : 'Enable Music';
   const creditTitle = `${musicTitle} | Music by patrickdearteaga.com`;
