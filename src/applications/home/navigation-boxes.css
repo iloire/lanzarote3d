@@ -214,6 +214,160 @@
 }
 
 /* =============================================
+   MUSIC TOGGLE STYLES
+   ============================================= */
+
+.music-toggle {
+  position: fixed;
+  top: 40px;
+  right: 40px;
+  z-index: 1000;
+
+  /* Reset button styles */
+  border: none;
+  padding: 0;
+  cursor: pointer;
+
+  /* Voxel-style box */
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(
+    135deg,
+    rgba(20, 20, 40, 0.85) 0%,
+    rgba(40, 40, 80, 0.9) 100%
+  );
+
+  /* Pixelated border effect */
+  border: 3px solid #4a9eff;
+  box-shadow:
+    0 0 15px rgba(74, 158, 255, 0.3),
+    inset 0 0 20px rgba(74, 158, 255, 0.1),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.2),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.3),
+    3px 3px 0 rgba(0, 0, 0, 0.4);
+
+  /* Layout */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Transition for hover effects */
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+
+  /* Font */
+  font-family: 'Press Start 2P', monospace;
+
+  /* Entrance animation */
+  animation: musicToggleFadeIn 1s ease-out 0.5s forwards;
+  opacity: 0;
+}
+
+.music-toggle.music-loaded {
+  opacity: 1;
+}
+
+@keyframes musicToggleFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.music-toggle:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.05);
+  border-color: #7ec8ff;
+  box-shadow:
+    0 0 25px rgba(74, 158, 255, 0.5),
+    inset 0 0 30px rgba(74, 158, 255, 0.2),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.3),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.3),
+    4px 4px 0 rgba(0, 0, 0, 0.3);
+}
+
+.music-toggle:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+  box-shadow:
+    0 0 10px rgba(74, 158, 255, 0.4),
+    inset 0 0 15px rgba(74, 158, 255, 0.1),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.1),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.4),
+    2px 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+.music-toggle:focus {
+  outline: none;
+  border-color: #ffcc00;
+  box-shadow:
+    0 0 20px rgba(255, 204, 0, 0.4),
+    inset 0 0 20px rgba(255, 204, 0, 0.1),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.2),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.3),
+    3px 3px 0 rgba(0, 0, 0, 0.4);
+}
+
+.music-toggle:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.music-toggle-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* Playing state - green glow */
+.music-toggle.music-playing {
+  border-color: #4aff9e;
+  box-shadow:
+    0 0 20px rgba(74, 255, 158, 0.4),
+    inset 0 0 25px rgba(74, 255, 158, 0.15),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.2),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.3),
+    3px 3px 0 rgba(0, 0, 0, 0.4);
+}
+
+.music-toggle.music-playing:hover:not(:disabled) {
+  border-color: #7effbe;
+  box-shadow:
+    0 0 30px rgba(74, 255, 158, 0.5),
+    inset 0 0 35px rgba(74, 255, 158, 0.2),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.3),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.3),
+    4px 4px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive adjustments for music toggle */
+@media (max-width: 600px) {
+  .music-toggle {
+    top: 20px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+  }
+
+  .music-toggle-icon {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 400px) {
+  .music-toggle {
+    top: 15px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .music-toggle-icon {
+    font-size: 16px;
+  }
+}
+
+/* =============================================
    NAVIGATION BOXES STYLES
    ============================================= */
 

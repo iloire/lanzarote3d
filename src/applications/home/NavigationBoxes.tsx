@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import { NAVIGATION_LINKS, NavigationLink } from './config';
 import './navigation-boxes.css';
+
+const MUSIC_ENABLED_KEY = 'lanzarote3d-music-enabled';
+const MUSIC_URL = '/assets/Looking-for-a-new-beginning.ogg';
 
 interface NavigationBoxProps {
   link: NavigationLink;
@@ -39,6 +42,77 @@ const VoxelTitle: React.FC = () => {
   );
 };
 
+const MusicToggle: React.FC = () => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    const audio = new Audio(MUSIC_URL);
+    audio.loop = true;
+    audio.volume = 0.2;
+    audioRef.current = audio;
+
+    audio.addEventListener('canplaythrough', () => {
+      setIsLoaded(true);
+    });
+
+    audio.addEventListener('error', () => {
+      console.error('Failed to load background music');
+    });
+
+    // Check localStorage for saved preference (default to enabled)
+    const savedPreference = localStorage.getItem(MUSIC_ENABLED_KEY);
+    if (savedPreference !== 'false') {
+      audio.play().then(() => {
+        setIsPlaying(true);
+      }).catch((err) => {
+        console.log('Autoplay blocked, user interaction required:', err);
+      });
+    }
+
+    return () => {
+      audio.pause();
+      audio.src = '';
+      audioRef.current = null;
+    };
+  }, []);
+
+  const toggleMusic = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (isPlaying) {
+      audio.pause();
+      setIsPlaying(false);
+      localStorage.setItem(MUSIC_ENABLED_KEY, 'false');
+    } else {
+      audio.play().then(() => {
+        setIsPlaying(true);
+        localStorage.setItem(MUSIC_ENABLED_KEY, 'true');
+      }).catch((err) => {
+        console.error('Failed to play music:', err);
+      });
+    }
+  }, [isPlaying]);
+
+  const className = ['music-toggle', isLoaded && 'music-loaded', isPlaying && 'music-playing']
+    .filter(Boolean)
+    .join(' ');
+
+  return (
+    <button
+      className={className}
+      onClick={toggleMusic}
+      title={isPlaying ? 'Disable Music' : 'Enable Music'}
+      aria-label={isPlaying ? 'Disable background music' : 'Enable background music'}
+      disabled={!isLoaded}
+    >
+      <span className="music-toggle-icon">{isPlaying ? '🔊' : '🔇'}</span>
+    </button>
+  );
+};
+
 const NavigationBoxes: React.FC = () => {
   const pilotLinks = NAVIGATION_LINKS.filter((link) => link.category === 'pilot');
   const generalLinks = NAVIGATION_LINKS.filter((link) => link.category === 'general');
@@ -46,6 +120,7 @@ const NavigationBoxes: React.FC = () => {
   return (
     <>
       <VoxelTitle />
+      <MusicToggle />
       <div className="navigation-boxes-container">
         <p className="voxel-tagline">Are you ready to play?</p>
 
