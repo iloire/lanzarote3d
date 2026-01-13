@@ -42,6 +42,7 @@ const NavigationBoxes: React.FC = () => {
     <>
       <VoxelTitle />
       <div className="navigation-boxes-container">
+        <p className="voxel-tagline">Are you ready to play?</p>
         <div className="navigation-boxes">
           {NAVIGATION_LINKS.map((link) => (
             <NavigationBox key={link.id} link={link} />
