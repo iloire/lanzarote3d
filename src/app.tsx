@@ -118,6 +118,11 @@ const App: React.FC<AppProps> = ({
     const renderer = createRenderer(SCENE_CONFIG.sizes);
     setRenderer(renderer);
 
+    // Show FPS stats in development mode, but not for the home app
+    if (process.env.NODE_ENV === 'development' && initialStory !== 'home') {
+      document.getElementById('stats')?.appendChild(stats.dom);
+    }
+
     const scene = new THREE.Scene();
 
     // Camera setup (no terrain dependency)
@@ -239,7 +244,7 @@ const App: React.FC<AppProps> = ({
 const stats = new Stats();
 if (process.env.NODE_ENV === 'development') {
   stats.showPanel(0);
-  document.getElementById('stats')?.appendChild(stats.dom);
+  // Stats will be appended conditionally in App component based on current app
 }
 
 export default App;
