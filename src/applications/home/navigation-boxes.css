@@ -1,0 +1,237 @@
+/* Navigation Boxes - Voxel/Pixelated Style HUD */
+
+/* Import a pixel-style font */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+.navigation-boxes-container {
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  pointer-events: auto;
+}
+
+.navigation-boxes {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-box {
+  /* Reset button styles */
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+
+  /* Voxel-style box */
+  width: 140px;
+  height: 140px;
+  background: linear-gradient(
+    135deg,
+    rgba(20, 20, 40, 0.85) 0%,
+    rgba(40, 40, 80, 0.9) 100%
+  );
+
+  /* Pixelated border effect */
+  border: 4px solid #4a9eff;
+  box-shadow:
+    /* Outer glow */
+    0 0 20px rgba(74, 158, 255, 0.3),
+    /* Inner highlight */
+    inset 0 0 30px rgba(74, 158, 255, 0.1),
+    /* 3D effect - top/left highlight */
+    inset 2px 2px 0 rgba(255, 255, 255, 0.2),
+    /* 3D effect - bottom/right shadow */
+    inset -2px -2px 0 rgba(0, 0, 0, 0.3),
+    /* Drop shadow */
+    4px 4px 0 rgba(0, 0, 0, 0.4);
+
+  /* Pixelated rendering for crisp edges */
+  image-rendering: pixelated;
+
+  /* Layout */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  /* Transition for hover effects */
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+
+  /* Font */
+  font-family: 'Press Start 2P', monospace;
+  color: #ffffff;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+.nav-box:hover {
+  transform: translateY(-4px) scale(1.05);
+  border-color: #7ec8ff;
+  box-shadow:
+    0 0 30px rgba(74, 158, 255, 0.5),
+    inset 0 0 40px rgba(74, 158, 255, 0.2),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.3),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.3),
+    6px 6px 0 rgba(0, 0, 0, 0.3);
+}
+
+.nav-box:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow:
+    0 0 15px rgba(74, 158, 255, 0.4),
+    inset 0 0 20px rgba(74, 158, 255, 0.1),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.1),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.4),
+    2px 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+.nav-box:focus {
+  outline: none;
+  border-color: #ffcc00;
+  box-shadow:
+    0 0 25px rgba(255, 204, 0, 0.4),
+    inset 0 0 30px rgba(255, 204, 0, 0.1),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.2),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.3),
+    4px 4px 0 rgba(0, 0, 0, 0.4);
+}
+
+.nav-box-icon {
+  font-size: 36px;
+  line-height: 1;
+  /* Disable font-family for emoji to render properly */
+  font-family: inherit;
+  /* Add slight animation */
+  animation: float 3s ease-in-out infinite;
+}
+
+.nav-box:nth-child(1) .nav-box-icon {
+  animation-delay: 0s;
+}
+
+.nav-box:nth-child(2) .nav-box-icon {
+  animation-delay: 0.5s;
+}
+
+.nav-box:nth-child(3) .nav-box-icon {
+  animation-delay: 1s;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.nav-box-label {
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.nav-box-description {
+  font-size: 6px;
+  opacity: 0.7;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+/* Individual box color variations */
+.nav-box:nth-child(1) {
+  border-color: #4a9eff;
+}
+
+.nav-box:nth-child(1):hover {
+  border-color: #7ec8ff;
+  box-shadow:
+    0 0 30px rgba(74, 158, 255, 0.5),
+    inset 0 0 40px rgba(74, 158, 255, 0.2),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.3),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.3),
+    6px 6px 0 rgba(0, 0, 0, 0.3);
+}
+
+.nav-box:nth-child(2) {
+  border-color: #4aff9e;
+}
+
+.nav-box:nth-child(2):hover {
+  border-color: #7effbe;
+  box-shadow:
+    0 0 30px rgba(74, 255, 158, 0.5),
+    inset 0 0 40px rgba(74, 255, 158, 0.2),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.3),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.3),
+    6px 6px 0 rgba(0, 0, 0, 0.3);
+}
+
+.nav-box:nth-child(3) {
+  border-color: #ff9e4a;
+}
+
+.nav-box:nth-child(3):hover {
+  border-color: #ffbe7e;
+  box-shadow:
+    0 0 30px rgba(255, 158, 74, 0.5),
+    inset 0 0 40px rgba(255, 158, 74, 0.2),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.3),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.3),
+    6px 6px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .navigation-boxes-container {
+    bottom: 20px;
+  }
+
+  .navigation-boxes {
+    gap: 12px;
+  }
+
+  .nav-box {
+    width: 100px;
+    height: 100px;
+    border-width: 3px;
+  }
+
+  .nav-box-icon {
+    font-size: 28px;
+  }
+
+  .nav-box-label {
+    font-size: 8px;
+  }
+
+  .nav-box-description {
+    display: none;
+  }
+}
+
+@media (max-width: 400px) {
+  .navigation-boxes {
+    gap: 8px;
+  }
+
+  .nav-box {
+    width: 80px;
+    height: 80px;
+  }
+
+  .nav-box-icon {
+    font-size: 24px;
+  }
+
+  .nav-box-label {
+    font-size: 6px;
+  }
+}

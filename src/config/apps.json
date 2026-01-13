@@ -1,5 +1,14 @@
 {
   "apps": {
+    "home": {
+      "name": "Home",
+      "description": "Landing page with navigation to paragliding services",
+      "route": "/home",
+      "category": "experience",
+      "requiresWebGL": true,
+      "visibility": "public",
+      "priority": 0
+    },
     "flyzones": {
       "name": "Flyzones",
       "description": "Explore flyzing locations in 3D",
