@@ -82,6 +82,10 @@ const App: React.FC<AppProps> = ({
   const [showAppSelection] = useState(initialShowAppSelection);
   const [renderer, setRenderer] = useState<THREE.WebGLRenderer | null>(null);
 
+  // Get current app name for title display
+  const currentAppConfig = initialStory ? getAppConfig(initialStory) : null;
+  const appName = currentAppConfig?.name || 'Lanzarote 3D';
+
   const initThree = async () => {
     const renderer = createRenderer(SCENE_CONFIG.sizes);
     setRenderer(renderer);
@@ -198,6 +202,7 @@ const App: React.FC<AppProps> = ({
           showPrivate={typeof showPrivate === 'undefined' ? false : showPrivate}
         />
       )}
+      <div className="app-title">{appName}</div>
       <canvas className="webgl" />
     </div>
   );

@@ -549,3 +549,24 @@ body {
   z-index: 1;
   pointer-events: auto;
 }
+
+/* Subtle app title in top right */
+.app-title {
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.75em;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  z-index: 100;
+  pointer-events: none;
+  font-weight: 400;
+}
+
+/* Hide app title on mobile (already shown in mobile header) */
+@media (max-width: 1024px) {
+  .app-title {
+    display: none;
+  }
+}
