@@ -1,6 +1,7 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
+const Dotenv = require("dotenv-webpack");
 
 /**
  * Build configuration from apps.json
@@ -21,6 +22,7 @@ const showcaseApps = Object.entries(appsConfig.apps)
   .map(([appKey, app]) => ({
     name: appKey,
     title: `Lanzarote - ${app.name}`,
+    description: app.description || 'Experience paragliding in Lanzarote through immersive 3D visualization',
     filename: app.route.replace(/^\//, '') + '.html',
     // Use custom webpack entry if specified (e.g., tile-debug), otherwise use standard index.tsx
     entry: app.webpackEntry
@@ -57,7 +59,7 @@ module.exports = {
   devServer: {
     port: 8080,
     open: {
-      target: ['famara-animation.html'], // Open default app instead of file browser
+      target: ['home.html'], // Open default app instead of file browser
     },
     static: [
       {
@@ -141,16 +143,18 @@ module.exports = {
         chunks: [app.name],
         filename: app.filename,
         title: app.title,
+        description: app.description,
         inject: 'body',
         minify: false
       })
     ),
-    // Create index.html that redirects to the main animation
+    // Create index.html that loads the home app
     new HtmlWebpackPlugin({
       template: path.join(__dirname, 'src/templates/showcase.html'),
-      chunks: ['animation'],
+      chunks: ['home'],
       filename: 'index.html',
-      title: 'Lanzarote - Famara animation',
+      title: 'Lanzarote Paragliding - 3D Flight Experience',
+      description: 'Experience paragliding in Lanzarote through stunning 3D visualization. Explore Famara beach, watch pilots soar over volcanic landscapes of the Canary Islands.',
       inject: 'body',
       minify: false
     }),
@@ -165,7 +169,19 @@ module.exports = {
           from: 'assets/favicon.svg',
           to: 'favicon.svg',
         },
+        {
+          from: 'assets/robots.txt',
+          to: 'robots.txt',
+        },
+        {
+          from: 'assets/sitemap.xml',
+          to: 'sitemap.xml',
+        },
       ],
+    }),
+    // Load environment variables from .env file
+    new Dotenv({
+      systemvars: true, // Also load system env vars
     }),
   ],
 }; 
