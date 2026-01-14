@@ -97,22 +97,29 @@
 
 .voxel-tagline {
   font-family: 'Press Start 2P', monospace;
-  font-size: 18px;
-  letter-spacing: 3px;
+  font-size: 24px;
+  letter-spacing: 4px;
   color: #ffcc00;
   text-align: center;
   margin: 0 0 24px 0;
 
-  /* Voxel-style 3D text effect */
+  /* Voxel-style 3D text effect with strong outline for readability */
   text-shadow:
+    /* Strong black outline for contrast */
+    -2px -2px 0 #000,
+    2px -2px 0 #000,
+    -2px 2px 0 #000,
+    2px 2px 0 #000,
+    -3px 0 0 #000,
+    3px 0 0 #000,
+    0 -3px 0 #000,
+    0 3px 0 #000,
     /* Main shadow layers for 3D depth */
-    2px 2px 0 #8a6600,
-    4px 4px 0 #4a3800,
+    3px 3px 0 #8a6600,
+    5px 5px 0 #4a3800,
     /* Glow effect */
-    0 0 25px rgba(255, 204, 0, 0.6),
-    0 0 50px rgba(255, 204, 0, 0.3),
-    /* Inner highlight */
-    -1px -1px 0 rgba(255, 255, 255, 0.2);
+    0 0 30px rgba(255, 204, 0, 0.7),
+    0 0 60px rgba(255, 204, 0, 0.4);
 
   /* Delayed entrance animation */
   animation: taglineFadeIn 1s ease-out 1s forwards, taglinePulse 2s ease-in-out 2s infinite;
@@ -133,19 +140,33 @@
 @keyframes taglinePulse {
   0%, 100% {
     text-shadow:
-      2px 2px 0 #8a6600,
-      4px 4px 0 #4a3800,
-      0 0 25px rgba(255, 204, 0, 0.6),
-      0 0 50px rgba(255, 204, 0, 0.3),
-      -1px -1px 0 rgba(255, 255, 255, 0.2);
+      -2px -2px 0 #000,
+      2px -2px 0 #000,
+      -2px 2px 0 #000,
+      2px 2px 0 #000,
+      -3px 0 0 #000,
+      3px 0 0 #000,
+      0 -3px 0 #000,
+      0 3px 0 #000,
+      3px 3px 0 #8a6600,
+      5px 5px 0 #4a3800,
+      0 0 30px rgba(255, 204, 0, 0.7),
+      0 0 60px rgba(255, 204, 0, 0.4);
   }
   50% {
     text-shadow:
-      2px 2px 0 #8a6600,
-      4px 4px 0 #4a3800,
-      0 0 35px rgba(255, 204, 0, 0.8),
-      0 0 70px rgba(255, 204, 0, 0.5),
-      -1px -1px 0 rgba(255, 255, 255, 0.3);
+      -2px -2px 0 #000,
+      2px -2px 0 #000,
+      -2px 2px 0 #000,
+      2px 2px 0 #000,
+      -3px 0 0 #000,
+      3px 0 0 #000,
+      0 -3px 0 #000,
+      0 3px 0 #000,
+      3px 3px 0 #8a6600,
+      5px 5px 0 #4a3800,
+      0 0 45px rgba(255, 204, 0, 0.9),
+      0 0 80px rgba(255, 204, 0, 0.6);
   }
 }
 
@@ -170,7 +191,7 @@
   }
 
   .voxel-tagline {
-    font-size: 12px;
+    font-size: 18px;
     margin-bottom: 16px;
   }
 }
@@ -203,13 +224,20 @@
   }
 
   .voxel-tagline {
-    font-size: 12px;
-    letter-spacing: 1px;
+    font-size: 14px;
+    letter-spacing: 2px;
     margin-bottom: 12px;
     text-shadow:
-      1px 1px 0 #8a6600,
-      2px 2px 0 #4a3800,
-      0 0 15px rgba(255, 204, 0, 0.5);
+      -1px -1px 0 #000,
+      1px -1px 0 #000,
+      -1px 1px 0 #000,
+      1px 1px 0 #000,
+      -2px 0 0 #000,
+      2px 0 0 #000,
+      0 -2px 0 #000,
+      0 2px 0 #000,
+      2px 2px 0 #8a6600,
+      0 0 20px rgba(255, 204, 0, 0.6);
   }
 }
 
@@ -652,7 +680,7 @@
 
 /* Pilot boxes - smaller and more subtle */
 .navigation-pilot-boxes .nav-box {
-  width: 100px;
+  width: 120px;
   height: 100px;
   opacity: 0.85;
 }
@@ -724,16 +752,16 @@
   }
 
   .nav-box-featured {
-    width: 140px;
-    height: 120px;
+    width: 180px;
+    height: 140px;
   }
 
   .nav-box-featured .nav-box-icon {
-    font-size: 32px;
+    font-size: 38px;
   }
 
   .nav-box-featured .nav-box-label {
-    font-size: 10px;
+    font-size: 11px;
   }
 
   .nav-box-featured .nav-box-description {
@@ -741,20 +769,21 @@
   }
 
   .nav-box-featured .nav-box-subtext {
-    display: none;
+    font-size: 8px;
+    margin-top: 6px;
   }
 
   .navigation-pilot-boxes .nav-box {
-    width: 80px;
-    height: 80px;
+    width: 115px;
+    height: 100px;
   }
 
   .navigation-pilot-boxes .nav-box-icon {
-    font-size: 22px;
+    font-size: 28px;
   }
 
   .navigation-pilot-boxes .nav-box-label {
-    font-size: 7px;
+    font-size: 8px;
   }
 
   .navigation-pilot-boxes .nav-box-description {
@@ -762,42 +791,46 @@
   }
 
   .navigation-pilot-label {
-    font-size: 6px;
+    font-size: 7px;
   }
 }
 
 @media (max-width: 400px) {
   .navigation-boxes-container {
-    gap: 8px;
+    gap: 10px;
   }
 
   .nav-box-featured {
-    width: 120px;
-    height: 100px;
+    width: 160px;
+    height: 130px;
   }
 
   .nav-box-featured .nav-box-icon {
-    font-size: 28px;
+    font-size: 34px;
   }
 
   .nav-box-featured .nav-box-label {
-    font-size: 8px;
+    font-size: 10px;
+  }
+
+  .nav-box-featured .nav-box-subtext {
+    font-size: 7px;
   }
 
   .navigation-pilot-boxes {
-    gap: 8px;
+    gap: 10px;
   }
 
   .navigation-pilot-boxes .nav-box {
-    width: 70px;
-    height: 70px;
+    width: 105px;
+    height: 90px;
   }
 
   .navigation-pilot-boxes .nav-box-icon {
-    font-size: 18px;
+    font-size: 24px;
   }
 
   .navigation-pilot-boxes .nav-box-label {
-    font-size: 6px;
+    font-size: 7px;
   }
 }

@@ -226,15 +226,15 @@ export interface NavigationLink {
 export const NAVIGATION_LINKS: NavigationLink[] = [
   {
     id: 'wind',
-    label: 'Wind',
-    description: 'Wind Forecast',
+    label: 'Conditions',
+    description: 'Current Conditions',
     url: 'https://wind.lanzaroteparagliding.com?ref=home',
     icon: '\uD83C\uDF2C\uFE0F', // wind emoji
     category: 'pilot',
   },
   {
     id: 'guide',
-    label: 'Guide',
+    label: 'Pilot Guide',
     description: 'Flying Guide',
     url: 'https://guide.lanzaroteparagliding.com?ref=home',
     icon: '\uD83D\uDDFA\uFE0F', // map emoji
