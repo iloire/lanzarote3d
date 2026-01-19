@@ -21,11 +21,11 @@
   <meta name="keywords" content="paragliding, Lanzarote, Famara, 3D visualization, flying, Canary Islands" />
   <meta name="author" content="Lanzarote Paragliding" />
   <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://lanzaroteparagliding.com/<%= htmlWebpackPlugin.options.filename %>" />
+  <link rel="canonical" href="https://lanzaroteparagliding.com/<%= htmlWebpackPlugin.options.filename === 'index.html' ? '' : htmlWebpackPlugin.options.filename %>" />
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://lanzaroteparagliding.com/<%= htmlWebpackPlugin.options.filename %>" />
+  <meta property="og:url" content="https://lanzaroteparagliding.com/<%= htmlWebpackPlugin.options.filename === 'index.html' ? '' : htmlWebpackPlugin.options.filename %>" />
   <meta property="og:title" content="<%= htmlWebpackPlugin.options.title %>" />
   <meta property="og:description" content="<%= htmlWebpackPlugin.options.description %>" />
   <meta property="og:image" content="https://lanzaroteparagliding.com/assets/og-image.jpg" />
@@ -36,7 +36,7 @@
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:url" content="https://lanzaroteparagliding.com/<%= htmlWebpackPlugin.options.filename %>" />
+  <meta name="twitter:url" content="https://lanzaroteparagliding.com/<%= htmlWebpackPlugin.options.filename === 'index.html' ? '' : htmlWebpackPlugin.options.filename %>" />
   <meta name="twitter:title" content="<%= htmlWebpackPlugin.options.title %>" />
   <meta name="twitter:description" content="<%= htmlWebpackPlugin.options.description %>" />
   <meta name="twitter:image" content="https://lanzaroteparagliding.com/assets/og-image.jpg" />
