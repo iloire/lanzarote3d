@@ -33,7 +33,12 @@ function getStoryName(): string {
 
   // Extract from HTML filename
   const pathMatch = currentPath.match(/\/([^/]+)\.html$/);
-  if (pathMatch) return pathMatch[1];
+  if (pathMatch) {
+    const filename = pathMatch[1];
+    // index.html should map to home app
+    if (filename === 'index') return 'home';
+    return filename;
+  }
 
   // Root path or index.html -> default
   if (currentPath === '/' || currentPath === '/index.html') {
