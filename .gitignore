@@ -9,5 +9,4 @@ TODO.md
 .next
 external-embed/dist
 .yarn/
-.env
 .claude/settings.local.json
