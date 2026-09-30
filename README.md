@@ -99,6 +99,12 @@ npm run deploy-placeholder
 
 All deployment scripts automatically use the `lanzaroteparagliding` AWS profile.
 
+## Archived branches
+
+Kept on the remote for reference only. They are not meant to be merged.
+
+- **`flier-cursor`** (March to September 2025, 87 commits): an experiment to replace the hand-rolled flight model with a rigid-body simulation in `cannon-es`. It has a glider and pilot joined by segmented ropes with lift applied at 16 points across the wing (`src/stories/physics/`), a `PhysicsFlier` class for the flier story, a standalone airplane sandbox (`src/stories/cannon.tsx`), a flight HUD, a force-vector visualizer and design notes in `src/docs/`. It was never finished: drag and brake forces are switched off and the constants are tuned by hand. `master` went with its own `ParagliderPhysics` instead, and the branch still uses the old `src/stories/` layout. The multi-point lift model and the docs are the parts worth reading if rigid-body physics is revisited.
+
 ## TODO
 
 - wing selection
