@@ -15,7 +15,7 @@ This folder contains a standalone, deployable package for embedding the Lanzarot
 From the project root, run:
 
 ```bash
-yarn build-external-embed
+npm run build-external-embed
 ```
 
 This will:
@@ -28,7 +28,7 @@ This will:
 To run without rebuilding:
 
 ```bash
-yarn run-external-embed
+npm run run-external-embed
 ```
 
 ## Deployment
@@ -139,7 +139,7 @@ The animation settings can be modified in the source files:
 - Animation duration: `src/applications/famara-animation/config.ts`
 - LOD settings: `src/applications/famara-animation/index.tsx`
 
-After modifications, rebuild with `yarn build-external-embed`.
+After modifications, rebuild with `npm run build-external-embed`.
 
 ## License
 

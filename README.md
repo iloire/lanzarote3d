@@ -35,10 +35,10 @@ This project uses AWS S3 for deployment. You need to configure AWS CLI with the 
 
 ```bash
 # Install dependencies
-yarn install
+npm install
 
 # Start development server
-yarn dev
+npm run dev
 ```
 
 #### Dev Mode in Production
@@ -88,13 +88,13 @@ The project can be deployed to different S3 buckets:
 
 ```bash
 # Deploy to staging environment
-yarn deploy-staging
+npm run deploy-staging
 
 # Deploy to flyzones environment
-yarn deploy-flyzones
+npm run deploy-flyzones
 
 # Deploy to placeholder environment
-yarn deploy-placeholder
+npm run deploy-placeholder
 ```
 
 All deployment scripts automatically use the `lanzaroteparagliding` AWS profile.

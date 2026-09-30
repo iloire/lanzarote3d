@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## [Unreleased] - 2026-09-30 12:22 UTC
+
+### Changed
+- **npm is the only package manager**: scripts call `npm run` instead of `yarn`, `yarn.lock` is removed, and `package-lock.json` is resynced (it was missing `dotenv-webpack`)
+
 ## [1.6.0] - 2025-10-02 00:00 UTC
 
 ### Added

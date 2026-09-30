@@ -8,5 +8,4 @@ built/*
 TODO.md
 .next
 external-embed/dist
-.yarn/
 .claude/settings.local.json
