@@ -244,8 +244,15 @@ export const NAVIGATION_LINKS: NavigationLink[] = [
     id: 'tandem',
     label: 'Tandem',
     description: 'Try Paragliding!',
-    url: 'https://venturilanzarote.com?ref=home',
+    url: 'https://venturilanzarote.com/tandem-paragliding-lanzarote?utm_source=lanzaroteparagliding.com&utm_medium=3d-island&utm_campaign=tandem-card',
     icon: '\uD83E\uDE82', // parachute emoji
     category: 'general',
   },
 ];
+
+/**
+ * True when the scene is shown inside another page (?embed=1), e.g. the
+ * lanzaroteparagliding.com landing page. The host page has its own title and
+ * links, so the scene renders without its overlay.
+ */
+export const isEmbedded = (): boolean => new URLSearchParams(window.location.search).has('embed');

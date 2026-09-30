@@ -4,7 +4,12 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 
 ## [Unreleased] - 2026-09-30 12:22 UTC
 
+### Added
+- **Embed mode for the home scene**: `?embed=1` hides the title, music button and navigation cards, so the scene can sit inside the lanzaroteparagliding.com landing page
+
 ### Changed
+- **Pages are addressed under `/3d/`**: canonical and social URLs point at `/3d/…`, where this build is served once the landing page takes the root domain
+- **Tandem card carries campaign parameters**: it links to the operator's booking page with `utm_*` tags instead of `?ref=home`, so bookings from the 3D scene can be attributed
 - **npm is the only package manager**: scripts call `npm run` instead of `yarn`, `yarn.lock` is removed, and `package-lock.json` is resynced (it was missing `dotenv-webpack`)
 
 ## [1.6.0] - 2025-10-02 00:00 UTC

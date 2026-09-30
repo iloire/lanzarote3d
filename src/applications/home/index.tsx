@@ -31,6 +31,7 @@ import {
   SHOW_CAMERA_TARGET_UI,
   ANIMATION_DURATION_MS,
   birdPath,
+  isEmbedded,
 } from './config';
 import {
   loadParagliders,
@@ -288,7 +289,9 @@ class HomeApp extends TerrainBase {
       }
 
       // Setup navigation boxes UI
-      this.setupNavigationUI();
+      if (!isEmbedded()) {
+        this.setupNavigationUI();
+      }
 
       this.setupCameraAnimation(camera, controls, renderer, scene);
 
