@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## [Unreleased] - 2026-10-03 16:19 UTC
+
+### Changed
+- **Pages are addressed on `3d.lanzaroteparagliding.com`**: canonical, social URLs and the share image point at the build's own subdomain instead of `lanzaroteparagliding.com/3d/…`; the landing page there embeds and links to the subdomain directly rather than proxying it, and redirects the old `/3d/…` and `/<page>.html` addresses to it
+
 ## [Unreleased] - 2026-09-30 12:22 UTC
 
 ### Added
