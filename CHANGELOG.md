@@ -2,6 +2,15 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## [Unreleased] - 2026-10-03 23:25 UTC
+
+### Fixed
+- **Scenes render about ten times faster**: the home scene issued about 8,100 draw calls a frame and now issues about 900 (measured in headless Chromium, where it went from 0.25 to 2.8 fps)
+  - The sun's point light no longer casts shadows. A point light renders its shadow map six times (a cube), drawing every shadow caster in the scene again for each face, and the directional light already casts the scene's shadows
+  - Towns are baked into one mesh per material after they are placed (`mergeStaticMeshes` in `src/foundation/utils/mergeStatic.ts`): about 6,300 house, plot, pool and cactus meshes become about 30
+  - Smoke trails draw every puff as an instance of one mesh instead of a mesh per puff, which takes several hundred draw calls a frame off Island Flying. Puffs keep a fixed opacity; the fade-out set the opacity of the one material all puffs shared, so it flickered rather than faded
+- **Debug arrows hidden**: the velocity and heading arrows on the aircraft in the home and Famara scenes were switched on
+
 ## [Unreleased] - 2026-10-03 22:48 UTC
 
 ### Changed

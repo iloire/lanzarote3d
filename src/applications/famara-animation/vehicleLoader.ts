@@ -19,7 +19,7 @@ export interface VehicleLoadResult {
   smokeTrail?: SmokeTrail;
 }
 
-const DEBUG_VECTORS = true;
+const DEBUG_VECTORS = false;
 /**
  * Loads paraglider vehicles into the scene
  */

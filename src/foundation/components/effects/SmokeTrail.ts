@@ -13,7 +13,8 @@ export interface SmokeTrailOptions {
 }
 
 interface SmokeParticle {
-  mesh: THREE.Mesh;
+  position: THREE.Vector3;
+  size: number;
   velocity: THREE.Vector3;
   age: number;
   lifetime: number;
@@ -26,8 +27,8 @@ interface SmokeParticle {
  * SmokeTrail - Particle system for aircraft smoke trails
  *
  * Creates a realistic smoke trail effect behind aircraft engines.
- * Uses instanced geometry for performance with many particles.
- * Particles grow, fade, and drift over their lifetime.
+ * All particles are instances of one InstancedMesh, so a trail is a single draw call.
+ * Particles grow and drift over their lifetime.
  */
 export class SmokeTrail {
   private group: THREE.Group;
@@ -35,6 +36,10 @@ export class SmokeTrail {
   private options: Required<SmokeTrailOptions>;
   private timeSinceLastEmission: number = 0;
   private material: THREE.MeshStandardMaterial;
+  private mesh: THREE.InstancedMesh;
+  private readonly matrix = new THREE.Matrix4();
+  private readonly scale = new THREE.Vector3();
+  private readonly rotation = new THREE.Quaternion();
 
   constructor(options: SmokeTrailOptions = {}) {
     this.group = new THREE.Group();
@@ -74,16 +79,17 @@ export class SmokeTrail {
       () => new THREE.SphereGeometry(1, 8, 6)
     );
 
-    for (let i = 0; i < this.options.maxParticles; i++) {
-      // CRITICAL FIX: Share material across all particles instead of cloning
-      // Was creating 100-120 unique materials per smoke trail, now shares 1 material
-      const mesh = new THREE.Mesh(geometry, this.material);
-      mesh.visible = false;
-      mesh.scale.set(0, 0, 0);
-      this.group.add(mesh);
+    this.mesh = new THREE.InstancedMesh(geometry, this.material, this.options.maxParticles);
+    this.mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    // Particles drift far from the origin of the instanced mesh, so its bounds never fit them.
+    this.mesh.frustumCulled = false;
+    this.mesh.count = 0;
+    this.group.add(this.mesh);
 
+    for (let i = 0; i < this.options.maxParticles; i++) {
       this.particles.push({
-        mesh,
+        position: new THREE.Vector3(),
+        size: 0,
         velocity: new THREE.Vector3(),
         age: 0,
         lifetime: 0,
@@ -109,13 +115,11 @@ export class SmokeTrail {
     particle.initialSize = this.options.initialSize * (0.8 + Math.random() * 0.4);
     particle.finalSize = this.options.finalSize * (0.8 + Math.random() * 0.4);
 
-    // Set position
-    particle.mesh.position.copy(position);
-
-    // Add some random offset
-    particle.mesh.position.x += (Math.random() - 0.5) * 2;
-    particle.mesh.position.y += (Math.random() - 0.5) * 2;
-    particle.mesh.position.z += (Math.random() - 0.5) * 2;
+    // Set position, with some random offset
+    particle.position.copy(position);
+    particle.position.x += (Math.random() - 0.5) * 2;
+    particle.position.y += (Math.random() - 0.5) * 2;
+    particle.position.z += (Math.random() - 0.5) * 2;
 
     // Set velocity (inherit aircraft velocity + turbulence)
     particle.velocity.copy(velocity);
@@ -124,10 +128,7 @@ export class SmokeTrail {
     particle.velocity.y += Math.random() * this.options.turbulence * 0.5; // Slight upward drift
     particle.velocity.z += (Math.random() - 0.5) * this.options.turbulence;
 
-    // Reset visual properties
-    particle.mesh.visible = true;
-    particle.mesh.scale.setScalar(particle.initialSize);
-    (particle.mesh.material as THREE.MeshStandardMaterial).opacity = 0.6;
+    particle.size = particle.initialSize;
   }
 
   /**
@@ -145,7 +146,8 @@ export class SmokeTrail {
       this.timeSinceLastEmission -= emissionInterval;
     }
 
-    // Update existing particles
+    // Update existing particles, packing the live ones into the first instances
+    let count = 0;
     for (const particle of this.particles) {
       if (!particle.active) continue;
 
@@ -155,7 +157,6 @@ export class SmokeTrail {
       // Deactivate if lifetime exceeded
       if (particle.age >= particle.lifetime) {
         particle.active = false;
-        particle.mesh.visible = false;
         continue;
       }
 
@@ -163,26 +164,20 @@ export class SmokeTrail {
       const progress = particle.age / particle.lifetime;
 
       // Update position with velocity and drag
-      particle.mesh.position.x += particle.velocity.x * deltaTime;
-      particle.mesh.position.y += particle.velocity.y * deltaTime;
-      particle.mesh.position.z += particle.velocity.z * deltaTime;
+      particle.position.addScaledVector(particle.velocity, deltaTime);
 
       // Apply drag (smoke slows down)
       particle.velocity.multiplyScalar(0.98);
 
       // Scale grows over time
-      const currentSize = THREE.MathUtils.lerp(
-        particle.initialSize,
-        particle.finalSize,
-        progress
-      );
-      particle.mesh.scale.setScalar(currentSize);
+      particle.size = THREE.MathUtils.lerp(particle.initialSize, particle.finalSize, progress);
 
-      // Opacity fades out over time (faster fade at the end)
-      const fadeProgress = progress < 0.7 ? 0 : (progress - 0.7) / 0.3;
-      const opacity = THREE.MathUtils.lerp(0.6, 0, fadeProgress);
-      (particle.mesh.material as THREE.MeshStandardMaterial).opacity = opacity;
+      this.matrix.compose(particle.position, this.rotation, this.scale.setScalar(particle.size));
+      this.mesh.setMatrixAt(count++, this.matrix);
     }
+
+    this.mesh.count = count;
+    this.mesh.instanceMatrix.needsUpdate = true;
   }
 
   /**
@@ -205,8 +200,8 @@ export class SmokeTrail {
   public clear(): void {
     for (const particle of this.particles) {
       particle.active = false;
-      particle.mesh.visible = false;
     }
+    this.mesh.count = 0;
   }
 
   /**
@@ -214,12 +209,7 @@ export class SmokeTrail {
    */
   public dispose(): void {
     this.clear();
-
-    // Dispose materials
-    for (const particle of this.particles) {
-      if (particle.mesh.material) {
-        (particle.mesh.material as THREE.Material).dispose();
-      }
-    }
+    this.material.dispose();
+    this.mesh.dispose();
   }
 }

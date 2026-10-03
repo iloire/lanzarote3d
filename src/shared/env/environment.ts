@@ -41,6 +41,7 @@ import { BoatConfig, BoatGroupConfig } from './boat-group-types';
 import { CarGroupCreator } from './car-group-creator';
 import { CarConfig, CarGroupConfig } from './car-group-types';
 import { HouseGroupCreator } from './house-group-creator';
+import { mergeStaticMeshes } from '../../foundation/utils/mergeStatic';
 
 /**
  * Boat type weights for realistic marine distribution
@@ -413,7 +414,7 @@ class Environment {
    * @param terrain - Terrain mesh for height adaptation
    * @param lowPoly - Whether to use low-poly models (default: true)
    * @param levelOfDetail - LOD level for houses (optional, overrides lowPoly if provided)
-   * @returns Array of all created house meshes
+   * @returns The created house objects. Their meshes are merged into shared scene meshes, so they are no longer in the scene
    */
   async addTownsFromConfig(
     towns: TownConfig[],
@@ -422,6 +423,7 @@ class Environment {
     levelOfDetail?: LevelOfDetail
   ): Promise<THREE.Object3D[]> {
     const allHouses: THREE.Object3D[] = [];
+    const existing = new Set(this.scene.children);
 
     for (const town of towns) {
       const houses = await this.addTown(town.position, terrain, {
@@ -433,6 +435,12 @@ class Environment {
       });
       allHouses.push(...houses);
     }
+
+    // Towns are thousands of small static meshes (houses, plots, pools, cacti);
+    // baking them into one mesh per material keeps them to a few dozen draw calls.
+    const added = this.scene.children.filter(child => !existing.has(child));
+    const merged = mergeStaticMeshes(added, this.scene);
+    logger.info(`🏘️ Merged ${added.length} town objects into ${merged.length} meshes`);
 
     return allHouses;
   }

@@ -206,7 +206,9 @@ export default class Sky extends THREE.Object3D {
       LIGHTING_CONFIG.POINT_LIGHT_INTENSITY,
       0 // Infinite range
     );
-    this.pointLight.castShadow = true;
+    // No shadows: a point light renders its shadow map six times (a cube) and the
+    // directional light below already casts the scene's shadows.
+    this.pointLight.castShadow = false;
     this.pointLight.color.setHSL(0.995, 0.5, 0.9); // Warm sunlight color
     this.pointLight.position.copy(this.sunPosition.clone().multiplyScalar(1000000));
 
