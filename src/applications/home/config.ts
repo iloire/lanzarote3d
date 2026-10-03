@@ -213,40 +213,39 @@ export const birdPath = [
   new THREE.Vector3(7000, 900, 0),
 ];
 
-// Navigation box configuration
-export interface NavigationLink {
-  id: string;
+// Scene picker: the public animations, opened in place of the home scene.
+// `app` is the key in src/config/apps.json, which owns the page's route.
+export interface SceneLink {
+  app: string;
   label: string;
   description: string;
-  url: string;
   icon: string;
-  category: 'pilot' | 'general';
 }
 
-export const NAVIGATION_LINKS: NavigationLink[] = [
+export const SCENE_LINKS: SceneLink[] = [
   {
-    id: 'wind',
-    label: 'Conditions',
-    description: 'Current Conditions',
-    url: 'https://wind.lanzaroteparagliding.com?ref=home',
-    icon: '\uD83C\uDF2C\uFE0F', // wind emoji
-    category: 'pilot',
+    app: 'animation',
+    label: 'Famara',
+    description: 'Golden hour on the cliff',
+    icon: '\uD83C\uDF05', // sunrise emoji
   },
   {
-    id: 'guide',
-    label: 'Pilot Guide',
-    description: 'Flying Guide',
-    url: 'https://guide.lanzaroteparagliding.com?ref=home',
-    icon: '\uD83D\uDDFA\uFE0F', // map emoji
-    category: 'pilot',
+    app: 'boatsanimation',
+    label: 'Boats',
+    description: 'From the sea to the sky',
+    icon: '\u26F5', // sailboat emoji
   },
   {
-    id: 'tandem',
-    label: 'Tandem',
-    description: 'Try Paragliding!',
-    url: 'https://venturilanzarote.com/tandem-paragliding-lanzarote?utm_source=lanzaroteparagliding.com&utm_medium=3d-island&utm_campaign=tandem-card',
-    icon: '\uD83E\uDE82', // parachute emoji
-    category: 'general',
+    app: 'island',
+    label: 'Island',
+    description: 'All of Lanzarote',
+    icon: '\uD83C\uDFDD\uFE0F', // island emoji
+  },
+  {
+    app: 'islandflying',
+    label: 'Island Flying',
+    description: 'Aircraft around the island',
+    icon: '\u2708\uFE0F', // airplane emoji
   },
 ];
 

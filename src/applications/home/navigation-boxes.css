@@ -419,51 +419,13 @@
   justify-content: center;
 }
 
-/* Featured section (Tandem) */
-.navigation-featured {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 8px;
-}
-
-/* Pilot tools section */
-.navigation-pilot-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-
-.navigation-pilot-label {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.8);
-  text-shadow:
-    1px 1px 0 #000,
-    -1px -1px 0 #000,
-    1px -1px 0 #000,
-    -1px 1px 0 #000,
-    2px 2px 4px rgba(0, 0, 0, 0.8);
-  background: rgba(0, 0, 0, 0.4);
-  padding: 4px 12px;
-  border-radius: 2px;
-}
-
-.navigation-pilot-boxes {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-  justify-content: center;
-}
-
 .nav-box {
-  /* Reset button styles */
-  border: none;
-  background: none;
-  padding: 0;
+  /* Reset link styles */
+  padding: 0 8px;
+  box-sizing: border-box;
+  text-align: center;
   cursor: pointer;
+  text-decoration: none;
 
   /* Voxel-style box */
   width: 140px;
@@ -560,6 +522,10 @@
   animation-delay: 1s;
 }
 
+.nav-box:nth-child(4) .nav-box-icon {
+  animation-delay: 1.5s;
+}
+
 @keyframes float {
   0%, 100% {
     transform: translateY(0);
@@ -584,6 +550,7 @@
 
 .nav-box-description {
   font-size: 6px;
+  line-height: 1.6;
   opacity: 0.9;
   letter-spacing: 0.5px;
   margin-top: 2px;
@@ -592,109 +559,6 @@
     -1px -1px 0 #000,
     1px -1px 0 #000,
     -1px 1px 0 #000;
-}
-
-.nav-box-subtext {
-  font-size: 9px;
-  letter-spacing: 1px;
-  margin-top: 8px;
-  color: #4aff9e;
-  text-shadow:
-    1px 1px 0 #000,
-    -1px -1px 0 #000,
-    1px -1px 0 #000,
-    -1px 1px 0 #000,
-    0 0 6px rgba(74, 255, 158, 0.4);
-}
-
-/* Featured box (Tandem) - larger and more prominent */
-.nav-box-featured {
-  width: 220px;
-  height: 160px;
-  border-color: #ff9e4a;
-  background: linear-gradient(
-    135deg,
-    rgba(40, 25, 15, 0.9) 0%,
-    rgba(60, 40, 30, 0.95) 100%
-  );
-  box-shadow:
-    0 0 30px rgba(255, 158, 74, 0.4),
-    inset 0 0 40px rgba(255, 158, 74, 0.15),
-    inset 2px 2px 0 rgba(255, 255, 255, 0.2),
-    inset -2px -2px 0 rgba(0, 0, 0, 0.3),
-    6px 6px 0 rgba(0, 0, 0, 0.4);
-  animation: featuredPulse 3s ease-in-out infinite;
-}
-
-.nav-box-featured .nav-box-icon {
-  font-size: 44px;
-}
-
-.nav-box-featured .nav-box-label {
-  font-size: 12px;
-  margin-top: 6px;
-}
-
-.nav-box-featured .nav-box-description {
-  font-size: 8px;
-  opacity: 1;
-  color: #ffcc00;
-  text-shadow:
-    1px 1px 0 #000,
-    -1px -1px 0 #000,
-    1px -1px 0 #000,
-    -1px 1px 0 #000,
-    0 0 8px rgba(255, 204, 0, 0.5);
-}
-
-@keyframes featuredPulse {
-  0%, 100% {
-    box-shadow:
-      0 0 30px rgba(255, 158, 74, 0.4),
-      inset 0 0 40px rgba(255, 158, 74, 0.15),
-      inset 2px 2px 0 rgba(255, 255, 255, 0.2),
-      inset -2px -2px 0 rgba(0, 0, 0, 0.3),
-      6px 6px 0 rgba(0, 0, 0, 0.4);
-  }
-  50% {
-    box-shadow:
-      0 0 45px rgba(255, 158, 74, 0.6),
-      inset 0 0 50px rgba(255, 158, 74, 0.2),
-      inset 2px 2px 0 rgba(255, 255, 255, 0.25),
-      inset -2px -2px 0 rgba(0, 0, 0, 0.3),
-      6px 6px 0 rgba(0, 0, 0, 0.4);
-  }
-}
-
-.nav-box-featured:hover {
-  transform: translateY(-6px) scale(1.08);
-  border-color: #ffbe7e;
-  box-shadow:
-    0 0 50px rgba(255, 158, 74, 0.7),
-    inset 0 0 50px rgba(255, 158, 74, 0.25),
-    inset 2px 2px 0 rgba(255, 255, 255, 0.3),
-    inset -2px -2px 0 rgba(0, 0, 0, 0.3),
-    8px 8px 0 rgba(0, 0, 0, 0.3);
-  animation: none;
-}
-
-/* Pilot boxes - smaller and more subtle */
-.navigation-pilot-boxes .nav-box {
-  width: 120px;
-  height: 100px;
-  opacity: 0.85;
-}
-
-.navigation-pilot-boxes .nav-box-icon {
-  font-size: 28px;
-}
-
-.navigation-pilot-boxes .nav-box-label {
-  font-size: 8px;
-}
-
-.navigation-pilot-boxes .nav-box:hover {
-  opacity: 1;
 }
 
 /* Individual box color variations */
@@ -740,97 +604,62 @@
     6px 6px 0 rgba(0, 0, 0, 0.3);
 }
 
-/* Responsive adjustments */
-@media (max-width: 600px) {
+.nav-box:nth-child(4) {
+  border-color: #ff4aa0;
+}
+
+.nav-box:nth-child(4):hover {
+  border-color: #ff7ebe;
+  box-shadow:
+    0 0 30px rgba(255, 74, 160, 0.5),
+    inset 0 0 40px rgba(255, 74, 160, 0.2),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.3),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.3),
+    6px 6px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive adjustments: four in a row, then two by two */
+@media (max-width: 700px) {
   .navigation-boxes-container {
     bottom: 20px;
     gap: 12px;
   }
 
   .navigation-boxes {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
     gap: 12px;
   }
 
-  .nav-box-featured {
-    width: 180px;
-    height: 140px;
+  .nav-box {
+    width: 140px;
+    height: 110px;
   }
 
-  .nav-box-featured .nav-box-icon {
-    font-size: 38px;
-  }
-
-  .nav-box-featured .nav-box-label {
-    font-size: 11px;
-  }
-
-  .nav-box-featured .nav-box-description {
-    font-size: 7px;
-  }
-
-  .nav-box-featured .nav-box-subtext {
-    font-size: 8px;
-    margin-top: 6px;
-  }
-
-  .navigation-pilot-boxes .nav-box {
-    width: 115px;
-    height: 100px;
-  }
-
-  .navigation-pilot-boxes .nav-box-icon {
+  .nav-box-icon {
     font-size: 28px;
   }
 
-  .navigation-pilot-boxes .nav-box-label {
+  .nav-box-label {
     font-size: 8px;
-  }
-
-  .navigation-pilot-boxes .nav-box-description {
-    display: none;
-  }
-
-  .navigation-pilot-label {
-    font-size: 7px;
   }
 }
 
 @media (max-width: 400px) {
-  .navigation-boxes-container {
+  .navigation-boxes {
     gap: 10px;
   }
 
-  .nav-box-featured {
-    width: 160px;
-    height: 130px;
+  .nav-box {
+    width: 130px;
+    height: 105px;
   }
 
-  .nav-box-featured .nav-box-icon {
-    font-size: 34px;
-  }
-
-  .nav-box-featured .nav-box-label {
-    font-size: 10px;
-  }
-
-  .nav-box-featured .nav-box-subtext {
-    font-size: 7px;
-  }
-
-  .navigation-pilot-boxes {
-    gap: 10px;
-  }
-
-  .navigation-pilot-boxes .nav-box {
-    width: 105px;
-    height: 90px;
-  }
-
-  .navigation-pilot-boxes .nav-box-icon {
+  .nav-box-icon {
     font-size: 24px;
   }
 
-  .navigation-pilot-boxes .nav-box-label {
+  .nav-box-label {
     font-size: 7px;
   }
 }

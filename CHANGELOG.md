@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## [Unreleased] - 2026-10-03 22:48 UTC
+
+### Changed
+- **Home scene offers the other animations instead of outside links**: the Tandem card and the Conditions / Pilot Guide cards are gone (lanzaroteparagliding.com now carries those links), replaced by four cards that open the public scenes on this site: Famara, Boats, Island and Island Flying. The list lives in `SCENE_LINKS` in `src/applications/home/config.ts`, and each card takes its page from the app's route in `src/config/apps.json`
+
 ## [Unreleased] - 2026-10-03 16:19 UTC
 
 ### Changed
