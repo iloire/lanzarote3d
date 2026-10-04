@@ -213,45 +213,9 @@ export const birdPath = [
   new THREE.Vector3(7000, 900, 0),
 ];
 
-// Scene picker: the public animations, opened in place of the home scene.
-// `app` is the key in src/config/apps.json, which owns the page's route.
-export interface SceneLink {
-  app: string;
-  label: string;
-  description: string;
-  icon: string;
-}
-
-export const SCENE_LINKS: SceneLink[] = [
-  {
-    app: 'animation',
-    label: 'Famara',
-    description: 'Golden hour on the cliff',
-    icon: '\uD83C\uDF05', // sunrise emoji
-  },
-  {
-    app: 'boatsanimation',
-    label: 'Boats',
-    description: 'From the sea to the sky',
-    icon: '\u26F5', // sailboat emoji
-  },
-  {
-    app: 'island',
-    label: 'Island',
-    description: 'All of Lanzarote',
-    icon: '\uD83C\uDFDD\uFE0F', // island emoji
-  },
-  {
-    app: 'islandflying',
-    label: 'Island Flying',
-    description: 'Aircraft around the island',
-    icon: '\u2708\uFE0F', // airplane emoji
-  },
-];
-
 /**
  * True when the scene is shown inside another page (?embed=1), e.g. the
- * lanzaroteparagliding.com landing page. The host page has its own title and
- * links, so the scene renders without its overlay.
+ * lanzaroteparagliding.com landing page. The host page has its own title, so
+ * the scene renders without its overlay.
  */
 export const isEmbedded = (): boolean => new URLSearchParams(window.location.search).has('embed');

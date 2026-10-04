@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## [Unreleased] - 2026-10-04 10:09 UTC
+
+### Removed
+- **Home scene shows only its title**: the scene cards, the "Are you ready to play?" tagline and the music button are gone, along with the music file (`assets/Looking-for-a-new-beginning.ogg`). `NavigationBoxes` is now `TitleOverlay`, which mounts just the voxel title
+
 ## [Unreleased] - 2026-10-03 23:25 UTC
 
 ### Fixed

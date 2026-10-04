@@ -43,11 +43,11 @@ import {
   setupCameraAnimation,
   applyFloatingMotion,
 } from './cameraAnimation';
-import { createNavigationBoxes } from './NavigationBoxes';
+import { createTitleOverlay } from './TitleOverlay';
 
 /**
- * Home App - Landing page with navigation to paragliding services
- * Based on famara-animation with added navigation UI
+ * Home App - Landing scene with the voxel title
+ * Based on famara-animation with a title overlay
  */
 class HomeApp extends TerrainBase {
   private environment: Environment | undefined;
@@ -64,7 +64,7 @@ class HomeApp extends TerrainBase {
   private cessnaSmokeTrail: any | undefined;
   private herculesSmokeTrail: any | undefined;
   private targetController: CameraTargetController | null = null;
-  private cleanupNavigationBoxes: (() => void) | null = null;
+  private removeTitleOverlay: (() => void) | null = null;
 
   constructor() {
     const appConfig = getAppConfig('home');
@@ -288,9 +288,8 @@ class HomeApp extends TerrainBase {
         createCameraTargetUI(this.targetController, controls);
       }
 
-      // Setup navigation boxes UI
       if (!isEmbedded()) {
-        this.setupNavigationUI();
+        this.removeTitleOverlay = createTitleOverlay();
       }
 
       this.setupCameraAnimation(camera, controls, renderer, scene);
@@ -309,20 +308,6 @@ class HomeApp extends TerrainBase {
       this.handleError(error as Error, 'load');
       throw error;
     }
-  }
-
-  private setupNavigationUI(): void {
-    // Create container for navigation boxes
-    let container = document.getElementById('navigation-boxes');
-    if (!container) {
-      container = document.createElement('div');
-      container.id = 'navigation-boxes';
-      document.body.appendChild(container);
-    }
-
-    // Mount the React component
-    this.cleanupNavigationBoxes = createNavigationBoxes(container);
-    logger.info('Navigation boxes UI created');
   }
 
   private setupCameraAnimation(
@@ -413,16 +398,9 @@ class HomeApp extends TerrainBase {
   public override dispose(): void {
     logger.debug(`Disposing ${this.config.name}`);
 
-    // Cleanup navigation boxes UI
-    if (this.cleanupNavigationBoxes) {
-      this.cleanupNavigationBoxes();
-      this.cleanupNavigationBoxes = null;
-    }
-
-    // Remove the navigation container from DOM
-    const container = document.getElementById('navigation-boxes');
-    if (container) {
-      container.remove();
+    if (this.removeTitleOverlay) {
+      this.removeTitleOverlay();
+      this.removeTitleOverlay = null;
     }
 
     if (this.animationId) {
