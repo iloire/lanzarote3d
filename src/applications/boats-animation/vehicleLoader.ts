@@ -16,7 +16,7 @@ export async function loadParagliders(
 ): Promise<VehicleLoadResult[]> {
   const results: VehicleLoadResult[] = [];
 
-  const voxelPromises = configs.map(async (p) => {
+  const voxelPromises = configs.map(async p => {
     try {
       const paraglider = new ParagliderVoxel(p.pg);
       const mesh = await paraglider.load();

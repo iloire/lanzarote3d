@@ -101,7 +101,7 @@ export function setupAnimatedCamera(
     animatorInstance = animator.animate(
       'boats-to-paragliders',
       ANIMATION_CONFIG.duration,
-      (progress) => {
+      progress => {
         let currentPosition;
         const { phases, speeds } = ANIMATION_CONFIG;
 
@@ -174,7 +174,11 @@ export function setupAnimatedCamera(
           );
 
           if (controls) {
-            controls.target.lerpVectors(controls.target, paragliderPosition, speeds.phase3LookShift);
+            controls.target.lerpVectors(
+              controls.target,
+              paragliderPosition,
+              speeds.phase3LookShift
+            );
             controls.update();
           }
         }

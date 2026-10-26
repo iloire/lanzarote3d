@@ -31,11 +31,7 @@ export function setupCameraAnimation(
   const intermediatePosition = new THREE.Vector3(4500, 1800, 1500);
 
   // Final position - slow, careful approach to the target
-  const finalCameraPosition = new THREE.Vector3(
-    pgPos.x - 100,
-    pgPos.y + 50,
-    pgPos.z + 200
-  );
+  const finalCameraPosition = new THREE.Vector3(pgPos.x - 100, pgPos.y + 50, pgPos.z + 200);
 
   // Set initial camera position and look at the target
   camera.position.copy(initialCameraPosition);
@@ -60,7 +56,7 @@ export function setupCameraAnimation(
     animator.animate(
       'camera-seamless',
       config.animationDurationMs,
-      (progress) => {
+      progress => {
         let currentPosition;
 
         if (progress < 0.35) {

@@ -125,8 +125,7 @@ class AnimationApp extends TerrainBase {
       const paragliderResults = await loadParagliders(
         scene,
         paraglidersVoxel,
-        this.handleError.bind(this),
-        ANIMATION_DURATION_MS
+        this.handleError.bind(this)
       );
       this.paragliderMeshes = paragliderResults.map(r => r.mesh);
 

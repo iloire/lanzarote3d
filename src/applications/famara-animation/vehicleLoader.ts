@@ -26,12 +26,11 @@ const DEBUG_VECTORS = false;
 export async function loadParagliders(
   scene: THREE.Scene,
   configs: ParagliderVoxelConfig[],
-  errorHandler: (error: Error, context: string) => void,
-  animationDurationMs: number = 0
+  errorHandler: (error: Error, context: string) => void
 ): Promise<VehicleLoadResult[]> {
   const results: VehicleLoadResult[] = [];
 
-  const voxelPromises = configs.map(async (p) => {
+  const voxelPromises = configs.map(async p => {
     try {
       logger.info('🪂 Creating paraglider with config:', JSON.stringify(p.options, null, 2));
       const paraglider = new ParagliderVoxel(p.options);
@@ -75,7 +74,9 @@ export async function loadParagliders(
       // }
 
       results.push({ mesh, flyingBehavior });
-      logger.info(`✅ Paraglider voxel loaded at position (${p.position.x}, ${p.position.y}, ${p.position.z})`);
+      logger.info(
+        `✅ Paraglider voxel loaded at position (${p.position.x}, ${p.position.y}, ${p.position.z})`
+      );
       return mesh;
     } catch (error) {
       errorHandler(error as Error, 'loading voxel paraglider');
