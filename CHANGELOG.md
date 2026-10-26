@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-26 23:38 UTC
+
+### Changed
+- **The Hercules looks like a C-130, still low poly**: a blunt radome nose with a tinted windscreen, round-sided fuselage sweeping up at the tail over a darker loading ramp, main-gear sponsons, a high wing with a constant-chord centre section and tapered outer panels, four nacelles with chin intakes, six-sided spinners and pitched four-blade props with banded tips (`stripeColor`), and a tall fin with a dorsal fillet. Replaces a stack of boxes and cylinders. It is one flat-shaded, vertex-coloured mesh, 768 triangles in 1 draw call where the old one had 2,068 in about 60. The gear is retracted because the plane is only ever seen flying, and it is a little larger: 27 × 36 units, up from 30 wide
+
 ## 2026-10-26 23:36 UTC
 
 ### Changed

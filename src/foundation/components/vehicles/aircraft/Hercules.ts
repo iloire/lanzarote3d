@@ -8,33 +8,152 @@ export interface HerculesOptions extends SimpleComponentOptions {
   wingColor?: string;
   propellerColor?: string;
   windowColor?: string;
+  /** Propeller tip bands */
   stripeColor?: string;
   scale?: number;
+  /** Darker rear loading ramp under the upswept tail */
   showCargoDoor?: boolean;
 }
 
+const DEFAULTS = {
+  bodyColor: '#5A6268',
+  wingColor: '#4A5158',
+  propellerColor: '#2C3E50',
+  windowColor: '#87CEEB',
+  stripeColor: '#FFD700',
+};
+
+/** Unit fuselage-style cross-section as (side, up) pairs: chamfered, a little flatter underneath */
+const OCTAGON: ReadonlyArray<readonly [number, number]> = [
+  [0.45, 1],
+  [1, 0.45],
+  [1, -0.5],
+  [0.6, -1],
+  [-0.6, -1],
+  [-1, -0.5],
+  [-1, 0.45],
+  [-0.45, 1],
+];
+// Segment k runs from OCTAGON[k] to OCTAGON[k + 1]
+const SEG_TOP = 7;
+const SEG_UPPER = [0, 6];
+const SEG_LOWER = [2, 4];
+const SEG_BOTTOM = 3;
+
+/** A ring at station x, spanning bottom..top vertically and ±halfWidth around z */
+const ring = (x: number, bottom: number, top: number, halfWidth: number, z = 0): THREE.Vector3[] =>
+  OCTAGON.map(
+    ([side, up]) =>
+      new THREE.Vector3(x, (top + bottom) / 2 + (up * (top - bottom)) / 2, z + side * halfWidth)
+  );
+
+/** Collects flat-coloured triangles into one geometry */
+class MeshBuilder {
+  private positions: number[] = [];
+  private colors: number[] = [];
+
+  tri(a: THREE.Vector3, b: THREE.Vector3, c: THREE.Vector3, color: THREE.Color): void {
+    for (const v of [a, b, c]) {
+      this.positions.push(v.x, v.y, v.z);
+      this.colors.push(color.r, color.g, color.b);
+    }
+  }
+
+  quad(a: THREE.Vector3, b: THREE.Vector3, c: THREE.Vector3, d: THREE.Vector3, color: THREE.Color) {
+    this.tri(a, b, c, color);
+    this.tri(a, c, d, color);
+  }
+
+  /** Fan-closes a ring around its centroid */
+  cap(points: THREE.Vector3[], color: THREE.Color): void {
+    const centre = points.reduce((sum, p) => sum.add(p), new THREE.Vector3());
+    centre.divideScalar(points.length);
+    points.forEach((p, i) => this.tri(centre, p, points[(i + 1) % points.length]!, color));
+  }
+
+  /** Skins consecutive rings (all with the same point count), capping both ends */
+  loft(
+    rings: THREE.Vector3[][],
+    color: (station: number, segment: number) => THREE.Color,
+    capColors: [THREE.Color, THREE.Color]
+  ): void {
+    for (let s = 0; s < rings.length - 1; s++) {
+      const a = rings[s]!;
+      const b = rings[s + 1]!;
+      for (let k = 0; k < a.length; k++) {
+        const n = (k + 1) % a.length;
+        this.quad(a[k]!, b[k]!, b[n]!, a[n]!, color(s, k));
+      }
+    }
+    this.cap(rings[0]!, capColors[0]);
+    this.cap(rings[rings.length - 1]!, capColors[1]);
+  }
+
+  /**
+   * A lifting surface through ribs given by leading edge, trailing edge and thickness; `up` is the
+   * direction the thickness grows in. Each rib is a four-point airfoil, thickest at 30% chord.
+   */
+  surface(
+    ribs: { le: THREE.Vector3; te: THREE.Vector3; thickness: number }[],
+    up: THREE.Vector3,
+    color: THREE.Color
+  ): void {
+    const rings = ribs.map(({ le, te, thickness }) => {
+      const crest = le.clone().lerp(te, 0.3);
+      return [
+        le,
+        crest.clone().addScaledVector(up, thickness * 0.6),
+        te,
+        crest.clone().addScaledVector(up, -thickness * 0.4),
+      ];
+    });
+    this.loft(rings, () => color, [color, color]);
+  }
+
+  build(): THREE.BufferGeometry {
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(this.positions, 3));
+    geometry.setAttribute('color', new THREE.Float32BufferAttribute(this.colors, 3));
+    geometry.computeVertexNormals();
+    geometry.computeBoundingSphere();
+    return geometry;
+  }
+}
+
+// Wing planform: constant chord over the centre section out past the engines, then tapering
+const HALF_SPAN = 18;
+const CENTRE_SECTION = 7;
+const wingAt = (z: number) => {
+  const t = Math.max(0, (Math.abs(z) - CENTRE_SECTION) / (HALF_SPAN - CENTRE_SECTION));
+  return {
+    le: THREE.MathUtils.lerp(3.2, 2.4, t),
+    te: THREE.MathUtils.lerp(-1.4, 0, t),
+    y: THREE.MathUtils.lerp(2.15, 2.6, t),
+    thickness: THREE.MathUtils.lerp(0.6, 0.22, t),
+  };
+};
+const ENGINE_Z = [-9.4, -4.6, 4.6, 9.4];
+const PROP_RADIUS = 1.9;
+
 /**
- * Hercules C-130 - legendary four-engine military transport aircraft
+ * Hercules C-130 - four-engine turboprop military transport, built low poly
  *
- * The C-130 Hercules is one of the most versatile and widely used military
- * transport aircraft in history. Known for its rugged design, four turboprop
- * engines, and distinctive high-wing configuration.
+ * One flat-shaded, vertex-coloured mesh: the blunt-nosed fuselage with its stepped windscreen and
+ * upswept tail over the loading ramp, main-gear sponsons, a high tapered wing, four nacelles with
+ * chin intakes and four-blade propellers, and the tall dorsal-filleted fin. Nose points +X, wing
+ * spans Z. The gear is retracted, since it is only ever seen flying.
  */
 export class Hercules extends SimpleThreeComponent {
   constructor(options: HerculesOptions = {}) {
     const metadata: ComponentMetadata = {
       name: 'Hercules C-130',
-      version: '1.0.0',
+      version: '2.0.0',
       description: 'Four-engine military transport aircraft with distinctive high-wing design',
       tags: ['vehicle', 'aircraft', 'hercules', 'c130', 'military', 'transport', 'cargo'],
     };
 
     super(metadata, {
-      bodyColor: '#5A6268', // Military gray
-      wingColor: '#4A5158', // Darker gray for wings
-      propellerColor: '#2C3E50', // Dark blue-gray
-      windowColor: '#87CEEB', // Sky blue
-      stripeColor: '#FFD700', // Gold stripe
+      ...DEFAULTS,
       scale: 1,
       showCargoDoor: true,
       ...options,
@@ -47,277 +166,177 @@ export class Hercules extends SimpleThreeComponent {
   }
 
   protected override createContent(): THREE.Object3D {
-    const hercules = new THREE.Group();
-    hercules.name = 'Hercules-C130';
-
     const options = this.options as HerculesOptions;
-    const scale = options.scale || 1;
+    const body = new THREE.Color(options.bodyColor ?? DEFAULTS.bodyColor);
+    const wing = new THREE.Color(options.wingColor ?? DEFAULTS.wingColor);
+    const prop = new THREE.Color(options.propellerColor ?? DEFAULTS.propellerColor);
+    const glass = new THREE.Color(options.windowColor ?? DEFAULTS.windowColor).multiplyScalar(0.6);
+    const stripe = new THREE.Color(options.stripeColor ?? DEFAULTS.stripeColor);
+    const radome = body.clone().multiplyScalar(0.8);
+    const ramp = body.clone().multiplyScalar(0.7);
+    const intake = new THREE.Color('#141414');
 
-    // Create materials
-    const bodyMaterial = resourceManager.getOrCreateMaterial(
-      `hercules_body_${options.bodyColor}`,
+    const mesh = new MeshBuilder();
+    this.buildFuselage(mesh, { body, glass, radome, ramp }, options.showCargoDoor !== false);
+    this.buildWingAndTail(mesh, wing);
+    ENGINE_Z.forEach(z => this.buildEngine(mesh, z, { body, prop, stripe, intake }));
+
+    const material = resourceManager.getOrCreateMaterial(
+      'hercules_lowpoly',
       () =>
-        new THREE.MeshStandardMaterial({
-          color: options.bodyColor,
-          metalness: 0.5,
-          roughness: 0.6,
+        new THREE.MeshLambertMaterial({
+          vertexColors: true,
+          flatShading: true,
+          side: THREE.DoubleSide,
         })
     );
-
-    const wingMaterial = resourceManager.getOrCreateMaterial(
-      `hercules_wing_${options.wingColor}`,
-      () =>
-        new THREE.MeshStandardMaterial({
-          color: options.wingColor,
-          metalness: 0.4,
-          roughness: 0.7,
-        })
-    );
-
-    const propellerMaterial = resourceManager.getOrCreateMaterial(
-      `hercules_propeller_${options.propellerColor}`,
-      () =>
-        new THREE.MeshStandardMaterial({
-          color: options.propellerColor,
-          metalness: 0.7,
-          roughness: 0.3,
-        })
-    );
-
-    const windowMaterial = resourceManager.getOrCreateMaterial(
-      `hercules_window_${options.windowColor}`,
-      () =>
-        new THREE.MeshStandardMaterial({
-          color: options.windowColor,
-          transparent: true,
-          opacity: 0.5,
-          metalness: 0.8,
-          roughness: 0.1,
-        })
-    );
-
-    const stripeMaterial = resourceManager.getOrCreateMaterial(
-      `hercules_stripe_${options.stripeColor}`,
-      () =>
-        new THREE.MeshStandardMaterial({
-          color: options.stripeColor,
-          metalness: 0.5,
-          roughness: 0.4,
-        })
-    );
-
-    const darkMaterial = new THREE.MeshStandardMaterial({
-      color: '#1A1A1A',
-      metalness: 0.3,
-      roughness: 0.8,
-    });
-
-    // Main fuselage (large cargo body)
-    const fuselageGeometry = new THREE.BoxGeometry(20, 4, 4);
-    const fuselage = new THREE.Mesh(fuselageGeometry, bodyMaterial);
-    fuselage.position.set(0, 0, 0);
-    fuselage.castShadow = this.options.castShadow ?? true;
-    fuselage.receiveShadow = this.options.receiveShadow ?? true;
-    hercules.add(fuselage);
-
-    // Nose section (cockpit area)
-    const noseGeometry = new THREE.BoxGeometry(4, 3.5, 3.5);
-    const nose = new THREE.Mesh(noseGeometry, bodyMaterial);
-    nose.position.set(12, 0.25, 0);
-    nose.castShadow = this.options.castShadow ?? true;
-    hercules.add(nose);
-
-    // Cockpit windows (distinctive upward-angled nose)
-    const cockpitWindowGeometry = new THREE.BoxGeometry(0.2, 2, 2.5);
-    const cockpitWindow = new THREE.Mesh(cockpitWindowGeometry, windowMaterial);
-    cockpitWindow.position.set(13.5, 0.5, 0);
-    hercules.add(cockpitWindow);
-
-    // Side cockpit windows
-    const sideWindowGeometry = new THREE.BoxGeometry(2, 1, 0.1);
-    const leftCockpitWindow = new THREE.Mesh(sideWindowGeometry, windowMaterial);
-    leftCockpitWindow.position.set(12, 1, 1.8);
-    hercules.add(leftCockpitWindow);
-
-    const rightCockpitWindow = new THREE.Mesh(sideWindowGeometry, windowMaterial);
-    rightCockpitWindow.position.set(12, 1, -1.8);
-    hercules.add(rightCockpitWindow);
-
-    // Small side windows along fuselage
-    for (let i = 0; i < 3; i++) {
-      const smallWindowGeometry = new THREE.BoxGeometry(1, 0.6, 0.1);
-      const leftWindow = new THREE.Mesh(smallWindowGeometry, windowMaterial);
-      leftWindow.position.set(8 - i * 4, 1.5, 2.05);
-      hercules.add(leftWindow);
-
-      const rightWindow = new THREE.Mesh(smallWindowGeometry, windowMaterial);
-      rightWindow.position.set(8 - i * 4, 1.5, -2.05);
-      hercules.add(rightWindow);
-    }
-
-    // Decorative military stripe
-    const stripeGeometry = new THREE.BoxGeometry(18, 0.3, 0.1);
-    const leftStripe = new THREE.Mesh(stripeGeometry, stripeMaterial);
-    leftStripe.position.set(1, 0.5, 2.06);
-    hercules.add(leftStripe);
-
-    const rightStripe = new THREE.Mesh(stripeGeometry, stripeMaterial);
-    rightStripe.position.set(1, 0.5, -2.06);
-    hercules.add(rightStripe);
-
-    // Cargo door markings (if enabled)
-    if (options.showCargoDoor) {
-      const cargoDoorGeometry = new THREE.BoxGeometry(0.1, 3.5, 3.5);
-      const cargoDoorMaterial = new THREE.MeshStandardMaterial({
-        color: '#3A4148',
-        metalness: 0.6,
-        roughness: 0.5,
-      });
-      const cargoDoor = new THREE.Mesh(cargoDoorGeometry, cargoDoorMaterial);
-      cargoDoor.position.set(-10, -0.25, 0);
-      hercules.add(cargoDoor);
-    }
-
-    // Main wings (high-wing configuration - signature of C-130)
-    const wingGeometry = new THREE.BoxGeometry(5, 0.5, 30);
-    const wings = new THREE.Mesh(wingGeometry, wingMaterial);
-    wings.position.set(2, 2.5, 0); // Positioned high above fuselage
-    wings.castShadow = this.options.castShadow ?? true;
-    hercules.add(wings);
-
-    // Wing fillets (fairings connecting wings to fuselage)
-    const filletGeometry = new THREE.BoxGeometry(3, 2, 4);
-    const leftFillet = new THREE.Mesh(filletGeometry, bodyMaterial);
-    leftFillet.position.set(2, 1.5, 8);
-    hercules.add(leftFillet);
-
-    const rightFillet = new THREE.Mesh(filletGeometry, bodyMaterial);
-    rightFillet.position.set(2, 1.5, -8);
-    hercules.add(rightFillet);
-
-    // Tail section
-    const tailGeometry = new THREE.BoxGeometry(4, 3, 3);
-    const tail = new THREE.Mesh(tailGeometry, bodyMaterial);
-    tail.position.set(-11, 1, 0);
-    tail.castShadow = this.options.castShadow ?? true;
-    hercules.add(tail);
-
-    // Vertical stabilizer (tall tail fin)
-    const verticalStabGeometry = new THREE.BoxGeometry(0.5, 5, 3);
-    const verticalStab = new THREE.Mesh(verticalStabGeometry, wingMaterial);
-    verticalStab.position.set(-12, 3.5, 0);
-    verticalStab.castShadow = this.options.castShadow ?? true;
-    hercules.add(verticalStab);
-
-    // Horizontal stabilizers
-    const horizontalStabGeometry = new THREE.BoxGeometry(3, 0.3, 10);
-    const horizontalStab = new THREE.Mesh(horizontalStabGeometry, wingMaterial);
-    horizontalStab.position.set(-12, 1.5, 0);
-    horizontalStab.castShadow = this.options.castShadow ?? true;
-    hercules.add(horizontalStab);
-
-    // Create 4 engines with propellers (signature feature)
-    const enginePositions = [
-      { x: 2, z: -15 }, // Left outer
-      { x: 2, z: -9 }, // Left inner
-      { x: 2, z: 9 }, // Right inner
-      { x: 2, z: 15 }, // Right outer
-    ];
-
-    enginePositions.forEach(pos => {
-      // Engine nacelle
-      const engineGeometry = new THREE.CylinderGeometry(0.9, 0.9, 2.5, 12);
-      const engine = new THREE.Mesh(engineGeometry, propellerMaterial);
-      engine.rotation.z = Math.PI / 2;
-      engine.position.set(pos.x, 2.5, pos.z);
-      engine.castShadow = this.options.castShadow ?? true;
-      hercules.add(engine);
-
-      // Engine intake (front)
-      const intakeGeometry = new THREE.CylinderGeometry(1.1, 0.9, 0.5, 12);
-      const intake = new THREE.Mesh(intakeGeometry, darkMaterial);
-      intake.rotation.z = Math.PI / 2;
-      intake.position.set(pos.x + 1.5, 2.5, pos.z);
-      hercules.add(intake);
-
-      // 4-blade propeller for each engine
-      const bladeGeometry = new THREE.BoxGeometry(0.3, 4, 0.5);
-
-      for (let i = 0; i < 4; i++) {
-        const blade = new THREE.Mesh(bladeGeometry, propellerMaterial);
-        blade.position.set(pos.x + 2.2, 2.5, pos.z);
-        blade.rotation.x = (i * Math.PI * 2) / 4; // Evenly space 4 blades
-        hercules.add(blade);
-      }
-
-      // Propeller hub
-      const hubGeometry = new THREE.SphereGeometry(0.4, 8, 8);
-      const hub = new THREE.Mesh(hubGeometry, propellerMaterial);
-      hub.position.set(pos.x + 2.2, 2.5, pos.z);
-      hercules.add(hub);
-
-      // Engine mounting pylon
-      const pylonGeometry = new THREE.BoxGeometry(1, 1.5, 1.5);
-      const pylon = new THREE.Mesh(pylonGeometry, bodyMaterial);
-      pylon.position.set(pos.x, 1.5, pos.z);
-      hercules.add(pylon);
-    });
-
-    // Landing gear (robust military gear)
-    const wheelGeometry = new THREE.CylinderGeometry(0.6, 0.6, 0.5, 16);
-    const wheelMaterial = new THREE.MeshStandardMaterial({
-      color: '#1A1A1A',
-      metalness: 0.3,
-      roughness: 0.7,
-    });
-
-    const strutGeometry = new THREE.CylinderGeometry(0.15, 0.15, 3);
-    const strutMaterial = new THREE.MeshStandardMaterial({
-      color: '#888888',
-      metalness: 0.7,
-      roughness: 0.3,
-    });
-
-    // Main landing gear (dual wheels each side)
-    const mainGearPositions = [
-      { x: 0, z: -3 }, // Left main
-      { x: 0, z: 3 }, // Right main
-    ];
-
-    mainGearPositions.forEach(pos => {
-      // Strut
-      const strut = new THREE.Mesh(strutGeometry, strutMaterial);
-      strut.position.set(pos.x, -1.5, pos.z);
-      hercules.add(strut);
-
-      // Dual wheels
-      for (let i = 0; i < 2; i++) {
-        const wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
-        wheel.rotation.z = Math.PI / 2;
-        wheel.position.set(pos.x + (i * 0.8 - 0.4), -3, pos.z);
-        hercules.add(wheel);
-      }
-    });
-
-    // Nose landing gear (dual wheels)
-    const noseStrut = new THREE.Mesh(strutGeometry, strutMaterial);
-    noseStrut.position.set(10, -1.5, 0);
-    hercules.add(noseStrut);
-
-    for (let i = 0; i < 2; i++) {
-      const noseWheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
-      noseWheel.rotation.z = Math.PI / 2;
-      noseWheel.position.set(10 + (i * 0.6 - 0.3), -3, 0);
-      noseWheel.scale.set(0.9, 0.9, 0.9);
-      hercules.add(noseWheel);
-    }
-
-    // Apply scale
-    if (scale !== 1) {
-      hercules.scale.setScalar(scale);
-    }
-
+    const hercules = new THREE.Mesh(mesh.build(), material);
+    hercules.name = 'Hercules-C130';
     return hercules;
+  }
+
+  private buildFuselage(
+    mesh: MeshBuilder,
+    colors: { body: THREE.Color; glass: THREE.Color; radome: THREE.Color; ramp: THREE.Color },
+    showCargoDoor: boolean
+  ): void {
+    // Stations nose to tail: x, bottom, top, half width
+    const stations: [number, number, number, number][] = [
+      [13.6, -0.35, 0.35, 0.3], // radome tip
+      [12.8, -1.05, 0.75, 1.05],
+      [11.8, -1.5, 1.15, 1.5], // windscreen starts
+      [10.9, -1.75, 1.8, 1.75], // cockpit roof
+      [9.2, -1.8, 1.8, 1.8],
+      [-6, -1.8, 1.8, 1.8], // upsweep starts
+      [-9, -0.9, 1.8, 1.65],
+      [-12, 0.6, 1.7, 1.1], // ramp hinge to tail cone
+      [-13.6, 1.1, 1.6, 0.4],
+    ];
+    const windscreen = 2;
+    const rampSection = 5;
+
+    mesh.loft(
+      stations.map(([x, bottom, top, w]) => ring(x, bottom, top, w)),
+      (s, k) => {
+        if (s === 0) return colors.radome;
+        if (s === windscreen && (k === SEG_TOP || SEG_UPPER.includes(k))) return colors.glass;
+        const underside = k === SEG_BOTTOM || SEG_LOWER.includes(k);
+        if (showCargoDoor && s === rampSection && underside) return colors.ramp;
+        return colors.body;
+      },
+      [colors.radome, colors.body]
+    );
+
+    // Main-gear sponsons bulging from the lower fuselage sides
+    [-1.75, 1.75].forEach(z => {
+      mesh.loft(
+        [
+          ring(3.4, -1.35, -0.95, 0.2, z),
+          ring(2.2, -1.9, -0.3, 0.55, z),
+          ring(-3.8, -1.9, -0.3, 0.55, z),
+          ring(-5.2, -1.5, -0.65, 0.2, z),
+        ],
+        () => colors.body,
+        [colors.body, colors.body]
+      );
+    });
+  }
+
+  private buildWingAndTail(mesh: MeshBuilder, color: THREE.Color): void {
+    const up = new THREE.Vector3(0, 1, 0);
+
+    mesh.surface(
+      [-HALF_SPAN, -CENTRE_SECTION, 0, CENTRE_SECTION, HALF_SPAN].map(z => {
+        const { le, te, y, thickness } = wingAt(z);
+        return { le: new THREE.Vector3(le, y, z), te: new THREE.Vector3(te, y, z), thickness };
+      }),
+      up,
+      color
+    );
+
+    // Horizontal stabiliser across the tail cone
+    mesh.surface(
+      [-6.5, 0, 6.5].map(z => {
+        const t = Math.abs(z) / 6.5;
+        const y = 1.4 + t * 0.1;
+        return {
+          le: new THREE.Vector3(THREE.MathUtils.lerp(-10.9, -12.3, t), y, z),
+          te: new THREE.Vector3(THREE.MathUtils.lerp(-13.4, -13.6, t), y, z),
+          thickness: THREE.MathUtils.lerp(0.28, 0.12, t),
+        };
+      }),
+      up,
+      color
+    );
+
+    // Tall fin, its long leading edge running into the dorsal fillet
+    mesh.surface(
+      [
+        {
+          le: new THREE.Vector3(-8.4, 1.5, 0),
+          te: new THREE.Vector3(-13.3, 1.5, 0),
+          thickness: 0.4,
+        },
+        { le: new THREE.Vector3(-11.4, 4, 0), te: new THREE.Vector3(-13.5, 4, 0), thickness: 0.28 },
+        { le: new THREE.Vector3(-12.3, 7, 0), te: new THREE.Vector3(-13.8, 7, 0), thickness: 0.15 },
+      ],
+      new THREE.Vector3(0, 0, 1),
+      color
+    );
+  }
+
+  private buildEngine(
+    mesh: MeshBuilder,
+    z: number,
+    colors: { body: THREE.Color; prop: THREE.Color; stripe: THREE.Color; intake: THREE.Color }
+  ): void {
+    const { le, te } = wingAt(z);
+
+    // Nacelle hanging under the wing, deep at the front for the chin intake
+    mesh.loft(
+      [
+        ring(le + 1.7, 1.25, 2.3, 0.5, z),
+        ring(le + 1.1, 0.95, 2.4, 0.62, z),
+        ring(le - 1.0, 1.0, 2.45, 0.62, z),
+        ring(te - 0.2, 1.5, 2.3, 0.45, z),
+        ring(te - 1.2, 1.95, 2.15, 0.12, z),
+      ],
+      () => colors.body,
+      [colors.intake, colors.body]
+    );
+
+    // Spinner: a six-sided cone in front of the intake
+    const hubY = 1.95;
+    const spinnerBase = Array.from({ length: 6 }, (_, i) => {
+      const a = (i / 6) * Math.PI * 2;
+      return new THREE.Vector3(le + 1.7, hubY + Math.cos(a) * 0.38, z + Math.sin(a) * 0.38);
+    });
+    const apex = new THREE.Vector3(le + 2.5, hubY, z);
+    spinnerBase.forEach((p, i) => mesh.tri(apex, p, spinnerBase[(i + 1) % 6]!, colors.prop));
+
+    // Four pitched blades in an X, tips banded
+    const hub = new THREE.Vector3(le + 2.0, hubY, z);
+    const pitch = THREE.MathUtils.degToRad(30);
+    for (let i = 0; i < 4; i++) {
+      const a = Math.PI / 4 + (i * Math.PI) / 2;
+      const out = new THREE.Vector3(0, Math.cos(a), Math.sin(a));
+      const chord = new THREE.Vector3(Math.sin(pitch), 0, 0).addScaledVector(
+        new THREE.Vector3(0, -Math.sin(a), Math.cos(a)),
+        Math.cos(pitch)
+      );
+      const at = (r: number, halfChord: number) => {
+        const centre = hub.clone().addScaledVector(out, r);
+        return [
+          centre.clone().addScaledVector(chord, -halfChord),
+          centre.clone().addScaledVector(chord, halfChord),
+        ];
+      };
+      const [rootA, rootB] = at(0.35, 0.16);
+      const [bandA, bandB] = at(PROP_RADIUS * 0.85, 0.12);
+      const [tipA, tipB] = at(PROP_RADIUS, 0.09);
+      mesh.quad(rootA!, rootB!, bandB!, bandA!, colors.prop);
+      mesh.quad(bandA!, bandB!, tipB!, tipA!, colors.stripe);
+    }
   }
 
   public override validate(): string[] {
@@ -336,7 +355,7 @@ export class Hercules extends SimpleThreeComponent {
 
     return {
       name: 'Hercules C-130',
-      version: '1.0.0',
+      version: '2.0.0',
       type: 'vehicle',
       subtype: 'aircraft',
       category: 'military_transport',
