@@ -20,7 +20,7 @@ npm run dev        # webpack dev server on http://localhost:8080, opens the home
 ```
 
 Scenes are picked with `?story=`: `home`, `famara-animation`, `boats-animation`, `island`,
-`island-flying`, and more in the sidebar. Add `?fx=0` to render without post-processing, to
+`famara`, `boats` and `town`. Add `?fx=0` to render without post-processing, to
 compare looks and frame times. Dev builds expose `window.__lz` for profiling (see RENDERING.md).
 
 ## Checking it
@@ -80,7 +80,7 @@ localStorage.setItem('lanzarote_dev_mode', 'true')
 localStorage.removeItem('lanzarote_dev_mode')
 ```
 
-When dev mode is enabled in production, you'll see "🔓 Secret dev mode enabled" in the console and have access to all private apps (workshop-demo, flyzones, etc.).
+When dev mode is enabled in production, you'll see "🔓 Secret dev mode enabled" in the console and have access to the private scenes (famara, boats, town).
 
 ### Show the sidebar on the home scene
 

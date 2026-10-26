@@ -18,8 +18,6 @@ export interface AppMetadata {
   visibility: 'public' | 'private' | 'hidden';
   priority?: number; // For ordering in menus
   theme?: string; // Optional theme ID that overrides global theme selection
-  entry?: string; // Optional: Override app location (default: derived from route)
-  webpackEntry?: string; // Optional: Custom webpack entry point (default: ./src/index.tsx)
 }
 
 // Generate APP_REGISTRY from JSON (now flat structure under 'apps')

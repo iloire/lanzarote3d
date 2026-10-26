@@ -10,7 +10,7 @@ const Dotenv = require("dotenv-webpack");
  * - All apps except "hidden" are built
  * - HTML filename comes from route (e.g., /boats-animation → boats-animation.html)
  * - Bundle name comes from app key (e.g., boatsanimation → boatsanimation.bundle.js)
- * - Entry point comes from app.entry or defaults to showcase-entry.tsx
+ * - Every app shares the ./src/index.tsx entry, which picks the story from the URL
  * - Apps are sorted by priority field
  */
 
@@ -24,10 +24,7 @@ const showcaseApps = Object.entries(appsConfig.apps)
     title: `Lanzarote - ${app.name}`,
     description: app.description || 'Experience paragliding in Lanzarote!. Tandem flights, pilot guides, real time wind conditions and more!',
     filename: app.route.replace(/^\//, '') + '.html',
-    // Use custom webpack entry if specified (e.g., tile-debug), otherwise use standard index.tsx
-    entry: app.webpackEntry
-      ? './src/' + app.webpackEntry.slice(2)  // Custom webpack entry
-      : './src/index.tsx'  // Standard entry point for all showcase apps
+    entry: './src/index.tsx'
   }))
   .sort((a, b) => {
     const priorityA = appsConfig.apps[a.name]?.priority || 999;

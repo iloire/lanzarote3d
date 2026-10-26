@@ -1,7 +1,6 @@
 Implement the following tasks if any is added following the instructions described below:
 ---
 TASKS:
-- add park to buildings whorkshop application.
 ---
 
 ### Instructions

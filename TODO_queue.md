@@ -8,6 +8,4 @@ done
 - I want to introduce Next.js so I can make easy deployments in vercel, introduce server side rendering, API supports, Next.js routing, etc.. Do that work in a new branch, test throughly the app after is done, make sure it builds properly and finally commit to that new branch.
 - play with some ideas to use shaders on the water and sky
 - fix mess with category: 'experience' | 'tool' | 'demo'; and status. we need better granularity to show menu. also menu doesnt fit in window 
-- the dome is missing from the workshop application 
 - keep improve typescript. Find technical debt and fix it 5 items at a time. Then build and commit, and repeat
-- Birds are actually ugly. Make them learner, thinner body and bigger wings. There is a weird oscillation effect with the wings. We want flapping wings.

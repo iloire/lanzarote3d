@@ -2,6 +2,13 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## [Unreleased] - 2026-10-26 21:49 UTC
+
+### Removed
+- **Every story except `home`, `famara-animation`, `boats-animation`, `island`, `famara`, `boats` and `town`**, because the project is now just a few polished Lanzarote animations and models. Gone: the dev tools (`workshop-demo`, `flying-behavior-test`, `camera-switcher-demo`, `procedural-terrain`, `tile-mapper`, `satellite-terrain`, `terrain-gps`, `terrain`, `voxel`), the single-part demos (`head`, `helmet`, `pilot`, `paraglider`, `glider`), the vehicle demos (`cars`, `car`, `truck`, `plane`, `planes`), the scenery demos `buildings`, `roads`, `clouds` and `boat`, and the half-built `flyzones` app
+- **45 source files that none of the remaining stories reach**: novelty helmets, flock birds, the audio system, `ParagliderPhysics` and its input controller, the procedural terrain generator and noise, trajectory tracking, unused camera controllers, `NonRenderingAppBase`, the showcase stats helpers, `ThemeSelector`, and the barrel `index.ts` files that only re-exported them
+- **Custom app entries**: the `entry`/`webpackEntry` options in `apps.json`, which only tile-debug used. Every story now loads from `applications/<route>/`
+
 ## [Unreleased] - 2026-10-26 21:36 UTC
 
 ### Removed
