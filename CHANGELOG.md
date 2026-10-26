@@ -4,6 +4,9 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 
 ## 2026-10-26 23:08 UTC
 
+### Removed
+- **Unused dependencies**: `ajv`, `react-ga4`, `stylus`, `stylus-loader`, `@testing-library/react`, `jsdom`, `source-map-loader`, `file-loader`, and the Babel toolchain (`babel-loader`, `@babel/*`, `.babelrc`) that only fed the dead `.jsx` rule. Also `.yarnrc.yml`, since the project installs with npm
+
 ### Fixed
 - **Jest maps CSS imports to `identity-obj-proxy`**: the key was misspelled `moduleNameMapping`, so Jest ignored it and any test importing a component with a stylesheet would have crashed. `jest-environment-jsdom` is now on 29, matching `jest`, instead of 30
 - **Webpack config holds only rules that do something**: the `.jsx` babel rule (no `.jsx` files, and it named a plugin that was never installed), the stylus rule (no `.styl` files) and the overwritten `showcaseApps` export are gone; images use webpack 5's `asset/resource` instead of the deprecated `file-loader`
