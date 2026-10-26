@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { SimpleThreeComponent, SimpleComponentOptions } from '../../base/SimpleThreeComponent';
 import { ComponentMetadata } from '../../base/IThreeComponent';
-import { resourceManager } from '../../../systems/ResourceManager';
+import { MeshBuilder, ring, lowPolyAircraftMaterial, glassColor } from './lowPolyMesh';
 
 export interface HerculesOptions extends SimpleComponentOptions {
   bodyColor?: string;
@@ -23,102 +23,11 @@ const DEFAULTS = {
   stripeColor: '#FFD700',
 };
 
-/** Unit fuselage-style cross-section as (side, up) pairs: chamfered, a little flatter underneath */
-const OCTAGON: ReadonlyArray<readonly [number, number]> = [
-  [0.45, 1],
-  [1, 0.45],
-  [1, -0.5],
-  [0.6, -1],
-  [-0.6, -1],
-  [-1, -0.5],
-  [-1, 0.45],
-  [-0.45, 1],
-];
-// Segment k runs from OCTAGON[k] to OCTAGON[k + 1]
+// OCTAGON segments, k running from point k to point k + 1
 const SEG_TOP = 7;
 const SEG_UPPER = [0, 6];
 const SEG_LOWER = [2, 4];
 const SEG_BOTTOM = 3;
-
-/** A ring at station x, spanning bottom..top vertically and ±halfWidth around z */
-const ring = (x: number, bottom: number, top: number, halfWidth: number, z = 0): THREE.Vector3[] =>
-  OCTAGON.map(
-    ([side, up]) =>
-      new THREE.Vector3(x, (top + bottom) / 2 + (up * (top - bottom)) / 2, z + side * halfWidth)
-  );
-
-/** Collects flat-coloured triangles into one geometry */
-class MeshBuilder {
-  private positions: number[] = [];
-  private colors: number[] = [];
-
-  tri(a: THREE.Vector3, b: THREE.Vector3, c: THREE.Vector3, color: THREE.Color): void {
-    for (const v of [a, b, c]) {
-      this.positions.push(v.x, v.y, v.z);
-      this.colors.push(color.r, color.g, color.b);
-    }
-  }
-
-  quad(a: THREE.Vector3, b: THREE.Vector3, c: THREE.Vector3, d: THREE.Vector3, color: THREE.Color) {
-    this.tri(a, b, c, color);
-    this.tri(a, c, d, color);
-  }
-
-  /** Fan-closes a ring around its centroid */
-  cap(points: THREE.Vector3[], color: THREE.Color): void {
-    const centre = points.reduce((sum, p) => sum.add(p), new THREE.Vector3());
-    centre.divideScalar(points.length);
-    points.forEach((p, i) => this.tri(centre, p, points[(i + 1) % points.length]!, color));
-  }
-
-  /** Skins consecutive rings (all with the same point count), capping both ends */
-  loft(
-    rings: THREE.Vector3[][],
-    color: (station: number, segment: number) => THREE.Color,
-    capColors: [THREE.Color, THREE.Color]
-  ): void {
-    for (let s = 0; s < rings.length - 1; s++) {
-      const a = rings[s]!;
-      const b = rings[s + 1]!;
-      for (let k = 0; k < a.length; k++) {
-        const n = (k + 1) % a.length;
-        this.quad(a[k]!, b[k]!, b[n]!, a[n]!, color(s, k));
-      }
-    }
-    this.cap(rings[0]!, capColors[0]);
-    this.cap(rings[rings.length - 1]!, capColors[1]);
-  }
-
-  /**
-   * A lifting surface through ribs given by leading edge, trailing edge and thickness; `up` is the
-   * direction the thickness grows in. Each rib is a four-point airfoil, thickest at 30% chord.
-   */
-  surface(
-    ribs: { le: THREE.Vector3; te: THREE.Vector3; thickness: number }[],
-    up: THREE.Vector3,
-    color: THREE.Color
-  ): void {
-    const rings = ribs.map(({ le, te, thickness }) => {
-      const crest = le.clone().lerp(te, 0.3);
-      return [
-        le,
-        crest.clone().addScaledVector(up, thickness * 0.6),
-        te,
-        crest.clone().addScaledVector(up, -thickness * 0.4),
-      ];
-    });
-    this.loft(rings, () => color, [color, color]);
-  }
-
-  build(): THREE.BufferGeometry {
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(this.positions, 3));
-    geometry.setAttribute('color', new THREE.Float32BufferAttribute(this.colors, 3));
-    geometry.computeVertexNormals();
-    geometry.computeBoundingSphere();
-    return geometry;
-  }
-}
 
 // Wing planform: constant chord over the centre section out past the engines, then tapering
 const HALF_SPAN = 18;
@@ -170,7 +79,7 @@ export class Hercules extends SimpleThreeComponent {
     const body = new THREE.Color(options.bodyColor ?? DEFAULTS.bodyColor);
     const wing = new THREE.Color(options.wingColor ?? DEFAULTS.wingColor);
     const prop = new THREE.Color(options.propellerColor ?? DEFAULTS.propellerColor);
-    const glass = new THREE.Color(options.windowColor ?? DEFAULTS.windowColor).multiplyScalar(0.6);
+    const glass = glassColor(options.windowColor ?? DEFAULTS.windowColor);
     const stripe = new THREE.Color(options.stripeColor ?? DEFAULTS.stripeColor);
     const radome = body.clone().multiplyScalar(0.8);
     const ramp = body.clone().multiplyScalar(0.7);
@@ -181,16 +90,7 @@ export class Hercules extends SimpleThreeComponent {
     this.buildWingAndTail(mesh, wing);
     ENGINE_Z.forEach(z => this.buildEngine(mesh, z, { body, prop, stripe, intake }));
 
-    const material = resourceManager.getOrCreateMaterial(
-      'hercules_lowpoly',
-      () =>
-        new THREE.MeshLambertMaterial({
-          vertexColors: true,
-          flatShading: true,
-          side: THREE.DoubleSide,
-        })
-    );
-    const hercules = new THREE.Mesh(mesh.build(), material);
+    const hercules = new THREE.Mesh(mesh.build(), lowPolyAircraftMaterial());
     hercules.name = 'Hercules-C130';
     return hercules;
   }
@@ -305,38 +205,19 @@ export class Hercules extends SimpleThreeComponent {
       [colors.intake, colors.body]
     );
 
-    // Spinner: a six-sided cone in front of the intake
+    // Six-sided spinner in front of the intake, four pitched blades in an X with banded tips
     const hubY = 1.95;
-    const spinnerBase = Array.from({ length: 6 }, (_, i) => {
-      const a = (i / 6) * Math.PI * 2;
-      return new THREE.Vector3(le + 1.7, hubY + Math.cos(a) * 0.38, z + Math.sin(a) * 0.38);
+    mesh.cone(new THREE.Vector3(le + 1.7, hubY, z), 0.8, 0.38, 6, colors.prop);
+    mesh.propeller({
+      hub: new THREE.Vector3(le + 2.0, hubY, z),
+      radius: PROP_RADIUS,
+      blades: 4,
+      phase: Math.PI / 4,
+      rootChord: 0.32,
+      tipChord: 0.18,
+      color: colors.prop,
+      tipColor: colors.stripe,
     });
-    const apex = new THREE.Vector3(le + 2.5, hubY, z);
-    spinnerBase.forEach((p, i) => mesh.tri(apex, p, spinnerBase[(i + 1) % 6]!, colors.prop));
-
-    // Four pitched blades in an X, tips banded
-    const hub = new THREE.Vector3(le + 2.0, hubY, z);
-    const pitch = THREE.MathUtils.degToRad(30);
-    for (let i = 0; i < 4; i++) {
-      const a = Math.PI / 4 + (i * Math.PI) / 2;
-      const out = new THREE.Vector3(0, Math.cos(a), Math.sin(a));
-      const chord = new THREE.Vector3(Math.sin(pitch), 0, 0).addScaledVector(
-        new THREE.Vector3(0, -Math.sin(a), Math.cos(a)),
-        Math.cos(pitch)
-      );
-      const at = (r: number, halfChord: number) => {
-        const centre = hub.clone().addScaledVector(out, r);
-        return [
-          centre.clone().addScaledVector(chord, -halfChord),
-          centre.clone().addScaledVector(chord, halfChord),
-        ];
-      };
-      const [rootA, rootB] = at(0.35, 0.16);
-      const [bandA, bandB] = at(PROP_RADIUS * 0.85, 0.12);
-      const [tipA, tipB] = at(PROP_RADIUS, 0.09);
-      mesh.quad(rootA!, rootB!, bandB!, bandA!, colors.prop);
-      mesh.quad(bandA!, bandB!, tipB!, tipA!, colors.stripe);
-    }
   }
 
   public override validate(): string[] {

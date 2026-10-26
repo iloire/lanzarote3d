@@ -1,35 +1,85 @@
 import * as THREE from 'three';
 import { SimpleThreeComponent, SimpleComponentOptions } from '../../base/SimpleThreeComponent';
 import { ComponentMetadata } from '../../base/IThreeComponent';
-import { resourceManager } from '../../../systems/ResourceManager';
+import {
+  MeshBuilder,
+  Section,
+  circle,
+  ring,
+  lowPolyAircraftMaterial,
+  glassColor,
+} from './lowPolyMesh';
 
 export interface CessnaOptions extends SimpleComponentOptions {
   bodyColor?: string;
   wingColor?: string;
   propellerColor?: string;
   windowColor?: string;
+  /** Cheat line along the fuselage, fin cap, spinner and propeller tips */
   stripeColor?: string;
   scale?: number;
 }
 
+const DEFAULTS = {
+  bodyColor: '#F4F4F4',
+  wingColor: '#E8E8E8',
+  propellerColor: '#2C3E50',
+  windowColor: '#87CEEB',
+  stripeColor: '#FF4500',
+};
+
+/** The octagon with its sides split so a cheat line can run along them */
+const STRIPED: Section = [
+  [0.5, 1],
+  [1, 0.5],
+  [1, 0],
+  [1, -0.18],
+  [0.65, -1],
+  [-0.65, -1],
+  [-1, -0.18],
+  [-1, 0],
+  [-1, 0.5],
+  [-0.5, 1],
+];
+// Segment k runs from point k to point k + 1
+const SEG_TOP = 9;
+const SEG_UPPER = [0, 8, 1, 7]; // chamfers and upper sides: where the windows are
+const SEG_STRIPE = [2, 6];
+
+type Palette = Record<'body' | 'wing' | 'prop' | 'glass' | 'stripe' | 'dark', THREE.Color>;
+
+// Wing planform: constant chord inboard, tapering outboard of the struts
+const HALF_SPAN = 6;
+const INBOARD = 2.6;
+const wingAt = (z: number) => {
+  const t = Math.max(0, (Math.abs(z) - INBOARD) / (HALF_SPAN - INBOARD));
+  return {
+    le: THREE.MathUtils.lerp(2.0, 1.8, t),
+    te: THREE.MathUtils.lerp(0.25, 0.75, t),
+    y: THREE.MathUtils.lerp(1.28, 1.45, t),
+    thickness: THREE.MathUtils.lerp(0.24, 0.14, t),
+  };
+};
+
 /**
- * Cessna - small single-engine general aviation aircraft
+ * Cessna 172 - single-engine four-seat high-wing trainer, built low poly
+ *
+ * One flat-shaded, vertex-coloured mesh: the cowled nose with a two-blade propeller, the cabin
+ * with wraparound windscreen, side and rear windows under a strut-braced wing, the cheat line
+ * down the slim tailcone, a swept fin and fixed tricycle gear on spring legs with wheel fairings.
+ * Nose points +X, wing spans Z.
  */
 export class Cessna extends SimpleThreeComponent {
   constructor(options: CessnaOptions = {}) {
     const metadata: ComponentMetadata = {
       name: 'Cessna',
-      version: '1.0.0',
+      version: '2.0.0',
       description: 'Small single-engine general aviation aircraft',
       tags: ['vehicle', 'aircraft', 'cessna', 'general-aviation'],
     };
 
     super(metadata, {
-      bodyColor: '#F4F4F4', // Off-white
-      wingColor: '#E8E8E8', // Light gray
-      propellerColor: '#2C3E50', // Dark blue-gray
-      windowColor: '#87CEEB', // Sky blue
-      stripeColor: '#FF4500', // Orange-red stripe
+      ...DEFAULTS,
       scale: 1,
       ...options,
     });
@@ -41,239 +91,171 @@ export class Cessna extends SimpleThreeComponent {
   }
 
   protected override createContent(): THREE.Object3D {
-    const cessna = new THREE.Group();
-    cessna.name = 'Cessna';
-
     const options = this.options as CessnaOptions;
-    const scale = options.scale || 1;
+    const colors: Palette = {
+      body: new THREE.Color(options.bodyColor ?? DEFAULTS.bodyColor),
+      wing: new THREE.Color(options.wingColor ?? DEFAULTS.wingColor),
+      prop: new THREE.Color(options.propellerColor ?? DEFAULTS.propellerColor),
+      glass: glassColor(options.windowColor ?? DEFAULTS.windowColor),
+      stripe: new THREE.Color(options.stripeColor ?? DEFAULTS.stripeColor),
+      dark: new THREE.Color('#1A1A1A'),
+    };
 
-    // Create materials
-    const bodyMaterial = resourceManager.getOrCreateMaterial(
-      `cessna_body_${options.bodyColor}`,
-      () =>
-        new THREE.MeshStandardMaterial({
-          color: options.bodyColor,
-          metalness: 0.4,
-          roughness: 0.5,
-        })
-    );
+    const mesh = new MeshBuilder();
+    this.buildFuselage(mesh, colors);
+    this.buildWingAndTail(mesh, colors);
+    this.buildGear(mesh, colors);
 
-    const wingMaterial = resourceManager.getOrCreateMaterial(
-      `cessna_wing_${options.wingColor}`,
-      () =>
-        new THREE.MeshStandardMaterial({
-          color: options.wingColor,
-          metalness: 0.3,
-          roughness: 0.6,
-        })
-    );
-
-    const propellerMaterial = resourceManager.getOrCreateMaterial(
-      `cessna_propeller_${options.propellerColor}`,
-      () =>
-        new THREE.MeshStandardMaterial({
-          color: options.propellerColor,
-          metalness: 0.7,
-          roughness: 0.3,
-        })
-    );
-
-    const windowMaterial = resourceManager.getOrCreateMaterial(
-      `cessna_window_${options.windowColor}`,
-      () =>
-        new THREE.MeshStandardMaterial({
-          color: options.windowColor,
-          transparent: true,
-          opacity: 0.6,
-          metalness: 0.8,
-          roughness: 0.1,
-        })
-    );
-
-    const stripeMaterial = resourceManager.getOrCreateMaterial(
-      `cessna_stripe_${options.stripeColor}`,
-      () =>
-        new THREE.MeshStandardMaterial({
-          color: options.stripeColor,
-          metalness: 0.4,
-          roughness: 0.5,
-        })
-    );
-
-    // Main fuselage (smaller, more compact)
-    const fuselageGeometry = new THREE.BoxGeometry(8, 2, 2.5);
-    const fuselage = new THREE.Mesh(fuselageGeometry, bodyMaterial);
-    fuselage.position.set(0, 0, 0);
-    fuselage.castShadow = this.options.castShadow ?? true;
-    fuselage.receiveShadow = this.options.receiveShadow ?? true;
-    cessna.add(fuselage);
-
-    // Nose section (engine cowling)
-    const noseGeometry = new THREE.BoxGeometry(2, 1.8, 2.3);
-    const nose = new THREE.Mesh(noseGeometry, bodyMaterial);
-    nose.position.set(5, 0, 0);
-    nose.castShadow = this.options.castShadow ?? true;
-    cessna.add(nose);
-
-    // Cockpit (cabin with windows)
-    const cockpitGeometry = new THREE.BoxGeometry(3, 2.2, 2.5);
-    const cockpit = new THREE.Mesh(cockpitGeometry, bodyMaterial);
-    cockpit.position.set(1.5, 0.5, 0);
-    cockpit.castShadow = this.options.castShadow ?? true;
-    cessna.add(cockpit);
-
-    // Windshield (front windows)
-    const windshieldGeometry = new THREE.BoxGeometry(0.1, 1.5, 2);
-    const windshield = new THREE.Mesh(windshieldGeometry, windowMaterial);
-    windshield.position.set(3, 0.5, 0);
-    cessna.add(windshield);
-
-    // Side windows
-    const sideWindowGeometry = new THREE.BoxGeometry(2, 1, 0.1);
-
-    const leftWindow1 = new THREE.Mesh(sideWindowGeometry, windowMaterial);
-    leftWindow1.position.set(2, 0.5, 1.3);
-    cessna.add(leftWindow1);
-
-    const leftWindow2 = new THREE.Mesh(sideWindowGeometry, windowMaterial);
-    leftWindow2.position.set(0, 0.5, 1.3);
-    cessna.add(leftWindow2);
-
-    const rightWindow1 = new THREE.Mesh(sideWindowGeometry, windowMaterial);
-    rightWindow1.position.set(2, 0.5, -1.3);
-    cessna.add(rightWindow1);
-
-    const rightWindow2 = new THREE.Mesh(sideWindowGeometry, windowMaterial);
-    rightWindow2.position.set(0, 0.5, -1.3);
-    cessna.add(rightWindow2);
-
-    // Decorative stripe
-    const stripeGeometry = new THREE.BoxGeometry(7, 0.2, 0.1);
-    const stripe = new THREE.Mesh(stripeGeometry, stripeMaterial);
-    stripe.position.set(0.5, 0.3, 1.31);
-    cessna.add(stripe);
-
-    const stripeRight = new THREE.Mesh(stripeGeometry, stripeMaterial);
-    stripeRight.position.set(0.5, 0.3, -1.31);
-    cessna.add(stripeRight);
-
-    // Main wings (high-wing configuration typical of Cessna)
-    const wingGeometry = new THREE.BoxGeometry(2.5, 0.3, 12);
-    const wings = new THREE.Mesh(wingGeometry, wingMaterial);
-    wings.position.set(0, 1.5, 0); // Positioned high on fuselage
-    wings.castShadow = this.options.castShadow ?? true;
-    cessna.add(wings);
-
-    // Wing struts (supporting wires from wing to fuselage)
-    const strutGeometry = new THREE.CylinderGeometry(0.1, 0.1, 2);
-    const strutMaterial = new THREE.MeshStandardMaterial({
-      color: '#888888',
-      metalness: 0.8,
-      roughness: 0.2,
-    });
-
-    const leftStrut1 = new THREE.Mesh(strutGeometry, strutMaterial);
-    leftStrut1.position.set(-0.5, 0.5, -4);
-    leftStrut1.rotation.z = -0.3;
-    cessna.add(leftStrut1);
-
-    const leftStrut2 = new THREE.Mesh(strutGeometry, strutMaterial);
-    leftStrut2.position.set(-0.5, 0.5, 4);
-    leftStrut2.rotation.z = 0.3;
-    cessna.add(leftStrut2);
-
-    // Tail section
-    const tailGeometry = new THREE.BoxGeometry(3, 1.5, 1.5);
-    const tail = new THREE.Mesh(tailGeometry, bodyMaterial);
-    tail.position.set(-4.5, 0.5, 0);
-    tail.castShadow = this.options.castShadow ?? true;
-    cessna.add(tail);
-
-    // Vertical stabilizer (tail fin)
-    const verticalStabGeometry = new THREE.BoxGeometry(0.3, 2.5, 2);
-    const verticalStab = new THREE.Mesh(verticalStabGeometry, wingMaterial);
-    verticalStab.position.set(-5.5, 1.5, 0);
-    verticalStab.castShadow = this.options.castShadow ?? true;
-    cessna.add(verticalStab);
-
-    // Horizontal stabilizers
-    const horizontalStabGeometry = new THREE.BoxGeometry(1.5, 0.2, 4);
-    const horizontalStab = new THREE.Mesh(horizontalStabGeometry, wingMaterial);
-    horizontalStab.position.set(-5.5, 0.5, 0);
-    horizontalStab.castShadow = this.options.castShadow ?? true;
-    cessna.add(horizontalStab);
-
-    // Engine (simple cylinder)
-    const engineGeometry = new THREE.CylinderGeometry(0.8, 0.8, 1.5, 12);
-    const engine = new THREE.Mesh(engineGeometry, propellerMaterial);
-    engine.rotation.z = Math.PI / 2;
-    engine.position.set(6, 0, 0);
-    engine.castShadow = this.options.castShadow ?? true;
-    cessna.add(engine);
-
-    // Propeller (3-blade)
-    const bladeGeometry = new THREE.BoxGeometry(0.2, 3, 0.4);
-
-    for (let i = 0; i < 3; i++) {
-      const blade = new THREE.Mesh(bladeGeometry, propellerMaterial);
-      blade.position.set(6.8, 0, 0);
-      blade.rotation.x = (i * Math.PI * 2) / 3; // Evenly space 3 blades
-      cessna.add(blade);
-    }
-
-    // Propeller hub
-    const hubGeometry = new THREE.SphereGeometry(0.3, 8, 8);
-    const hub = new THREE.Mesh(hubGeometry, propellerMaterial);
-    hub.position.set(6.8, 0, 0);
-    cessna.add(hub);
-
-    // Landing gear (fixed gear - typical of small Cessna)
-    const wheelGeometry = new THREE.CylinderGeometry(0.4, 0.4, 0.3, 12);
-    const wheelMaterial = new THREE.MeshStandardMaterial({
-      color: '#1A1A1A',
-      metalness: 0.3,
-      roughness: 0.7,
-    });
-
-    const strutMainGeometry = new THREE.CylinderGeometry(0.1, 0.1, 1.5);
-
-    // Left main gear
-    const leftGearStrut = new THREE.Mesh(strutMainGeometry, strutMaterial);
-    leftGearStrut.position.set(0.5, -1.5, -2);
-    cessna.add(leftGearStrut);
-
-    const leftWheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
-    leftWheel.rotation.z = Math.PI / 2;
-    leftWheel.position.set(0.5, -2.3, -2);
-    cessna.add(leftWheel);
-
-    // Right main gear
-    const rightGearStrut = new THREE.Mesh(strutMainGeometry, strutMaterial);
-    rightGearStrut.position.set(0.5, -1.5, 2);
-    cessna.add(rightGearStrut);
-
-    const rightWheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
-    rightWheel.rotation.z = Math.PI / 2;
-    rightWheel.position.set(0.5, -2.3, 2);
-    cessna.add(rightWheel);
-
-    // Nose wheel
-    const noseGearStrut = new THREE.Mesh(strutMainGeometry, strutMaterial);
-    noseGearStrut.position.set(4.5, -1.5, 0);
-    cessna.add(noseGearStrut);
-
-    const noseWheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
-    noseWheel.rotation.z = Math.PI / 2;
-    noseWheel.position.set(4.5, -2.3, 0);
-    noseWheel.scale.set(0.8, 0.8, 0.8); // Smaller nose wheel
-    cessna.add(noseWheel);
-
-    // Apply scale
-    if (scale !== 1) {
-      cessna.scale.setScalar(scale);
-    }
-
+    const cessna = new THREE.Mesh(mesh.build(), lowPolyAircraftMaterial());
+    cessna.name = 'Cessna';
     return cessna;
+  }
+
+  private buildFuselage(mesh: MeshBuilder, colors: Palette): void {
+    // Stations nose to tail: x, bottom, top, half width
+    const stations: [number, number, number, number][] = [
+      [4.15, -0.32, 0.32, 0.36], // cowl front
+      [3.85, -0.55, 0.45, 0.5],
+      [3.0, -0.62, 0.55, 0.56], // firewall, windscreen starts
+      [1.9, -0.66, 1.15, 0.58], // roof under the wing
+      [0.65, -0.62, 1.15, 0.58], // door post
+      [0.45, -0.6, 1.15, 0.57],
+      [-0.8, -0.42, 1.0, 0.5], // end of the rear windows
+      [-3.0, -0.05, 0.55, 0.26],
+      [-4.6, 0.18, 0.45, 0.08],
+    ];
+    const windscreen = 2;
+    const sideWindows = 3;
+    const rearWindows = 5;
+
+    mesh.loft(
+      stations.map(([x, bottom, top, w]) => ring(x, bottom, top, w, 0, STRIPED)),
+      (s, k) => {
+        if (SEG_STRIPE.includes(k)) return colors.stripe;
+        const upper = SEG_UPPER.includes(k);
+        if (s === windscreen && (upper || k === SEG_TOP)) return colors.glass;
+        if (s === sideWindows && upper) return colors.glass;
+        if (s === rearWindows && (upper || k === SEG_TOP)) return colors.glass;
+        return colors.body;
+      },
+      [colors.dark, colors.body]
+    );
+
+    // Spinner and two-blade propeller
+    mesh.cone(new THREE.Vector3(4.15, 0.02, 0), 0.55, 0.24, 8, colors.stripe);
+    mesh.propeller({
+      hub: new THREE.Vector3(4.3, 0.02, 0),
+      radius: 1.0,
+      blades: 2,
+      phase: 0.35,
+      rootChord: 0.16,
+      tipChord: 0.1,
+      color: colors.prop,
+      tipColor: colors.stripe,
+    });
+  }
+
+  private buildWingAndTail(mesh: MeshBuilder, colors: Palette): void {
+    const up = new THREE.Vector3(0, 1, 0);
+
+    mesh.surface(
+      [-HALF_SPAN, -INBOARD, 0, INBOARD, HALF_SPAN].map(z => {
+        const { le, te, y, thickness } = wingAt(z);
+        return { le: new THREE.Vector3(le, y, z), te: new THREE.Vector3(te, y, z), thickness };
+      }),
+      up,
+      colors.wing
+    );
+
+    // Struts from the wing down to the lower fuselage
+    [-1, 1].forEach(side => {
+      const z = side * 3.3;
+      const top = new THREE.Vector3(1.25, wingAt(z).y - 0.08, z);
+      mesh.strut(top, new THREE.Vector3(0.95, -0.5, side * 0.56), 0.16, 0.05, colors.wing);
+    });
+
+    mesh.surface(
+      [-1.8, 0, 1.8].map(z => {
+        const t = Math.abs(z) / 1.8;
+        return {
+          le: new THREE.Vector3(THREE.MathUtils.lerp(-3.45, -3.8, t), 0.38, z),
+          te: new THREE.Vector3(THREE.MathUtils.lerp(-4.55, -4.45, t), 0.38, z),
+          thickness: THREE.MathUtils.lerp(0.1, 0.06, t),
+        };
+      }),
+      up,
+      colors.wing
+    );
+
+    // Swept fin with its dorsal fillet, capped in the stripe colour
+    mesh.surface(
+      [
+        {
+          le: new THREE.Vector3(-2.5, 0.5, 0),
+          te: new THREE.Vector3(-4.6, 0.5, 0),
+          thickness: 0.12,
+        },
+        {
+          le: new THREE.Vector3(-3.6, 1.0, 0),
+          te: new THREE.Vector3(-4.62, 1.0, 0),
+          thickness: 0.1,
+        },
+        {
+          le: new THREE.Vector3(-4.1, 1.75, 0),
+          te: new THREE.Vector3(-4.82, 1.75, 0),
+          thickness: 0.07,
+        },
+        {
+          le: new THREE.Vector3(-4.3, 2.05, 0),
+          te: new THREE.Vector3(-4.9, 2.05, 0),
+          thickness: 0.06,
+        },
+      ],
+      new THREE.Vector3(0, 0, 1),
+      span => (span === 2 ? colors.stripe : colors.wing)
+    );
+  }
+
+  private buildGear(mesh: MeshBuilder, colors: Palette): void {
+    const wheel = (centre: THREE.Vector3, radius: number) => {
+      const halfWidth = new THREE.Vector3(0, 0, 0.07);
+      mesh.loft(
+        [
+          circle(centre.clone().sub(halfWidth), radius, 8, 'z'),
+          circle(centre.clone().add(halfWidth), radius, 8, 'z'),
+        ],
+        () => colors.dark,
+        [colors.dark, colors.dark]
+      );
+    };
+    // Wheel fairing around a wheel at x, y, z: a short teardrop, wider at the front
+    const fairing = (x: number, y: number, z: number, size: number) => {
+      const st: [number, number, number, number][] = [
+        [0.37, -0.05, 0.09, 0.04],
+        [0.15, -0.23, 0.27, 0.15],
+        [-0.3, -0.19, 0.21, 0.13],
+        [-0.55, -0.05, 0.07, 0.03],
+      ];
+      mesh.loft(
+        st.map(([dx, b, t, w]) => ring(x + dx * size, y + b * size, y + t * size, w * size, z)),
+        () => colors.body,
+        [colors.body, colors.body]
+      );
+    };
+
+    // Main gear: spring-steel legs splayed out from the belly
+    [-1, 1].forEach(side => {
+      const hub = new THREE.Vector3(0.05, -1.37, side * 1.25);
+      mesh.strut(new THREE.Vector3(0.3, -0.55, side * 0.5), hub, 0.1, 0.04, colors.body);
+      wheel(hub, 0.26);
+      fairing(hub.x, hub.y, hub.z, 1);
+    });
+
+    // Nose gear
+    const noseHub = new THREE.Vector3(3.5, -1.4, 0);
+    mesh.strut(new THREE.Vector3(3.45, -0.5, 0), noseHub, 0.08, 0.06, colors.body);
+    wheel(noseHub, 0.22);
+    fairing(noseHub.x, noseHub.y, noseHub.z, 0.85);
   }
 
   public override validate(): string[] {
@@ -292,7 +274,7 @@ export class Cessna extends SimpleThreeComponent {
 
     return {
       name: 'Cessna',
-      version: '1.0.0',
+      version: '2.0.0',
       type: 'vehicle',
       subtype: 'aircraft',
       category: 'general_aviation',
