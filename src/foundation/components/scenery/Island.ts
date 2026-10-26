@@ -26,6 +26,8 @@ const loadFromBlenderModel = async (manager: THREE.LoadingManager) => {
 // Distances (world units) over which the wireframe fades from near to far opacity.
 const LINE_FADE_START = 600;
 const LINE_FADE_END = 9000;
+// Brightest the lines get (linear, before tone mapping): a light grey, not a glare.
+const LINE_MAX_BRIGHTNESS = 0.9;
 
 /**
  * Let the wireframe fade with distance. Far away the mesh is so dense that solid lines
@@ -45,7 +47,11 @@ const addLineFade = (material: THREE.Material): void => {
       )
       .replace(
         '#include <opaque_fragment>',
-        `diffuseColor.a *= mix(uLineNear, uLineFar,
+        `// Lines are lit far past white before tone mapping; at any opacity that still blends
+        // to white. Cap their brightness first so the opacity reads as intended.
+        float lzPeak = max(max(outgoingLight.r, outgoingLight.g), outgoingLight.b);
+        outgoingLight *= min(1.0, ${LINE_MAX_BRIGHTNESS.toFixed(2)} / max(lzPeak, 1e-4));
+        diffuseColor.a *= mix(uLineNear, uLineFar,
           smoothstep(${LINE_FADE_START.toFixed(1)}, ${LINE_FADE_END.toFixed(1)}, length(vLzWorld - cameraPosition)));
         #include <opaque_fragment>`
       );

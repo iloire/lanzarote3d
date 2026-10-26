@@ -71,7 +71,9 @@ Polygon offset can't do this, because the logarithmic depth buffer overrides it.
 
 Over the underlay the wireframe is translucent, and it fades with distance: from
 `lineOpacity` near the camera to `farLineOpacity` between 600 m and 9 km. Without the fade,
-the far end of the mesh is so dense that solid lines merge into a white sheet.
+the far end of the mesh is so dense that solid lines merge into a white sheet. The lines'
+brightness is capped (`LINE_MAX_BRIGHTNESS`) before they blend. They're lit several times
+past white before tone mapping, and at that brightness any opacity still blends to white.
 
 ## Life
 
