@@ -17,9 +17,9 @@ export const THEMES: Record<string, Theme> = {
     terrain: {
       style: 'wireframe',
       customMaterial: {
-        color: '#c2c2c2',
-        emissive: '#BF8F6E',
-        emissiveIntensity: 0.25,
+        color: '#8a6248',
+        emissive: '#5c3a26',
+        emissiveIntensity: 0.2,
         roughness: 0.8,
         metalness: 0.05,
         opacity: 1.0,

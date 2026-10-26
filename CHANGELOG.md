@@ -5,6 +5,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ## [Unreleased] - 2026-10-26 20:31 UTC
 
 ### Changed
+- **Brown wireframe** in the default theme (`#8a6248`, a few shades above the basalt ground) instead of near-white, so the grid sits in the landscape rather than on top of it
 - **Softer wireframe**: over the solid ground the lines are translucent and fade with distance (`terrain.underlay.lineOpacity` / `farLineOpacity`, 0.45 → 0.12 by 9 km), so the far island no longer turns into a white sheet of lines. Their brightness is capped before blending: lit far past white in HDR, they otherwise blended back to white at any opacity
 
 ## [Unreleased] - 2026-10-26 19:59 UTC
