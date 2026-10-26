@@ -1,47 +1,63 @@
-# lanzarote 3d
+# Lanzarote 3D
 
-## Setup
+A 3D, voxel-styled Lanzarote you can watch paragliders fly over, in the browser. The island is a
+real height map drawn as a wireframe over sunlit ground, with a living sea, gulls in thermals,
+towns, boats and planes, and voxel pilots soaring the Famara cliffs. The home scene opens on the
+island with just its title; the other scenes (Famara, Boats, Island, Island Flying) are standalone
+animations, and the sidebar holds a playground of flight and rendering experiments.
 
-### AWS Configuration
+![Ivan soaring the Famara cliffs on the home scene](docs/screenshots/home.png)
 
-This project uses AWS S3 for deployment. You need to configure AWS CLI with the `lanzaroteparagliding` profile:
+Built with three.js, React and webpack. How a frame is drawn (the filmic pipeline, the sea, the
+shaded wireframe, adaptive quality) is in [docs/RENDERING.md](docs/RENDERING.md); the rest of the
+docs are indexed in [docs/README.md](docs/README.md).
 
-1. Install AWS CLI if you haven't already:
-   ```bash
-   # On macOS
-   brew install awscli
-
-   # On Linux/Windows
-   # Follow instructions at https://aws.amazon.com/cli/
-   ```
-
-2. Configure the AWS profile:
-   ```bash
-   aws configure --profile lanzaroteparagliding
-   ```
-
-   You'll be prompted to enter:
-   - AWS Access Key ID
-   - AWS Secret Access Key
-   - Default region (e.g., `eu-west-1`)
-   - Default output format (e.g., `json`)
-
-3. Verify the profile is set up correctly:
-   ```bash
-   aws s3 ls --profile lanzaroteparagliding
-   ```
-
-### Development
+## Running it
 
 ```bash
-# Install dependencies
 npm install
-
-# Start development server
-npm run dev
+npm run dev        # webpack dev server on http://localhost:8080, opens the home scene
 ```
 
-#### Dev Mode in Production
+Scenes are picked with `?story=`: `home`, `famara-animation`, `boats-animation`, `island`,
+`island-flying`, and more in the sidebar. Add `?fx=0` to render without post-processing, to
+compare looks and frame times. Dev builds expose `window.__lz` for profiling (see RENDERING.md).
+
+## Checking it
+
+```bash
+npm run lint:check
+npm run format:check
+npm run type-check
+npm run test:ci    # Jest
+```
+
+## Deploying
+
+Production is an S3 bucket (`lanzaroteparagliding-placeholder`) behind CloudFront, deployed with
+the AWS CLI's `lanzaroteparagliding` profile:
+
+```bash
+brew install awscli                                  # once
+aws configure --profile lanzaroteparagliding         # once: access key, secret, region
+aws s3 ls --profile lanzaroteparagliding             # check the profile works
+
+npm run deploy-prod
+```
+
+`deploy-prod` builds into `dist/`, tags the commit `PROD-<date>_<time>` (locally), empties the
+bucket, uploads `dist/` and invalidates the CloudFront cache. Two things to know:
+
+- It builds the **working tree**, uncommitted changes included. Deploy from a clean checkout of
+  `master` to ship exactly what's committed.
+- The bucket is **empty for the length of the upload**, so the site can briefly 404.
+
+`npm run run-prod` builds and serves `dist/` locally on port 8080, to check a production build
+before deploying.
+
+## Development notes
+
+### Dev mode in production
 
 By default, only public apps are visible in production. To access private/hidden apps and dev tools in production:
 
@@ -66,7 +82,7 @@ localStorage.removeItem('lanzarote_dev_mode')
 
 When dev mode is enabled in production, you'll see "🔓 Secret dev mode enabled" in the console and have access to all private apps (workshop-demo, location-editor, tile-debug, etc.).
 
-#### Show Sidebar on Home App
+### Show the sidebar on the home scene
 
 The sidebar is hidden by default on the home app for a cleaner presentation. To force-show it:
 
@@ -81,23 +97,6 @@ localStorage.removeItem('lanzarote_show_menu')
 ```
 
 Reload the page after changing this setting.
-
-### Deployment
-
-The project can be deployed to different S3 buckets:
-
-```bash
-# Deploy to staging environment
-npm run deploy-staging
-
-# Deploy to flyzones environment
-npm run deploy-flyzones
-
-# Deploy to placeholder environment
-npm run deploy-placeholder
-```
-
-All deployment scripts automatically use the `lanzaroteparagliding` AWS profile.
 
 ## Archived branches
 
@@ -114,7 +113,7 @@ Kept on the remote for reference only. They are not meant to be merged.
 
 ## Screenshots
 
-![Screenshot](https://raw.githubusercontent.com/iloire/lanzarote3d/master/screenshots/screenshot3.png)
+Older looks are kept in [`screenshots/`](screenshots/).
 
 ## Height map
 
