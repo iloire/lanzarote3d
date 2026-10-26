@@ -3,59 +3,80 @@ import { ParagliderVoxel } from '../../foundation/components/vehicles';
 import { Hangglider } from '../../foundation/components/vehicles';
 import { Cessna } from '../../foundation/components/vehicles';
 import { Hercules } from '../../foundation/components/vehicles';
-import { FlyingBehavior } from '../../foundation/systems/behaviors/FlyingBehavior';
+import { FlyingBehavior, FlightPattern } from '../../foundation/systems/behaviors/FlyingBehavior';
 import { SmokeTrail } from '../../foundation/components/effects/SmokeTrail';
 import { logger } from '../../foundation/utils/logger';
+import { ParagliderMotion } from './paragliderMotion';
 import type {
   ParagliderVoxelConfig,
   HanggliderConfig,
   CessnaConfig,
   HerculesConfig,
 } from './config';
+import { RIDGE_LOOP, RIDGE_LOOP_TENSION, PARAGLIDER_SPEED } from './config';
 
 export interface VehicleLoadResult {
   mesh: THREE.Object3D;
   flyingBehavior?: FlyingBehavior;
   smokeTrail?: SmokeTrail;
+  motion?: ParagliderMotion;
 }
 
 const DEBUG_VECTORS = false;
 
 /**
- * Loads paraglider vehicles into the scene
+ * Loads the paragliders, each flying its copy of the ridge loop from its own start point.
+ * They are placed on the loop straight away and fly from the first frame.
  */
 export async function loadParagliders(
   scene: THREE.Scene,
   configs: ParagliderVoxelConfig[],
-  errorHandler: (error: Error, context: string) => void,
-  animationDurationMs: number = 0
+  errorHandler: (error: Error, context: string) => void
 ): Promise<VehicleLoadResult[]> {
-  const results: VehicleLoadResult[] = [];
+  const loaded = await Promise.all(
+    configs.map(async (p): Promise<VehicleLoadResult | null> => {
+      try {
+        const mesh = await new ParagliderVoxel(p.options).load();
+        const scale = 0.01;
+        mesh.scale.set(scale, scale, scale);
 
-  const voxelPromises = configs.map(async (p) => {
-    try {
-      logger.info('Creating paraglider with config:', JSON.stringify(p.options, null, 2));
-      const paraglider = new ParagliderVoxel(p.options);
-      logger.info('Paraglider created, loading...');
-      const mesh = await paraglider.load();
-      mesh.position.copy(p.position);
-      const scale = 0.01;
-      mesh.scale.set(scale, scale, scale);
-      scene.add(mesh);
+        // FlyingBehavior owns the rig's rotation, so the paraglider keeps its own inside it,
+        // and ParagliderMotion banks and sways the body between the two.
+        const rig = new THREE.Group();
+        rig.name = `paraglider-${p.options.pilot.characterType}`;
+        const body = new THREE.Group();
+        body.add(mesh);
+        rig.add(body);
+        scene.add(rig);
 
-      const flyingBehavior: FlyingBehavior | undefined = undefined;
+        const flyingBehavior = new FlyingBehavior({
+          pattern: FlightPattern.WAYPOINT,
+          speed: PARAGLIDER_SPEED,
+          turnSpeed: 1.0,
+          forwardAxis: '-z',
+          debugVectors: DEBUG_VECTORS,
+          waypoints: RIDGE_LOOP.map(point => point.clone().add(p.pathOffset)),
+          waypointTension: RIDGE_LOOP_TENSION,
+          waypointLoop: true,
+          waypointStartProgress: p.startProgress,
+        });
+        flyingBehavior.attachTo(rig);
+        flyingBehavior.snapToWaypointCurve();
+        flyingBehavior.start();
 
-      results.push({ mesh, flyingBehavior });
-      logger.info(`Paraglider voxel loaded at position (${p.position.x}, ${p.position.y}, ${p.position.z})`);
-      return mesh;
-    } catch (error) {
-      errorHandler(error as Error, 'loading voxel paraglider');
-      logger.error('Failed to load paraglider voxel:', error);
-      return null;
-    }
-  });
+        return {
+          mesh: rig,
+          flyingBehavior,
+          motion: new ParagliderMotion(rig, body, PARAGLIDER_SPEED),
+        };
+      } catch (error) {
+        errorHandler(error as Error, 'loading voxel paraglider');
+        return null;
+      }
+    })
+  );
 
-  await Promise.all(voxelPromises);
+  const results = loaded.filter((r): r is VehicleLoadResult => r !== null);
   logger.info(`Loaded ${results.length} paraglider(s)`);
   return results;
 }

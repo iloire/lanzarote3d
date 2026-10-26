@@ -28,6 +28,7 @@ export interface FlyingBehaviorOptions {
   waypoints?: THREE.Vector3[]; // Predefined points for WAYPOINT pattern
   waypointTension?: number; // Catmull-Rom spline tension (0 = sharp, 0.5 = smooth, default 0.5)
   waypointLoop?: boolean; // Whether to loop back to start (default true)
+  waypointStartProgress?: number; // Where on the curve to start, 0 to 1 (default 0)
 }
 
 export interface FlightState {
@@ -90,6 +91,7 @@ export class FlyingBehavior {
   private waypointProgress = 0; // 0 to 1 along the curve
   private waypointTension: number;
   private waypointLoop: boolean;
+  private waypointStartProgress: number;
 
   constructor(options: FlyingBehaviorOptions = {}) {
     this.pattern = options.pattern || FlightPattern.FREE_ROAM;
@@ -110,6 +112,7 @@ export class FlyingBehavior {
     this.debugVectors = options.debugVectors || false;
     this.waypointTension = options.waypointTension ?? 0.5;
     this.waypointLoop = options.waypointLoop ?? true;
+    this.waypointStartProgress = options.waypointStartProgress ?? 0;
 
     // Setup waypoints if provided
     if (options.waypoints && options.waypoints.length >= 2) {
@@ -213,8 +216,19 @@ export class FlyingBehavior {
       this.waypointTension
     );
 
-    this.waypointProgress = 0;
+    this.waypointProgress = this.waypointStartProgress;
     logger.debug(`Waypoint curve created with ${points.length} points, loop: ${this.waypointLoop}`);
+  }
+
+  /**
+   * Put the attached object on the waypoint curve at its current progress, facing along it,
+   * so it doesn't jump onto the curve when the flight starts
+   */
+  public snapToWaypointCurve(): void {
+    if (!this.mesh || !this.waypointCurve) return;
+    this.mesh.position.copy(this.waypointCurve.getPoint(this.waypointProgress));
+    const tangent = this.waypointCurve.getTangent(this.waypointProgress);
+    this.mesh.quaternion.copy(this.getTargetQuaternion(tangent));
   }
 
   /**
@@ -597,16 +611,26 @@ export class FlyingBehavior {
   protected orientToDirection(direction: THREE.Vector3): void {
     if (!this.mesh || direction.length() === 0) return;
 
+    const targetQuaternion = this.getTargetQuaternion(direction);
+
+    // FIXED: Simplified rotation with consistent speed
+    // Use turnSpeed directly for more predictable rotation
+    const rotationSpeed = Math.min(this.turnSpeed * 0.1, 0.2); // More responsive, capped at 0.2
+
+    // Smooth rotation without euler angle limits (they cause jitter)
+    this.mesh.quaternion.slerp(targetQuaternion, rotationSpeed);
+  }
+
+  /**
+   * Rotation that points the model's forward axis along direction
+   */
+  private getTargetQuaternion(direction: THREE.Vector3): THREE.Quaternion {
     // Use the full 3D direction for natural aircraft orientation
     const normalizedDirection = direction.clone().normalize();
 
-    // Create target position for lookAt
-    const targetPosition = this.mesh.position.clone().add(normalizedDirection);
-
-    // Create a temporary object to get the lookAt rotation
+    // A temporary object at the origin gives the lookAt rotation
     const tempObject = new THREE.Object3D();
-    tempObject.position.copy(this.mesh.position);
-    tempObject.lookAt(targetPosition);
+    tempObject.lookAt(normalizedDirection);
 
     // Apply corrective rotation based on model's forward axis
     const correction = new THREE.Euler();
@@ -632,14 +656,7 @@ export class FlyingBehavior {
     }
 
     const correctionQuaternion = new THREE.Quaternion().setFromEuler(correction);
-    const targetQuaternion = tempObject.quaternion.clone().multiply(correctionQuaternion);
-
-    // FIXED: Simplified rotation with consistent speed
-    // Use turnSpeed directly for more predictable rotation
-    const rotationSpeed = Math.min(this.turnSpeed * 0.1, 0.2); // More responsive, capped at 0.2
-
-    // Smooth rotation without euler angle limits (they cause jitter)
-    this.mesh.quaternion.slerp(targetQuaternion, rotationSpeed);
+    return tempObject.quaternion.clone().multiply(correctionQuaternion);
   }
 
   /**

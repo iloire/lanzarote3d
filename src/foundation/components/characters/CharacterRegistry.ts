@@ -7,6 +7,9 @@ import { logger } from '../../utils/logger';
 export enum CharacterType {
   ADRI = 'adri',
   IVAN = 'ivan',
+  JEHOSUA = 'jehosua',
+  MIGUEL = 'miguel',
+  ROOS = 'roos',
   PILOT_CLASSIC = 'pilot-classic',
   PILOT_MODERN = 'pilot-modern',
   WARRIOR = 'warrior',
@@ -114,6 +117,45 @@ export class CharacterRegistry {
       tags: ['pilot', 'personal', 'ivan', 'voxel'],
       author: 'Lanzarote3D',
       version: '1.0.0',
+    });
+
+    // Built from Ivan by 3d-characters tools/pilots and exported in Adri's frame like him.
+    const pilots: { id: CharacterType; name: string; description: string }[] = [
+      {
+        id: CharacterType.JEHOSUA,
+        name: 'Jehosua',
+        description: 'Piratas Aéreos pilot - skull helmet, open harness',
+      },
+      {
+        id: CharacterType.MIGUEL,
+        name: 'Miguel',
+        description: 'Venturi pilot - orange helmet, cocoon harness',
+      },
+      {
+        id: CharacterType.ROOS,
+        name: 'Roos',
+        description: 'Full-face helmet, plum jacket, open harness',
+      },
+    ];
+    pilots.forEach(({ id, name, description }) => {
+      this.registerCharacter({
+        id,
+        name,
+        description,
+        assets: {
+          objFile: `/assets/foundation/models/characters/${id}/${id}.obj`,
+          textureFile: `/assets/foundation/models/characters/${id}/${id}.png`,
+        },
+        defaultScale: 0.01,
+        defaultMaterialOptions: {
+          roughness: 0.7,
+          metalness: 0.15,
+          side: THREE.DoubleSide,
+        },
+        tags: ['pilot', 'personal', id, 'voxel'],
+        author: 'Lanzarote3D',
+        version: '1.0.0',
+      });
     });
 
     logger.debug(`Character Registry initialized with ${this.characters.size} characters`);

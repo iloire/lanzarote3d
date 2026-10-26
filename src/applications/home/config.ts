@@ -5,12 +5,10 @@ import { FlightPattern } from '../../foundation/systems/behaviors/FlyingBehavior
 
 export type ParagliderVoxelConfig = {
   options: ParagliderVoxelOptions;
-  position: THREE.Vector3;
-  flightPattern?: FlightPattern;
-  speed?: number;
-  waypoints?: THREE.Vector3[];
-  waypointTension?: number;
-  waypointLoop?: boolean;
+  /** Where on the ridge loop this pilot starts, 0 to 1, so the pilots spread out */
+  startProgress: number;
+  /** Shifts this pilot's copy of the loop so the pilots don't fly through each other */
+  pathOffset: THREE.Vector3;
 };
 
 export type HanggliderConfig = {
@@ -73,6 +71,27 @@ export type HerculesConfig = {
   waypointLoop?: boolean;
 };
 
+/**
+ * Ridge-soaring beat along the Famara cliff, flown as a closed loop by every pilot. The first
+ * point is where the camera arrives, so the lead pilot starts in view. It clears the terrain
+ * by at least ~130 m everywhere; check that again after moving a point.
+ */
+export const RIDGE_LOOP: THREE.Vector3[] = [
+  // South along the cliff edge, out over the sea and back north in front of the cliff
+  new THREE.Vector3(6897, 920, -705),
+  new THREE.Vector3(7120, 905, -1050),
+  new THREE.Vector3(7330, 890, -1400),
+  new THREE.Vector3(7230, 875, -1620),
+  new THREE.Vector3(6980, 880, -1250),
+  new THREE.Vector3(6650, 895, -600),
+  new THREE.Vector3(6380, 915, -50),
+  new THREE.Vector3(6400, 935, 250),
+  new THREE.Vector3(6620, 935, -150),
+];
+export const RIDGE_LOOP_TENSION = 0.5;
+export const PARAGLIDER_SPEED = 15;
+
+/** The first pilot leads: the camera flies in to it and follows it round the loop */
 export const paraglidersVoxel: ParagliderVoxelConfig[] = [
   {
     options: {
@@ -82,27 +101,49 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
         inletsColor: 'pink',
         numeroCajones: 35,
       },
-      pilot: {
-        characterType: CharacterType.IVAN,
-      },
+      pilot: { characterType: CharacterType.IVAN },
     },
-    position: new THREE.Vector3(6897, 920, -705),
-    flightPattern: FlightPattern.WAYPOINT,
-    speed: 15,
-    waypoints: [
-      new THREE.Vector3(6897, 700, -705),
-      new THREE.Vector3(6700, 720, 200),
-      new THREE.Vector3(5800, 750, 1000),
-      new THREE.Vector3(5400, 720, 1400),
-      new THREE.Vector3(5800, 680, 500),
-      new THREE.Vector3(6200, 650, -1500),
-      new THREE.Vector3(6500, 680, -2800),
-      new THREE.Vector3(7000, 700, -2200),
-      new THREE.Vector3(7200, 720, -1000),
-      new THREE.Vector3(7000, 700, -200),
-    ],
-    waypointTension: 0.5,
-    waypointLoop: true,
+    startProgress: 0,
+    pathOffset: new THREE.Vector3(0, 0, 0),
+  },
+  {
+    options: {
+      glider: {
+        wingColor1: '#f26a1b',
+        wingColor2: '#7fe0c0',
+        inletsColor: 'white',
+        numeroCajones: 35,
+      },
+      pilot: { characterType: CharacterType.MIGUEL },
+    },
+    startProgress: 0.04,
+    pathOffset: new THREE.Vector3(-30, 25, 20),
+  },
+  {
+    options: {
+      glider: {
+        wingColor1: '#1a1a1a',
+        wingColor2: '#f4f4f4',
+        inletsColor: 'black',
+        numeroCajones: 35,
+      },
+      pilot: { characterType: CharacterType.JEHOSUA },
+    },
+    startProgress: 0.35,
+    pathOffset: new THREE.Vector3(20, -15, 0),
+  },
+  {
+    options: {
+      glider: {
+        wingColor1: '#7b2d6b',
+        wingColor2: '#e8b830',
+        inletsColor: 'white',
+        numeroCajones: 35,
+      },
+      pilot: { characterType: CharacterType.ROOS },
+    },
+    startProgress: 0.65,
+    pathOffset: new THREE.Vector3(-20, 40, -10),
   },
 ];
 

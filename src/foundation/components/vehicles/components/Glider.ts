@@ -11,8 +11,8 @@ const DEFAULT_OPTIONS: GliderOptions = {
   wingColor1: '#FFA500',
   wingColor2: '#b100cd',
   breakColor: '#ffffff',
-  lineFrontColor: '#ffffff',
-  lineBackColor: '#ffffff',
+  lineFrontColor: '#3a3a3a',
+  lineBackColor: '#3a3a3a',
   inletsColor: '#333333',
   numeroCajones: 40,
 };
@@ -51,17 +51,14 @@ const createHalfWing = (options: GliderOptions): HalfWing => {
   const mat_wing = new THREE.MeshLambertMaterial({ color: options.wingColor1 });
   const mat_break = new THREE.MeshLambertMaterial({ color: options.breakColor });
   const mat_frontCajon = new THREE.MeshLambertMaterial({ color: options.inletsColor });
+  // Real lines are thin and dark: a hint of them reads at a distance, bright ones look like wires.
   const lineMat = new THREE.LineBasicMaterial({
     color: options.lineBackColor,
     transparent: true,
-    opacity: 0.01,
+    opacity: 0.22,
     side: THREE.FrontSide,
   });
-  const breakLineMat = new THREE.LineBasicMaterial({
-    color: 'yellow',
-    transparent: true,
-    opacity: 0.4,
-  });
+  const breakLineMat = lineMat;
 
   const group = new THREE.Mesh();
   let distanceCajon = 0;

@@ -2,11 +2,12 @@
 
 A 3D, voxel-styled Lanzarote you can watch paragliders fly over, in the browser. The island is a
 real height map drawn as a wireframe over sunlit ground, with a living sea, gulls in thermals,
-towns, boats and planes, and voxel pilots soaring the Famara cliffs. The home scene opens on the
-island with just its title; Famara and Boats are standalone camera animations, and the static
+towns, boats and planes, and voxel pilots soaring the Famara cliffs. The home scene flies in to Ivan,
+Miguel, Jehosua and Roos ridge-soaring a loop along the Famara cliff and follows Ivan round it;
+Famara and Boats are standalone camera animations, and the static
 Famara and Town scenes show the landscape and the models up close.
 
-![Ivan soaring the Famara cliffs on the home scene](docs/screenshots/home.png)
+![Ivan, Miguel and Jehosua soaring the Famara cliffs on the home scene](docs/screenshots/home.png)
 
 Built with three.js, React and webpack. How a frame is drawn (the filmic pipeline, the sea, the
 shaded wireframe, adaptive quality) is in [docs/RENDERING.md](docs/RENDERING.md); the rest of the

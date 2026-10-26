@@ -2,6 +2,15 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## [Unreleased] - 2026-10-26 22:50 UTC
+
+### Changed
+- **The home scene's pilots fly.** Ivan, plus Miguel, Jehosua and Roos from the 3d-characters repo, ridge-soar one closed loop along the Famara cliff (`RIDGE_LOOP` in `src/applications/home/config.ts`), each from its own point on it. The intro camera flies in to Ivan wherever he has got to and then follows him round
+- **Paragliders bank into turns** by the coordinated-turn angle for their speed, and the pilot swings gently under the wing (`src/applications/home/paragliderMotion.ts`)
+- **Glider lines are faint dark grey** instead of bright yellow brake lines, on every scene
+- **The home title is a small wordmark in the bottom-left corner** instead of a large title across the top
+- `FlyingBehavior` takes `waypointStartProgress` and can `snapToWaypointCurve()` before it starts
+
 ## [Unreleased] - 2026-10-26 22:40 UTC
 
 ### Fixed

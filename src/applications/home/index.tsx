@@ -26,6 +26,7 @@ import { LevelOfDetail } from '../../foundation/types/lod';
 import { logger } from '../../foundation/utils/logger';
 import {
   paraglidersVoxel,
+  RIDGE_LOOP,
   hanggliderConfig,
   cessnaConfig,
   herculesConfig,
@@ -39,6 +40,7 @@ import {
 import { loadParagliders, loadHangglider, loadCessna, loadHercules } from './vehicleLoader';
 import { setupCameraAnimation, applyFloatingMotion } from './cameraAnimation';
 import { createTitleOverlay } from './TitleOverlay';
+import type { ParagliderMotion } from './paragliderMotion';
 
 /**
  * Home App - Landing scene with the voxel title
@@ -48,11 +50,12 @@ class HomeApp extends TerrainBase {
   private environment: Environment | undefined;
   private animationId: number | undefined;
   private paragliderMeshes: THREE.Object3D[] = [];
+  private paragliderFlyingBehaviors: FlyingBehavior[] = [];
+  private paragliderMotions: ParagliderMotion[] = [];
   private hanggliderMesh: THREE.Object3D | undefined;
   private cessnaMesh: THREE.Object3D | undefined;
   private herculesMesh: THREE.Object3D | undefined;
   private isAnimating: boolean = false;
-  private flyingBehavior: FlyingBehavior | undefined;
   private hanggliderFlyingBehavior: FlyingBehavior | undefined;
   private cessnaFlyingBehavior: FlyingBehavior | undefined;
   private herculesFlyingBehavior: FlyingBehavior | undefined;
@@ -87,7 +90,7 @@ class HomeApp extends TerrainBase {
       const { camera, controls, scene, renderer } = options;
       const initialCameraPosition = new THREE.Vector3(-2000, 2200, 5000);
       camera.position.copy(initialCameraPosition);
-      const pgPos = paraglidersVoxel[0]?.position.clone() || new THREE.Vector3();
+      const pgPos = RIDGE_LOOP[0].clone();
       camera.lookAt(pgPos);
       if (controls) {
         controls.target.copy(pgPos);
@@ -111,10 +114,13 @@ class HomeApp extends TerrainBase {
       const paragliderResults = await loadParagliders(
         scene,
         paraglidersVoxel,
-        this.handleError.bind(this),
-        ANIMATION_DURATION_MS
+        this.handleError.bind(this)
       );
       this.paragliderMeshes = paragliderResults.map(r => r.mesh);
+      this.paragliderFlyingBehaviors = paragliderResults.flatMap(r =>
+        r.flyingBehavior ? [r.flyingBehavior] : []
+      );
+      this.paragliderMotions = paragliderResults.flatMap(r => (r.motion ? [r.motion] : []));
 
       if (SHOW_HANGGLIDER) {
         const hanggliderResult = await loadHangglider(
@@ -315,12 +321,15 @@ class HomeApp extends TerrainBase {
     renderer: THREE.WebGLRenderer,
     scene: THREE.Scene
   ): void {
-    const pgPos = paraglidersVoxel[0]?.position.clone() || new THREE.Vector3();
+    const lead = this.paragliderMeshes[0];
+    if (!lead) {
+      throw new Error('No paraglider loaded for the camera to follow');
+    }
 
-    this.startAnimationLoop(renderer, scene, camera, controls);
+    this.startAnimationLoop(renderer, scene, camera, controls, lead);
 
     setupCameraAnimation(camera, controls, {
-      targetPosition: pgPos,
+      target: lead,
       animationDurationMs: ANIMATION_DURATION_MS,
       onAnimationStart: () => {
         this.isAnimating = true;
@@ -335,10 +344,13 @@ class HomeApp extends TerrainBase {
     renderer: THREE.WebGLRenderer,
     scene: THREE.Scene,
     camera: THREE.Camera,
-    controls: OrbitControls
+    controls: OrbitControls,
+    lead: THREE.Object3D
   ): void {
     const startTime = Date.now();
     let lastTime = Date.now();
+    const lastLeadPosition = lead.position.clone();
+    const leadMove = new THREE.Vector3();
 
     const animate = () => {
       try {
@@ -352,7 +364,14 @@ class HomeApp extends TerrainBase {
           this.targetController.update(deltaTime);
         }
 
-        if (!this.targetController) {
+        this.paragliderMotions.forEach(motion => motion.update(deltaTime));
+
+        // Carry the camera along with the lead pilot; the intro animation places it itself.
+        leadMove.subVectors(lead.position, lastLeadPosition);
+        lastLeadPosition.copy(lead.position);
+        if (!this.isAnimating && !this.targetController) {
+          camera.position.add(leadMove);
+          controls.target.add(leadMove);
           applyFloatingMotion(camera, startTime, this.isAnimating);
         }
 
@@ -404,10 +423,9 @@ class HomeApp extends TerrainBase {
       this.animationId = undefined;
     }
 
-    if (this.flyingBehavior) {
-      this.flyingBehavior.dispose();
-      this.flyingBehavior = undefined;
-    }
+    this.paragliderFlyingBehaviors.forEach(behavior => behavior.dispose());
+    this.paragliderFlyingBehaviors.length = 0;
+    this.paragliderMotions.length = 0;
 
     if (this.hanggliderFlyingBehavior) {
       this.hanggliderFlyingBehavior.dispose();
