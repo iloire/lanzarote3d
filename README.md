@@ -91,12 +91,6 @@ the spin, `?model=<id>` links to one. A new model goes in `src/applications/mode
 To show the sidebar on home without listing private scenes:
 `localStorage.setItem('lanzarote_show_menu', 'true')` (remove the key to undo), then reload.
 
-## Archived branches
-
-Kept on the remote for reference only. They are not meant to be merged.
-
-- **`flier-cursor`** (March to September 2025, 87 commits): an experiment to replace the hand-rolled flight model with a rigid-body simulation in `cannon-es`. It has a glider and pilot joined by segmented ropes with lift applied at 16 points across the wing (`src/stories/physics/`), a `PhysicsFlier` class for the flier story, a standalone airplane sandbox (`src/stories/cannon.tsx`), a flight HUD, a force-vector visualizer and design notes in `src/docs/`. It was never finished: drag and brake forces are switched off and the constants are tuned by hand. The flyable game it served has since been removed from `master`, which now only plays scripted scenes; the branch still uses the old `src/stories/` layout.
-
 ## Source art
 
 `3d/` holds the island's sources: the height map (`.xcf` / `.png`) and a Blender scene of the island (`lanzarote.blend`). The scenes load `assets/foundation/models/environment/lanzarote.glb`. The pilots are voxel models from the `3d-characters` repo, exported to `.obj`.
