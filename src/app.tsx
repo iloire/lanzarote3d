@@ -1,3 +1,4 @@
+import { isDevFlagSet } from './devMode';
 import React, { useEffect, useState } from 'react';
 import GUI from 'lil-gui';
 import Stats from 'three/examples/jsm/libs/stats.module';
@@ -77,7 +78,7 @@ const createRenderer = (sizes: { width: number; height: number }) => {
  */
 function shouldShowSidebar(story?: string): boolean {
   // Check for localStorage override to force show menu
-  const forceShowMenu = localStorage.getItem('lanzarote_show_menu') === 'true';
+  const forceShowMenu = localStorage.getItem('lanzarote_show_menu') === 'true' || isDevFlagSet();
   if (forceShowMenu) {
     return true;
   }

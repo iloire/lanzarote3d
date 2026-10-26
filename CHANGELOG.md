@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-26 22:51 UTC
+
+### Added
+- **`?dev=1` turns on dev mode** in this browser (`?dev=0` turns it off): the menu lists the private scenes (famara, town) and the sidebar shows on every scene, home included. `enableDevMode()` / `disableDevMode()` are now defined on localhost too, where they used to be missing. The logic lives in `src/devMode.ts`
+
 ## [Unreleased] - 2026-10-26 22:50 UTC
 
 ### Changed

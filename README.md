@@ -60,46 +60,23 @@ before deploying.
 
 ## Development notes
 
-### Dev mode in production
+### Dev mode: every scene in the menu
 
-By default, only public apps are visible in production. To access private/hidden apps and dev tools in production:
+Production menus list only the public scenes, and the home scene hides its sidebar. Dev mode lists
+the private scenes too (`famara`, `town`) and shows the sidebar everywhere.
 
-**Enable dev mode:**
-1. Open browser console on the production site
-2. Run: `enableDevMode()`
-3. Reload the page
+- **Turn on:** open any page with `?dev=1`, e.g. `https://3d.lanzaroteparagliding.com/?dev=1`
+- **Turn off:** `?dev=0`
 
-**Disable dev mode:**
-```javascript
-disableDevMode()
-```
+It sticks in this browser (`localStorage.lanzarote_dev_mode`) until turned off, and the console logs
+"🔓 Dev mode enabled" on load. `enableDevMode()` / `disableDevMode()` in the console do the same,
+followed by a reload; run them on the scene's own page, not on a page that embeds it in an iframe.
 
-**Manual control:**
-```javascript
-// Enable
-localStorage.setItem('lanzarote_dev_mode', 'true')
+At `localhost` the private scenes are always listed; home still hides its sidebar unless `?dev=1`.
+Private scenes also open directly without dev mode: `?story=famara`, `?story=town`.
 
-// Disable
-localStorage.removeItem('lanzarote_dev_mode')
-```
-
-When dev mode is enabled in production, you'll see "🔓 Secret dev mode enabled" in the console and have access to the private scenes (famara, town).
-
-### Show the sidebar on the home scene
-
-The sidebar is hidden by default on the home app for a cleaner presentation. To force-show it:
-
-**Enable:**
-```javascript
-localStorage.setItem('lanzarote_show_menu', 'true')
-```
-
-**Disable:**
-```javascript
-localStorage.removeItem('lanzarote_show_menu')
-```
-
-Reload the page after changing this setting.
+To show the sidebar on home without listing private scenes:
+`localStorage.setItem('lanzarote_show_menu', 'true')` (remove the key to undo), then reload.
 
 ## Archived branches
 

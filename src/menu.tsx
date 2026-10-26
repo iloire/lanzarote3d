@@ -1,3 +1,4 @@
+import { isDevFlagSet } from './devMode';
 import React from 'react';
 import * as THREE from 'three';
 import { getAppsByVisibility, type AppMetadata } from './config/app-registry';
@@ -28,7 +29,7 @@ class Menu extends React.Component<MenuProps> {
 
   getInitialMenuVisibility(): boolean {
     // Check for localStorage override to force show menu
-    const forceShowMenu = localStorage.getItem('lanzarote_show_menu') === 'true';
+    const forceShowMenu = localStorage.getItem('lanzarote_show_menu') === 'true' || isDevFlagSet();
     if (forceShowMenu) {
       return true;
     }
