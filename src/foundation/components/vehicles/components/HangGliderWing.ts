@@ -243,7 +243,8 @@ export class HangGliderWing extends SimpleThreeComponent {
       const x = t * chordLength;
 
       // Simple airfoil shape - thicker at front, thin at back
-      const thickness = chordLength * 0.12 * (0.3 * Math.sqrt(t) - 0.13 * t - 0.13 * t * t + 0.05 * t * t * t);
+      const thickness =
+        chordLength * 0.12 * (0.3 * Math.sqrt(t) - 0.13 * t - 0.13 * t * t + 0.05 * t * t * t);
       const y = i === 0 || i === segments ? 0 : thickness;
 
       if (i === 0) {
@@ -293,14 +294,15 @@ export class HangGliderWing extends SimpleThreeComponent {
 
     const wingMaterial = resourceManager.getOrCreateMaterial(
       `hangglider_wing_fabric_${options.wingColor}`,
-      () => new THREE.MeshStandardMaterial({
-        color: options.wingColor,
-        side: THREE.DoubleSide,
-        transparent: true,
-        opacity: 0.8,
-        roughness: 0.7,
-        metalness: 0.1,
-      })
+      () =>
+        new THREE.MeshStandardMaterial({
+          color: options.wingColor,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.8,
+          roughness: 0.7,
+          metalness: 0.1,
+        })
     );
 
     return new THREE.Mesh(wingGeometry, wingMaterial);
@@ -320,11 +322,12 @@ export class HangGliderWing extends SimpleThreeComponent {
 
     const tubeMaterial = resourceManager.getOrCreateMaterial(
       `hangglider_leading_edge_${options.leadingEdgeColor}`,
-      () => new THREE.MeshStandardMaterial({
-        color: options.leadingEdgeColor,
-        metalness: 0.7,
-        roughness: 0.3,
-      })
+      () =>
+        new THREE.MeshStandardMaterial({
+          color: options.leadingEdgeColor,
+          metalness: 0.7,
+          roughness: 0.3,
+        })
     );
 
     // Left leading edge
@@ -357,11 +360,12 @@ export class HangGliderWing extends SimpleThreeComponent {
 
     const edgeMaterial = resourceManager.getOrCreateMaterial(
       `hangglider_trailing_edge_${options.trailingEdgeColor}`,
-      () => new THREE.MeshStandardMaterial({
-        color: options.trailingEdgeColor,
-        metalness: 0.6,
-        roughness: 0.4,
-      })
+      () =>
+        new THREE.MeshStandardMaterial({
+          color: options.trailingEdgeColor,
+          metalness: 0.6,
+          roughness: 0.4,
+        })
     );
 
     const trailingEdge = new THREE.Mesh(edgeGeometry, edgeMaterial);
@@ -385,11 +389,12 @@ export class HangGliderWing extends SimpleThreeComponent {
 
     const battenMaterial = resourceManager.getOrCreateMaterial(
       'hangglider_batten_material',
-      () => new THREE.MeshStandardMaterial({
-        color: '#95A5A6',
-        metalness: 0.5,
-        roughness: 0.5,
-      })
+      () =>
+        new THREE.MeshStandardMaterial({
+          color: '#95A5A6',
+          metalness: 0.5,
+          roughness: 0.5,
+        })
     );
 
     // Create battens across the wingspan
@@ -417,11 +422,12 @@ export class HangGliderWing extends SimpleThreeComponent {
 
     const frameMaterial = resourceManager.getOrCreateMaterial(
       `hangglider_control_bar_${options.controlBarColor}`,
-      () => new THREE.MeshStandardMaterial({
-        color: options.controlBarColor,
-        metalness: 0.8,
-        roughness: 0.2,
-      })
+      () =>
+        new THREE.MeshStandardMaterial({
+          color: options.controlBarColor,
+          metalness: 0.8,
+          roughness: 0.2,
+        })
     );
 
     // Horizontal control bar
@@ -458,11 +464,12 @@ export class HangGliderWing extends SimpleThreeComponent {
 
     const cableMaterial = resourceManager.getOrCreateMaterial(
       `hangglider_cables_${options.cableColor}`,
-      () => new THREE.MeshStandardMaterial({
-        color: options.cableColor,
-        metalness: 0.9,
-        roughness: 0.1,
-      })
+      () =>
+        new THREE.MeshStandardMaterial({
+          color: options.cableColor,
+          metalness: 0.9,
+          roughness: 0.1,
+        })
     );
 
     // Create flying wires (main support cables)
@@ -524,8 +531,8 @@ export class HangGliderWing extends SimpleThreeComponent {
       designType: options.designType || HangGliderDesignType.REALISTIC_AIRFOIL,
       wingspan: options.wingspan,
       chordLength: options.chordLength,
-      sweep: options.sweep ? (options.sweep * 180 / Math.PI).toFixed(1) + '°' : '0°',
-      dihedral: options.dihedral ? (options.dihedral * 180 / Math.PI).toFixed(1) + '°' : '0°',
+      sweep: options.sweep ? ((options.sweep * 180) / Math.PI).toFixed(1) + '°' : '0°',
+      dihedral: options.dihedral ? ((options.dihedral * 180) / Math.PI).toFixed(1) + '°' : '0°',
       battens: options.battens,
       hasControlFrame: options.showControlFrame,
       hasCables: options.showCables,

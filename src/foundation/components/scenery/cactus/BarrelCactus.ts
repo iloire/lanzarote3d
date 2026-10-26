@@ -47,7 +47,8 @@ export class BarrelCactus extends SimpleThreeComponent {
     const scale = options.scale || 1;
 
     // Check both lowPoly (legacy) and levelOfDetail (new)
-    const isLowPoly = options.lowPoly || (options.levelOfDetail !== undefined && options.levelOfDetail <= 1);
+    const isLowPoly =
+      options.lowPoly || (options.levelOfDetail !== undefined && options.levelOfDetail <= 1);
 
     if (isLowPoly) {
       return this.createLowPolyBarrelCactus(options, scale);
@@ -72,19 +73,16 @@ export class BarrelCactus extends SimpleThreeComponent {
     );
 
     // Main barrel body - spherical with flattened top and bottom
-    const bodyGeometry = resourceManager.getOrCreateGeometry(
-      'barrel_body',
-      () => {
-        const geometry = new THREE.SphereGeometry(3, 32, 16);
-        // Flatten the sphere to create barrel shape
-        const positions = geometry.attributes.position;
-        for (let i = 0; i < positions.count; i++) {
-          const y = positions.getY(i);
-          positions.setY(i, y * 0.7); // Compress vertically
-        }
-        return geometry;
+    const bodyGeometry = resourceManager.getOrCreateGeometry('barrel_body', () => {
+      const geometry = new THREE.SphereGeometry(3, 32, 16);
+      // Flatten the sphere to create barrel shape
+      const positions = geometry.attributes.position;
+      for (let i = 0; i < positions.count; i++) {
+        const y = positions.getY(i);
+        positions.setY(i, y * 0.7); // Compress vertically
       }
-    );
+      return geometry;
+    });
 
     const body = new THREE.Mesh(bodyGeometry, cactusMaterial);
     body.position.y = 2.1; // Position so bottom sits at ground level (radius * 0.7)
@@ -239,11 +237,7 @@ export class BarrelCactus extends SimpleThreeComponent {
       );
 
       const spine = new THREE.Mesh(spineGeometry, spineMaterial);
-      spine.position.set(
-        Math.cos(angle) * 3.2,
-        3,
-        Math.sin(angle) * 3.2
-      );
+      spine.position.set(Math.cos(angle) * 3.2, 3, Math.sin(angle) * 3.2);
       cactus.add(spine);
     }
 

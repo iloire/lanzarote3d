@@ -47,7 +47,8 @@ export class PricklyPearCactus extends SimpleThreeComponent {
     const scale = options.scale || 1;
 
     // Check both lowPoly (legacy) and levelOfDetail (new)
-    const isLowPoly = options.lowPoly || (options.levelOfDetail !== undefined && options.levelOfDetail <= 1);
+    const isLowPoly =
+      options.lowPoly || (options.levelOfDetail !== undefined && options.levelOfDetail <= 1);
 
     if (isLowPoly) {
       return this.createLowPolyPricklyPearCactus(options, scale);
@@ -73,20 +74,16 @@ export class PricklyPearCactus extends SimpleThreeComponent {
 
     // Create paddle geometry (flat oval shape)
     const createPadGeometry = (width: number, height: number) => {
-      return resourceManager.getOrCreateGeometry(
-        `prickly_pad_${width}_${height}`,
-        () => {
-          const geometry = new THREE.CylinderGeometry(width/2, width/2, 0.5, 16);
-          // Flatten and make oval
-          const positions = geometry.attributes.position;
-          for (let i = 0; i < positions.count; i++) {
-            const x = positions.getX(i);
-            const z = positions.getZ(i);
-            positions.setZ(i, z * (height / width));
-          }
-          return geometry;
+      return resourceManager.getOrCreateGeometry(`prickly_pad_${width}_${height}`, () => {
+        const geometry = new THREE.CylinderGeometry(width / 2, width / 2, 0.5, 16);
+        // Flatten and make oval
+        const positions = geometry.attributes.position;
+        for (let i = 0; i < positions.count; i++) {
+          const z = positions.getZ(i);
+          positions.setZ(i, z * (height / width));
         }
-      );
+        return geometry;
+      });
     };
 
     // Base pad
@@ -112,7 +109,7 @@ export class PricklyPearCactus extends SimpleThreeComponent {
       { parent: basePad, x: -0.8, y: 2.25, angle: -0.2, width: 1.8, height: 2.2 }, // Adjusted for ground level
       { parent: basePad, x: 1.5, y: -1.75, angle: 0.7, width: 1.5, height: 2 }, // Adjusted for ground level
       { parent: basePad, x: -1.5, y: -1.75, angle: -0.7, width: 1.5, height: 2 }, // Adjusted for ground level
-      { parent: basePad, x: 0, y: -2.75, angle: 0, width: 2, height: 2.5 } // Adjusted for ground level
+      { parent: basePad, x: 0, y: -2.75, angle: 0, width: 2, height: 2.5 }, // Adjusted for ground level
     ];
 
     for (let i = 0; i < padCount && i < padConfigs.length; i++) {
@@ -183,7 +180,10 @@ export class PricklyPearCactus extends SimpleThreeComponent {
   /**
    * Create ultra low-poly version: ~18 triangles vs ~1,500 (98.8% reduction)
    */
-  private createLowPolyPricklyPearCactus(options: PricklyPearCactusOptions, scale: number): THREE.Object3D {
+  private createLowPolyPricklyPearCactus(
+    options: PricklyPearCactusOptions,
+    scale: number
+  ): THREE.Object3D {
     const cactus = new THREE.Group();
     cactus.name = 'PricklyPearCactus (Low-Poly)';
 

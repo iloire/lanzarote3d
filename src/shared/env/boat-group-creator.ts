@@ -1,23 +1,14 @@
 import * as THREE from 'three';
-import {
-  SmallSailBoat,
-  FishingBoat,
-  Yacht,
-  SpeedBoat,
-  PatrolBoat,
-} from '../../foundation/components/scenery';
-import { MovementPattern } from '../../foundation/systems/behaviors/MovingBehavior';
+import { SmallSailBoat, FishingBoat, Yacht, SpeedBoat } from '../../foundation/components/scenery';
 import { ComponentRegistry } from '../../foundation/systems/ComponentRegistry';
 import { BoatConfig, BoatGroupConfig } from './boat-group-types';
-import {
-  calculateBoatPositions,
-  generateMarinaBoats,
-  generatePatrolFleet,
-  generateRacingFleet,
-  generateMixedRecreationalBoats,
-} from './boat-group-utils';
+import { calculateBoatPositions, generateMixedRecreationalBoats } from './boat-group-utils';
 
-type BoatComponent = InstanceType<typeof SmallSailBoat> | InstanceType<typeof FishingBoat> | InstanceType<typeof Yacht> | InstanceType<typeof SpeedBoat> | InstanceType<typeof PatrolBoat>;
+type BoatComponent =
+  | InstanceType<typeof SmallSailBoat>
+  | InstanceType<typeof FishingBoat>
+  | InstanceType<typeof Yacht>
+  | InstanceType<typeof SpeedBoat>;
 
 /**
  * Boat Group Creator - handles the creation and management of boat groups
@@ -36,12 +27,11 @@ export class BoatGroupCreator {
    */
   private async createSingleBoat(
     boatConfig: BoatConfig,
-    position: THREE.Vector3,
-    water: THREE.Mesh
+    position: THREE.Vector3
   ): Promise<THREE.Object3D | null> {
     let boat: BoatComponent;
     let boatMesh: THREE.Object3D;
-    let scale = boatConfig.scale || 2.5;
+    const scale = boatConfig.scale || 2.5;
 
     // Create boat based on type
     switch (boatConfig.type) {
@@ -85,21 +75,8 @@ export class BoatGroupCreator {
           speed: boatConfig.speed,
           radius: boatConfig.radius,
           autoStartMoving: boatConfig.enableMovement,
-          ...(boatConfig.colors || {}),
         });
         boatMesh = await this.componentRegistry.register(boat, 'speedboat');
-        break;
-
-      case 'PatrolBoat':
-        boat = new PatrolBoat({
-          enableMovement: boatConfig.enableMovement,
-          pattern: boatConfig.pattern,
-          speed: boatConfig.speed,
-          radius: boatConfig.radius,
-          autoStartMoving: boatConfig.enableMovement,
-          ...(boatConfig.colors || {}),
-        });
-        boatMesh = await this.componentRegistry.register(boat, 'patrolboat');
         break;
 
       default:
@@ -140,74 +117,13 @@ export class BoatGroupCreator {
       const boatConfig = boats[i];
       const position = positions[i];
 
-      const boatMesh = await this.createSingleBoat(boatConfig, position, water);
+      const boatMesh = await this.createSingleBoat(boatConfig, position);
       if (boatMesh) {
         boatMeshes.push(boatMesh);
       }
     }
 
     return boatMeshes;
-  }
-
-  /**
-   * Create a marina/harbor formation with mixed boat types
-   */
-  async createMarina(
-    water: THREE.Mesh,
-    center: THREE.Vector3,
-    size: 'small' | 'medium' | 'large' = 'medium'
-  ): Promise<THREE.Object3D[]> {
-    const boats = generateMarinaBoats(size);
-    const config = {
-      small: { spacing: 40, radius: 80 },
-      medium: { spacing: 50, radius: 120 },
-      large: { spacing: 60, radius: 180 },
-    }[size];
-
-    return this.createBoatGroup(water, boats, {
-      center,
-      formation: 'harbor',
-      spacing: config.spacing,
-      groupRadius: config.radius,
-    });
-  }
-
-  /**
-   * Create a patrol fleet with coordinated movement
-   */
-  async createPatrolFleet(
-    water: THREE.Mesh,
-    center: THREE.Vector3,
-    size: 'single' | 'formation' | 'fleet' = 'formation'
-  ): Promise<THREE.Object3D[]> {
-    const boats = generatePatrolFleet(size);
-    const spacing = size === 'single' ? 0 : size === 'formation' ? 80 : 100;
-
-    return this.createBoatGroup(water, boats, {
-      center,
-      formation: 'line',
-      spacing,
-      lineDirection: new THREE.Vector3(1, 0, 0),
-    });
-  }
-
-  /**
-   * Create a racing fleet with fast-moving boats
-   */
-  async createRacingFleet(
-    water: THREE.Mesh,
-    center: THREE.Vector3,
-    size: 'small' | 'medium' | 'large' = 'medium'
-  ): Promise<THREE.Object3D[]> {
-    const boats = generateRacingFleet(size);
-    const spacing = size === 'small' ? 30 : size === 'medium' ? 35 : 40;
-
-    return this.createBoatGroup(water, boats, {
-      center,
-      formation: 'line',
-      spacing,
-      lineDirection: new THREE.Vector3(1, 0, 0),
-    });
   }
 
   /**
@@ -226,42 +142,6 @@ export class BoatGroupCreator {
       formation,
       spacing: 90,
       groupRadius: 190,
-    });
-  }
-
-  /**
-   * Create boats in a circular formation
-   */
-  async createCircularFormation(
-    water: THREE.Mesh,
-    center: THREE.Vector3,
-    boats: BoatConfig[],
-    radius: number = 100
-  ): Promise<THREE.Object3D[]> {
-    return this.createBoatGroup(water, boats, {
-      center,
-      formation: 'circle',
-      spacing: 80,
-      groupRadius: radius,
-    });
-  }
-
-  /**
-   * Create boats in a grid formation
-   */
-  async createGridFormation(
-    water: THREE.Mesh,
-    center: THREE.Vector3,
-    boats: BoatConfig[],
-    spacing: number = 60,
-    rowCount: number = 3
-  ): Promise<THREE.Object3D[]> {
-    return this.createBoatGroup(water, boats, {
-      center,
-      formation: 'grid',
-      spacing,
-      rowCount,
-      colCount: Math.ceil(boats.length / rowCount),
     });
   }
 }

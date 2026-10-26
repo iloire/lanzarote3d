@@ -254,14 +254,15 @@ export class ProceduralRoad extends SimpleThreeComponent {
     // Create material
     const material = resourceManager.getOrCreateMaterial(
       `road_surface_${options.roadColor}_${options.roughness}_${options.metalness}_${options.opacity}_${options.transparent}`,
-      () => new THREE.MeshStandardMaterial({
-        color: options.roadColor,
-        roughness: options.roughness || 0.9,
-        metalness: options.metalness || 0.0,
-        opacity: options.opacity ?? 1.0,
-        transparent: options.transparent ?? false,
-        side: THREE.DoubleSide,
-      })
+      () =>
+        new THREE.MeshStandardMaterial({
+          color: options.roadColor,
+          roughness: options.roughness || 0.9,
+          metalness: options.metalness || 0.0,
+          opacity: options.opacity ?? 1.0,
+          transparent: options.transparent ?? false,
+          side: THREE.DoubleSide,
+        })
     );
 
     const mesh = new THREE.Mesh(geometry, material);
@@ -297,17 +298,19 @@ export class ProceduralRoad extends SimpleThreeComponent {
         lineVertices.push(point.x, point.y + 0.02, point.z); // Slightly above road
       } else if (lineVertices.length > 0 && posInCycle >= dashLength) {
         // End of dash segment, create line
-        if (lineVertices.length >= 6) { // At least 2 points
+        if (lineVertices.length >= 6) {
+          // At least 2 points
           const geometry = new THREE.BufferGeometry();
           geometry.setAttribute('position', new THREE.Float32BufferAttribute([...lineVertices], 3));
 
           // Share material across all roads
           const material = resourceManager.getOrCreateMaterial(
             `road_centerline_${options.lineColor}_2`,
-            () => new THREE.LineBasicMaterial({
-              color: options.lineColor,
-              linewidth: 2,
-            })
+            () =>
+              new THREE.LineBasicMaterial({
+                color: options.lineColor,
+                linewidth: 2,
+              })
           );
 
           const line = new THREE.Line(geometry, material);
@@ -328,10 +331,11 @@ export class ProceduralRoad extends SimpleThreeComponent {
     // Share material across all roads
     const material = resourceManager.getOrCreateMaterial(
       `road_centerline_${options.lineColor}_2`,
-      () => new THREE.LineBasicMaterial({
-        color: options.lineColor,
-        linewidth: 2,
-      })
+      () =>
+        new THREE.LineBasicMaterial({
+          color: options.lineColor,
+          linewidth: 2,
+        })
     );
 
     return new THREE.Line(geometry, material);
@@ -353,10 +357,11 @@ export class ProceduralRoad extends SimpleThreeComponent {
     // Share material across all edge lines
     const edgeMaterial = resourceManager.getOrCreateMaterial(
       'road_edgeline_white_1',
-      () => new THREE.LineBasicMaterial({
-        color: '#FFFFFF', // White edge lines
-        linewidth: 1,
-      })
+      () =>
+        new THREE.LineBasicMaterial({
+          color: '#FFFFFF', // White edge lines
+          linewidth: 1,
+        })
     );
 
     // Create left and right edge lines
@@ -372,9 +377,9 @@ export class ProceduralRoad extends SimpleThreeComponent {
           .crossVectors(tangent, new THREE.Vector3(0, 1, 0))
           .normalize();
 
-        const edgePoint = point.clone().add(
-          perpendicular.clone().multiplyScalar(halfWidth * 0.9 * side)
-        );
+        const edgePoint = point
+          .clone()
+          .add(perpendicular.clone().multiplyScalar(halfWidth * 0.9 * side));
 
         edgeVertices.push(edgePoint.x, edgePoint.y + 0.02, edgePoint.z);
       }

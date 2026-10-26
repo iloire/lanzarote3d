@@ -109,14 +109,6 @@ module.exports = {
         type: "asset/resource",
       },
       {
-        test: /\.(drc)$/,
-        type: "asset/resource",
-      },
-      {
-        test: /\.(mp3|wav)$/,
-        type: "asset/resource",
-      },
-      {
         test: /\.css$/,
         use: ["style-loader", "css-loader"],
       },

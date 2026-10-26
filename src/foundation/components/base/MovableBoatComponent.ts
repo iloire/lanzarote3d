@@ -67,7 +67,6 @@ export abstract class MovableBoatComponent extends FloatingThreeComponent {
     return object;
   }
 
-
   // Movement control methods (only work if movement is enabled)
   public startMoving(): void {
     if (this.movingBehavior) {

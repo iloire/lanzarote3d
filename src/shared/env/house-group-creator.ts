@@ -18,17 +18,9 @@ import {
 } from '../../foundation/components/scenery/buildings';
 import { LevelOfDetail, getLODFromLegacy } from '../../foundation/types/lod';
 import { ComponentRegistry } from '../../foundation/systems/ComponentRegistry';
-import { HouseConfig, HouseGroupConfig, NeighborhoodVariation, DEFAULT_VARIATION } from './house-group-types';
+import { HouseConfig, HouseGroupConfig } from './house-group-types';
 import { logger } from '../../foundation/utils/logger';
-import {
-  calculateHousePositions,
-  generateSuburbanNeighborhood,
-  generateUrbanNeighborhood,
-  generateRuralNeighborhood,
-  generateMixedNeighborhood,
-} from './house-group-utils';
-
-type HouseComponent = InstanceType<typeof House> | InstanceType<typeof Villa> | InstanceType<typeof Townhouse> | InstanceType<typeof Barn> | InstanceType<typeof DesertHouse> | InstanceType<typeof DesertHouseWithPool>;
+import { calculateHousePositions, generateMixedNeighborhood } from './house-group-utils';
 
 /**
  * House Group Creator - handles the creation and management of neighborhoods
@@ -39,18 +31,10 @@ export class HouseGroupCreator {
   private lowPoly: boolean = false; // Deprecated - kept for backward compatibility
   private levelOfDetail: LevelOfDetail = LevelOfDetail.HIGH;
   private createdObjects: THREE.Object3D[] = []; // Track all created objects
-  private exclusionZones: Array<{ center: THREE.Vector3; radius: number }> = []; // Zones where buildings cannot be placed
 
   constructor(scene: THREE.Scene, componentRegistry: ComponentRegistry) {
     this.scene = scene;
     this.componentRegistry = componentRegistry;
-  }
-
-  /**
-   * Set exclusion zones where buildings should not be placed
-   */
-  setExclusionZones(zones: Array<{ center: THREE.Vector3; radius: number }>): void {
-    this.exclusionZones = zones;
   }
 
   /**
@@ -67,7 +51,7 @@ export class HouseGroupCreator {
    */
   setLOD(lod: LevelOfDetail): void {
     this.levelOfDetail = lod;
-    this.lowPoly = (lod === LevelOfDetail.LOW || lod === LevelOfDetail.ULTRA_LOW);
+    this.lowPoly = lod === LevelOfDetail.LOW || lod === LevelOfDetail.ULTRA_LOW;
     logger.info(`🏠 HouseGroupCreator LOD set to: ${lod} (lowPoly: ${this.lowPoly})`);
   }
 
@@ -125,7 +109,7 @@ export class HouseGroupCreator {
   ): Promise<THREE.Object3D | null> {
     let house: any; // Type as any to allow legacy synchronous load()
     let houseMesh: THREE.Object3D;
-    let scale = houseConfig.scale || 1;
+    const scale = houseConfig.scale || 1;
 
     // Create house based on type
     try {
@@ -133,7 +117,7 @@ export class HouseGroupCreator {
         case 'House':
           logger.debug(`✅ Creating House with levelOfDetail: ${this.levelOfDetail}`);
           house = new House({
-            type: houseConfig.houseType || HouseType.Medium,
+            type: HouseType.Medium,
             levelOfDetail: this.levelOfDetail,
             ...(houseConfig.colors || {}),
           });
@@ -179,7 +163,6 @@ export class HouseGroupCreator {
           });
           houseMesh = await house.load();
           break;
-
 
         case 'DesertHouseWithPool':
           logger.debug(`✅ Creating DesertHouseWithPool with levelOfDetail: ${this.levelOfDetail}`);
@@ -266,7 +249,9 @@ export class HouseGroupCreator {
       // The land plot will get the same deltaY adjustment as the house
       landMesh.position.copy(housePosition);
 
-      logger.debug(`🟩 Land plot created at Y=${landMesh.position.y.toFixed(1)} (house Y=${housePosition.y.toFixed(1)})`);
+      logger.debug(
+        `🟩 Land plot created at Y=${landMesh.position.y.toFixed(1)} (house Y=${housePosition.y.toFixed(1)})`
+      );
 
       // Rotate to lie flat and match house rotation if needed
       landMesh.rotation.x = -Math.PI / 2; // Lie flat
@@ -365,7 +350,7 @@ export class HouseGroupCreator {
     logger.debug(`🌵 Creating BarrelCactus with levelOfDetail: ${this.levelOfDetail}`);
     const cactus = new BarrelCactus({
       scale: 0.4 + Math.random() * 0.3,
-      levelOfDetail: this.levelOfDetail
+      levelOfDetail: this.levelOfDetail,
     });
     const cactusMesh = await cactus.load();
 
@@ -390,7 +375,9 @@ export class HouseGroupCreator {
         }
       }
     });
-    logger.debug(`🌵 BarrelCactus created with ${Math.floor(polygons)} polygons (levelOfDetail: ${this.levelOfDetail})`);
+    logger.debug(
+      `🌵 BarrelCactus created with ${Math.floor(polygons)} polygons (levelOfDetail: ${this.levelOfDetail})`
+    );
 
     this.scene.add(cactusMesh);
     this.createdObjects.push(cactusMesh);
@@ -399,7 +386,7 @@ export class HouseGroupCreator {
   private async addPricklyPearCactus(position: THREE.Vector3): Promise<void> {
     const cactus = new PricklyPearCactus({
       scale: 0.3 + Math.random() * 0.4,
-      levelOfDetail: this.levelOfDetail
+      levelOfDetail: this.levelOfDetail,
     });
     const cactusMesh = await cactus.load();
 
@@ -415,7 +402,7 @@ export class HouseGroupCreator {
   private async addSaguaroCactus(position: THREE.Vector3): Promise<void> {
     const cactus = new SaguaroCactus({
       scale: 0.2 + Math.random() * 0.3,
-      levelOfDetail: this.levelOfDetail
+      levelOfDetail: this.levelOfDetail,
     });
     const cactusMesh = await cactus.load();
 
@@ -431,7 +418,7 @@ export class HouseGroupCreator {
   private async addOrganPipeCactus(position: THREE.Vector3): Promise<void> {
     const cactus = new OrganPipeCactus({
       scale: 0.3 + Math.random() * 0.3,
-      levelOfDetail: this.levelOfDetail
+      levelOfDetail: this.levelOfDetail,
     });
     const cactusMesh = await cactus.load();
 
@@ -475,8 +462,7 @@ export class HouseGroupCreator {
    */
   async createNeighborhood(
     houses: HouseConfig[],
-    groupConfig: HouseGroupConfig,
-    variation: NeighborhoodVariation = DEFAULT_VARIATION
+    groupConfig: HouseGroupConfig
   ): Promise<THREE.Object3D[]> {
     const houseMeshes: THREE.Object3D[] = [];
 
@@ -484,7 +470,6 @@ export class HouseGroupCreator {
     const positions = calculateHousePositions(houses.length, groupConfig);
 
     // Create each house with its specific configuration
-    // Note: positions.length might be less than houses.length if some were excluded
     const actualHouseCount = Math.min(houses.length, positions.length);
 
     for (let i = 0; i < actualHouseCount; i++) {
@@ -499,148 +484,7 @@ export class HouseGroupCreator {
       }
     }
 
-    // Log warning if some houses couldn't be placed
-    if (positions.length < houses.length) {
-      logger.warn(`Only placed ${positions.length} of ${houses.length} houses due to exclusion zones`);
-    }
-
     return houseMeshes;
-  }
-
-  /**
-   * Calculate dynamic spacing based on house types and sizes in the neighborhood
-   */
-  private calculateDynamicSpacing(houses: HouseConfig[], baseSpacing: number): number {
-    // Calculate average land plot size for houses in this neighborhood
-    const totalLandSize = houses.reduce((sum, house) => {
-      const scale = house.scale || 1;
-
-      // Base sizes for different house types (matching the land plot calculations)
-      const baseSizes: Record<HouseConfig['type'], number> = {
-        'House': 60,
-        'Villa': 100,
-        'Townhouse': 50,
-        'Barn': 80,
-        'DesertHouse': 70,
-        'DesertHouseWithPool': 90,
-      };
-
-      const baseSize = baseSizes[house.type] || 60;
-      return sum + (baseSize * scale);
-    }, 0);
-
-    const averageLandSize = totalLandSize / houses.length;
-
-    // Adjust spacing based on average land size
-    // Minimum spacing should be at least 1.5x the average land size
-    const dynamicSpacing = Math.max(baseSpacing, averageLandSize * 1.5);
-
-    logger.debug(`🏘️ Dynamic spacing for ${houses.length} houses: base=${baseSpacing}, avgLandSize=${averageLandSize.toFixed(1)}, final=${dynamicSpacing.toFixed(1)}`);
-
-    return dynamicSpacing;
-  }
-
-  /**
-   * Create a suburban neighborhood with mixed housing
-   */
-  async createSuburbanNeighborhood(
-    center: THREE.Vector3,
-    size: 'small' | 'medium' | 'large' = 'medium',
-    variation: NeighborhoodVariation = DEFAULT_VARIATION
-  ): Promise<THREE.Object3D[]> {
-    const houses = generateSuburbanNeighborhood(size, variation);
-    const baseSpacing = size === 'small' ? 80 : size === 'medium' ? 90 : 100;
-    const dynamicSpacing = this.calculateDynamicSpacing(houses, baseSpacing);
-
-    return this.createNeighborhood(houses, {
-      center,
-      formation: 'suburban',
-      spacing: dynamicSpacing,
-      neighborhoodSize: size === 'small' ? 120 : size === 'medium' ? 150 : 180,
-      randomVariation: 0.3,
-      exclusionZones: this.exclusionZones,
-    }, variation);
-  }
-
-  /**
-   * Create an urban neighborhood with compact housing
-   */
-  async createUrbanNeighborhood(
-    center: THREE.Vector3,
-    density: 'compact' | 'dense' | 'downtown' = 'dense',
-    variation: NeighborhoodVariation = DEFAULT_VARIATION
-  ): Promise<THREE.Object3D[]> {
-    const houses = generateUrbanNeighborhood(density, variation);
-    const baseSpacing = density === 'compact' ? 60 : density === 'dense' ? 50 : 45;
-    const dynamicSpacing = this.calculateDynamicSpacing(houses, baseSpacing);
-
-    return this.createNeighborhood(houses, {
-      center,
-      formation: 'grid',
-      spacing: dynamicSpacing,
-      neighborhoodSize: density === 'compact' ? 140 : density === 'dense' ? 160 : 180,
-      randomVariation: 0.15,
-      exclusionZones: this.exclusionZones,
-    }, variation);
-  }
-
-  /**
-   * Create a rural neighborhood with scattered buildings
-   */
-  async createRuralNeighborhood(
-    center: THREE.Vector3,
-    style: 'farmstead' | 'village' | 'scattered' = 'village',
-    variation: NeighborhoodVariation = DEFAULT_VARIATION
-  ): Promise<THREE.Object3D[]> {
-    const houses = generateRuralNeighborhood(style, variation);
-    const spacing = style === 'farmstead' ? 150 : style === 'village' ? 120 : 200;
-
-    return this.createNeighborhood(houses, {
-      center,
-      formation: 'rural',
-      spacing,
-      neighborhoodSize: style === 'farmstead' ? 180 : style === 'village' ? 150 : 200,
-      randomVariation: 0.4,
-      exclusionZones: this.exclusionZones,
-    }, variation);
-  }
-
-  /**
-   * Create houses along a street
-   */
-  async createStreetNeighborhood(
-    center: THREE.Vector3,
-    houses: HouseConfig[],
-    streetWidth: number = 30
-  ): Promise<THREE.Object3D[]> {
-    return this.createNeighborhood(houses, {
-      center,
-      formation: 'street',
-      spacing: 80,
-      streetWidth,
-      randomVariation: 0.2,
-      exclusionZones: this.exclusionZones,
-    });
-  }
-
-  /**
-   * Create houses in a grid formation
-   */
-  async createGridNeighborhood(
-    center: THREE.Vector3,
-    houses: HouseConfig[],
-    spacing: number = 90,
-    rowCount: number = 3
-  ): Promise<THREE.Object3D[]> {
-    return this.createNeighborhood(houses, {
-      center,
-      formation: 'grid',
-      spacing,
-      rowCount,
-      colCount: Math.ceil(houses.length / rowCount),
-      randomVariation: 0.15,
-      exclusionZones: this.exclusionZones,
-    });
   }
 
   /**
@@ -650,16 +494,16 @@ export class HouseGroupCreator {
     center: THREE.Vector3,
     count: number,
     formation: HouseGroupConfig['formation'] = 'suburban',
-    houseDistribution?: Partial<Record<HouseConfig['type'], number>>,
-    variation: NeighborhoodVariation = DEFAULT_VARIATION,
     spacingMultiplier: number = 1.0
   ): Promise<THREE.Object3D[]> {
     // Validate spacing multiplier
     if (spacingMultiplier < 0.1 || spacingMultiplier > 10) {
-      throw new Error(`Invalid spacing multiplier: ${spacingMultiplier}. Must be between 0.1 and 10.0`);
+      throw new Error(
+        `Invalid spacing multiplier: ${spacingMultiplier}. Must be between 0.1 and 10.0`
+      );
     }
 
-    const houses = generateMixedNeighborhood(count, houseDistribution, variation);
+    const houses = generateMixedNeighborhood(count);
     const baseSpacing = formation === 'rural' ? 250 : 90;
     const spacing = baseSpacing * spacingMultiplier;
 
@@ -675,25 +519,6 @@ export class HouseGroupCreator {
       spacing,
       neighborhoodSize,
       randomVariation: 0.3,
-      exclusionZones: this.exclusionZones,
-    }, variation);
-  }
-
-  /**
-   * Create a random neighborhood layout
-   */
-  async createRandomNeighborhood(
-    center: THREE.Vector3,
-    houses: HouseConfig[],
-    size: number = 120
-  ): Promise<THREE.Object3D[]> {
-    return this.createNeighborhood(houses, {
-      center,
-      formation: 'random',
-      spacing: 70,
-      neighborhoodSize: size,
-      randomVariation: 0.5,
-      exclusionZones: this.exclusionZones,
     });
   }
 }

@@ -55,12 +55,13 @@ export class Pool extends SimpleThreeComponent {
     // Create materials with resource sharing
     const waterMaterial = resourceManager.getOrCreateMaterial(
       `pool_water_${options.waterColor}`,
-      () => new THREE.MeshLambertMaterial({
-        color: options.waterColor,
-        transparent: true,
-        opacity: 0.8,
-        side: THREE.DoubleSide
-      })
+      () =>
+        new THREE.MeshLambertMaterial({
+          color: options.waterColor,
+          transparent: true,
+          opacity: 0.8,
+          side: THREE.DoubleSide,
+        })
     );
 
     const tileMaterial = resourceManager.getOrCreateMaterial(
@@ -88,7 +89,7 @@ export class Pool extends SimpleThreeComponent {
     );
 
     const basin = new THREE.Mesh(basinGeometry, concreteMaterial);
-    basin.position.set(0, -depth/2, 0);
+    basin.position.set(0, -depth / 2, 0);
     basin.castShadow = this.options.castShadow ?? true;
     basin.receiveShadow = this.options.receiveShadow ?? true;
     pool.add(basin);
@@ -115,12 +116,12 @@ export class Pool extends SimpleThreeComponent {
     );
 
     const frontWall = new THREE.Mesh(frontWallGeometry, tileMaterial);
-    frontWall.position.set(0, -depth/2, length/2 - 0.25);
+    frontWall.position.set(0, -depth / 2, length / 2 - 0.25);
     pool.add(frontWall);
 
     const backWall = new THREE.Mesh(frontWallGeometry, tileMaterial);
     backWall.rotation.y = Math.PI;
-    backWall.position.set(0, -depth/2, -length/2 + 0.25);
+    backWall.position.set(0, -depth / 2, -length / 2 + 0.25);
     pool.add(backWall);
 
     // Side walls
@@ -131,12 +132,12 @@ export class Pool extends SimpleThreeComponent {
 
     const leftWall = new THREE.Mesh(sideWallGeometry, tileMaterial);
     leftWall.rotation.y = Math.PI / 2;
-    leftWall.position.set(-width/2 + 0.25, -depth/2, 0);
+    leftWall.position.set(-width / 2 + 0.25, -depth / 2, 0);
     pool.add(leftWall);
 
     const rightWall = new THREE.Mesh(sideWallGeometry, tileMaterial);
     rightWall.rotation.y = -Math.PI / 2;
-    rightWall.position.set(width/2 - 0.25, -depth/2, 0);
+    rightWall.position.set(width / 2 - 0.25, -depth / 2, 0);
     pool.add(rightWall);
 
     // Water surface
@@ -173,13 +174,13 @@ export class Pool extends SimpleThreeComponent {
     // Create coping around pool edge
     const copingPieces = [
       // Front
-      { width: width + 0.4, height: 0.2, length: 0.4, pos: [0, 0.1, length/2 + 0.2] },
+      { width: width + 0.4, height: 0.2, length: 0.4, pos: [0, 0.1, length / 2 + 0.2] },
       // Back
-      { width: width + 0.4, height: 0.2, length: 0.4, pos: [0, 0.1, -length/2 - 0.2] },
+      { width: width + 0.4, height: 0.2, length: 0.4, pos: [0, 0.1, -length / 2 - 0.2] },
       // Left
-      { width: 0.4, height: 0.2, length: length, pos: [-width/2 - 0.2, 0.1, 0] },
+      { width: 0.4, height: 0.2, length: length, pos: [-width / 2 - 0.2, 0.1, 0] },
       // Right
-      { width: 0.4, height: 0.2, length: length, pos: [width/2 + 0.2, 0.1, 0] },
+      { width: 0.4, height: 0.2, length: length, pos: [width / 2 + 0.2, 0.1, 0] },
     ];
 
     copingPieces.forEach((piece, index) => {
@@ -208,11 +209,11 @@ export class Pool extends SimpleThreeComponent {
     );
 
     const leftRail = new THREE.Mesh(railGeometry, ladderMaterial);
-    leftRail.position.set(-0.3, -depth/2 + 0.25, length/2);
+    leftRail.position.set(-0.3, -depth / 2 + 0.25, length / 2);
     pool.add(leftRail);
 
     const rightRail = new THREE.Mesh(railGeometry, ladderMaterial);
-    rightRail.position.set(0.3, -depth/2 + 0.25, length/2);
+    rightRail.position.set(0.3, -depth / 2 + 0.25, length / 2);
     pool.add(rightRail);
 
     // Ladder steps
@@ -224,7 +225,7 @@ export class Pool extends SimpleThreeComponent {
     for (let i = 0; i < 3; i++) {
       const step = new THREE.Mesh(stepGeometry, ladderMaterial);
       step.rotation.z = Math.PI / 2;
-      step.position.set(0, -depth + 0.3 + i * 0.5, length/2);
+      step.position.set(0, -depth + 0.3 + i * 0.5, length / 2);
       pool.add(step);
     }
 

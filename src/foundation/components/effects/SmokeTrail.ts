@@ -2,14 +2,14 @@ import * as THREE from 'three';
 import { resourceManager } from '../../systems/ResourceManager';
 
 export interface SmokeTrailOptions {
-  emissionRate?: number;      // particles per second
-  particleLifetime?: number;   // seconds
-  initialSize?: number;        // starting scale
-  finalSize?: number;          // ending scale
-  color?: THREE.Color;         // smoke color
-  maxParticles?: number;       // pool size
-  turbulence?: number;         // random drift amount
-  enabled?: boolean;           // toggle emission
+  emissionRate?: number; // particles per second
+  particleLifetime?: number; // seconds
+  initialSize?: number; // starting scale
+  finalSize?: number; // ending scale
+  color?: THREE.Color; // smoke color
+  maxParticles?: number; // pool size
+  turbulence?: number; // random drift amount
+  enabled?: boolean; // toggle emission
 }
 
 interface SmokeParticle {
@@ -134,7 +134,11 @@ export class SmokeTrail {
   /**
    * Update smoke trail
    */
-  public update(deltaTime: number, emitterPosition: THREE.Vector3, emitterVelocity: THREE.Vector3): void {
+  public update(
+    deltaTime: number,
+    emitterPosition: THREE.Vector3,
+    emitterVelocity: THREE.Vector3
+  ): void {
     if (!this.options.enabled) return;
 
     // Emit new particles

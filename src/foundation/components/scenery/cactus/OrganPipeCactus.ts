@@ -47,7 +47,8 @@ export class OrganPipeCactus extends SimpleThreeComponent {
     const scale = options.scale || 1;
 
     // Check both lowPoly (legacy) and levelOfDetail (new)
-    const isLowPoly = options.lowPoly || (options.levelOfDetail !== undefined && options.levelOfDetail <= 1);
+    const isLowPoly =
+      options.lowPoly || (options.levelOfDetail !== undefined && options.levelOfDetail <= 1);
 
     if (isLowPoly) {
       return this.createLowPolyOrganPipeCactus(options, scale);
@@ -72,23 +73,23 @@ export class OrganPipeCactus extends SimpleThreeComponent {
     );
 
     // Create multiple vertical pipes of varying heights
-    const pipePositions: Array<{x: number, z: number, height: number, radius: number}> = [];
-    
+    const pipePositions: Array<{ x: number; z: number; height: number; radius: number }> = [];
+
     // Central tallest pipe
     pipePositions.push({ x: 0, z: 0, height: 12 + Math.random() * 4, radius: 1.2 });
-    
+
     // Surrounding pipes in a naturalistic cluster
     for (let i = 1; i < pipeCount; i++) {
       const angle = (i / (pipeCount - 1)) * Math.PI * 2 + Math.random() * 0.5;
       const distance = 2 + Math.random() * 2;
       const height = 8 + Math.random() * 8; // Varying heights
       const radius = 0.8 + Math.random() * 0.5;
-      
+
       pipePositions.push({
         x: Math.cos(angle) * distance,
         z: Math.sin(angle) * distance,
         height: height,
-        radius: radius
+        radius: radius,
       });
     }
 
@@ -99,10 +100,13 @@ export class OrganPipeCactus extends SimpleThreeComponent {
     // Pre-create geometries for common radius values
     for (let r = 0.6; r <= 1.4; r += 0.1) {
       const key = r.toFixed(1);
-      pipeGeometries.set(key, resourceManager.getOrCreateGeometry(
-        `organ_pipe_r${key}`,
-        () => new THREE.CylinderGeometry(r * 0.9, r, segmentHeight, 12)
-      ));
+      pipeGeometries.set(
+        key,
+        resourceManager.getOrCreateGeometry(
+          `organ_pipe_r${key}`,
+          () => new THREE.CylinderGeometry(r * 0.9, r, segmentHeight, 12)
+        )
+      );
     }
 
     const ribGeometry = resourceManager.getOrCreateGeometry(
@@ -136,7 +140,7 @@ export class OrganPipeCactus extends SimpleThreeComponent {
         const pipeSegment = new THREE.Mesh(pipeGeometry, cactusMaterial);
         pipeSegment.position.set(
           pipe.x,
-          i * segmentHeight + segmentHeight/2, // Already positioned correctly for ground level
+          i * segmentHeight + segmentHeight / 2, // Already positioned correctly for ground level
           pipe.z
         );
         pipeSegment.castShadow = this.options.castShadow ?? true;
@@ -209,11 +213,7 @@ export class OrganPipeCactus extends SimpleThreeComponent {
         Math.random() * 0.2,
         Math.sin(angle) * distance
       );
-      rock.rotation.set(
-        Math.random() * Math.PI,
-        Math.random() * Math.PI,
-        Math.random() * Math.PI
-      );
+      rock.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
       rock.scale.set(
         0.5 + Math.random() * 0.5,
         0.5 + Math.random() * 0.5,
@@ -233,7 +233,10 @@ export class OrganPipeCactus extends SimpleThreeComponent {
   /**
    * Create ultra low-poly version: ~24 triangles vs ~3,000 (99.2% reduction)
    */
-  private createLowPolyOrganPipeCactus(options: OrganPipeCactusOptions, scale: number): THREE.Object3D {
+  private createLowPolyOrganPipeCactus(
+    options: OrganPipeCactusOptions,
+    scale: number
+  ): THREE.Object3D {
     const cactus = new THREE.Group();
     cactus.name = 'OrganPipeCactus (Low-Poly)';
 
@@ -255,11 +258,7 @@ export class OrganPipeCactus extends SimpleThreeComponent {
       );
 
       const pipe = new THREE.Mesh(pipeGeometry, cactusMaterial);
-      pipe.position.set(
-        Math.cos(angle) * distance,
-        height / 2,
-        Math.sin(angle) * distance
-      );
+      pipe.position.set(Math.cos(angle) * distance, height / 2, Math.sin(angle) * distance);
       pipe.castShadow = this.options.castShadow ?? true;
       pipe.receiveShadow = this.options.receiveShadow ?? true;
       cactus.add(pipe);

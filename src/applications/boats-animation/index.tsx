@@ -28,9 +28,9 @@ class BoatsAnimationApp extends TerrainBase {
   private cessnaFlyingBehavior: EngineFlyingBehavior | undefined;
 
   constructor() {
-    const appConfig = getAppConfig('boats');
+    const appConfig = getAppConfig('boatsanimation');
     if (!appConfig) {
-      throw new Error('Boats app not found in registry');
+      throw new Error('Boats animation app not found in registry');
     }
     super({
       name: appConfig.name,

@@ -60,47 +60,52 @@ export class Park extends SimpleThreeComponent {
     // Create materials
     const grassMaterial = resourceManager.getOrCreateMaterial(
       `park_grass_${options.grassColor}`,
-      () => new THREE.MeshStandardMaterial({
-        color: options.grassColor,
-        roughness: 0.9,
-        metalness: 0.1
-      })
+      () =>
+        new THREE.MeshStandardMaterial({
+          color: options.grassColor,
+          roughness: 0.9,
+          metalness: 0.1,
+        })
     );
 
     const pathMaterial = resourceManager.getOrCreateMaterial(
       `park_path_${options.pathColor}`,
-      () => new THREE.MeshStandardMaterial({
-        color: options.pathColor,
-        roughness: 0.8,
-        metalness: 0.0
-      })
+      () =>
+        new THREE.MeshStandardMaterial({
+          color: options.pathColor,
+          roughness: 0.8,
+          metalness: 0.0,
+        })
     );
 
     const treeTrunkMaterial = resourceManager.getOrCreateMaterial(
       'park_tree_trunk',
-      () => new THREE.MeshStandardMaterial({
-        color: '#654321',
-        roughness: 0.9,
-        metalness: 0.0
-      })
+      () =>
+        new THREE.MeshStandardMaterial({
+          color: '#654321',
+          roughness: 0.9,
+          metalness: 0.0,
+        })
     );
 
     const treeFoliageMaterial = resourceManager.getOrCreateMaterial(
       'park_tree_foliage',
-      () => new THREE.MeshStandardMaterial({
-        color: '#2D5016',
-        roughness: 0.7,
-        metalness: 0.0
-      })
+      () =>
+        new THREE.MeshStandardMaterial({
+          color: '#2D5016',
+          roughness: 0.7,
+          metalness: 0.0,
+        })
     );
 
     const benchMaterial = resourceManager.getOrCreateMaterial(
       'park_bench',
-      () => new THREE.MeshStandardMaterial({
-        color: '#8B4513',
-        roughness: 0.6,
-        metalness: 0.2
-      })
+      () =>
+        new THREE.MeshStandardMaterial({
+          color: '#8B4513',
+          roughness: 0.6,
+          metalness: 0.2,
+        })
     );
 
     // 1. Grass base
@@ -235,19 +240,13 @@ export class Park extends SimpleThreeComponent {
     const bench = new THREE.Group();
 
     // Seat
-    const seat = new THREE.Mesh(
-      new THREE.BoxGeometry(4, 0.3, 1.5),
-      material
-    );
+    const seat = new THREE.Mesh(new THREE.BoxGeometry(4, 0.3, 1.5), material);
     seat.position.y = 1;
     seat.castShadow = this.options.castShadow ?? true;
     bench.add(seat);
 
     // Backrest
-    const backrest = new THREE.Mesh(
-      new THREE.BoxGeometry(4, 1.5, 0.2),
-      material
-    );
+    const backrest = new THREE.Mesh(new THREE.BoxGeometry(4, 1.5, 0.2), material);
     backrest.position.set(0, 1.8, -0.65);
     backrest.castShadow = this.options.castShadow ?? true;
     bench.add(backrest);
@@ -277,7 +276,7 @@ export class Park extends SimpleThreeComponent {
     const fountainMaterial = new THREE.MeshStandardMaterial({
       color: '#A9A9A9', // Dark gray stone
       roughness: 0.5,
-      metalness: 0.3
+      metalness: 0.3,
     });
 
     const waterMaterial = new THREE.MeshStandardMaterial({
@@ -285,7 +284,7 @@ export class Park extends SimpleThreeComponent {
       transparent: true,
       opacity: 0.7,
       roughness: 0.1,
-      metalness: 0.5
+      metalness: 0.5,
     });
 
     // Base pool

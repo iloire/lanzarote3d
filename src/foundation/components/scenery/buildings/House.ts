@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import GuiHelper from '../../../utils/gui';
 import { LODComponent } from '../../base/LODComponent';
 import { SimpleComponentOptions } from '../../base/SimpleThreeComponent';
 import { ComponentMetadata } from '../../base/IThreeComponent';
@@ -7,10 +6,10 @@ import { resourceManager } from '../../../systems/ResourceManager';
 import { LevelOfDetail, getLODFromLegacy } from '../../../types/lod';
 
 export enum HouseType {
-  Small,   // 2 wings
-  Medium,  // 3 wings
-  Large,   // 4 wings
-  Modern,  // 4 wings with modern styling
+  Small, // 2 wings
+  Medium, // 3 wings
+  Large, // 4 wings
+  Modern, // 4 wings with modern styling
 }
 
 export interface HouseOptions extends SimpleComponentOptions {
@@ -196,7 +195,7 @@ class House extends LODComponent {
     const roof = new THREE.Mesh(roofGeometry, roofMaterial);
     roof.position.set(
       mainWing.position[0],
-      mainWing.position[1] + mainWing.size[1]/2 + 0.5,
+      mainWing.position[1] + mainWing.size[1] / 2 + 0.5,
       mainWing.position[2]
     );
     roof.castShadow = this.options.castShadow ?? true;
@@ -268,7 +267,7 @@ class House extends LODComponent {
       const roof = new THREE.Mesh(roofGeometry, roofMaterial);
       roof.position.set(
         wing.position[0],
-        wing.position[1] + wing.size[1]/2 + 0.5,
+        wing.position[1] + wing.size[1] / 2 + 0.5,
         wing.position[2]
       );
       roof.castShadow = this.options.castShadow ?? true;
@@ -349,7 +348,7 @@ class House extends LODComponent {
       const roof = new THREE.Mesh(roofGeometry, roofMaterial);
       roof.position.set(
         wing.position[0],
-        wing.position[1] + wing.size[1]/2 + 0.5,
+        wing.position[1] + wing.size[1] / 2 + 0.5,
         wing.position[2]
       );
       roof.castShadow = this.options.castShadow ?? true;
@@ -396,10 +395,10 @@ class House extends LODComponent {
     const windowCount = wing.name === 'main' ? 3 : 2;
     for (let i = 0; i < windowCount; i++) {
       const spacing = wing.size[0] / (windowCount + 1);
-      const x = wing.position[0] - wing.size[0]/2 + spacing * (i + 1);
+      const x = wing.position[0] - wing.size[0] / 2 + spacing * (i + 1);
 
       const window = new THREE.Mesh(windowGeometry, windowMaterial);
-      window.position.set(x, wing.position[1] + 2, wing.position[2] + wing.size[2]/2 + 0.25);
+      window.position.set(x, wing.position[1] + 2, wing.position[2] + wing.size[2] / 2 + 0.25);
       house.add(window);
 
       const frame = new THREE.Mesh(frameGeometry, frameMaterial);
@@ -412,7 +411,8 @@ class House extends LODComponent {
     if (wing.name !== 'main') {
       const sideWindow = new THREE.Mesh(windowGeometry, windowMaterial);
       sideWindow.position.set(
-        wing.position[0] + (wing.name === 'left' ? -wing.size[0]/2 - 0.25 : wing.size[0]/2 + 0.25),
+        wing.position[0] +
+          (wing.name === 'left' ? -wing.size[0] / 2 - 0.25 : wing.size[0] / 2 + 0.25),
         wing.position[1] + 2,
         wing.position[2]
       );
@@ -445,7 +445,7 @@ class House extends LODComponent {
     door.position.set(
       mainWing.position[0],
       mainWing.position[1] - 6,
-      mainWing.position[2] + mainWing.size[2]/2 + 0.25
+      mainWing.position[2] + mainWing.size[2] / 2 + 0.25
     );
     house.add(door);
 
@@ -467,17 +467,17 @@ class House extends LODComponent {
     );
 
     const steps = new THREE.Mesh(stepsGeometry, frameMaterial);
-    steps.position.set(
-      door.position.x,
-      door.position.y - 4.5,
-      door.position.z + 2
-    );
+    steps.position.set(door.position.x, door.position.y - 4.5, door.position.z + 2);
     house.add(steps);
   }
 
   private addModernFeatures(
     house: THREE.Group,
-    wings: Array<{ position: [number, number, number]; size: [number, number, number]; name: string }>,
+    wings: Array<{
+      position: [number, number, number];
+      size: [number, number, number];
+      name: string;
+    }>,
     windowMaterial: THREE.Material,
     frameMaterial: THREE.Material,
     accentMaterial: THREE.Material
@@ -494,14 +494,11 @@ class House extends LODComponent {
     panoramic.position.set(
       mainWing.position[0],
       mainWing.position[1] + 4,
-      mainWing.position[2] + mainWing.size[2]/2 + 0.25
+      mainWing.position[2] + mainWing.size[2] / 2 + 0.25
     );
     house.add(panoramic);
 
-    const panoramicFrame = new THREE.Mesh(
-      new THREE.BoxGeometry(17, 11, 1),
-      frameMaterial
-    );
+    const panoramicFrame = new THREE.Mesh(new THREE.BoxGeometry(17, 11, 1), frameMaterial);
     panoramicFrame.position.copy(panoramic.position);
     panoramicFrame.position.z -= 0.25;
     house.add(panoramicFrame);
@@ -516,7 +513,7 @@ class House extends LODComponent {
     pillar.position.set(
       mainWing.position[0] - 8,
       mainWing.position[1],
-      mainWing.position[2] + mainWing.size[2]/2 - 2
+      mainWing.position[2] + mainWing.size[2] / 2 - 2
     );
     house.add(pillar);
   }
@@ -540,10 +537,10 @@ class House extends LODComponent {
       // Just 2 front windows for main wing
       for (let i = 0; i < 2; i++) {
         const spacing = wing.size[0] / 3;
-        const x = wing.position[0] - wing.size[0]/2 + spacing * (i + 1);
+        const x = wing.position[0] - wing.size[0] / 2 + spacing * (i + 1);
 
         const window = new THREE.Mesh(windowGeometry, windowMaterial);
-        window.position.set(x, wing.position[1] + 2, wing.position[2] + wing.size[2]/2 + 0.15);
+        window.position.set(x, wing.position[1] + 2, wing.position[2] + wing.size[2] / 2 + 0.15);
         house.add(window);
       }
     } else {
@@ -552,7 +549,7 @@ class House extends LODComponent {
       window.position.set(
         wing.position[0],
         wing.position[1] + 2,
-        wing.position[2] + wing.size[2]/2 + 0.15
+        wing.position[2] + wing.size[2] / 2 + 0.15
       );
       house.add(window);
     }
@@ -576,7 +573,7 @@ class House extends LODComponent {
     door.position.set(
       mainWing.position[0],
       mainWing.position[1] - 7,
-      mainWing.position[2] + mainWing.size[2]/2 + 0.15
+      mainWing.position[2] + mainWing.size[2] / 2 + 0.15
     );
     house.add(door);
   }
@@ -609,7 +606,6 @@ class House extends LODComponent {
       scale: options.scale,
     };
   }
-
 }
 
 export default House;

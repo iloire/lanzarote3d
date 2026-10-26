@@ -52,9 +52,10 @@ export abstract class LODComponent extends SimpleThreeComponent {
 
   constructor(metadata: ComponentMetadata, options: LODComponentOptions = {}) {
     // Handle backward compatibility with lowPoly
-    const lod = options.levelOfDetail !== undefined
-      ? options.levelOfDetail
-      : getLODFromLegacy(options.lowPoly);
+    const lod =
+      options.levelOfDetail !== undefined
+        ? options.levelOfDetail
+        : getLODFromLegacy(options.lowPoly);
 
     super(metadata, { ...options, levelOfDetail: lod });
     this.currentLOD = lod;

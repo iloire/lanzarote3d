@@ -355,7 +355,7 @@ class AnimationApp extends TerrainBase {
     this.startAnimationLoop(renderer, scene, camera, controls);
 
     // Setup and execute camera animation
-    const animationState = setupCameraAnimation(camera, controls, {
+    setupCameraAnimation(camera, controls, {
       targetPosition: pgPos,
       animationDurationMs: ANIMATION_DURATION_MS,
       onAnimationStart: () => {

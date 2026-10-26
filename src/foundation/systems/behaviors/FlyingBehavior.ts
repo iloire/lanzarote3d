@@ -102,7 +102,9 @@ export class FlyingBehavior {
     this.maxHeight = options.maxHeight || 15;
     this.obstacleAvoidanceDistance = options.obstacleAvoidanceDistance || 5;
     this.returnDistance = options.returnDistance || this.flightRadius * 1.5;
-    this.centerPoint = options.centerPoint ? options.centerPoint.clone() : new THREE.Vector3(0, 0, 0);
+    this.centerPoint = options.centerPoint
+      ? options.centerPoint.clone()
+      : new THREE.Vector3(0, 0, 0);
     this.faceDirection = options.faceDirection !== false;
     this.forwardAxis = options.forwardAxis || 'z';
     this.debugVectors = options.debugVectors || false;
@@ -115,11 +117,13 @@ export class FlyingBehavior {
     }
 
     // Initialize with random direction
-    this.targetDirection.set(
-      (Math.random() - 0.5) * 2,
-      (Math.random() - 0.5) * 0.5, // Less vertical movement
-      (Math.random() - 0.5) * 2
-    ).normalize();
+    this.targetDirection
+      .set(
+        (Math.random() - 0.5) * 2,
+        (Math.random() - 0.5) * 0.5, // Less vertical movement
+        (Math.random() - 0.5) * 2
+      )
+      .normalize();
   }
 
   /**
@@ -377,7 +381,7 @@ export class FlyingBehavior {
     const direction = new THREE.Vector3();
 
     switch (this.pattern) {
-      case FlightPattern.CIRCULAR:
+      case FlightPattern.CIRCULAR: {
         // Fly in a circle around center point
         const toCenter = this.centerPoint.clone().sub(this.mesh!.position);
         toCenter.y = 0; // Keep horizontal
@@ -390,14 +394,16 @@ export class FlyingBehavior {
           direction.crossVectors(toCenter.normalize(), new THREE.Vector3(0, 1, 0));
         }
         break;
+      }
 
-      case FlightPattern.FIGURE_EIGHT:
+      case FlightPattern.FIGURE_EIGHT: {
         // Create figure-eight pattern
         const figureEightX = Math.cos(this.time * 0.5) * this.flightRadius;
         const figureEightZ = Math.sin(this.time) * this.flightRadius * 0.5;
         const target = new THREE.Vector3(figureEightX, 0, figureEightZ).add(this.centerPoint);
         direction.copy(target).sub(this.mesh!.position).normalize();
         break;
+      }
 
       case FlightPattern.FREE_ROAM:
       default:
@@ -405,12 +411,15 @@ export class FlyingBehavior {
         direction.copy(this.targetDirection);
 
         // Add some randomness every few seconds
-        if (Math.random() < 0.02) { // 2% chance per frame
-          direction.add(new THREE.Vector3(
-            (Math.random() - 0.5) * 0.3,
-            (Math.random() - 0.5) * 0.1,
-            (Math.random() - 0.5) * 0.3
-          ));
+        if (Math.random() < 0.02) {
+          // 2% chance per frame
+          direction.add(
+            new THREE.Vector3(
+              (Math.random() - 0.5) * 0.3,
+              (Math.random() - 0.5) * 0.1,
+              (Math.random() - 0.5) * 0.3
+            )
+          );
         }
         break;
     }
@@ -443,12 +452,16 @@ export class FlyingBehavior {
         avoidDirection.normalize();
 
         // Stronger force when closer
-        const strength = (this.obstacleAvoidanceDistance - distance) / this.obstacleAvoidanceDistance;
+        const strength =
+          (this.obstacleAvoidanceDistance - distance) / this.obstacleAvoidanceDistance;
         avoidanceForce.add(avoidDirection.multiplyScalar(strength * 2));
 
         // Log close encounters
-        if (this.debugLogCounter % 30 === 0) { // Log every ~0.5 seconds at 60fps
-          logger.debug(`⚠️ Close to ${nearestObstacleName}: distance=${distance.toFixed(2)}, strength=${strength.toFixed(2)}`);
+        if (this.debugLogCounter % 30 === 0) {
+          // Log every ~0.5 seconds at 60fps
+          logger.debug(
+            `⚠️ Close to ${nearestObstacleName}: distance=${distance.toFixed(2)}, strength=${strength.toFixed(2)}`
+          );
         }
       }
     }
@@ -477,7 +490,8 @@ export class FlyingBehavior {
       // Gentle force to return to flight area
       const returnDirection = this.centerPoint.clone().sub(this.mesh.position);
       returnDirection.normalize();
-      const strength = (distanceFromCenter - this.flightRadius) / (this.returnDistance - this.flightRadius);
+      const strength =
+        (distanceFromCenter - this.flightRadius) / (this.returnDistance - this.flightRadius);
       boundaryForce.add(returnDirection.multiplyScalar(strength));
     }
 
@@ -551,10 +565,13 @@ export class FlyingBehavior {
         position: `(${this.mesh.position.x.toFixed(1)}, ${this.mesh.position.y.toFixed(1)}, ${this.mesh.position.z.toFixed(1)})`,
         speed: `${this.currentSpeed.toFixed(2)} (${(this.speedReductionFactor * 100).toFixed(0)}% of base)`,
         baseSpeed: this.baseSpeed.toFixed(2),
-        nearestObstacle: this.nearestObstacleDistance === Infinity ? 'None' : this.nearestObstacleDistance.toFixed(2),
+        nearestObstacle:
+          this.nearestObstacleDistance === Infinity
+            ? 'None'
+            : this.nearestObstacleDistance.toFixed(2),
         distanceFromCenter: distanceFromCenter.toFixed(2),
         velocity: `(${this.currentVelocity.x.toFixed(2)}, ${this.currentVelocity.y.toFixed(2)}, ${this.currentVelocity.z.toFixed(2)})`,
-        pattern: this.pattern
+        pattern: this.pattern,
       });
     }
   }
@@ -592,7 +609,7 @@ export class FlyingBehavior {
     tempObject.lookAt(targetPosition);
 
     // Apply corrective rotation based on model's forward axis
-    let correction = new THREE.Euler();
+    const correction = new THREE.Euler();
     switch (this.forwardAxis) {
       case 'x':
         correction.set(0, -Math.PI / 2, 0);
@@ -752,7 +769,7 @@ export class FlyingBehavior {
       velocity: this.currentVelocity.clone(),
       direction: this.targetDirection.clone(),
       distanceFromCenter: this.mesh ? this.mesh.position.distanceTo(this.centerPoint) : 0,
-      pattern: this.pattern
+      pattern: this.pattern,
     };
   }
 

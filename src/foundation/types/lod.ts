@@ -34,10 +34,10 @@ export const LOD_POLYGON_BUDGETS = {
  * Distance thresholds for automatic LOD selection (in world units)
  */
 export const LOD_DISTANCE_THRESHOLDS = {
-  ULTRA_LOW: 500,  // Use ULTRA_LOW beyond this distance
-  LOW: 200,        // Use LOW beyond this distance
-  MEDIUM: 50,      // Use MEDIUM beyond this distance
-  HIGH: 0,         // Use HIGH below MEDIUM threshold
+  ULTRA_LOW: 500, // Use ULTRA_LOW beyond this distance
+  LOW: 200, // Use LOW beyond this distance
+  MEDIUM: 50, // Use MEDIUM beyond this distance
+  HIGH: 0, // Use HIGH below MEDIUM threshold
 } as const;
 
 /**
@@ -72,7 +72,11 @@ export function selectLODByDistance(distance: number): LevelOfDetail {
 /**
  * Get polygon budget for a given LOD level
  */
-export function getPolygonBudget(lod: LevelOfDetail): { min: number; max: number; recommended: number } {
+export function getPolygonBudget(lod: LevelOfDetail): {
+  min: number;
+  max: number;
+  recommended: number;
+} {
   return LOD_POLYGON_BUDGETS[lod];
 }
 

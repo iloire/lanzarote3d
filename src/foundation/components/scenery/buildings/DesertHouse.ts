@@ -125,7 +125,7 @@ export class DesertHouse extends LODComponent {
       window: resourceManager.getOrCreateMaterial(
         `desert_house_window_low_${options.windowColor}`,
         () => new THREE.MeshLambertMaterial({ color: options.windowColor })
-      )
+      ),
     };
 
     // Main house structure
@@ -203,7 +203,7 @@ export class DesertHouse extends LODComponent {
       window: resourceManager.getOrCreateMaterial(
         `desert_house_window_medium_${options.windowColor}`,
         () => new THREE.MeshLambertMaterial({ color: options.windowColor })
-      )
+      ),
     };
 
     // Main house structure
@@ -330,7 +330,7 @@ export class DesertHouse extends LODComponent {
       cactus: resourceManager.getOrCreateMaterial(
         'desert_house_cactus',
         () => new THREE.MeshLambertMaterial({ color: '#228B22' })
-      )
+      ),
     };
   }
 
@@ -338,7 +338,6 @@ export class DesertHouse extends LODComponent {
    * Add main structure (walls and roof)
    */
   private addMainStructure(house: THREE.Group, materials: any): void {
-
     // Main house structure - simple cubic adobe style
     const mainBodyGeometry = resourceManager.getOrCreateGeometry(
       'desert_house_main_body',
@@ -374,7 +373,6 @@ export class DesertHouse extends LODComponent {
    * Add doors and windows
    */
   private addDoorsAndWindows(house: THREE.Group, materials: any, isLowPoly: boolean): void {
-
     // Simple arched doorway
     const doorGeometry = resourceManager.getOrCreateGeometry(
       'desert_house_door',
@@ -407,7 +405,6 @@ export class DesertHouse extends LODComponent {
       const singleWindow = new THREE.Mesh(windowLowPolyGeometry, materials.window);
       singleWindow.position.set(0, 8, 8.1);
       house.add(singleWindow);
-
     } else {
       // Full detail windows with frames
       const windowGeometry = resourceManager.getOrCreateGeometry(
@@ -448,7 +445,6 @@ export class DesertHouse extends LODComponent {
    * Add decorative elements (courtyard, cactus, shade structure)
    */
   private addDecorativeElements(house: THREE.Group, materials: any): void {
-
     // Small courtyard wall (typical of desert architecture)
     const courtyardWallGeometry = resourceManager.getOrCreateGeometry(
       'desert_house_courtyard_wall',
@@ -497,7 +493,7 @@ export class DesertHouse extends LODComponent {
       new THREE.Vector3(5, 4, -8),
       new THREE.Vector3(11, 4, -8),
       new THREE.Vector3(5, 4, -4),
-      new THREE.Vector3(11, 4, -4)
+      new THREE.Vector3(11, 4, -4),
     ];
 
     posts.forEach(pos => {
@@ -506,7 +502,6 @@ export class DesertHouse extends LODComponent {
       house.add(post);
     });
   }
-
 
   public override validate(): string[] {
     const issues: string[] = [];

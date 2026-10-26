@@ -53,18 +53,17 @@
     /* Main shadow layers for 3D depth */
     4px 4px 0 #1a3a5c,
     8px 8px 0 #0d1f33,
-    /* Glow effect */
-    0 0 40px rgba(74, 158, 255, 0.6),
+    /* Glow effect */ 0 0 40px rgba(74, 158, 255, 0.6),
     0 0 80px rgba(74, 158, 255, 0.3),
-    /* Inner highlight */
-    -1px -1px 0 rgba(255, 255, 255, 0.3);
+    /* Inner highlight */ -1px -1px 0 rgba(255, 255, 255, 0.3);
 
   /* Subtle floating animation */
   animation: titleFloat 4s ease-in-out infinite;
 }
 
 @keyframes titleFloat {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -84,11 +83,9 @@
     /* Main shadow layers for 3D depth */
     3px 3px 0 #1a4a3c,
     6px 6px 0 #0d2b22,
-    /* Glow effect */
-    0 0 30px rgba(74, 255, 158, 0.5),
+    /* Glow effect */ 0 0 30px rgba(74, 255, 158, 0.5),
     0 0 60px rgba(74, 255, 158, 0.2),
-    /* Inner highlight */
-    -1px -1px 0 rgba(255, 255, 255, 0.2);
+    /* Inner highlight */ -1px -1px 0 rgba(255, 255, 255, 0.2);
 
   /* Delayed floating animation */
   animation: titleFloat 4s ease-in-out infinite;
@@ -114,7 +111,6 @@
       4px 4px 0 #0d2b22,
       0 0 20px rgba(74, 255, 158, 0.4);
   }
-
 }
 
 @media (max-width: 500px) {
@@ -143,5 +139,4 @@
   .voxel-title {
     gap: 10px;
   }
-
 }

@@ -1,20 +1,5 @@
 import * as THREE from 'three';
-import { HouseConfig, HouseGroupConfig, NEIGHBORHOOD_PRESETS, NeighborhoodVariation, DEFAULT_VARIATION } from './house-group-types';
-import { HouseType } from '../../foundation/components/scenery/buildings/House';
-
-/**
- * Check if a position is within any exclusion zone
- */
-function isInExclusionZone(position: THREE.Vector3, exclusionZones?: Array<{ center: THREE.Vector3; radius: number }>): boolean {
-  if (!exclusionZones || exclusionZones.length === 0) {
-    return false;
-  }
-
-  return exclusionZones.some(zone => {
-    const distance = position.distanceTo(zone.center);
-    return distance < zone.radius;
-  });
-}
+import { HouseConfig, HouseGroupConfig, DEFAULT_VARIATION } from './house-group-types';
 
 /**
  * Calculate positions for houses based on neighborhood formation type
@@ -24,20 +9,11 @@ export function calculateHousePositions(
   groupConfig: HouseGroupConfig
 ): THREE.Vector3[] {
   const positions: THREE.Vector3[] = [];
-  const {
-    center,
-    formation,
-    spacing,
-    neighborhoodSize = 300,
-    streetWidth = 30,
-    rowCount = 3,
-    colCount = 3,
-    randomVariation = 0.2,
-    exclusionZones,
-  } = groupConfig;
+  const { center, formation, spacing, neighborhoodSize = 300, randomVariation = 0.2 } = groupConfig;
+  const streetWidth = 30;
 
   switch (formation) {
-    case 'street':
+    case 'street': {
       // Houses along both sides of a street
       const housesPerSide = Math.ceil(houseCount / 2);
       for (let i = 0; i < houseCount; i++) {
@@ -52,35 +28,15 @@ export function calculateHousePositions(
         const randomZ = z + (Math.random() - 0.5) * variation * 0.5;
 
         const position = new THREE.Vector3(randomX, center.y, randomZ);
-
-        // Only add if not in exclusion zone
-        if (!isInExclusionZone(position, exclusionZones)) {
-          positions.push(position);
-        }
+        positions.push(position);
       }
       break;
+    }
 
-    case 'cul-de-sac':
-      // Circular arrangement around a cul-de-sac
-      const radius = Math.min(neighborhoodSize * 0.4, spacing * houseCount / (2 * Math.PI) * 1.5);
-      for (let i = 0; i < houseCount; i++) {
-        const angle = (i / houseCount) * Math.PI * 1.2 + Math.PI * 0.1; // 216 degrees arc
-        const houseRadius = radius + (Math.random() - 0.5) * spacing * randomVariation;
-        const x = center.x + Math.cos(angle) * houseRadius;
-        const z = center.z + Math.sin(angle) * houseRadius;
-        const position = new THREE.Vector3(x, center.y, z);
-
-        // Only add if not in exclusion zone
-        if (!isInExclusionZone(position, exclusionZones)) {
-          positions.push(position);
-        }
-      }
-      break;
-
-    case 'grid':
+    case 'grid': {
       // Regular grid pattern
-      const actualRowCount = rowCount || Math.ceil(Math.sqrt(houseCount));
-      const actualColCount = colCount || Math.ceil(houseCount / actualRowCount);
+      const actualRowCount = 3;
+      const actualColCount = 3;
 
       for (let i = 0; i < houseCount; i++) {
         const row = Math.floor(i / actualColCount);
@@ -94,19 +50,15 @@ export function calculateHousePositions(
         z += (Math.random() - 0.5) * variation;
 
         const position = new THREE.Vector3(x, center.y, z);
-
-        // Only add if not in exclusion zone
-        if (!isInExclusionZone(position, exclusionZones)) {
-          positions.push(position);
-        }
+        positions.push(position);
       }
       break;
+    }
 
-    case 'suburban':
+    case 'suburban': {
       // Mixed layout with curved streets and varied positioning
       // Scale sectors based on house count for better distribution
       const sectors = Math.max(4, Math.ceil(houseCount / 8));
-      const housesPerSector = Math.ceil(houseCount / sectors);
       let houseIndex = 0;
 
       for (let sector = 0; sector < sectors && houseIndex < houseCount; sector++) {
@@ -129,15 +81,12 @@ export function calculateHousePositions(
           const x = sectorCenter.x + Math.cos(localAngle) * localRadius;
           const z = sectorCenter.z + Math.sin(localAngle) * localRadius;
           const position = new THREE.Vector3(x, center.y, z);
-
-          // Only add if not in exclusion zone
-          if (!isInExclusionZone(position, exclusionZones)) {
-            positions.push(position);
-          }
+          positions.push(position);
           houseIndex++;
         }
       }
       break;
+    }
 
     case 'rural':
       // Scattered placement with larger spacing
@@ -156,14 +105,9 @@ export function calculateHousePositions(
           attempts++;
         } while (
           attempts < 20 &&
-          (positions.some(existingPos => existingPos.distanceTo(position) < spacing) ||
-           isInExclusionZone(position, exclusionZones))
+          positions.some(existingPos => existingPos.distanceTo(position) < spacing)
         );
-
-        // Only add if not in exclusion zone (final check)
-        if (!isInExclusionZone(position, exclusionZones)) {
-          positions.push(position);
-        }
+        positions.push(position);
       }
       break;
 
@@ -180,14 +124,9 @@ export function calculateHousePositions(
           attempts++;
         } while (
           attempts < 30 &&
-          (positions.some(existingPos => existingPos.distanceTo(position) < spacing * 0.8) ||
-           isInExclusionZone(position, exclusionZones))
+          positions.some(existingPos => existingPos.distanceTo(position) < spacing * 0.8)
         );
-
-        // Only add if not in exclusion zone (final check)
-        if (!isInExclusionZone(position, exclusionZones)) {
-          positions.push(position);
-        }
+        positions.push(position);
       }
       break;
 
@@ -200,137 +139,11 @@ export function calculateHousePositions(
 }
 
 /**
- * Generate a suburban neighborhood with mixed house types
- */
-export function generateSuburbanNeighborhood(
-  size: 'small' | 'medium' | 'large' = 'medium',
-  variation: NeighborhoodVariation = DEFAULT_VARIATION
-): HouseConfig[] {
-  const preset = NEIGHBORHOOD_PRESETS.suburban[size];
-  const houses: HouseConfig[] = [];
-
-  const houseTypes: Array<{ type: HouseConfig['type']; weight: number; houseType?: HouseType }> = [
-    { type: 'House', weight: 0.4, houseType: HouseType.Medium },
-    { type: 'House', weight: 0.2, houseType: HouseType.Large },
-    { type: 'House', weight: 0.15, houseType: HouseType.Modern },
-    { type: 'Villa', weight: 0.1 },
-    { type: 'Townhouse', weight: 0.1 },
-    { type: 'DesertHouse', weight: 0.05 },
-  ];
-
-  for (let i = 0; i < preset.count; i++) {
-    const selectedType = selectWeightedHouseType(houseTypes);
-    const baseScale = 0.8 + Math.random() * 0.4; // 0.8 to 1.2
-    const scaleVariation = variation.scaleVariation * (Math.random() - 0.5) * 0.4;
-
-    // Generate 90-degree increment rotation
-    const rotations = [0, Math.PI / 2, Math.PI, Math.PI * 1.5];
-    const rotation = variation.rotationVariation
-      ? rotations[Math.floor(Math.random() * rotations.length)]
-      : 0;
-
-    const finalScale = Math.max(0.5, baseScale + scaleVariation);
-
-    houses.push({
-      ...selectedType,
-      scale: finalScale,
-      includePool: Math.random() < variation.poolChance,
-      rotation,
-      colors: variation.colorVariation ? generateRandomColors() : undefined,
-      landPlot: generateLandPlot(selectedType.type, finalScale),
-    });
-  }
-
-  return houses;
-}
-
-/**
- * Generate an urban neighborhood with more compact buildings
- */
-export function generateUrbanNeighborhood(
-  density: 'compact' | 'dense' | 'downtown' = 'dense',
-  variation: NeighborhoodVariation = DEFAULT_VARIATION
-): HouseConfig[] {
-  const preset = NEIGHBORHOOD_PRESETS.urban[density];
-  const houses: HouseConfig[] = [];
-
-  const houseTypes: Array<{ type: HouseConfig['type']; weight: number; houseType?: HouseType }> = [
-    { type: 'Townhouse', weight: 0.4 },
-    { type: 'House', weight: 0.25, houseType: HouseType.Modern },
-    { type: 'House', weight: 0.15, houseType: HouseType.Large },
-    { type: 'Villa', weight: 0.1 },
-  ];
-
-  for (let i = 0; i < preset.count; i++) {
-    const selectedType = selectWeightedHouseType(houseTypes);
-    const baseScale = 0.7 + Math.random() * 0.3; // Smaller for urban density
-
-    // Generate 90-degree increment rotation
-    const rotations = [0, Math.PI / 2, Math.PI, Math.PI * 1.5];
-    const rotation = variation.rotationVariation
-      ? rotations[Math.floor(Math.random() * rotations.length)]
-      : 0;
-
-    houses.push({
-      ...selectedType,
-      scale: baseScale,
-      includePool: Math.random() < variation.poolChance * 0.5, // Fewer pools in urban areas
-      rotation,
-      colors: variation.colorVariation ? generateRandomColors() : undefined,
-      landPlot: generateLandPlot(selectedType.type, baseScale),
-    });
-  }
-
-  return houses;
-}
-
-/**
- * Generate a rural neighborhood with farms and scattered buildings
- */
-export function generateRuralNeighborhood(
-  style: 'farmstead' | 'village' | 'scattered' = 'village',
-  variation: NeighborhoodVariation = DEFAULT_VARIATION
-): HouseConfig[] {
-  const preset = NEIGHBORHOOD_PRESETS.rural[style];
-  const houses: HouseConfig[] = [];
-
-  const houseTypes: Array<{ type: HouseConfig['type']; weight: number; houseType?: HouseType }> = [
-    { type: 'House', weight: 0.3, houseType: HouseType.Small },
-    { type: 'House', weight: 0.2, houseType: HouseType.Medium },
-    { type: 'Barn', weight: 0.25 },
-    { type: 'DesertHouse', weight: 0.15 },
-    { type: 'Villa', weight: 0.1 },
-  ];
-
-  for (let i = 0; i < preset.count; i++) {
-    const selectedType = selectWeightedHouseType(houseTypes);
-    const baseScale = 0.9 + Math.random() * 0.4; // Larger for rural areas
-
-    // Generate 90-degree increment rotation
-    const rotations = [0, Math.PI / 2, Math.PI, Math.PI * 1.5];
-    const rotation = variation.rotationVariation
-      ? rotations[Math.floor(Math.random() * rotations.length)]
-      : 0;
-
-    houses.push({
-      ...selectedType,
-      scale: baseScale,
-      includePool: Math.random() < variation.poolChance * 0.7,
-      rotation,
-      colors: variation.colorVariation ? generateRandomColors() : undefined,
-      landPlot: generateLandPlot(selectedType.type, baseScale),
-    });
-  }
-
-  return houses;
-}
-
-/**
  * Select a house type based on weighted probabilities
  */
-function selectWeightedHouseType(
-  types: Array<{ type: HouseConfig['type']; weight: number; houseType?: HouseType }>
-): { type: HouseConfig['type']; houseType?: HouseType } {
+function selectWeightedHouseType(types: Array<{ type: HouseConfig['type']; weight: number }>): {
+  type: HouseConfig['type'];
+} {
   const totalWeight = types.reduce((sum, t) => sum + t.weight, 0);
   const random = Math.random() * totalWeight;
   let accumulated = 0;
@@ -338,7 +151,7 @@ function selectWeightedHouseType(
   for (const typeOption of types) {
     accumulated += typeOption.weight;
     if (random <= accumulated) {
-      return { type: typeOption.type, houseType: typeOption.houseType };
+      return { type: typeOption.type };
     }
   }
 
@@ -364,23 +177,26 @@ function generateRandomColors(): { [key: string]: string } {
 /**
  * Generate a random land plot for a house based on house type and scale
  */
-function generateLandPlot(houseType: HouseConfig['type'], scale: number = 1): { width: number; depth: number; color?: string } {
+function generateLandPlot(
+  houseType: HouseConfig['type'],
+  scale: number = 1
+): { width: number; depth: number; color?: string } {
   const baseWidths: Record<HouseConfig['type'], number> = {
-    'House': 60,
-    'Villa': 100,
-    'Townhouse': 50,
-    'Barn': 80,
-    'DesertHouse': 70,
-    'DesertHouseWithPool': 90,
+    House: 60,
+    Villa: 100,
+    Townhouse: 50,
+    Barn: 80,
+    DesertHouse: 70,
+    DesertHouseWithPool: 90,
   };
 
   const baseDepths: Record<HouseConfig['type'], number> = {
-    'House': 60,
-    'Villa': 90,
-    'Townhouse': 70,
-    'Barn': 100,
-    'DesertHouse': 80,
-    'DesertHouseWithPool': 100,
+    House: 60,
+    Villa: 90,
+    Townhouse: 70,
+    Barn: 100,
+    DesertHouse: 80,
+    DesertHouseWithPool: 100,
   };
 
   const landColors = ['#D2B48C', '#DEB887', '#F5DEB3', '#D2691E', '#CD853F']; // Desert sand shades
@@ -399,26 +215,22 @@ function generateLandPlot(houseType: HouseConfig['type'], scale: number = 1): { 
 /**
  * Create a mixed neighborhood with custom house distribution
  */
-export function generateMixedNeighborhood(
-  count: number,
-  houseDistribution?: Partial<Record<HouseConfig['type'], number>>,
-  variation: NeighborhoodVariation = DEFAULT_VARIATION
-): HouseConfig[] {
+export function generateMixedNeighborhood(count: number): HouseConfig[] {
+  const variation = DEFAULT_VARIATION;
   const houses: HouseConfig[] = [];
-  const defaultDistribution = {
-    'House': 0.4,
-    'Villa': 0.15,
-    'Townhouse': 0.15,
-    'Barn': 0.1,
-    'DesertHouse': 0.1,
-    'DesertHouseWithPool': 0.05,
+  const distribution = {
+    House: 0.4,
+    Villa: 0.15,
+    Townhouse: 0.15,
+    Barn: 0.1,
+    DesertHouse: 0.1,
+    DesertHouseWithPool: 0.05,
   };
 
-  const distribution = { ...defaultDistribution, ...houseDistribution };
-
   // Create house types based on distribution
-  const types: Array<{ type: HouseConfig['type']; weight: number }> = Object.entries(distribution)
-    .map(([type, weight]) => ({ type: type as HouseConfig['type'], weight }));
+  const types: Array<{ type: HouseConfig['type']; weight: number }> = Object.entries(
+    distribution
+  ).map(([type, weight]) => ({ type: type as HouseConfig['type'], weight }));
 
   for (let i = 0; i < count; i++) {
     const selectedType = selectWeightedHouseType(types);

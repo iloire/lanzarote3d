@@ -45,7 +45,8 @@ export class SaguaroCactus extends SimpleThreeComponent {
     const scale = options.scale || 1;
 
     // Check both lowPoly (legacy) and levelOfDetail (new)
-    const isLowPoly = options.lowPoly || (options.levelOfDetail !== undefined && options.levelOfDetail <= 1);
+    const isLowPoly =
+      options.lowPoly || (options.levelOfDetail !== undefined && options.levelOfDetail <= 1);
 
     if (isLowPoly) {
       return this.createLowPolySaguaroCactus(options, scale);
@@ -93,7 +94,7 @@ export class SaguaroCactus extends SimpleThreeComponent {
       const radius = 1.5 - t * 0.3; // Slight taper
 
       const segment = new THREE.Mesh(trunkGeometries[i], cactusMaterial);
-      segment.position.y = i * segmentHeight + segmentHeight/2; // Adjusted for ground level positioning
+      segment.position.y = i * segmentHeight + segmentHeight / 2; // Adjusted for ground level positioning
       segment.castShadow = this.options.castShadow ?? true;
       segment.receiveShadow = this.options.receiveShadow ?? true;
       cactus.add(segment);
@@ -115,16 +116,37 @@ export class SaguaroCactus extends SimpleThreeComponent {
 
     // Create shared arm geometries (varied lengths)
     const armHorizontalGeometries = [
-      resourceManager.getOrCreateGeometry('saguaro_arm_h3', () => new THREE.CylinderGeometry(0.8, 0.9, 3, 10)),
-      resourceManager.getOrCreateGeometry('saguaro_arm_h4', () => new THREE.CylinderGeometry(0.8, 0.9, 4, 10)),
-      resourceManager.getOrCreateGeometry('saguaro_arm_h5', () => new THREE.CylinderGeometry(0.8, 0.9, 5, 10))
+      resourceManager.getOrCreateGeometry(
+        'saguaro_arm_h3',
+        () => new THREE.CylinderGeometry(0.8, 0.9, 3, 10)
+      ),
+      resourceManager.getOrCreateGeometry(
+        'saguaro_arm_h4',
+        () => new THREE.CylinderGeometry(0.8, 0.9, 4, 10)
+      ),
+      resourceManager.getOrCreateGeometry(
+        'saguaro_arm_h5',
+        () => new THREE.CylinderGeometry(0.8, 0.9, 5, 10)
+      ),
     ];
 
     const armVerticalGeometries = [
-      resourceManager.getOrCreateGeometry('saguaro_arm_v5', () => new THREE.CylinderGeometry(0.7, 0.8, 5, 10)),
-      resourceManager.getOrCreateGeometry('saguaro_arm_v6', () => new THREE.CylinderGeometry(0.7, 0.8, 6, 10)),
-      resourceManager.getOrCreateGeometry('saguaro_arm_v7', () => new THREE.CylinderGeometry(0.7, 0.8, 7, 10)),
-      resourceManager.getOrCreateGeometry('saguaro_arm_v8', () => new THREE.CylinderGeometry(0.7, 0.8, 8, 10))
+      resourceManager.getOrCreateGeometry(
+        'saguaro_arm_v5',
+        () => new THREE.CylinderGeometry(0.7, 0.8, 5, 10)
+      ),
+      resourceManager.getOrCreateGeometry(
+        'saguaro_arm_v6',
+        () => new THREE.CylinderGeometry(0.7, 0.8, 6, 10)
+      ),
+      resourceManager.getOrCreateGeometry(
+        'saguaro_arm_v7',
+        () => new THREE.CylinderGeometry(0.7, 0.8, 7, 10)
+      ),
+      resourceManager.getOrCreateGeometry(
+        'saguaro_arm_v8',
+        () => new THREE.CylinderGeometry(0.7, 0.8, 8, 10)
+      ),
     ];
 
     const elbowGeometry = resourceManager.getOrCreateGeometry(
@@ -152,7 +174,7 @@ export class SaguaroCactus extends SimpleThreeComponent {
       { height: 0.3, side: 1, angle: 0.3 },
       { height: 0.4, side: -1, angle: -0.3 },
       { height: 0.5, side: 1, angle: 0.2 },
-      { height: 0.35, side: -1, angle: -0.4 }
+      { height: 0.35, side: -1, angle: -0.4 },
     ];
 
     for (let i = 0; i < armCount && i < armPositions.length; i++) {
@@ -165,7 +187,7 @@ export class SaguaroCactus extends SimpleThreeComponent {
 
       const horizontal = new THREE.Mesh(horizontalGeometry, cactusMaterial);
       horizontal.rotation.z = Math.PI / 2;
-      horizontal.position.x = arm.side * horizontalLength / 2;
+      horizontal.position.x = (arm.side * horizontalLength) / 2;
       armGroup.add(horizontal);
 
       // Vertical part of arm - use shared geometries
@@ -196,11 +218,7 @@ export class SaguaroCactus extends SimpleThreeComponent {
       const angle = Math.random() * Math.PI * 2;
       const radius = 1.2 + Math.random() * 0.3;
 
-      spine.position.set(
-        Math.cos(angle) * radius,
-        y,
-        Math.sin(angle) * radius
-      );
+      spine.position.set(Math.cos(angle) * radius, y, Math.sin(angle) * radius);
       spine.rotation.z = angle;
       spine.rotation.x = Math.random() * 0.3;
       cactus.add(spine);

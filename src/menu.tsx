@@ -1,6 +1,6 @@
 import React from 'react';
 import * as THREE from 'three';
-import { getAppsByVisibility, getVisibleApps, type AppMetadata } from './config/app-registry';
+import { getAppsByVisibility, type AppMetadata } from './config/app-registry';
 import { themeManager } from './foundation/systems/ThemeManager';
 import { getAllThemes } from './foundation/themes';
 import { Theme } from './foundation/types/Theme';
@@ -224,9 +224,13 @@ class Menu extends React.Component<MenuProps> {
                   this.setState({ isMenuOpen: false });
                 }
               }}
-              style={isDevOnly ? {
-                position: 'relative'
-              } : undefined}
+              style={
+                isDevOnly
+                  ? {
+                      position: 'relative',
+                    }
+                  : undefined
+              }
             >
               {app.name}
               {isDevOnly && (
@@ -236,7 +240,7 @@ class Menu extends React.Component<MenuProps> {
                     color: '#ff9800',
                     marginLeft: '4px',
                     opacity: 0.7,
-                    fontWeight: 'normal'
+                    fontWeight: 'normal',
                   }}
                   title="Only visible in development mode"
                 >
@@ -286,7 +290,10 @@ class Menu extends React.Component<MenuProps> {
             {shouldShowPrivate && privateApps.filter(app => app.category === 'demo').length > 0 && (
               <>
                 <h3>Private Demos</h3>
-                {renderButtons(privateApps.filter(app => app.category === 'demo'), true)}
+                {renderButtons(
+                  privateApps.filter(app => app.category === 'demo'),
+                  true
+                )}
               </>
             )}
             {showDev && toolApps.length > 0 && (
@@ -295,12 +302,16 @@ class Menu extends React.Component<MenuProps> {
                 {renderButtons(toolApps, true)}
               </>
             )}
-            {shouldShowPrivate && privateApps.filter(app => app.category === 'experience').length > 0 && (
-              <>
-                <h3>Experiences</h3>
-                {renderButtons(privateApps.filter(app => app.category === 'experience'), true)}
-              </>
-            )}
+            {shouldShowPrivate &&
+              privateApps.filter(app => app.category === 'experience').length > 0 && (
+                <>
+                  <h3>Experiences</h3>
+                  {renderButtons(
+                    privateApps.filter(app => app.category === 'experience'),
+                    true
+                  )}
+                </>
+              )}
           </div>
         </div>
       );
@@ -341,7 +352,10 @@ class Menu extends React.Component<MenuProps> {
             {shouldShowPrivate && privateApps.filter(app => app.category === 'demo').length > 0 && (
               <>
                 <h2>Private Demos</h2>
-                {renderButtons(privateApps.filter(app => app.category === 'demo'), true)}
+                {renderButtons(
+                  privateApps.filter(app => app.category === 'demo'),
+                  true
+                )}
               </>
             )}
             {showDev && toolApps.length > 0 && (
@@ -350,12 +364,16 @@ class Menu extends React.Component<MenuProps> {
                 {renderButtons(toolApps, true)}
               </>
             )}
-            {shouldShowPrivate && privateApps.filter(app => app.category === 'experience').length > 0 && (
-              <>
-                <h2>Experiences</h2>
-                {renderButtons(privateApps.filter(app => app.category === 'experience'), true)}
-              </>
-            )}
+            {shouldShowPrivate &&
+              privateApps.filter(app => app.category === 'experience').length > 0 && (
+                <>
+                  <h2>Experiences</h2>
+                  {renderButtons(
+                    privateApps.filter(app => app.category === 'experience'),
+                    true
+                  )}
+                </>
+              )}
           </>
         )}
       </div>

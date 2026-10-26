@@ -26,7 +26,10 @@ export class PerformanceUI {
   private controlsContainer!: HTMLDivElement;
   private onToggleCallback?: () => Promise<void>;
 
-  constructor(private settings: PerformanceSettings, private neighborhoodCount: () => number) {}
+  constructor(
+    private settings: PerformanceSettings,
+    private neighborhoodCount: () => number
+  ) {}
 
   /**
    * Initialize and render the on-screen controls
@@ -147,7 +150,10 @@ export class PerformanceUI {
     let polygonInfo = '';
 
     if (polygonBreakdown) {
-      const totalPolygons = Object.values(polygonBreakdown).reduce((sum, count) => sum + (count || 0), 0);
+      const totalPolygons = Object.values(polygonBreakdown).reduce(
+        (sum, count) => sum + (count || 0),
+        0
+      );
 
       // Calculate percentages (handle division by zero)
       const calculatePercentage = (value: number) => {
@@ -163,7 +169,7 @@ export class PerformanceUI {
         roads: calculatePercentage(polygonBreakdown.roads || 0),
         parks: calculatePercentage(polygonBreakdown.parks || 0),
         squares: calculatePercentage(polygonBreakdown.squares || 0),
-        other: calculatePercentage(polygonBreakdown.other || 0)
+        other: calculatePercentage(polygonBreakdown.other || 0),
       };
 
       polygonInfo = `
@@ -181,9 +187,10 @@ export class PerformanceUI {
         </div>
       `;
     } else {
-      const polygonText = this.settings.polygonCount > 0
-        ? this.settings.polygonCount.toLocaleString()
-        : 'Calculating...';
+      const polygonText =
+        this.settings.polygonCount > 0
+          ? this.settings.polygonCount.toLocaleString()
+          : 'Calculating...';
       polygonInfo = `<div><strong>Polygons:</strong> ${polygonText}</div>`;
     }
 

@@ -184,5 +184,4 @@ export class SpeedBoat extends MovableBoatComponent {
   }
 }
 
-
 export default SpeedBoat;

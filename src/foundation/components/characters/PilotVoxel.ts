@@ -2,8 +2,7 @@ import * as THREE from 'three';
 import { SimpleThreeComponent } from '../base/SimpleThreeComponent';
 import { ComponentOptions } from '../base/IThreeComponent';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
-import { CharacterType, characterRegistry, CharacterDefinition, CharacterAssets } from './CharacterRegistry';
-import { logger } from '../../utils/logger';
+import { CharacterType, characterRegistry, CharacterDefinition } from './CharacterRegistry';
 
 /**
  * Options for pilot voxel component
@@ -57,13 +56,15 @@ export class PilotVoxel extends SimpleThreeComponent {
     }
 
     // Get model and texture paths (with alternative support)
-    const objFile = options.useAlternativeModel !== undefined && character.assets.alternativeModels
-      ? character.assets.alternativeModels[options.useAlternativeModel]
-      : character.assets.objFile;
+    const objFile =
+      options.useAlternativeModel !== undefined && character.assets.alternativeModels
+        ? character.assets.alternativeModels[options.useAlternativeModel]
+        : character.assets.objFile;
 
-    const textureFile = options.useAlternativeTexture !== undefined && character.assets.alternativeTextures
-      ? character.assets.alternativeTextures[options.useAlternativeTexture]
-      : character.assets.textureFile;
+    const textureFile =
+      options.useAlternativeTexture !== undefined && character.assets.alternativeTextures
+        ? character.assets.alternativeTextures[options.useAlternativeTexture]
+        : character.assets.textureFile;
 
     super(
       {
@@ -196,8 +197,6 @@ export class PilotVoxel extends SimpleThreeComponent {
     });
   }
 
-
-
   /**
    * Get current character type
    */
@@ -239,7 +238,6 @@ export class PilotVoxel extends SimpleThreeComponent {
 
     return new PilotVoxel(options);
   }
-
 }
 
 export default PilotVoxel;

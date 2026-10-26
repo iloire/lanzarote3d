@@ -90,8 +90,7 @@ function shouldShowSidebar(story?: string): boolean {
   // Check for root path with no story (development default = home)
   const params = new URLSearchParams(window.location.search);
   const urlStory = params.get('story');
-  const isRootPath =
-    window.location.pathname === '/' || window.location.pathname === '/index.html';
+  const isRootPath = window.location.pathname === '/' || window.location.pathname === '/index.html';
   if (isRootPath && !urlStory) {
     return false;
   }
@@ -106,7 +105,7 @@ const App: React.FC<AppProps> = ({
   showPrivate,
   showDev,
 }) => {
-  const [loadingProcess, setLoadingProcess] = useState(0);
+  const [loadingProcess] = useState(0);
   const [showAppSelection] = useState(initialShowAppSelection);
   const [renderer, setRenderer] = useState<THREE.WebGLRenderer | null>(null);
 

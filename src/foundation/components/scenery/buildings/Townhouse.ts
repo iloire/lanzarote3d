@@ -35,7 +35,8 @@ export class Townhouse extends LODComponent {
     const metadata: ComponentMetadata = {
       name: 'Townhouse',
       version: '2.0.0',
-      description: 'Multi-story urban townhouse with traditional brick architecture. Supports 4 LOD levels.',
+      description:
+        'Multi-story urban townhouse with traditional brick architecture. Supports 4 LOD levels.',
       tags: ['scenery', 'building', 'urban', 'multi-story', 'residential', 'lod'],
     };
 
@@ -333,7 +334,7 @@ export class Townhouse extends LODComponent {
       trim: resourceManager.getOrCreateMaterial(
         `townhouse_trim_${options.trimColor}`,
         () => new THREE.MeshLambertMaterial({ color: options.trimColor })
-      )
+      ),
     };
   }
 
@@ -341,7 +342,6 @@ export class Townhouse extends LODComponent {
    * Add main structure (walls, roof, and roof peak)
    */
   private addMainStructure(townhouse: THREE.Group, materials: TownhouseMaterials): void {
-
     // Main townhouse structure - properly proportioned 2-story building
     const mainBodyGeometry = resourceManager.getOrCreateGeometry(
       'townhouse_main_body',
@@ -378,7 +378,6 @@ export class Townhouse extends LODComponent {
    * Add entrance (door, frame, and steps)
    */
   private addEntrance(townhouse: THREE.Group, materials: TownhouseMaterials): void {
-
     // Front door
     const doorGeometry = resourceManager.getOrCreateGeometry(
       'townhouse_door',
@@ -411,7 +410,6 @@ export class Townhouse extends LODComponent {
    * Add windows for both floors
    */
   private addWindows(townhouse: THREE.Group, materials: TownhouseMaterials): void {
-
     // Full detail windows with frames
     const windowGeometry = resourceManager.getOrCreateGeometry(
       'townhouse_window',
@@ -473,7 +471,6 @@ export class Townhouse extends LODComponent {
    * Add decorative elements (cornices and chimney)
    */
   private addDecorativeElements(townhouse: THREE.Group, materials: TownhouseMaterials): void {
-
     // Decorative cornices between floors
     const corniceGeometry = resourceManager.getOrCreateGeometry(
       'townhouse_cornice',
@@ -498,7 +495,6 @@ export class Townhouse extends LODComponent {
     chimney.castShadow = this.options.castShadow ?? true;
     townhouse.add(chimney);
   }
-
 
   public override validate(): string[] {
     const issues: string[] = [];

@@ -101,7 +101,7 @@ export abstract class SimpleThreeComponent extends BaseThreeComponent {
     const castShadow = this._options.castShadow !== false;
     const receiveShadow = this._options.receiveShadow !== false;
 
-    object.traverse((child) => {
+    object.traverse(child => {
       if (child instanceof THREE.Mesh) {
         child.castShadow = castShadow;
         child.receiveShadow = receiveShadow;
@@ -125,7 +125,6 @@ export abstract class SimpleThreeComponent extends BaseThreeComponent {
     return object;
   }
 
-
   /**
    * Override dispose to release shared resources
    */
@@ -145,7 +144,10 @@ export abstract class SimpleThreeComponent extends BaseThreeComponent {
    */
   protected override createClone(options: ComponentOptions): SimpleThreeComponent {
     // Use proper constructor typing for cloning
-    type ComponentConstructor = new (metadata: ComponentMetadata, options?: ComponentOptions) => SimpleThreeComponent;
+    type ComponentConstructor = new (
+      metadata: ComponentMetadata,
+      options?: ComponentOptions
+    ) => SimpleThreeComponent;
     const Constructor = this.constructor as ComponentConstructor;
     return new Constructor(this.metadata, options);
   }

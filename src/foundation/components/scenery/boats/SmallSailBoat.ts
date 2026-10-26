@@ -116,5 +116,4 @@ export class SmallSailBoat extends MovableBoatComponent {
   }
 }
 
-
 export default SmallSailBoat;

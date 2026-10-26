@@ -1,9 +1,6 @@
 import * as THREE from 'three';
 import { SimpleThreeComponent } from './SimpleThreeComponent';
-import {
-  FloatingBehavior,
-  FloatingBehaviorOptions,
-} from '../../systems/behaviors/FloatingBehavior';
+import { FloatingBehavior } from '../../systems/behaviors/FloatingBehavior';
 import type { ComponentOptions, ComponentMetadata } from './BaseThreeComponent';
 
 export interface FloatingComponentOptions extends ComponentOptions {
@@ -43,7 +40,6 @@ export abstract class FloatingThreeComponent extends SimpleThreeComponent {
 
     return object;
   }
-
 
   // Floating control methods
   public startFloating(): void {

@@ -34,7 +34,11 @@ const Helpers = {
     scene.add(this.getAxisHelperWithLabels(scale));
   },
 
-  createSelectiveHelpers: function (scene: THREE.Scene, config: { axes?: boolean; grid?: boolean; lighting?: boolean; scale?: number }, scale: number = 100) {
+  createSelectiveHelpers: function (
+    scene: THREE.Scene,
+    config: { axes?: boolean; grid?: boolean; lighting?: boolean; scale?: number },
+    scale: number = 100
+  ) {
     // Use the scale from config if provided, otherwise use the passed scale parameter
     const actualScale = config.scale || scale;
 
@@ -153,7 +157,12 @@ const Helpers = {
     const arrowGroup = new THREE.Group();
 
     // Create arrow shaft (cylinder)
-    const shaftGeometry = new THREE.CylinderGeometry(labelSize * 0.3, labelSize * 0.3, labelSize * 3, 8);
+    const shaftGeometry = new THREE.CylinderGeometry(
+      labelSize * 0.3,
+      labelSize * 0.3,
+      labelSize * 3,
+      8
+    );
     const shaftMaterial = new THREE.MeshBasicMaterial({ color: 0x00ffff });
     const shaftMesh = new THREE.Mesh(shaftGeometry, shaftMaterial);
     shaftMesh.position.set(0, 0, -len - labelSize * 1.5);
@@ -172,7 +181,11 @@ const Helpers = {
     group.add(arrowGroup);
 
     // Add text label for forward direction
-    const forwardTextLabel = createTextLabel('FWD', 0x00ffff, new THREE.Vector3(0, labelSize * 2, -len - labelSize * 3));
+    const forwardTextLabel = createTextLabel(
+      'FWD',
+      0x00ffff,
+      new THREE.Vector3(0, labelSize * 2, -len - labelSize * 3)
+    );
     if (forwardTextLabel) {
       forwardTextLabel.name = 'Forward-direction-text';
       group.add(forwardTextLabel);

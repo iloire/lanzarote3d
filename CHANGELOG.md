@@ -2,6 +2,27 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## [Unreleased] - 2026-10-26 22:27 UTC
+
+### Removed
+- **The `island` and `boats` scenes.** Five scenes remain: `home`, `famara-animation`, `boats-animation`, `famara` and `town`
+- **Models and systems no scene uses any more**:
+  - Models: Dome, Hospital, the coconut, date, fan and palm trees, Igloo, TownSquare, PineTree, the Paraglider and Tandem rigs and TandemPilot, Airliner, Jet, Truck, PatrolBoat, Wing, and the whole car stack (Car, AutonomousCar, MovableCarComponent, the car group creator, TerrainFollowingBehavior)
+  - Game leftovers: WindIndicator and the "game" UserAnalytics tracker
+  - Dead branches of `Environment` and the boat and house group creators: marina, patrol and racing fleets, exclusion zones, and suburban, urban and rural neighbourhoods that were never called
+- **Satellite terrain mode**: no theme enabled it and its texture atlas was missing. It went with `satellite-textures.ts`, the tile download and atlas scripts, and `public/`, whose textures nothing served
+- **Unreferenced assets, about 10 MB**: all audio (the game's vario tones and ambience), the old UI icons, `birds.glb`, the Draco island, unused textures, the character `.vox`/`.stl` sources (they live in the `3d-characters` repo), unlinked favicons, and a template `site.webmanifest`
+- **Outdated docs**: the year-old technical-debt, refactoring and planning docs, the satellite tile doc, a FlyingBehavior doc whose defaults and API were wrong, a website-background guide built on a stub library, the components README and the OrbitControlsHelper examples, the assets README, both TODO files, and the README's game notebook (feature wishlist, fix list, credits for the audio)
+
+### Fixed
+- **The external embed rendered Home, not Famara.** Every bundle shares one entry, which reads the scene from the URL. An embed page can now name its scene with `<div id="root" data-story="…">`, and `build-external-embed` clears stale bundles from `external-embed/dist` first
+- **`boats-animation` read its metadata from the `boats` registry entry.** It now uses its own entry
+- **`npm run lint:check` / `format:check` only checked part of `src`.** The globs were unquoted, so `sh` expanded `src/**/*` one level deep. They are quoted now, and the whole of `src` is formatted and passes ESLint (case-block scoping, `var`, and unused code removed rather than silenced)
+- **`assets/sitemap.xml`** no longer lists the deleted `island` and `island-flying` pages
+
+### Changed
+- **`docs/COMPONENT_COMPOSITION.md` is rewritten** to describe the base classes that exist and the two ways of building a component. **`docs/README.md`** is a short index of the docs that remain
+
 ## [Unreleased] - 2026-10-26 21:49 UTC
 
 ### Removed

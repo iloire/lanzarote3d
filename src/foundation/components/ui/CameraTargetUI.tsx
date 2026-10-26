@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { CameraTargetController, CameraMode, CameraTarget } from '../../systems/scene/CameraTargetController';
+import {
+  CameraTargetController,
+  CameraMode,
+  CameraTarget,
+} from '../../systems/scene/CameraTargetController';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { logger } from '../../utils/logger';
 
@@ -39,15 +43,15 @@ const CameraTargetUIComponent: React.FC<CameraTargetUIProps> = ({
   };
 
   const targetColors: Record<string, string> = {
-    'cessna': '#00bfff',
-    'plane': '#00bfff',
-    'jet': '#4169e1',
-    'boat': '#1e90ff',
-    'bird': '#32cd32',
-    'car': '#ff6347',
-    'truck': '#ff4500',
-    'marker': '#ffa500',
-    'default': '#4CAF50',
+    cessna: '#00bfff',
+    plane: '#00bfff',
+    jet: '#4169e1',
+    boat: '#1e90ff',
+    bird: '#32cd32',
+    car: '#ff6347',
+    truck: '#ff4500',
+    marker: '#ffa500',
+    default: '#4CAF50',
   };
 
   const getTargetColor = (target: CameraTarget): string => {
@@ -136,37 +140,37 @@ const CameraTargetUIComponent: React.FC<CameraTargetUIProps> = ({
               {Object.values(CameraMode)
                 .filter(mode => mode !== CameraMode.FirstPerson)
                 .map(mode => (
-                <button
-                  key={mode}
-                  onClick={() => handleModeChange(mode)}
-                  style={{
-                    flex: '1',
-                    background:
-                      currentMode === mode
-                        ? 'rgba(100, 50, 200, 0.8)'
-                        : 'rgba(100, 50, 200, 0.3)',
-                    color: 'white',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    outline: currentMode === mode ? '1px solid #fff' : 'none',
-                    outlineOffset: '-2px',
-                    borderRadius: '3px',
-                    padding: '4px',
-                    fontSize: '10px',
-                    fontWeight: currentMode === mode ? 'bold' : 'normal',
-                    cursor: 'pointer',
-                    transition: 'background 0.2s ease, outline 0.2s ease',
-                    boxShadow: 'none',
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.filter = 'brightness(1.2)';
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.filter = 'brightness(1)';
-                  }}
-                >
-                  {modeLabels[mode]}
-                </button>
-              ))}
+                  <button
+                    key={mode}
+                    onClick={() => handleModeChange(mode)}
+                    style={{
+                      flex: '1',
+                      background:
+                        currentMode === mode
+                          ? 'rgba(100, 50, 200, 0.8)'
+                          : 'rgba(100, 50, 200, 0.3)',
+                      color: 'white',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      outline: currentMode === mode ? '1px solid #fff' : 'none',
+                      outlineOffset: '-2px',
+                      borderRadius: '3px',
+                      padding: '4px',
+                      fontSize: '10px',
+                      fontWeight: currentMode === mode ? 'bold' : 'normal',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s ease, outline 0.2s ease',
+                      boxShadow: 'none',
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.filter = 'brightness(1.2)';
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.filter = 'brightness(1)';
+                    }}
+                  >
+                    {modeLabels[mode]}
+                  </button>
+                ))}
             </div>
           </div>
 
@@ -215,9 +219,7 @@ const CameraTargetUIComponent: React.FC<CameraTargetUIProps> = ({
                       width: '100%',
                       cursor: 'pointer',
                       transition: 'all 0.2s ease',
-                      boxShadow: isActive
-                        ? `0 2px 6px ${color}80`
-                        : '0 1px 2px rgba(0,0,0,0.3)',
+                      boxShadow: isActive ? `0 2px 6px ${color}80` : '0 1px 2px rgba(0,0,0,0.3)',
                       textAlign: 'left',
                       display: 'flex',
                       alignItems: 'center',

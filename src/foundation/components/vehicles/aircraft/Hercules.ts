@@ -56,55 +56,60 @@ export class Hercules extends SimpleThreeComponent {
     // Create materials
     const bodyMaterial = resourceManager.getOrCreateMaterial(
       `hercules_body_${options.bodyColor}`,
-      () => new THREE.MeshStandardMaterial({
-        color: options.bodyColor,
-        metalness: 0.5,
-        roughness: 0.6
-      })
+      () =>
+        new THREE.MeshStandardMaterial({
+          color: options.bodyColor,
+          metalness: 0.5,
+          roughness: 0.6,
+        })
     );
 
     const wingMaterial = resourceManager.getOrCreateMaterial(
       `hercules_wing_${options.wingColor}`,
-      () => new THREE.MeshStandardMaterial({
-        color: options.wingColor,
-        metalness: 0.4,
-        roughness: 0.7
-      })
+      () =>
+        new THREE.MeshStandardMaterial({
+          color: options.wingColor,
+          metalness: 0.4,
+          roughness: 0.7,
+        })
     );
 
     const propellerMaterial = resourceManager.getOrCreateMaterial(
       `hercules_propeller_${options.propellerColor}`,
-      () => new THREE.MeshStandardMaterial({
-        color: options.propellerColor,
-        metalness: 0.7,
-        roughness: 0.3
-      })
+      () =>
+        new THREE.MeshStandardMaterial({
+          color: options.propellerColor,
+          metalness: 0.7,
+          roughness: 0.3,
+        })
     );
 
     const windowMaterial = resourceManager.getOrCreateMaterial(
       `hercules_window_${options.windowColor}`,
-      () => new THREE.MeshStandardMaterial({
-        color: options.windowColor,
-        transparent: true,
-        opacity: 0.5,
-        metalness: 0.8,
-        roughness: 0.1
-      })
+      () =>
+        new THREE.MeshStandardMaterial({
+          color: options.windowColor,
+          transparent: true,
+          opacity: 0.5,
+          metalness: 0.8,
+          roughness: 0.1,
+        })
     );
 
     const stripeMaterial = resourceManager.getOrCreateMaterial(
       `hercules_stripe_${options.stripeColor}`,
-      () => new THREE.MeshStandardMaterial({
-        color: options.stripeColor,
-        metalness: 0.5,
-        roughness: 0.4
-      })
+      () =>
+        new THREE.MeshStandardMaterial({
+          color: options.stripeColor,
+          metalness: 0.5,
+          roughness: 0.4,
+        })
     );
 
     const darkMaterial = new THREE.MeshStandardMaterial({
       color: '#1A1A1A',
       metalness: 0.3,
-      roughness: 0.8
+      roughness: 0.8,
     });
 
     // Main fuselage (large cargo body)
@@ -166,7 +171,7 @@ export class Hercules extends SimpleThreeComponent {
       const cargoDoorMaterial = new THREE.MeshStandardMaterial({
         color: '#3A4148',
         metalness: 0.6,
-        roughness: 0.5
+        roughness: 0.5,
       });
       const cargoDoor = new THREE.Mesh(cargoDoorGeometry, cargoDoorMaterial);
       cargoDoor.position.set(-10, -0.25, 0);
@@ -213,10 +218,10 @@ export class Hercules extends SimpleThreeComponent {
 
     // Create 4 engines with propellers (signature feature)
     const enginePositions = [
-      { x: 2, z: -15 },  // Left outer
-      { x: 2, z: -9 },   // Left inner
-      { x: 2, z: 9 },    // Right inner
-      { x: 2, z: 15 }    // Right outer
+      { x: 2, z: -15 }, // Left outer
+      { x: 2, z: -9 }, // Left inner
+      { x: 2, z: 9 }, // Right inner
+      { x: 2, z: 15 }, // Right outer
     ];
 
     enginePositions.forEach(pos => {
@@ -263,20 +268,20 @@ export class Hercules extends SimpleThreeComponent {
     const wheelMaterial = new THREE.MeshStandardMaterial({
       color: '#1A1A1A',
       metalness: 0.3,
-      roughness: 0.7
+      roughness: 0.7,
     });
 
     const strutGeometry = new THREE.CylinderGeometry(0.15, 0.15, 3);
     const strutMaterial = new THREE.MeshStandardMaterial({
       color: '#888888',
       metalness: 0.7,
-      roughness: 0.3
+      roughness: 0.3,
     });
 
     // Main landing gear (dual wheels each side)
     const mainGearPositions = [
-      { x: 0, z: -3 },   // Left main
-      { x: 0, z: 3 },    // Right main
+      { x: 0, z: -3 }, // Left main
+      { x: 0, z: 3 }, // Right main
     ];
 
     mainGearPositions.forEach(pos => {

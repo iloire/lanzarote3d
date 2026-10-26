@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { Theme, ThemeApplicationOptions } from '../types/Theme';
 import { StoryOptions } from '../../shared/types';
-import Environment from '../../shared/env/environment';
 import { Weather } from '../components/physics';
 import { logger } from '../utils/logger';
 import { OceanMaterial } from '../rendering/OceanMaterial';
@@ -65,33 +64,6 @@ export class ThemeEngine {
       logger.info(`Theme '${theme.name}' applied successfully`);
     } catch (error) {
       logger.error(`Failed to apply theme '${theme.name}':`, error);
-      throw error;
-    }
-  }
-
-  /**
-   * Apply theme to environment components (clouds, terrain, weather)
-   */
-  static async applyToEnvironment(
-    env: Environment,
-    theme: Theme,
-    _options?: { terrain?: THREE.Mesh }
-  ): Promise<void> {
-    logger.debug(`Applying theme to environment: ${theme.name}`);
-
-    try {
-      // Update cloud colors for existing clouds
-      env.updateCloudColors(theme);
-
-      // Weather settings are applied when creating Weather instance
-      // This is handled in the demo files
-
-      // Note: Terrain is typically handled during creation
-      // but we can add methods to update it post-creation if needed
-
-      logger.debug(`Theme '${theme.name}' applied to environment successfully`);
-    } catch (error) {
-      logger.error(`Failed to apply theme to environment '${theme.name}':`, error);
       throw error;
     }
   }
@@ -189,13 +161,6 @@ export class ThemeEngine {
       colors: theme.clouds.colors,
       // Additional cloud options can be added here as the Clouds component supports them
     };
-  }
-
-  /**
-   * Get terrain style from theme
-   */
-  static getTerrainStyleFromTheme(theme: Theme): string {
-    return theme.terrain.style;
   }
 
   /**

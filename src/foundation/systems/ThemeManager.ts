@@ -152,10 +152,7 @@ class ThemeManager {
       await ThemeEngine.apply(this.storyOptions!, this.currentTheme);
       this.notifyListeners(this.currentTheme);
     } catch (error) {
-      logger.error(
-        `Failed to apply theme "${this.currentTheme.name}" after story load:`,
-        error
-      );
+      logger.error(`Failed to apply theme "${this.currentTheme.name}" after story load:`, error);
     }
   }
 

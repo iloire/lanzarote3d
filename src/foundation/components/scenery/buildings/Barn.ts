@@ -265,11 +265,6 @@ export class Barn extends LODComponent {
       () => new THREE.MeshLambertMaterial({ color: options.doorColor })
     );
 
-    const trimMaterial = resourceManager.getOrCreateMaterial(
-      `barn_trim_${options.trimColor}`,
-      () => new THREE.MeshLambertMaterial({ color: options.trimColor })
-    );
-
     // Main barn structure - long and wide
     const mainBodyGeometry = resourceManager.getOrCreateGeometry(
       'barn_main_body',

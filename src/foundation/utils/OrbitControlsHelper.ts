@@ -210,7 +210,10 @@ export class OrbitControlsHelper {
   /**
    * Apply a preset configuration to orbit controls
    */
-  static applyPreset(controls: ExtendedOrbitControls, presetName: keyof typeof ORBIT_CONTROLS_PRESETS): void {
+  static applyPreset(
+    controls: ExtendedOrbitControls,
+    presetName: keyof typeof ORBIT_CONTROLS_PRESETS
+  ): void {
     const preset = ORBIT_CONTROLS_PRESETS[presetName];
     if (!preset) {
       console.warn(`OrbitControlsHelper: Preset '${presetName}' not found`);
@@ -244,7 +247,11 @@ export class OrbitControlsHelper {
   /**
    * Update controls target and apply limits around new target
    */
-  static focusOnTarget(controls: ExtendedOrbitControls, target: THREE.Vector3, limits?: OrbitControlsLimits): void {
+  static focusOnTarget(
+    controls: ExtendedOrbitControls,
+    target: THREE.Vector3,
+    limits?: OrbitControlsLimits
+  ): void {
     if (!controls) return;
 
     // Update target

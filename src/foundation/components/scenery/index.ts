@@ -1,21 +1,13 @@
 // Scenery Components
 export { default as Island } from './Island';
-export { default as Igloo, IglooSize } from './Igloo';
-export { default as CoconutPalm } from './CoconutPalm';
-export { default as DatePalm } from './DatePalm';
-export { default as FanPalm } from './FanPalm';
 export { default as Pool } from './Pool';
 export { default as Stone } from './Stone';
 export { default as ProceduralRoad } from './ProceduralRoad';
 export { Park } from './Park';
 export type { ParkOptions } from './Park';
-export { TownSquare } from './TownSquare';
-export type { TownSquareOptions } from './TownSquare';
 
 // Tree Components (organized in trees subfolder)
 export { default as Tree } from './trees/Tree';
-export { default as PineTree } from './trees/PineTree';
-export { default as PalmTree } from './trees/PalmTree';
 export * from './trees';
 
 // Cactus Components (organized in cactus subfolder)

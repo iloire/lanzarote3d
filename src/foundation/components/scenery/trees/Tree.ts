@@ -3,9 +3,9 @@ import * as THREE from 'three';
 import { SimpleThreeComponent, SimpleComponentOptions } from '../../base/SimpleThreeComponent';
 import { ComponentMetadata } from '../../base/IThreeComponent';
 
-var mat_grey = new THREE.MeshLambertMaterial({ color: 0xf3f2f7 });
-var mat_yellow = new THREE.MeshLambertMaterial({ color: 0xfeb42b });
-var mat_green = new THREE.MeshLambertMaterial({ color: 0xb2d2a4 });
+const mat_grey = new THREE.MeshLambertMaterial({ color: 0xf3f2f7 });
+const mat_yellow = new THREE.MeshLambertMaterial({ color: 0xfeb42b });
+const mat_green = new THREE.MeshLambertMaterial({ color: 0xb2d2a4 });
 
 export interface LegacyTreeOptions extends SimpleComponentOptions {
   trunkColor?: number;
@@ -83,7 +83,7 @@ class LegacyTree extends SimpleThreeComponent {
     leaf.add(blade);
 
     const subStems = [];
-    for (var i = 0; i < 8; i++) {
+    for (let i = 0; i < 8; i++) {
       subStems[i] = mainStem.clone();
       subStems[i]?.scale.set(0.0055, 0.0055, 0.01);
       if (subStems[i]) subStems[i].castShadow = true;
@@ -105,7 +105,7 @@ class LegacyTree extends SimpleThreeComponent {
     subStems[6].scale.z = 0.045;
     subStems[6].position.set(0, -0.1, 0.26);
 
-    for (var i = 1; i < 8; i += 2) {
+    for (let i = 1; i < 8; i += 2) {
       subStems[i].rotation.x = -subStems[i - 1].rotation.x;
       subStems[i].scale.z = subStems[i - 1].scale.z;
       subStems[i].position.set(0, subStems[i - 1].position.y, -subStems[i - 1].position.z);

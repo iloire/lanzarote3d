@@ -39,12 +39,11 @@ class TownWorkshop extends WorkshopDemoBase {
       ground: {
         create: true,
         size: { width: 2400, height: 2000 },
-        color: 0xD2B48C, // Sandy brown for desert town ground
+        color: 0xd2b48c, // Sandy brown for desert town ground
         opacity: 0.4,
       },
       lighting: {
         sunPosition: 10,
-        
       },
     });
   }
@@ -63,7 +62,7 @@ class TownWorkshop extends WorkshopDemoBase {
         hasGui: !!gui,
         hasControls: !!controls,
         guiType: typeof gui,
-        gui
+        gui,
       });
 
       // Store references for reconstruction
@@ -109,7 +108,6 @@ class TownWorkshop extends WorkshopDemoBase {
     }
   }
 
-
   /**
    * Toggle between low-poly and high-detail modes
    */
@@ -137,7 +135,6 @@ class TownWorkshop extends WorkshopDemoBase {
       const switchTime = Math.round(endTime - startTime);
 
       logger.info(`✅ Mode switch completed in ${switchTime}ms`);
-
     } catch (error) {
       logger.error('❌ Error toggling low-poly mode:', error);
     } finally {
@@ -145,7 +142,6 @@ class TownWorkshop extends WorkshopDemoBase {
       this.performanceUI.setLoading(false);
     }
   }
-
 
   /**
    * Setup neighborhood and performance controls
@@ -198,10 +194,7 @@ class TownWorkshop extends WorkshopDemoBase {
         this.updatePolygonCount();
       });
 
-    performanceFolder
-      .add(this.performanceSettings, 'polygonCount')
-      .name('Total Polygons')
-      .listen();
+    performanceFolder.add(this.performanceSettings, 'polygonCount').name('Total Polygons').listen();
 
     performanceFolder
       .add(this.performanceSettings, 'lastRenderTime')
@@ -221,7 +214,7 @@ class TownWorkshop extends WorkshopDemoBase {
       roads: 0,
       parks: 0,
       squares: 0,
-      other: 0
+      other: 0,
     };
 
     // Count neighborhood polygons with detailed breakdown by component type
@@ -250,15 +243,23 @@ class TownWorkshop extends WorkshopDemoBase {
           const allNames = `${name} ${parentName} ${grandParentName} ${greatGrandParentName}`;
 
           // House-related patterns (most common, check first)
-          if (allNames.includes('house') || allNames.includes('villa') ||
-              allNames.includes('barn') || allNames.includes('townhouse') ||
-              allNames.includes('desert')) {
+          if (
+            allNames.includes('house') ||
+            allNames.includes('villa') ||
+            allNames.includes('barn') ||
+            allNames.includes('townhouse') ||
+            allNames.includes('desert')
+          ) {
             polygonCounts.houses += childPolygons;
           }
           // Cactus patterns
-          else if (allNames.includes('cactus') || allNames.includes('saguaro') ||
-                   allNames.includes('barrel') || allNames.includes('prickly') ||
-                   allNames.includes('organ')) {
+          else if (
+            allNames.includes('cactus') ||
+            allNames.includes('saguaro') ||
+            allNames.includes('barrel') ||
+            allNames.includes('prickly') ||
+            allNames.includes('organ')
+          ) {
             polygonCounts.cacti += childPolygons;
           }
           // Stone patterns
@@ -270,8 +271,11 @@ class TownWorkshop extends WorkshopDemoBase {
             polygonCounts.pools += childPolygons;
           }
           // Road patterns
-          else if (allNames.includes('road') || allNames.includes('street') ||
-                   allNames.includes('path')) {
+          else if (
+            allNames.includes('road') ||
+            allNames.includes('street') ||
+            allNames.includes('path')
+          ) {
             polygonCounts.roads += childPolygons;
           }
           // Park patterns
@@ -279,8 +283,11 @@ class TownWorkshop extends WorkshopDemoBase {
             polygonCounts.parks += childPolygons;
           }
           // Square patterns
-          else if (allNames.includes('square') || allNames.includes('plaza') ||
-                   allNames.includes('townsquare')) {
+          else if (
+            allNames.includes('square') ||
+            allNames.includes('plaza') ||
+            allNames.includes('townsquare')
+          ) {
             polygonCounts.squares += childPolygons;
           }
           // Everything else
@@ -308,18 +315,34 @@ class TownWorkshop extends WorkshopDemoBase {
       roads: calculatePercentage(polygonCounts.roads),
       parks: calculatePercentage(polygonCounts.parks),
       squares: calculatePercentage(polygonCounts.squares),
-      other: calculatePercentage(polygonCounts.other)
+      other: calculatePercentage(polygonCounts.other),
     };
 
     logger.info(`📊 Detailed Polygon Breakdown (LowPoly: ${this.isLowPoly}):`);
-    logger.info(`  🏠 Houses: ${Math.floor(polygonCounts.houses).toLocaleString()} (${percentages.houses}%)`);
-    logger.info(`  🌵 Cacti: ${Math.floor(polygonCounts.cacti).toLocaleString()} (${percentages.cacti}%)`);
-    logger.info(`  🪨 Stones: ${Math.floor(polygonCounts.stones).toLocaleString()} (${percentages.stones}%)`);
-    logger.info(`  🏊 Pools: ${Math.floor(polygonCounts.pools).toLocaleString()} (${percentages.pools}%)`);
-    logger.info(`  🛣️ Roads: ${Math.floor(polygonCounts.roads).toLocaleString()} (${percentages.roads}%)`);
-    logger.info(`  🌳 Parks: ${Math.floor(polygonCounts.parks).toLocaleString()} (${percentages.parks}%)`);
-    logger.info(`  🏛️ Squares: ${Math.floor(polygonCounts.squares).toLocaleString()} (${percentages.squares}%)`);
-    logger.info(`  ❓ Other: ${Math.floor(polygonCounts.other).toLocaleString()} (${percentages.other}%)`);
+    logger.info(
+      `  🏠 Houses: ${Math.floor(polygonCounts.houses).toLocaleString()} (${percentages.houses}%)`
+    );
+    logger.info(
+      `  🌵 Cacti: ${Math.floor(polygonCounts.cacti).toLocaleString()} (${percentages.cacti}%)`
+    );
+    logger.info(
+      `  🪨 Stones: ${Math.floor(polygonCounts.stones).toLocaleString()} (${percentages.stones}%)`
+    );
+    logger.info(
+      `  🏊 Pools: ${Math.floor(polygonCounts.pools).toLocaleString()} (${percentages.pools}%)`
+    );
+    logger.info(
+      `  🛣️ Roads: ${Math.floor(polygonCounts.roads).toLocaleString()} (${percentages.roads}%)`
+    );
+    logger.info(
+      `  🌳 Parks: ${Math.floor(polygonCounts.parks).toLocaleString()} (${percentages.parks}%)`
+    );
+    logger.info(
+      `  🏛️ Squares: ${Math.floor(polygonCounts.squares).toLocaleString()} (${percentages.squares}%)`
+    );
+    logger.info(
+      `  ❓ Other: ${Math.floor(polygonCounts.other).toLocaleString()} (${percentages.other}%)`
+    );
     logger.info(`  📊 TOTAL: ${this.performanceSettings.polygonCount.toLocaleString()} polygons`);
 
     // Update on-screen display if available
@@ -347,7 +370,9 @@ class TownWorkshop extends WorkshopDemoBase {
     // Recreate with current low-poly setting
     await this.loadNeighborhoods(this.currentScene);
 
-    logger.info(`✅ Neighborhoods recreated in ${this.isLowPoly ? 'Low-Poly' : 'High-Detail'} mode`);
+    logger.info(
+      `✅ Neighborhoods recreated in ${this.isLowPoly ? 'Low-Poly' : 'High-Detail'} mode`
+    );
   }
 
   /**
@@ -370,7 +395,6 @@ class TownWorkshop extends WorkshopDemoBase {
 
     logger.debug('✅ Neighborhood cleanup completed');
   }
-
 
   private async loadNeighborhoods(scene: THREE.Scene): Promise<void> {
     try {
@@ -403,7 +427,6 @@ class TownWorkshop extends WorkshopDemoBase {
     // Update polygon count
     this.updatePolygonCount();
   }
-
 
   private setupCamera(camera: THREE.Camera): void {
     const lookAt = new THREE.Vector3(0, 0, 0); // Center of town

@@ -50,49 +50,54 @@ export class Cessna extends SimpleThreeComponent {
     // Create materials
     const bodyMaterial = resourceManager.getOrCreateMaterial(
       `cessna_body_${options.bodyColor}`,
-      () => new THREE.MeshStandardMaterial({
-        color: options.bodyColor,
-        metalness: 0.4,
-        roughness: 0.5
-      })
+      () =>
+        new THREE.MeshStandardMaterial({
+          color: options.bodyColor,
+          metalness: 0.4,
+          roughness: 0.5,
+        })
     );
 
     const wingMaterial = resourceManager.getOrCreateMaterial(
       `cessna_wing_${options.wingColor}`,
-      () => new THREE.MeshStandardMaterial({
-        color: options.wingColor,
-        metalness: 0.3,
-        roughness: 0.6
-      })
+      () =>
+        new THREE.MeshStandardMaterial({
+          color: options.wingColor,
+          metalness: 0.3,
+          roughness: 0.6,
+        })
     );
 
     const propellerMaterial = resourceManager.getOrCreateMaterial(
       `cessna_propeller_${options.propellerColor}`,
-      () => new THREE.MeshStandardMaterial({
-        color: options.propellerColor,
-        metalness: 0.7,
-        roughness: 0.3
-      })
+      () =>
+        new THREE.MeshStandardMaterial({
+          color: options.propellerColor,
+          metalness: 0.7,
+          roughness: 0.3,
+        })
     );
 
     const windowMaterial = resourceManager.getOrCreateMaterial(
       `cessna_window_${options.windowColor}`,
-      () => new THREE.MeshStandardMaterial({
-        color: options.windowColor,
-        transparent: true,
-        opacity: 0.6,
-        metalness: 0.8,
-        roughness: 0.1
-      })
+      () =>
+        new THREE.MeshStandardMaterial({
+          color: options.windowColor,
+          transparent: true,
+          opacity: 0.6,
+          metalness: 0.8,
+          roughness: 0.1,
+        })
     );
 
     const stripeMaterial = resourceManager.getOrCreateMaterial(
       `cessna_stripe_${options.stripeColor}`,
-      () => new THREE.MeshStandardMaterial({
-        color: options.stripeColor,
-        metalness: 0.4,
-        roughness: 0.5
-      })
+      () =>
+        new THREE.MeshStandardMaterial({
+          color: options.stripeColor,
+          metalness: 0.4,
+          roughness: 0.5,
+        })
     );
 
     // Main fuselage (smaller, more compact)
@@ -164,7 +169,7 @@ export class Cessna extends SimpleThreeComponent {
     const strutMaterial = new THREE.MeshStandardMaterial({
       color: '#888888',
       metalness: 0.8,
-      roughness: 0.2
+      roughness: 0.2,
     });
 
     const leftStrut1 = new THREE.Mesh(strutGeometry, strutMaterial);
@@ -227,7 +232,7 @@ export class Cessna extends SimpleThreeComponent {
     const wheelMaterial = new THREE.MeshStandardMaterial({
       color: '#1A1A1A',
       metalness: 0.3,
-      roughness: 0.7
+      roughness: 0.7,
     });
 
     const strutMainGeometry = new THREE.CylinderGeometry(0.1, 0.1, 1.5);

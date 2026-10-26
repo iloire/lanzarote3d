@@ -48,17 +48,17 @@ class SubmarineHarness {
     // Y-axis positioning (height/vertical) - Using absolute offsets for consistent spacing
     const baseY = -400; // Base reference position (lowered to make head visible)
     const HEIGHT_POSITIONS = {
-      topFin: baseY + 160,        // Top periscope
-      carabiners: baseY + 120,    // Attachment points
-      topPanel: baseY + 40,       // Upper hull panel
-      upperDome: baseY + 20,      // Upper cockpit dome
-      frontWindow: baseY + 4,     // Front viewport
-      sideWindows: baseY - 40,    // Side viewports
-      hatch: baseY - 40,          // Emergency hatch
-      mainHull: baseY,            // Main hull center (reference)
-      bottomPanel: baseY - 64,    // Lower hull panel
-      fins: baseY,                // Side stabilizer fins
-      thruster: baseY,            // Back thruster
+      topFin: baseY + 160, // Top periscope
+      carabiners: baseY + 120, // Attachment points
+      topPanel: baseY + 40, // Upper hull panel
+      upperDome: baseY + 20, // Upper cockpit dome
+      frontWindow: baseY + 4, // Front viewport
+      sideWindows: baseY - 40, // Side viewports
+      hatch: baseY - 40, // Emergency hatch
+      mainHull: baseY, // Main hull center (reference)
+      bottomPanel: baseY - 64, // Lower hull panel
+      fins: baseY, // Side stabilizer fins
+      thruster: baseY, // Back thruster
     };
 
     // Z-axis positioning (depth/forward-back) - Using cumulative positioning
@@ -66,16 +66,16 @@ class SubmarineHarness {
     // regardless of depth parameter changes
     const DEPTH_POSITIONS = {
       // Back to front positioning - cumulative offsets from center
-      thruster: -depth / 2,                    // Back edge (thruster at rear)
-      rearFins: -depth / 2 + depth * 0.15,     // Stabilizer fins (slightly forward of thruster)
-      lowerHull: -depth / 2 + depth * 0.75,    // Lower hull (overlaps with main hull)
-      center: 0,                               // Main hull center (reference point)
-      upperDome: 75,                           // Upper dome (absolute offset from center)
-      sideWindows: 75,                         // Side windows (aligned with dome)
-      hatch: 150,                              // Emergency hatch (absolute offset)
-      carabiners: 270,                         // Attachment points (absolute offset)
-      frontWindow: depth / 2,                  // Front viewport (at front edge)
-      topFin: 0,                               // Top periscope (at center)
+      thruster: -depth / 2, // Back edge (thruster at rear)
+      rearFins: -depth / 2 + depth * 0.15, // Stabilizer fins (slightly forward of thruster)
+      lowerHull: -depth / 2 + depth * 0.75, // Lower hull (overlaps with main hull)
+      center: 0, // Main hull center (reference point)
+      upperDome: 75, // Upper dome (absolute offset from center)
+      sideWindows: 75, // Side windows (aligned with dome)
+      hatch: 150, // Emergency hatch (absolute offset)
+      carabiners: 270, // Attachment points (absolute offset)
+      frontWindow: depth / 2, // Front viewport (at front edge)
+      topFin: 0, // Top periscope (at center)
     };
 
     // Main hull - larger rounded body
@@ -127,12 +127,20 @@ class SubmarineHarness {
     const finGeo = new THREE.BoxGeometry(width * 0.18, height * 0.72, depth * 0.0375);
     const finMat = getColoredMaterial('#0d2433');
     const leftFin = new THREE.Mesh(finGeo, finMat);
-    leftFin.position.set(-width / 2 - width * 0.044, HEIGHT_POSITIONS.fins, DEPTH_POSITIONS.rearFins);
+    leftFin.position.set(
+      -width / 2 - width * 0.044,
+      HEIGHT_POSITIONS.fins,
+      DEPTH_POSITIONS.rearFins
+    );
     leftFin.rotation.z = Math.PI / 6;
     group.add(leftFin);
 
     const rightFin = leftFin.clone();
-    rightFin.position.set(width / 2 + width * 0.044, HEIGHT_POSITIONS.fins, DEPTH_POSITIONS.rearFins);
+    rightFin.position.set(
+      width / 2 + width * 0.044,
+      HEIGHT_POSITIONS.fins,
+      DEPTH_POSITIONS.rearFins
+    );
     rightFin.rotation.z = -Math.PI / 6;
     group.add(rightFin);
 
@@ -145,11 +153,19 @@ class SubmarineHarness {
     // Carabiners - attachment points on top
     const carabinerGeo = new THREE.BoxGeometry(width * 0.13, height * 0.16, depth * 0.05);
     const carabinerLeft = new THREE.Mesh(carabinerGeo, carabinerMat);
-    carabinerLeft.position.set(this.options.carabinerSeparationMM / 2, HEIGHT_POSITIONS.carabiners, DEPTH_POSITIONS.carabiners);
+    carabinerLeft.position.set(
+      this.options.carabinerSeparationMM / 2,
+      HEIGHT_POSITIONS.carabiners,
+      DEPTH_POSITIONS.carabiners
+    );
     group.add(carabinerLeft);
 
     const carabinerRight = carabinerLeft.clone();
-    carabinerRight.position.set((-1 * this.options.carabinerSeparationMM) / 2, HEIGHT_POSITIONS.carabiners, DEPTH_POSITIONS.carabiners);
+    carabinerRight.position.set(
+      (-1 * this.options.carabinerSeparationMM) / 2,
+      HEIGHT_POSITIONS.carabiners,
+      DEPTH_POSITIONS.carabiners
+    );
     group.add(carabinerRight);
 
     // Emergency hatch indicator (red)

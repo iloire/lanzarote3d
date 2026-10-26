@@ -14,8 +14,8 @@ export interface HanggliderOptions extends SimpleComponentOptions {
 /**
  * Hangglider - combines wing and pilot into a single aircraft
  *
- * This component uses Pattern B (SimpleThreeComponent + createObject override)
- * for async composition of multiple sub-components (HangGliderWing + Pilot).
+ * It overrides createObject (SimpleThreeComponent) to compose its async
+ * sub-components (HangGliderWing + Pilot).
  *
  * See docs/COMPONENT_COMPOSITION.md for architecture details.
  */
@@ -46,9 +46,8 @@ export class Hangglider extends SimpleThreeComponent {
   }
 
   /**
-   * Override createObject to compose async sub-components.
-   * This is Pattern B from COMPONENT_COMPOSITION.md - the standard pattern
-   * for vehicles that combine multiple loadable components.
+   * Override createObject to compose async sub-components, the standard
+   * approach for vehicles that combine multiple loadable components.
    */
   protected override async createObject(): Promise<THREE.Object3D> {
     const group = new THREE.Group();

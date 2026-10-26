@@ -12,8 +12,8 @@ export interface ParagliderVoxelOptions extends SimpleComponentOptions {
 /**
  * ParagliderVoxel - voxel-style paraglider with simplified pilot
  *
- * This component uses Pattern B (SimpleThreeComponent + createObject override)
- * for async composition of multiple sub-components (Glider + PilotVoxel).
+ * It overrides createObject (SimpleThreeComponent) to compose its async
+ * sub-components (Glider + PilotVoxel).
  * Uses voxel-based (blocky/Minecraft-style) graphics for the pilot character.
  *
  * See docs/COMPONENT_COMPOSITION.md for architecture details.
@@ -40,9 +40,8 @@ export class ParagliderVoxel extends SimpleThreeComponent {
   }
 
   /**
-   * Override createObject to compose async sub-components.
-   * This is Pattern B from COMPONENT_COMPOSITION.md - the standard pattern
-   * for vehicles that combine multiple loadable components.
+   * Override createObject to compose async sub-components, the standard
+   * approach for vehicles that combine multiple loadable components.
    */
   protected override async createObject(): Promise<THREE.Object3D> {
     const group = new THREE.Object3D();

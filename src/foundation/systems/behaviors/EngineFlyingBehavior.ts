@@ -149,8 +149,11 @@ export class EngineFlyingBehavior extends FlyingBehavior {
         avoidanceForce.add(new THREE.Vector3(0, Math.min(climbUrgency * 3, 5), 0));
 
         // Log when climbing to avoid terrain
-        if (Math.random() < 0.01) { // 1% of frames
-          logger.debug(`Climbing to avoid terrain: required=${requiredAltitude.toFixed(0)}, current=${currentAltitude.toFixed(0)}`);
+        if (Math.random() < 0.01) {
+          // 1% of frames
+          logger.debug(
+            `Climbing to avoid terrain: required=${requiredAltitude.toFixed(0)}, current=${currentAltitude.toFixed(0)}`
+          );
         }
       }
     }
@@ -169,7 +172,8 @@ export class EngineFlyingBehavior extends FlyingBehavior {
     const altitudeDiff = this.cruiseAltitude - currentAltitude;
 
     // Gentle force to return to cruise altitude
-    if (Math.abs(altitudeDiff) > 20) { // Only adjust if significantly off cruise altitude
+    if (Math.abs(altitudeDiff) > 20) {
+      // Only adjust if significantly off cruise altitude
       const climbForce = (altitudeDiff / this.cruiseAltitude) * 0.5;
       altitudeForce.add(new THREE.Vector3(0, climbForce, 0));
     }

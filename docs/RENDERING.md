@@ -1,7 +1,7 @@
 # Rendering: how the island scenes get their look
 
-Every scene built on `TerrainBase` (Home, Famara, Boats, Island, Island Flying and the
-other island demos) draws through one shared pipeline. The code lives in
+Every scene built on `TerrainBase` (Home, the Famara and Boats animations, and static Famara)
+draws through one shared pipeline. The code lives in
 `src/foundation/rendering/`, and each theme can tune it.
 
 ## The frame

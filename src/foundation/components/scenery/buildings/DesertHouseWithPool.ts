@@ -76,15 +76,15 @@ export class DesertHouseWithPool extends LODComponent {
     // Simplified materials
     const wallMaterial = new THREE.MeshLambertMaterial({
       color: options.wallColor,
-      name: 'desert_house_wall_ultra_low'
+      name: 'desert_house_wall_ultra_low',
     });
     const roofMaterial = new THREE.MeshLambertMaterial({
       color: options.roofColor,
-      name: 'desert_house_roof_ultra_low'
+      name: 'desert_house_roof_ultra_low',
     });
     const poolWaterMaterial = new THREE.MeshLambertMaterial({
       color: options.poolWaterColor,
-      name: 'pool_water_ultra_low'
+      name: 'pool_water_ultra_low',
     });
 
     // Simple main house - single box
@@ -127,12 +127,30 @@ export class DesertHouseWithPool extends LODComponent {
 
     // Simplified materials
     const materials = {
-      wall: new THREE.MeshLambertMaterial({ color: options.wallColor, name: 'desert_house_wall_low' }),
-      roof: new THREE.MeshLambertMaterial({ color: options.roofColor, name: 'desert_house_roof_low' }),
-      door: new THREE.MeshLambertMaterial({ color: options.doorColor, name: 'desert_house_door_low' }),
-      window: new THREE.MeshLambertMaterial({ color: options.windowColor, name: 'desert_house_window_low' }),
-      poolWater: new THREE.MeshLambertMaterial({ color: options.poolWaterColor, name: 'pool_water_low' }),
-      poolTile: new THREE.MeshLambertMaterial({ color: options.poolTileColor, name: 'pool_tile_low' }),
+      wall: new THREE.MeshLambertMaterial({
+        color: options.wallColor,
+        name: 'desert_house_wall_low',
+      }),
+      roof: new THREE.MeshLambertMaterial({
+        color: options.roofColor,
+        name: 'desert_house_roof_low',
+      }),
+      door: new THREE.MeshLambertMaterial({
+        color: options.doorColor,
+        name: 'desert_house_door_low',
+      }),
+      window: new THREE.MeshLambertMaterial({
+        color: options.windowColor,
+        name: 'desert_house_window_low',
+      }),
+      poolWater: new THREE.MeshLambertMaterial({
+        color: options.poolWaterColor,
+        name: 'pool_water_low',
+      }),
+      poolTile: new THREE.MeshLambertMaterial({
+        color: options.poolTileColor,
+        name: 'pool_tile_low',
+      }),
     };
 
     // Simple main house - just main structure
@@ -192,12 +210,30 @@ export class DesertHouseWithPool extends LODComponent {
 
     // Materials
     const materials = {
-      wall: new THREE.MeshLambertMaterial({ color: options.wallColor, name: 'desert_house_wall_medium' }),
-      roof: new THREE.MeshLambertMaterial({ color: options.roofColor, name: 'desert_house_roof_medium' }),
-      door: new THREE.MeshLambertMaterial({ color: options.doorColor, name: 'desert_house_door_medium' }),
-      window: new THREE.MeshLambertMaterial({ color: options.windowColor, name: 'desert_house_window_medium' }),
-      poolWater: new THREE.MeshLambertMaterial({ color: options.poolWaterColor, name: 'pool_water_medium' }),
-      poolTile: new THREE.MeshLambertMaterial({ color: options.poolTileColor, name: 'pool_tile_medium' }),
+      wall: new THREE.MeshLambertMaterial({
+        color: options.wallColor,
+        name: 'desert_house_wall_medium',
+      }),
+      roof: new THREE.MeshLambertMaterial({
+        color: options.roofColor,
+        name: 'desert_house_roof_medium',
+      }),
+      door: new THREE.MeshLambertMaterial({
+        color: options.doorColor,
+        name: 'desert_house_door_medium',
+      }),
+      window: new THREE.MeshLambertMaterial({
+        color: options.windowColor,
+        name: 'desert_house_window_medium',
+      }),
+      poolWater: new THREE.MeshLambertMaterial({
+        color: options.poolWaterColor,
+        name: 'pool_water_medium',
+      }),
+      poolTile: new THREE.MeshLambertMaterial({
+        color: options.poolTileColor,
+        name: 'pool_tile_medium',
+      }),
       plant: new THREE.MeshLambertMaterial({ color: '#228B22', name: 'plant_medium' }),
       rock: new THREE.MeshLambertMaterial({ color: '#696969', name: 'rock_medium' }),
     };
@@ -283,7 +319,7 @@ export class DesertHouseWithPool extends LODComponent {
     const scale = options.scale || 1;
 
     // Create materials for landscaping and amenities
-    const materials = this.createMaterials(options);
+    const materials = this.createMaterials();
 
     // Add landscaping (synchronous geometry only)
     this.addPoolLandscaping(compound, materials);
@@ -313,7 +349,7 @@ export class DesertHouseWithPool extends LODComponent {
       // Load house and pool in parallel
       await Promise.all([
         this.addDesertHouse(baseObject, options),
-        this.addSwimmingPool(baseObject, options)
+        this.addSwimmingPool(baseObject, options),
       ]);
     }
 
@@ -323,7 +359,7 @@ export class DesertHouseWithPool extends LODComponent {
   /**
    * Create all material resources
    */
-  private createMaterials(options: DesertHouseWithPoolOptions) {
+  private createMaterials() {
     return {
       plant: new THREE.MeshLambertMaterial({ color: '#228B22' }),
       rock: new THREE.MeshLambertMaterial({ color: '#696969' }),
@@ -332,14 +368,17 @@ export class DesertHouseWithPool extends LODComponent {
       cushion: new THREE.MeshLambertMaterial({ color: '#F0E68C' }),
       metal: new THREE.MeshLambertMaterial({ color: '#C0C0C0' }),
       firePit: new THREE.MeshLambertMaterial({ color: '#2F4F4F' }),
-      canopy: new THREE.MeshLambertMaterial({ color: '#FF6347', side: THREE.DoubleSide })
+      canopy: new THREE.MeshLambertMaterial({ color: '#FF6347', side: THREE.DoubleSide }),
     };
   }
 
   /**
    * Add the main desert house
    */
-  private async addDesertHouse(compound: THREE.Group, options: DesertHouseWithPoolOptions): Promise<void> {
+  private async addDesertHouse(
+    compound: THREE.Group,
+    options: DesertHouseWithPoolOptions
+  ): Promise<void> {
     const desertHouse = new DesertHouse({
       wallColor: options.wallColor,
       roofColor: options.roofColor,
@@ -360,7 +399,10 @@ export class DesertHouseWithPool extends LODComponent {
   /**
    * Add the swimming pool
    */
-  private async addSwimmingPool(compound: THREE.Group, options: DesertHouseWithPoolOptions): Promise<void> {
+  private async addSwimmingPool(
+    compound: THREE.Group,
+    options: DesertHouseWithPoolOptions
+  ): Promise<void> {
     const pool = new Pool({
       waterColor: options.poolWaterColor,
       tileColor: options.poolTileColor,
@@ -382,7 +424,6 @@ export class DesertHouseWithPool extends LODComponent {
    * Add landscaping around the pool
    */
   private addPoolLandscaping(compound: THREE.Group, materials: LandscapingMaterials): void {
-
     // Desert plants around the pool
     const plantPositions = [
       new THREE.Vector3(-10, 0, -30),
@@ -428,11 +469,7 @@ export class DesertHouseWithPool extends LODComponent {
       const angle = (i / borderStones) * Math.PI * 2;
       const stoneGeometry = new THREE.CylinderGeometry(0.3, 0.4, 0.8, 6);
       const stone = new THREE.Mesh(stoneGeometry, materials.rock);
-      stone.position.set(
-        Math.cos(angle) * radius,
-        0.4,
-        -25 + Math.sin(angle) * radius
-      );
+      stone.position.set(Math.cos(angle) * radius, 0.4, -25 + Math.sin(angle) * radius);
       stone.rotation.y = Math.random() * Math.PI;
       compound.add(stone);
     }
@@ -442,7 +479,6 @@ export class DesertHouseWithPool extends LODComponent {
    * Add outdoor furniture and amenities
    */
   private addOutdoorAmenities(compound: THREE.Group, materials: LandscapingMaterials): void {
-
     // Pool lounge chairs
     const loungePositions = [
       { pos: new THREE.Vector3(-6, 0, -20), rot: 0 },
@@ -537,7 +573,10 @@ export class DesertHouseWithPool extends LODComponent {
 
     // Create materials for parasol
     const woodMaterial = new THREE.MeshLambertMaterial({ color: '#8B4513' });
-    const canopyMaterial = new THREE.MeshLambertMaterial({ color: '#FF6347', side: THREE.DoubleSide });
+    const canopyMaterial = new THREE.MeshLambertMaterial({
+      color: '#FF6347',
+      side: THREE.DoubleSide,
+    });
 
     // Parasol pole
     const poleGeometry = new THREE.CylinderGeometry(0.1, 0.1, 3);
@@ -554,7 +593,6 @@ export class DesertHouseWithPool extends LODComponent {
 
     return parasol;
   }
-
 
   public override validate(): string[] {
     const issues: string[] = [];

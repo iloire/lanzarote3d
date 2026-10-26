@@ -174,5 +174,4 @@ export class FishingBoat extends MovableBoatComponent {
   }
 }
 
-
 export default FishingBoat;
