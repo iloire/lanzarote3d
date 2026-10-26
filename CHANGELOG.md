@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## [Unreleased] - 2026-10-26 21:04 UTC
+
+### Performance
+- **Full resolution on Retina screens**: from a pixel ratio of 1.5 up the scene pass takes 2 MSAA samples instead of 4, which looks the same and saves 3–5 ms of a ~25 ms frame at 2880×1800 (M3 Pro). That brings the home scene under the adaptive threshold, so it now keeps DPR 2 instead of dropping resolution. When frames still run long, the adaptive quality sheds samples (4 → 2 → 0) before it lowers the pixel ratio
+
 ## [Unreleased] - 2026-10-26 20:41 UTC
 
 ### Performance

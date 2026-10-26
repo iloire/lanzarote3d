@@ -22,12 +22,18 @@ export const DEFAULT_ATMOSPHERE: Required<Omit<AtmosphereTheme, 'fogColor'>> = {
   cloudShadow: 0.25,
 };
 
-// Adaptive resolution: drop the pixel ratio when frames run long, recover when they don't.
+// Adaptive quality: when frames run long, shed MSAA samples first and then pixel ratio;
+// recover in the reverse order when they don't.
 const SLOW_FRAME_MS = 22;
 const FAST_FRAME_MS = 17.5;
 const DPR_STEP = 0.25;
 const DPR_CHECK_MS = 1500;
 const DPR_RAISE_COOLDOWN_MS = 10000;
+
+// MSAA samples for a pixel ratio. From 1.5x up the pixels are small enough that 2x
+// smooths the edges, and on a Retina screen samples cost more than pixels: 4x took
+// ~7.5 ms of a 25 ms frame at 2880x1800 on an M3 Pro, 2x about half that.
+const samplesFor = (pixelRatio: number): number => (pixelRatio >= 1.5 ? 2 : 4);
 
 // The sun's shadow covers a box this size round the camera instead of the whole island.
 const SHADOW_BOX = 3000;
@@ -71,7 +77,7 @@ const GradeShader = {
 };
 
 /**
- * Draws the scene into its own 4x multisampled target, then copies the resolved image
+ * Draws the scene into its own multisampled target (see samplesFor), then copies the resolved image
  * into the composer's chain. Only this pass pays for MSAA; giving the composer's
  * ping-pong buffers samples made every full-screen pass resolve too, which doubled the
  * frame time on an M3 Pro.
@@ -116,6 +122,17 @@ class MsaaScenePass extends Pass {
 
   override setSize(width: number, height: number): void {
     this.target.setSize(width, height);
+  }
+
+  get samples(): number {
+    return this.target.samples;
+  }
+
+  set samples(samples: number) {
+    if (samples === this.target.samples) return;
+    this.target.samples = samples;
+    // The GPU buffers are rebuilt with the new sample count on next use.
+    this.target.dispose();
   }
 
   override render(
@@ -189,6 +206,7 @@ export class RenderPipeline {
     this.composer = new EffectComposer(renderer, target);
 
     this.renderPass = new MsaaScenePass(scene, camera);
+    this.renderPass.samples = samplesFor(this.pixelRatio);
     this.bloomPass = new UnrealBloomPass(
       size.clone().multiplyScalar(0.5),
       DEFAULT_ATMOSPHERE.bloomStrength,
@@ -314,7 +332,7 @@ export class RenderPipeline {
   render(camera: THREE.Camera): void {
     const delta = Math.min(this.clock.getDelta(), 0.1);
     sharedUniforms.uTime.value += delta;
-    this.adaptPixelRatio(delta * 1000);
+    this.adaptQuality(delta * 1000);
     this.followShadow(camera);
     this.renderPass.camera = camera;
     this.renderer.info.reset();
@@ -336,31 +354,45 @@ export class RenderPipeline {
     light.target.updateMatrixWorld();
   }
 
-  private adaptPixelRatio(frameMs: number): void {
+  private adaptQuality(frameMs: number): void {
     this.frameMsAverage += (frameMs - this.frameMsAverage) * 0.05;
     const now = performance.now();
     if (now - this.lastDprCheck < DPR_CHECK_MS) return;
     this.lastDprCheck = now;
-    let next = this.pixelRatio;
-    if (this.frameMsAverage > SLOW_FRAME_MS && this.pixelRatio > 1) {
-      next = Math.max(1, this.pixelRatio - DPR_STEP);
+    const samples = this.renderPass.samples;
+    if (this.frameMsAverage > SLOW_FRAME_MS) {
+      if (samples > 0) {
+        this.renderPass.samples = samples > 2 ? 2 : 0;
+      } else if (this.pixelRatio > 1) {
+        this.setPixelRatio(Math.max(1, this.pixelRatio - DPR_STEP));
+      } else {
+        return;
+      }
       this.lastDprDrop = now;
     } else if (
       this.frameMsAverage < FAST_FRAME_MS &&
-      this.pixelRatio < this.maxPixelRatio &&
       now - this.lastDprDrop > DPR_RAISE_COOLDOWN_MS
     ) {
-      next = Math.min(this.maxPixelRatio, this.pixelRatio + DPR_STEP);
-    }
-    if (next !== this.pixelRatio) {
-      this.pixelRatio = next;
-      this.renderer.setPixelRatio(next);
-      this.composer.setPixelRatio(next);
+      if (this.pixelRatio < this.maxPixelRatio) {
+        this.setPixelRatio(Math.min(this.maxPixelRatio, this.pixelRatio + DPR_STEP));
+      } else if (samples < samplesFor(this.pixelRatio)) {
+        this.renderPass.samples = samples === 0 ? 2 : 4;
+      }
     }
   }
 
-  getStats(): { pixelRatio: number; frameMs: number } {
-    return { pixelRatio: this.pixelRatio, frameMs: this.frameMsAverage };
+  private setPixelRatio(pixelRatio: number): void {
+    this.pixelRatio = pixelRatio;
+    this.renderer.setPixelRatio(pixelRatio);
+    this.composer.setPixelRatio(pixelRatio);
+  }
+
+  getStats(): { pixelRatio: number; samples: number; frameMs: number } {
+    return {
+      pixelRatio: this.pixelRatio,
+      samples: this.renderPass.samples,
+      frameMs: this.frameMsAverage,
+    };
   }
 
   private onResize = (): void => {

@@ -8,8 +8,10 @@ other island demos) draws through one shared pipeline. The code lives in
 
 `RenderPipeline.render(camera)` is called once per frame through `TerrainBase.renderFrame()`:
 
-1. **Scene pass, 4× MSAA, half float** (`MsaaScenePass`). This is the only multisampled
-   target, which keeps the wireframe edges clean. When the composer's own ping-pong buffers
+1. **Scene pass, MSAA, half float** (`MsaaScenePass`). This is the only multisampled
+   target. It takes 4 samples below a pixel ratio of 1.5 and 2 from 1.5 up (`samplesFor`):
+   on a Retina screen the pixels are small enough that 2× gives the same edges, and at
+   2880×1800 on an M3 Pro 4× cost 3–5 ms more of a ~22 ms frame. When the composer's own ping-pong buffers
    were multisampled, every full-screen pass paid for a resolve and the frame time doubled
    (17.2 ms against 8.3 ms on an M3 Pro). The copy out also drops NaN/Inf pixels and
    clamps blown-out highlights, because bloom would otherwise smear one bad pixel into a
@@ -30,9 +32,12 @@ Every frame the pipeline also:
   and the gulls;
 - moves the sun's shadow box (±3 km, snapped to whole texels) to follow the camera,
   instead of spreading one 2048² map across the whole island;
-- adapts the pixel ratio: it drops 0.25 when frames average over 22 ms, and climbs back
-  once they're under 17.5 ms, with a 10 s cooldown after each drop. The ceiling is the
-  device's ratio (at most 2), or 1.5 when the scene is embedded (`?embed=1`).
+- adapts its quality when frames average over 22 ms: first it sheds MSAA samples (4 → 2 → 0),
+  because they cost more than pixels, and only then drops the pixel ratio by 0.25 at a time.
+  Once frames are under 17.5 ms, with a 10 s cooldown after each drop, it climbs back in the
+  reverse order: pixel ratio first, then samples up to `samplesFor` that ratio. The pixel
+  ratio's ceiling is the device's ratio (at most 2), or 1.5 when the scene is embedded
+  (`?embed=1`).
 
 ## The sky lights everything
 
@@ -139,4 +144,4 @@ weather: { windDirectionDegreesFromNorth: 280, speedMetresPerSecond: 5 }, // dri
 
 Dev builds expose `window.__lz = { renderer, pipeline }`. `renderer.info.render` counts the
 whole frame, because the pipeline resets it once per frame rather than once per pass, and
-`pipeline.getStats()` returns the current pixel ratio and the average frame time.
+`pipeline.getStats()` returns the current pixel ratio, MSAA samples and average frame time.
