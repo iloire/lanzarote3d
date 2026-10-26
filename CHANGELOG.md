@@ -2,6 +2,25 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## [Unreleased] - 2026-10-26 19:59 UTC
+
+### Added
+- **Filmic look for every island scene** (`src/foundation/rendering/`, see `docs/RENDERING.md`): ACES tone mapping, 4× MSAA on the scene pass only, bloom on the sun and its glints, a colour grade with vignette, an environment map lit by the sky, and fog in the sky's own horizon colour, so the sea and the far island fade into one haze. `?fx=0` renders without it
+- **A real sea**: wave normals driven by the theme's wind, turquoise shallows, surf rolling onto the beaches and foam at the water's edge, worked out from a coast-distance field baked from the island at load; whitecaps; drifting cloud shadows on the sea and the ground
+- **Solid ground under the wireframe**: sand at the waterline, basalt, then rust towards the peaks; it receives the sun's shadows
+- **Gulls circling in thermals** replace the old bird model in the Famara scenes: one instanced draw call, banking and wingbeats in the vertex shader
+- Themes take `water.shallowColor` / `shallowDistance`, `terrain.underlay` and an `atmosphere` block (exposure, fog, bloom, grade, cloud shadows)
+
+### Changed
+- **Home fly-in** follows one spline at a speed that never jumps (the old two-phase move stalled halfway), then drifts slowly round the pilots until touched
+- **Follow camera** is a chase camera: behind the target's heading, sized to the target, easing only its offset
+- The sun's shadow covers a 6 km box following the camera instead of the whole island, so shadows are sharper; they're soft grey rather than black
+- The pixel ratio adapts to frame time (1.5 at most when embedded)
+
+### Fixed
+- **Island Flying rendered black**: OrbitControls had been handed the sky's own sun vector as its target
+- Themes are now applied to the sky, sea and island in every terrain scene; Home applied its theme before they existed
+
 ## [Unreleased] - 2026-10-04 10:09 UTC
 
 ### Removed

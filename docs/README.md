@@ -5,6 +5,7 @@ This directory contains comprehensive documentation and examples for the Lanzaro
 ## Documentation Files
 
 ### Core Documentation
+- **[RENDERING.md](RENDERING.md)** - The render pipeline, sea, ground, gulls and camera, and the theme fields that tune them
 - **[WEBSITE_BACKGROUND_INTEGRATION.md](WEBSITE_BACKGROUND_INTEGRATION.md)** - Complete guide for using Lanzarote 3D demos as website backgrounds
 
 ### Examples

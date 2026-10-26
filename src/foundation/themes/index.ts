@@ -26,10 +26,13 @@ export const THEMES: Record<string, Theme> = {
         wireframe: true,
         visible: true,
       },
+      underlay: { color: '#34302d', peakColor: '#3f2f27', sandColor: '#b39668' },
     },
     water: {
-      color: '#333',
-      opacity: 0.75,
+      color: '#08304a',
+      opacity: 1,
+      shallowColor: '#23a9a6',
+      shallowDistance: 700,
     },
     weather: {
       windDirectionDegreesFromNorth: 280,
@@ -40,6 +43,7 @@ export const THEMES: Record<string, Theme> = {
       lightingIntensity: 1.05,
       shadowIntensity: 0.95,
     },
+    atmosphere: {},
   },
 
   golden: {
@@ -76,10 +80,12 @@ export const THEMES: Record<string, Theme> = {
         wireframe: true,
         visible: true,
       },
+      underlay: { color: '#3a2a20', peakColor: '#6a321a', sandColor: '#c89a5c' },
     },
     water: {
-      color: 'orange',
-      opacity: 0.5,
+      color: '#12344a',
+      opacity: 1,
+      shallowColor: '#3aa597',
     },
     weather: {
       windDirectionDegreesFromNorth: 270,
@@ -90,6 +96,7 @@ export const THEMES: Record<string, Theme> = {
       lightingIntensity: 1.4,
       shadowIntensity: 0.6,
     },
+    atmosphere: { exposure: 0.95, warmth: 0.09, bloomStrength: 0.6, saturation: 1.18 },
   },
 
   arctic: {
@@ -131,10 +138,12 @@ export const THEMES: Record<string, Theme> = {
         wireframe: true,
         visible: true,
       },
+      underlay: { color: '#8a9db0', peakColor: '#eef4fa', sandColor: '#c9d6e0' },
     },
     water: {
-      color: '#1976d2',
-      opacity: 0.9,
+      color: '#0b3558',
+      opacity: 1,
+      shallowColor: '#5fb8c9',
     },
     weather: {
       windDirectionDegreesFromNorth: 0,
@@ -145,6 +154,7 @@ export const THEMES: Record<string, Theme> = {
       lightingIntensity: 0.9,
       shadowIntensity: 1.2,
     },
+    atmosphere: { warmth: -0.03, saturation: 1.0, fogDensity: 0.00004 },
   },
 
   storm: {

@@ -51,6 +51,13 @@ export class CameraTargetController extends THREE.PerspectiveCamera {
   private settings: CameraSettings;
   private updateCallbacks: Array<() => void> = [];
 
+  // Chase camera state: the offset is eased, never the position, so the camera rides
+  // with its target and a long frame can't open up a lag that makes it pulse.
+  private followOffset: THREE.Vector3 | null = null;
+  private followHeading = new THREE.Vector3(0, 0, 1);
+  private followLastPosition: THREE.Vector3 | null = null;
+  private readonly targetRadius = new WeakMap<THREE.Object3D, number>();
+
   constructor(fov: number, aspect: number, near: number, far: number) {
     super(fov, aspect, near, far);
 
@@ -209,22 +216,53 @@ export class CameraTargetController extends THREE.PerspectiveCamera {
    */
   private updateFollowMode(target: CameraTarget, deltaTime: number): void {
     const targetPos = target.object.position;
-    const angle = this.settings.follow.angle;
 
-    // Calculate camera position behind and above the target
-    const x = Math.sin(angle) * this.settings.follow.distance;
-    const z = Math.cos(angle) * this.settings.follow.distance;
-    const y = this.settings.follow.height;
+    // Which way is it going? Track horizontal motion, ignoring tiny or wild jumps.
+    if (this.followLastPosition) {
+      const motion = targetPos.clone().sub(this.followLastPosition).setY(0);
+      const step = motion.length();
+      if (step > 1e-3 && step < 2000) {
+        this.followHeading.lerp(motion.divideScalar(step), 1 - Math.exp(-deltaTime * 1.5));
+        this.followHeading.normalize();
+      }
+    }
+    this.followLastPosition = targetPos.clone();
 
-    const desiredPosition = new THREE.Vector3(
-      targetPos.x + x,
-      targetPos.y + y,
-      targetPos.z + z
-    );
+    const desiredOffset = this.followOffsetFor(target);
+    if (!this.followOffset) {
+      this.followOffset = desiredOffset.clone();
+    } else {
+      this.followOffset.lerp(desiredOffset, 1 - Math.exp(-deltaTime * 2));
+    }
 
-    // Smooth camera movement
-    this.position.lerp(desiredPosition, Math.min(deltaTime * 3, 1));
+    this.position.copy(targetPos).add(this.followOffset);
     this.lookAt(targetPos);
+  }
+
+  /**
+   * Behind and above the target along its heading, far enough back to frame the whole
+   * of it whatever its scale.
+   */
+  private followOffsetFor(target: CameraTarget): THREE.Vector3 {
+    let radius = this.targetRadius.get(target.object);
+    if (radius === undefined) {
+      // Size it from its meshes; rigging lines and trails would make it look far bigger.
+      const box = new THREE.Box3();
+      target.object.updateMatrixWorld(true);
+      target.object.traverse(child => {
+        if (child instanceof THREE.Mesh && child.visible) box.expandByObject(child);
+      });
+      const r = box.isEmpty() ? 0 : box.getBoundingSphere(new THREE.Sphere()).radius;
+      radius = Number.isFinite(r) ? r : 0;
+      this.targetRadius.set(target.object, radius);
+    }
+    const distance = Math.max(this.settings.follow.distance, radius * 2.5);
+    const height = Math.max(this.settings.follow.height, distance * 0.3);
+    const back = this.followHeading.clone().multiplyScalar(-distance);
+    if (this.settings.follow.angle) {
+      back.applyAxisAngle(new THREE.Vector3(0, 1, 0), this.settings.follow.angle);
+    }
+    return back.setY(height);
   }
 
   /**
@@ -259,11 +297,9 @@ export class CameraTargetController extends THREE.PerspectiveCamera {
 
     switch (this.currentMode) {
       case CameraMode.Follow: {
-        const angle = this.settings.follow.angle;
-        const x = Math.sin(angle) * this.settings.follow.distance;
-        const z = Math.cos(angle) * this.settings.follow.distance;
-        const y = this.settings.follow.height;
-        return new THREE.Vector3(targetPos.x + x, targetPos.y + y, targetPos.z + z);
+        this.followOffset = null;
+        this.followLastPosition = null;
+        return targetPos.clone().add(this.followOffsetFor(target));
       }
       case CameraMode.FirstPerson: {
         return targetPos.clone().add(this.settings.firstPerson.offset);
@@ -344,7 +380,8 @@ export class CameraTargetController extends THREE.PerspectiveCamera {
     // Target and mode selection
     if (this.targets.length > 0) {
       const targetNames = this.targets.map(t => t.name);
-      cameraFolder.add({ target: this.targets[this.currentTargetIndex]?.name || '' }, 'target', targetNames)
+      cameraFolder
+        .add({ target: this.targets[this.currentTargetIndex]?.name || '' }, 'target', targetNames)
         .name('Current Target')
         .onChange((value: string) => {
           const index = this.targets.findIndex(t => t.name === value);
@@ -354,7 +391,8 @@ export class CameraTargetController extends THREE.PerspectiveCamera {
         });
     }
 
-    cameraFolder.add({ mode: this.currentMode }, 'mode', Object.values(CameraMode))
+    cameraFolder
+      .add({ mode: this.currentMode }, 'mode', Object.values(CameraMode))
       .name('Camera Mode')
       .onChange((value: string) => {
         this.setMode(value as CameraMode);

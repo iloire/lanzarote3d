@@ -28,6 +28,9 @@ export const Easing = {
   easeInOut: (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t),
   easeIn: (t: number) => t * t,
   easeOut: (t: number) => t * (2 - t),
+  // Starts and ends at rest, fastest a third of the way in, then a long gentle arrival:
+  // 1 - (1 - t)^3 (1 + 3t), whose speed is 12 t (1 - t)^2. For camera fly-ins.
+  approach: (t: number) => 1 - Math.pow(1 - t, 3) * (1 + 3 * t),
 };
 
 /**

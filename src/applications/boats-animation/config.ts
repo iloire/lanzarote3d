@@ -195,15 +195,6 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
   },
 ];
 
-// Bird path configuration
-export const birdPath = [
-  new THREE.Vector3(5000, 1000, 0),
-  new THREE.Vector3(6000, 1100, -500),
-  new THREE.Vector3(7000, 1200, -1000),
-  new THREE.Vector3(8000, 1000, -500),
-  new THREE.Vector3(7000, 900, 0),
-];
-
 // Cessna configuration - fast flyby near paraglider
 export const cessnaConfig: CessnaConfig = {
   position: new THREE.Vector3(7200, 1000, 500), // Start behind and to the right of paraglider

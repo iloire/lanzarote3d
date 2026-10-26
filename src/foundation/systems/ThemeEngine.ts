@@ -4,6 +4,8 @@ import { StoryOptions } from '../../shared/types';
 import Environment from '../../shared/env/environment';
 import { Weather } from '../components/physics';
 import { logger } from '../utils/logger';
+import { OceanMaterial } from '../rendering/OceanMaterial';
+import { setSharedWind } from '../rendering/sharedUniforms';
 
 export class ThemeEngine {
   private static currentTheme: Theme | null = null;
@@ -48,6 +50,17 @@ export class ThemeEngine {
       if (!skipComponents.includes('ambient') && theme.ambient) {
         await this.applyAmbientTheme(options, theme);
       }
+
+      // Wind drives the waves, whitecaps and cloud shadows
+      if (!skipComponents.includes('weather') && theme.weather) {
+        setSharedWind(
+          theme.weather.windDirectionDegreesFromNorth,
+          theme.weather.speedMetresPerSecond
+        );
+      }
+
+      // Filmic look: exposure, bloom, grade, fog. Last, so it sees the sun where the sky left it.
+      options.pipeline?.applyAtmosphere(theme.atmosphere);
 
       logger.info(`Theme '${theme.name}' applied successfully`);
     } catch (error) {
@@ -99,6 +112,15 @@ export class ThemeEngine {
    */
   private static async applyWaterTheme(waterMesh: THREE.Mesh, theme: Theme): Promise<void> {
     const { water } = theme;
+
+    if (waterMesh.material instanceof OceanMaterial) {
+      waterMesh.material.setLook({
+        deepColor: water.color,
+        shallowColor: water.shallowColor,
+        shallowDistance: water.shallowDistance,
+      });
+      return;
+    }
 
     if (waterMesh.material && 'color' in waterMesh.material) {
       const material = waterMesh.material as THREE.MeshLambertMaterial;

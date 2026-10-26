@@ -4,7 +4,7 @@ import {
   OrbitControlsHelper,
   ORBIT_CONTROLS_PRESETS,
 } from '../../foundation/utils/OrbitControlsHelper';
-import { animator } from '../../foundation/systems/animation/SimpleAnimator';
+import { animator, Easing } from '../../foundation/systems/animation/SimpleAnimator';
 
 export interface CameraAnimationConfig {
   targetPosition: THREE.Vector3;
@@ -14,7 +14,7 @@ export interface CameraAnimationConfig {
 }
 
 /**
- * Sets up and executes a dramatic two-phase camera animation
+ * Flies the camera in from across the island to the pilots
  */
 export function setupCameraAnimation(
   camera: THREE.Camera,
@@ -31,11 +31,7 @@ export function setupCameraAnimation(
   const intermediatePosition = new THREE.Vector3(4500, 1800, 1500);
 
   // Final position - slow, careful approach to the target
-  const finalCameraPosition = new THREE.Vector3(
-    pgPos.x - 100,
-    pgPos.y + 50,
-    pgPos.z + 200
-  );
+  const finalCameraPosition = new THREE.Vector3(pgPos.x - 100, pgPos.y + 50, pgPos.z + 200);
 
   // Set initial camera position and look at the target
   camera.position.copy(initialCameraPosition);
@@ -48,10 +44,15 @@ export function setupCameraAnimation(
     controls.enabled = false; // Disable controls during animation
   }
 
-  // Start the dramatic two-phase camera animation
-  setTimeout(() => {
-    const startTarget = controls ? controls.target.clone() : pgPos.clone();
+  // One continuous move along a spline through all three points. The old two-phase
+  // lerp stopped dead at the intermediate point; this one never changes speed abruptly.
+  const path = new THREE.CatmullRomCurve3(
+    [initialCameraPosition, intermediatePosition, finalCameraPosition],
+    false,
+    'centripetal'
+  );
 
+  setTimeout(() => {
     if (config.onAnimationStart) {
       config.onAnimationStart();
     }
@@ -60,51 +61,12 @@ export function setupCameraAnimation(
     animator.animate(
       'camera-seamless',
       config.animationDurationMs,
-      (progress) => {
-        let currentPosition;
-
-        if (progress < 0.35) {
-          // Phase 1: Fast approach (first 35% of total duration)
-          const phase1Progress = progress / 0.35;
-          const easedProgress =
-            phase1Progress < 0.5
-              ? 4 * phase1Progress * phase1Progress * phase1Progress
-              : 1 - Math.pow(-2 * phase1Progress + 2, 3) / 2;
-
-          currentPosition = new THREE.Vector3().lerpVectors(
-            initialCameraPosition,
-            intermediatePosition,
-            easedProgress
-          );
-
-          const lookTarget = new THREE.Vector3().lerpVectors(
-            startTarget,
-            pgPos,
-            easedProgress * 0.5
-          );
-          if (controls) {
-            controls.target.copy(lookTarget);
-            controls.update();
-          }
-        } else {
-          // Phase 2: Slow approach (last 65%)
-          const phase2Progress = (progress - 0.35) / 0.65;
-          const easedProgress = 1 - Math.pow(1 - phase2Progress, 4);
-
-          currentPosition = new THREE.Vector3().lerpVectors(
-            intermediatePosition,
-            finalCameraPosition,
-            easedProgress
-          );
-
-          if (controls) {
-            const smoothFactor = 0.03 * (1 - Math.pow(1 - phase2Progress, 2));
-            controls.target.lerpVectors(controls.target, pgPos, smoothFactor);
-            controls.update();
-          }
+      progress => {
+        camera.position.copy(path.getPointAt(progress));
+        if (controls) {
+          controls.target.copy(pgPos);
+          controls.update();
         }
-
-        camera.position.copy(currentPosition);
       },
       () => {
         // Animation complete
@@ -127,6 +89,13 @@ export function setupCameraAnimation(
             },
           });
           OrbitControlsHelper.applyLimits(controls, limits);
+
+          // Drift slowly round the pilots until someone takes the controls.
+          controls.autoRotate = true;
+          controls.autoRotateSpeed = 0.3;
+          controls.addEventListener('start', () => {
+            controls.autoRotate = false;
+          });
         }
 
         state.isAnimating = false;
@@ -134,7 +103,8 @@ export function setupCameraAnimation(
         if (config.onAnimationComplete) {
           config.onAnimationComplete();
         }
-      }
+      },
+      Easing.approach
     );
   }, 100);
 

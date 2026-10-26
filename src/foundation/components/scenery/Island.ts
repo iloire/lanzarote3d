@@ -5,6 +5,7 @@ import { MeshBVH, acceleratedRaycast } from 'three-mesh-bvh';
 import { TerrainTheme, SatelliteImageryConfig } from '../../types/Theme';
 import SatelliteTextureManager from '../../utils/satellite-textures';
 import { logger } from '../../utils/logger';
+import { addCloudShadows } from '../../rendering/shaderChunks';
 
 THREE.Mesh.prototype.raycast = acceleratedRaycast;
 
@@ -16,12 +17,58 @@ const loadFromBlenderModel = async (manager: THREE.LoadingManager) => {
     wireframe: true,
     depthTest: true,
   });
+  addCloudShadows(mesh.material);
   mesh.geometry.boundsTree = new MeshBVH(mesh.geometry);
   return mesh;
 };
 
+/**
+ * The solid ground under the wireframe: same geometry, tinted from beach to peak, with
+ * every vertex pushed a fraction further along its view ray. That keeps the lines in
+ * front of it at any distance without moving it on screen (polygon offset doesn't work
+ * with the logarithmic depth buffer).
+ */
+const createUnderlay = (geometry: THREE.BufferGeometry): THREE.Mesh => {
+  const material = new THREE.MeshStandardMaterial({ roughness: 0.95, metalness: 0 });
+  material.userData['peakColor'] = { value: new THREE.Color() };
+  material.userData['sandColor'] = { value: new THREE.Color() };
+  material.onBeforeCompile = shader => {
+    shader.uniforms['uPeakColor'] = material.userData['peakColor'];
+    shader.uniforms['uSandColor'] = material.userData['sandColor'];
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying float vLzHeight;')
+      .replace(
+        '#include <project_vertex>',
+        `#include <project_vertex>
+        vLzHeight = (modelMatrix * vec4(transformed, 1.0)).y;
+        mvPosition.xyz *= 1.003;
+        gl_Position = projectionMatrix * mvPosition;`
+      );
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        '#include <common>',
+        '#include <common>\nvarying float vLzHeight;\nuniform vec3 uPeakColor;\nuniform vec3 uSandColor;'
+      )
+      .replace(
+        'vec4 diffuseColor = vec4( diffuse, opacity );',
+        `vec3 lzGround = mix( diffuse, uPeakColor, smoothstep( 60.0, 650.0, vLzHeight ) );
+        lzGround = mix( uSandColor, lzGround, smoothstep( 4.0, 30.0, vLzHeight ) );
+        vec4 diffuseColor = vec4( lzGround, opacity );`
+      );
+  };
+  material.customProgramCacheKey = () => 'lz-underlay';
+  addCloudShadows(material);
+
+  const underlay = new THREE.Mesh(geometry, material);
+  underlay.name = 'island-underlay';
+  underlay.receiveShadow = true;
+  underlay.raycast = () => {};
+  return underlay;
+};
+
 class Island {
   private mesh: THREE.Mesh | null = null;
+  private underlay: THREE.Mesh | null = null;
   private satelliteManager: SatelliteTextureManager;
   private originalMaterial: THREE.Material | THREE.Material[] | null = null;
 
@@ -54,9 +101,12 @@ class Island {
 
     // Handle satellite imagery mode
     if (terrainTheme.style === 'satellite' && terrainTheme.satelliteImagery?.enabled) {
+      this.setUnderlay(undefined);
       await this.applySatelliteTexture(terrainTheme.satelliteImagery);
       return;
     }
+
+    this.setUnderlay(terrainTheme.underlay);
 
     // Handle regular material themes
     const material = this.mesh.material as THREE.MeshStandardMaterial;
@@ -116,6 +166,29 @@ class Island {
     }
 
     logger.debug('Island terrain theme applied successfully');
+  }
+
+  /**
+   * Show, recolour or remove the solid ground drawn behind the wireframe.
+   */
+  private setUnderlay(underlay: TerrainTheme['underlay']): void {
+    if (!this.mesh) return;
+    if (!underlay) {
+      if (this.underlay) {
+        this.mesh.remove(this.underlay);
+        (this.underlay.material as THREE.Material).dispose();
+        this.underlay = null;
+      }
+      return;
+    }
+    if (!this.underlay) {
+      this.underlay = createUnderlay(this.mesh.geometry);
+      this.mesh.add(this.underlay);
+    }
+    const material = this.underlay.material as THREE.MeshStandardMaterial;
+    material.color.set(underlay.color);
+    material.userData['peakColor'].value.set(underlay.peakColor ?? underlay.color);
+    material.userData['sandColor'].value.set(underlay.sandColor ?? underlay.color);
   }
 
   /**

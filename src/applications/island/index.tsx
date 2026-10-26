@@ -96,9 +96,7 @@ class IslandWorkshopApp extends TerrainBase {
       // Camera is at (-21200, 2500, 23000) looking at the island
 
       // Import the MovementPattern enum properly
-      const { MovementPattern } = await import(
-        '../../foundation/systems/behaviors/MovingBehavior'
-      );
+      const { MovementPattern } = await import('../../foundation/systems/behaviors/MovingBehavior');
       const { TerrainDrivingMode } = await import(
         '../../foundation/systems/behaviors/TerrainFollowingBehavior'
       );
@@ -228,7 +226,7 @@ class IslandWorkshopApp extends TerrainBase {
         // Update controls for damping
         controls.update();
 
-        renderer.render(scene, camera);
+        this.renderFrame(renderer, scene, camera);
         this.animationId = requestAnimationFrame(animate);
       } catch (error) {
         this.handleError(error as Error, 'animation loop');

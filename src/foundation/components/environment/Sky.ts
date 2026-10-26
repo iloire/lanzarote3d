@@ -152,6 +152,13 @@ export default class Sky extends THREE.Object3D {
   // Debug helpers
   directionalLightHelper!: THREE.DirectionalLightHelper;
 
+  private lensflare: Lensflare | null = null;
+
+  private readonly hazeUniforms = {
+    uHazeColor: { value: new THREE.Color() },
+    uHaze: { value: 0 },
+  };
+
   constructor(timeOfDayInHours: number, monthOfTheYear: number, skyOptions?: SkyOptions) {
     super();
 
@@ -176,6 +183,20 @@ export default class Sky extends THREE.Object3D {
    */
   private initializeSkyAtmosphere(): void {
     this.sky = new SkyExample();
+    // Blend the sky into the fog colour towards the horizon, so the sea and the far
+    // end of the island fade into the same haze instead of meeting the sky at a line.
+    const hazeUniforms = this.hazeUniforms;
+    this.sky.material.onBeforeCompile = shader => {
+      shader.uniforms['uHazeColor'] = hazeUniforms.uHazeColor;
+      shader.uniforms['uHaze'] = hazeUniforms.uHaze;
+      shader.fragmentShader = shader.fragmentShader
+        .replace('void main() {', 'uniform vec3 uHazeColor;\nuniform float uHaze;\nvoid main() {')
+        .replace(
+          'gl_FragColor = vec4( retColor, 1.0 );',
+          `float lzHaze = (1.0 - smoothstep(-0.02, 0.14, direction.y)) * uHaze;
+          gl_FragColor = vec4( mix( retColor, uHazeColor, lzHaze ), 1.0 );`
+        );
+    };
     this.sky.material.uniforms['sunPosition']?.value?.copy(this.sunPosition);
     this.sky.scale.setScalar(10000000);
 
@@ -305,6 +326,23 @@ export default class Sky extends THREE.Object3D {
   }
 
   /**
+   * The sprite flare reads the framebuffer to test whether the sun is hidden, which
+   * doesn't work from a multisampled render target; the filmic pipeline turns it off
+   * and lets bloom make the sun glow instead.
+   */
+  setLensflareVisible(visible: boolean): void {
+    if (this.lensflare) this.lensflare.visible = visible;
+  }
+
+  /**
+   * Colour and strength (0-1) of the haze the sky fades into at the horizon.
+   */
+  setHaze(color: THREE.Color, strength: number): void {
+    this.hazeUniforms.uHazeColor.value.copy(color);
+    this.hazeUniforms.uHaze.value = strength;
+  }
+
+  /**
    * Get current sun position
    */
   getSunPosition(): THREE.Vector3 {
@@ -331,6 +369,7 @@ export default class Sky extends THREE.Object3D {
     }
 
     this.pointLight.add(lensflare);
+    this.lensflare = lensflare;
   }
 
   /**

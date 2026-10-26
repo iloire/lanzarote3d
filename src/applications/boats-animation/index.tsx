@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import Environment, { LANZAROTE_TOWNS } from '../../shared/env/environment';
+import Environment, { FAMARA_GULL_FLOCKS, LANZAROTE_TOWNS } from '../../shared/env/environment';
 import { StoryOptions } from '../../shared/types';
 import { getDefaultTheme } from '../../foundation/themes';
 import { ThemeEngine } from '../../foundation/systems/ThemeEngine';
@@ -10,297 +10,287 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { logger } from '../../foundation/utils/logger';
 import { Cessna } from '../../foundation/components/vehicles';
 import { EngineFlyingBehavior } from '../../foundation/systems/behaviors/EngineFlyingBehavior';
-import {
-    ANIMATION_CONFIG,
-    paraglidersVoxel,
-    birdPath,
-    cessnaConfig,
-    SHOW_CESSNA,
-} from './config';
+import { ANIMATION_CONFIG, paraglidersVoxel, cessnaConfig, SHOW_CESSNA } from './config';
 import { loadParagliders } from './vehicleLoader';
-import {
-    setupStaticCamera,
-    setupAnimatedCamera,
-    applyFloatingMotion,
-} from './cameraAnimation';
+import { setupStaticCamera, setupAnimatedCamera, applyFloatingMotion } from './cameraAnimation';
 
 /**
  * Boats Animation Demo - Based on original animation but with camera starting near boats
  * Shows boats partially in frame, then transitions to focus on paragliders and clouds
  */
 class BoatsAnimationApp extends TerrainBase {
-    private environment: Environment | undefined;
-    private animationId: number | undefined;
-    private paragliderMeshes: THREE.Object3D[] = [];
-    private isAnimating: boolean = false;
-    private animationCleanup: (() => void) | undefined;
-    private cessnaMesh: THREE.Object3D | undefined;
-    private cessnaFlyingBehavior: EngineFlyingBehavior | undefined;
+  private environment: Environment | undefined;
+  private animationId: number | undefined;
+  private paragliderMeshes: THREE.Object3D[] = [];
+  private isAnimating: boolean = false;
+  private animationCleanup: (() => void) | undefined;
+  private cessnaMesh: THREE.Object3D | undefined;
+  private cessnaFlyingBehavior: EngineFlyingBehavior | undefined;
 
-    constructor() {
-        const appConfig = getAppConfig('boats');
-        if (!appConfig) {
-            throw new Error('Boats app not found in registry');
-        }
-        super({
-            name: appConfig.name,
-            description: appConfig.description,
-            requiredComponents: ['scene', 'camera', 'renderer', 'terrain', 'water', 'controls'],
-            scene: {
-                environment: 'lanzarote',
-                lighting: 'dynamic',
-                physics: false,
-            },
-            performance: {
-                monitoring: true,
-                logIntervalMs: 12000,
-            },
-        });
+  constructor() {
+    const appConfig = getAppConfig('boats');
+    if (!appConfig) {
+      throw new Error('Boats app not found in registry');
+    }
+    super({
+      name: appConfig.name,
+      description: appConfig.description,
+      requiredComponents: ['scene', 'camera', 'renderer', 'terrain', 'water', 'controls'],
+      scene: {
+        environment: 'lanzarote',
+        lighting: 'dynamic',
+        physics: false,
+      },
+      performance: {
+        monitoring: true,
+        logIntervalMs: 12000,
+      },
+    });
+  }
+
+  async load(options: StoryOptions): Promise<void> {
+    try {
+      // Set camera to initial position FIRST to avoid jarring transition
+      const { camera, controls, scene, renderer } = options;
+      const initialCameraPosition = new THREE.Vector3(8055, 220, -6155);
+      camera.position.copy(initialCameraPosition);
+      const boatCenterPosition = new THREE.Vector3(8400, 0, -6100);
+      camera.lookAt(boatCenterPosition);
+      if (controls) {
+        controls.target.copy(boatCenterPosition);
+        controls.update();
+      }
+
+      // Apply theme BEFORE loading environment to ensure visual consistency
+      const theme = options.theme ?? getDefaultTheme();
+      await ThemeEngine.apply(options, theme);
+
+      // Initialize core systems from TerrainBase
+      this.initializeCore(options);
+
+      // Load full environment (island, water, sky) from TerrainBase
+      await this.initializeEnvironment(options);
+
+      const { terrain, water } = options;
+
+      // Hide canvas during loading to prevent visual pop-in
+      const canvas = renderer.domElement;
+      const originalOpacity = canvas.style.opacity;
+      canvas.style.opacity = '0';
+
+      // Render once with theme applied for terrain height calculations
+      renderer.render(scene, camera);
+
+      // Load voxel paragliders with proper tracking
+      const paragliderResults = await loadParagliders(
+        scene,
+        paraglidersVoxel,
+        this.handleError.bind(this)
+      );
+      this.paragliderMeshes = paragliderResults.map(r => r.mesh);
+
+      // Set up environment using theme (same as original)
+      this.environment = new Environment(scene);
+      const weather = this.environment.createWeatherFromTheme(theme);
+      const thermals = this.environment.generateThermals(weather, 0.7);
+
+      // Add environment elements using theme (same as original)
+      await this.environment.addCloudsFromTheme(thermals, theme);
+      this.environment.addTrees(terrain);
+
+      // Create Lanzarote towns using the predefined configuration
+      await this.environment.addTownsFromConfig(LANZAROTE_TOWNS, terrain);
+
+      logger.info('Adding boats to the scene...');
+      this.environment.addMixedBoats(water);
+      logger.info('Boats added. Component stats:', this.environment.getComponentStats());
+
+      // Make environment available for theme switching
+      options.environment = this.environment;
+
+      // Add birds
+      this.environment.addGulls(FAMARA_GULL_FLOCKS);
+
+      // Add Cessna if enabled
+      if (SHOW_CESSNA) {
+        await this.addCessna(scene, terrain);
+      }
+
+      // Setup camera animation sequence - ONLY DIFFERENCE from original
+      this.setupCameraAnimation(camera, controls, renderer, scene);
+
+      // Restore canvas visibility after everything is loaded
+      canvas.style.opacity = originalOpacity || '1';
+
+      this.isLoaded = true;
+      logger.info(
+        `✅ ${this.config.name} loaded successfully with ${this.paragliderMeshes.length} paragliders`
+      );
+    } catch (error) {
+      this.handleError(error as Error, 'load');
+      throw error;
+    }
+  }
+
+  private setupCameraAnimation(
+    camera: THREE.Camera,
+    controls: OrbitControls,
+    renderer: THREE.WebGLRenderer,
+    scene: THREE.Scene
+  ): void {
+    const pgPos = paraglidersVoxel[0]?.position.clone() || new THREE.Vector3();
+    const boatCenterPosition = new THREE.Vector3(
+      ANIMATION_CONFIG.positions.boatCenter.x,
+      ANIMATION_CONFIG.positions.boatCenter.y,
+      ANIMATION_CONFIG.positions.boatCenter.z
+    );
+
+    // Start animation loop
+    this.startAnimationLoop(renderer, scene, camera, controls);
+
+    // Check if animation is enabled
+    if (!ANIMATION_CONFIG.enableAnimation) {
+      // Static mode
+      setupStaticCamera(camera, controls, boatCenterPosition);
+      return;
     }
 
-    async load(options: StoryOptions): Promise<void> {
-        try {
-            // Set camera to initial position FIRST to avoid jarring transition
-            const { camera, controls, scene, renderer } = options;
-            const initialCameraPosition = new THREE.Vector3(8055, 220, -6155);
-            camera.position.copy(initialCameraPosition);
-            const boatCenterPosition = new THREE.Vector3(8400, 0, -6100);
-            camera.lookAt(boatCenterPosition);
-            if (controls) {
-                controls.target.copy(boatCenterPosition);
-                controls.update();
-            }
-
-            // Apply theme BEFORE loading environment to ensure visual consistency
-            const theme = options.theme ?? getDefaultTheme();
-            await ThemeEngine.apply(options, theme);
-
-            // Initialize core systems from TerrainBase
-            this.initializeCore(options);
-
-            // Load full environment (island, water, sky) from TerrainBase
-            await this.initializeEnvironment(options);
-
-            const { terrain, water } = options;
-
-            // Hide canvas during loading to prevent visual pop-in
-            const canvas = renderer.domElement;
-            const originalOpacity = canvas.style.opacity;
-            canvas.style.opacity = '0';
-
-            // Render once with theme applied for terrain height calculations
-            renderer.render(scene, camera);
-
-            // Load voxel paragliders with proper tracking
-            const paragliderResults = await loadParagliders(
-                scene,
-                paraglidersVoxel,
-                this.handleError.bind(this)
-            );
-            this.paragliderMeshes = paragliderResults.map((r) => r.mesh);
-
-            // Set up environment using theme (same as original)
-            this.environment = new Environment(scene);
-            const weather = this.environment.createWeatherFromTheme(theme);
-            const thermals = this.environment.generateThermals(weather, 0.7);
-
-            // Add environment elements using theme (same as original)
-            await this.environment.addCloudsFromTheme(thermals, theme);
-            this.environment.addTrees(terrain);
-
-            // Create Lanzarote towns using the predefined configuration
-            await this.environment.addTownsFromConfig(LANZAROTE_TOWNS, terrain);
-
-            logger.info('Adding boats to the scene...');
-            this.environment.addMixedBoats(water);
-            logger.info('Boats added. Component stats:', this.environment.getComponentStats());
-
-            // Make environment available for theme switching
-            options.environment = this.environment;
-
-            // Add birds
-            await this.environment.addBirds(birdPath);
-
-            // Add Cessna if enabled
-            if (SHOW_CESSNA) {
-                await this.addCessna(scene, terrain);
-            }
-
-            // Setup camera animation sequence - ONLY DIFFERENCE from original
-            this.setupCameraAnimation(camera, controls, renderer, scene);
-
-            // Restore canvas visibility after everything is loaded
-            canvas.style.opacity = originalOpacity || '1';
-
-            this.isLoaded = true;
-            logger.info(
-                `✅ ${this.config.name} loaded successfully with ${this.paragliderMeshes.length} paragliders`
-            );
-        } catch (error) {
-            this.handleError(error as Error, 'load');
-            throw error;
-        }
-    }
-
-    private setupCameraAnimation(
-        camera: THREE.Camera,
-        controls: OrbitControls,
-        renderer: THREE.WebGLRenderer,
-        scene: THREE.Scene
-    ): void {
-        const pgPos = paraglidersVoxel[0]?.position.clone() || new THREE.Vector3();
-        const boatCenterPosition = new THREE.Vector3(
-            ANIMATION_CONFIG.positions.boatCenter.x,
-            ANIMATION_CONFIG.positions.boatCenter.y,
-            ANIMATION_CONFIG.positions.boatCenter.z
-        );
-
-        // Start animation loop
-        this.startAnimationLoop(renderer, scene, camera, controls);
-
-        // Check if animation is enabled
-        if (!ANIMATION_CONFIG.enableAnimation) {
-            // Static mode
-            setupStaticCamera(camera, controls, boatCenterPosition);
-            return;
-        }
-
-        // Animation mode
-        this.animationCleanup = setupAnimatedCamera(camera, controls, pgPos, {
-            onAnimationStart: () => {
-                this.isAnimating = true;
-            },
-            onAnimationComplete: () => {
-                this.isAnimating = false;
-            },
-        }).cleanup;
-    }
-
-    /**
-     * Add Cessna aircraft with waypoint-based flight behavior
-     */
-    private async addCessna(scene: THREE.Scene, terrain: THREE.Mesh): Promise<void> {
-        try {
-            const cessna = new Cessna({
-                bodyColor: cessnaConfig.bodyColor,
-                wingColor: cessnaConfig.wingColor,
-                propellerColor: cessnaConfig.propellerColor,
-                windowColor: cessnaConfig.windowColor,
-                stripeColor: cessnaConfig.stripeColor,
-                scale: cessnaConfig.scale,
-                castShadow: true,
-            });
-
-            this.cessnaMesh = await cessna.load();
-            this.cessnaMesh.position.copy(cessnaConfig.position);
-            scene.add(this.cessnaMesh);
-
-            // Create engine flying behavior with waypoints
-            this.cessnaFlyingBehavior = new EngineFlyingBehavior({
-                speed: cessnaConfig.speed,
-                turnSpeed: cessnaConfig.turnSpeed,
-                flightRadius: cessnaConfig.flightRadius,
-                cruiseAltitude: cessnaConfig.position.y,
-                minHeight: cessnaConfig.minHeight,
-                maxHeight: cessnaConfig.maxHeight,
-                terrainClearance: 100,
-                lookAheadDistance: 200,
-                centerPoint: cessnaConfig.position,
-                obstacleAvoidanceDistance: cessnaConfig.obstacleAvoidanceDistance,
-                autoStart: true,
-                faceDirection: true,
-                forwardAxis: cessnaConfig.forwardAxis,
-                debugVectors: false,
-                pattern: cessnaConfig.flightPattern,
-                waypoints: cessnaConfig.waypoints,
-                waypointTension: cessnaConfig.waypointTension,
-                waypointLoop: cessnaConfig.waypointLoop,
-            });
-
-            this.cessnaFlyingBehavior.attachTo(this.cessnaMesh);
-            this.cessnaFlyingBehavior.setTerrain(terrain);
-
-            logger.info('✈️  Cessna added with waypoint flight behavior');
-        } catch (error) {
-            logger.error('Failed to add Cessna:', error);
-        }
-    }
-
-    private startAnimationLoop(
-        renderer: THREE.WebGLRenderer,
-        scene: THREE.Scene,
-        camera: THREE.Camera,
-        controls: OrbitControls
-    ): void {
-        const startTime = Date.now();
-
-        const animate = () => {
-            try {
-                this.updatePerformance();
-
-                // Update environment components (boats, etc.)
-                if (this.environment) {
-                    const deltaTime = 0.016; // Assume 60fps for deltaTime
-                    this.environment.update(deltaTime);
-                }
-
-                // Apply floating motion
-                applyFloatingMotion(camera, startTime, this.isAnimating);
-
-                OrbitControlsHelper.update(controls);
-                renderer.render(scene, camera);
-                this.animationId = requestAnimationFrame(animate);
-            } catch (error) {
-                this.handleError(error as Error, 'animation loop');
-            }
-        };
-        animate();
-    }
-
-    public override dispose(): void {
-        logger.debug(`🧹 Disposing ${this.config.name}`);
-
-        if (this.animationId) {
-            cancelAnimationFrame(this.animationId);
-            this.animationId = undefined;
-        }
-
-        if (this.animationCleanup) {
-            this.animationCleanup();
-            this.animationCleanup = undefined;
-        }
-
+    // Animation mode
+    this.animationCleanup = setupAnimatedCamera(camera, controls, pgPos, {
+      onAnimationStart: () => {
+        this.isAnimating = true;
+      },
+      onAnimationComplete: () => {
         this.isAnimating = false;
+      },
+    }).cleanup;
+  }
 
-        // Dispose Cessna flying behavior
-        if (this.cessnaFlyingBehavior) {
-            this.cessnaFlyingBehavior.dispose();
-            this.cessnaFlyingBehavior = undefined;
-        }
-        this.cessnaMesh = undefined;
+  /**
+   * Add Cessna aircraft with waypoint-based flight behavior
+   */
+  private async addCessna(scene: THREE.Scene, terrain: THREE.Mesh): Promise<void> {
+    try {
+      const cessna = new Cessna({
+        bodyColor: cessnaConfig.bodyColor,
+        wingColor: cessnaConfig.wingColor,
+        propellerColor: cessnaConfig.propellerColor,
+        windowColor: cessnaConfig.windowColor,
+        stripeColor: cessnaConfig.stripeColor,
+        scale: cessnaConfig.scale,
+        castShadow: true,
+      });
 
-        this.paragliderMeshes.forEach(mesh => {
-            mesh.traverse(child => {
-                if (child instanceof THREE.Mesh) {
-                    if (child.geometry) child.geometry.dispose();
-                    if (child.material) {
-                        if (Array.isArray(child.material)) {
-                            child.material.forEach((material: THREE.Material) => material.dispose());
-                        } else {
-                            child.material.dispose();
-                        }
-                    }
-                }
-            });
-        });
-        this.paragliderMeshes.length = 0;
+      this.cessnaMesh = await cessna.load();
+      this.cessnaMesh.position.copy(cessnaConfig.position);
+      scene.add(this.cessnaMesh);
 
-        if (this.environment) {
-            this.environment = undefined;
-        }
+      // Create engine flying behavior with waypoints
+      this.cessnaFlyingBehavior = new EngineFlyingBehavior({
+        speed: cessnaConfig.speed,
+        turnSpeed: cessnaConfig.turnSpeed,
+        flightRadius: cessnaConfig.flightRadius,
+        cruiseAltitude: cessnaConfig.position.y,
+        minHeight: cessnaConfig.minHeight,
+        maxHeight: cessnaConfig.maxHeight,
+        terrainClearance: 100,
+        lookAheadDistance: 200,
+        centerPoint: cessnaConfig.position,
+        obstacleAvoidanceDistance: cessnaConfig.obstacleAvoidanceDistance,
+        autoStart: true,
+        faceDirection: true,
+        forwardAxis: cessnaConfig.forwardAxis,
+        debugVectors: false,
+        pattern: cessnaConfig.flightPattern,
+        waypoints: cessnaConfig.waypoints,
+        waypointTension: cessnaConfig.waypointTension,
+        waypointLoop: cessnaConfig.waypointLoop,
+      });
 
-        super.dispose();
+      this.cessnaFlyingBehavior.attachTo(this.cessnaMesh);
+      this.cessnaFlyingBehavior.setTerrain(terrain);
+
+      logger.info('✈️  Cessna added with waypoint flight behavior');
+    } catch (error) {
+      logger.error('Failed to add Cessna:', error);
     }
+  }
+
+  private startAnimationLoop(
+    renderer: THREE.WebGLRenderer,
+    scene: THREE.Scene,
+    camera: THREE.Camera,
+    controls: OrbitControls
+  ): void {
+    const startTime = Date.now();
+
+    const animate = () => {
+      try {
+        this.updatePerformance();
+
+        // Update environment components (boats, etc.)
+        if (this.environment) {
+          const deltaTime = 0.016; // Assume 60fps for deltaTime
+          this.environment.update(deltaTime);
+        }
+
+        // Apply floating motion
+        applyFloatingMotion(camera, startTime, this.isAnimating);
+
+        OrbitControlsHelper.update(controls);
+        this.renderFrame(renderer, scene, camera);
+        this.animationId = requestAnimationFrame(animate);
+      } catch (error) {
+        this.handleError(error as Error, 'animation loop');
+      }
+    };
+    animate();
+  }
+
+  public override dispose(): void {
+    logger.debug(`🧹 Disposing ${this.config.name}`);
+
+    if (this.animationId) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = undefined;
+    }
+
+    if (this.animationCleanup) {
+      this.animationCleanup();
+      this.animationCleanup = undefined;
+    }
+
+    this.isAnimating = false;
+
+    // Dispose Cessna flying behavior
+    if (this.cessnaFlyingBehavior) {
+      this.cessnaFlyingBehavior.dispose();
+      this.cessnaFlyingBehavior = undefined;
+    }
+    this.cessnaMesh = undefined;
+
+    this.paragliderMeshes.forEach(mesh => {
+      mesh.traverse(child => {
+        if (child instanceof THREE.Mesh) {
+          if (child.geometry) child.geometry.dispose();
+          if (child.material) {
+            if (Array.isArray(child.material)) {
+              child.material.forEach((material: THREE.Material) => material.dispose());
+            } else {
+              child.material.dispose();
+            }
+          }
+        }
+      });
+    });
+    this.paragliderMeshes.length = 0;
+
+    if (this.environment) {
+      this.environment = undefined;
+    }
+
+    super.dispose();
+  }
 }
 
 // Create singleton instance
@@ -308,15 +298,15 @@ const boatsAnimationApp = new BoatsAnimationApp();
 
 // Export in the expected format
 const BoatsAnimation = {
-    load: async (options: StoryOptions) => {
-        return boatsAnimationApp.load(options);
-    },
-    dispose: () => {
-        return boatsAnimationApp.dispose();
-    },
-    getAppInfo: () => {
-        return boatsAnimationApp.getAppInfo();
-    },
+  load: async (options: StoryOptions) => {
+    return boatsAnimationApp.load(options);
+  },
+  dispose: () => {
+    return boatsAnimationApp.dispose();
+  },
+  getAppInfo: () => {
+    return boatsAnimationApp.getAppInfo();
+  },
 };
 
 export default BoatsAnimation;

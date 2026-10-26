@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { Water as WaterEffect } from 'three/examples/jsm/objects/Water';
 import { logger } from '../../utils/logger';
+import { OceanMaterial } from '../../rendering/OceanMaterial';
 
 export type WaterOptions = {
   size: number;
@@ -14,14 +15,12 @@ export default class Water {
     this.options = options;
   }
 
-  load(sunPosition: THREE.Vector3) {
+  load(_sunPosition: THREE.Vector3) {
     logger.debug('Loading water component');
     const waterGeometry = new THREE.PlaneGeometry(this.options.size, this.options.size);
-    const mat = new THREE.MeshLambertMaterial({ color: 0x000511 });
-    mat.transparent = true;
-    // mat.opacity = 0.6;
-    this.waterMesh = new THREE.Mesh(waterGeometry, mat);
+    this.waterMesh = new THREE.Mesh(waterGeometry, new OceanMaterial());
     this.waterMesh.rotation.x = -Math.PI / 2;
+    this.waterMesh.receiveShadow = true;
     return this.waterMesh;
   }
 
@@ -42,7 +41,12 @@ export default class Water {
   /**
    * Apply water theme settings to the water mesh
    */
-  applyTheme(waterTheme: { color?: string; opacity?: number; roughness?: number; animated?: boolean }) {
+  applyTheme(waterTheme: {
+    color?: string;
+    opacity?: number;
+    roughness?: number;
+    animated?: boolean;
+  }) {
     if (!this.waterMesh || !this.waterMesh.material) return;
 
     const material = this.waterMesh.material as THREE.MeshLambertMaterial;

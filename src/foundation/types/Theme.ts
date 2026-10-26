@@ -58,14 +58,14 @@ export interface SatelliteImageryConfig {
 
 export interface TerrainTheme {
   style:
-  | 'volcanic'
-  | 'arctic'
-  | 'desert'
-  | 'alien'
-  | 'crystal'
-  | 'wireframe'
-  | 'plasma'
-  | 'satellite';
+    | 'volcanic'
+    | 'arctic'
+    | 'desert'
+    | 'alien'
+    | 'crystal'
+    | 'wireframe'
+    | 'plasma'
+    | 'satellite';
   satelliteImagery?: SatelliteImageryConfig;
   customMaterial?: {
     color?: string;
@@ -80,11 +80,19 @@ export interface TerrainTheme {
     displacementBias?: number;
     visible?: boolean;
   };
+  // A solid surface drawn just behind the wireframe so the island reads as ground.
+  underlay?: {
+    color: string; // The bulk of the island
+    peakColor?: string; // Blended in with altitude
+    sandColor?: string; // Beaches, the last few metres above the sea
+  };
 }
 
 export interface WaterTheme {
   color: string;
   opacity: number;
+  shallowColor?: string; // Turquoise over the sand near the beaches
+  shallowDistance?: number; // How far out the shallows reach, in world units
   roughness?: number;
   animated?: boolean;
 }
@@ -102,6 +110,24 @@ export interface AmbientTheme {
   shadowIntensity?: number;
 }
 
+/**
+ * The filmic look of the terrain scenes (see RenderPipeline). Every field is optional;
+ * missing ones fall back to DEFAULT_ATMOSPHERE.
+ */
+export interface AtmosphereTheme {
+  exposure?: number; // Tone-mapping exposure
+  fogColor?: string; // Defaults to the sky's own colour at the horizon
+  fogDensity?: number; // FogExp2 density; ~0.00003 fades the far end of the island
+  bloomStrength?: number;
+  bloomRadius?: number;
+  bloomThreshold?: number; // Linear brightness above which pixels glow
+  vignette?: number; // 0 = none
+  saturation?: number; // 1 = unchanged
+  contrast?: number; // 1 = unchanged
+  warmth?: number; // Warm highlights / cool shadows, 0 = neutral
+  cloudShadow?: number; // Strength of drifting cloud shadows, 0-1
+}
+
 export interface Theme {
   id: string;
   name: string;
@@ -114,6 +140,7 @@ export interface Theme {
   water: WaterTheme;
   weather: WeatherTheme;
   ambient?: AmbientTheme;
+  atmosphere?: AtmosphereTheme;
 }
 
 // Helper type for partial theme overrides

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import Environment, { LANZAROTE_TOWNS } from '../../shared/env/environment';
+import Environment, { FAMARA_GULL_FLOCKS, LANZAROTE_TOWNS } from '../../shared/env/environment';
 import { StoryOptions } from '../../shared/types';
 import { getDefaultTheme } from '../../foundation/themes';
 import { ThemeEngine } from '../../foundation/systems/ThemeEngine';
@@ -93,9 +93,13 @@ class FamaraApp extends TerrainBase {
       // Add environment elements using theme
       await this.environment.addCloudsFromTheme(thermals, theme);
 
-
       // Create Lanzarote towns using ULTRA_LOW LOD for optimal performance
-      await this.environment.addTownsFromConfig(LANZAROTE_TOWNS, terrain, true, LevelOfDetail.ULTRA_LOW);
+      await this.environment.addTownsFromConfig(
+        LANZAROTE_TOWNS,
+        terrain,
+        true,
+        LevelOfDetail.ULTRA_LOW
+      );
 
       this.environment.addBoats(water);
 
@@ -103,14 +107,7 @@ class FamaraApp extends TerrainBase {
       options.environment = this.environment;
 
       // Add birds for more natural ambiance
-      const birdPath = [
-        new THREE.Vector3(5000, 1000, 0),
-        new THREE.Vector3(6000, 1100, -500),
-        new THREE.Vector3(7000, 1200, -1000),
-        new THREE.Vector3(8000, 1000, -500),
-        new THREE.Vector3(7000, 900, 0),
-      ];
-      await this.environment.addBirds(birdPath);
+      this.environment.addGulls(FAMARA_GULL_FLOCKS);
 
       // Add Cessna with engine-powered flight behavior
       await this.addCessna(scene, terrain);

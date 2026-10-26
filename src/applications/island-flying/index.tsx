@@ -9,12 +9,12 @@ import {
   Jet,
   Airliner,
 } from '../../foundation/components/vehicles';
-import {
-  FlyingBehavior,
-  FlightPattern,
-} from '../../foundation/systems/behaviors/FlyingBehavior';
+import { FlyingBehavior, FlightPattern } from '../../foundation/systems/behaviors/FlyingBehavior';
 import { SmokeTrail } from '../../foundation/components/effects/SmokeTrail';
-import { CameraTargetController, CameraMode } from '../../foundation/systems/scene/CameraTargetController';
+import {
+  CameraTargetController,
+  CameraMode,
+} from '../../foundation/systems/scene/CameraTargetController';
 import { createCameraTargetUI } from '../../foundation/components/ui/CameraTargetUI';
 
 interface FlyingVehicle {
@@ -84,11 +84,7 @@ class IslandFlyingApp extends TerrainBase {
       controls.minPolarAngle = Math.PI * 0.1;
 
       // Center on island
-      if (options.sky) {
-        controls.target = options.sky.getSunPosition();
-      } else {
-        controls.target.set(0, 0, 0);
-      }
+      controls.target.set(0, 0, 0);
       controls.update();
 
       // Add flying vehicles
@@ -110,9 +106,7 @@ class IslandFlyingApp extends TerrainBase {
       this.startAnimationLoop(renderer, scene, controls);
 
       this.isLoaded = true;
-      logger.info(
-        `✅ ${this.config.name} loaded with ${this.vehicles.length} flying vehicles`
-      );
+      logger.info(`✅ ${this.config.name} loaded with ${this.vehicles.length} flying vehicles`);
     } catch (error) {
       this.handleError(error as Error, 'load');
       throw error;
@@ -426,7 +420,7 @@ class IslandFlyingApp extends TerrainBase {
 
         // Render with camera controller
         if (this.targetController) {
-          renderer.render(scene, this.targetController);
+          this.renderFrame(renderer, scene, this.targetController);
         }
 
         this.animationId = requestAnimationFrame(animate);

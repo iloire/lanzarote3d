@@ -17,7 +17,7 @@ import {
 import { Car } from '../../foundation/components/vehicles/ground/Car';
 import { AutonomousCar } from '../../foundation/components/vehicles/ground/AutonomousCar';
 import { MovementPattern } from '../../foundation/systems/behaviors/MovingBehavior';
-import FlockBirds from '../../foundation/components/wildlife/FlockBirds';
+import { Gulls, GullFlock } from '../../foundation/components/wildlife/Gulls';
 import GuiHelper from '../../foundation/utils/gui';
 import { Hangglider as HangGlider } from '../../foundation/components/vehicles';
 import { addMeshAroundArea } from './mesh-utils';
@@ -93,8 +93,15 @@ export const LANZAROTE_TOWNS: TownConfig[] = [
   { position: TOWN_LA_CALETA, houseCount: 40, formation: 'rural' },
 ];
 
+/** Gulls circling in the thermals off Famara, at about the pilots' height. */
+export const FAMARA_GULL_FLOCKS: GullFlock[] = [
+  { center: new THREE.Vector3(7127, 980, -1405), count: 14 },
+  { center: new THREE.Vector3(6650, 860, -380), count: 8 },
+  { center: new THREE.Vector3(5600, 1050, -650), count: 10 },
+];
+
 class Environment {
-  birds!: FlockBirds;
+  gulls?: Gulls;
   hg!: HangGlider;
   thermals: Thermal[] = [];
   cloudInstances: Clouds[] = [];
@@ -109,25 +116,13 @@ class Environment {
     this.carGroupCreator = new CarGroupCreator(scene, this.componentRegistry);
   }
 
-  updateWrapSpeed(wrapSpeed: number) {
-    this.birds && this.birds.updateWrapSpeed(wrapSpeed);
-    // Note: Hangglider no longer extends AutoFlier, so updateWrapSpeed removed
-    // Use FlyingBehavior composition for autonomous flight instead
-  }
-
-  async addBirds(path: THREE.Vector3[], gui?: any) {
-    // Create birds with optimized flight parameters for the environment
-    this.birds = new FlockBirds({
-      speed: 2,
-      arrivalThreshold: 20,
-      smoothRotation: true,
-      rotationSpeed: 0.06,
-      forwardAxis: 'z', // Back to Z axis but will fix orientation in rotation logic
-      scale: 1,
-      animationSpeed: 1.2,
-    });
-    const birdsMesh = await this.birds.load(path, gui);
-    this.scene.add(birdsMesh);
+  /**
+   * Flocks of gulls circling in thermals: one instanced draw call for all of them.
+   */
+  addGulls(flocks: GullFlock[]): Gulls {
+    this.gulls = new Gulls(flocks);
+    this.scene.add(this.gulls.mesh);
+    return this.gulls;
   }
 
   async addHangGlider(path: THREE.Vector3[], gui?: any) {
@@ -347,14 +342,20 @@ class Environment {
                 const oldObjY = obj.position.y;
 
                 // Get terrain height at THIS object's actual position
-                const objTerrainHeight = this.getTerrainHeight(obj.position.x, obj.position.z, terrain);
+                const objTerrainHeight = this.getTerrainHeight(
+                  obj.position.x,
+                  obj.position.z,
+                  terrain
+                );
 
                 if (!isNaN(objTerrainHeight)) {
                   // Position at terrain height with small offset for land plots
                   obj.position.y = objTerrainHeight + (isLandPlot ? 0.1 : 0);
 
                   if (isLandPlot) {
-                    logger.debug(`Land plot adapted: ${oldObjY.toFixed(1)} → ${obj.position.y.toFixed(1)} (terrain: ${objTerrainHeight.toFixed(1)})`);
+                    logger.debug(
+                      `Land plot adapted: ${oldObjY.toFixed(1)} → ${obj.position.y.toFixed(1)} (terrain: ${objTerrainHeight.toFixed(1)})`
+                    );
                   }
                 }
               }
@@ -392,10 +393,12 @@ class Environment {
       formation = 'random',
       spacing = 1.0,
       lowPoly = true,
-      levelOfDetail
+      levelOfDetail,
     } = options || {};
 
-    logger.info(`🏘️ Creating ${formation} neighborhood with ${houseCount} houses, LOD: ${levelOfDetail ?? 'legacy'}`);
+    logger.info(
+      `🏘️ Creating ${formation} neighborhood with ${houseCount} houses, LOD: ${levelOfDetail ?? 'legacy'}`
+    );
 
     return this.createHouseNeighborhood(
       center,
@@ -444,7 +447,6 @@ class Environment {
 
     return allHouses;
   }
-
 
   async addStones(terrain: THREE.Mesh) {
     const stone = await this.componentRegistry.register(new Stone({}), 'stone');
@@ -813,10 +815,8 @@ class Environment {
     });
     this.cloudInstances.length = 0;
 
-    // Dispose birds and hang glider if they exist
-    if (this.birds && this.birds.dispose) {
-      this.birds.dispose();
-    }
+    // Dispose gulls and hang glider if they exist
+    this.gulls?.dispose();
 
     if (this.hg && this.hg.dispose) {
       this.hg.dispose();

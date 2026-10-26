@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import Environment, {
+  FAMARA_GULL_FLOCKS,
   LANZAROTE_TOWNS,
   TOWN_TEGUISE_TOP,
   TOWN_FAMARA,
@@ -14,7 +15,10 @@ import { TerrainBase } from '../../shared/TerrainBase';
 import { OrbitControlsHelper } from '../../foundation/utils/OrbitControlsHelper';
 import { getAppConfig } from '../../config/app-registry';
 import { FlyingBehavior } from '../../foundation/systems/behaviors/FlyingBehavior';
-import { CameraTargetController, CameraMode } from '../../foundation/systems/scene/CameraTargetController';
+import {
+  CameraTargetController,
+  CameraMode,
+} from '../../foundation/systems/scene/CameraTargetController';
 import { createCameraTargetUI } from '../../foundation/components/ui/CameraTargetUI';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { ProceduralRoad } from '../../foundation/components/scenery';
@@ -30,18 +34,9 @@ import {
   SHOW_HERCULES,
   SHOW_CAMERA_TARGET_UI,
   ANIMATION_DURATION_MS,
-  birdPath,
 } from './config';
-import {
-  loadParagliders,
-  loadHangglider,
-  loadCessna,
-  loadHercules,
-} from './vehicleLoader';
-import {
-  setupCameraAnimation,
-  applyFloatingMotion,
-} from './cameraAnimation';
+import { loadParagliders, loadHangglider, loadCessna, loadHercules } from './vehicleLoader';
+import { setupCameraAnimation, applyFloatingMotion } from './cameraAnimation';
 
 /**
  * Animation Demo - Restored original animation with voxel paraglider
@@ -133,7 +128,7 @@ class AnimationApp extends TerrainBase {
         this.handleError.bind(this),
         ANIMATION_DURATION_MS
       );
-      this.paragliderMeshes = paragliderResults.map((r) => r.mesh);
+      this.paragliderMeshes = paragliderResults.map(r => r.mesh);
 
       // Load hangglider if enabled
       if (SHOW_HANGGLIDER) {
@@ -189,7 +184,12 @@ class AnimationApp extends TerrainBase {
       // this.environment.addTrees(terrain);
 
       // Create Lanzarote towns using ULTRA_LOW LOD for optimal animation performance
-      await this.environment.addTownsFromConfig(LANZAROTE_TOWNS, terrain, true, LevelOfDetail.ULTRA_LOW);
+      await this.environment.addTownsFromConfig(
+        LANZAROTE_TOWNS,
+        terrain,
+        true,
+        LevelOfDetail.ULTRA_LOW
+      );
 
       // Create individual roads connecting each pair of towns
       // Roads stop ~200 units before town centers to avoid passing through houses
@@ -209,7 +209,7 @@ class AnimationApp extends TerrainBase {
         showEdgeLines: true,
         heightOffset: 5,
         opacity: 0.2,
-        transparent: true
+        transparent: true,
       });
 
       // Road 2: Famara to Noruegos (via intermediate point)
@@ -227,7 +227,7 @@ class AnimationApp extends TerrainBase {
         showEdgeLines: true,
         heightOffset: 5,
         opacity: 0.2,
-        transparent: true
+        transparent: true,
       });
 
       // Road 3: La Caleta to Famara
@@ -244,7 +244,7 @@ class AnimationApp extends TerrainBase {
         showEdgeLines: true,
         heightOffset: 5,
         opacity: 0.2,
-        transparent: true
+        transparent: true,
       });
 
       // Road 4: Teguise to Teguise Top
@@ -261,7 +261,7 @@ class AnimationApp extends TerrainBase {
         showEdgeLines: true,
         heightOffset: 5,
         opacity: 0.2,
-        transparent: true
+        transparent: true,
       });
 
       // Load and add all roads to scene
@@ -283,9 +283,8 @@ class AnimationApp extends TerrainBase {
       // Make environment available for theme switching
       options.environment = this.environment;
 
-      // Add birds with shared animation loop
-      await this.environment.addBirds(birdPath);
-      // Birds animation will be driven from main loop via environment.updateBirds()
+      // Gulls circling in the thermals (animated on the GPU)
+      this.environment.addGulls(FAMARA_GULL_FLOCKS);
 
       // Setup Camera Target Controller if enabled
       if (SHOW_CAMERA_TARGET_UI) {
@@ -330,7 +329,8 @@ class AnimationApp extends TerrainBase {
       canvas.style.opacity = originalOpacity || '1';
 
       this.isLoaded = true;
-      const vehicleCount = this.paragliderMeshes.length +
+      const vehicleCount =
+        this.paragliderMeshes.length +
         (this.hanggliderMesh ? 1 : 0) +
         (this.cessnaMesh ? 1 : 0) +
         (this.herculesMesh ? 1 : 0);
@@ -399,11 +399,6 @@ class AnimationApp extends TerrainBase {
         // Update controls for damping to work
         OrbitControlsHelper.update(controls);
 
-        // PERFORMANCE FIX: Update birds in main loop instead of separate RAF
-        if (this.environment && this.environment.birds) {
-          this.environment.birds.update(deltaTime);
-        }
-
         // Update smoke trails
         if (this.cessnaSmokeTrail && this.cessnaMesh && this.cessnaFlyingBehavior) {
           const velocity = this.cessnaFlyingBehavior.getVelocity();
@@ -431,8 +426,9 @@ class AnimationApp extends TerrainBase {
 
         // Render with appropriate camera
         // Use original camera during initial animation, then switch to controller if available
-        const renderCamera = (this.isAnimating || !this.targetController) ? camera : this.targetController;
-        renderer.render(scene, renderCamera);
+        const renderCamera =
+          this.isAnimating || !this.targetController ? camera : this.targetController;
+        this.renderFrame(renderer, scene, renderCamera);
         this.animationId = requestAnimationFrame(animate);
       } catch (error) {
         this.handleError(error as Error, 'animation loop');

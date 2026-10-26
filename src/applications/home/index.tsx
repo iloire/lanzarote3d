@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import Environment, {
+  FAMARA_GULL_FLOCKS,
   LANZAROTE_TOWNS,
   TOWN_TEGUISE_TOP,
   TOWN_FAMARA,
@@ -14,7 +15,10 @@ import { TerrainBase } from '../../shared/TerrainBase';
 import { OrbitControlsHelper } from '../../foundation/utils/OrbitControlsHelper';
 import { getAppConfig } from '../../config/app-registry';
 import { FlyingBehavior } from '../../foundation/systems/behaviors/FlyingBehavior';
-import { CameraTargetController, CameraMode } from '../../foundation/systems/scene/CameraTargetController';
+import {
+  CameraTargetController,
+  CameraMode,
+} from '../../foundation/systems/scene/CameraTargetController';
 import { createCameraTargetUI } from '../../foundation/components/ui/CameraTargetUI';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { ProceduralRoad } from '../../foundation/components/scenery';
@@ -30,19 +34,10 @@ import {
   SHOW_HERCULES,
   SHOW_CAMERA_TARGET_UI,
   ANIMATION_DURATION_MS,
-  birdPath,
   isEmbedded,
 } from './config';
-import {
-  loadParagliders,
-  loadHangglider,
-  loadCessna,
-  loadHercules,
-} from './vehicleLoader';
-import {
-  setupCameraAnimation,
-  applyFloatingMotion,
-} from './cameraAnimation';
+import { loadParagliders, loadHangglider, loadCessna, loadHercules } from './vehicleLoader';
+import { setupCameraAnimation, applyFloatingMotion } from './cameraAnimation';
 import { createTitleOverlay } from './TitleOverlay';
 
 /**
@@ -119,7 +114,7 @@ class HomeApp extends TerrainBase {
         this.handleError.bind(this),
         ANIMATION_DURATION_MS
       );
-      this.paragliderMeshes = paragliderResults.map((r) => r.mesh);
+      this.paragliderMeshes = paragliderResults.map(r => r.mesh);
 
       if (SHOW_HANGGLIDER) {
         const hanggliderResult = await loadHangglider(
@@ -168,7 +163,12 @@ class HomeApp extends TerrainBase {
 
       await this.environment.addCloudsFromTheme(thermals, theme);
 
-      await this.environment.addTownsFromConfig(LANZAROTE_TOWNS, terrain, true, LevelOfDetail.ULTRA_LOW);
+      await this.environment.addTownsFromConfig(
+        LANZAROTE_TOWNS,
+        terrain,
+        true,
+        LevelOfDetail.ULTRA_LOW
+      );
 
       const roadOffset = 200;
 
@@ -185,7 +185,7 @@ class HomeApp extends TerrainBase {
         showEdgeLines: true,
         heightOffset: 5,
         opacity: 0.2,
-        transparent: true
+        transparent: true,
       });
 
       const road2 = new ProceduralRoad({
@@ -202,7 +202,7 @@ class HomeApp extends TerrainBase {
         showEdgeLines: true,
         heightOffset: 5,
         opacity: 0.2,
-        transparent: true
+        transparent: true,
       });
 
       const road3 = new ProceduralRoad({
@@ -218,7 +218,7 @@ class HomeApp extends TerrainBase {
         showEdgeLines: true,
         heightOffset: 5,
         opacity: 0.2,
-        transparent: true
+        transparent: true,
       });
 
       const road4 = new ProceduralRoad({
@@ -234,7 +234,7 @@ class HomeApp extends TerrainBase {
         showEdgeLines: true,
         heightOffset: 5,
         opacity: 0.2,
-        transparent: true
+        transparent: true,
       });
 
       const [roadMesh1, roadMesh2, roadMesh3, roadMesh4] = await Promise.all([
@@ -254,7 +254,7 @@ class HomeApp extends TerrainBase {
 
       options.environment = this.environment;
 
-      await this.environment.addBirds(birdPath);
+      this.environment.addGulls(FAMARA_GULL_FLOCKS);
 
       if (SHOW_CAMERA_TARGET_UI) {
         this.targetController = new CameraTargetController(
@@ -297,13 +297,12 @@ class HomeApp extends TerrainBase {
       canvas.style.opacity = originalOpacity || '1';
 
       this.isLoaded = true;
-      const vehicleCount = this.paragliderMeshes.length +
+      const vehicleCount =
+        this.paragliderMeshes.length +
         (this.hanggliderMesh ? 1 : 0) +
         (this.cessnaMesh ? 1 : 0) +
         (this.herculesMesh ? 1 : 0);
-      logger.info(
-        `${this.config.name} loaded successfully with ${vehicleCount} flying vehicles`
-      );
+      logger.info(`${this.config.name} loaded successfully with ${vehicleCount} flying vehicles`);
     } catch (error) {
       this.handleError(error as Error, 'load');
       throw error;
@@ -359,10 +358,6 @@ class HomeApp extends TerrainBase {
 
         OrbitControlsHelper.update(controls);
 
-        if (this.environment && this.environment.birds) {
-          this.environment.birds.update(deltaTime);
-        }
-
         if (this.cessnaSmokeTrail && this.cessnaMesh && this.cessnaFlyingBehavior) {
           const velocity = this.cessnaFlyingBehavior.getVelocity();
           const enginePos = new THREE.Vector3();
@@ -385,8 +380,9 @@ class HomeApp extends TerrainBase {
           this.herculesSmokeTrail.update(deltaTime, enginePos, velocity);
         }
 
-        const renderCamera = (this.isAnimating || !this.targetController) ? camera : this.targetController;
-        renderer.render(scene, renderCamera);
+        const renderCamera =
+          this.isAnimating || !this.targetController ? camera : this.targetController;
+        this.renderFrame(renderer, scene, renderCamera);
         this.animationId = requestAnimationFrame(animate);
       } catch (error) {
         this.handleError(error as Error, 'animation loop');

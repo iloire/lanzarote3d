@@ -204,15 +204,6 @@ export const SHOW_CAMERA_TARGET_UI = false;
 // Animation configuration
 export const ANIMATION_DURATION_MS = 6000; // 6 seconds
 
-// Bird path configuration
-export const birdPath = [
-  new THREE.Vector3(5000, 1000, 0),
-  new THREE.Vector3(6000, 1100, -500),
-  new THREE.Vector3(7000, 1200, -1000),
-  new THREE.Vector3(8000, 1000, -500),
-  new THREE.Vector3(7000, 900, 0),
-];
-
 /**
  * True when the scene is shown inside another page (?embed=1), e.g. the
  * lanzaroteparagliding.com landing page. The host page has its own title, so
