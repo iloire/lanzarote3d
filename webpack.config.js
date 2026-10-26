@@ -9,8 +9,8 @@ const Dotenv = require("dotenv-webpack");
  * Simple rules:
  * - All apps except "hidden" are built
  * - HTML filename comes from route (e.g., /boats-animation → boats-animation.html)
- * - Bundle name comes from app key (e.g., boatsanimation → boatsanimation.bundle.js)
- * - Every app shares the ./src/index.tsx entry, which picks the story from the URL
+ * - Every page loads the same main bundle (./src/index.tsx), which picks the story from the URL
+ *   and lazy-loads that app's chunk
  * - Apps are sorted by priority field
  */
 
@@ -24,7 +24,6 @@ const showcaseApps = Object.entries(appsConfig.apps)
     title: `Lanzarote - ${app.name}`,
     description: app.description || 'Experience paragliding in Lanzarote!. Tandem flights, pilot guides, real time wind conditions and more!',
     filename: app.route.replace(/^\//, '') + '.html',
-    entry: './src/index.tsx'
   }))
   .sort((a, b) => {
     const priorityA = appsConfig.apps[a.name]?.priority || 999;
@@ -37,14 +36,8 @@ console.log(`Building ${showcaseApps.length} applications...`);
 // Export for use in other files
 module.exports.showcaseApps = showcaseApps;
 
-// Generate webpack entry points
-const entries = showcaseApps.reduce((acc, app) => {
-  acc[app.name] = app.entry;
-  return acc;
-}, {});
-
 module.exports = {
-  entry: entries,
+  entry: { main: './src/index.tsx' },
   output: {
     path: path.join(__dirname, "/dist"),
     filename: "[name].bundle.js",
@@ -129,7 +122,7 @@ module.exports = {
     ...showcaseApps.map(app =>
       new HtmlWebpackPlugin({
         template: path.join(__dirname, 'src/templates/showcase.html'),
-        chunks: [app.name],
+        chunks: ['main'],
         filename: app.filename,
         title: app.title,
         description: app.description,
@@ -140,7 +133,7 @@ module.exports = {
     // Create index.html that loads the home app
     new HtmlWebpackPlugin({
       template: path.join(__dirname, 'src/templates/showcase.html'),
-      chunks: ['home'],
+      chunks: ['main'],
       filename: 'index.html',
       title: 'Lanzarote Paragliding',
       description: 'Experience paragliding in Lanzarote with all your senses!. Tandem flights, pilot guides, real time wind conditions and more!',

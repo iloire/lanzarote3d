@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-26 23:08 UTC
+
+### Changed
+- **Every page loads one shared `main.bundle.js`** instead of its own copy: the five app entries all pointed at `src/index.tsx`, so the build emitted five identical ~1 MB bundles and a visitor moving between scenes downloaded the same code again under another name. Each scene's code still loads as its own lazy chunk
+
 ## 2026-10-26 23:01 UTC
 
 ### Changed
