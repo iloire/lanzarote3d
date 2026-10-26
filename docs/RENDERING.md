@@ -19,8 +19,10 @@ other island demos) draws through one shared pipeline. The code lives in
 3. **Output**: ACES filmic tone mapping and conversion to sRGB.
 4. **Grade**: saturation, contrast, warm highlights against cool shadows, and a vignette.
 
-The whole pipeline costs about 0.8 ms a frame on the home scene. Pass `?fx=0` to render
-without it, to compare looks and frame times.
+The post passes themselves are cheap; what costs is multisampling. MSAA makes every
+primitive in the scene pass expensive, which is why the wireframe is shaded rather than
+drawn as lines (see the ground, below). Pass `?fx=0` to render without the pipeline, to
+compare looks and frame times.
 
 Every frame the pipeline also:
 
@@ -63,17 +65,28 @@ patch adds:
 
 ## The ground (`Island.ts`)
 
-The wireframe is drawn over a solid **underlay** that shares its geometry. The underlay is
-tinted from sand at the waterline, through the main ground colour, to the peak colour at
-altitude, and it receives the sun's shadows. Each of its vertices is pushed 0.3 % further
-along its view ray, so the lines always draw in front of it without moving on screen.
-Polygon offset can't do this, because the logarithmic depth buffer overrides it.
+The ground is a solid **underlay** that also draws the wireframe. It's tinted from sand at
+the waterline, through the main ground colour, to the peak colour at altitude, and it
+casts and receives the sun's shadows.
 
-Over the underlay the wireframe is translucent, and it fades with distance: from
-`lineOpacity` near the camera to `farLineOpacity` between 600 m and 9 km. Without the fade,
-the far end of the mesh is so dense that solid lines merge into a white sheet. The lines'
-brightness is capped (`LINE_MAX_BRIGHTNESS`) before they blend. They're lit several times
-past white before tone mapping, and at that brightness any opacity still blends to white.
+The lines are shaded into the underlay rather than drawn as GL lines. The underlay keeps
+its own non-indexed copy of the island in which every triangle corner carries a barycentric
+coordinate, so the fragment shader knows its distance to each edge in pixels (`fwidth`) and
+mixes in the theme's line colour and emissive over about one anti-aliased pixel. The island's
+own line material is hidden while an underlay is shown; raycasts still use its indexed mesh
+and BVH. Drawn as GL lines, 350k segments went into the 4× multisampled scene target, and
+on an M3 Pro (1440×900) the frame took 74 ms looking at the whole island and 36–44 ms
+closer in; shaded, it takes about 22 ms from every view.
+
+The lines fade with distance: from `lineOpacity` near the camera to `farLineOpacity` between
+600 m and 9 km. Without the fade, the far end of the mesh is so dense that the lines merge
+into a sheet.
+
+Themes without an underlay (satellite) still draw the GL lines, with the same fade and
+their brightness capped (`LINE_MAX_BRIGHTNESS`) before they blend. Each underlay vertex is
+pushed 0.3 % further along its view ray, so roads and anything else drawn on the ground stay
+in front of it. Polygon offset can't do this, because the logarithmic depth buffer overrides
+it.
 
 ## Life
 

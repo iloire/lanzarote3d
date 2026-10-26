@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## [Unreleased] - 2026-10-26 20:41 UTC
+
+### Performance
+- **Island scenes render 1.6–3.3× faster**: the wireframe is shaded into the solid ground from barycentric coordinates instead of being drawn as 350k GL line segments into the 4× multisampled scene target. On the home scene (M3 Pro, 1440×900) a frame took 74 ms looking at the whole island and 36–44 ms closer in; it now takes about 22 ms from every view, and the lines look the same. The solid ground now casts the sun's shadow instead of the lines
+
 ## [Unreleased] - 2026-10-26 20:31 UTC
 
 ### Changed
