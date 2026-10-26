@@ -4,8 +4,6 @@
   theme fields that tune them.
 - **[COMPONENT_COMPOSITION.md](COMPONENT_COMPOSITION.md)**: how the models are built, from the
   component base classes to the two ways of building a component.
-- **[../external-embed/README.md](../external-embed/README.md)**: embedding the Famara animation as a
-  website background.
 
 The scenes are in `src/applications/<story>/`, registered in `src/config/apps.json`, and picked with
 `?story=`: `home`, `famara-animation`, `boats-animation`, `famara` and `town`.

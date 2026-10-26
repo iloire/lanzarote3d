@@ -17,9 +17,8 @@ declare global {
 THREE.Cache.enabled = true;
 
 /**
- * Extract story name from the page
+ * Extract story name from URL
  * - From query parameter: ?story=boats-animation
- * - From the root element: <div id="root" data-story="famara-animation"> (embeds)
  * - From HTML path: /boats-animation.html -> boats-animation
  * - From root path or index: home
  * - Default: home
@@ -29,9 +28,6 @@ function getStoryName(): string {
   const queryStory = params.get('story');
 
   if (queryStory) return queryStory;
-
-  const rootStory = document.getElementById('root')?.dataset.story;
-  if (rootStory) return rootStory;
 
   const currentPath = window.location.pathname;
 

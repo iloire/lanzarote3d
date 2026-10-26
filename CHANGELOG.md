@@ -2,6 +2,12 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## [Unreleased] - 2026-10-26 22:33 UTC
+
+### Removed
+- **The external embed package** (`external-embed/`, the `build-external-embed` / `run-external-embed` scripts, and the `data-story` root attribute that only embeds used). If a site still needs it, restore it from commit eda71a8
+- **`archive/video/`**, which held one old video
+
 ## [Unreleased] - 2026-10-26 22:27 UTC
 
 ### Removed

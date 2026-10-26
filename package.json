@@ -57,8 +57,6 @@
     "start": "npm run clean && webpack serve --mode development --open --hot",
     "dev": "npm run start",
     "build": "npm run clean && webpack --mode production",
-    "build-external-embed": "webpack --mode production && rm -rf external-embed/dist && mkdir -p external-embed/dist && cp dist/*.bundle.js dist/*.glb dist/*.LICENSE.txt external-embed/dist/ 2>/dev/null || true && cp -r dist/assets external-embed/dist/ && npx serve external-embed -p 8081",
-    "run-external-embed": "npx serve external-embed -p 8081",
     "pre-build": "npm run lint:check && npm run format:check",
     "pre-deploy": "npm run lint:check && npm run format:check",
     "test": "jest --watch",

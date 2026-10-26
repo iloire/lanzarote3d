@@ -7,5 +7,4 @@ built/*
 .DS_Store
 TODO.md
 .next
-external-embed/dist
 .claude/settings.local.json
