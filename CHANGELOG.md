@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## [Unreleased] - 2026-10-26 21:17 UTC
+
+### Changed
+- **Ivan flies the Home, Famara and Boats scenes** instead of Adri: red and white helmet, blue jacket, black pod. His model is now exported from his own `.vox` (3d-characters `tools/vox-to-obj.mjs`); the old `ivan.obj` was a copy of Adri's, so the `IVAN` character used to render as Adri. He's exported in Adri's frame, so he sits in the harness exactly where she did, and his `defaultScale` now matches hers (0.01)
+
 ## [Unreleased] - 2026-10-26 21:04 UTC
 
 ### Performance

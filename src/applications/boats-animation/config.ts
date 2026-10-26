@@ -188,7 +188,7 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
         numeroCajones: 35,
       },
       pilot: {
-        characterType: CharacterType.ADRI,
+        characterType: CharacterType.IVAN,
       },
     },
     position: new THREE.Vector3(6897, 920, -705),

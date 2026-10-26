@@ -97,13 +97,15 @@ export class CharacterRegistry {
     this.registerCharacter({
       id: CharacterType.IVAN,
       name: 'Ivan',
+      // Exported in Adri's frame (3d-characters tools/vox-to-obj.mjs --frame), so the two
+      // swap without moving the pilot in the harness.
       description: 'Personal voxel character - Ivan variant',
       assets: {
         objFile: '/assets/foundation/models/characters/ivan/ivan.obj',
         textureFile: '/assets/foundation/models/characters/ivan/ivan.png',
         thumbnailFile: '/assets/foundation/models/characters/ivan/ivan.png',
       },
-      defaultScale: 0.001,
+      defaultScale: 0.01,
       defaultMaterialOptions: {
         roughness: 0.7,
         metalness: 0.15,
