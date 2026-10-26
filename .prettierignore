@@ -7,3 +7,4 @@ src/lib/
 coverage/
 .git/
 .DS_Store
+package-lock.json

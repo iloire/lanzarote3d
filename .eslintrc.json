@@ -21,14 +21,8 @@
     "sourceType": "module",
     "project": "./tsconfig.json"
   },
-  "plugins": [
-    "react",
-    "react-hooks",
-    "@typescript-eslint",
-    "prettier"
-  ],
+  "plugins": ["react", "react-hooks", "@typescript-eslint"],
   "rules": {
-    "prettier/prettier": "error",
     "@typescript-eslint/no-unused-vars": [
       "error",
       {
@@ -55,11 +49,5 @@
       "version": "detect"
     }
   },
-  "ignorePatterns": [
-    "node_modules/",
-    "dist/",
-    "built/",
-    "src/lib/",
-    "*.js"
-  ]
+  "ignorePatterns": ["node_modules/", "dist/", "built/", "src/lib/", "*.js"]
 }

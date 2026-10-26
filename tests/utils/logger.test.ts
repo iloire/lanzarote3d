@@ -70,11 +70,8 @@ describe('Logger', () => {
     logger.setLevel(LogLevel.DEBUG);
     logger.info('Message with', 'multiple', 'arguments', { key: 'value' });
 
-    expect(mockInfo).toHaveBeenCalledWith(
-      '[INFO] Message with',
-      'multiple',
-      'arguments',
-      { key: 'value' }
-    );
+    expect(mockInfo).toHaveBeenCalledWith('[INFO] Message with', 'multiple', 'arguments', {
+      key: 'value',
+    });
   });
 });

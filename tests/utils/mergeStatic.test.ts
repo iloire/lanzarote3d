@@ -26,7 +26,9 @@ describe('mergeStaticMeshes', () => {
     expect(house.parent).toBeNull();
     expect(scene.children).toEqual(merged);
 
-    const redMesh = merged.find(m => (m.material as THREE.MeshLambertMaterial).color.getHex() === 0xff0000)!;
+    const redMesh = merged.find(
+      m => (m.material as THREE.MeshLambertMaterial).color.getHex() === 0xff0000
+    )!;
     expect(redMesh.geometry.getAttribute('position').count).toBe(36 * 2);
     expect(redMesh.castShadow).toBe(true);
 

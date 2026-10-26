@@ -1,7 +1,7 @@
-const path = require("path");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const CopyWebpackPlugin = require("copy-webpack-plugin");
-const Dotenv = require("dotenv-webpack");
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const Dotenv = require('dotenv-webpack');
 
 /**
  * Build configuration from apps.json
@@ -22,7 +22,9 @@ const showcaseApps = Object.entries(appsConfig.apps)
   .map(([appKey, app]) => ({
     name: appKey,
     title: `Lanzarote - ${app.name}`,
-    description: app.description || 'Experience paragliding in Lanzarote!. Tandem flights, pilot guides, real time wind conditions and more!',
+    description:
+      app.description ||
+      'Experience paragliding in Lanzarote!. Tandem flights, pilot guides, real time wind conditions and more!',
     filename: app.route.replace(/^\//, '') + '.html',
   }))
   .sort((a, b) => {
@@ -36,12 +38,12 @@ console.log(`Building ${showcaseApps.length} applications...`);
 module.exports = {
   entry: { main: './src/index.tsx' },
   output: {
-    path: path.join(__dirname, "/dist"),
-    filename: "[name].bundle.js",
+    path: path.join(__dirname, '/dist'),
+    filename: '[name].bundle.js',
   },
   externals: {
-    glStats: "glStats",
-    threeStats: "threeStats",
+    glStats: 'glStats',
+    threeStats: 'threeStats',
   },
   devServer: {
     port: 8080,
@@ -59,52 +61,53 @@ module.exports = {
     rules: [
       {
         test: /\.tsx?$/,
-        loader: "ts-loader",
+        loader: 'ts-loader',
         exclude: /node_modules/,
       },
       {
         test: /\.(png|jpg|mp4)$/,
-        type: "asset/resource",
+        type: 'asset/resource',
         generator: {
-          filename: "images/[hash][ext]",
+          filename: 'images/[hash][ext]',
         },
       },
       {
         test: /\.(glb|gltf)$/,
-        type: "asset/resource",
+        type: 'asset/resource',
       },
       {
         test: /\.obj$/,
-        type: "asset/resource",
+        type: 'asset/resource',
       },
       {
         test: /\.css$/,
-        use: ["style-loader", "css-loader"],
+        use: ['style-loader', 'css-loader'],
       },
       {
         // Exclude HTML and MD files from being processed as modules
         // But not the showcase template which is used by HtmlWebpackPlugin
         test: /\.(html|md)$/,
         exclude: /src\/templates\/showcase\.html/,
-        type: "asset/resource",
+        type: 'asset/resource',
       },
     ],
   },
   resolve: {
-    extensions: [".tsx", ".ts", ".js", ".jsx"],
+    extensions: ['.tsx', '.ts', '.js', '.jsx'],
   },
   plugins: [
     // Generate HTML plugins dynamically for each app
-    ...showcaseApps.map(app =>
-      new HtmlWebpackPlugin({
-        template: path.join(__dirname, 'src/templates/showcase.html'),
-        chunks: ['main'],
-        filename: app.filename,
-        title: app.title,
-        description: app.description,
-        inject: 'body',
-        minify: false
-      })
+    ...showcaseApps.map(
+      app =>
+        new HtmlWebpackPlugin({
+          template: path.join(__dirname, 'src/templates/showcase.html'),
+          chunks: ['main'],
+          filename: app.filename,
+          title: app.title,
+          description: app.description,
+          inject: 'body',
+          minify: false,
+        })
     ),
     // Create index.html that loads the home app
     new HtmlWebpackPlugin({
@@ -112,9 +115,10 @@ module.exports = {
       chunks: ['main'],
       filename: 'index.html',
       title: 'Lanzarote Paragliding',
-      description: 'Experience paragliding in Lanzarote with all your senses!. Tandem flights, pilot guides, real time wind conditions and more!',
+      description:
+        'Experience paragliding in Lanzarote with all your senses!. Tandem flights, pilot guides, real time wind conditions and more!',
       inject: 'body',
-      minify: false
+      minify: false,
     }),
     // Copy assets folder to dist for production deployment
     new CopyWebpackPlugin({
@@ -142,4 +146,4 @@ module.exports = {
       systemvars: true, // Also load system env vars
     }),
   ],
-}; 
+};

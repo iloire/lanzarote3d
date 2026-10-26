@@ -2,6 +2,14 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-26 23:24 UTC
+
+### Changed
+- **Prettier is checked once, by Prettier**: `eslint-plugin-prettier` is gone, so lint no longer reports formatting a second time as errors; `npm run format` / `format:check` now cover `tests/`, the root config files and the CI workflow as well as `src/`, and those files are formatted. `package-lock.json` is ignored
+
+### Fixed
+- **The boats and famara animation files follow the Prettier style** — four were committed unformatted — and `loadParagliders` no longer takes an `animationDurationMs` it never read, the one lint error on master
+
 ## 2026-10-26 23:16 UTC
 
 ### Changed

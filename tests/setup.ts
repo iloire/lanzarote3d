@@ -19,7 +19,7 @@ jest.mock('three', () => {
 
 // Mock WebGL context
 Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
-  value: jest.fn().mockImplementation((type) => {
+  value: jest.fn().mockImplementation(type => {
     if (type === 'webgl' || type === 'webgl2') {
       return {
         // Mock WebGL context methods
@@ -37,10 +37,7 @@ Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
 const originalError = console.error;
 beforeAll(() => {
   console.error = (...args) => {
-    if (
-      typeof args[0] === 'string' &&
-      args[0].includes('Warning: ReactDOM.render is deprecated')
-    ) {
+    if (typeof args[0] === 'string' && args[0].includes('Warning: ReactDOM.render is deprecated')) {
       return;
     }
     originalError.call(console, ...args);
