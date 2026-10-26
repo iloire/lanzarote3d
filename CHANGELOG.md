@@ -2,6 +2,12 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-26 23:25 UTC
+
+### Changed
+- **Paraglider wings have a real paraglider shape**: the canopy is lofted through cambered airfoil ribs on an arc that stays flat in the middle and curls down at the tips, with an elliptical planform, a swept leading edge, billowing cells and dark inlets. `wingColor2`, set per pilot but never drawn, now colours the wingtips. Lines cascade from A, B and C rows into junctions and risers, and the brakes fan from the outer trailing edge to the pilot's hands. The old wing was a lopsided staircase of boxes with six lines a side
+- **Removed the paraglider brake controls** (`ParagliderVoxel.left()`/`right()`, `Glider.breakLeft()`…) and the unused glider options (`breakColor`, `lineFrontColor`, `lineBackColor`, `carabinersSeparationMM`, `bandLength`): nothing called them since the flyable game went
+
 ## 2026-10-26 23:24 UTC
 
 ### Added

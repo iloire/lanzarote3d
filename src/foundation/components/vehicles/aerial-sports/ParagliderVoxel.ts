@@ -49,11 +49,10 @@ export class ParagliderVoxel extends SimpleThreeComponent {
 
     const options = this.options as ParagliderVoxelOptions;
 
-    // Create and load glider wing
+    // Glider wing, hung from the pilot's carabiners
     this.glider = new Glider(options.glider);
     const wing = await this.glider.load();
-    wing.translateY(-300);
-    wing.translateX(300);
+    wing.position.set(300, 100, 0);
     group.add(wing);
 
     // Create voxel pilot
@@ -71,34 +70,6 @@ export class ParagliderVoxel extends SimpleThreeComponent {
     group.rotation.y = Math.PI / 2;
 
     return group;
-  }
-
-  /**
-   * Control methods - delegate to glider for brake inputs.
-   * These methods are called by ParagliderInputController.
-   */
-  public left(): void {
-    if (this.glider) {
-      this.glider.breakLeft();
-    }
-  }
-
-  public right(): void {
-    if (this.glider) {
-      this.glider.breakRight();
-    }
-  }
-
-  public leftRelease(): void {
-    if (this.glider) {
-      this.glider.handsUp();
-    }
-  }
-
-  public rightRelease(): void {
-    if (this.glider) {
-      this.glider.handsUp();
-    }
   }
 
   public override validate(): string[] {
