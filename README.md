@@ -34,8 +34,10 @@ npm run test:ci    # Jest
 
 ## Deploying
 
-Production is an S3 bucket (`lanzaroteparagliding-placeholder`) behind CloudFront, deployed with
-the AWS CLI's `lanzaroteparagliding` profile:
+Production is [3d.lanzaroteparagliding.com](https://3d.lanzaroteparagliding.com): an S3 bucket
+(`lanzaroteparagliding-placeholder`) behind CloudFront, deployed with the AWS CLI's
+`lanzaroteparagliding` profile. The lanzaroteparagliding.com landing page embeds the home scene with
+`?embed=1`, which hides the title overlay.
 
 ```bash
 brew install awscli                                  # once

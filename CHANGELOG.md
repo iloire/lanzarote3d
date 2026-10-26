@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## [Unreleased] - 2026-10-26 22:40 UTC
+
+### Fixed
+- **The sitemap and robots.txt pointed crawlers at lanzaroteparagliding.com**, but they are served from 3d.lanzaroteparagliding.com, where this project is deployed. Every URL now uses the subdomain, matching the canonical and og tags. The README names the production domain and the landing page's `?embed=1` embed
+
 ## [Unreleased] - 2026-10-26 22:33 UTC
 
 ### Removed
