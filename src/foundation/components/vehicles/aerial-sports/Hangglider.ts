@@ -1,40 +1,41 @@
 import * as THREE from 'three';
 import { SimpleThreeComponent, SimpleComponentOptions } from '../../base/SimpleThreeComponent';
 import { ComponentMetadata } from '../../base/IThreeComponent';
-import { Pilot, type PilotOptions } from '../../characters/Pilot';
+import { resourceManager } from '../../../systems/ResourceManager';
 import HangGliderWing from '../components/HangGliderWing';
 
 export interface HanggliderOptions extends SimpleComponentOptions {
-  pilotOptions?: PilotOptions;
-  wingColor?: string;
-  wingspan?: number;
+  sailColor?: string;
+  harnessColor?: string;
+  helmetColor?: string;
   scale?: number;
 }
 
+/** The pilot lies prone this far below the hang point, in metres */
+const PILOT_DEPTH = 1.25;
+
 /**
- * Hangglider - combines wing and pilot into a single aircraft
+ * Hangglider - a flex wing with its pilot prone in a pod harness, hands on the basebar.
+ * Nose points along +X, in metres.
  *
- * It overrides createObject (SimpleThreeComponent) to compose its async
- * sub-components (HangGliderWing + Pilot).
- *
+ * It overrides createObject (SimpleThreeComponent) to compose the async wing component.
  * See docs/COMPONENT_COMPOSITION.md for architecture details.
  */
 export class Hangglider extends SimpleThreeComponent {
   private wing?: HangGliderWing;
-  private pilot?: Pilot;
-  private pilotMesh?: THREE.Object3D;
 
   constructor(options: HanggliderOptions = {}) {
     const metadata: ComponentMetadata = {
       name: 'Hangglider',
-      version: '2.0.0',
-      description: 'Recreational hangglider with pilot in prone flying position',
+      version: '3.0.0',
+      description: 'Flex wing hang glider with pilot in prone flying position',
       tags: ['vehicle', 'aircraft', 'hangglider', 'aerial-sports', 'composite'],
     };
 
     super(metadata, {
-      wingColor: '#FF6B35', // Orange
-      wingspan: 100,
+      sailColor: '#FF6B35',
+      harnessColor: '#2B3A55',
+      helmetColor: '#F2F2F2',
       scale: 1,
       ...options,
     });
@@ -45,53 +46,70 @@ export class Hangglider extends SimpleThreeComponent {
     return new THREE.BoxGeometry(1, 1, 1);
   }
 
-  /**
-   * Override createObject to compose async sub-components, the standard
-   * approach for vehicles that combine multiple loadable components.
-   */
   protected override async createObject(): Promise<THREE.Object3D> {
     const group = new THREE.Group();
     group.name = 'Hangglider';
 
     const options = this.options as HanggliderOptions;
 
-    // Create and load wing component
-    this.wing = new HangGliderWing({
-      wingColor: options.wingColor,
-      wingspan: options.wingspan,
-    });
-    const wingMesh = await this.wing.load();
-    wingMesh.position.y = 10;
-    wingMesh.position.x = -40;
-    group.add(wingMesh);
+    this.wing = new HangGliderWing({ sailColor: options.sailColor });
+    group.add(await this.wing.load());
+    group.add(this.createPilot(options));
 
-    // Create and load pilot component
-    this.pilot = new Pilot({
-      castShadow: this.options.castShadow,
-      receiveShadow: this.options.receiveShadow,
-      ...options.pilotOptions,
-    });
-    this.pilotMesh = await this.pilot.load();
-    const pilotScale = 0.03;
-    this.pilotMesh.scale.set(pilotScale, pilotScale, pilotScale);
-    this.pilotMesh.position.x = -5;
-    this.pilotMesh.position.z = -0.4;
-    this.pilotMesh.rotateY(Math.PI / 2);
-    group.add(this.pilotMesh);
-
-    // Rotate the entire hangglider model 90 degrees to the left + 180 degrees (total 270 degrees)
-    group.rotateY(-Math.PI / 2 + Math.PI);
-
-    // Apply scale
     const scale = options.scale || 1;
-    if (scale !== 1) {
-      group.scale.set(scale, scale, scale);
-    }
+    group.scale.setScalar(scale);
 
-    // Apply shadow settings via helper method from base class
     this.applyShadows(group);
 
     return group;
+  }
+
+  private material(color: string | undefined): THREE.Material {
+    return resourceManager.getOrCreateMaterial(
+      `hangglider_pilot_${color}`,
+      () => new THREE.MeshStandardMaterial({ color, roughness: 0.8 })
+    );
+  }
+
+  /** Pod harness, helmet and arms reaching forward to the basebar */
+  private createPilot(options: HanggliderOptions): THREE.Group {
+    const pilot = new THREE.Group();
+    pilot.name = 'pilot';
+    const harness = this.material(options.harnessColor);
+
+    const pod = new THREE.Mesh(new THREE.CapsuleGeometry(0.2, 1.35, 4, 10), harness);
+    pod.rotation.z = Math.PI / 2;
+    pod.position.set(-0.2, -PILOT_DEPTH, 0);
+    pilot.add(pod);
+
+    const helmet = new THREE.Mesh(
+      new THREE.SphereGeometry(0.14, 12, 10),
+      this.material(options.helmetColor)
+    );
+    helmet.position.set(0.72, -PILOT_DEPTH + 0.06, 0);
+    pilot.add(helmet);
+
+    // Hang strap from the keel down to the harness
+    const strap = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, PILOT_DEPTH), harness);
+    strap.position.set(0.15, -PILOT_DEPTH / 2, 0);
+    pilot.add(strap);
+
+    [-1, 1].forEach(sign => {
+      const shoulder = new THREE.Vector3(0.5, -PILOT_DEPTH + 0.05, sign * 0.17);
+      const hand = new THREE.Vector3(0.85, -1.6, sign * 0.4);
+      const arm = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.045, 0.05, shoulder.distanceTo(hand), 6),
+        harness
+      );
+      arm.position.copy(shoulder).lerp(hand, 0.5);
+      arm.quaternion.setFromUnitVectors(
+        new THREE.Vector3(0, 1, 0),
+        hand.clone().sub(shoulder).normalize()
+      );
+      pilot.add(arm);
+    });
+
+    return pilot;
   }
 
   public override validate(): string[] {
@@ -102,28 +120,12 @@ export class Hangglider extends SimpleThreeComponent {
       issues.push('Scale must be greater than 0');
     }
 
-    if (options.wingspan && options.wingspan <= 0) {
-      issues.push('Wingspan must be greater than 0');
-    }
-
     return issues;
   }
 
   public override dispose(): void {
-    // Dispose sub-components first
-    if (this.pilot) {
-      this.pilot.dispose();
-    }
-    if (this.wing) {
-      this.wing.dispose();
-    }
-
-    // Clear references
+    this.wing?.dispose();
     this.wing = undefined;
-    this.pilot = undefined;
-    this.pilotMesh = undefined;
-
-    // Call parent dispose
     super.dispose();
   }
 
@@ -132,12 +134,11 @@ export class Hangglider extends SimpleThreeComponent {
 
     return {
       name: 'Hangglider',
-      version: '2.0.0',
+      version: '3.0.0',
       type: 'vehicle',
       subtype: 'aircraft',
       category: 'aerial_sports',
-      wingColor: options.wingColor,
-      wingspan: options.wingspan,
+      sailColor: options.sailColor,
       scale: options.scale,
     };
   }

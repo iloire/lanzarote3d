@@ -82,49 +82,41 @@ export async function loadParagliders(
 }
 
 /**
- * Loads a hangglider vehicle with flying behavior
+ * Loads the hangglider on its raised copy of the ridge loop. It flies from the first frame
+ * and banks into turns like the paragliders.
  */
 export async function loadHangglider(
   scene: THREE.Scene,
   config: HanggliderConfig,
-  animationDurationMs: number,
   errorHandler: (error: Error, context: string) => void
 ): Promise<VehicleLoadResult | null> {
   try {
-    const hangglider = new Hangglider({ scale: config.scale });
-    const mesh = await hangglider.load();
-    mesh.position.copy(config.position);
-    scene.add(mesh);
+    const mesh = await new Hangglider({ scale: config.scale }).load();
+    // The model's nose points along +X; turn it to fly along -Z like the paragliders' rig
+    mesh.rotation.y = Math.PI / 2;
+
+    const rig = new THREE.Group();
+    rig.name = 'hangglider';
+    const body = new THREE.Group();
+    body.add(mesh);
+    rig.add(body);
+    scene.add(rig);
 
     const flyingBehavior = new FlyingBehavior({
-      pattern: config.flightPattern,
+      pattern: FlightPattern.WAYPOINT,
       speed: config.speed,
-      turnSpeed: config.turnSpeed,
-      flightRadius: config.flightRadius,
-      returnDistance: config.returnDistance,
-      minHeight: config.minHeight,
-      maxHeight: config.maxHeight,
-      obstacleAvoidanceDistance: config.obstacleAvoidanceDistance,
-      centerPoint: config.position,
-      autoStart: true,
-      faceDirection: true,
-      forwardAxis: config.forwardAxis,
+      turnSpeed: 1.0,
+      forwardAxis: '-z',
       debugVectors: DEBUG_VECTORS,
       waypoints: config.waypoints,
       waypointTension: config.waypointTension,
-      waypointLoop: config.waypointLoop,
+      waypointLoop: true,
     });
+    flyingBehavior.attachTo(rig);
+    flyingBehavior.snapToWaypointCurve();
+    flyingBehavior.start();
 
-    flyingBehavior.attachTo(mesh);
-
-    setTimeout(() => {
-      flyingBehavior.start();
-      logger.info('Flying behavior started for hangglider');
-    }, animationDurationMs + 2000);
-
-    logger.info('Hangglider loaded successfully with flying behavior');
-
-    return { mesh, flyingBehavior };
+    return { mesh: rig, flyingBehavior, motion: new ParagliderMotion(rig, body, config.speed) };
   } catch (error) {
     errorHandler(error as Error, 'loading hangglider');
     return null;

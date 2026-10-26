@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-26 23:36 UTC
+
+### Changed
+- **The hang glider is a real flex wing and flies in the home scene again**: a billowed delta sail with a dark leading edge band on swept leading edges, keel, crossbar, kingpost and a triangular control frame, braced by flying and landing wires, with the pilot prone in a pod harness and hands on the basebar. It is 10 m across like the paragliders; the old one was a straight extruded airfoil ten times their size. It flies the ridge loop raised 110 m and widened by a quarter, at twice the paragliders' speed, and banks into turns with them. Its config is just scale, speed and loop; the unused wing design types and wing options are gone
+
 ## 2026-10-26 23:25 UTC
 
 ### Added

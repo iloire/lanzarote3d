@@ -126,12 +126,12 @@ class HomeApp extends TerrainBase {
         const hanggliderResult = await loadHangglider(
           scene,
           hanggliderConfig,
-          ANIMATION_DURATION_MS,
           this.handleError.bind(this)
         );
         if (hanggliderResult) {
           this.hanggliderMesh = hanggliderResult.mesh;
           this.hanggliderFlyingBehavior = hanggliderResult.flyingBehavior;
+          if (hanggliderResult.motion) this.paragliderMotions.push(hanggliderResult.motion);
         }
       }
 

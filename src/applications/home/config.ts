@@ -12,20 +12,11 @@ export type ParagliderVoxelConfig = {
 };
 
 export type HanggliderConfig = {
-  position: THREE.Vector3;
   scale: number;
-  flightPattern: FlightPattern;
   speed: number;
-  turnSpeed: number;
-  flightRadius: number;
-  returnDistance: number;
-  minHeight: number;
-  maxHeight: number;
-  obstacleAvoidanceDistance: number;
-  forwardAxis: 'x' | 'y' | 'z' | '-x' | '-y' | '-z';
-  waypoints?: THREE.Vector3[];
-  waypointTension?: number;
-  waypointLoop?: boolean;
+  /** The loop it flies: the ridge loop raised and widened, so it soars above the paragliders */
+  waypoints: THREE.Vector3[];
+  waypointTension: number;
 };
 
 export type CessnaConfig = {
@@ -147,31 +138,27 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
   },
 ];
 
+/** Raises the ridge loop by `rise` and widens it about its centre by `widen` */
+function liftLoop(rise: number, widen: number): THREE.Vector3[] {
+  const centre = RIDGE_LOOP.reduce((sum, p) => sum.add(p), new THREE.Vector3()).divideScalar(
+    RIDGE_LOOP.length
+  );
+  return RIDGE_LOOP.map(p =>
+    p
+      .clone()
+      .sub(centre)
+      .multiplyScalar(widen)
+      .add(centre)
+      .setY(p.y + rise)
+  );
+}
+
 export const hanggliderConfig: HanggliderConfig = {
-  position: new THREE.Vector3(4800, 950, -500),
   scale: 1.0,
-  flightPattern: FlightPattern.WAYPOINT,
-  speed: 25,
-  turnSpeed: 7.0,
-  flightRadius: 145,
-  returnDistance: 155,
-  minHeight: 900,
-  maxHeight: 1225,
-  obstacleAvoidanceDistance: 150,
-  forwardAxis: 'x',
-  waypoints: [
-    new THREE.Vector3(7679, 800, -5245),
-    new THREE.Vector3(8079, 820, -5445),
-    new THREE.Vector3(8079, 800, -5645),
-    new THREE.Vector3(7679, 780, -5645),
-    new THREE.Vector3(8079, 790, -6255),
-    new THREE.Vector3(8479, 800, -6455),
-    new THREE.Vector3(8479, 820, -6655),
-    new THREE.Vector3(8079, 800, -6655),
-    new THREE.Vector3(7879, 810, -6055),
-  ],
-  waypointTension: 0.7,
-  waypointLoop: true,
+  // A hang glider trims much faster than a paraglider
+  speed: PARAGLIDER_SPEED * 2,
+  waypoints: liftLoop(110, 1.25),
+  waypointTension: RIDGE_LOOP_TENSION,
 };
 
 export const cessnaConfig: CessnaConfig = {
@@ -235,7 +222,7 @@ export const herculesConfig: HerculesConfig = {
 };
 
 // Visibility flags for easy toggling
-export const SHOW_HANGGLIDER = false;
+export const SHOW_HANGGLIDER = true;
 export const SHOW_CESSNA = true;
 export const SHOW_HERCULES = true;
 
