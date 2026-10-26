@@ -80,7 +80,7 @@ localStorage.setItem('lanzarote_dev_mode', 'true')
 localStorage.removeItem('lanzarote_dev_mode')
 ```
 
-When dev mode is enabled in production, you'll see "🔓 Secret dev mode enabled" in the console and have access to all private apps (workshop-demo, location-editor, tile-debug, etc.).
+When dev mode is enabled in production, you'll see "🔓 Secret dev mode enabled" in the console and have access to all private apps (workshop-demo, flyzones, etc.).
 
 ### Show the sidebar on the home scene
 

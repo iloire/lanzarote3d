@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## [Unreleased] - 2026-10-26 21:36 UTC
+
+### Removed
+- **Stories `island-flying`, `paraglider-voxel`, `hangglider`, `animals`, `editor` and `tile-debug`**, which were rough demos and tools, not part of the project's focus on a few polished Lanzarote animations and models. Their only dependencies went with them: the Crow/Eagle/Vulture bird models, the unregistered flyzone visualizer, `FlyzoneAPI` and its types, the flyzone API docs, and `webpack.flyzones.js` (which pointed at a `src/apps/` folder that no longer exists). The Hangglider and ParagliderVoxel models stay because Home and Famara use them
+
 ## [Unreleased] - 2026-10-26 21:17 UTC
 
 ### Changed

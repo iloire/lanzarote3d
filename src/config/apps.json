@@ -19,15 +19,6 @@
       "visibility": "private",
       "priority": 1
     },
-    "editor": {
-      "name": "Flyzone Editor",
-      "description": "Advanced tool for creating and editing flyzone locations with terrain interaction",
-      "route": "/editor",
-      "category": "tool",
-      "requiresWebGL": true,
-      "visibility": "private",
-      "priority": 2
-    },
     "workshopdemo": {
       "name": "Workshop Demo",
       "description": "Dev environment for testing and showcasing individual 3D components",
@@ -54,17 +45,6 @@
       "requiresWebGL": true,
       "visibility": "private",
       "priority": 11
-    },
-    "tiledebug": {
-      "name": "Tile Debug Dashboard",
-      "description": "Debug tool showing satellite tile download process, calculations, and atlas creation for terrain mapping",
-      "entry": "./applications/tile-debug/entry.tsx",
-      "route": "/tile-debug",
-      "category": "tool",
-      "requiresWebGL": true,
-      "visibility": "private",
-      "priority": 11,
-      "webpackEntry": "./applications/tile-debug/entry.tsx"
     },
     "animation": {
       "name": "Famara animation",
@@ -112,24 +92,6 @@
       "visibility": "public",
       "priority": 3
     },
-    "islandflying": {
-      "name": "Island Flying",
-      "description": "Multiple aircraft flying freely around Lanzarote island with autonomous behavior",
-      "route": "/island-flying",
-      "category": "demo",
-      "requiresWebGL": true,
-      "visibility": "public",
-      "priority": 4
-    },
-    "paraglidervoxel": {
-      "name": "Voxel pilot",
-      "description": "Voxel-based paraglider component showcase",
-      "route": "/paraglider-voxel",
-      "category": "demo",
-      "requiresWebGL": true,
-      "visibility": "private",
-      "priority": 3
-    },
     "glider": {
       "name": "Glider",
       "description": "Legacy glider component demo showcasing traditional wing configurations",
@@ -138,15 +100,6 @@
       "requiresWebGL": true,
       "visibility": "private",
       "priority": 11
-    },
-    "hangglider": {
-      "name": "Hang Glider",
-      "description": "Hang glider component demo showcasing hang glider wing configurations",
-      "route": "/hangglider",
-      "category": "demo",
-      "requiresWebGL": true,
-      "visibility": "private",
-      "priority": 12
     },
     "pilot": {
       "name": "Pilot",
@@ -192,15 +145,6 @@
       "requiresWebGL": true,
       "visibility": "private",
       "priority": 20
-    },
-    "animals": {
-      "name": "Animals",
-      "description": "Showcase of bird species with realistic wing animations including Crow, Eagle, and Vulture",
-      "route": "/animals",
-      "category": "demo",
-      "requiresWebGL": true,
-      "visibility": "private",
-      "priority": 22
     },
     "cars": {
       "name": "Cars",

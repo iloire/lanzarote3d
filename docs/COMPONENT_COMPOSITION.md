@@ -718,7 +718,6 @@ constructor(options: MyOptions = {}) {
 ## Related Documentation
 
 - [TECHNICAL_DEBT.md](./TECHNICAL_DEBT.md) - Issue #4: Inconsistent Vehicle API Pattern
-- [API.md](./API.md) - Component API reference
 - [ARCHITECTURE.md](./ARCHITECTURE.md) - Overall architecture overview
 
 ---

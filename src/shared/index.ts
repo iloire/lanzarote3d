@@ -74,7 +74,7 @@ export async function loadApp(appKey: string, options: StoryOptions): Promise<vo
   let importPath: string;
 
   if (app.entry) {
-    // Custom entry specified (e.g., tile-debug with special structure)
+    // Custom entry specified (app lives outside the route-derived folder)
     importPath = app.entry
       .replace(/^\.\//, '../') // Convert ./applications/... to ../applications/...
       .replace(/\.(tsx?|jsx?)$/, ''); // Remove extension
