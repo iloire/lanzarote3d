@@ -69,6 +69,10 @@ altitude, and it receives the sun's shadows. Each of its vertices is pushed 0.3 
 along its view ray, so the lines always draw in front of it without moving on screen.
 Polygon offset can't do this, because the logarithmic depth buffer overrides it.
 
+Over the underlay the wireframe is translucent, and it fades with distance: from
+`lineOpacity` near the camera to `farLineOpacity` between 600 m and 9 km. Without the fade,
+the far end of the mesh is so dense that solid lines merge into a white sheet.
+
 ## Life
 
 `Gulls` (`components/wildlife/Gulls.ts`) puts flocks circling in thermals into one
@@ -99,7 +103,11 @@ water: {
   shallowDistance: 700,      // how far out the shallows reach (world units ≈ metres)
 },
 terrain: {
-  underlay: { color: '#34302d', peakColor: '#3f2f27', sandColor: '#b39668' },
+  underlay: {
+    color: '#34302d', peakColor: '#3f2f27', sandColor: '#b39668',
+    lineOpacity: 0.45,       // wireframe near the camera
+    farLineOpacity: 0.12,    // ...fading to this by 9 km
+  },
 },
 atmosphere: {                // defaults: DEFAULT_ATMOSPHERE in RenderPipeline.ts
   exposure: 0.72,

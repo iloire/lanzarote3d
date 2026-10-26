@@ -18,8 +18,38 @@ const loadFromBlenderModel = async (manager: THREE.LoadingManager) => {
     depthTest: true,
   });
   addCloudShadows(mesh.material);
+  addLineFade(mesh.material);
   mesh.geometry.boundsTree = new MeshBVH(mesh.geometry);
   return mesh;
+};
+
+// Distances (world units) over which the wireframe fades from near to far opacity.
+const LINE_FADE_START = 600;
+const LINE_FADE_END = 9000;
+
+/**
+ * Let the wireframe fade with distance. Far away the mesh is so dense that solid lines
+ * merge into a white sheet; over the underlay they can be translucent instead.
+ */
+const addLineFade = (material: THREE.Material): void => {
+  const fade = { uLineNear: { value: 1 }, uLineFar: { value: 1 } };
+  material.userData['lineFade'] = fade;
+  const previous = material.onBeforeCompile;
+  material.onBeforeCompile = (shader, renderer) => {
+    previous.call(material, shader, renderer);
+    Object.assign(shader.uniforms, fade);
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        '#include <common>',
+        '#include <common>\nuniform float uLineNear;\nuniform float uLineFar;'
+      )
+      .replace(
+        '#include <opaque_fragment>',
+        `diffuseColor.a *= mix(uLineNear, uLineFar,
+          smoothstep(${LINE_FADE_START.toFixed(1)}, ${LINE_FADE_END.toFixed(1)}, length(vLzWorld - cameraPosition)));
+        #include <opaque_fragment>`
+      );
+  };
 };
 
 /**
@@ -106,8 +136,6 @@ class Island {
       return;
     }
 
-    this.setUnderlay(terrainTheme.underlay);
-
     // Handle regular material themes
     const material = this.mesh.material as THREE.MeshStandardMaterial;
 
@@ -165,6 +193,8 @@ class Island {
       material.needsUpdate = true;
     }
 
+    this.setUnderlay(terrainTheme.underlay);
+
     logger.debug('Island terrain theme applied successfully');
   }
 
@@ -173,6 +203,14 @@ class Island {
    */
   private setUnderlay(underlay: TerrainTheme['underlay']): void {
     if (!this.mesh) return;
+    const lines = this.mesh.material as THREE.Material;
+    const fade = lines.userData['lineFade'];
+    if (fade) {
+      fade.uLineNear.value = underlay ? (underlay.lineOpacity ?? 0.45) : 1;
+      fade.uLineFar.value = underlay ? (underlay.farLineOpacity ?? 0.12) : 1;
+      // Translucent lines only make sense over the solid ground.
+      if (underlay) lines.transparent = true;
+    }
     if (!underlay) {
       if (this.underlay) {
         this.mesh.remove(this.underlay);
