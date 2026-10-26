@@ -5,7 +5,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ## 2026-10-26 23:42 UTC
 
 ### Changed
-- **The Cessna looks like a 172, still low poly**: a cowled nose with a spinner and a two-blade propeller, a cabin with a wraparound windscreen, side and rear windows, a high wing that tapers outboard and is braced by struts, a slim tailcone with the cheat line (`stripeColor`) running nose to tail, a swept fin with a dorsal fillet and a coloured cap, and fixed tricycle gear on spring legs with wheel fairings. Replaces a stack of boxes. It is one flat-shaded, vertex-coloured mesh, 660 triangles in 1 draw call where the old one had 1,148 in about 30. The same size as before: 9.6 long, 12 wide
+- **The Cessna looks like a 172, still low poly**: a cowled nose with a spinner and a two-blade propeller, a cabin with a wraparound windscreen, side and rear windows, a high wing that tapers outboard and is braced by struts, a slim tailcone with the cheat line (`stripeColor`) running nose to tail, a swept fin with a dorsal fillet and a coloured cap, and fixed tricycle gear on spring legs with wheel fairings. Replaces a stack of boxes. It is one flat-shaded, vertex-coloured mesh, 660 triangles in 1 draw call where the old one had 1,148 in about 30. It keeps its 12-unit span but is shorter, 9.6 long instead of 13, which matches a real 172
 - **The aircraft share one low-poly builder**: `vehicles/aircraft/lowPolyMesh.ts` does the lofting, the airfoil surfaces, struts, spinners and propellers, and holds the one shared material. The Hercules now uses it too and looks the same
 
 ## 2026-10-26 23:38 UTC
