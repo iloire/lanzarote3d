@@ -22,8 +22,8 @@ npm install
 npm run dev        # webpack dev server on http://localhost:8080, opens the home scene
 ```
 
-Scenes are picked with `?story=`: `home`, `famara-animation`, `boats-animation`, `famara` and
-`town`. Add `?fx=0` to render without post-processing, to
+Scenes are picked with `?story=`: `home`, `famara-animation`, `boats-animation`, `famara`,
+`town` and `models`. Add `?fx=0` to render without post-processing, to
 compare looks and frame times. Dev builds expose `window.__lz` for profiling (see RENDERING.md).
 
 ## Checking it
@@ -70,7 +70,7 @@ before deploying.
 ### Dev mode: every scene in the menu
 
 Production menus list only the public scenes, and the home scene hides its sidebar. Dev mode lists
-the private scenes too (`famara`, `town`) and shows the sidebar everywhere.
+the private scenes too (`famara`, `town`, `models`) and shows the sidebar everywhere.
 
 - **Turn on:** open any page with `?dev=1`, e.g. `https://3d.lanzaroteparagliding.com/?dev=1`
 - **Turn off:** `?dev=0`
@@ -81,6 +81,12 @@ followed by a reload; run them on the scene's own page, not on a page that embed
 
 At `localhost` the private scenes are always listed; home still hides its sidebar unless `?dev=1`.
 Private scenes also open directly without dev mode: `?story=famara`, `?story=town`.
+
+### Model viewer
+
+`?story=models` (Models in the dev menu) shows every model the scenes use, one at a time on a
+turntable, with its size and triangle count: pick one from the list, step with ← / →, space toggles
+the spin, `?model=<id>` links to one. A new model goes in `src/applications/models/catalog.ts`.
 
 To show the sidebar on home without listing private scenes:
 `localStorage.setItem('lanzarote_show_menu', 'true')` (remove the key to undo), then reload.

@@ -44,6 +44,15 @@
       "requiresWebGL": true,
       "visibility": "private",
       "priority": 19
+    },
+    "models": {
+      "name": "Models",
+      "description": "Every model of the scenes on a turntable, one at a time, with its size and triangle count",
+      "route": "/models",
+      "category": "demo",
+      "requiresWebGL": true,
+      "visibility": "private",
+      "priority": 20
     }
   }
 }

@@ -10,9 +10,12 @@ export interface GullsOptions {
   wingspan?: number; // World units; real gulls are ~1.3 m, drawn larger to read from afar
   minRadius?: number;
   maxRadius?: number;
+  /** Scales how far the birds of a flock scatter and drift up and down, 1 in the scenes */
+  spread?: number;
 }
 
-const DEFAULTS: Required<GullsOptions> = { wingspan: 6, minRadius: 40, maxRadius: 160 };
+const DEFAULTS: Required<GullsOptions> = { wingspan: 6, minRadius: 40, maxRadius: 160, spread: 1 };
+const DRIFT = 60; // how far a gull climbs and sinks round its thermal, at spread 1
 
 /**
  * Gulls circling in thermals, as they do over Famara on a good day. Every gull of every
@@ -30,7 +33,7 @@ export class Gulls {
     const total = flocks.reduce((n, f) => n + (f.count ?? 10), 0);
 
     const orbit = new Float32Array(total * 4);
-    const material = createGullMaterial();
+    const material = createGullMaterial(DRIFT * o.spread);
     this.mesh = new THREE.InstancedMesh(geometry, material, total);
     this.mesh.name = 'gulls';
     this.mesh.frustumCulled = false;
@@ -47,15 +50,21 @@ export class Gulls {
         const angularSpeed = (direction * 11) / radius;
         orbit.set([radius, angularSpeed, Math.random() * Math.PI * 2, Math.random()], i * 4);
         matrix.makeTranslation(
-          flock.center.x + (Math.random() - 0.5) * 60,
-          flock.center.y + (Math.random() - 0.5) * 120,
-          flock.center.z + (Math.random() - 0.5) * 60
+          flock.center.x + (Math.random() - 0.5) * 60 * o.spread,
+          flock.center.y + (Math.random() - 0.5) * 120 * o.spread,
+          flock.center.z + (Math.random() - 0.5) * 60 * o.spread
         );
         this.mesh.setMatrixAt(i, matrix);
       }
     }
     geometry.setAttribute('aOrbit', new THREE.InstancedBufferAttribute(orbit, 4));
     this.mesh.instanceMatrix.needsUpdate = true;
+
+    // The shader flies the birds round their circles, so the bounds have to include them
+    this.mesh.computeBoundingBox();
+    this.mesh.boundingBox?.expandByVector(
+      new THREE.Vector3(o.maxRadius, DRIFT * o.spread, o.maxRadius)
+    );
   }
 
   dispose(): void {
@@ -121,6 +130,7 @@ function createGullGeometry(span: number): THREE.BufferGeometry {
 
 const GULL_VERTEX_PARS = /* glsl */ `
   uniform float uTime;
+  uniform float uDrift;
   attribute vec4 aOrbit; // radius, angular speed (sign = turn direction), phase, random
   attribute float aWing;
 
@@ -146,10 +156,11 @@ const GULL_VERTEX_PARS = /* glsl */ `
   }
 `;
 
-function createGullMaterial(): THREE.MeshLambertMaterial {
+function createGullMaterial(drift: number): THREE.MeshLambertMaterial {
   const material = new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide });
   material.onBeforeCompile = shader => {
     shader.uniforms['uTime'] = sharedUniforms.uTime;
+    shader.uniforms['uDrift'] = { value: drift };
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', `#include <common>\n${GULL_VERTEX_PARS}`)
       .replace(
@@ -166,7 +177,7 @@ function createGullMaterial(): THREE.MeshLambertMaterial {
         float a = lzAngle();
         transformed += vec3(cos(a), 0.0, sin(a)) * aOrbit.x;
         // Climb slowly round the thermal and sink back, out of step with the others.
-        transformed.y += sin(uTime * 0.05 + aOrbit.w * 6.28) * 60.0;`
+        transformed.y += sin(uTime * 0.05 + aOrbit.w * 6.28) * uDrift;`
       );
   };
   material.customProgramCacheKey = () => 'lz-gulls';

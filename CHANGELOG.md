@@ -4,6 +4,10 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 
 ## 2026-10-26 23:25 UTC
 
+### Added
+- **Models scene** (`?story=models`, private, in the dev menu): every model the scenes place, one at a time on a turntable, framed to its size, with its dimensions and triangle count. Pick from the list or step with ← / →, space toggles the spin, and `?model=<id>` links straight to one. Paragliders, Cessna and Hercules come from the home scene's config, so they look as they do there; the catalog is `src/applications/models/catalog.ts`
+- **`Gulls` `spread` option** (default 1, unchanged in the scenes) scales how far a flock scatters and drifts, and the flock's bounding box now includes the circles the shader flies, so the viewer can frame it
+
 ### Changed
 - **Paraglider wings have a real paraglider shape**: the canopy is lofted through cambered airfoil ribs on an arc that stays flat in the middle and curls down at the tips, with an elliptical planform, a swept leading edge, billowing cells and dark inlets. `wingColor2`, set per pilot but never drawn, now colours the wingtips. Lines cascade from A, B and C rows into junctions and risers, and the brakes fan from the outer trailing edge to the pilot's hands. The old wing was a lopsided staircase of boxes with six lines a side
 - **Removed the paraglider brake controls** (`ParagliderVoxel.left()`/`right()`, `Glider.breakLeft()`…) and the unused glider options (`breakColor`, `lineFrontColor`, `lineBackColor`, `carabinersSeparationMM`, `bandLength`): nothing called them since the flyable game went
