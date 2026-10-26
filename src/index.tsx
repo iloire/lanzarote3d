@@ -45,19 +45,12 @@ function getStoryName(): string {
 // Initialize the app
 const storyName = getStoryName();
 initDevMode();
-const isDevMode = isDevModeEnabled();
 
 const rootElement = document.getElementById('root');
 if (rootElement && WebGL.isWebGLAvailable()) {
   const root = createRoot(rootElement);
   root.render(
-    <App
-      showAppSelection={true}
-      showPublic={true}
-      showDev={isDevMode}
-      showPrivate={isDevMode}
-      initialStory={storyName}
-    />
+    <App showAppSelection={true} showPrivate={isDevModeEnabled()} initialStory={storyName} />
   );
   logger.info(`${storyName} story started`);
 } else if (rootElement) {

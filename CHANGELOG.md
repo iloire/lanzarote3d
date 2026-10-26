@@ -2,6 +2,14 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-26 23:01 UTC
+
+### Changed
+- **The scene menu has two sections**: the public scenes, plus a "Private" section in dev mode. The always-empty Tools and private Experiences sections are gone, as are the duplicate `showDev`/`showPublic` props, the `tool` category and the unused `getAppsByCategory`/`getVisibleApps` registry helpers. Desktop and mobile layouts render the same section list
+
+### Fixed
+- **Home is listed first in the menu** — its priority 0 was treated as missing and sorted it last
+
 ## 2026-10-26 22:51 UTC
 
 ### Added

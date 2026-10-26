@@ -1,20 +1,13 @@
-import { isDevFlagSet } from './devMode';
 import React from 'react';
-import * as THREE from 'three';
 import { getAppsByVisibility, type AppMetadata } from './config/app-registry';
+import { isDevFlagSet } from './devMode';
 
 interface MenuProps {
-  showPublic?: boolean;
-  showPrivate?: boolean;
-  showDev?: boolean; // Kept for backwards compatibility
+  showPrivate: boolean;
 }
 
 class Menu extends React.Component<MenuProps> {
-  renderer: THREE.WebGLRenderer;
-
   override state = {
-    loadingProcess: 0,
-    showAppSelection: false,
     hoveredRoute: null as string | null,
     isMobile: false,
     isMenuOpen: false,
@@ -80,30 +73,18 @@ class Menu extends React.Component<MenuProps> {
     // Remove leading slash if present
     const cleanRoute = route.replace(/^\//, '');
 
-    if (isDevelopment) {
-      window.location.href = '?story=' + cleanRoute;
-    } else {
-      if (cleanRoute === 'animation') {
-        window.location.href = 'index.html';
-      } else {
-        window.location.href = cleanRoute + '.html';
-      }
-    }
+    window.location.href = isDevelopment ? '?story=' + cleanRoute : cleanRoute + '.html';
   }
 
   override render() {
-    // Get apps from registry by visibility
     const publicApps = getAppsByVisibility('public');
-    const privateApps = getAppsByVisibility('private');
-
-    // Get tool apps separately for the Tools section (private only)
-    const toolApps = getAppsByVisibility('private').filter(app => app.category === 'tool');
+    const privateApps = this.props.showPrivate ? getAppsByVisibility('private') : [];
 
     // Get selected story from URL
     const params = new URLSearchParams(window.location.search);
     const selectedStory = params.get('story');
 
-    const renderButtons = (apps: AppMetadata[], isDevOnly: boolean = false) =>
+    const renderButtons = (apps: AppMetadata[], isPrivate: boolean = false) =>
       apps.map(app => {
         const routeKey = app.route.replace('/', '');
         const isHovered = this.state.hoveredRoute === routeKey;
@@ -124,7 +105,7 @@ class Menu extends React.Component<MenuProps> {
                 }
               }}
               style={
-                isDevOnly
+                isPrivate
                   ? {
                       position: 'relative',
                     }
@@ -132,7 +113,7 @@ class Menu extends React.Component<MenuProps> {
               }
             >
               {app.name}
-              {isDevOnly && (
+              {isPrivate && (
                 <span
                   style={{
                     fontSize: '10px',
@@ -141,7 +122,7 @@ class Menu extends React.Component<MenuProps> {
                     opacity: 0.7,
                     fontWeight: 'normal',
                   }}
-                  title="Only visible in development mode"
+                  title="Only listed in dev mode"
                 >
                   dev
                 </span>
@@ -152,15 +133,22 @@ class Menu extends React.Component<MenuProps> {
         );
       });
 
-    const {
-      showPublic = true,
-      showPrivate: showPrivate = false, // Default to false - only show in dev
-      showDev: showDev = false, // Kept for backwards compatibility
-    } = this.props;
-
-    // For backwards compatibility, if showDev is true, also show private apps
-    const shouldShowPrivate = showPrivate || showDev;
     const { isMobile, isMenuOpen, isMenuVisible } = this.state;
+
+    // Same sections in both layouts; mobile nests them under its own header, so one heading level down
+    const Heading = isMobile ? 'h3' : 'h2';
+    const sections = (
+      <>
+        <Heading>{isMobile ? 'Main' : 'Lanzarote 3D'}</Heading>
+        {renderButtons(publicApps)}
+        {privateApps.length > 0 && (
+          <>
+            <Heading>Private</Heading>
+            {renderButtons(privateApps, true)}
+          </>
+        )}
+      </>
+    );
 
     // Mobile menu
     if (isMobile) {
@@ -175,39 +163,7 @@ class Menu extends React.Component<MenuProps> {
             </button>
           </div>
 
-          <div className={`mobile-menu-content ${isMenuOpen ? 'open' : ''}`}>
-            {showPublic && publicApps.length > 0 && (
-              <>
-                <h3>Main</h3>
-                {renderButtons(publicApps)}
-              </>
-            )}
-            {shouldShowPrivate && privateApps.filter(app => app.category === 'demo').length > 0 && (
-              <>
-                <h3>Private Demos</h3>
-                {renderButtons(
-                  privateApps.filter(app => app.category === 'demo'),
-                  true
-                )}
-              </>
-            )}
-            {showDev && toolApps.length > 0 && (
-              <>
-                <h3>Tools</h3>
-                {renderButtons(toolApps, true)}
-              </>
-            )}
-            {shouldShowPrivate &&
-              privateApps.filter(app => app.category === 'experience').length > 0 && (
-                <>
-                  <h3>Experiences</h3>
-                  {renderButtons(
-                    privateApps.filter(app => app.category === 'experience'),
-                    true
-                  )}
-                </>
-              )}
-          </div>
+          <div className={`mobile-menu-content ${isMenuOpen ? 'open' : ''}`}>{sections}</div>
         </div>
       );
     }
@@ -232,41 +188,7 @@ class Menu extends React.Component<MenuProps> {
         </div>
 
         {/* Menu content - conditionally visible */}
-        {isMenuVisible && (
-          <>
-            {showPublic && publicApps.length > 0 && (
-              <>
-                <h2>Lanzarote 3D</h2>
-                {renderButtons(publicApps)}
-              </>
-            )}
-            {shouldShowPrivate && privateApps.filter(app => app.category === 'demo').length > 0 && (
-              <>
-                <h2>Private Demos</h2>
-                {renderButtons(
-                  privateApps.filter(app => app.category === 'demo'),
-                  true
-                )}
-              </>
-            )}
-            {showDev && toolApps.length > 0 && (
-              <>
-                <h2>Tools</h2>
-                {renderButtons(toolApps, true)}
-              </>
-            )}
-            {shouldShowPrivate &&
-              privateApps.filter(app => app.category === 'experience').length > 0 && (
-                <>
-                  <h2>Experiences</h2>
-                  {renderButtons(
-                    privateApps.filter(app => app.category === 'experience'),
-                    true
-                  )}
-                </>
-              )}
-          </>
-        )}
+        {isMenuVisible && sections}
       </div>
     );
   }

@@ -1,4 +1,3 @@
-import { isDevFlagSet } from './devMode';
 import React, { useEffect, useState } from 'react';
 import GUI from 'lil-gui';
 import Stats from 'three/examples/jsm/libs/stats.module';
@@ -9,6 +8,7 @@ import Menu from './menu';
 import Controls from './foundation/utils/controls';
 import { StoryOptions } from './shared/types';
 import { getAppConfig } from './config/app-registry';
+import { isDevFlagSet } from './devMode';
 import { logger } from './foundation/utils/logger';
 
 import './index.css';
@@ -21,9 +21,7 @@ gui.hide();
 interface AppProps {
   initialStory?: string;
   showAppSelection?: boolean;
-  showPublic?: boolean;
   showPrivate?: boolean;
-  showDev?: boolean;
 }
 
 interface SceneConfig {
@@ -99,9 +97,7 @@ function shouldShowSidebar(story?: string): boolean {
 const App: React.FC<AppProps> = ({
   initialStory,
   showAppSelection: initialShowAppSelection = false,
-  showPublic,
-  showPrivate,
-  showDev,
+  showPrivate = false,
 }) => {
   const [loadingProcess] = useState(0);
   const [showAppSelection] = useState(initialShowAppSelection);
@@ -196,13 +192,7 @@ const App: React.FC<AppProps> = ({
           <span className="progress">LOADING {loadingProcess} %</span>
         </div>
       )}
-      {showAppSelection && shouldShowSidebar(initialStory) && (
-        <Menu
-          showPublic={typeof showPublic === 'undefined' ? true : showPublic}
-          showDev={typeof showDev === 'undefined' ? false : showDev}
-          showPrivate={typeof showPrivate === 'undefined' ? false : showPrivate}
-        />
-      )}
+      {showAppSelection && shouldShowSidebar(initialStory) && <Menu showPrivate={showPrivate} />}
       <div className="app-title">{appName}</div>
       <canvas className="webgl" />
     </div>
