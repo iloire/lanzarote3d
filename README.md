@@ -1,5 +1,7 @@
 # Lanzarote 3D
 
+[![CI](https://github.com/iloire/lanzarote3d/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/iloire/lanzarote3d/actions/workflows/ci.yml)
+
 A 3D, voxel-styled Lanzarote you can watch paragliders fly over, in the browser. The island is a
 real height map drawn as a wireframe over sunlit ground, with a living sea, gulls in thermals,
 towns, boats and planes, and voxel pilots soaring the Famara cliffs. The home scene flies in to Ivan,
@@ -32,6 +34,11 @@ npm run format:check
 npm run type-check
 npm run test:ci    # Jest
 ```
+
+`npm run format` rewrites files into the Prettier style that `format:check` expects.
+
+GitHub Actions (`.github/workflows/ci.yml`) runs Jest, then all three checks and the production
+build, on every push to `master` and every pull request.
 
 ## Deploying
 

@@ -4,6 +4,9 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 
 ## 2026-10-26 23:24 UTC
 
+### Added
+- **GitHub Actions CI** (`.github/workflows/ci.yml`) on every push to `master` and every pull request: `npm ci`, Jest, lint, format check, type-check and the production build, with the git-crypt `.env` removed first since CI has no key. Its badge heads the README
+
 ### Changed
 - **Prettier is checked once, by Prettier**: `eslint-plugin-prettier` is gone, so lint no longer reports formatting a second time as errors; `npm run format` / `format:check` now cover `tests/`, the root config files and the CI workflow as well as `src/`, and those files are formatted. `package-lock.json` is ignored
 
