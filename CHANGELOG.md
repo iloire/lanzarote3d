@@ -4,6 +4,9 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 
 ## 2026-10-26 23:16 UTC
 
+### Changed
+- **The entry setup runs once**: `src/index.tsx` alone imports `index.css` and turns on `THREE.Cache` (`app.tsx` repeated both), `getStoryName()` loses three branches that all returned `home`, and the `export default {}` webpack placeholder is gone
+
 ### Removed
 - **Dead types and helpers**: `foundation/types/components.ts`, `config.ts`, `systems.ts` and their barrel (none of their interfaces were used; `VehicleConfig` was only re-exported), the unused LOD helpers and tables in `foundation/types/lod.ts` (only the `LevelOfDetail` enum and `getLODFromLegacy` are used), `getCharacterAssetPath` / `createCharacterFolder`, `isThreeComponent`, `PartialTheme` and the registry's `getApp`
 

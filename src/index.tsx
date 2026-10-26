@@ -13,33 +13,14 @@ THREE.Cache.enabled = true;
  * Extract story name from URL
  * - From query parameter: ?story=boats-animation
  * - From HTML path: /boats-animation.html -> boats-animation
- * - From root path or index: home
- * - Default: home
+ * - Anything else (/, /index.html): home
  */
 function getStoryName(): string {
-  const params = new URLSearchParams(window.location.search);
-  const queryStory = params.get('story');
-
+  const queryStory = new URLSearchParams(window.location.search).get('story');
   if (queryStory) return queryStory;
 
-  const currentPath = window.location.pathname;
-
-  // Extract from HTML filename
-  const pathMatch = currentPath.match(/\/([^/]+)\.html$/);
-  if (pathMatch) {
-    const filename = pathMatch[1];
-    // index.html should map to home app
-    if (filename === 'index') return 'home';
-    return filename;
-  }
-
-  // Root path or index.html -> default
-  if (currentPath === '/' || currentPath === '/index.html') {
-    return 'home';
-  }
-
-  // Fallback
-  return 'home';
+  const filename = window.location.pathname.match(/\/([^/]+)\.html$/)?.[1];
+  return filename && filename !== 'index' ? filename : 'home';
 }
 
 // Initialize the app
@@ -60,6 +41,3 @@ if (rootElement && WebGL.isWebGLAvailable()) {
 } else {
   logger.error('Root element not found');
 }
-
-// Export empty object to satisfy webpack
-export default {};

@@ -11,10 +11,6 @@ import { getAppConfig } from './config/app-registry';
 import { isDevFlagSet } from './devMode';
 import { logger } from './foundation/utils/logger';
 
-import './index.css';
-
-THREE.Cache.enabled = true;
-
 const gui = new GUI();
 gui.hide();
 
