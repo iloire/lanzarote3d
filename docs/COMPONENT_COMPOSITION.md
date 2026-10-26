@@ -32,10 +32,12 @@ Use this when the model is built from three.js primitives and nothing has to loa
 of meshes; transforms and shadows are still applied for you.
 
 Used by Cessna, Hercules, Park, Pool, Stone, ProceduralRoad, the cacti and every boat.
-Cessna and Hercules return a single flat-shaded, vertex-coloured mesh instead of a `Group`, built
-with `vehicles/aircraft/lowPolyMesh.ts`: lofted cross-section rings for fuselages and nacelles,
-four-point airfoil surfaces for wings, tails and struts, plus cones, propellers and one shared
-material. Reach for it when building another low-poly aircraft.
+Cessna, Hercules and the four boats return a single flat-shaded, vertex-coloured mesh instead of
+a `Group`, built with `base/lowPolyMesh.ts`: lofted cross-section rings for fuselages, nacelles
+and superstructures, four-point airfoil surfaces for wings, tails and struts, plus boxes, rods,
+cones, propellers and one shared material. The boats add `scenery/boats/lowPolyHull.ts`: hulls
+lofted through stations and painted in bands (sheer, topsides, boot stripe, antifouling), guard
+rails and sails. Reach for these when building another low-poly vehicle.
 `LODComponent` is the same pattern: its `createContent()` picks `createUltraLowLODContent()`,
 `createLowLODContent()`, `createMediumLODContent()` or `createHighLODContent()` from the
 `levelOfDetail` option. Barn, House, DesertHouse, DesertHouseWithPool, Townhouse and Villa use it.

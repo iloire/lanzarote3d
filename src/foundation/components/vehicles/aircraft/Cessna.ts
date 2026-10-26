@@ -6,9 +6,9 @@ import {
   Section,
   circle,
   ring,
-  lowPolyAircraftMaterial,
+  lowPolyMaterial,
   glassColor,
-} from './lowPolyMesh';
+} from '../../base/lowPolyMesh';
 
 export interface CessnaOptions extends SimpleComponentOptions {
   bodyColor?: string;
@@ -106,7 +106,7 @@ export class Cessna extends SimpleThreeComponent {
     this.buildWingAndTail(mesh, colors);
     this.buildGear(mesh, colors);
 
-    const cessna = new THREE.Mesh(mesh.build(), lowPolyAircraftMaterial());
+    const cessna = new THREE.Mesh(mesh.build(), lowPolyMaterial());
     cessna.name = 'Cessna';
     return cessna;
   }

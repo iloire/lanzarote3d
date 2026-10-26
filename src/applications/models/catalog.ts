@@ -67,6 +67,9 @@ const gullFlock = (): Loadable => {
 const lod = { levelOfDetail: LevelOfDetail.HIGH };
 
 /** Every model the scenes place, grouped as the viewer lists them */
+/** Boats drift off on their movement patterns and bob through the grid unless held still */
+const STILL = { enableMovement: false, autoStartFloating: false };
+
 export const MODEL_CATALOG: ModelEntry[] = [
   ...pilots,
   { id: 'hangglider', name: 'Hangglider', group: 'Aerial', create: () => new Hangglider() },
@@ -78,23 +81,23 @@ export const MODEL_CATALOG: ModelEntry[] = [
     name: 'Fishing boat',
     group: 'Boats',
     scale: 2.5,
-    create: () => new FishingBoat(),
+    create: () => new FishingBoat(STILL),
   },
   {
     id: 'sail-boat',
     name: 'Small sail boat',
     group: 'Boats',
     scale: 2.5,
-    create: () => new SmallSailBoat(),
+    create: () => new SmallSailBoat(STILL),
   },
   {
     id: 'speed-boat',
     name: 'Speed boat',
     group: 'Boats',
     scale: 2.5,
-    create: () => new SpeedBoat(),
+    create: () => new SpeedBoat(STILL),
   },
-  { id: 'yacht', name: 'Yacht', group: 'Boats', scale: 2.5, create: () => new Yacht() },
+  { id: 'yacht', name: 'Yacht', group: 'Boats', scale: 2.5, create: () => new Yacht(STILL) },
 
   {
     id: 'house',

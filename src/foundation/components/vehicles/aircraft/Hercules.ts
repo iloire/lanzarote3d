@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { SimpleThreeComponent, SimpleComponentOptions } from '../../base/SimpleThreeComponent';
 import { ComponentMetadata } from '../../base/IThreeComponent';
-import { MeshBuilder, ring, lowPolyAircraftMaterial, glassColor } from './lowPolyMesh';
+import { MeshBuilder, ring, lowPolyMaterial, glassColor } from '../../base/lowPolyMesh';
 
 export interface HerculesOptions extends SimpleComponentOptions {
   bodyColor?: string;
@@ -90,7 +90,7 @@ export class Hercules extends SimpleThreeComponent {
     this.buildWingAndTail(mesh, wing);
     ENGINE_Z.forEach(z => this.buildEngine(mesh, z, { body, prop, stripe, intake }));
 
-    const hercules = new THREE.Mesh(mesh.build(), lowPolyAircraftMaterial());
+    const hercules = new THREE.Mesh(mesh.build(), lowPolyMaterial());
     hercules.name = 'Hercules-C130';
     return hercules;
   }

@@ -1,10 +1,10 @@
 import * as THREE from 'three';
-import { resourceManager } from '../../../systems/ResourceManager';
+import { resourceManager } from '../../systems/ResourceManager';
 
 /**
- * Building blocks for the low-poly aircraft: every part is pushed as flat-coloured triangles into
- * one MeshBuilder, so a whole plane is a single vertex-coloured mesh and one draw call.
- * Conventions: nose points +X, up is +Y, wings span Z.
+ * Building blocks for the low-poly aircraft and boats: every part is pushed as flat-coloured
+ * triangles into one MeshBuilder, so a whole vehicle is a single vertex-coloured mesh and one draw
+ * call. Conventions: nose or bow points +X, up is +Y, wings and beam span Z.
  */
 
 /** A unit cross-section as (side, up) pairs, walked around the X axis */
@@ -20,6 +20,14 @@ export const OCTAGON: Section = [
   [-1, -0.5],
   [-1, 0.45],
   [-0.45, 1],
+];
+
+/** A rectangle: right side, bottom, left side, top */
+export const BOX: Section = [
+  [1, 1],
+  [1, -1],
+  [-1, -1],
+  [-1, 1],
 ];
 
 /** A ring at station x, spanning bottom..top vertically and ±halfWidth around z */
@@ -150,6 +158,37 @@ export class MeshBuilder {
     );
   }
 
+  /** A box from x0 to x1, spanning bottom..top and ±halfWidth around z */
+  box(
+    x0: number,
+    x1: number,
+    bottom: number,
+    top: number,
+    halfWidth: number,
+    z: number,
+    color: THREE.Color
+  ): void {
+    const rings = [x0, x1].map(x => ring(x, bottom, top, halfWidth, z, BOX));
+    this.loft(rings, () => color, [color, color]);
+  }
+
+  /** A thin prism from a to b: spars, rails, stays */
+  rod(a: THREE.Vector3, b: THREE.Vector3, radius: number, color: THREE.Color, sides = 4): void {
+    const axis = b.clone().sub(a).normalize();
+    const helper = Math.abs(axis.y) < 0.9 ? new THREE.Vector3(0, 1, 0) : new THREE.Vector3(1, 0, 0);
+    const u = new THREE.Vector3().crossVectors(axis, helper).normalize();
+    const v = new THREE.Vector3().crossVectors(axis, u);
+    const around = (centre: THREE.Vector3) =>
+      Array.from({ length: sides }, (_, i) => {
+        const t = ((i + 0.5) / sides) * Math.PI * 2;
+        return centre
+          .clone()
+          .addScaledVector(u, Math.cos(t) * radius)
+          .addScaledVector(v, Math.sin(t) * radius);
+      });
+    this.loft([around(a), around(b)], () => color, [color, color]);
+  }
+
   /** A cone pointing +X from a base polygon around the X axis */
   cone(
     baseCentre: THREE.Vector3,
@@ -198,10 +237,10 @@ export class MeshBuilder {
   }
 }
 
-/** The one material every low-poly aircraft shares: colours come from the vertices */
-export const lowPolyAircraftMaterial = (): THREE.Material =>
+/** The one material every low-poly vehicle shares: colours come from the vertices */
+export const lowPolyMaterial = (): THREE.Material =>
   resourceManager.getOrCreateMaterial(
-    'aircraft_lowpoly',
+    'lowpoly_vertex_colors',
     () =>
       new THREE.MeshLambertMaterial({
         vertexColors: true,

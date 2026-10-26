@@ -1,7 +1,18 @@
 import * as THREE from 'three';
 import { MovableBoatComponent, MovableBoatComponentOptions } from '../../base/MovableBoatComponent';
-import { resourceManager } from '../../../systems/ResourceManager';
 import { MovementPattern } from '../../../systems/behaviors/MovingBehavior';
+import { BOX, MeshBuilder, glassColor, lowPolyMaterial, ring } from '../../base/lowPolyMesh';
+import {
+  ANTIFOULING,
+  STAINLESS,
+  Station,
+  TEAK,
+  WINDOWED,
+  SEG_WINDOWS,
+  buildHull,
+  buildRails,
+  hullAt,
+} from './lowPolyHull';
 
 export interface YachtOptions extends MovableBoatComponentOptions {
   hullColor?: string;
@@ -10,21 +21,46 @@ export interface YachtOptions extends MovableBoatComponentOptions {
   scale?: number;
 }
 
+const DEFAULTS = {
+  hullColor: '#F5F5F5',
+  trimColor: '#4169E1',
+  glassColor: '#87CEEB',
+};
+
+const DARK = new THREE.Color('#1F2937');
+const CUSHION = new THREE.Color('#E7E0D0');
+
+// Stern to bow: a 30 m motor yacht with a long foredeck and a raked, flared bow
+const STATIONS: Station[] = [
+  { x: -15, deck: 3.0, keel: -1.3, beam: 4.2 },
+  { x: -8, deck: 3.0, keel: -1.8, beam: 4.6 },
+  { x: 4, deck: 3.3, keel: -1.8, beam: 4.4 },
+  { x: 10, deck: 4.0, keel: -1.0, beam: 3.0 },
+  { x: 15, deck: 4.8, keel: 1.0, beam: 0.1 },
+];
+// Long dark hull windows on the topsides: x from, x to
+const HULL_WINDOWS: [number, number][] = [
+  [-6, -1.5],
+  [0, 4],
+];
+
 /**
- * Modern yacht component with realistic floating animation and optional movement
+ * Motor yacht, built low poly: a white hull with a trim-coloured boot stripe and dark hull
+ * windows, a teak aft deck and swim platform, a glazed saloon, a flybridge deck edged in the trim
+ * colour carrying the helm station under a hardtop with radar mast, a bow sunpad and guard rails
+ * all round. One flat-shaded, vertex-coloured mesh. Bow points +X before the quarter turn that
+ * aligns it with the movement's forward axis.
  */
 export class Yacht extends MovableBoatComponent {
   constructor(options: YachtOptions = {}) {
     super(
       {
         name: 'Yacht',
-        version: '1.0.0',
+        version: '2.0.0',
         description: 'Luxury yacht with realistic floating animation and optional movement',
       },
       {
-        hullColor: '#F5F5F5',
-        trimColor: '#4169E1',
-        glassColor: '#87CEEB',
+        ...DEFAULTS,
         scale: 1,
         // Movement defaults - disabled by default, can be enabled via options
         enableMovement: true,
@@ -44,133 +80,72 @@ export class Yacht extends MovableBoatComponent {
   }
 
   protected override createContent(): THREE.Object3D {
-    const yacht = new THREE.Group();
-    yacht.name = 'Yacht';
-
     const options = this.options as YachtOptions;
-    const scale = options.scale || 1;
+    const hull = new THREE.Color(options.hullColor ?? DEFAULTS.hullColor);
+    const trim = new THREE.Color(options.trimColor ?? DEFAULTS.trimColor);
+    const glass = glassColor(options.glassColor ?? DEFAULTS.glassColor);
+    const v = (x: number, y: number, z = 0) => new THREE.Vector3(x, y, z);
+    const deckAt = (x: number) => hullAt(STATIONS, x).deck;
 
-    // Create materials with resource sharing
-    const hullMaterial = resourceManager.getOrCreateMaterial(
-      `yacht_hull_${options.hullColor}`,
-      () => new THREE.MeshLambertMaterial({ color: options.hullColor })
+    const mesh = new MeshBuilder();
+    buildHull(mesh, STATIONS, {
+      sheer: hull,
+      topside: hull,
+      boot: trim,
+      bottom: ANTIFOULING,
+      deck: span => (span === 0 ? TEAK : hull),
+    });
+    [-1, 1].forEach(side => {
+      HULL_WINDOWS.forEach(([x0, x1]) => {
+        const z = (x: number) => side * (hullAt(STATIONS, x).beam * 0.985 + 0.03);
+        mesh.quad(
+          v(x0, 1.5, z(x0)),
+          v(x1, 1.5, z(x1)),
+          v(x1, 1.85, z(x1)),
+          v(x0, 1.85, z(x0)),
+          DARK
+        );
+      });
+    });
+    mesh.box(-16, -15, 0.35, 0.65, 3.8, 0, TEAK); // swim platform
+
+    // Saloon: glazed above the window line, aft doors and raked windscreen glass
+    mesh.loft(
+      [
+        ring(-11, 2.9, 6.0, 3.7, 0, WINDOWED),
+        ring(3.5, 3.1, 6.0, 3.5, 0, WINDOWED),
+        ring(7.0, 3.4, 5.0, 2.6, 0, WINDOWED),
+      ],
+      (_, k) => (SEG_WINDOWS.includes(k) ? glass : hull),
+      [glass, glass]
     );
 
-    const trimMaterial = resourceManager.getOrCreateMaterial(
-      `yacht_trim_${options.trimColor}`,
-      () => new THREE.MeshLambertMaterial({ color: options.trimColor })
+    // Flybridge deck, its edge in the trim colour, with the helm station under a hardtop
+    mesh.loft(
+      [ring(-12.5, 6.0, 6.45, 3.9, 0, BOX), ring(4.5, 6.0, 6.45, 3.7, 0, BOX)],
+      (_, k) => (k === 3 ? hull : trim),
+      [trim, trim]
     );
-
-    const glassMaterial = resourceManager.getOrCreateMaterial(
-      `yacht_glass_${options.glassColor}`,
-      () =>
-        new THREE.MeshLambertMaterial({
-          color: options.glassColor,
-          transparent: true,
-          opacity: 0.7,
-        })
+    mesh.loft(
+      [
+        ring(-5, 6.45, 8.3, 2.7, 0, WINDOWED),
+        ring(1.5, 6.45, 8.3, 2.7, 0, WINDOWED),
+        ring(2.8, 6.45, 7.6, 2.4, 0, WINDOWED),
+      ],
+      (_, k) => (SEG_WINDOWS.includes(k) ? glass : hull),
+      [hull, glass]
     );
+    mesh.box(-6, 2.5, 8.3, 8.6, 3.0, 0, hull);
+    mesh.rod(v(-4.5, 8.6), v(-4.5, 11.2), 0.15, hull);
+    mesh.box(-4.8, -4.2, 11.2, 11.4, 1.4, 0, DARK); // radar
+    mesh.box(-3.9, -3.3, 8.6, 9.1, 0.3, 0, DARK); // satellite dome
 
-    // Main hull - sleek and long
-    const hullGeometry = resourceManager.getOrCreateGeometry(
-      'yacht_hull',
-      () => new THREE.BoxGeometry(30, 5, 10)
-    );
-    const hull = new THREE.Mesh(hullGeometry, hullMaterial);
-    hull.castShadow = this.options.castShadow ?? true;
-    hull.receiveShadow = this.options.receiveShadow ?? true;
-    yacht.add(hull);
+    // Bow sunpad and guard rails
+    mesh.box(7.5, 11, deckAt(9.25) - 0.1, deckAt(9.25) + 0.35, 1.6, 0, CUSHION);
+    buildRails(mesh, STATIONS, [-14, -10, -6, -2, 2, 6, 10, 13], 1.0, STAINLESS);
 
-    // Lower deck
-    const lowerDeckGeometry = resourceManager.getOrCreateGeometry(
-      'yacht_lower_deck',
-      () => new THREE.BoxGeometry(25, 2, 8)
-    );
-    const lowerDeck = new THREE.Mesh(lowerDeckGeometry, hullMaterial);
-    lowerDeck.position.set(0, 3.5, 0);
-    lowerDeck.castShadow = this.options.castShadow ?? true;
-    lowerDeck.receiveShadow = this.options.receiveShadow ?? true;
-    yacht.add(lowerDeck);
-
-    // Upper cabin/bridge
-    const cabinGeometry = resourceManager.getOrCreateGeometry(
-      'yacht_cabin',
-      () => new THREE.BoxGeometry(15, 8, 7)
-    );
-    const cabin = new THREE.Mesh(cabinGeometry, hullMaterial);
-    cabin.position.set(-3, 8, 0);
-    cabin.castShadow = this.options.castShadow ?? true;
-    cabin.receiveShadow = this.options.receiveShadow ?? true;
-    yacht.add(cabin);
-
-    // Bridge/flybridge
-    const bridgeGeometry = resourceManager.getOrCreateGeometry(
-      'yacht_bridge',
-      () => new THREE.BoxGeometry(8, 4, 5)
-    );
-    const bridge = new THREE.Mesh(bridgeGeometry, hullMaterial);
-    bridge.position.set(-3, 14, 0);
-    bridge.castShadow = this.options.castShadow ?? true;
-    yacht.add(bridge);
-
-    // Trim lines
-    const trimGeometry = resourceManager.getOrCreateGeometry(
-      'yacht_trim',
-      () => new THREE.BoxGeometry(32, 0.5, 10.5)
-    );
-    const trim = new THREE.Mesh(trimGeometry, trimMaterial);
-    trim.position.set(0, 2.5, 0);
-    yacht.add(trim);
-
-    // Large windows on main cabin
-    const windowGeometry = resourceManager.getOrCreateGeometry(
-      'yacht_window',
-      () => new THREE.BoxGeometry(12, 5, 0.3)
-    );
-    const frontWindow = new THREE.Mesh(windowGeometry, glassMaterial);
-    frontWindow.position.set(-3, 9, 3.6);
-    yacht.add(frontWindow);
-
-    const backWindow = new THREE.Mesh(windowGeometry, glassMaterial);
-    backWindow.position.set(-3, 9, -3.6);
-    yacht.add(backWindow);
-
-    // Side windows
-    const sideWindowGeometry = resourceManager.getOrCreateGeometry(
-      'yacht_side_window',
-      () => new THREE.BoxGeometry(0.3, 5, 6)
-    );
-    const leftWindow = new THREE.Mesh(sideWindowGeometry, glassMaterial);
-    leftWindow.position.set(4.6, 9, 0);
-    yacht.add(leftWindow);
-
-    const rightWindow = new THREE.Mesh(sideWindowGeometry, glassMaterial);
-    rightWindow.position.set(-10.6, 9, 0);
-    yacht.add(rightWindow);
-
-    // Radar/antenna mast
-    const mastGeometry = resourceManager.getOrCreateGeometry(
-      'yacht_mast',
-      () => new THREE.CylinderGeometry(0.2, 0.2, 8)
-    );
-    const mast = new THREE.Mesh(mastGeometry, trimMaterial);
-    mast.position.set(-3, 20, 0);
-    mast.castShadow = this.options.castShadow ?? true;
-    yacht.add(mast);
-
-    // Radar dish
-    const radarGeometry = resourceManager.getOrCreateGeometry(
-      'yacht_radar',
-      () => new THREE.CylinderGeometry(1.5, 1.5, 0.3)
-    );
-    const radar = new THREE.Mesh(radarGeometry, glassMaterial);
-    radar.position.set(-3, 24, 0);
-    yacht.add(radar);
-
-    // Apply scale
-    if (scale !== 1) {
-      yacht.scale.setScalar(scale);
-    }
+    const yacht = new THREE.Mesh(mesh.build(), lowPolyMaterial());
+    yacht.name = 'Yacht';
 
     // Rotate 90 degrees to align with forward axis
     yacht.rotateY(Math.PI / 2);
@@ -189,12 +164,12 @@ export class Yacht extends MovableBoatComponent {
     return issues;
   }
 
-  public getInfo(): Record<string, any> {
+  public getInfo(): Record<string, unknown> {
     const options = this.options as YachtOptions;
 
     return {
       name: 'Yacht',
-      version: '1.0.0',
+      version: '2.0.0',
       type: 'boat',
       hullColor: options.hullColor,
       trimColor: options.trimColor,

@@ -2,6 +2,18 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-26 23:54 UTC
+
+### Changed
+- **The boats are rebuilt low poly**: each hull is lofted through stations from transom to a raked stem and painted in bands, with a sheer line, topsides, a boot stripe at the waterline and antifouling below
+  - **Small sail boat**: a cruiser with a teak deck, a coachroof with portlights, and a sloop rig of mast, boom, mainsail and jib with stays, shrouds and bow rails. The sails are now off-white (they were grey)
+  - **Fishing boat**: a Canarian trawler in blue with white stripes. It has bulwarks round the working deck, a wheelhouse forward with a window band under an overhanging roof, radar, a mast with trawl booms, a stern A-frame, and fish crates, floats and nets aft. The mast is now light grey (it was brown)
+  - **Speed boat**: a deep-V hull with a black stripe and white bottom, an open cockpit behind a wraparound windscreen, a helm console, bucket seats, a stern bench, bow rails and twin outboards
+  - **Yacht**: a motor yacht with dark hull windows, a teak aft deck and swim platform, a glazed saloon, a flybridge edged in the trim colour with the helm under a hardtop and radar mast, a bow sunpad and rails all round
+  - Each boat is one flat-shaded mesh in a single draw call: 344, 476, 572 and 686 triangles. The old boats were only a few boxes (18, 316, 104 and 364 triangles), so these are more detailed and somewhat heavier, but still low poly. Sizes and colour options are unchanged
+- **One low-poly builder for planes and boats**: `lowPolyMesh.ts` moves to `components/base` and gains boxes and rods; the boats add `scenery/boats/lowPolyHull.ts` for hulls, rails and sails
+- **The Models scene holds boats still**: the speed boat, yacht and sail boat sailed off on their movement patterns and out of frame, and floating sank every boat into the grid
+
 ## 2026-10-26 23:42 UTC
 
 ### Changed
