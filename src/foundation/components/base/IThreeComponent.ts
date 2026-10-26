@@ -182,20 +182,3 @@ export class ComponentDisposedError extends Error {
     this.name = 'ComponentDisposedError';
   }
 }
-
-/**
- * Type guard to check if an object implements IThreeComponent
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function isThreeComponent(obj: any): obj is IThreeComponent {
-  return (
-    obj &&
-    typeof obj.load === 'function' &&
-    typeof obj.dispose === 'function' &&
-    typeof obj.update === 'function' &&
-    typeof obj.setVisible === 'function' &&
-    typeof obj.getObject === 'function' &&
-    typeof obj.metadata === 'object' &&
-    typeof obj.isLoaded === 'boolean'
-  );
-}

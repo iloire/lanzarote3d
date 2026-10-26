@@ -26,13 +26,6 @@ export const APP_REGISTRY: Record<string, AppMetadata> = appsConfig.apps as Reco
 >;
 
 /**
- * Get a specific app by key
- */
-export function getApp(key: string): AppMetadata | null {
-  return APP_REGISTRY[key] || null;
-}
-
-/**
  * Get all apps flattened
  */
 export function getAllApps(): AppMetadata[] {

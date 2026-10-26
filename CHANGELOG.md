@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-26 23:16 UTC
+
+### Removed
+- **Dead types and helpers**: `foundation/types/components.ts`, `config.ts`, `systems.ts` and their barrel (none of their interfaces were used; `VehicleConfig` was only re-exported), the unused LOD helpers and tables in `foundation/types/lod.ts` (only the `LevelOfDetail` enum and `getLODFromLegacy` are used), `getCharacterAssetPath` / `createCharacterFolder`, `isThreeComponent`, `PartialTheme` and the registry's `getApp`
+
 ## 2026-10-26 23:08 UTC
 
 ### Removed

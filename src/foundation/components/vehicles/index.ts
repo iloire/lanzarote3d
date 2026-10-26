@@ -8,6 +8,3 @@ export * from './aerial-sports';
 
 // Re-export vehicle components (wings, gliders, etc.)
 export * from './components';
-
-// Type exports
-export type { VehicleConfig } from '../../types';

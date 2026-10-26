@@ -106,9 +106,6 @@ export interface Theme {
   atmosphere?: AtmosphereTheme;
 }
 
-// Helper type for partial theme overrides
-export type PartialTheme = Partial<Theme> & { id: string };
-
 // Theme application options
 export interface ThemeApplicationOptions {
   preserveCamera?: boolean;

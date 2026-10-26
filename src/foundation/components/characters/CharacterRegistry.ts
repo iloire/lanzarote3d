@@ -300,29 +300,3 @@ export class CharacterRegistry {
 
 // Export singleton instance
 export const characterRegistry = CharacterRegistry.getInstance();
-
-// Export utility functions
-export function getCharacterAssetPath(
-  type: CharacterType,
-  assetType: 'obj' | 'texture' | 'thumbnail'
-): string {
-  const character = characterRegistry.getCharacter(type);
-  if (!character) {
-    throw new Error(`Character type ${type} not found in registry`);
-  }
-
-  switch (assetType) {
-    case 'obj':
-      return character.assets.objFile;
-    case 'texture':
-      return character.assets.textureFile;
-    case 'thumbnail':
-      return character.assets.thumbnailFile || character.assets.textureFile;
-    default:
-      throw new Error(`Unknown asset type: ${assetType}`);
-  }
-}
-
-export function createCharacterFolder(type: CharacterType): string {
-  return `/assets/foundation/models/characters/${type}`;
-}
