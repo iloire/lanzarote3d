@@ -4,6 +4,10 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 
 ## 2026-10-26 23:08 UTC
 
+### Fixed
+- **Jest maps CSS imports to `identity-obj-proxy`**: the key was misspelled `moduleNameMapping`, so Jest ignored it and any test importing a component with a stylesheet would have crashed. `jest-environment-jsdom` is now on 29, matching `jest`, instead of 30
+- **Webpack config holds only rules that do something**: the `.jsx` babel rule (no `.jsx` files, and it named a plugin that was never installed), the stylus rule (no `.styl` files) and the overwritten `showcaseApps` export are gone; images use webpack 5's `asset/resource` instead of the deprecated `file-loader`
+
 ### Changed
 - **Every page loads one shared `main.bundle.js`** instead of its own copy: the five app entries all pointed at `src/index.tsx`, so the build emitted five identical ~1 MB bundles and a visitor moving between scenes downloaded the same code again under another name. Each scene's code still loads as its own lazy chunk
 

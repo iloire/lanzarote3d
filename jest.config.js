@@ -20,7 +20,7 @@ module.exports = {
   coverageReporters: ['text', 'lcov', 'html'],
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-  moduleNameMapping: {
+  moduleNameMapper: {
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy'
   },
   testTimeout: 10000

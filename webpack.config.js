@@ -33,9 +33,6 @@ const showcaseApps = Object.entries(appsConfig.apps)
 
 console.log(`Building ${showcaseApps.length} applications...`);
 
-// Export for use in other files
-module.exports.showcaseApps = showcaseApps;
-
 module.exports = {
   entry: { main: './src/index.tsx' },
   output: {
@@ -66,32 +63,11 @@ module.exports = {
         exclude: /node_modules/,
       },
       {
-        test: /\.styl?$/,
-        loader: "stylus-loader",
-      },
-      {
-        test: /\.jsx?$/,
-        exclude: /node_modules/,
-        use: [
-          {
-            loader: "babel-loader",
-            options: {
-              presets: ["@babel/react"],
-              plugins: ["@babel/proposal-class-properties"],
-            },
-          },
-        ],
-      },
-      {
         test: /\.(png|jpg|mp4)$/,
-        use: [
-          {
-            loader: "file-loader",
-            options: {
-              outputPath: "./images/",
-            },
-          },
-        ],
+        type: "asset/resource",
+        generator: {
+          filename: "images/[hash][ext]",
+        },
       },
       {
         test: /\.(glb|gltf)$/,
