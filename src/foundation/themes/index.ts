@@ -1,304 +1,53 @@
 import { Theme } from '../types/Theme';
 
-export const THEMES: Record<string, Theme> = {
-  default: {
-    id: 'default',
-    name: 'Default',
-    enabled: true,
-    sky: {
-      timeOfDay: 15,
-      sunIntensity: 1.9,
-    },
-    clouds: {
-      colors: ['#FFFFFF', '#F5F5F5', '#E8E8E8', '#D0D0D0'],
-      density: 0.6,
-      opacity: 0.85,
-    },
-    terrain: {
-      style: 'wireframe',
-      customMaterial: {
-        color: '#8a6248',
-        emissive: '#5c3a26',
-        emissiveIntensity: 0.2,
-        roughness: 0.8,
-        metalness: 0.05,
-        opacity: 1.0,
-        wireframe: true,
-        visible: true,
-      },
-      underlay: { color: '#34302d', peakColor: '#3f2f27', sandColor: '#b39668' },
-    },
-    water: {
-      color: '#08304a',
-      opacity: 1,
-      shallowColor: '#23a9a6',
-      shallowDistance: 700,
-    },
-    weather: {
-      windDirectionDegreesFromNorth: 280,
-      speedMetresPerSecond: 5,
-      lclLevel: 1750,
-    },
-    ambient: {
-      lightingIntensity: 1.05,
-      shadowIntensity: 0.95,
-    },
-    atmosphere: {},
+/**
+ * The scenes' one look: sky, sea, fog, light and clouds. There used to be alternative presets
+ * (Golden Hour, Arctic Winter, ...) and a picker in the menu; they're in git history before the
+ * commit that removed them.
+ */
+export const DEFAULT_THEME: Theme = {
+  id: 'default',
+  name: 'Default',
+  enabled: true,
+  sky: {
+    timeOfDay: 15,
+    sunIntensity: 1.9,
   },
-
-  golden: {
-    id: 'golden',
-    name: 'Golden Hour',
-    enabled: true,
-    sky: {
-      timeOfDay: 17.5,
-      sunIntensity: 2.0,
-    },
-    clouds: {
-      colors: [
-        '#FFD700',
-        '#FFA500',
-        '#FF8C00',
-        '#FFFF99',
-        '#FFE135',
-        '#DAA520',
-        '#FFF8F0',
-        '#FF6B6B',
-      ],
-      density: 0.8,
-      opacity: 0.9,
-    },
-    terrain: {
-      style: 'desert',
-      customMaterial: {
-        color: '#DAA520',
-        emissive: '#FFD700',
-        emissiveIntensity: 0.5,
-        roughness: 0.7,
-        metalness: 0.0,
-        opacity: 1.0,
-        wireframe: true,
-        visible: true,
-      },
-      underlay: { color: '#3a2a20', peakColor: '#6a321a', sandColor: '#c89a5c' },
-    },
-    water: {
-      color: '#12344a',
-      opacity: 1,
-      shallowColor: '#3aa597',
-    },
-    weather: {
-      windDirectionDegreesFromNorth: 270,
-      speedMetresPerSecond: 3,
-      lclLevel: 2000,
-    },
-    ambient: {
-      lightingIntensity: 1.4,
-      shadowIntensity: 0.6,
-    },
-    atmosphere: { exposure: 0.95, warmth: 0.09, bloomStrength: 0.6, saturation: 1.18 },
+  clouds: {
+    colors: ['#FFFFFF', '#F5F5F5', '#E8E8E8', '#D0D0D0'],
+    density: 0.6,
+    opacity: 0.85,
   },
-
-  arctic: {
-    id: 'arctic',
-    name: 'Arctic Winter',
-    enabled: true,
-    sky: {
-      timeOfDay: 14,
-      sunIntensity: 1.8,
-      directionalLight: {
-        intensity: 1.2,
-        color: '#E6F3FF',
-        castShadow: true,
-        shadowMapSize: 4096,
-        shadowCamera: {
-          near: 0.5,
-          far: 50000,
-          left: -10000,
-          right: 10000,
-          top: 10000,
-          bottom: -10000,
-        },
-      },
+  terrain: {
+    style: 'wireframe',
+    customMaterial: {
+      color: '#8a6248',
+      emissive: '#5c3a26',
+      emissiveIntensity: 0.2,
+      roughness: 0.8,
+      metalness: 0.05,
+      opacity: 1.0,
+      wireframe: true,
+      visible: true,
     },
-    clouds: {
-      colors: ['#FFFFFF', '#E6F3FF', '#87CEEB', '#2F4F4F'],
-      density: 0.6,
-      opacity: 0.95,
-    },
-    terrain: {
-      style: 'arctic',
-      customMaterial: {
-        color: '#ffffff',
-        emissive: '#87CEEB',
-        emissiveIntensity: 0.2,
-        roughness: 0.1,
-        metalness: 0.3,
-        opacity: 1.0,
-        wireframe: true,
-        visible: true,
-      },
-      underlay: { color: '#8a9db0', peakColor: '#eef4fa', sandColor: '#c9d6e0' },
-    },
-    water: {
-      color: '#0b3558',
-      opacity: 1,
-      shallowColor: '#5fb8c9',
-    },
-    weather: {
-      windDirectionDegreesFromNorth: 0,
-      speedMetresPerSecond: 8,
-      lclLevel: 1200,
-    },
-    ambient: {
-      lightingIntensity: 0.9,
-      shadowIntensity: 1.2,
-    },
-    atmosphere: { warmth: -0.03, saturation: 1.0, fogDensity: 0.00004 },
+    underlay: { color: '#34302d', peakColor: '#3f2f27', sandColor: '#b39668' },
   },
-
-  storm: {
-    id: 'storm',
-    name: 'Storm Clouds',
-    enabled: false,
-    sky: {
-      timeOfDay: 15,
-      sunIntensity: 1.2,
-      directionalLight: {
-        intensity: 0.4,
-        color: '#404040',
-        castShadow: true,
-        shadowMapSize: 1024,
-      },
-    },
-    clouds: {
-      colors: ['#2F2F2F', '#4A4A4A', '#F5F5F5', '#696969', '#D3D3D3'],
-      density: 1.2,
-      opacity: 0.95,
-    },
-    terrain: {
-      style: 'volcanic',
-      customMaterial: {
-        color: '#FFFF00', // Bright yellow wireframe for dramatic storm effect
-        emissive: '#FFD700', // Golden yellow glow
-        emissiveIntensity: 0.4,
-        roughness: 0.9,
-        metalness: 0.0,
-        wireframe: true, // Show terrain wireframe during storms
-        opacity: 0.9,
-        transparent: true,
-        visible: true,
-      },
-    },
-    water: {
-      color: '#263238',
-      opacity: 0.85,
-    },
-    weather: {
-      windDirectionDegreesFromNorth: 45,
-      speedMetresPerSecond: 12,
-      lclLevel: 1500,
-    },
-    ambient: {
-      lightingIntensity: 0.7,
-      shadowIntensity: 1.4,
-    },
+  water: {
+    color: '#08304a',
+    opacity: 1,
+    shallowColor: '#23a9a6',
+    shallowDistance: 700,
   },
-
-  autumn: {
-    id: 'autumn',
-    name: 'Autumn Mist',
-    enabled: false,
-    sky: {
-      timeOfDay: 16,
-      sunIntensity: 1.8,
-    },
-    clouds: {
-      colors: ['#CD853F', '#DEB887', '#F5DEB3', '#D2691E', '#BC8F8F', '#F4A460'],
-      density: 0.7,
-      opacity: 0.85,
-    },
-    terrain: {
-      style: 'desert',
-      customMaterial: {
-        color: '#8d6e63',
-        emissive: '#D2691E',
-        emissiveIntensity: 0.4,
-        roughness: 0.8,
-        metalness: 0.0,
-        opacity: 1.0,
-        wireframe: false,
-        visible: true,
-      },
-    },
-    water: {
-      color: '#6d4c41',
-      opacity: 0.8,
-    },
-    weather: {
-      windDirectionDegreesFromNorth: 225,
-      speedMetresPerSecond: 6,
-      lclLevel: 1600,
-    },
-    ambient: {
-      lightingIntensity: 1.1,
-      shadowIntensity: 0.9,
-    },
+  weather: {
+    windDirectionDegreesFromNorth: 280,
+    speedMetresPerSecond: 5,
+    lclLevel: 1750,
   },
-
-  natural: {
-    id: 'natural',
-    name: 'Natural Famara',
-    enabled: false,
-    sky: {
-      timeOfDay: 13,
-      sunIntensity: 2.2,
-    },
-    clouds: {
-      colors: ['#FFFFFF', '#E6F3FF', '#87CEEB'],
-      density: 0.8,
-      opacity: 0.9,
-    },
-    terrain: {
-      style: 'desert',
-      customMaterial: {
-        color: '#A0522D',
-        emissive: '#F4A460',
-        emissiveIntensity: 0.1,
-        roughness: 0.8,
-        metalness: 0.0,
-        opacity: 1.0,
-        wireframe: false,
-        visible: true,
-      },
-    },
-    water: {
-      color: '#2196f3',
-      opacity: 0.85,
-    },
-    weather: {
-      windDirectionDegreesFromNorth: 310,
-      speedMetresPerSecond: 5,
-      lclLevel: 1800,
-    },
-    ambient: {
-      lightingIntensity: 1.0,
-      shadowIntensity: 1.0,
-    },
+  ambient: {
+    lightingIntensity: 1.05,
+    shadowIntensity: 0.95,
   },
+  atmosphere: {},
 };
 
-// Helper functions for theme management
-export const getThemeById = (id: string): Theme | undefined => {
-  return THEMES[id] as Theme | undefined;
-};
-
-export const getDefaultTheme = (): Theme => {
-  return THEMES['default'] as Theme;
-};
-
-export const getAllThemes = (): Theme[] => {
-  return Object.values(THEMES).filter(theme => theme.enabled !== false);
-};
-
-export default THEMES;
+export const getDefaultTheme = (): Theme => DEFAULT_THEME;

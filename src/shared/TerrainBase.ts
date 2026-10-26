@@ -102,7 +102,7 @@ export abstract class TerrainBase extends AppBase {
     }
 
     // Apps may have applied their theme before the sky, sea and island existed.
-    await ThemeEngine.apply(options, options.theme ?? getDefaultTheme(), {
+    await ThemeEngine.apply(options, getDefaultTheme(), {
       skipComponents: ['environment'],
     });
 

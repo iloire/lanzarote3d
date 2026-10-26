@@ -7,6 +7,11 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ### Added
 - **`?dev=1` turns on dev mode** in this browser (`?dev=0` turns it off): the menu lists the private scenes (famara, town) and the sidebar shows on every scene, home included. `enableDevMode()` / `disableDevMode()` are now defined on localhost too, where they used to be missing. The logic lives in `src/devMode.ts`
 
+## [Unreleased] - 2026-10-26 23:05 UTC
+
+### Removed
+- **Themes.** The default look is the only one: the menu's Themes buttons, `ThemeManager` (switching and the saved choice), the Golden Hour, Arctic Winter, Storm, Autumn and Natural presets, and the per-app `theme` field (static Famara asked for a misspelt `artic` that never applied) are gone. `ThemeEngine` still applies `DEFAULT_THEME`; the presets are in git history if one is wanted back
+
 ## [Unreleased] - 2026-10-26 22:50 UTC
 
 ### Changed

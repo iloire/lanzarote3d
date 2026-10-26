@@ -53,7 +53,7 @@ class FamaraApp extends TerrainBase {
       const { camera, scene, renderer, controls } = options;
 
       // Apply theme BEFORE loading environment to ensure visual consistency
-      const theme = options.theme ?? getDefaultTheme();
+      const theme = getDefaultTheme();
       await ThemeEngine.apply(options, theme);
 
       // Position camera to showcase Famara beach area (no paragliders to focus on)

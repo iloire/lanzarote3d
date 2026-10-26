@@ -95,7 +95,7 @@ class AnimationApp extends TerrainBase {
       }
 
       // Apply theme and fog BEFORE loading environment to ensure visual consistency
-      const theme = options.theme ?? getDefaultTheme();
+      const theme = getDefaultTheme();
       await ThemeEngine.apply(options, theme);
 
       // Set fog early to avoid visual pop-in

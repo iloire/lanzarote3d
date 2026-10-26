@@ -17,7 +17,6 @@ export interface AppMetadata {
   requiresWebGL?: boolean;
   visibility: 'public' | 'private' | 'hidden';
   priority?: number; // For ordering in menus
-  theme?: string; // Optional theme ID that overrides global theme selection
 }
 
 // Generate APP_REGISTRY from JSON (now flat structure under 'apps')

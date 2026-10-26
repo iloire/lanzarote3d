@@ -8,10 +8,7 @@ import { CameraTargetController as Camera } from './foundation/systems/scene/Cam
 import Menu from './menu';
 import Controls from './foundation/utils/controls';
 import { StoryOptions } from './shared/types';
-import { themeManager } from './foundation/systems/ThemeManager';
-import { ThemeEngine } from './foundation/systems/ThemeEngine';
 import { getAppConfig } from './config/app-registry';
-import { getThemeById } from './foundation/themes';
 import { logger } from './foundation/utils/logger';
 
 import './index.css';
@@ -171,38 +168,9 @@ const App: React.FC<AppProps> = ({
       // Environment components will be loaded by base classes as needed
     };
 
-    // Check for app-specific theme override
-    // Match by route (without leading slash) which comes from the HTML filename
-    const currentApp = initialStory ? getAppConfig(initialStory) : null;
-
-    if (currentApp?.theme) {
-      const appTheme = getThemeById(currentApp.theme);
-      if (appTheme) {
-        logger.info(`Applying app-specific theme: ${appTheme.name} for app: ${currentApp.name}`);
-        // Apply the app-specific theme before initializing theme manager
-        await ThemeEngine.apply(storyOptions, appTheme);
-        storyOptions.theme = appTheme;
-      } else {
-        logger.warn(
-          `App-specific theme '${currentApp.theme}' not found for app: ${currentApp.name}`
-        );
-      }
-    }
-
-    // Initialize theme manager for dynamic theme switching
-    themeManager.initialize(storyOptions);
-
     // Load the selected app
     if (initialStory && hasApp(initialStory)) {
       await loadApp(initialStory, storyOptions);
-
-      // If the app applied a theme, capture it in the theme manager
-      if (storyOptions.theme && ThemeEngine.getCurrentTheme()) {
-        themeManager.setCurrentTheme(ThemeEngine.getCurrentTheme()!);
-      }
-
-      // Apply saved theme after app has loaded (includes environment for cloud colors)
-      await themeManager.applySavedThemeAfterLoad();
     } else {
       logger.error(`App "${initialStory}" not found in registry`);
     }

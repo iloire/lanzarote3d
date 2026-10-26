@@ -62,7 +62,7 @@ class BoatsAnimationApp extends TerrainBase {
       }
 
       // Apply theme BEFORE loading environment to ensure visual consistency
-      const theme = options.theme ?? getDefaultTheme();
+      const theme = getDefaultTheme();
       await ThemeEngine.apply(options, theme);
 
       // Initialize core systems from TerrainBase

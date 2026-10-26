@@ -97,7 +97,7 @@ class HomeApp extends TerrainBase {
         controls.update();
       }
 
-      const theme = options.theme ?? getDefaultTheme();
+      const theme = getDefaultTheme();
       await ThemeEngine.apply(options, theme);
 
       this.initializeCore(options);

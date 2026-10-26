@@ -3,7 +3,6 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { Sky } from '../foundation/components/environment';
 import { Island } from '../foundation/components/scenery/Island';
 import { GUI } from 'lil-gui';
-import { Theme } from '../foundation/types/Theme';
 import Environment from './env/environment';
 import type { RenderPipeline } from '../foundation/rendering/RenderPipeline';
 
@@ -22,6 +21,5 @@ export interface StoryOptions {
   pipeline?: RenderPipeline; // Filmic renderer for the terrain scenes (TerrainBase)
 
   // Optional parameters
-  theme?: Theme; // Optional theme parameter
   environment?: Environment; // Optional Environment instance for theme application
 }

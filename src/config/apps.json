@@ -34,8 +34,7 @@
       "category": "demo",
       "requiresWebGL": true,
       "visibility": "private",
-      "priority": 3,
-      "theme": "artic"
+      "priority": 3
     },
     "town": {
       "name": "Town",

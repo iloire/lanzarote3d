@@ -2,7 +2,8 @@
 
 Every scene built on `TerrainBase` (Home, the Famara and Boats animations, and static Famara)
 draws through one shared pipeline. The code lives in
-`src/foundation/rendering/`, and each theme can tune it.
+`src/foundation/rendering/`, and the theme (`DEFAULT_THEME` in `src/foundation/themes/index.ts`)
+tunes it.
 
 ## The frame
 
@@ -41,7 +42,7 @@ Every frame the pipeline also:
 
 ## The sky lights everything
 
-`refreshSky()` runs on load and whenever a theme moves the sun:
+`refreshSky()` runs on load and whenever the sun moves:
 
 - **Environment map**: the sky is rendered through PMREM into `scene.environment`, so
   every `MeshStandardMaterial` (the sea, the ground) is lit by the real sky colour.
@@ -87,7 +88,7 @@ The lines fade with distance: from `lineOpacity` near the camera to `farLineOpac
 600 m and 9 km. Without the fade, the far end of the mesh is so dense that the lines merge
 into a sheet.
 
-Themes without an underlay (satellite) still draw the GL lines, with the same fade and
+A theme without an underlay still draws the GL lines, with the same fade and
 their brightness capped (`LINE_MAX_BRIGHTNESS`) before they blend. Each underlay vertex is
 pushed 0.3 % further along its view ray, so roads and anything else drawn on the ground stay
 in front of it. Polygon offset can't do this, because the logarithmic depth buffer overrides
@@ -113,8 +114,8 @@ scenes share `FAMARA_GULL_FLOCKS` from `shared/env/environment.ts`.
 
 ## Theme schema
 
-Everything here is driven from the themes in `src/foundation/themes/index.ts`. All the new
-fields are optional.
+Everything here is driven from `DEFAULT_THEME` in `src/foundation/themes/index.ts`, the only theme
+(the alternative presets and the menu picker were removed). All the new fields are optional.
 
 ```ts
 water: {
