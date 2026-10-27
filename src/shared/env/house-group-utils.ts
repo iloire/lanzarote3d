@@ -34,9 +34,10 @@ export function calculateHousePositions(
     }
 
     case 'grid': {
-      // Regular grid pattern
-      const actualRowCount = 3;
-      const actualColCount = 3;
+      // Regular grid pattern, as near square as the count allows, so a big town doesn't run
+      // off in a long strip
+      const actualColCount = Math.ceil(Math.sqrt(houseCount));
+      const actualRowCount = Math.ceil(houseCount / actualColCount);
 
       for (let i = 0; i < houseCount; i++) {
         const row = Math.floor(i / actualColCount);
@@ -190,6 +191,7 @@ function generateLandPlot(
     Barn: 80,
     DesertHouse: 70,
     DesertHouseWithPool: 90,
+    RoundBungalow: 45,
   };
 
   const baseDepths: Record<HouseConfig['type'], number> = {
@@ -199,6 +201,7 @@ function generateLandPlot(
     Barn: 100,
     DesertHouse: 80,
     DesertHouseWithPool: 100,
+    RoundBungalow: 40,
   };
 
   const landColors = plot?.colors ?? ['#D2B48C', '#DEB887', '#F5DEB3', '#D2691E', '#CD853F']; // Desert sand shades

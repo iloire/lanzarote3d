@@ -14,6 +14,8 @@ import {
   Barn,
   DesertHouse,
   DesertHouseWithPool,
+  RoundBungalow,
+  CanaryPalm,
   FishingBoat,
   SmallSailBoat,
   SpeedBoat,
@@ -43,6 +45,7 @@ import { HARBOUR_FEATURES } from '../puerto-del-carmen/harbour';
 import {
   createErmita,
   createMast,
+  createMirador,
   createRadarStation,
   createWindsock,
 } from '../../foundation/components/scenery/landmarks/Landmarks';
@@ -197,6 +200,12 @@ export const MODEL_CATALOG: ModelEntry[] = [
     group: 'Buildings',
     create: () => new DesertHouseWithPool(lod),
   },
+  {
+    id: 'round-bungalow',
+    name: 'Round bungalow (Famara)',
+    group: 'Buildings',
+    create: () => new RoundBungalow(lod),
+  },
   { id: 'pool', name: 'Pool', group: 'Buildings', create: () => new Pool() },
   {
     id: 'harbour',
@@ -213,6 +222,13 @@ export const MODEL_CATALOG: ModelEntry[] = [
     group: 'Landmarks',
     scale: 2,
     create: landmark(createRadarStation),
+  },
+  {
+    id: 'mirador',
+    name: 'Mirador del Río',
+    group: 'Landmarks',
+    scale: 2,
+    create: landmark(createMirador),
   },
   { id: 'mast', name: 'Mast', group: 'Landmarks', scale: 2, create: landmark(createMast) },
   {
@@ -231,6 +247,7 @@ export const MODEL_CATALOG: ModelEntry[] = [
   },
 
   { id: 'tree', name: 'Tree', group: 'Nature', create: () => new Tree() },
+  { id: 'canary-palm', name: 'Canary palm', group: 'Nature', create: () => new CanaryPalm(lod) },
   { id: 'stone', name: 'Stone', group: 'Nature', create: () => new Stone() },
   {
     id: 'barrel-cactus',

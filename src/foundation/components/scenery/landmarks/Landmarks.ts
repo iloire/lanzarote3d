@@ -94,6 +94,30 @@ export const createMast = (height = 45): THREE.Mesh => {
 };
 
 /**
+ * An icosphere's facets above `floor`, squashed to `squash` of its height: a radome, or a
+ * Manrique cupola. Alternate facets a shade apart, so the panels show even in flat light.
+ */
+const dome = (
+  mesh: MeshBuilder,
+  centre: THREE.Vector3,
+  radius: number,
+  squash: number,
+  floor: number
+) => {
+  const sphere = new THREE.IcosahedronGeometry(radius, 1);
+  const p = sphere.getAttribute('position');
+  for (let i = 0; i < p.count; i += 3) {
+    const [a, b, c] = [0, 1, 2].map(k => {
+      const v = new THREE.Vector3().fromBufferAttribute(p, i + k);
+      return v.setY(v.y * squash).add(centre);
+    }) as [THREE.Vector3, THREE.Vector3, THREE.Vector3];
+    if ((a.y + b.y + c.y) / 3 < floor) continue;
+    mesh.tri(a, b, c, (i / 3) % 2 === 0 ? WHITE : LIME);
+  }
+  sphere.dispose();
+};
+
+/**
  * The air-surveillance station on Peñas del Chache, the top of the Risco: a faceted white radome
  * on a drum, the operations block beside it and a mast of its own.
  */
@@ -106,19 +130,8 @@ export const createRadarStation = (): THREE.Mesh => {
   cylinder(mesh, 0, 0, radius * 0.75, -FOOTING, drumTop, LIME, 8);
   cylinder(mesh, 0, 0, radius * 0.8, drumTop - 0.6, drumTop + 0.4, CONCRETE, 8);
 
-  // Radome: an icosphere's facets above its lower quarter, so it reads as a geodesic ball
-  const sphere = new THREE.IcosahedronGeometry(radius, 1);
-  const p = sphere.getAttribute('position');
-  const centre = new THREE.Vector3(0, drumTop + radius * 0.55, 0);
-  for (let i = 0; i < p.count; i += 3) {
-    const [a, b, c] = [0, 1, 2].map(k =>
-      new THREE.Vector3().fromBufferAttribute(p, i + k).add(centre)
-    ) as [THREE.Vector3, THREE.Vector3, THREE.Vector3];
-    if ((a.y + b.y + c.y) / 3 < drumTop) continue;
-    // Alternate facets a shade apart, so the panels show even in flat light
-    mesh.tri(a, b, c, (i / 3) % 2 === 0 ? WHITE : LIME);
-  }
-  sphere.dispose();
+  // Radome: a geodesic ball, its lower quarter hidden in the drum
+  dome(mesh, new THREE.Vector3(0, drumTop + radius * 0.55, 0), radius, 1, drumTop);
 
   // Operations block, flat-roofed with a row of dark windows
   const ops = volume(17, 2, 16, 9, -FOOTING, 4.5);
@@ -176,6 +189,67 @@ export const createErmita = (): THREE.Mesh => {
   [-7, 7].forEach(x => block(mesh, volume(x, nave.z1 + 3, 0.6, 6, -FOOTING, 1.2), WHITE));
 
   return asMesh(mesh, 'Ermita de las Nieves');
+};
+
+const LAVA = new THREE.Color('#3E3631');
+const LAVA_LIGHT = new THREE.Color('#544941');
+const EARTH = new THREE.Color('#6B5A4A');
+const SEA_GLASS = new THREE.Color('#3B5566');
+
+/**
+ * Manrique's Mirador del Río at the north end of the Risco, built into the cliff top so it nearly
+ * disappears: a D-shaped body walled in dry volcanic stone, a long curved band of glass in its
+ * front looking out over El Río to La Graciosa, the roof laid with earth and broken by two white
+ * cupolas, and a low stone parapet round the terrace in front.
+ */
+export const createMirador = (): THREE.Mesh => {
+  const mesh = new MeshBuilder();
+  const radius = 16;
+  const height = 5;
+  const sweep = THREE.MathUtils.degToRad(75);
+  const segments = 12;
+  const at = (a: number, r: number, y: number) =>
+    new THREE.Vector3(Math.sin(a) * r, y, Math.cos(a) * r);
+  const angles = Array.from(
+    { length: segments + 1 },
+    (_, i) => -sweep + (2 * sweep * i) / segments
+  );
+
+  angles.slice(0, -1).forEach((a, i) => {
+    const b = angles[i + 1]!;
+    const stone = i % 2 === 0 ? LAVA : LAVA_LIGHT;
+    mesh.quad(
+      at(a, radius, -FOOTING),
+      at(b, radius, -FOOTING),
+      at(b, radius, height),
+      at(a, radius, height),
+      stone
+    );
+    // The glass band runs across the middle of the front, under a stone lintel
+    if (i >= 2 && i < segments - 2) {
+      const r = radius + 0.15;
+      mesh.quad(at(a, r, 1.4), at(b, r, 1.4), at(b, r, 3.9), at(a, r, 3.9), SEA_GLASS);
+    }
+    // Earth roof fanned from the middle of the back wall
+    const back = new THREE.Vector3(0, height, Math.cos(sweep) * radius);
+    mesh.tri(back, at(b, radius, height), at(a, radius, height), EARTH);
+    // Terrace parapet, a few metres out
+    const t = radius + 5;
+    mesh.quad(at(a, t, -FOOTING), at(b, t, -FOOTING), at(b, t, 1.1), at(a, t, 1.1), LAVA_LIGHT);
+  });
+  // Back wall along the chord, mostly buried in the hill
+  const [left, right] = [at(-sweep, radius, 0), at(sweep, radius, 0)];
+  mesh.quad(
+    left.clone().setY(-FOOTING),
+    right.clone().setY(-FOOTING),
+    right.clone().setY(height),
+    left.clone().setY(height),
+    LAVA
+  );
+
+  dome(mesh, new THREE.Vector3(-4, height - 0.5, radius * 0.58), 4, 0.7, height);
+  dome(mesh, new THREE.Vector3(4.5, height - 0.5, radius * 0.5), 3.2, 0.7, height);
+  return asMesh(mesh, 'Mirador del Río');
 };
 
 const SOCK_LENGTH = 5;

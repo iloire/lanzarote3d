@@ -4,10 +4,9 @@ import {
   HouseType,
   Pool,
   Stone,
-  SaguaroCactus,
   BarrelCactus,
   PricklyPearCactus,
-  OrganPipeCactus,
+  CanaryPalm,
 } from '../../foundation/components/scenery';
 import {
   Villa,
@@ -15,6 +14,7 @@ import {
   Barn,
   DesertHouse,
   DesertHouseWithPool,
+  RoundBungalow,
 } from '../../foundation/components/scenery/buildings';
 import { LevelOfDetail, getLODFromLegacy } from '../../foundation/types/lod';
 import { ComponentRegistry } from '../../foundation/systems/ComponentRegistry';
@@ -174,6 +174,15 @@ export class HouseGroupCreator {
           houseMesh = await house.load();
           break;
 
+        case 'RoundBungalow':
+          house = new RoundBungalow({
+            scale: scale,
+            levelOfDetail: this.levelOfDetail,
+            ...(houseConfig.colors || {}),
+          });
+          houseMesh = await house.load();
+          break;
+
         default:
           logger.warn(`Unknown house type: ${houseConfig.type}`);
           return null;
@@ -316,12 +325,9 @@ export class HouseGroupCreator {
         } else if (elementType < 0.7) {
           // 20% chance for prickly pear cactus
           elementPromises.push(this.addPricklyPearCactus(elementPosition));
-        } else if (elementType < 0.85) {
-          // 15% chance for saguaro cactus
-          elementPromises.push(this.addSaguaroCactus(elementPosition));
         } else {
-          // 15% chance for organ pipe cactus
-          elementPromises.push(this.addOrganPipeCactus(elementPosition));
+          // 30% chance for a Canary palm, the island's garden palm
+          elementPromises.push(this.addCanaryPalm(elementPosition));
         }
       } catch (error) {
         logger.error('Error adding landscape element:', error);
@@ -402,34 +408,21 @@ export class HouseGroupCreator {
     this.createdObjects.push(cactusMesh);
   }
 
-  private async addSaguaroCactus(position: THREE.Vector3): Promise<void> {
-    const cactus = new SaguaroCactus({
-      scale: 0.2 + Math.random() * 0.3,
+  private async addCanaryPalm(position: THREE.Vector3): Promise<void> {
+    const palm = new CanaryPalm({
+      height: 7 + Math.random() * 5,
+      seed: Math.random() * 1000,
       levelOfDetail: this.levelOfDetail,
     });
-    const cactusMesh = await cactus.load();
+    const palmMesh = await palm.load();
 
     // Tag as landscape element for terrain adaptation
-    cactusMesh.userData.isLandscapeElement = true;
+    palmMesh.userData.isLandscapeElement = true;
 
-    cactusMesh.position.copy(position);
-    this.scene.add(cactusMesh);
-    this.createdObjects.push(cactusMesh);
-  }
-
-  private async addOrganPipeCactus(position: THREE.Vector3): Promise<void> {
-    const cactus = new OrganPipeCactus({
-      scale: 0.3 + Math.random() * 0.3,
-      levelOfDetail: this.levelOfDetail,
-    });
-    const cactusMesh = await cactus.load();
-
-    // Tag as landscape element for terrain adaptation
-    cactusMesh.userData.isLandscapeElement = true;
-
-    cactusMesh.position.copy(position);
-    this.scene.add(cactusMesh);
-    this.createdObjects.push(cactusMesh);
+    palmMesh.position.copy(position);
+    palmMesh.rotation.y = Math.random() * Math.PI * 2;
+    this.scene.add(palmMesh);
+    this.createdObjects.push(palmMesh);
   }
 
   /**

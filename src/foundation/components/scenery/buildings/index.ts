@@ -8,6 +8,7 @@ export { Townhouse, default as TownhouseLegacy } from './Townhouse';
 export { Barn, default as BarnLegacy } from './Barn';
 export { DesertHouse, default as DesertHouseLegacy } from './DesertHouse';
 export { DesertHouseWithPool, default as DesertHouseWithPoolLegacy } from './DesertHouseWithPool';
+export { RoundBungalow } from './RoundBungalow';
 
 // Export types
 export type { HouseOptions } from './House';
@@ -16,3 +17,4 @@ export type { TownhouseOptions } from './Townhouse';
 export type { BarnOptions } from './Barn';
 export type { DesertHouseOptions } from './DesertHouse';
 export type { DesertHouseWithPoolOptions } from './DesertHouseWithPool';
+export type { RoundBungalowOptions } from './RoundBungalow';

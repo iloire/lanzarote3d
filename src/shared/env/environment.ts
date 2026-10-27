@@ -55,14 +55,32 @@ export const TOWN_NORUEGOS = town(29.11441, -13.54721); // Urbanización Famara
 export const TOWN_TEGUISE = town(29.05925, -13.56022);
 export const TOWN_SOO = town(29.09932, -13.62235);
 
+/** Urbanización Famara: whitewashed round bungalows, woodwork in blue or Canarian green */
+const FAMARA_BUNGALOWS: HouseStyle = {
+  types: { RoundBungalow: 1 },
+  palette: {
+    wallColor: ['#F7F5EF', '#F2EFE6', '#EFEBE1'],
+    roofColor: ['#DCD6C8', '#CFC8B8'],
+    accentColor: ['#2F6DB5', '#3C7A4A', '#2E5E8C'],
+  },
+  // Small sandy plots, packed close the way the village is
+  plot: { scale: 0.7, colors: ['#CFC3A8', '#D8CCB0', '#C4B89C'] },
+};
+
 /**
  * Lanzarote island town configuration
  * Real locations of major settlements on the island
  */
 export const LANZAROTE_TOWNS: TownConfig[] = [
-  { position: TOWN_LAS_LADERAS, houseCount: 50, formation: 'rural', spacing: 2.0 },
+  { position: TOWN_LAS_LADERAS, houseCount: 12, formation: 'rural', spacing: 4.0 }, // scattered farmsteads, not a village
   { position: TOWN_FAMARA, houseCount: 120, formation: 'rural', spacing: 2.0 },
-  { position: TOWN_NORUEGOS, houseCount: 50, formation: 'grid' },
+  {
+    position: TOWN_NORUEGOS,
+    houseCount: 80,
+    formation: 'grid',
+    spacing: 0.5,
+    style: FAMARA_BUNGALOWS,
+  },
   { position: TOWN_TEGUISE, houseCount: 51, formation: 'suburban' },
   { position: TOWN_SOO, houseCount: 40, formation: 'rural' },
 ];

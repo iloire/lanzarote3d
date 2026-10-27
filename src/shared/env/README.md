@@ -29,7 +29,7 @@ with the same anchor, so roads and towns stay together.
 
 ## `landmarks.json`
 
-The landmarks on the Risco and at its takeoffs, placed from OpenStreetMap. `landmarks.ts` projects
+The landmarks on the Risco, at its takeoffs and in Haría, placed from OpenStreetMap. `landmarks.ts` projects
 each with `ISLAND_ANCHOR`, sets it on the terrain and builds it from
 `foundation/components/scenery/landmarks/Landmarks.ts`.
 
@@ -40,12 +40,14 @@ each with `ISLAND_ANCHOR`, sets it on the terrain and builds it from
   "landmarks": [
     {
       "name": "…", // free text, also the object's name in the scene
-      "kind": "radar" | "ermita" | "mast" | "windsock",
+      "kind": "radar" | "ermita" | "mast" | "windsock" | "mirador" | "palms",
       "osm": "node/…", // the feature it was placed from
       "at": [lat, lon],
       "heading": 315, // optional: compass bearing the front faces; the windsock turns to the wind
       "height": 30, // optional, masts only: metres to the top, default 45
-      "top": 200 // optional: lift it onto the highest ground within this many units
+      "top": 200, // optional: lift it onto the highest ground within this many units
+      "count": 60, // palms only: how many palms in the grove, default 30
+      "radius": 450 // palms only: units from the centre they spread over, default 300
     }
   ]
 }

@@ -42,6 +42,22 @@
       "kind": "windsock",
       "osm": "node/3001813520",
       "at": [29.08495, -13.57228]
+    },
+    {
+      "name": "Mirador del Río",
+      "kind": "mirador",
+      "osm": "relation/19357684",
+      "at": [29.21442, -13.48137],
+      "heading": 310,
+      "top": 200
+    },
+    {
+      "name": "Palm grove in the valley of Haría",
+      "kind": "palms",
+      "osm": "relation/340781",
+      "at": [29.14589, -13.5001],
+      "count": 60,
+      "radius": 450
     }
   ]
 }

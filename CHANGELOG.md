@@ -2,6 +2,16 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 13:18 UTC
+
+### Added
+- **Canary palms**: a low-poly Phoenix canariensis (`CanaryPalm`: banded trunk, knob of frond bases, a round crown of rising and arching fronds, dates up close; 206 triangles at the towns' ULTRA_LOW). They replace the saguaro and organ-pipe cacti in the town gardens (30% of garden elements; barrel and prickly pear stay), and a grove of 60 grows in the valley of Haría (`kind: "palms"` in `shared/env/landmarks.json`, one mesh for the whole grove)
+- **Mirador del Río**: Manrique's lookout at the north end of the Risco, from OSM relation 19357684: a D-shaped body in dry lava stone with a curved glass band facing La Graciosa, an earth roof with two white cupolas and a stone terrace parapet
+- **Round bungalows at Urbanización Famara**: `RoundBungalow`, two whitewashed round rooms under flat roofs with blue or green woodwork; the town is now 80 of them on small sandy plots (`FAMARA_BUNGALOWS` style)
+
+### Fixed
+- **Grid towns laid out square**: the `grid` formation had three columns whatever the count, so a big town ran off in a long strip (Urbanización Famara climbed the Risco); columns are now the square root of the count, which leaves the nine-house blocks of Puerto del Carmen as they were
+
 ## 2026-10-27 12:42 UTC
 
 ### Added

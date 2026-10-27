@@ -4,7 +4,14 @@ import * as THREE from 'three';
  * Configuration for individual houses in a neighborhood
  */
 export interface HouseConfig {
-  type: 'House' | 'Villa' | 'Townhouse' | 'Barn' | 'DesertHouse' | 'DesertHouseWithPool';
+  type:
+    | 'House'
+    | 'Villa'
+    | 'Townhouse'
+    | 'Barn'
+    | 'DesertHouse'
+    | 'DesertHouseWithPool'
+    | 'RoundBungalow';
   scale?: number;
   includePool?: boolean; // Random chance if not specified
   colors?: { [key: string]: string }; // House-specific color overrides
