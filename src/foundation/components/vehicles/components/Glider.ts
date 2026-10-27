@@ -20,6 +20,12 @@ const TIP_ARC = 1.15; // radians the canopy has turned down by at the tip
 const ARC_EXPONENT = 1.6; // > 1 keeps the centre flat and curls the tips
 const CELL_BILLOW = 1.12; // profile scale midway between two ribs
 const TIP_ACCENT = 0.72; // span fraction where wingColor2 takes over on the top surface
+/** Span bands of the stripes near each tip, and how far back from the nose they run */
+const STRIPE_BANDS: [number, number][] = [
+  [0.76, 0.81],
+  [0.85, 0.88],
+];
+const STRIPE_CHORD = 0.45;
 const CARABINER_HALF_GAP = 150;
 const RISER_LENGTH = 450;
 const HANDS = new THREE.Vector3(-150, 380, 330); // z mirrored per side
@@ -45,6 +51,8 @@ export type GliderOptions = {
   wingColor2?: string;
   /** Cell openings along the leading edge */
   inletsColor?: string;
+  /** Two stripes across the front of each tip, top and bottom; none when unset */
+  stripeColor?: string;
   lineColor?: string;
   /** Cells per half wing */
   numeroCajones?: number;
@@ -128,10 +136,13 @@ const createCanopy = (ribs: Rib[], options: GliderOptions): THREE.Mesh => {
   const tips = new THREE.Color(options.wingColor2);
   const bottom = top.clone().lerp(new THREE.Color('#000000'), 0.25);
   const inlets = new THREE.Color(options.inletsColor);
+  const stripe = options.stripeColor ? new THREE.Color(options.stripeColor) : null;
 
   const outlines = ribs.map((rib, i) => ribOutline(rib, i % 2 === 0 ? 1 : CELL_BILLOW));
   const pointsPerRib = outlines[0]!.length;
   const topPoints = PROFILE_X.length;
+  // Chord position of each outline point, in the order ribOutline lists them
+  const outlineX = [...[...PROFILE_X].reverse(), ...PROFILE_X.slice(1, -1)];
 
   const positions: number[] = [];
   const colors: number[] = [];
@@ -154,7 +165,19 @@ const createCanopy = (ribs: Rib[], options: GliderOptions): THREE.Mesh => {
       const onTop = p < topPoints - 1;
       // The segment just under the nose is where the cells breathe
       const isInlet = p === topPoints - 1 && t < 0.9;
-      const color = isInlet ? inlets : onTop ? (t > TIP_ACCENT ? tips : top) : bottom;
+      const isStripe =
+        stripe !== null &&
+        (outlineX[p]! + outlineX[q]!) / 2 < STRIPE_CHORD &&
+        STRIPE_BANDS.some(([from, to]) => t >= from && t <= to);
+      const color = isInlet
+        ? inlets
+        : isStripe
+          ? stripe
+          : onTop
+            ? t > TIP_ACCENT
+              ? tips
+              : top
+            : bottom;
       pushTriangle(a[p]!, b[p]!, b[q]!, color);
       pushTriangle(a[p]!, b[q]!, a[q]!, color);
     }

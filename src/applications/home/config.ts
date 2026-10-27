@@ -10,6 +10,8 @@ export type ParagliderVoxelConfig = {
   startProgress: number;
   /** Shifts this pilot's copy of the loop so the pilots don't fly through each other */
   pathOffset: THREE.Vector3;
+  /** A loop of this pilot's own, flown instead of the shared one (pathOffset still applies) */
+  waypoints?: THREE.Vector3[];
 };
 
 export type HanggliderConfig = {
@@ -83,6 +85,21 @@ export const RIDGE_LOOP: THREE.Vector3[] = [
 export const RIDGE_LOOP_TENSION = 0.5;
 export const PARAGLIDER_SPEED = 15;
 
+/** Raises the ridge loop by `rise` and widens it about its centre by `widen` */
+function liftLoop(rise: number, widen: number): THREE.Vector3[] {
+  const centre = RIDGE_LOOP.reduce((sum, p) => sum.add(p), new THREE.Vector3()).divideScalar(
+    RIDGE_LOOP.length
+  );
+  return RIDGE_LOOP.map(p =>
+    p
+      .clone()
+      .sub(centre)
+      .multiplyScalar(widen)
+      .add(centre)
+      .setY(p.y + rise)
+  );
+}
+
 /** The first pilot leads: the camera flies in to it and follows it round the loop */
 export const paraglidersVoxel: ParagliderVoxelConfig[] = [
   {
@@ -137,22 +154,25 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
     startProgress: 0.65,
     pathOffset: new THREE.Vector3(-20, 40, -10),
   },
+  {
+    // Magne is the best of them: his loop is raised clear of everyone's (the others top out
+    // at ~975 m, his lowest point is ~1005 m) and widened past the hang glider's, so he is
+    // always higher and farther out. Lime Ozone Rush with navy stripes near the tips.
+    options: {
+      glider: {
+        wingColor1: '#c5d62a',
+        wingColor2: '#c5d62a',
+        stripeColor: '#1f3584',
+        inletsColor: '#8a9a1c',
+        numeroCajones: 31,
+      },
+      pilot: { characterType: CharacterType.MAGNE },
+    },
+    startProgress: 0.2,
+    pathOffset: new THREE.Vector3(0, 0, 0),
+    waypoints: liftLoop(130, 1.5),
+  },
 ];
-
-/** Raises the ridge loop by `rise` and widens it about its centre by `widen` */
-function liftLoop(rise: number, widen: number): THREE.Vector3[] {
-  const centre = RIDGE_LOOP.reduce((sum, p) => sum.add(p), new THREE.Vector3()).divideScalar(
-    RIDGE_LOOP.length
-  );
-  return RIDGE_LOOP.map(p =>
-    p
-      .clone()
-      .sub(centre)
-      .multiplyScalar(widen)
-      .add(centre)
-      .setY(p.y + rise)
-  );
-}
 
 export const hanggliderConfig: HanggliderConfig = {
   scale: 1.0,

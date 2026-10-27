@@ -8,6 +8,7 @@ export enum CharacterType {
   ADRI = 'adri',
   IVAN = 'ivan',
   JEHOSUA = 'jehosua',
+  MAGNE = 'magne',
   MIGUEL = 'miguel',
   ROOS = 'roos',
   PILOT_CLASSIC = 'pilot-classic',
@@ -125,6 +126,11 @@ export class CharacterRegistry {
         id: CharacterType.JEHOSUA,
         name: 'Jehosua',
         description: 'Piratas Aéreos pilot - skull helmet, open harness',
+      },
+      {
+        id: CharacterType.MAGNE,
+        name: 'Magne',
+        description: 'Blue full-face helmet with a peak, blue jacket, black cocoon harness',
       },
       {
         id: CharacterType.MIGUEL,

@@ -32,7 +32,7 @@ export interface FlightLoop {
 
 /**
  * Loads the paragliders, each flying its copy of the loop (the Famara ridge loop unless another
- * is given) from its own start point. They are placed on the loop straight away and fly from the
+ * is given, or the pilot has a loop of its own) from its own start point. They are placed on the loop straight away and fly from the
  * first frame.
  */
 export async function loadParagliders(
@@ -64,7 +64,7 @@ export async function loadParagliders(
           turnSpeed: 1.0,
           forwardAxis: '-z',
           debugVectors: DEBUG_VECTORS,
-          waypoints: loop.waypoints.map(point => point.clone().add(p.pathOffset)),
+          waypoints: (p.waypoints ?? loop.waypoints).map(point => point.clone().add(p.pathOffset)),
           waypointTension: loop.tension,
           waypointLoop: true,
           waypointStartProgress: p.startProgress,

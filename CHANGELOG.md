@@ -2,6 +2,13 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 10:09 UTC
+
+### Added
+- **Magne joins the home pilots**: his voxel model from `3d-characters` (blue full-face helmet, blue jacket, black cocoon) under a lime Ozone Rush with navy stripes near the tips. He is the best of them, so he flies a loop of his own, the ridge loop raised 130 m and widened 1.5× (`liftLoop(130, 1.5)`): 1005–1067 m against the others' 875–977 m, 6.4 km a lap against 4.3 km, at least 267 m over the terrain, and farther out than the hang glider's
+- **Glider stripes**: `GliderOptions.stripeColor` paints two stripes across the front of each wingtip, top and bottom; wings without it are unchanged
+- A paraglider config can carry `waypoints` of its own instead of the shared ridge loop
+
 ## 2026-10-27 09:35 UTC
 
 ### Added
