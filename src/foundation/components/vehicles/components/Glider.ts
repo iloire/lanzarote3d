@@ -26,9 +26,8 @@ type WingShape = {
 
 /**
  * A standard wing is big and thick for lift, tapers to its tips and stays flat in the middle. A
- * roller (speed wing) has about half the area, a thinner, flatter section, shorter lines, a
- * nearly rectangular plan with square tips, and an arc that bends evenly from centre to tip into
- * almost a half circle; it flies half as fast again.
+ * roller (speed wing) is smaller, with a thin flat section, shorter lines and a shallow arc that
+ * only drops towards the tips; it flies half as fast again.
  */
 export const WING_SHAPES = {
   standard: {
@@ -54,16 +53,19 @@ export const WING_SHAPES = {
     arcExponent: 1.5,
     speedFactor: 1,
   },
-  /** Niviuk Roller */
+  /**
+   * Niviuk Roller: Niviuk's flat aspect ratio of 4.3, three quarters of the Rush's area (a 16
+   * against a 21), and a shallow arc: the real 16 spans 8.3 m flat and 7.2 m projected
+   */
   roller: {
-    halfSpan: 3300,
-    rootChord: 1500,
-    tipChord: 0.85,
-    thickness: 0.1,
+    halfSpan: 3700,
+    rootChord: 1900,
+    tipChord: 0.55,
+    thickness: 0.09,
     camber: 0.03,
     lineHeight: 3300,
-    tipArc: 1.35,
-    arcExponent: 1,
+    tipArc: 0.95,
+    arcExponent: 1.4,
     speedFactor: 1.5,
   },
 } satisfies Record<string, WingShape>;
