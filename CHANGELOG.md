@@ -2,6 +2,12 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 11:34 UTC
+
+### Changed
+- **The pilots spread out along the Risco**: Roos stays low by takeoff at the south-west end; Miguel, David, Luc, Jehosua, Fabio and Franz step up the cliff towards La Graciosa every ~500 m (0.45–2.95 km), each higher than the last (865–1147 m, at least 124 m over the ground), instead of all sharing Ivan's loop a few tens of metres apart; Bernt moves out to 6 km and 1325–1387 m, Magne to 8.5 km and 1625–1687 m
+- **The Hercules passes high over everyone**: its loop is raised 600 m to 2000–2200 m, well above Magne
+
 ## 2026-10-27 11:30 UTC
 
 ### Changed

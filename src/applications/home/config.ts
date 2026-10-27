@@ -276,7 +276,13 @@ const niviukIkuma = (colors: { base: string; tip: string; inlets: string }): Gli
 /** Fabio's: pink with black tips */
 export const FABIO_IKUMA = niviukIkuma({ base: '#9c1a58', tip: '#161616', inlets: '#6a1040' });
 
-/** The first pilot leads: the camera flies in to it and follows it round the loop */
+/**
+ * The first pilot leads: the camera flies in to it and follows it round the loop.
+ *
+ * They spread out along the Risco: Roos low by takeoff at the south-west end, the middle group
+ * stepped up the cliff towards La Graciosa every ~500 m, each higher than the last (865-1147 m,
+ * every one at least 124 m clear of the ground), then Bernt and Magne far out and highest.
+ */
 export const paraglidersVoxel: ParagliderVoxelConfig[] = [
   {
     options: {
@@ -292,16 +298,18 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
       glider: PURPLE_ROLLER,
       pilot: { characterType: CharacterType.MIGUEL },
     },
+    // 0.45 km up the cliff (the roller's drop takes his 30 m rise to -10)
     startProgress: 0.04,
-    pathOffset: new THREE.Vector3(-30, 25, 20),
+    pathOffset: new THREE.Vector3(147, 30, -442),
   },
   {
     options: {
       glider: JEHOSUA_RUSH,
       pilot: { characterType: CharacterType.JEHOSUA },
     },
+    // 1.95 km up the cliff
     startProgress: 0.35,
-    pathOffset: new THREE.Vector3(20, -15, 0),
+    pathOffset: new THREE.Vector3(1020, 120, -1663),
   },
   {
     options: {
@@ -335,8 +343,9 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
       glider: DAVID_DELTA,
       pilot: { characterType: CharacterType.DAVID },
     },
+    // 0.95 km up the cliff
     startProgress: 0.12,
-    pathOffset: new THREE.Vector3(25, 10, -20),
+    pathOffset: new THREE.Vector3(488, 80, -816),
   },
   {
     options: {
@@ -344,16 +353,18 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
       glider: GREEN_ROLLER,
       pilot: { characterType: CharacterType.LUC },
     },
+    // 1.45 km up the cliff, out over the sea (the roller's drop takes his rise to 70)
     startProgress: 0.27,
-    pathOffset: new THREE.Vector3(-25, 5, 15),
+    pathOffset: new THREE.Vector3(671, 110, -1295),
   },
   {
     options: {
       glider: FABIO_IKUMA,
       pilot: { characterType: CharacterType.FABIO },
     },
+    // 2.45 km up the cliff
     startProgress: 0.5,
-    pathOffset: new THREE.Vector3(15, 20, 25),
+    pathOffset: new THREE.Vector3(1245, 170, -2114),
   },
   {
     options: {
@@ -361,32 +372,33 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
       glider: MAGNE_RUSH,
       pilot: { characterType: CharacterType.BERNT },
     },
-    // Out on his own, 4.2 km up the Risco towards La Graciosa and 300 m higher (1175-1237 m,
-    // at least 608 m clear of the ground)
+    // Out on his own, 6 km up the Risco towards La Graciosa and 450 m higher (1325-1387 m,
+    // at least 179 m clear of the ground)
     startProgress: 0.8,
-    pathOffset: new THREE.Vector3(2300, 0, -3500),
-    waypoints: liftLoop(300, 1),
+    pathOffset: new THREE.Vector3(3000, 0, -5200),
+    waypoints: liftLoop(450, 1),
   },
   {
     options: {
       glider: FRANZ_BUZZ,
       pilot: { characterType: CharacterType.FRANZ },
     },
+    // 2.95 km up the cliff, the highest of the middle group
     startProgress: 0.9,
-    pathOffset: new THREE.Vector3(-15, -10, -25),
+    pathOffset: new THREE.Vector3(1569, 210, -2499),
   },
   {
-    // Magne is the best of them: his loop is widened 1.5x, raised above everyone's (1425-1487 m;
-    // the others top out at ~1237 m) and carried 6 km up the Risco towards La Graciosa, past
+    // Magne is the best of them: his loop is widened 1.5x, raised above everyone's (1625-1687 m;
+    // Bernt tops out at ~1387 m) and carried 8.5 km up the Risco towards La Graciosa, past
     // Bernt, out along the cliff edge, so he is always higher and farther out.
-    // At least ~240 m clear of the ground.
+    // At least ~430 m clear of the ground.
     options: {
       glider: MAGNE_RUSH,
       pilot: { characterType: CharacterType.MAGNE },
     },
     startProgress: 0.2,
-    pathOffset: new THREE.Vector3(3000, 0, -5200),
-    waypoints: liftLoop(550, 1.5),
+    pathOffset: new THREE.Vector3(4000, 0, -7500),
+    waypoints: liftLoop(750, 1.5),
   },
 ];
 
@@ -417,7 +429,7 @@ export const cessnaConfig: CessnaConfig = {
   forwardAxis: 'x',
   // An oval 1-3 km out to sea off the Risco, parallel to it, at 1230-1260 m: 200+ m above the
   // pilots on the ridge loop and at least 1 km from every pilot, Bernt and Magne included;
-  // under the Hercules (1400+). At least 969 m over the ground.
+  // under the Hercules (2000+). At least 969 m over the ground.
   waypoints: [
     new THREE.Vector3(4785, 1240, -870),
     new THREE.Vector3(5985, 1250, -2070),
@@ -434,7 +446,7 @@ export const cessnaConfig: CessnaConfig = {
 };
 
 export const herculesConfig: HerculesConfig = {
-  position: new THREE.Vector3(6200, 1200, -1200),
+  position: new THREE.Vector3(6200, 1800, -1200),
   scale: 2.5,
   bodyColor: '#6B7280',
   wingColor: '#4B5563',
@@ -449,15 +461,16 @@ export const herculesConfig: HerculesConfig = {
   maxHeight: 1600,
   obstacleAvoidanceDistance: 250,
   forwardAxis: 'x',
+  // 2000-2200 m: high over everyone, Magne included (he tops out at ~1687 m)
   waypoints: [
-    new THREE.Vector3(5200, 1500, 2000),
-    new THREE.Vector3(7500, 1600, 1500),
-    new THREE.Vector3(9000, 1550, -4000),
-    new THREE.Vector3(8500, 1500, -7500),
-    new THREE.Vector3(6500, 1450, -8000),
-    new THREE.Vector3(4500, 1400, -5000),
-    new THREE.Vector3(4000, 1450, -1000),
-    new THREE.Vector3(4800, 1500, 500),
+    new THREE.Vector3(5200, 2100, 2000),
+    new THREE.Vector3(7500, 2200, 1500),
+    new THREE.Vector3(9000, 2150, -4000),
+    new THREE.Vector3(8500, 2100, -7500),
+    new THREE.Vector3(6500, 2050, -8000),
+    new THREE.Vector3(4500, 2000, -5000),
+    new THREE.Vector3(4000, 2050, -1000),
+    new THREE.Vector3(4800, 2100, 500),
   ],
   waypointTension: 0.3,
   waypointLoop: true,
