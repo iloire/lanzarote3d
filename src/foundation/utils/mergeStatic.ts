@@ -37,12 +37,19 @@ const isVisibleInTree = (object: THREE.Object3D): boolean => {
 };
 
 /** A copy of the mesh's geometry in world space, non-indexed, with only the attributes the material reads. */
-const worldGeometry = (mesh: THREE.Mesh, keepUv: boolean): THREE.BufferGeometry => {
+const worldGeometry = (
+  mesh: THREE.Mesh,
+  keepUv: boolean,
+  keepColor: boolean
+): THREE.BufferGeometry => {
   const source = mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry.clone();
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', source.getAttribute('position'));
   if (source.getAttribute('normal')) geometry.setAttribute('normal', source.getAttribute('normal'));
   if (keepUv && source.getAttribute('uv')) geometry.setAttribute('uv', source.getAttribute('uv'));
+  if (keepColor && source.getAttribute('color')) {
+    geometry.setAttribute('color', source.getAttribute('color'));
+  }
 
   geometry.applyMatrix4(mesh.matrixWorld);
   if (!geometry.getAttribute('normal')) geometry.computeVertexNormals();
@@ -113,7 +120,9 @@ export function mergeStaticMeshes(roots: THREE.Object3D[], parent: THREE.Object3
 
   const merged: THREE.Mesh[] = [];
   for (const { material, meshes } of groups.values()) {
-    const geometry = concatGeometries(meshes.map(mesh => worldGeometry(mesh, !!material.map)));
+    const geometry = concatGeometries(
+      meshes.map(mesh => worldGeometry(mesh, !!material.map, material.vertexColors))
+    );
     if (!geometry) continue;
     geometry.applyMatrix4(toParentSpace);
 

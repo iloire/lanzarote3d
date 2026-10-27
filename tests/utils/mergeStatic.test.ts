@@ -50,4 +50,26 @@ describe('mergeStaticMeshes', () => {
     expect(shader.parent).toBe(group);
     expect(group.parent).toBe(scene);
   });
+
+  it('keeps per-vertex colours for vertex-coloured materials', () => {
+    const scene = new THREE.Scene();
+    const material = new THREE.MeshLambertMaterial({ vertexColors: true, flatShading: true });
+    const painted = (x: number, hex: number) => {
+      const mesh = box(material, x);
+      const color = new THREE.Color(hex);
+      const count = mesh.geometry.getAttribute('position').count;
+      const colors = new Float32Array(count * 3);
+      for (let i = 0; i < count; i++) colors.set([color.r, color.g, color.b], i * 3);
+      mesh.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+      return mesh;
+    };
+    scene.add(painted(0, 0xff0000), painted(5, 0x0000ff));
+
+    const [merged] = mergeStaticMeshes([...scene.children], scene);
+
+    const colors = merged!.geometry.getAttribute('color');
+    expect(colors.count).toBe(36 * 2);
+    expect([colors.getX(0), colors.getZ(0)]).toEqual([1, 0]);
+    expect([colors.getX(36), colors.getZ(36)]).toEqual([0, 1]);
+  });
 });

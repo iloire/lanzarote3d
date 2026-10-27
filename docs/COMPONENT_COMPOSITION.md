@@ -40,7 +40,14 @@ lofted through stations and painted in bands (sheer, topsides, boot stripe, anti
 rails and sails. Reach for these when building another low-poly vehicle.
 `LODComponent` is the same pattern: its `createContent()` picks `createUltraLowLODContent()`,
 `createLowLODContent()`, `createMediumLODContent()` or `createHighLODContent()` from the
-`levelOfDetail` option. Barn, House, DesertHouse, DesertHouseWithPool, Townhouse and Villa use it.
+`levelOfDetail` option. The cacti use it directly. The buildings (Barn, House, DesertHouse,
+DesertHouseWithPool, Townhouse and Villa) extend `LowPolyBuilding` in
+`scenery/buildings/lowPolyBuilding.ts`, which maps all four hooks onto one `build(mesh, detail)`
+that adds detail as the level rises, and supplies the kit they are made from: open-box walls,
+flat/gabled/hipped roofs, flat panels for doors, windows and trim, chimneys, palms. Towns place
+hundreds of buildings at ULTRA_LOW, so that level is only massing and roof (10 to 26 triangles)
+and every building shares one vertex-coloured material, merging into a single draw call. The
+Models scene takes `?lod=ultra_low|low|medium|high` to inspect each level.
 
 ```typescript
 class Stone extends SimpleThreeComponent {

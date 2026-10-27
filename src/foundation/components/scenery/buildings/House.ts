@@ -1,9 +1,23 @@
 import * as THREE from 'three';
-import { LODComponent } from '../../base/LODComponent';
 import { SimpleComponentOptions } from '../../base/SimpleThreeComponent';
 import { ComponentMetadata } from '../../base/IThreeComponent';
-import { resourceManager } from '../../../systems/ResourceManager';
+import { MeshBuilder } from '../../base/lowPolyMesh';
 import { LevelOfDetail, getLODFromLegacy } from '../../../types/lod';
+import {
+  Face,
+  LowPolyBuilding,
+  OpeningStyle,
+  Volume,
+  block,
+  chimney,
+  color,
+  flatRoof,
+  hipRoof,
+  opening,
+  openingRow,
+  volume,
+  walls,
+} from './lowPolyBuilding';
 
 export enum HouseType {
   Small, // 2 wings
@@ -23,25 +37,42 @@ export interface HouseOptions extends SimpleComponentOptions {
   levelOfDetail?: LevelOfDetail;
 }
 
+const DEFAULTS = {
+  wallColor: '#F5F5DC',
+  accentColor: '#8B4513',
+  roofColor: '#f8f8ff',
+  windowColor: '#4169E1',
+};
+
+/** A wing's footprint centre, its size (width, wall height, depth) and which way it faces */
+interface Wing {
+  x: number;
+  z: number;
+  size: [number, number, number];
+  name: 'main' | 'left' | 'right' | 'back';
+}
+
 /**
- * House building component - Villa-based architecture with configurable wing count
+ * House - a two-storey main block with lower wings either side (and behind, for the larger types)
+ *
+ * Hipped roofs, or flat roofs behind parapets for HouseType.Modern. ULTRA_LOW is the massing: the
+ * main block and the side wings as one long block. LOW builds each wing with the door and front
+ * windows. MEDIUM frames the windows in the accent colour and adds rear windows, a doorstep and a
+ * chimney. HIGH adds shutters, end windows and a porch canopy.
  */
-class House extends LODComponent {
+class House extends LowPolyBuilding {
   private type: HouseType;
 
   constructor(options: HouseOptions = { type: HouseType.Small }) {
     const metadata: ComponentMetadata = {
       name: 'House',
-      version: '2.0.0',
-      description: 'Villa-based house component with 2-4 wings depending on type',
-      tags: ['scenery', 'building', 'residential', 'villa-based'],
+      version: '3.0.0',
+      description: 'Two-storey house with 2-4 wings depending on type. Supports 4 LOD levels.',
+      tags: ['scenery', 'building', 'residential', 'lod'],
     };
 
     super(metadata, {
-      wallColor: '#F5F5DC', // Beige walls
-      accentColor: '#8B4513', // Brown accents
-      roofColor: '#f8f8ff', // Almost white roof
-      windowColor: '#4169E1', // Royal blue windows
+      ...DEFAULTS,
       scale: 1,
       ...options,
     });
@@ -50,532 +81,127 @@ class House extends LODComponent {
     this.currentLOD = options.levelOfDetail ?? getLODFromLegacy(options.lowPoly);
   }
 
-  protected createGeometry(): THREE.BufferGeometry {
-    // Return placeholder - actual geometry created in createSyncContent
-    return new THREE.BoxGeometry(1, 1, 1);
-  }
-
-  private getWingConfiguration(): Array<{
-    position: [number, number, number];
-    size: [number, number, number];
-    name: string;
-  }> {
+  private getWings(): Wing[] {
     switch (this.type) {
-      case HouseType.Small: // 2 wings
+      case HouseType.Small:
         return [
-          { position: [0, 10, 0], size: [20, 20, 20], name: 'main' },
-          { position: [-18, 8, 0], size: [16, 16, 16], name: 'left' },
+          { x: 0, z: 0, size: [20, 14, 20], name: 'main' },
+          { x: -18, z: 0, size: [16, 9, 16], name: 'left' },
         ];
-
-      case HouseType.Medium: // 3 wings
+      case HouseType.Medium:
         return [
-          { position: [0, 10, 0], size: [20, 20, 20], name: 'main' },
-          { position: [-18, 8, 0], size: [16, 16, 16], name: 'left' },
-          { position: [18, 8, 0], size: [16, 16, 16], name: 'right' },
+          { x: 0, z: 0, size: [20, 14, 20], name: 'main' },
+          { x: -18, z: 0, size: [16, 9, 16], name: 'left' },
+          { x: 18, z: 0, size: [16, 9, 16], name: 'right' },
         ];
-
-      case HouseType.Large: // 4 wings
+      case HouseType.Large:
         return [
-          { position: [0, 12, 0], size: [22, 24, 22], name: 'main' },
-          { position: [-20, 10, 0], size: [18, 20, 18], name: 'left' },
-          { position: [20, 10, 0], size: [18, 20, 18], name: 'right' },
-          { position: [0, 8, -20], size: [16, 16, 16], name: 'back' },
+          { x: 0, z: 0, size: [22, 15, 22], name: 'main' },
+          { x: -20, z: 0, size: [18, 10, 18], name: 'left' },
+          { x: 20, z: 0, size: [18, 10, 18], name: 'right' },
+          { x: 0, z: -20, size: [16, 9, 16], name: 'back' },
         ];
-
-      case HouseType.Modern: // 4 wings modern
+      case HouseType.Modern:
         return [
-          { position: [0, 12, 0], size: [24, 24, 24], name: 'main' },
-          { position: [-22, 10, 0], size: [20, 20, 20], name: 'left' },
-          { position: [22, 10, 0], size: [20, 20, 20], name: 'right' },
-          { position: [0, 8, -22], size: [18, 16, 18], name: 'back' },
+          { x: 0, z: 0, size: [24, 15, 24], name: 'main' },
+          { x: -22, z: 0, size: [20, 10, 20], name: 'left' },
+          { x: 22, z: 0, size: [20, 10, 20], name: 'right' },
+          { x: 0, z: -22, size: [18, 9, 18], name: 'back' },
         ];
-
       default:
-        return [{ position: [0, 10, 0], size: [20, 20, 20], name: 'main' }];
+        return [{ x: 0, z: 0, size: [20, 14, 20], name: 'main' }];
     }
   }
 
-  protected createUltraLowLODContent(): THREE.Object3D {
-    // ULTRA_LOW: ~20-50 polygons
-    // Single box with single color - no wings, no windows, minimal detail
-    const house = new THREE.Group();
-    house.name = 'House (Ultra Low LOD)';
-
+  protected build(mesh: MeshBuilder, detail: LevelOfDetail): void {
     const options = this.options as HouseOptions;
-    const scale = options.scale || 1;
+    const wall = color(options.wallColor, DEFAULTS.wallColor);
+    const accent = color(options.accentColor, DEFAULTS.accentColor);
+    const roof = color(options.roofColor, DEFAULTS.roofColor);
+    const glass = color(options.windowColor, DEFAULTS.windowColor);
+    const modern = this.type === HouseType.Modern;
+    const framed = detail >= LevelOfDetail.MEDIUM;
+    const window = { pane: glass, frame: framed ? accent : undefined, frameWidth: 0.35 };
+    const shuttered = { ...window, shutters: detail >= LevelOfDetail.HIGH ? accent : undefined };
 
-    // Single material
-    const wallMaterial = resourceManager.getOrCreateMaterial(
-      `house_wall_ultra_low_${options.wallColor}`,
-      () => new THREE.MeshLambertMaterial({ color: options.wallColor })
-    );
+    const shell = (v: Volume, main: boolean) => {
+      walls(mesh, v, wall);
+      if (modern) flatRoof(mesh, v, roof);
+      else hipRoof(mesh, v, main ? 6 : 4.5, 1, roof);
+    };
+    const toVolume = (wing: Wing) =>
+      volume(wing.x, wing.z, wing.size[0], wing.size[2], 0, wing.size[1]);
 
-    const roofMaterial = resourceManager.getOrCreateMaterial(
-      `house_roof_ultra_low_${options.roofColor}`,
-      () => new THREE.MeshLambertMaterial({ color: options.roofColor })
-    );
-
-    // Single combined box representing entire house
-    const bodyGeometry = resourceManager.getOrCreateGeometry(
-      'house_ultra_low_body',
-      () => new THREE.BoxGeometry(20, 20, 20)
-    );
-
-    const body = new THREE.Mesh(bodyGeometry, wallMaterial);
-    body.position.set(0, 10, 0);
-    body.castShadow = this.options.castShadow ?? true;
-    body.receiveShadow = this.options.receiveShadow ?? true;
-    house.add(body);
-
-    // Single simple roof
-    const roofGeometry = resourceManager.getOrCreateGeometry(
-      'house_ultra_low_roof',
-      () => new THREE.BoxGeometry(22, 1, 22)
-    );
-
-    const roof = new THREE.Mesh(roofGeometry, roofMaterial);
-    roof.position.set(0, 20.5, 0);
-    roof.castShadow = this.options.castShadow ?? true;
-    house.add(roof);
-
-    // Apply scale
-    if (scale !== 1) {
-      house.scale.setScalar(scale);
-    }
-
-    return house;
-  }
-
-  protected createLowLODContent(): THREE.Object3D {
-    // LOW: ~100-300 polygons
-    // Main wing only + simple roof + single door, no windows
-    const house = new THREE.Group();
-    house.name = 'House (Low LOD)';
-
-    const options = this.options as HouseOptions;
-    const scale = options.scale || 1;
-
-    const wallMaterial = resourceManager.getOrCreateMaterial(
-      `house_wall_low_${options.wallColor}`,
-      () => new THREE.MeshLambertMaterial({ color: options.wallColor })
-    );
-
-    const accentMaterial = resourceManager.getOrCreateMaterial(
-      `house_accent_low_${options.accentColor}`,
-      () => new THREE.MeshLambertMaterial({ color: options.accentColor })
-    );
-
-    const roofMaterial = resourceManager.getOrCreateMaterial(
-      `house_roof_low_${options.roofColor}`,
-      () => new THREE.MeshLambertMaterial({ color: options.roofColor })
-    );
-
-    // Get main wing only
-    const wings = this.getWingConfiguration();
-    const mainWing = wings[0];
-
-    // Main body
-    const bodyGeometry = resourceManager.getOrCreateGeometry(
-      'house_low_main_body',
-      () => new THREE.BoxGeometry(mainWing.size[0], mainWing.size[1], mainWing.size[2])
-    );
-
-    const body = new THREE.Mesh(bodyGeometry, wallMaterial);
-    body.position.set(mainWing.position[0], mainWing.position[1], mainWing.position[2]);
-    body.castShadow = this.options.castShadow ?? true;
-    body.receiveShadow = this.options.receiveShadow ?? true;
-    house.add(body);
-
-    // Roof
-    const roofGeometry = resourceManager.getOrCreateGeometry(
-      'house_low_roof',
-      () => new THREE.BoxGeometry(mainWing.size[0] + 2, 1, mainWing.size[2] + 2)
-    );
-
-    const roof = new THREE.Mesh(roofGeometry, roofMaterial);
-    roof.position.set(
-      mainWing.position[0],
-      mainWing.position[1] + mainWing.size[1] / 2 + 0.5,
-      mainWing.position[2]
-    );
-    roof.castShadow = this.options.castShadow ?? true;
-    house.add(roof);
-
-    // Simple door only
-    this.addEntranceLowPoly(house, mainWing, accentMaterial);
-
-    // Apply scale
-    if (scale !== 1) {
-      house.scale.setScalar(scale);
-    }
-
-    return house;
-  }
-
-  protected createMediumLODContent(): THREE.Object3D {
-    // MEDIUM: ~500-1000 polygons
-    // All wings + simple windows (no frames) + door
-    const house = new THREE.Group();
-    house.name = 'House (Medium LOD)';
-
-    const options = this.options as HouseOptions;
-    const scale = options.scale || 1;
-
-    const wallMaterial = resourceManager.getOrCreateMaterial(
-      `house_wall_medium_${options.wallColor}`,
-      () => new THREE.MeshLambertMaterial({ color: options.wallColor })
-    );
-
-    const accentMaterial = resourceManager.getOrCreateMaterial(
-      `house_accent_medium_${options.accentColor}`,
-      () => new THREE.MeshLambertMaterial({ color: options.accentColor })
-    );
-
-    const roofMaterial = resourceManager.getOrCreateMaterial(
-      `house_roof_medium_${options.roofColor}`,
-      () => new THREE.MeshLambertMaterial({ color: options.roofColor })
-    );
-
-    const windowMaterial = resourceManager.getOrCreateMaterial(
-      `house_window_medium_${options.windowColor}`,
-      () => new THREE.MeshLambertMaterial({ color: options.windowColor })
-    );
-
-    // Get wing configuration based on house type
-    const wings = this.getWingConfiguration();
-
-    // Create each wing
-    wings.forEach((wing, index) => {
-      // Main body
-      const bodyGeometry = resourceManager.getOrCreateGeometry(
-        `house_medium_wing_${index}`,
-        () => new THREE.BoxGeometry(wing.size[0], wing.size[1], wing.size[2])
-      );
-
-      const body = new THREE.Mesh(bodyGeometry, wallMaterial);
-      body.position.set(wing.position[0], wing.position[1], wing.position[2]);
-      body.castShadow = this.options.castShadow ?? true;
-      body.receiveShadow = this.options.receiveShadow ?? true;
-      house.add(body);
-
-      // Roof for each wing
-      const roofGeometry = resourceManager.getOrCreateGeometry(
-        `house_medium_roof_${index}`,
-        () => new THREE.BoxGeometry(wing.size[0] + 2, 1, wing.size[2] + 2)
-      );
-
-      const roof = new THREE.Mesh(roofGeometry, roofMaterial);
-      roof.position.set(
-        wing.position[0],
-        wing.position[1] + wing.size[1] / 2 + 0.5,
-        wing.position[2]
-      );
-      roof.castShadow = this.options.castShadow ?? true;
-      house.add(roof);
-
-      // Add windows to each wing (simplified - no frames)
-      this.addWindowsToWingLowPoly(house, wing, windowMaterial);
-    });
-
-    // Add entrance door (simplified)
-    this.addEntranceLowPoly(house, wings[0], accentMaterial);
-
-    // Apply scale
-    if (scale !== 1) {
-      house.scale.setScalar(scale);
-    }
-
-    return house;
-  }
-
-  protected createHighLODContent(): THREE.Object3D {
-    // HIGH: ~2000+ polygons
-    // Full detail with all wings, windows with frames, door with frame, modern features
-    const house = new THREE.Group();
-    house.name = 'House (High LOD)';
-
-    const options = this.options as HouseOptions;
-    const scale = options.scale || 1;
-
-    const wallMaterial = resourceManager.getOrCreateMaterial(
-      `house_wall_${options.wallColor}`,
-      () => new THREE.MeshLambertMaterial({ color: options.wallColor })
-    );
-
-    const accentMaterial = resourceManager.getOrCreateMaterial(
-      `house_accent_${options.accentColor}`,
-      () => new THREE.MeshLambertMaterial({ color: options.accentColor })
-    );
-
-    const roofMaterial = resourceManager.getOrCreateMaterial(
-      `house_roof_${options.roofColor}`,
-      () => new THREE.MeshLambertMaterial({ color: options.roofColor })
-    );
-
-    const windowMaterial = resourceManager.getOrCreateMaterial(
-      `house_window_${options.windowColor}`,
-      () => new THREE.MeshLambertMaterial({ color: options.windowColor })
-    );
-
-    const frameMaterial = resourceManager.getOrCreateMaterial(
-      'house_frame',
-      () => new THREE.MeshLambertMaterial({ color: '#FFFFFF' })
-    );
-
-    // Get wing configuration based on house type
-    const wings = this.getWingConfiguration();
-
-    // Create each wing
-    wings.forEach((wing, index) => {
-      // Main body
-      const bodyGeometry = resourceManager.getOrCreateGeometry(
-        `house_wing_${index}`,
-        () => new THREE.BoxGeometry(wing.size[0], wing.size[1], wing.size[2])
-      );
-
-      const body = new THREE.Mesh(bodyGeometry, wallMaterial);
-      body.position.set(wing.position[0], wing.position[1], wing.position[2]);
-      body.castShadow = this.options.castShadow ?? true;
-      body.receiveShadow = this.options.receiveShadow ?? true;
-      house.add(body);
-
-      // Roof for each wing
-      const roofGeometry = resourceManager.getOrCreateGeometry(
-        `house_roof_${index}`,
-        () => new THREE.BoxGeometry(wing.size[0] + 2, 1, wing.size[2] + 2)
-      );
-
-      const roof = new THREE.Mesh(roofGeometry, roofMaterial);
-      roof.position.set(
-        wing.position[0],
-        wing.position[1] + wing.size[1] / 2 + 0.5,
-        wing.position[2]
-      );
-      roof.castShadow = this.options.castShadow ?? true;
-      house.add(roof);
-
-      // Add windows to each wing with frames
-      this.addWindowsToWing(house, wing, windowMaterial, frameMaterial);
-    });
-
-    // Add entrance door with frame
-    this.addEntrance(house, wings[0], accentMaterial, frameMaterial);
-
-    // Add special features based on type
-    if (this.type === HouseType.Modern) {
-      this.addModernFeatures(house, wings, windowMaterial, frameMaterial, accentMaterial);
-    }
-
-    // Apply scale
-    if (scale !== 1) {
-      house.scale.setScalar(scale);
-    }
-
-    return house;
-  }
-
-  private addWindowsToWing(
-    house: THREE.Group,
-    wing: { position: [number, number, number]; size: [number, number, number]; name: string },
-    windowMaterial: THREE.Material,
-    frameMaterial: THREE.Material
-  ): void {
-    const windowSize = this.type === HouseType.Modern ? 8 : 6;
-    const windowGeometry = resourceManager.getOrCreateGeometry(
-      `house_window_${windowSize}`,
-      () => new THREE.BoxGeometry(windowSize, windowSize, 0.5)
-    );
-
-    const frameGeometry = resourceManager.getOrCreateGeometry(
-      `house_window_frame_${windowSize}`,
-      () => new THREE.BoxGeometry(windowSize + 1, windowSize + 1, 1)
-    );
-
-    // Front windows
-    const windowCount = wing.name === 'main' ? 3 : 2;
-    for (let i = 0; i < windowCount; i++) {
-      const spacing = wing.size[0] / (windowCount + 1);
-      const x = wing.position[0] - wing.size[0] / 2 + spacing * (i + 1);
-
-      const window = new THREE.Mesh(windowGeometry, windowMaterial);
-      window.position.set(x, wing.position[1] + 2, wing.position[2] + wing.size[2] / 2 + 0.25);
-      house.add(window);
-
-      const frame = new THREE.Mesh(frameGeometry, frameMaterial);
-      frame.position.copy(window.position);
-      frame.position.z -= 0.5; // Increased distance to avoid z-fighting
-      house.add(frame);
-    }
-
-    // Side windows (if not main wing)
-    if (wing.name !== 'main') {
-      const sideWindow = new THREE.Mesh(windowGeometry, windowMaterial);
-      sideWindow.position.set(
-        wing.position[0] +
-          (wing.name === 'left' ? -wing.size[0] / 2 - 0.25 : wing.size[0] / 2 + 0.25),
-        wing.position[1] + 2,
-        wing.position[2]
-      );
-      house.add(sideWindow);
-
-      const sideFrame = new THREE.Mesh(frameGeometry, frameMaterial);
-      sideFrame.position.copy(sideWindow.position);
-      if (wing.name === 'left') {
-        sideFrame.position.x += 0.5; // Increased distance to avoid z-fighting
-      } else {
-        sideFrame.position.x -= 0.5; // Increased distance to avoid z-fighting
+    if (detail === LevelOfDetail.ULTRA_LOW) {
+      // From afar: the main block, the side wings as one long block through it, and any back wing
+      const wings = this.getWings();
+      const sides = wings.filter(wing => wing.name === 'left' || wing.name === 'right');
+      wings
+        .filter(wing => !sides.includes(wing))
+        .forEach(wing => shell(toVolume(wing), wing.name === 'main'));
+      if (sides.length > 0) {
+        const [x0, x1] = [
+          Math.min(...sides.map(s => toVolume(s).x0)),
+          Math.max(...sides.map(s => toVolume(s).x1)),
+        ];
+        const [, h, d] = sides[0]!.size;
+        shell(volume((x0 + x1) / 2, 0, x1 - x0, d, 0, h), false);
       }
-      house.add(sideFrame);
+      return;
     }
+
+    this.getWings().forEach(wing => {
+      const v = toVolume(wing);
+      shell(v, wing.name === 'main');
+
+      if (wing.name === 'main')
+        this.dressMain(mesh, v, detail, { wall, accent, window, shuttered });
+      else this.dressWing(mesh, v, wing.name, detail, window);
+    });
   }
 
-  private addEntrance(
-    house: THREE.Group,
-    mainWing: { position: [number, number, number]; size: [number, number, number] },
-    accentMaterial: THREE.Material,
-    frameMaterial: THREE.Material
+  private dressMain(
+    mesh: MeshBuilder,
+    v: Volume,
+    detail: LevelOfDetail,
+    style: { wall: THREE.Color; accent: THREE.Color; window: OpeningStyle; shuttered: OpeningStyle }
   ): void {
-    // Door
-    const doorGeometry = resourceManager.getOrCreateGeometry(
-      'house_door',
-      () => new THREE.BoxGeometry(4, 8, 0.5)
+    const storey = (v.y1 - v.y0) / 2;
+    opening(mesh, v, '+z', 0, 0, 3, 5.5, { pane: style.accent, frame: style.window.frame });
+    [-5.5, 5.5].forEach(u => opening(mesh, v, '+z', u, 2.2, 3, 3, style.window));
+    openingRow(mesh, v, '+z', 3, storey + 1.8, 2.6, 3.2, style.shuttered, 3);
+
+    if (detail < LevelOfDetail.MEDIUM) return;
+
+    [0, 1].forEach(floor =>
+      openingRow(mesh, v, '-z', 3, floor * storey + 2, 2.6, 3.2, style.window, 3)
     );
+    block(mesh, volume(0, v.z1 + 0.8, 5, 1.6, 0, 0.5), style.wall.clone().multiplyScalar(0.85));
+    chimney(mesh, v.x0 + 4, (v.z0 + v.z1) / 2 - 2, v.y1, 5, style.wall);
 
-    const door = new THREE.Mesh(doorGeometry, accentMaterial);
-    door.position.set(
-      mainWing.position[0],
-      mainWing.position[1] - 6,
-      mainWing.position[2] + mainWing.size[2] / 2 + 0.25
-    );
-    house.add(door);
+    if (detail < LevelOfDetail.HIGH) return;
 
-    // Door frame
-    const frameGeometry = resourceManager.getOrCreateGeometry(
-      'house_door_frame',
-      () => new THREE.BoxGeometry(5, 9, 1)
-    );
-
-    const frame = new THREE.Mesh(frameGeometry, frameMaterial);
-    frame.position.copy(door.position);
-    frame.position.z -= 0.25;
-    house.add(frame);
-
-    // Steps
-    const stepsGeometry = resourceManager.getOrCreateGeometry(
-      'house_steps',
-      () => new THREE.BoxGeometry(8, 1, 4)
-    );
-
-    const steps = new THREE.Mesh(stepsGeometry, frameMaterial);
-    steps.position.set(door.position.x, door.position.y - 4.5, door.position.z + 2);
-    house.add(steps);
+    // Porch canopy on two posts over the door
+    const z = v.z1 + 2;
+    block(mesh, volume(0, z, 6, 4, 6.2, 6.6), style.accent);
+    [-2.7, 2.7].forEach(x => block(mesh, volume(x, z + 1.7, 0.4, 0.4, 0, 6.2), style.wall));
   }
 
-  private addModernFeatures(
-    house: THREE.Group,
-    wings: Array<{
-      position: [number, number, number];
-      size: [number, number, number];
-      name: string;
-    }>,
-    windowMaterial: THREE.Material,
-    frameMaterial: THREE.Material,
-    accentMaterial: THREE.Material
+  private dressWing(
+    mesh: MeshBuilder,
+    v: Volume,
+    name: Wing['name'],
+    detail: LevelOfDetail,
+    window: OpeningStyle
   ): void {
-    const mainWing = wings[0];
-
-    // Large panoramic window
-    const panoramicGeometry = resourceManager.getOrCreateGeometry(
-      'house_panoramic_window',
-      () => new THREE.BoxGeometry(16, 10, 0.5)
-    );
-
-    const panoramic = new THREE.Mesh(panoramicGeometry, windowMaterial);
-    panoramic.position.set(
-      mainWing.position[0],
-      mainWing.position[1] + 4,
-      mainWing.position[2] + mainWing.size[2] / 2 + 0.25
-    );
-    house.add(panoramic);
-
-    const panoramicFrame = new THREE.Mesh(new THREE.BoxGeometry(17, 11, 1), frameMaterial);
-    panoramicFrame.position.copy(panoramic.position);
-    panoramicFrame.position.z -= 0.25;
-    house.add(panoramicFrame);
-
-    // Modern pillar
-    const pillarGeometry = resourceManager.getOrCreateGeometry(
-      'house_modern_pillar',
-      () => new THREE.BoxGeometry(1, mainWing.size[1], 1)
-    );
-
-    const pillar = new THREE.Mesh(pillarGeometry, accentMaterial);
-    pillar.position.set(
-      mainWing.position[0] - 8,
-      mainWing.position[1],
-      mainWing.position[2] + mainWing.size[2] / 2 - 2
-    );
-    house.add(pillar);
-  }
-
-  /**
-   * Add simplified windows for low-poly version - fewer windows, no frames
-   */
-  private addWindowsToWingLowPoly(
-    house: THREE.Group,
-    wing: { position: [number, number, number]; size: [number, number, number]; name: string },
-    windowMaterial: THREE.Material
-  ): void {
-    const windowSize = 4; // Smaller than regular windows
-    const windowGeometry = resourceManager.getOrCreateGeometry(
-      `house_window_lowpoly_${windowSize}`,
-      () => new THREE.BoxGeometry(windowSize, windowSize, 0.3)
-    );
-
-    // Only add windows to main wing and reduce count significantly
-    if (wing.name === 'main') {
-      // Just 2 front windows for main wing
-      for (let i = 0; i < 2; i++) {
-        const spacing = wing.size[0] / 3;
-        const x = wing.position[0] - wing.size[0] / 2 + spacing * (i + 1);
-
-        const window = new THREE.Mesh(windowGeometry, windowMaterial);
-        window.position.set(x, wing.position[1] + 2, wing.position[2] + wing.size[2] / 2 + 0.15);
-        house.add(window);
-      }
-    } else {
-      // Just 1 window for side wings
-      const window = new THREE.Mesh(windowGeometry, windowMaterial);
-      window.position.set(
-        wing.position[0],
-        wing.position[1] + 2,
-        wing.position[2] + wing.size[2] / 2 + 0.15
-      );
-      house.add(window);
+    const front: Face = name === 'back' ? '-z' : '+z';
+    const end: Face = name === 'left' ? '-x' : '+x';
+    const y = (v.y1 - v.y0) * 0.3;
+    openingRow(mesh, v, front, detail >= LevelOfDetail.MEDIUM ? 2 : 1, y, 3, 3, window, 3);
+    if (detail >= LevelOfDetail.MEDIUM && name !== 'back') {
+      openingRow(mesh, v, '-z', 2, y, 3, 3, window, 3);
     }
-  }
-
-  /**
-   * Add simplified entrance for low-poly version - just a door, no frame or steps
-   */
-  private addEntranceLowPoly(
-    house: THREE.Group,
-    mainWing: { position: [number, number, number]; size: [number, number, number] },
-    accentMaterial: THREE.Material
-  ): void {
-    // Simple door without frame
-    const doorGeometry = resourceManager.getOrCreateGeometry(
-      'house_door_lowpoly',
-      () => new THREE.BoxGeometry(3, 6, 0.3)
-    );
-
-    const door = new THREE.Mesh(doorGeometry, accentMaterial);
-    door.position.set(
-      mainWing.position[0],
-      mainWing.position[1] - 7,
-      mainWing.position[2] + mainWing.size[2] / 2 + 0.15
-    );
-    house.add(door);
+    if (detail >= LevelOfDetail.HIGH) opening(mesh, v, end, 0, y, 3, 3, window);
   }
 
   public override validate(): string[] {
@@ -589,18 +215,18 @@ class House extends LODComponent {
     return issues;
   }
 
-  public getInfo(): Record<string, any> {
+  public getInfo(): Record<string, unknown> {
     const options = this.options as HouseOptions;
-    const wingCount = this.getWingConfiguration().length;
 
     return {
       name: 'House',
-      version: '2.0.0',
+      version: '3.0.0',
       type: 'building',
       subtype: 'residential',
-      style: this.type === HouseType.Modern ? 'modern' : 'villa-based',
+      style: this.type === HouseType.Modern ? 'modern' : 'hipped',
       houseType: HouseType[this.type],
-      wingCount,
+      wingCount: this.getWings().length,
+      levelOfDetail: LevelOfDetail[this.currentLOD],
       wallColor: options.wallColor,
       roofColor: options.roofColor,
       scale: options.scale,

@@ -44,19 +44,19 @@ export const ring = (
       new THREE.Vector3(x, (top + bottom) / 2 + (up * (top - bottom)) / 2, z + side * halfWidth)
   );
 
-/** A regular polygon of `sides` points around an axis through `centre` along X or Z */
+/** A regular polygon of `sides` points around an axis through `centre` along X, Y or Z */
 export const circle = (
   centre: THREE.Vector3,
   radius: number,
   sides: number,
-  axis: 'x' | 'z'
+  axis: 'x' | 'y' | 'z'
 ): THREE.Vector3[] =>
   Array.from({ length: sides }, (_, i) => {
     const a = (i / sides) * Math.PI * 2;
     const [u, v] = [Math.cos(a) * radius, Math.sin(a) * radius];
-    return axis === 'x'
-      ? new THREE.Vector3(centre.x, centre.y + u, centre.z + v)
-      : new THREE.Vector3(centre.x + u, centre.y + v, centre.z);
+    if (axis === 'x') return new THREE.Vector3(centre.x, centre.y + u, centre.z + v);
+    if (axis === 'y') return new THREE.Vector3(centre.x + u, centre.y, centre.z + v);
+    return new THREE.Vector3(centre.x + u, centre.y + v, centre.z);
   });
 
 export interface Rib {

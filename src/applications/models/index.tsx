@@ -9,7 +9,8 @@ const PARAM = 'model';
 
 /**
  * Model viewer - shows one scene model at a time on a turntable, framed to its size, with its
- * dimensions and triangle count. Pick from the list or step with ← / →; ?model=<id> links to one.
+ * dimensions and triangle count. Pick from the list or step with ← / →; ?model=<id> links to one,
+ * and ?lod=ultra_low|low|medium|high picks the detail of buildings and cacti (HIGH by default).
  */
 class ModelsViewer extends WorkshopDemoBase {
   private options!: StoryOptions;

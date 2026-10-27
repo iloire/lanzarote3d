@@ -1,9 +1,23 @@
 import * as THREE from 'three';
-import { LODComponent } from '../../base/LODComponent';
 import { SimpleComponentOptions } from '../../base/SimpleThreeComponent';
 import { ComponentMetadata } from '../../base/IThreeComponent';
-import { resourceManager } from '../../../systems/ResourceManager';
+import { MeshBuilder } from '../../base/lowPolyMesh';
 import { LevelOfDetail, getLODFromLegacy } from '../../../types/lod';
+import {
+  Face,
+  LowPolyBuilding,
+  Volume,
+  block,
+  color,
+  cone,
+  cylinder,
+  opening,
+  openingRow,
+  panel,
+  strip,
+  volume,
+  walls,
+} from './lowPolyBuilding';
 
 export interface BarnOptions extends SimpleComponentOptions {
   wallColor?: string;
@@ -15,23 +29,66 @@ export interface BarnOptions extends SimpleComponentOptions {
   levelOfDetail?: LevelOfDetail;
 }
 
+const DEFAULTS = {
+  wallColor: '#F5DEB3',
+  roofColor: '#DEB887',
+  doorColor: '#654321',
+  trimColor: '#FFFFFF',
+};
+
+const PANE = new THREE.Color('#2B2B2B');
+const HAY = new THREE.Color('#D9B65D');
+const EAVE = 11;
+const KNEE = { inset: 2.5, y: 17 };
+const RIDGE = 20.5;
+
 /**
- * Barn building component - Rural agricultural building
+ * A gambrel roof over a volume, ridge along z: steep lower slopes to a knee, shallow upper ones to
+ * the ridge, closed at both ends by pentagonal gables in the wall colour
  */
-export class Barn extends LODComponent {
+const gambrelRoof = (
+  mesh: MeshBuilder,
+  v: Volume,
+  overhang: number,
+  roof: THREE.Color,
+  gable: THREE.Color
+) => {
+  const xm = (v.x0 + v.x1) / 2;
+  const profile = [
+    [v.x0, EAVE],
+    [v.x0 + KNEE.inset, KNEE.y],
+    [xm, RIDGE],
+    [v.x1 - KNEE.inset, KNEE.y],
+    [v.x1, EAVE],
+  ];
+  const at = (i: number, z: number) => new THREE.Vector3(profile[i]![0], profile[i]![1], z);
+  const [za, zb] = [v.z0 - overhang, v.z1 + overhang];
+  for (let i = 0; i < profile.length - 1; i++) {
+    mesh.quad(at(i, za), at(i + 1, za), at(i + 1, zb), at(i, zb), roof);
+  }
+  [v.z0, v.z1].forEach(z => {
+    for (let i = 1; i < profile.length - 1; i++) mesh.tri(at(0, z), at(i, z), at(i + 1, z), gable);
+  });
+};
+
+/**
+ * Barn - a gambrel-roofed barn with big doors in its front gable
+ *
+ * ULTRA_LOW is just the walls and roof. LOW adds the double door and hayloft door. MEDIUM frames
+ * them in the trim colour with X braces and adds windows down both sides. HIGH adds a silo and
+ * hay bales.
+ */
+export class Barn extends LowPolyBuilding {
   constructor(options: BarnOptions = {}) {
     const metadata: ComponentMetadata = {
       name: 'Barn',
-      version: '1.0.0',
-      description: 'Traditional rural barn with agricultural architecture',
-      tags: ['scenery', 'building', 'rural', 'agricultural', 'traditional'],
+      version: '3.0.0',
+      description: 'Gambrel-roofed barn with gable doors. Supports 4 LOD levels.',
+      tags: ['scenery', 'building', 'rural', 'agricultural', 'traditional', 'lod'],
     };
 
     super(metadata, {
-      wallColor: '#F5DEB3', // Sandy beige matching desert house
-      roofColor: '#DEB887', // Burlywood matching desert house
-      doorColor: '#654321', // Brown wooden doors
-      trimColor: '#FFFFFF', // White trim
+      ...DEFAULTS,
       scale: 1,
       ...options,
     });
@@ -39,291 +96,57 @@ export class Barn extends LODComponent {
     this.currentLOD = options.levelOfDetail ?? getLODFromLegacy(options.lowPoly);
   }
 
-  protected createGeometry(): THREE.BufferGeometry {
-    // Return placeholder - actual geometry created in createSyncContent
-    return new THREE.BoxGeometry(1, 1, 1);
-  }
-
-  protected createUltraLowLODContent(): THREE.Object3D {
-    // ULTRA_LOW: ~20-50 polygons
-    // Single box body + single box roof, no door, no windows
-    const barn = new THREE.Group();
-    barn.name = 'Barn (Ultra Low LOD)';
-
+  protected build(mesh: MeshBuilder, detail: LevelOfDetail): void {
     const options = this.options as BarnOptions;
-    const scale = options.scale || 1;
+    const wall = color(options.wallColor, DEFAULTS.wallColor);
+    const roof = color(options.roofColor, DEFAULTS.roofColor);
+    const door = color(options.doorColor, DEFAULTS.doorColor);
+    const trim = color(options.trimColor, DEFAULTS.trimColor);
+    const framed = detail >= LevelOfDetail.MEDIUM;
 
-    // Create materials
-    const wallMaterial = resourceManager.getOrCreateMaterial(
-      `barn_wall_ultra_low_${options.wallColor}`,
-      () => new THREE.MeshLambertMaterial({ color: options.wallColor })
+    const body = volume(0, 0, 20, 30, 0, EAVE);
+    walls(mesh, body, wall);
+    gambrelRoof(mesh, body, 0.8, roof, wall);
+
+    // From afar a building is its massing and roof; openings start at LOW
+    if (detail === LevelOfDetail.ULTRA_LOW) return;
+
+    const front: Face = '+z';
+    opening(mesh, body, front, 0, 0, 8, 8.5, { pane: door, frame: framed ? trim : undefined });
+    opening(mesh, body, front, 0, 12.5, 3, 3.5, { pane: door, frame: framed ? trim : undefined });
+
+    if (detail < LevelOfDetail.MEDIUM) return;
+
+    // X braces across each leaf of the double door, and the split between them
+    [-2, 2].forEach(u => {
+      strip(mesh, body, front, [u - 1.8, 0.3], [u + 1.8, 8.2], 0.35, trim);
+      strip(mesh, body, front, [u + 1.8, 0.3], [u - 1.8, 8.2], 0.35, trim);
+    });
+    panel(mesh, body, front, 0, 0, 0.3, 8.5, trim, 0.3);
+    (['+x', '-x'] as Face[]).forEach(face =>
+      openingRow(
+        mesh,
+        body,
+        face,
+        4,
+        5.5,
+        1.8,
+        2.2,
+        { pane: PANE, frame: trim, frameWidth: 0.3 },
+        3
+      )
     );
 
-    const roofMaterial = resourceManager.getOrCreateMaterial(
-      `barn_roof_ultra_low_${options.roofColor}`,
-      () => new THREE.MeshLambertMaterial({ color: options.roofColor })
-    );
+    if (detail < LevelOfDetail.HIGH) return;
 
-    // Single box for body
-    const bodyGeometry = resourceManager.getOrCreateGeometry(
-      'barn_ultra_low_body',
-      () => new THREE.BoxGeometry(30, 18, 20)
-    );
-    const body = new THREE.Mesh(bodyGeometry, wallMaterial);
-    body.position.set(0, 9, 0);
-    body.castShadow = this.options.castShadow ?? true;
-    body.receiveShadow = this.options.receiveShadow ?? true;
-    barn.add(body);
-
-    // Single box for roof (no rotation for simplicity)
-    const roofGeometry = resourceManager.getOrCreateGeometry(
-      'barn_ultra_low_roof',
-      () => new THREE.BoxGeometry(32, 4, 22)
-    );
-    const roof = new THREE.Mesh(roofGeometry, roofMaterial);
-    roof.position.set(0, 20, 0);
-    roof.castShadow = this.options.castShadow ?? true;
-    barn.add(roof);
-
-    // Apply scale
-    if (scale !== 1) {
-      barn.scale.setScalar(scale);
-    }
-
-    return barn;
-  }
-
-  protected createLowLODContent(): THREE.Object3D {
-    // LOW: ~100-200 polygons
-    // Body + simple roof + single door (no windows)
-    const barn = new THREE.Group();
-    barn.name = 'Barn (Low LOD)';
-
-    const options = this.options as BarnOptions;
-    const scale = options.scale || 1;
-
-    // Create materials
-    const wallMaterial = resourceManager.getOrCreateMaterial(
-      `barn_wall_low_${options.wallColor}`,
-      () => new THREE.MeshLambertMaterial({ color: options.wallColor })
-    );
-
-    const roofMaterial = resourceManager.getOrCreateMaterial(
-      `barn_roof_low_${options.roofColor}`,
-      () => new THREE.MeshLambertMaterial({ color: options.roofColor })
-    );
-
-    const doorMaterial = resourceManager.getOrCreateMaterial(
-      `barn_door_low_${options.doorColor}`,
-      () => new THREE.MeshLambertMaterial({ color: options.doorColor })
-    );
-
-    // Main barn structure
-    const mainBodyGeometry = resourceManager.getOrCreateGeometry(
-      'barn_main_body_low',
-      () => new THREE.BoxGeometry(30, 18, 20)
-    );
-    const mainBody = new THREE.Mesh(mainBodyGeometry, wallMaterial);
-    mainBody.position.set(0, 9, 0);
-    mainBody.castShadow = this.options.castShadow ?? true;
-    mainBody.receiveShadow = this.options.receiveShadow ?? true;
-    barn.add(mainBody);
-
-    // Simplified roof - single angled box
-    const roofGeometry = resourceManager.getOrCreateGeometry(
-      'barn_roof_low',
-      () => new THREE.BoxGeometry(32, 8, 22)
-    );
-    const roof = new THREE.Mesh(roofGeometry, roofMaterial);
-    roof.position.set(0, 22, 0);
-    roof.rotation.x = -Math.PI / 8;
-    roof.castShadow = this.options.castShadow ?? true;
-    barn.add(roof);
-
-    // Single large door - no separation, no frame
-    const doorGeometry = resourceManager.getOrCreateGeometry(
-      'barn_door_low',
-      () => new THREE.BoxGeometry(12, 12, 0.3)
-    );
-    const door = new THREE.Mesh(doorGeometry, doorMaterial);
-    door.position.set(0, 6, 10.15);
-    barn.add(door);
-
-    // Apply scale
-    if (scale !== 1) {
-      barn.scale.setScalar(scale);
-    }
-
-    return barn;
-  }
-
-  protected createMediumLODContent(): THREE.Object3D {
-    // MEDIUM: ~300-500 polygons
-    // Body + roof + door + 2 windows, simplified features
-    const barn = new THREE.Group();
-    barn.name = 'Barn (Medium LOD)';
-
-    const options = this.options as BarnOptions;
-    const scale = options.scale || 1;
-
-    // Create materials
-    const wallMaterial = resourceManager.getOrCreateMaterial(
-      `barn_wall_medium_${options.wallColor}`,
-      () => new THREE.MeshLambertMaterial({ color: options.wallColor })
-    );
-
-    const roofMaterial = resourceManager.getOrCreateMaterial(
-      `barn_roof_medium_${options.roofColor}`,
-      () => new THREE.MeshLambertMaterial({ color: options.roofColor })
-    );
-
-    const doorMaterial = resourceManager.getOrCreateMaterial(
-      `barn_door_medium_${options.doorColor}`,
-      () => new THREE.MeshLambertMaterial({ color: options.doorColor })
-    );
-
-    const windowMaterial = resourceManager.getOrCreateMaterial(
-      'barn_window_glass_medium',
-      () => new THREE.MeshLambertMaterial({ color: '#333333' })
-    );
-
-    // Main barn structure
-    const mainBodyGeometry = resourceManager.getOrCreateGeometry(
-      'barn_main_body_medium',
-      () => new THREE.BoxGeometry(30, 18, 20)
-    );
-    const mainBody = new THREE.Mesh(mainBodyGeometry, wallMaterial);
-    mainBody.position.set(0, 9, 0);
-    mainBody.castShadow = this.options.castShadow ?? true;
-    mainBody.receiveShadow = this.options.receiveShadow ?? true;
-    barn.add(mainBody);
-
-    // Simplified roof
-    const roofGeometry = resourceManager.getOrCreateGeometry(
-      'barn_roof_medium',
-      () => new THREE.BoxGeometry(32, 6, 22)
-    );
-    const roof = new THREE.Mesh(roofGeometry, roofMaterial);
-    roof.position.set(0, 21, 0);
-    roof.rotation.x = -Math.PI / 10;
-    roof.castShadow = this.options.castShadow ?? true;
-    barn.add(roof);
-
-    // Door
-    const doorGeometry = resourceManager.getOrCreateGeometry(
-      'barn_door_medium',
-      () => new THREE.BoxGeometry(10, 12, 0.4)
-    );
-    const door = new THREE.Mesh(doorGeometry, doorMaterial);
-    door.position.set(0, 6, 10.2);
-    barn.add(door);
-
-    // Two side windows (simplified - no frames)
-    const windowGeometry = resourceManager.getOrCreateGeometry(
-      'barn_window_medium',
-      () => new THREE.BoxGeometry(3, 2, 0.3)
-    );
-
-    const leftSideWindow = new THREE.Mesh(windowGeometry, windowMaterial);
-    leftSideWindow.position.set(-15.15, 13, 5);
-    barn.add(leftSideWindow);
-
-    const rightSideWindow = new THREE.Mesh(windowGeometry, windowMaterial);
-    rightSideWindow.position.set(15.15, 13, 5);
-    barn.add(rightSideWindow);
-
-    // Apply scale
-    if (scale !== 1) {
-      barn.scale.setScalar(scale);
-    }
-
-    return barn;
-  }
-
-  protected createHighLODContent(): THREE.Object3D {
-    // HIGH: ~600-1000 polygons
-    // Full detail with body, roof, door, windows, and trim
-    const barn = new THREE.Group();
-    barn.name = 'Barn (High LOD)';
-
-    const options = this.options as BarnOptions;
-    const scale = options.scale || 1;
-
-    // Create materials with resource sharing
-    const wallMaterial = resourceManager.getOrCreateMaterial(
-      `barn_wall_${options.wallColor}`,
-      () => new THREE.MeshLambertMaterial({ color: options.wallColor })
-    );
-
-    const roofMaterial = resourceManager.getOrCreateMaterial(
-      `barn_roof_${options.roofColor}`,
-      () => new THREE.MeshLambertMaterial({ color: options.roofColor })
-    );
-
-    const doorMaterial = resourceManager.getOrCreateMaterial(
-      `barn_door_${options.doorColor}`,
-      () => new THREE.MeshLambertMaterial({ color: options.doorColor })
-    );
-
-    // Main barn structure - long and wide
-    const mainBodyGeometry = resourceManager.getOrCreateGeometry(
-      'barn_main_body',
-      () => new THREE.BoxGeometry(30, 18, 20)
-    );
-    const mainBody = new THREE.Mesh(mainBodyGeometry, wallMaterial);
-    mainBody.position.set(0, 9, 0); // Position so bottom is at y=0 (ground level)
-    mainBody.castShadow = this.options.castShadow ?? true;
-    mainBody.receiveShadow = this.options.receiveShadow ?? true;
-    barn.add(mainBody);
-
-    // Simplified roof - single piece instead of gambrel (saves polygons)
-    const roofGeometry = resourceManager.getOrCreateGeometry(
-      'barn_roof_simple',
-      () => new THREE.BoxGeometry(32, 6, 22)
-    );
-    const roof = new THREE.Mesh(roofGeometry, roofMaterial);
-    roof.position.set(0, 21, 0);
-    roof.rotation.x = -Math.PI / 10; // Single angle
-    roof.castShadow = this.options.castShadow ?? true;
-    barn.add(roof);
-
-    // Single large door - no double doors (saves polygons)
-    const doorGeometry = resourceManager.getOrCreateGeometry(
-      'barn_door_simple',
-      () => new THREE.BoxGeometry(10, 12, 0.5)
-    );
-    const door = new THREE.Mesh(doorGeometry, doorMaterial);
-    door.position.set(0, 6, 10.25);
-    barn.add(door);
-
-    // Minimal windows - just 2 side windows (removed loft door)
-    const windowGeometry = resourceManager.getOrCreateGeometry(
-      'barn_window',
-      () => new THREE.BoxGeometry(3, 2, 0.3)
-    );
-
-    const windowMaterial = resourceManager.getOrCreateMaterial(
-      'barn_window_glass',
-      () => new THREE.MeshLambertMaterial({ color: '#333333' })
-    );
-
-    const leftSideWindow = new THREE.Mesh(windowGeometry, windowMaterial);
-    leftSideWindow.position.set(-15.15, 13, 5);
-    barn.add(leftSideWindow);
-
-    const rightSideWindow = new THREE.Mesh(windowGeometry, windowMaterial);
-    rightSideWindow.position.set(15.15, 13, 5);
-    barn.add(rightSideWindow);
-
-    // Removed: weathervane, fence posts, fence rails to reduce polygon count
-    // Barn is now: 1 body + 1 roof + 1 door + 2 windows = 5 meshes ≈ 60 triangles (12 per box)
-
-    // Apply scale
-    if (scale !== 1) {
-      barn.scale.setScalar(scale);
-    }
-
-    return barn;
+    // Silo with a conical cap beside the barn, and hay bales by the door
+    cylinder(mesh, 14, -8, 3.2, 0, 21, wall.clone().multiplyScalar(0.9), 8, false);
+    cone(mesh, 14, -8, 3.5, 21, 3, roof, 8);
+    [
+      [-7, 19, 0],
+      [-4.8, 19.4, 0],
+      [-6, 19.2, 1.4],
+    ].forEach(([x, z, y]) => block(mesh, volume(x!, z!, 2, 1.4, y!, y! + 1.4), HAY));
   }
 
   public override validate(): string[] {
@@ -337,15 +160,15 @@ export class Barn extends LODComponent {
     return issues;
   }
 
-  public getInfo(): Record<string, any> {
+  public getInfo(): Record<string, unknown> {
     const options = this.options as BarnOptions;
 
     return {
       name: 'Barn',
-      version: '1.0.0',
+      version: '3.0.0',
       type: 'building',
       subtype: 'agricultural',
-      style: 'traditional',
+      levelOfDetail: LevelOfDetail[this.currentLOD],
       wallColor: options.wallColor,
       roofColor: options.roofColor,
       scale: options.scale,

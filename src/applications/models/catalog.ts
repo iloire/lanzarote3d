@@ -64,11 +64,16 @@ const gullFlock = (): Loadable => {
   return { load: async () => gulls.mesh, dispose: () => gulls.dispose() };
 };
 
-const lod = { levelOfDetail: LevelOfDetail.HIGH };
+/** Buildings and cacti at the detail ?lod= asks for (ultra_low, low, medium or high), else HIGH */
+const lodParam = new URLSearchParams(window.location.search).get('lod')?.toUpperCase();
+const lod = {
+  levelOfDetail: LevelOfDetail[lodParam as keyof typeof LevelOfDetail] ?? LevelOfDetail.HIGH,
+};
 
-/** Every model the scenes place, grouped as the viewer lists them */
 /** Boats drift off on their movement patterns and bob through the grid unless held still */
 const STILL = { enableMovement: false, autoStartFloating: false };
+
+/** Every model the scenes place, grouped as the viewer lists them */
 
 export const MODEL_CATALOG: ModelEntry[] = [
   ...pilots,

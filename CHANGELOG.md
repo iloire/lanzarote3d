@@ -2,6 +2,21 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 00:29 UTC
+
+### Changed
+- **The town buildings are rebuilt low poly and lighter from afar**: each building is one flat-shaded, vertex-coloured mesh sharing a single material, so a whole town merges into one draw call for its buildings (the Famara scene's town now merges into 18 meshes instead of 26). The towns use ULTRA_LOW, which is now just massing and roof, because no window survives that distance: 10 to 26 triangles a building, about 21 on average across the town mix, against about 25 for the old two-box versions
+  - **Townhouse**: three storeys under a flat roof behind a parapet; closer up, a window grid, cornice, string course, doorstep, chimney, shutters, a balcony and a rooftop water tank
+  - **House**: a two-storey hip-roofed main block with lower wings (flat roofs for the modern type); closer up, framed and shuttered windows, a porch canopy and a chimney
+  - **Villa**: a broad ground floor whose roof is a terrace, with a hip-roofed upper floor set back on it; closer up, picture windows, a columned portico, a front terrace and palms
+  - **Barn**: a gambrel roof; closer up, braced double doors, a hayloft door, side windows, a silo and hay bales
+  - **Desert house**: two flat-roofed Lanzarote cubes; closer up, the white island chimney, a courtyard wall with a gate, a pergola and a palm
+  - **Desert house with pool**: the same house with a pool on a deck behind it; closer up, a tiled coping, sun loungers and a parasol
+  - Every LOD shares one builder that adds detail level by level: LOW doors and windows, MEDIUM frames, trim and chimneys, HIGH shutters, balconies and props. At HIGH the buildings are lighter than before, except the barn: 200, 220, 218, 126, 178 and 246 triangles, where the old ones had 324, 680, 276, 60, 936 and 3,096
+  - The villa's unused `size` and `rooms` options are gone
+- **Merging keeps vertex colours**: `mergeStaticMeshes` dropped every attribute but position, normal and uv, so vertex-coloured meshes merged into one flat colour; it now keeps `color` when the material uses vertex colours
+- **Models scene `?lod=`**: `ultra_low`, `low`, `medium` or `high` sets the detail of buildings and cacti (HIGH by default)
+
 ## 2026-10-27 00:13 UTC
 
 ### Changed
