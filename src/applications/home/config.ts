@@ -284,6 +284,46 @@ const niviukIkuma = (colors: { base: string; tip: string; inlets: string }): Gli
 /** Fabio's: pink with black tips */
 export const FABIO_IKUMA = niviukIkuma({ base: '#9c1a58', tip: '#161616', inlets: '#6a1040' });
 
+/**
+ * Roos's Ozone Mojo: turquoise at the front, purple behind, split by a white band along the span
+ * that rises in a sharp peak into the purple either side of the centre. The underside is pale.
+ */
+const MOJO_WHITE = '#f4f2f6';
+const MOJO_PURPLE = '#9a38bc';
+/** Where the white band runs on each half, as (span, chord) points from the centre out */
+const MOJO_EDGE: [number, number][] = [
+  [0, 0.46],
+  [0.17, 0.5],
+  [0.3, 0.8],
+  [0.42, 0.56],
+  [0.7, 0.5],
+  [1.1, 0.45],
+];
+/** The white band's chord position at span s, between the MOJO_EDGE points */
+const mojoEdgeAt = (s: number): number => {
+  const i = Math.max(1, MOJO_EDGE.findIndex(([span]) => span >= s));
+  const [[s0, c0], [s1, c1]] = [MOJO_EDGE[i - 1], MOJO_EDGE[i]];
+  return c0 + ((s - s0) / (s1 - s0)) * (c1 - c0);
+};
+export const ROOS_MOJO: GliderOptions = {
+  wingColor1: '#34a4d4',
+  wingColor2: '#34a4d4',
+  undersideColor: '#e6deee',
+  inletsColor: '#1f7aa6',
+  patches: [
+    // The white band first, so it wins over the purple strips that start on it
+    ...MOJO_EDGE.slice(1).map(
+      (to, i): GliderPatch => ({ color: MOJO_WHITE, from: MOJO_EDGE[i], to, width: 0.06 })
+    ),
+    // The purple filled in chordwise strips from the band back past the trailing edge
+    ...Array.from({ length: 23 }, (_, i): GliderPatch => {
+      const s = i * 0.05;
+      return { color: MOJO_PURPLE, from: [s, mojoEdgeAt(s)], to: [s, 1.2], width: 0.06 };
+    }),
+  ].flatMap(mirrored),
+  numeroCajones: 35,
+};
+
 /** The pilot the camera flies in to and follows round the loop, unless ?pilot= picks another */
 export const LEAD_PILOT = CharacterType.IVAN;
 
@@ -296,12 +336,7 @@ export const LEAD_PILOT = CharacterType.IVAN;
 export const paraglidersVoxel: ParagliderVoxelConfig[] = [
   {
     options: {
-      glider: {
-        wingColor1: '#7b2d6b',
-        wingColor2: '#e8b830',
-        inletsColor: 'white',
-        numeroCajones: 35,
-      },
+      glider: ROOS_MOJO,
       pilot: { characterType: CharacterType.ROOS },
     },
     // Low and close to takeoff: a short beat of her own at the south-west end of the Risco,
