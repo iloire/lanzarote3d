@@ -427,6 +427,8 @@ class Environment {
     this.cloudInstances.forEach(c => c.dispose());
     this.cloudInstances = [];
     const cloudBase = (lclLevel + rndIntBetween(-200, 200)) * 1.08;
+    // Each cluster's base sits a little above or below the day's cloud base
+    const CLUSTER_BASE_JITTER = 100;
 
     const sites = THERMAL_SITES.map(({ x, z }) => ({
       position: new THREE.Vector3(x, cloudBase, z),
@@ -462,6 +464,7 @@ class Environment {
       sites.map(async site => {
         const cloudInstance = new Clouds(site.kind);
         this.cloudInstances.push(cloudInstance);
+        site.position.y += rndIntBetween(-CLUSTER_BASE_JITTER, CLUSTER_BASE_JITTER);
         const cloud = await cloudInstance.load(site.position, site.scale);
         this.scene.add(cloud);
         return cloud;

@@ -6,10 +6,10 @@ import { buildCloudGeometry, CloudKind, padBounds } from './Cloud';
 
 /** How far the clouds of a group spread round its centre, and how much their bases differ */
 const SPREAD = 1100;
-const BASE_JITTER = 25;
+const BASE_JITTER = 60;
 
 /**
- * A cluster of 2 to 6 cumulus sharing one cloud base, drawn as a single mesh. A tower
+ * A cluster of 2 to 6 cumulus with roughly one cloud base, drawn as a single mesh. A tower
  * cluster, over a strong thermal, has one towering cloud among the puffs.
  */
 class Clouds {

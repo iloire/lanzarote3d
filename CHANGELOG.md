@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 22:05 UTC
+
+### Changed
+- **Cloud bases vary in height**: each cluster sits up to 100 units above or below the day's cloud base, and each cloud within a cluster up to 60 more (was 25), so the bases form a ragged layer rather than one plane
+
 ## 2026-10-27 21:55 UTC
 
 ### Changed

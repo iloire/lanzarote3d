@@ -102,14 +102,16 @@ it.
 
 ## Clouds (`Cloud.ts`, `Clouds.ts`, `cloudMaterial.ts`)
 
-Low-poly cumulus with flat bottoms, all at one cloud base just above the main thermals' tops.
+Low-poly cumulus, their bases near one cloud base just above the main thermals' tops. Each
+cluster's base is up to 100 units above or below it, and each cloud's up to 60 more (scaled
+with the cluster), so the bases form a ragged layer rather than one plane.
 There's a cluster of 2 to 6 clouds over each main thermal and three more in between. The
 super thermal's cluster is led by a tower. `buildCloudGeometry` stacks icosahedron lobes in
 layers that narrow as they rise. Puffs have 2–3 layers and towers 6–7, and lobes over 150
 units get the finer 80-face icosahedron. It then squashes everything below the base to 30 %
 of its depth, so the bottom layer becomes a shallow faceted belly: level enough to read as a
-cloud base, without the cut-off plate a hard clamp made. Each cluster is merged into one non-indexed mesh, which
-makes one draw call and gives every face its own flat normal.
+cloud base, without the cut-off plate a hard clamp made. Each cluster is merged into one
+non-indexed mesh, which makes one draw call and gives every face its own flat normal.
 
 The clouds aren't lit by the scene's lights. They all share one `ShaderMaterial` that shades
 them itself:
