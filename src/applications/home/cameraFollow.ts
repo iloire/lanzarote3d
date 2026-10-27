@@ -153,3 +153,43 @@ export class BackdropSway {
     camera.copy(target).add(this.offset.setFromSpherical(this.spherical));
   }
 }
+
+export type ZoomInSettings = {
+  /** How far from its target the camera ends up, in metres */
+  distance: number;
+  /** How fast the camera closes in, per second */
+  response: number;
+};
+
+/**
+ * Brings a zoomed-out camera back in to `distance` from its target, along its line of sight so
+ * the angle is kept. Started on each pilot switch; a camera already closer is left alone.
+ */
+export class ZoomIn {
+  private active = false;
+  private readonly offset = new THREE.Vector3();
+
+  constructor(private readonly settings: ZoomInSettings) {}
+
+  start(): void {
+    this.active = true;
+  }
+
+  stop(): void {
+    this.active = false;
+  }
+
+  /** Advances by `deltaTime` seconds, moving `camera` towards `target` */
+  update(deltaTime: number, camera: THREE.Vector3, target: THREE.Vector3): void {
+    if (!this.active || deltaTime <= 0) return;
+    const { distance, response } = this.settings;
+    this.offset.subVectors(camera, target);
+    const current = this.offset.length();
+    if (current <= distance + 0.5) {
+      this.active = false;
+      return;
+    }
+    const next = distance + (current - distance) * Math.exp(-deltaTime * response);
+    camera.copy(target).addScaledVector(this.offset, next / current);
+  }
+}

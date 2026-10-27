@@ -5,6 +5,7 @@ import {
   ORBIT_CONTROLS_PRESETS,
 } from '../../foundation/utils/OrbitControlsHelper';
 import { animator, Easing } from '../../foundation/systems/animation/SimpleAnimator';
+import { CAMERA_ARRIVAL_OFFSET } from './config';
 
 export interface CameraAnimationConfig {
   /** The lead pilot; it is flying, so the camera aims at where it is now, every frame */
@@ -34,7 +35,7 @@ export function setupCameraAnimation(
   const intermediatePosition = new THREE.Vector3(4500, 1800, 1500);
 
   // Final position - slow, careful approach to the target
-  const finalCameraPosition = new THREE.Vector3(pgPos.x - 100, pgPos.y + 50, pgPos.z + 200);
+  const finalCameraPosition = pgPos.clone().add(CAMERA_ARRIVAL_OFFSET);
 
   // Set initial camera position and look at the target
   camera.position.copy(initialCameraPosition);

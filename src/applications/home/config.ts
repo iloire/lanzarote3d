@@ -6,7 +6,7 @@ import type {
 } from '../../foundation/components/vehicles';
 import { CharacterType } from '../../foundation/components/characters/CharacterRegistry';
 import { FlightPattern } from '../../foundation/systems/behaviors/FlyingBehavior';
-import type { BackdropSwaySettings, CameraFollowSettings } from './cameraFollow';
+import type { BackdropSwaySettings, CameraFollowSettings, ZoomInSettings } from './cameraFollow';
 import type { TwistSettings, WingoverSettings } from './paragliderMotion';
 
 export type ParagliderVoxelConfig = {
@@ -562,6 +562,18 @@ export const CAMERA_FOLLOW: CameraFollowSettings = {
   velocityResponse: 2,
   rollShare: 0.25,
   rollResponse: 1.5,
+};
+
+/** Where the fly-in leaves the camera, relative to the lead pilot: about 230 m behind and above */
+export const CAMERA_ARRIVAL_OFFSET = new THREE.Vector3(-100, 50, 200);
+
+/**
+ * Switching pilots with the arrows after zooming out brings the camera back in to the fly-in's
+ * distance as it glides across, most of the way within about 1.5 s; zoomed in closer, it stays.
+ */
+export const CAMERA_ZOOM_IN: ZoomInSettings = {
+  distance: CAMERA_ARRIVAL_OFFSET.length(),
+  response: 2,
 };
 
 /** La Graciosa, off the north tip of the island, about 14 km from the ridge */

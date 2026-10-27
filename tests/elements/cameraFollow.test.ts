@@ -1,9 +1,10 @@
 import * as THREE from 'three';
-import { BackdropSway, CameraFollow, smoothDamp } from '../../src/applications/home/cameraFollow';
+import { BackdropSway, CameraFollow, smoothDamp, ZoomIn } from '../../src/applications/home/cameraFollow';
 
 const STEP = 1 / 60;
 const SETTINGS = {
   smoothTime: 1.2,
+  switchTime: 0.75,
   lookAhead: 2,
   velocityResponse: 2,
   rollShare: 0.25,
@@ -118,5 +119,41 @@ describe('BackdropSway', () => {
     expect(widest).toBeGreaterThan(SWAY.amplitude / 2);
     expect(camera.distanceTo(target)).toBeCloseTo(range, 6);
     expect(camera.y).toBeCloseTo(950, 6);
+  });
+});
+
+describe('ZoomIn', () => {
+  const settings = { distance: 230, response: 2 };
+
+  it('brings a zoomed-out camera back to the distance, keeping its angle', () => {
+    const target = new THREE.Vector3(500, 900, -700);
+    const camera = target.clone().add(new THREE.Vector3(-1000, 500, 2000));
+    const direction = camera.clone().sub(target).normalize();
+    const zoom = new ZoomIn(settings);
+    zoom.start();
+    for (let t = 0; t < 5; t += STEP) zoom.update(STEP, camera, target);
+    expect(camera.distanceTo(target)).toBeCloseTo(230, 0);
+    expect(camera.clone().sub(target).normalize().dot(direction)).toBeCloseTo(1, 6);
+  });
+
+  it('leaves a camera that is already closer alone', () => {
+    const target = new THREE.Vector3(0, 0, 0);
+    const camera = new THREE.Vector3(0, 50, 80);
+    const zoom = new ZoomIn(settings);
+    zoom.start();
+    zoom.update(STEP, camera, target);
+    expect(camera.toArray()).toEqual([0, 50, 80]);
+  });
+
+  it('does nothing until started, or once stopped', () => {
+    const target = new THREE.Vector3(0, 0, 0);
+    const camera = new THREE.Vector3(0, 0, 2000);
+    const zoom = new ZoomIn(settings);
+    zoom.update(STEP, camera, target);
+    expect(camera.z).toBe(2000);
+    zoom.start();
+    zoom.stop();
+    zoom.update(STEP, camera, target);
+    expect(camera.z).toBe(2000);
   });
 });

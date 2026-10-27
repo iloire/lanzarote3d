@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 12:30 UTC
+
+### Changed
+- **Pilot arrows zoom back in**: stepping to another pilot after zooming out brings the camera back in to the fly-in's distance (~230 m) as it glides across, keeping the viewing angle; grabbing the controls stops it, and a camera already closer is left alone (`ZoomIn`, `CAMERA_ZOOM_IN`; the fly-in's landing offset is now `CAMERA_ARRIVAL_OFFSET`, shared by both)
+
 ## 2026-10-27 12:24 UTC
 
 ### Fixed

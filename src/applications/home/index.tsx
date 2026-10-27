@@ -30,12 +30,13 @@ import {
   CAMERA_FOLLOW,
   LEAD_PILOT,
   CAMERA_SWAY,
+  CAMERA_ZOOM_IN,
   LA_GRACIOSA,
   isEmbedded,
 } from './config';
 import { loadParagliders, loadHangglider, loadCessna, loadHercules } from './vehicleLoader';
 import { setupCameraAnimation, applyFloatingMotion } from './cameraAnimation';
-import { BackdropSway, CameraFollow } from './cameraFollow';
+import { BackdropSway, CameraFollow, ZoomIn } from './cameraFollow';
 import { createTitleOverlay } from './TitleOverlay';
 import { createPilotPicker } from './PilotPicker';
 import { pilotFromSearch, searchWithPilot } from './pilotParam';
@@ -304,8 +305,11 @@ class HomeApp extends TerrainBase {
     // Sways the camera with La Graciosa behind the pilots until someone takes the controls
     const sway = new BackdropSway(LA_GRACIOSA, CAMERA_SWAY);
     let swaying = true;
+    // Picking another pilot after zooming out closes back in, unless someone grabs the controls
+    const zoomIn = new ZoomIn(CAMERA_ZOOM_IN);
     controls.addEventListener('start', () => {
       swaying = false;
+      zoomIn.stop();
     });
     const enginePos = new THREE.Vector3();
     const tail = new THREE.Vector3();
@@ -343,11 +347,15 @@ class HomeApp extends TerrainBase {
         if (following) {
           const pilot = this.pilots[this.leadIndex];
           if (!wasFollowing) follow.reset(pilot.mesh.position);
-          else if (pilot !== followed) follow.retarget(pilot.mesh.position);
+          else if (pilot !== followed) {
+            follow.retarget(pilot.mesh.position);
+            zoomIn.start();
+          }
           followed = pilot;
           follow.update(deltaTime, pilot.mesh.position, pilot.motion?.bankAngle ?? 0, cameraMove);
           camera.position.add(cameraMove);
           controls.target.add(cameraMove);
+          zoomIn.update(deltaTime, camera.position, controls.target);
           if (swaying) sway.update(deltaTime, camera.position, controls.target);
           applyFloatingMotion(camera, startTime, this.isAnimating);
         }
