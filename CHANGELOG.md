@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 20:45 UTC
+
+### Changed
+- **Roos leads**: the fly-in lands on Roos, pilot number 1 at takeoff, instead of Ivan, number 2; `?pilot=` still picks anyone else
+
 ## 2026-10-27 20:21 UTC
 
 ### Changed

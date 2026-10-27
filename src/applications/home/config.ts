@@ -327,7 +327,7 @@ export const ROOS_MOJO: GliderOptions = {
 };
 
 /** The pilot the camera flies in to and follows round the loop, unless ?pilot= picks another */
-export const LEAD_PILOT = CharacterType.IVAN;
+export const LEAD_PILOT = CharacterType.ROOS;
 
 /**
  * They spread out along the whole Risco, from takeoff to the Mirador del Río: Roos low by takeoff
