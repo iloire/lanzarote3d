@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 11:30 UTC
+
+### Changed
+- **Roos flies low and close to takeoff**: she leaves the shared ridge loop for a short beat of her own at the south-west end of the Risco, where the cliff bends round towards Teguise (away from La Graciosa), at 690–760 m, about 180 m under the others and at least 99 m over the ground
+
 ## 2026-10-27 11:28 UTC
 
 ### Changed

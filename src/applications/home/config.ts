@@ -313,8 +313,22 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
       },
       pilot: { characterType: CharacterType.ROOS },
     },
+    // Low and close to takeoff: a short beat of her own at the south-west end of the Risco,
+    // where the cliff bends round towards Teguise, away from La Graciosa. 690-760 m, about
+    // 180 m under the ridge loop and at least 99 m clear of the ground.
     startProgress: 0.65,
-    pathOffset: new THREE.Vector3(-20, 40, -10),
+    pathOffset: new THREE.Vector3(0, 0, 0),
+    waypoints: [
+      new THREE.Vector3(6600, 760, -420),
+      new THREE.Vector3(6300, 730, -120),
+      new THREE.Vector3(6000, 710, 150),
+      new THREE.Vector3(5750, 700, 300),
+      new THREE.Vector3(5650, 690, 150),
+      new THREE.Vector3(5900, 690, -100),
+      new THREE.Vector3(6250, 700, -350),
+      new THREE.Vector3(6550, 720, -650),
+      new THREE.Vector3(6750, 750, -650),
+    ],
   },
   {
     options: {
