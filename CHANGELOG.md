@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 11:05 UTC
+
+### Fixed
+- **Franz's Buzz Z6 has its real colours**: the top is blue, except on the right half, where a white line edged in grey runs diagonally from the trailing edge at the centre to 38% of the chord at the tip, with lime behind it; the underside is lime. The bands run along the span, not across it as before
+
 ## 2026-10-27 11:04 UTC
 
 ### Added

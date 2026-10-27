@@ -203,18 +203,19 @@ export const DAVID_DELTA: GliderOptions = {
 
 /**
  * Franz's Ozone Buzz Z6, asymmetric on top: blue, except on the right half, where a white line
- * edged in grey in front runs diagonally from the trailing edge by the centre to 45% of the
+ * edged in grey in front runs diagonally from the trailing edge at the centre to 38% of the
  * chord at the tip, with lime behind it. The underside is lime.
  */
+const BUZZ_LIME = '#a8d42c';
 export const FRANZ_BUZZ: GliderOptions = {
   wingColor1: '#1f86d8',
   wingColor2: '#1f86d8',
-  undersideColor: '#b6dc30',
+  undersideColor: BUZZ_LIME,
   inletsColor: '#16609c',
   patches: [
-    { color: '#f4f6f6', from: [0.05, 0.95], to: [1.05, 0.42], width: 0.05 },
-    { color: '#7a8682', from: [0.036, 0.844], to: [1.036, 0.314], width: 0.06 },
-    { color: '#b6dc30', from: [0.133, 1.578], to: [1.133, 1.048], width: 0.6 },
+    { color: '#f4f6f6', from: [0.0, 0.85], to: [1.05, 0.38], width: 0.05 },
+    { color: '#7a8682', from: [-0.012, 0.743], to: [1.038, 0.273], width: 0.06 },
+    { color: BUZZ_LIME, from: [0.071, 1.484], to: [1.121, 1.014], width: 0.6 },
   ],
   numeroCajones: 27,
 };
