@@ -13,11 +13,7 @@ export const DEFAULT_THEME: Theme = {
     timeOfDay: 15,
     sunIntensity: 1.9,
   },
-  clouds: {
-    colors: ['#FFFFFF', '#F5F5F5', '#E8E8E8', '#D0D0D0'],
-    density: 0.6,
-    opacity: 0.85,
-  },
+  clouds: {},
   terrain: {
     style: 'wireframe',
     customMaterial: {

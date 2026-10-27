@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { setCloudColors } from '../rendering/cloudMaterial';
 import { Theme, ThemeApplicationOptions } from '../types/Theme';
 import { StoryOptions } from '../../shared/types';
 import { Weather } from '../components/physics';
@@ -41,8 +42,8 @@ export class ThemeEngine {
       }
 
       // Apply environment styling (clouds, etc.)
-      if (!skipComponents.includes('environment') && theme.clouds && options.environment) {
-        await this.applyEnvironmentTheme(options.environment, theme);
+      if (!skipComponents.includes('environment') && theme.clouds) {
+        setCloudColors(theme.clouds);
       }
 
       // Apply ambient scene settings
@@ -117,19 +118,6 @@ export class ThemeEngine {
   }
 
   /**
-   * Apply environment theme (clouds, etc.)
-   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private static async applyEnvironmentTheme(environment: any, theme: Theme): Promise<void> {
-    if (environment && typeof environment.updateCloudColors === 'function') {
-      logger.debug('Applying environment theme to update cloud colors');
-      environment.updateCloudColors(theme);
-    } else {
-      logger.warn('Environment instance not available or does not support cloud color theming');
-    }
-  }
-
-  /**
    * Apply ambient scene theme
    */
   private static async applyAmbientTheme(options: StoryOptions, theme: Theme): Promise<void> {
@@ -151,16 +139,6 @@ export class ThemeEngine {
    */
   static createWeatherFromTheme(theme: Theme): Weather {
     return new Weather(theme.weather);
-  }
-
-  /**
-   * Get cloud options from theme
-   */
-  static getCloudOptionsFromTheme(theme: Theme): { colors: string[] } {
-    return {
-      colors: theme.clouds.colors,
-      // Additional cloud options can be added here as the Clouds component supports them
-    };
   }
 
   /**

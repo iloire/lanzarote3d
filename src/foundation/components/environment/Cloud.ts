@@ -1,188 +1,144 @@
 import * as THREE from 'three';
 import { rndBetween, rndIntBetween } from '../../utils/math';
+import { cloudMaterial } from '../../rendering/cloudMaterial';
 
-const generateCloudPart = (radius: number, scale: number, material: THREE.Material) => {
-  const geo_cloudPart = new THREE.IcosahedronGeometry(radius, 0);
-  const cloudPart = new THREE.Mesh(geo_cloudPart, material);
-  const scaleX = rndBetween(scale * 0.9, scale * 1.1);
-  const scaleY = rndBetween(scale * 0.9, scale * 1.1);
-  const scaleZ = rndBetween(scale * 0.9, scale * 1.1);
-  cloudPart.scale.set(scaleX, scaleY, scaleZ);
-  cloudPart.rotation.z = -0.5;
-  cloudPart.rotation.x = -0.2;
-  cloudPart.castShadow = true;
-  return cloudPart;
-};
-
-const generateCloud = async (options: CloudOptions): Promise<THREE.Object3D> => {
-  // Create materials for ALL available colors, not just the first 3
-  const materials: THREE.MeshLambertMaterial[] = [];
-  if (options.colors && options.colors.length > 0) {
-    // Use all provided colors from the theme
-    options.colors.forEach(color => {
-      materials.push(new THREE.MeshLambertMaterial({ color }));
-    });
-  } else {
-    // Fallback to default grayscale if no colors provided
-    materials.push(new THREE.MeshLambertMaterial({ color: 0xffffff }));
-    materials.push(new THREE.MeshLambertMaterial({ color: 0x666666 }));
-    materials.push(new THREE.MeshLambertMaterial({ color: 0x999999 }));
-  }
-
-  const radius = 40;
-  const r = rndBetween;
-  const nCloudParts = rndIntBetween(3, 8);
-  const group = new THREE.Group();
-
-  // Randomly decide if this cloud should be monochrome or multi-colored
-  const useMonochrome = Math.random() < 0.3; // 30% chance of single-color cloud
-  const monochromeIndex = rndIntBetween(0, materials.length - 1);
-
-  for (let i = 0; i < nCloudParts; i++) {
-    // Each cloud part can have a different material for more color variety
-    const materialIndex = useMonochrome ? monochromeIndex : rndIntBetween(0, materials.length - 1);
-    const material = materials[materialIndex];
-    if (!material) continue; // Skip if material not found;
-
-    const scale = r(i * 0.9, i * 1.1);
-    const posX = 1.7 * radius * r(-1 * i, i);
-    const posY = 0.3 * radius * r(-1 * i, i);
-    const posZ = 1.2 * radius * r(-1 * i, i);
-    const p = generateCloudPart(radius, scale, material);
-    p.position.set(posX, posY, posZ);
-    group.add(p);
-  }
-
-  return group;
-};
-
-/** How far the parts breathe: their scale by ±5 %, their offset from the cloud's centre by ±10 % */
-const PART_SCALE_SWING = 0.05;
-const PART_OFFSET_SWING = 0.1;
-/** The whole cloud bobs ±60 units over about a minute */
-const BOB_HEIGHT = 60;
-const BOB_RATE = 0.1;
-
-type PartRest = {
-  part: THREE.Object3D;
-  scale: THREE.Vector3;
-  position: THREE.Vector3;
-  phase: number;
-};
+export type CloudKind = 'puff' | 'tower';
 
 /**
- * All clouds move on one shared requestAnimationFrame, and the motion is a pure function of
- * time around each piece's rest pose, so it neither drifts nor depends on the frame rate
+ * How each kind stacks its lobes: the footprint's width, how many layers rise from the
+ * flat base, how much narrower each layer is than the one below and how far above it
+ * sits, in radii
  */
-const activeClouds = new Set<Cloud>();
-let tickerId: number | null = null;
-const tick = (now: number) => {
-  activeClouds.forEach(cloud => cloud.update(now / 1000));
-  tickerId = activeClouds.size > 0 ? requestAnimationFrame(tick) : null;
+const SHAPES: Record<
+  CloudKind,
+  { width: [number, number]; layers: [number, number]; narrow: number; rise: number }
+> = {
+  puff: { width: [450, 850], layers: [2, 3], narrow: 0.65, rise: 0.85 },
+  tower: { width: [700, 1000], layers: [6, 7], narrow: 0.85, rise: 0.9 },
 };
 
-export type CloudOptions = {
-  colors?: string[];
+/** Lobes bigger than this get the finer icosahedron (80 faces instead of 20) */
+const FINE_LOBE_RADIUS = 150;
+
+type Lobe = { centre: THREE.Vector3; radius: number };
+
+const stackLobes = (kind: CloudKind): Lobe[] => {
+  const shape = SHAPES[kind];
+  const lobes: Lobe[] = [];
+  let width = rndBetween(...shape.width);
+  const layers = rndIntBetween(...shape.layers);
+  let y = 0;
+  for (let layer = 0; layer < layers; layer++) {
+    const radius = width * rndBetween(0.22, 0.28);
+    const count = layer === 0 ? rndIntBetween(3, 5) : rndIntBetween(2, 3);
+    // The bottom layer sinks below the base, which then cuts it flat
+    y += radius * (layer === 0 ? 0.3 : shape.rise);
+    for (let i = 0; i < count; i++) {
+      const across = count === 1 ? 0 : i / (count - 1) - 0.5;
+      lobes.push({
+        centre: new THREE.Vector3(
+          across * (width - radius) + rndBetween(-0.1, 0.1) * radius,
+          y + rndBetween(-0.15, 0.15) * radius,
+          rndBetween(-0.3, 0.3) * width * 0.5
+        ),
+        radius: radius * rndBetween(0.85, 1.15),
+      });
+    }
+    width *= shape.narrow;
+  }
+  return lobes;
 };
 
-class Cloud {
-  options: CloudOptions;
-  private mesh: THREE.Object3D | null = null;
-  private rest: PartRest[] = [];
-  // Read on the first update: whoever loads the cloud places it after load() returns
-  private restY: number | null = null;
-  private readonly phase = Math.random() * 100;
+export type CloudPlacement = { offset?: THREE.Vector3; yaw?: number };
 
-  constructor(options: CloudOptions) {
-    this.options = options;
+/**
+ * One low-poly cumulus as a single non-indexed geometry, its base flat at y = 0. Every
+ * vertex carries its lobe (aLobe) and the cloud's phase and its height up the cloud
+ * (aCloud), which cloudMaterial uses to animate and shade it.
+ */
+export const buildCloudGeometry = (
+  kind: CloudKind,
+  { offset = new THREE.Vector3(), yaw = 0 }: CloudPlacement = {}
+): THREE.BufferGeometry => {
+  const turn = new THREE.Matrix4().makeRotationY(yaw).setPosition(offset);
+  const phase = Math.random() * 100;
+  const positions: number[] = [];
+  const lobeAttr: number[] = [];
+  const v = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
+  const edgeA = new THREE.Vector3();
+  const edgeB = new THREE.Vector3();
+
+  for (const { centre, radius } of stackLobes(kind)) {
+    const lobe = new THREE.IcosahedronGeometry(1, radius > FINE_LOBE_RADIUS ? 1 : 0);
+    lobe.applyMatrix4(
+      new THREE.Matrix4().compose(
+        centre,
+        new THREE.Quaternion().setFromEuler(
+          new THREE.Euler(rndBetween(0, Math.PI), rndBetween(0, Math.PI), 0)
+        ),
+        new THREE.Vector3(radius * rndBetween(1, 1.2), radius * rndBetween(0.8, 1), radius)
+      )
+    );
+    const placedCentre = centre.clone().applyMatrix4(turn);
+    const lobePhase = Math.random() * Math.PI * 2;
+    const corners = lobe.getAttribute('position');
+    for (let f = 0; f < corners.count; f += 3) {
+      for (let k = 0; k < 3; k++) {
+        v[k]!.fromBufferAttribute(corners, f + k);
+        v[k]!.y = Math.max(v[k]!.y, 0);
+      }
+      // Faces wholly under the base collapse to nothing; the rest form its flat underside
+      edgeA.subVectors(v[1]!, v[0]!);
+      edgeB.subVectors(v[2]!, v[0]!);
+      if (edgeA.cross(edgeB).lengthSq() < 1e-6) continue;
+      for (const corner of v) {
+        corner.applyMatrix4(turn);
+        positions.push(corner.x, corner.y, corner.z);
+        lobeAttr.push(placedCentre.x, placedCentre.y, placedCentre.z, lobePhase);
+      }
+    }
+    lobe.dispose();
   }
 
+  let top = 0;
+  for (let i = 1; i < positions.length; i += 3) top = Math.max(top, positions[i]!);
+  const cloudAttr: number[] = [];
+  for (let i = 1; i < positions.length; i += 3) cloudAttr.push(phase, positions[i]! / top);
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute('aLobe', new THREE.Float32BufferAttribute(lobeAttr, 4));
+  geometry.setAttribute('aCloud', new THREE.Float32BufferAttribute(cloudAttr, 2));
+  // Non-indexed, so every face gets its own flat normal: the facets of the low-poly look
+  geometry.computeVertexNormals();
+  return geometry;
+};
+
+/** The breathing and bobbing happen in the shader, so the bounds must allow for them */
+export const padBounds = (geometry: THREE.BufferGeometry): void => {
+  geometry.computeBoundingSphere();
+  const sphere = geometry.boundingSphere!;
+  sphere.radius = sphere.radius * 1.1 + 40;
+};
+
+export type CloudOptions = { kind?: CloudKind };
+
+/** A single cloud, as the Models viewer shows it; the scenes place them in groups (Clouds) */
+class Cloud {
+  private mesh: THREE.Mesh | null = null;
+
+  constructor(private readonly options: CloudOptions = {}) {}
+
   async load(): Promise<THREE.Object3D> {
-    this.mesh = await generateCloud(this.options);
-    this.rest = this.mesh.children.map(part => ({
-      part,
-      scale: part.scale.clone(),
-      position: part.position.clone(),
-      phase: Math.random() * Math.PI * 2,
-    }));
-    this.animate();
+    const geometry = buildCloudGeometry(this.options.kind ?? 'puff');
+    padBounds(geometry);
+    this.mesh = new THREE.Mesh(geometry, cloudMaterial);
+    this.mesh.castShadow = true;
     return this.mesh;
   }
 
-  animate() {
-    if (!this.mesh) return;
-    activeClouds.add(this);
-    if (tickerId === null) tickerId = requestAnimationFrame(tick);
-  }
-
-  stop() {
-    activeClouds.delete(this);
-  }
-
-  /** Poses the cloud for `time` in seconds */
-  update(time: number) {
-    if (!this.mesh) return;
-    if (this.restY === null) this.restY = this.mesh.position.y;
-    const t = time + this.phase;
-    this.mesh.position.y = this.restY + Math.sin(t * BOB_RATE) * BOB_HEIGHT;
-    this.rest.forEach(({ part, scale, position, phase }) => {
-      part.scale.copy(scale).multiplyScalar(1 + Math.sin(t * 0.7 + phase) * PART_SCALE_SWING);
-      part.position
-        .copy(position)
-        .multiplyScalar(1 + Math.sin(t * 0.4 + phase * 2) * PART_OFFSET_SWING);
-    });
-  }
-
-  /**
-   * Update cloud colors by recreating materials with new colors
-   */
-  updateColors(newColors: string[]) {
-    if (!this.mesh || !newColors || newColors.length === 0) return;
-
-    // Create new materials with the new colors
-    const newMaterials: THREE.MeshLambertMaterial[] = [];
-    newColors.forEach(color => {
-      newMaterials.push(new THREE.MeshLambertMaterial({ color }));
-    });
-
-    // Update each cloud part's material
-    this.mesh.children.forEach(child => {
-      if (child instanceof THREE.Mesh) {
-        // Dispose old material
-        if (Array.isArray(child.material)) {
-          child.material.forEach(material => material.dispose());
-        } else {
-          child.material?.dispose();
-        }
-
-        // Apply new material (random selection from new colors)
-        const materialIndex = Math.floor(Math.random() * newMaterials.length);
-        const newMaterial = newMaterials[materialIndex];
-        if (newMaterial) {
-          child.material = newMaterial;
-        }
-      }
-    });
-
-    // Update stored options for future reference
-    this.options.colors = newColors;
-  }
-
   dispose() {
-    this.stop();
-    // Clean up mesh and materials
-    if (this.mesh) {
-      this.mesh.children.forEach(child => {
-        if (child instanceof THREE.Mesh) {
-          child.geometry?.dispose();
-          if (Array.isArray(child.material)) {
-            child.material.forEach(material => material.dispose());
-          } else {
-            child.material?.dispose();
-          }
-        }
-      });
-    }
+    this.mesh?.geometry.dispose();
   }
 }
 

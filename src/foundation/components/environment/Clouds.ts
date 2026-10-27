@@ -1,81 +1,51 @@
-import Cloud, { CloudOptions } from './Cloud';
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils';
+import { rndBetween, rndIntBetween } from '../../utils/math';
+import { cloudMaterial } from '../../rendering/cloudMaterial';
+import { buildCloudGeometry, CloudKind, padBounds } from './Cloud';
 
-const randomNumber = (min: number, max: number) => Math.random() * min + max;
+/** How far the clouds of a group spread round its centre, and how much their bases differ */
+const SPREAD = 1100;
+const BASE_JITTER = 25;
 
-const getRandomSign = (): number => {
-  const randomBoolean = Math.random() < 0.5;
-  return randomBoolean ? 1 : -1;
-};
-
-const getRandomCloud = async (options: CloudOptions) => {
-  const cloud = await new Cloud(options).load();
-  const boundingBox = new THREE.Box3().setFromObject(cloud);
-  const size = new THREE.Vector3();
-  boundingBox.getSize(size);
-  const rndPosOffset = new THREE.Vector3(
-    getRandomSign() * random(0.3 * size.x, 1.2 * size.x),
-    getRandomSign() * random(0.1 * size.y, 0.2 * size.y),
-    getRandomSign() * random(0.3 * size.z, size.z)
-  );
-  cloud.position.copy(rndPosOffset);
-  cloud.rotation.x = -Math.PI / 2;
-  cloud.rotation.z = (getRandomSign() * Math.PI) / random(11, 20);
-  cloud.rotation.y = (getRandomSign() * Math.PI) / random(38, 45);
-  const scale = cloud.scale.x * randomNumber(0.6, 1.1);
-  cloud.scale.set(scale, scale, scale);
-  return cloud;
-};
-
-const random = (min: number, max: number): number => Math.floor(Math.random() * (max - min)) + min;
-
+/**
+ * A cluster of 2 to 6 cumulus sharing one cloud base, drawn as a single mesh. A tower
+ * cluster, over a strong thermal, has one towering cloud among the puffs.
+ */
 class Clouds {
-  options: CloudOptions;
-  private group: THREE.Group | null = null;
+  private mesh: THREE.Mesh | null = null;
 
-  constructor(options: CloudOptions) {
-    this.options = options;
+  constructor(private readonly kind: CloudKind = 'puff') {}
+
+  /** `base` is where the cloud bases sit: the group's centre, at cloudbase height */
+  async load(base: THREE.Vector3, scale = 1): Promise<THREE.Object3D> {
+    const count = rndIntBetween(2, 6);
+    const geometries = Array.from({ length: count }, (_, i) =>
+      buildCloudGeometry(i === 0 ? this.kind : 'puff', {
+        offset:
+          i === 0
+            ? new THREE.Vector3()
+            : new THREE.Vector3(
+                rndBetween(-1, 1) * SPREAD,
+                rndBetween(-1, 1) * BASE_JITTER,
+                rndBetween(-1, 1) * SPREAD
+              ),
+        yaw: rndBetween(0, Math.PI * 2),
+      })
+    );
+    const geometry = mergeGeometries(geometries)!;
+    geometries.forEach(g => g.dispose());
+    padBounds(geometry);
+
+    this.mesh = new THREE.Mesh(geometry, cloudMaterial);
+    this.mesh.castShadow = true;
+    this.mesh.position.copy(base);
+    this.mesh.scale.setScalar(scale);
+    return this.mesh;
   }
 
-  async load(scale: number, pos: THREE.Vector3): Promise<THREE.Object3D> {
-    const group = new THREE.Group();
-    this.group = group;
-    const nClouds = random(2, 6);
-
-    for (let i = 0; i < nClouds; i++) {
-      const cloud = await getRandomCloud(this.options);
-      group.add(cloud);
-      group.position.copy(pos);
-    }
-    group.scale.set(scale, scale, scale);
-    return group;
-  }
-
-  /**
-   * Update colors of all clouds in this cloud group
-   */
-  updateColors(newColors: string[]) {
-    if (!this.group || !newColors || newColors.length === 0) return;
-
-    // Update options for future reference
-    this.options.colors = newColors;
-
-    // Since we don't store Cloud instances, we need to traverse the group
-    // and update materials directly on the mesh children
-    this.group.traverse(child => {
-      if (child instanceof THREE.Mesh && child.material) {
-        // Dispose old material
-        if (Array.isArray(child.material)) {
-          child.material.forEach(material => material.dispose());
-        } else {
-          child.material.dispose();
-        }
-
-        // Apply new material (random selection from new colors)
-        const materialIndex = Math.floor(Math.random() * newColors.length);
-        child.material = new THREE.MeshLambertMaterial({ color: newColors[materialIndex] });
-      }
-    });
+  dispose() {
+    this.mesh?.geometry.dispose();
   }
 }
 

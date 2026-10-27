@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 08:54 UTC
+
+### Changed
+- **The clouds are low-poly cumulus with flat bottoms, shaded like clouds**: they used to be loose piles of grey icosahedrons in four random greys, lit like rocks, and rotated so they stood as towers. Now each cloud is lobes stacked in narrowing layers and cut flat at a cloud base shared across the island, just above the thermals. Puffs are wide and low; the super thermal gets a tower. One shader shades every cloud: white where faces turn to the sun, blue-grey away from it, darker on the flat undersides, a silver edge when looking towards the sun, and warmer as the sun gets low. They fade into the horizon haze with the fog. Each cluster is one merged mesh and one draw call, and the breathing and bobbing moved from a JavaScript ticker into the vertex shader. The colours are theme fields (`clouds.light`, `shade`, `base`, `rim`, `brightness`); the unused `colors`, `density` and `opacity` are gone. The Models viewer gains a `cloud-tower`. Tests cover the flat base, the shapes, the normals and the heights
+
 ## 2026-10-27 08:14 UTC
 
 ### Docs

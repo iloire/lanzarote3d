@@ -6,6 +6,7 @@ import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 import { Sky as SkyExample } from 'three/examples/jsm/objects/Sky';
 import { sharedUniforms } from './sharedUniforms';
+import { setCloudSun } from './cloudMaterial';
 import { AtmosphereTheme } from '../types/Theme';
 
 /** The filmic look, all of it overridable per theme (theme.atmosphere). */
@@ -292,6 +293,7 @@ export class RenderPipeline {
       this.scene.fog = new THREE.FogExp2(horizon, density);
     }
     this.sky.setHaze(horizon, 1);
+    setCloudSun(this.sky.getSunPosition());
   }
 
   /** Average sky colour a few degrees above the horizon, looking across the sun. */

@@ -100,6 +100,29 @@ pushed 0.3 % further along its view ray, so roads and anything else drawn on the
 in front of it. Polygon offset can't do this, because the logarithmic depth buffer overrides
 it.
 
+## Clouds (`Cloud.ts`, `Clouds.ts`, `cloudMaterial.ts`)
+
+Low-poly cumulus with flat bottoms, all at one cloud base just above the main thermals' tops.
+There's a cluster of 2 to 6 clouds over each main thermal and three more in between. The
+super thermal's cluster is led by a tower. `buildCloudGeometry` stacks icosahedron lobes in
+layers that narrow as they rise. Puffs have 2–3 layers and towers 6–7, and lobes over 150
+units get the finer 80-face icosahedron. It then clamps everything below the base to y = 0,
+so the bottom layer is cut flat. Each cluster is merged into one non-indexed mesh, which
+makes one draw call and gives every face its own flat normal.
+
+The clouds aren't lit by the scene's lights. They all share one `ShaderMaterial` that shades
+them itself:
+
+- `light` on faces turned to the sun, `shade` on faces turned away;
+- `base` on the flat underside and the lowest third;
+- a `rim` silver lining when the camera looks towards the sun;
+- `setCloudSun` (called from `refreshSky`) warms everything as the sun nears the horizon;
+- the scene's fog, so distant clouds fade into the horizon haze.
+
+Each vertex carries its lobe's centre and phase and its cloud's phase. The vertex shader
+uses these to make the lobes breathe (±5 %) and each cloud bob (±40 units), so no CPU work
+runs per frame. The Models viewer shows a single `cloud` and `cloud-tower`.
+
 ## Life
 
 `Gulls` (`components/wildlife/Gulls.ts`) puts flocks circling in thermals into one
@@ -128,6 +151,10 @@ Everything here is driven from `DEFAULT_THEME` in `src/foundation/themes/index.t
 (the alternative presets and the menu picker were removed). All the new fields are optional.
 
 ```ts
+clouds: {                    // defaults: DEFAULT_CLOUDS in cloudMaterial.ts
+  light: '#ffffff', shade: '#b4c0d4', base: '#8b98b0', rim: '#fff3dc',
+  brightness: 1.35,          // scales all four
+},
 water: {
   color: '#08304a',          // deep water
   shallowColor: '#23a9a6',   // over the sand near the beaches

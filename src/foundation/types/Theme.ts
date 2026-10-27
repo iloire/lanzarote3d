@@ -19,11 +19,13 @@ export interface SkyTheme {
   };
 }
 
+/** The clouds' colours; see cloudMaterial for how each is used and DEFAULT_CLOUDS for the defaults */
 export interface CloudTheme {
-  colors: string[];
-  density?: number;
-  scale?: number;
-  opacity?: number;
+  light?: string; // Faces turned to the sun
+  shade?: string; // Faces turned away from it
+  base?: string; // The flat underside
+  rim?: string; // Silver lining, when looking towards the sun
+  brightness?: number; // Scales all four
 }
 
 export interface TerrainTheme {

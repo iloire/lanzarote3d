@@ -2,13 +2,12 @@ import * as THREE from 'three';
 import { Clouds } from '../../foundation/components/environment';
 import { Weather } from '../../foundation/components/physics';
 import { Thermal } from '../../foundation/components/physics';
-import { rndIntBetween } from '../../foundation/utils/math';
 import Tree from '../../foundation/components/scenery/trees/Tree';
 import { logger } from '../../foundation/utils/logger';
 import { Gulls, GullFlock } from '../../foundation/components/wildlife/Gulls';
 import { addMeshAroundArea } from './mesh-utils';
 import { generateThermalPair, ThermalGenerationOptions } from './thermal-utils';
-import { CloudOptions } from '../../foundation/components/environment';
+import { setCloudColors } from '../../foundation/rendering/cloudMaterial';
 import { Theme } from '../../foundation/types/Theme';
 import { ThemeEngine } from '../../foundation/systems/ThemeEngine';
 import { IThreeComponent } from '../../foundation/components/base/IThreeComponent';
@@ -330,80 +329,49 @@ class Environment {
     return allThermals;
   }
 
-  async addClouds(thermals: Thermal[], options: CloudOptions): Promise<THREE.Object3D[]> {
-    // Clear previous cloud instances
+  /**
+   * A cluster of cumulus over each main thermal, their bases level just above the thermal's
+   * top, a towering one over the super thermal, and a few clusters in between.
+   */
+  async addClouds(thermals: Thermal[]): Promise<THREE.Object3D[]> {
+    this.cloudInstances.forEach(c => c.dispose());
     this.cloudInstances = [];
-
-    // from thermals
     const mainThermals = thermals.filter(t => t.isMainThermal());
-    const cloudPromises = mainThermals.map(async t => {
-      const cloudInstance = new Clouds(options);
-      this.cloudInstances.push(cloudInstance);
+    const cloudBase = (mainThermals[0]?.getDimensions().height ?? 1800) * 1.08;
 
-      if (t.isSuperThermal()) {
-        return cloudInstance.load(
-          3,
-          new THREE.Vector3(
-            t.getPosition().x,
-            t.getDimensions().height * (1 + 0.01 * rndIntBetween(10, 30)),
-            t.getPosition().z
-          )
-        );
-      } else {
-        return cloudInstance.load(
-          1,
-          new THREE.Vector3(
-            t.getPosition().x,
-            t.getDimensions().height * (1 + 0.01 * rndIntBetween(10, 30)),
-            t.getPosition().z
-          )
-        );
-      }
-    });
+    const sites = mainThermals.map(t => ({
+      position: new THREE.Vector3(t.getPosition().x, cloudBase, t.getPosition().z),
+      kind: t.isSuperThermal() ? ('tower' as const) : ('puff' as const),
+      scale: t.isSuperThermal() ? 1.6 : 1,
+    }));
+    [
+      { x: 5120, z: -10100 },
+      { x: 2600, z: 842 },
+      { x: -3600, z: 8042 },
+    ].forEach(({ x, z }) =>
+      sites.push({ position: new THREE.Vector3(x, cloudBase, z), kind: 'puff', scale: 1 })
+    );
 
-    const clouds = await Promise.all(cloudPromises);
-    clouds.forEach(c => {
-      this.scene.add(c);
-    });
-
-    // custom clouds
-    const customCloudPromises = [
-      { x: 5120, y: 2000, z: -10100 },
-      { x: 2600, y: 2300, z: 842 },
-      { x: -3600, y: 2300, z: 8042 },
-    ].map(async pos => {
-      const cloudInstance = new Clouds(options);
-      this.cloudInstances.push(cloudInstance);
-      const cloud = await cloudInstance.load(1, new THREE.Vector3(pos.x, pos.y, pos.z));
-      this.scene.add(cloud);
-      return cloud;
-    });
-
-    const customClouds = await Promise.all(customCloudPromises);
-    return clouds.concat(customClouds);
+    const clouds = await Promise.all(
+      sites.map(async site => {
+        const cloudInstance = new Clouds(site.kind);
+        this.cloudInstances.push(cloudInstance);
+        const cloud = await cloudInstance.load(site.position, site.scale);
+        this.scene.add(cloud);
+        return cloud;
+      })
+    );
+    return clouds;
   }
 
   // Theme-aware methods
 
   /**
-   * Add clouds using theme settings
+   * Add clouds coloured from the theme
    */
   async addCloudsFromTheme(thermals: Thermal[], theme: Theme): Promise<THREE.Object3D[]> {
-    const cloudOptions = ThemeEngine.getCloudOptionsFromTheme(theme);
-    return this.addClouds(thermals, cloudOptions);
-  }
-
-  /**
-   * Update cloud colors for theme switching
-   */
-  updateCloudColors(theme: Theme): void {
-    const cloudOptions = ThemeEngine.getCloudOptionsFromTheme(theme);
-    if (cloudOptions.colors && cloudOptions.colors.length > 0) {
-      logger.debug('Updating cloud colors for theme:', theme.name, cloudOptions.colors);
-      this.cloudInstances.forEach(cloudInstance => {
-        cloudInstance.updateColors(cloudOptions.colors!);
-      });
-    }
+    setCloudColors(theme.clouds);
+    return this.addClouds(thermals);
   }
 
   /**

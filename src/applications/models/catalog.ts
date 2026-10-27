@@ -155,5 +155,11 @@ export const MODEL_CATALOG: ModelEntry[] = [
     create: () => new OrganPipeCactus(lod),
   },
   { id: 'gulls', name: 'Gulls', group: 'Nature', create: gullFlock },
-  { id: 'cloud', name: 'Cloud', group: 'Nature', create: () => new Cloud({}) },
+  { id: 'cloud', name: 'Cloud', group: 'Nature', create: () => new Cloud({ kind: 'puff' }) },
+  {
+    id: 'cloud-tower',
+    name: 'Cloud (tower)',
+    group: 'Nature',
+    create: () => new Cloud({ kind: 'tower' }),
+  },
 ];
