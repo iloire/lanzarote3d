@@ -6,7 +6,7 @@ import { CloudTheme } from '../types/Theme';
 export const DEFAULT_CLOUDS: Required<CloudTheme> = {
   light: '#ffffff',
   shade: '#b4c0d4',
-  base: '#8b98b0',
+  base: '#77849c', // a touch dark, like the base of a cumulus over a good thermal
   rim: '#fff3dc',
   brightness: 1.35,
 };

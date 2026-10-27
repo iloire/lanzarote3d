@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 09:10 UTC
+
+### Changed
+- **Cloud bases are slightly darker**: the underside colour (`clouds.base`) goes from `#8b98b0` to `#77849c`, about 12 % darker, like the grey base of a cumulus over a good thermal; the tops and sides are unchanged
+
 ## 2026-10-27 08:54 UTC
 
 ### Changed
