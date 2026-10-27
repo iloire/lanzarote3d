@@ -1,0 +1,47 @@
+{
+  "source": "© OpenStreetMap contributors, ODbL 1.0, https://www.openstreetmap.org/copyright",
+  "scale": 2,
+  "landmarks": [
+    {
+      "name": "Radar station on Peñas del Chache, the top of the Risco",
+      "kind": "radar",
+      "osm": "node/948743656",
+      "at": [29.11941, -13.52092],
+      "heading": 315,
+      "top": 200
+    },
+    {
+      "name": "Ermita de las Nieves",
+      "kind": "ermita",
+      "osm": "way/153639000",
+      "at": [29.1066, -13.5281],
+      "heading": 225,
+      "top": 200
+    },
+    {
+      "name": "Communication mast above Los Valles",
+      "kind": "mast",
+      "osm": "node/3695164481",
+      "at": [29.08029, -13.52167]
+    },
+    {
+      "name": "Communication mast above Los Valles",
+      "kind": "mast",
+      "osm": "node/3695164482",
+      "at": [29.08039, -13.52159],
+      "height": 30
+    },
+    {
+      "name": "Windsock at the Famara takeoff",
+      "kind": "windsock",
+      "osm": "node/3001813519",
+      "at": [29.08019, -13.55788]
+    },
+    {
+      "name": "Windsock at the landing field at the foot of the Risco",
+      "kind": "windsock",
+      "osm": "node/3001813520",
+      "at": [29.08495, -13.57228]
+    }
+  ]
+}

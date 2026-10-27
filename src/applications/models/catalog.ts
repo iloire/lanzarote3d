@@ -40,6 +40,12 @@ import {
   IVAN_RUSH,
 } from '../home/config';
 import { HARBOUR_FEATURES } from '../puerto-del-carmen/harbour';
+import {
+  createErmita,
+  createMast,
+  createRadarStation,
+  createWindsock,
+} from '../../foundation/components/scenery/landmarks/Landmarks';
 
 /** Anything the viewer can show: every scene component, and Cloud, load like this */
 interface Loadable {
@@ -55,6 +61,11 @@ export interface ModelEntry {
   scale?: number;
   create: () => Loadable;
 }
+
+/** A landmark built as a plain mesh, wrapped so the viewer can load it */
+const landmark = (create: () => THREE.Object3D) => (): Loadable => ({
+  load: async () => create(),
+});
 
 const pilots: ModelEntry[] = paraglidersVoxel.map(p => ({
   id: `paraglider-${p.options.pilot.characterType}`,
@@ -194,6 +205,30 @@ export const MODEL_CATALOG: ModelEntry[] = [
     create: () => new Harbour({ features: HARBOUR_FEATURES }),
   },
   { id: 'park', name: 'Park', group: 'Buildings', create: () => new Park() },
+
+  // Drawn twice life size in the scenes (`scale` in shared/env/landmarks.json)
+  {
+    id: 'radar-station',
+    name: 'Radar station (Peñas del Chache)',
+    group: 'Landmarks',
+    scale: 2,
+    create: landmark(createRadarStation),
+  },
+  { id: 'mast', name: 'Mast', group: 'Landmarks', scale: 2, create: landmark(createMast) },
+  {
+    id: 'ermita',
+    name: 'Ermita de las Nieves',
+    group: 'Landmarks',
+    scale: 2,
+    create: landmark(createErmita),
+  },
+  {
+    id: 'windsock',
+    name: 'Windsock',
+    group: 'Landmarks',
+    scale: 2,
+    create: landmark(createWindsock),
+  },
 
   { id: 'tree', name: 'Tree', group: 'Nature', create: () => new Tree() },
   { id: 'stone', name: 'Stone', group: 'Nature', create: () => new Stone() },

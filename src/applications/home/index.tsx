@@ -14,6 +14,7 @@ import {
 import { createCameraTargetUI } from '../../foundation/components/ui/CameraTargetUI';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { createIslandRoads } from '../../shared/env/roads';
+import { createLandmarks } from '../../shared/env/landmarks';
 import { LevelOfDetail } from '../../foundation/types/lod';
 import { logger } from '../../foundation/utils/logger';
 import {
@@ -187,6 +188,9 @@ class HomeApp extends TerrainBase {
       const roads = await createIslandRoads(terrain);
       roads.forEach(road => scene.add(road));
       logger.info(`${roads.length} roads connecting the Famara towns created`);
+
+      const landmarks = createLandmarks(terrain);
+      landmarks.forEach(landmark => scene.add(landmark));
 
       this.environment.addRandomBoats(water);
 

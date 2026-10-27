@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 12:42 UTC
+
+### Added
+- **Landmarks on the Risco de Famara**: the air-surveillance radar on Peñas del Chache (a faceted white radome, the operations block and a red-and-white lattice mast), the Ermita de las Nieves (whitewashed nave, tiled gable, stone quoins, bell gable, sacristy and forecourt wall), the two communication masts above Los Valles, and orange-and-white windsocks at the Famara takeoff and the landing field that swing round with the shared wind and flutter. Placed from OpenStreetMap through `shared/env/landmarks.json` with `ISLAND_ANCHOR`, drawn twice life size, in the home and famara-animation scenes and in the models viewer. A `top` radius lifts a landmark onto the highest ground nearby, because the projection can put a summit on the model's cliff face; 132–606 triangles each, one draw call apiece
+
 ## 2026-10-27 12:30 UTC
 
 ### Changed

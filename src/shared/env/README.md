@@ -1,6 +1,6 @@
 # Shared environment
 
-Towns, boats, thermals, gulls and roads shared by the island scenes (home, famara-animation).
+Towns, boats, thermals, gulls, roads and landmarks shared by the island scenes (home, famara-animation).
 
 ## `roads.json`
 
@@ -26,3 +26,30 @@ bends. The road's look (width, colour, height above the ground) is `ROAD_STYLE` 
 
 The towns the roads join (`TOWN_*` in `environment.ts`) are placed from their OSM place nodes
 with the same anchor, so roads and towns stay together.
+
+## `landmarks.json`
+
+The landmarks on the Risco and at its takeoffs, placed from OpenStreetMap. `landmarks.ts` projects
+each with `ISLAND_ANCHOR`, sets it on the terrain and builds it from
+`foundation/components/scenery/landmarks/Landmarks.ts`.
+
+```jsonc
+{
+  "source": "© OpenStreetMap contributors, ODbL …", // attribution, keep it
+  "scale": 2, // world units per model metre: twice life size, so they read from the air
+  "landmarks": [
+    {
+      "name": "…", // free text, also the object's name in the scene
+      "kind": "radar" | "ermita" | "mast" | "windsock",
+      "osm": "node/…", // the feature it was placed from
+      "at": [lat, lon],
+      "heading": 315, // optional: compass bearing the front faces; the windsock turns to the wind
+      "height": 30, // optional, masts only: metres to the top, default 45
+      "top": 200 // optional: lift it onto the highest ground within this many units
+    }
+  ]
+}
+```
+
+Use `top` for anything that stands on a summit or the cliff edge: the projection can be ~170
+units off near the coast, which on the Risco puts a summit on the cliff face.

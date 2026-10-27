@@ -5,7 +5,7 @@ const getRandomRotation = (): THREE.Euler => {
   return new THREE.Euler(0, rndBetween(0, Math.PI), 0);
 };
 
-const getTerrainHeight = (x: number, z: number, terrain: THREE.Mesh) => {
+export const getTerrainHeight = (x: number, z: number, terrain: THREE.Mesh) => {
   const rayVertical = new THREE.Raycaster(
     new THREE.Vector3(x, 10000, z), // big enough value for Y
     new THREE.Vector3(0, -1, 0) // vertical
