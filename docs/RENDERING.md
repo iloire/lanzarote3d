@@ -142,8 +142,11 @@ scenes share `FAMARA_GULL_FLOCKS` from `shared/env/environment.ts`.
   seaward of Graciosa (`CAMERA_SWAY`, `LA_GRACIOSA`) rather than circling round to the cliff,
   until someone takes the controls. Once it has landed, ‹ › arrows at the bottom
   (`home/PilotPicker.tsx`) step it through every paraglider and the hangglider, numbered,
-  never named; the spring retargets and glides across, starting at `switchTime` (3 s) and
-  tightening back to `smoothTime`. They are hidden when the scene is embedded.
+  never named; the spring retargets and glides across, starting at `switchTime` (1.5 s) and
+  tightening back to `smoothTime`. They are hidden when the scene is embedded. Each click
+  sends a GA `pilot_switch` event (`pilot` number, `direction`) and rewrites the address to
+  `?pilot=<number>`. `?pilot=3` or `?pilot=bernt` (`home/pilotParam.ts`; the name is the
+  pilot's character type, or `hangglider`) makes the fly-in land on that pilot, embedded too.
 - **Follow mode** (`CameraTargetController`) is a chase camera. It sits behind the
   target's direction of travel, its distance is sized from the target's meshes, and it
   eases only its offset, so it moves with the target instead of trailing behind it.

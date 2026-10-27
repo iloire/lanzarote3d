@@ -45,6 +45,7 @@ import { setupCameraAnimation, applyFloatingMotion } from './cameraAnimation';
 import { BackdropSway, CameraFollow } from './cameraFollow';
 import { createTitleOverlay } from './TitleOverlay';
 import { createPilotPicker } from './PilotPicker';
+import { pilotFromSearch, searchWithPilot } from './pilotParam';
 import type { ParagliderMotion } from './paragliderMotion';
 import type { SmokeTrail } from '../../foundation/components/effects/SmokeTrail';
 
@@ -317,7 +318,10 @@ class HomeApp extends TerrainBase {
     renderer: THREE.WebGLRenderer,
     scene: THREE.Scene
   ): void {
-    const lead = this.pilots[0]?.mesh;
+    // ?pilot= picks who the fly-in lands on, by number or by the rig's name (e.g. bernt)
+    const names = this.pilots.map(({ mesh }) => mesh.name.replace(/^paraglider-/, ''));
+    this.leadIndex = pilotFromSearch(window.location.search, names);
+    const lead = this.pilots[this.leadIndex]?.mesh;
     if (!lead) {
       throw new Error('No paraglider loaded for the camera to follow');
     }
@@ -334,8 +338,10 @@ class HomeApp extends TerrainBase {
         this.isAnimating = false;
         // The arrows only steer the follow camera, so they appear once the intro has landed
         if (!isEmbedded() && !this.targetController && this.pilots.length > 1) {
-          this.removePilotPicker = createPilotPicker(this.pilots.length, index => {
+          this.removePilotPicker = createPilotPicker(this.pilots.length, this.leadIndex, index => {
             this.leadIndex = index;
+            // Keeps the address on the pilot in view, so it can be shared
+            history.replaceState(null, '', searchWithPilot(window.location.search, index));
           });
         }
       },

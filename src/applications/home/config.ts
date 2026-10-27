@@ -496,7 +496,7 @@ export const ANIMATION_DURATION_MS = 6000; // 6 seconds
  */
 export const CAMERA_FOLLOW: CameraFollowSettings = {
   smoothTime: 1.2,
-  switchTime: 3,
+  switchTime: 1.5,
   lookAhead: 2,
   velocityResponse: 2,
   rollShare: 0.25,

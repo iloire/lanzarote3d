@@ -2,6 +2,14 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 11:42 UTC
+
+### Added
+- **Link to a pilot, and arrow use in GA**: `?pilot=3` or `?pilot=bernt` (any case; `hangglider` for the hangglider) makes the home fly-in land on that pilot, embedded or not, and the arrows start there. Clicking an arrow rewrites the address to `?pilot=<number>` so the view can be shared without naming anyone, and sends a GA `pilot_switch` event with the pilot's number and the direction
+
+### Changed
+- **Switching pilots glides twice as fast**: `switchTime` 3 → 1.5 s; the pilots 4–6 km up the Risco arrive in 3–4 s instead of 6
+
 ## 2026-10-27 11:34 UTC
 
 ### Changed
