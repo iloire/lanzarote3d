@@ -140,7 +140,8 @@ export class CharacterRegistry {
       {
         id: CharacterType.FABIO,
         name: 'Fabio',
-        description: 'Black Charly helmet, black clothes with red stripes, black cocoon harness',
+        description:
+          'Black Charly helmet visor down, black clothes with red stripes, 360 camera, cocoon',
       },
       {
         id: CharacterType.FRANZ,
@@ -170,7 +171,8 @@ export class CharacterRegistry {
       {
         id: CharacterType.ROOS,
         name: 'Roos',
-        description: 'Full-face helmet, plum jacket, open harness',
+        description:
+          'Black carbon Charly helmet, white sunglasses, dark jacket, open harness, flight deck',
       },
     ];
     pilots.forEach(({ id, name, description }) => {
