@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 20:21 UTC
+
+### Changed
+- **Franz and Jehosua re-exported** from `3d-characters`: Franz flies in a red T-shirt with bare arms, blue shorts, bare legs and black sneakers, and Jehosua wears a grey jacket instead of the white jersey (Piratas Aéreos badge unchanged)
+
 ## 2026-10-27 18:03 UTC
 
 ### Added
