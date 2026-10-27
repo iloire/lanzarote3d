@@ -1,17 +1,14 @@
 import * as THREE from 'three';
 import { Sky } from '../../components/environment';
-import { Weather } from '../../components/physics';
 
 export interface SceneConfig {
   environment?: 'lanzarote' | 'custom';
   lighting?: 'dynamic' | 'static';
-  physics?: boolean;
 }
 
 export interface SceneComponents {
   scene: THREE.Scene;
   sky?: Sky;
-  weather?: Weather;
   lighting: {
     ambientLight: THREE.AmbientLight;
     directionalLight: THREE.DirectionalLight;
@@ -27,7 +24,6 @@ export class SceneManager {
     this.config = {
       environment: 'lanzarote',
       lighting: 'dynamic',
-      physics: false,
       ...config,
     };
 
@@ -57,27 +53,11 @@ export class SceneManager {
     if (this.config.environment === 'lanzarote') {
       this.setupLanzaroteEnvironment();
     }
-
-    // Setup physics if enabled
-    if (this.config.physics) {
-      this.setupPhysics();
-    }
   }
 
   private setupLanzaroteEnvironment(): void {
     // Sky setup will be handled by Sky component
     // This is a placeholder for environment-specific setup
-  }
-
-  private setupPhysics(): void {
-    // Weather system setup
-    if (!this.components.weather) {
-      this.components.weather = new Weather({
-        windDirectionDegreesFromNorth: 310,
-        speedMetresPerSecond: 5,
-        lclLevel: 1800,
-      });
-    }
   }
 
   // Public API methods
@@ -110,9 +90,6 @@ export class SceneManager {
   dispose(): void {
     // Clean up resources
     this.scene.clear();
-    if (this.components.weather) {
-      // Weather cleanup if needed
-    }
   }
 }
 

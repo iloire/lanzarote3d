@@ -70,7 +70,6 @@ class AnimationApp extends TerrainBase {
       scene: {
         environment: 'lanzarote',
         lighting: 'dynamic',
-        physics: false,
       },
       performance: {
         monitoring: true,
@@ -173,11 +172,8 @@ class AnimationApp extends TerrainBase {
 
       // Set up environment using theme
       this.environment = new Environment(scene);
-      const weather = this.environment.createWeatherFromTheme(theme);
-      const thermals = this.environment.generateThermals(weather, 0.7);
-
       // Add environment elements using theme
-      await this.environment.addCloudsFromTheme(thermals, theme);
+      await this.environment.addCloudsFromTheme(theme);
       // this.environment.addTrees(terrain);
 
       // Create Lanzarote towns using ULTRA_LOW LOD for optimal animation performance

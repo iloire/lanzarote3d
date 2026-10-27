@@ -61,7 +61,6 @@ class PuertoDelCarmenApp extends TerrainBase {
       scene: {
         environment: 'lanzarote',
         lighting: 'dynamic',
-        physics: false,
       },
       performance: {
         monitoring: true,
@@ -101,9 +100,7 @@ class PuertoDelCarmenApp extends TerrainBase {
       renderer.render(scene, camera);
 
       this.environment = new Environment(scene);
-      const weather = this.environment.createWeatherFromTheme(theme);
-      const thermals = this.environment.generateThermals(weather, 0);
-      await this.environment.addCloudsFromTheme(thermals, theme);
+      await this.environment.addCloudsFromTheme(theme);
 
       // The harbour goes in before the town, so it is merged with it
       const harbour = await new Harbour({ features: HARBOUR_FEATURES }).load();

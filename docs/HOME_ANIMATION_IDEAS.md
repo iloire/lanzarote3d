@@ -20,8 +20,8 @@ Top picks: **1** (pendulum pilot), **5** (spring camera with roll) and **7** (cl
 2. **Make the canopy breathe.** A small vertex-shader offset along the span
    (`sin(time + aSpan * k)`) so the cells billow and the tips flex. GPU only, no CPU cost; the
    gulls already do the same with `aWing`.
-3. **Vary what the pilots do.** All four fly the same ridge loop. `generateThermals()` already
-   gives thermal positions: a pilot could peel off, circle up in a thermal and glide back to the
+3. **Vary what the pilots do.** All four fly the same ridge loop. `THERMAL_SITES` in
+   `shared/env/environment.ts` already gives thermal positions: a pilot could peel off, circle up in a thermal and glide back to the
    ridge, and now and then one could throw a wingover. Only a different set of waypoints.
 4. **Hang glider weight shift.** The pilot's body slides against the bank inside the control
    frame.

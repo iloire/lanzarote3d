@@ -57,7 +57,6 @@ export abstract class WorkshopDemoBase extends AppBase {
       scene: {
         environment: 'custom',
         lighting: 'static',
-        physics: false,
       },
       performance: {
         monitoring: true,

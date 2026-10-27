@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import { setCloudColors } from '../rendering/cloudMaterial';
 import { Theme, ThemeApplicationOptions } from '../types/Theme';
 import { StoryOptions } from '../../shared/types';
-import { Weather } from '../components/physics';
 import { logger } from '../utils/logger';
 import { OceanMaterial } from '../rendering/OceanMaterial';
 import { setSharedWind } from '../rendering/sharedUniforms';
@@ -132,13 +131,6 @@ export class ThemeEngine {
 
     // Note: Lighting intensity modifications would need access to the lighting system
     // This could be extended based on how lighting is structured in the Sky component
-  }
-
-  /**
-   * Create weather settings from theme
-   */
-  static createWeatherFromTheme(theme: Theme): Weather {
-    return new Weather(theme.weather);
   }
 
   /**

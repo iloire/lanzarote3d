@@ -1,18 +1,15 @@
 import * as THREE from 'three';
 import { Clouds } from '../../foundation/components/environment';
-import { Weather } from '../../foundation/components/physics';
-import { Thermal } from '../../foundation/components/physics';
 import Tree from '../../foundation/components/scenery/trees/Tree';
 import { logger } from '../../foundation/utils/logger';
 import { Gulls, GullFlock, RAVEN } from '../../foundation/components/wildlife/Gulls';
 import { addMeshAroundArea } from './mesh-utils';
-import { generateThermalPair, ThermalGenerationOptions } from './thermal-utils';
 import { setCloudColors } from '../../foundation/rendering/cloudMaterial';
 import { Theme } from '../../foundation/types/Theme';
-import { ThemeEngine } from '../../foundation/systems/ThemeEngine';
 import { IThreeComponent } from '../../foundation/components/base/IThreeComponent';
 import { ComponentRegistry } from '../../foundation/systems/ComponentRegistry';
 import { LevelOfDetail } from '../../foundation/types/lod';
+import { rndIntBetween } from '../../foundation/utils/math';
 import { ISLAND_ANCHOR, geoToWorld } from '../geo';
 
 interface MovableComponent extends IThreeComponent {
@@ -24,6 +21,23 @@ import { mergeStaticMeshes } from '../../foundation/utils/mergeStatic';
 import { removeHousesAtSea } from './house-group-utils';
 import { HouseStyle } from './house-group-types';
 import { Berth, BoatConfig } from './boat-group-types';
+
+/**
+ * Where thermals go up: Famara, Tenesar, the Mirador del Río, Playa Quemada (pq) and Mala.
+ * Each gets a cluster of cumulus; the Mirador's super thermal adds a tower to it.
+ */
+const THERMAL_SITES = [
+  { x: 0, z: 0 },
+  { x: 7127, z: -1405 },
+  { x: 3027, z: 1005 },
+  { x: -4827, z: -855 },
+  { x: 15027, z: -12555 },
+  { x: -6227, z: 14055 },
+  { x: 14227, z: -3755 },
+  { x: -3927, z: 9830 },
+  { x: 592, z: 5530 },
+];
+const SUPER_THERMAL_SITE = { x: 15027, z: -12555 };
 
 /** Houses whose ground is lower than this are in the sea and are left out */
 const MIN_LAND_HEIGHT = 2;
@@ -404,57 +418,26 @@ class Environment {
     addMeshAroundArea([tree], new THREE.Vector3(5600, 0, 705), 100, terrain, this.scene, 40, 5);
   }
 
-  generateThermals(weather: Weather, opacity: number = 0.05): Thermal[] {
-    // famara
-    const baseOptions: ThermalGenerationOptions = {
-      position: new THREE.Vector3(0, 0, 0),
-      weather,
-      superThermal: false,
-      opacity,
-    };
-
-    const allThermals = generateThermalPair(baseOptions)
-      .concat(generateThermalPair({ ...baseOptions, position: new THREE.Vector3(7127, 0, -1405) }))
-      .concat(generateThermalPair({ ...baseOptions, position: new THREE.Vector3(3027, 0, 1005) }))
-      // tenesar
-      .concat(generateThermalPair({ ...baseOptions, position: new THREE.Vector3(-4827, 0, -855) }))
-      // mirador
-      .concat(
-        generateThermalPair({ ...baseOptions, position: new THREE.Vector3(15027, 0, -12555) })
-      )
-      //pq
-      .concat(generateThermalPair({ ...baseOptions, position: new THREE.Vector3(-6227, 0, 14055) }))
-      //mala
-      .concat(generateThermalPair({ ...baseOptions, position: new THREE.Vector3(14227, 0, -3755) }))
-      // pq
-      .concat(generateThermalPair({ ...baseOptions, position: new THREE.Vector3(-3927, 0, 9830) }))
-      .concat(generateThermalPair({ ...baseOptions, position: new THREE.Vector3(592, 0, 5530) }))
-      .concat(
-        generateThermalPair({
-          ...baseOptions,
-          position: new THREE.Vector3(15027, 0, -12555),
-          superThermal: true,
-        })
-      );
-
-    return allThermals;
-  }
-
   /**
-   * A cluster of cumulus over each main thermal, their bases level just above the thermal's
-   * top, a towering one over the super thermal, and a few clusters in between.
+   * A cluster of cumulus over each thermal site, their bases level just above the condensation
+   * level (the LCL, give or take 200), a towering one over the super thermal, and a few
+   * clusters in between.
    */
-  async addClouds(thermals: Thermal[]): Promise<THREE.Object3D[]> {
+  async addClouds(lclLevel: number): Promise<THREE.Object3D[]> {
     this.cloudInstances.forEach(c => c.dispose());
     this.cloudInstances = [];
-    const mainThermals = thermals.filter(t => t.isMainThermal());
-    const cloudBase = (mainThermals[0]?.getDimensions().height ?? 1800) * 1.08;
+    const cloudBase = (lclLevel + rndIntBetween(-200, 200)) * 1.08;
 
-    const sites = mainThermals.map(t => ({
-      position: new THREE.Vector3(t.getPosition().x, cloudBase, t.getPosition().z),
-      kind: t.isSuperThermal() ? ('tower' as const) : ('puff' as const),
-      scale: t.isSuperThermal() ? 1.6 : 1,
+    const sites = THERMAL_SITES.map(({ x, z }) => ({
+      position: new THREE.Vector3(x, cloudBase, z),
+      kind: 'puff' as 'puff' | 'tower',
+      scale: 1,
     }));
+    sites.push({
+      position: new THREE.Vector3(SUPER_THERMAL_SITE.x, cloudBase, SUPER_THERMAL_SITE.z),
+      kind: 'tower',
+      scale: 1.6,
+    });
     [
       { x: 5120, z: -10100 },
       { x: 2600, z: 842 },
@@ -492,16 +475,9 @@ class Environment {
   /**
    * Add clouds coloured from the theme
    */
-  async addCloudsFromTheme(thermals: Thermal[], theme: Theme): Promise<THREE.Object3D[]> {
+  async addCloudsFromTheme(theme: Theme): Promise<THREE.Object3D[]> {
     setCloudColors(theme.clouds);
-    return this.addClouds(thermals);
-  }
-
-  /**
-   * Create weather from theme
-   */
-  createWeatherFromTheme(theme: Theme): Weather {
-    return ThemeEngine.createWeatherFromTheme(theme);
+    return this.addClouds(theme.weather.lclLevel);
   }
 
   /**

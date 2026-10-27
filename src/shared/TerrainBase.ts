@@ -14,7 +14,6 @@ export interface TerrainConfig extends Omit<AppConfig, 'scene'> {
   scene?: {
     environment?: 'lanzarote' | 'custom';
     lighting?: 'dynamic' | 'static';
-    physics?: boolean;
   };
 }
 
@@ -39,7 +38,6 @@ export abstract class TerrainBase extends AppBase {
       scene: {
         environment: 'lanzarote',
         lighting: 'dynamic',
-        physics: false,
         ...config.scene,
       },
       performance: {
@@ -51,7 +49,7 @@ export abstract class TerrainBase extends AppBase {
   }
 
   /**
-   * Load full environment for demos (same as experiences but no physics)
+   * Load full environment for demos
    */
   protected async loadEnvironment(options: StoryOptions): Promise<void> {
     const { scene, gui, renderer, camera } = options;

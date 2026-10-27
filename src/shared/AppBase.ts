@@ -10,7 +10,6 @@ export interface AppConfig {
   scene?: {
     environment?: 'lanzarote' | 'custom';
     lighting?: 'dynamic' | 'static';
-    physics?: boolean;
   };
   performance?: {
     monitoring?: boolean;

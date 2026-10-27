@@ -39,7 +39,6 @@ class FamaraApp extends TerrainBase {
       scene: {
         environment: 'lanzarote',
         lighting: 'dynamic',
-        physics: false,
       },
       performance: {
         monitoring: true,
@@ -87,11 +86,8 @@ class FamaraApp extends TerrainBase {
 
       // Set up environment using theme
       this.environment = new Environment(scene);
-      const weather = this.environment.createWeatherFromTheme(theme);
-      const thermals = this.environment.generateThermals(weather, 0);
-
       // Add environment elements using theme
-      await this.environment.addCloudsFromTheme(thermals, theme);
+      await this.environment.addCloudsFromTheme(theme);
 
       // Create Lanzarote towns using ULTRA_LOW LOD for optimal performance
       await this.environment.addTownsFromConfig(

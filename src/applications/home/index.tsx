@@ -88,7 +88,6 @@ class HomeApp extends TerrainBase {
       scene: {
         environment: 'lanzarote',
         lighting: 'dynamic',
-        physics: false,
       },
       performance: {
         monitoring: true,
@@ -178,10 +177,7 @@ class HomeApp extends TerrainBase {
       }
 
       this.environment = new Environment(scene);
-      const weather = this.environment.createWeatherFromTheme(theme);
-      const thermals = this.environment.generateThermals(weather, 0.7);
-
-      await this.environment.addCloudsFromTheme(thermals, theme);
+      await this.environment.addCloudsFromTheme(theme);
 
       await this.environment.addTownsFromConfig(
         LANZAROTE_TOWNS,

@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 21:05 UTC
+
+### Removed
+- **Thermals and Weather**: the red thermal cylinders were built for every scene and never added to it; they only told the clouds where to sit. `Weather` was created only to read the cloud base, and started a 5 s timer it never stopped. Both are gone with the whole `physics/` folder, `thermal-utils.ts` and the `physics` scene option every app turned off. The thermal positions are now a plain `THERMAL_SITES` list, and the clouds read the condensation level from `theme.weather.lclLevel`, so they look the same
+
 ## 2026-10-27 20:47 UTC
 
 ### Removed
