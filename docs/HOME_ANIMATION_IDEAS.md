@@ -28,10 +28,16 @@ Top picks: **1** (pendulum pilot), **5** (spring camera with roll) and **7** (cl
 
 ## Camera
 
-5. **Follow the lead on a spring, not rigidly.** The loop adds the lead's movement straight to
+5. ~~**Follow the lead on a spring, not rigidly.** The loop adds the lead's movement straight to
    the camera, so it is bolted to the pilot. A critically damped follow with a little look-ahead
-   into turns, plus a slight camera roll as the pilot banks, would feel filmed.
-   `applyFloatingMotion` moves the camera about 0.04 units, so it does nothing visible today.
+   into turns, plus a slight camera roll as the pilot banks, would feel filmed.~~ ✅
+   `CameraFollow` (`home/cameraFollow.ts`) chases a point 2 s along the lead's flight on a
+   critically damped spring that settles in 1.2 s, so at a steady speed the camera aims about
+   12 m ahead of the pilot and swings into turns early; it rolls with a quarter of the lead's
+   bank. The camera and orbit target move by the spring's step, so orbiting and zooming still
+   work, and the roll is undone after each frame so OrbitControls never sees it. Tuned in
+   `CAMERA_FOLLOW` in `home/config.ts`. Still open: `applyFloatingMotion` moves the camera
+   about 0.04 units, so it does nothing visible.
 6. **A shot director.** After the intro, cut or blend every 15–20 s between a few framings: chase
    behind the lead, the hang glider passing overhead, low along the cliff as a pilot goes by,
    gulls in the foreground.

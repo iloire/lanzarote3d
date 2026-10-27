@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { ParagliderVoxelOptions } from '../../foundation/components/vehicles';
 import { CharacterType } from '../../foundation/components/characters/CharacterRegistry';
 import { FlightPattern } from '../../foundation/systems/behaviors/FlyingBehavior';
+import type { CameraFollowSettings } from './cameraFollow';
 
 export type ParagliderVoxelConfig = {
   options: ParagliderVoxelOptions;
@@ -231,6 +232,20 @@ export const SHOW_CAMERA_TARGET_UI = false;
 
 // Animation configuration
 export const ANIMATION_DURATION_MS = 6000; // 6 seconds
+
+/**
+ * How the camera follows the lead pilot once the intro has landed: it trails on a spring that
+ * settles in `smoothTime` and aims `lookAhead` seconds along the pilot's flight, so at a steady
+ * speed it sits (lookAhead - smoothTime) × speed ahead, about 12 m for a paraglider, and swings
+ * into turns ahead of the pilot. It rolls with a quarter of the pilot's bank.
+ */
+export const CAMERA_FOLLOW: CameraFollowSettings = {
+  smoothTime: 1.2,
+  lookAhead: 2,
+  velocityResponse: 2,
+  rollShare: 0.25,
+  rollResponse: 1.5,
+};
 
 /**
  * True when the scene is shown inside another page (?embed=1), e.g. the

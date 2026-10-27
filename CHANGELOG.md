@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 07:57 UTC
+
+### Changed
+- **The home camera follows the lead pilot on a spring, not rigidly**: it used to add the pilot's every movement straight to the camera, bolting the two together and passing on the jitter of the pilot's own update loop. Now a critically damped spring (settling in 1.2 s) chases a point 2 s along the pilot's flight, so the camera eases into the pilot's moves, aims about 12 m ahead of them and swings into turns early, without overshooting. It also rolls with a quarter of the pilot's bank. Orbiting and zooming work as before, and the settings are `CAMERA_FOLLOW` in `home/config.ts`
+
 ## 2026-10-27 00:36 UTC
 
 ### Changed

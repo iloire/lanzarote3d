@@ -35,10 +35,12 @@ import {
   SHOW_HERCULES,
   SHOW_CAMERA_TARGET_UI,
   ANIMATION_DURATION_MS,
+  CAMERA_FOLLOW,
   isEmbedded,
 } from './config';
 import { loadParagliders, loadHangglider, loadCessna, loadHercules } from './vehicleLoader';
 import { setupCameraAnimation, applyFloatingMotion } from './cameraAnimation';
+import { CameraFollow } from './cameraFollow';
 import { createTitleOverlay } from './TitleOverlay';
 import type { ParagliderMotion } from './paragliderMotion';
 import type { SmokeTrail } from '../../foundation/components/effects/SmokeTrail';
@@ -350,8 +352,9 @@ class HomeApp extends TerrainBase {
   ): void {
     const startTime = Date.now();
     let lastTime: number | null = null;
-    const lastLeadPosition = lead.position.clone();
-    const leadMove = new THREE.Vector3();
+    const follow = new CameraFollow(CAMERA_FOLLOW);
+    const cameraMove = new THREE.Vector3();
+    let wasFollowing = false;
     const enginePos = new THREE.Vector3();
     const tail = new THREE.Vector3();
 
@@ -383,14 +386,17 @@ class HomeApp extends TerrainBase {
 
         this.paragliderMotions.forEach(motion => motion.update(deltaTime));
 
-        // Carry the camera along with the lead pilot; the intro animation places it itself.
-        leadMove.subVectors(lead.position, lastLeadPosition);
-        lastLeadPosition.copy(lead.position);
-        if (!this.isAnimating && !this.targetController) {
-          camera.position.add(leadMove);
-          controls.target.add(leadMove);
+        // Carry the camera after the lead pilot on a spring; the intro animation places it itself.
+        const following = !this.isAnimating && !this.targetController;
+        if (following) {
+          if (!wasFollowing) follow.reset(lead.position);
+          const leadBank = this.paragliderMotions[0]?.bankAngle ?? 0;
+          follow.update(deltaTime, lead.position, leadBank, cameraMove);
+          camera.position.add(cameraMove);
+          controls.target.add(cameraMove);
           applyFloatingMotion(camera, startTime, this.isAnimating);
         }
+        wasFollowing = following;
 
         OrbitControlsHelper.update(controls);
 
@@ -415,7 +421,10 @@ class HomeApp extends TerrainBase {
 
         const renderCamera =
           this.isAnimating || !this.targetController ? camera : this.targetController;
+        // The roll is undone after the frame so the orbit controls never see it.
+        if (following) camera.rotateZ(follow.roll);
         this.renderFrame(renderer, scene, renderCamera);
+        if (following) camera.rotateZ(-follow.roll);
         this.animationId = requestAnimationFrame(animate);
       } catch (error) {
         this.handleError(error as Error, 'animation loop');

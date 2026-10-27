@@ -57,6 +57,11 @@ export class ParagliderMotion {
     private readonly pilotSwing?: THREE.Object3D
   ) {}
 
+  /** The wing's bank in radians, positive in a left turn */
+  get bankAngle(): number {
+    return this.bank;
+  }
+
   update(deltaTime: number): void {
     if (deltaTime <= 0) return;
     this.time += deltaTime;
