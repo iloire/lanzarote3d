@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 13:48 UTC
+
+### Changed
+- **Bernt second farthest as well as second highest**: he moves from halfway to 85% of the way to the Mirador (11 km up the Risco, still 1500-1562 m), just short of Magne; Jehosua, Fabio and Franz close up to halfway, six-tenths and seven-tenths, and Bernt moves to just before Magne in the list, so the arrows still step up the Risco. Everyone at least 153 m clear of the ground
+
 ## 2026-10-27 13:45 UTC
 
 ### Changed

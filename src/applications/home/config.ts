@@ -332,11 +332,11 @@ export const LEAD_PILOT = CharacterType.IVAN;
 /**
  * They spread out along the whole Risco, from takeoff to the Mirador del Río: Roos low by takeoff
  * at the south-west end, Ivan on the takeoff beat, then a pilot every ~1.4 km up the cliff
- * towards La Graciosa, with Bernt halfway and Magne at the Mirador. Each loop sits on the cliff
- * edge where it flies. Magne is the farthest and the highest (1659-1753 m), then Bernt
- * (1500-1562 m), then the rest at 875-1327 m, rising with the cliff and capped under Bernt; every
- * one at least 173 m clear of the ground. They are listed in that order, so the arrows step from
- * takeoff up the Risco.
+ * towards La Graciosa. Magne is the farthest and the highest, at the Mirador (1659-1753 m); Bernt
+ * is second in both, 85% of the way there (1500-1562 m); the rest step up the cliff between
+ * takeoff and Bernt at 875-1327 m, rising with the cliff and capped under him. Each loop sits on
+ * the cliff edge where it flies, every one at least 153 m clear of the ground. They are listed in
+ * that order, so the arrows step from takeoff up the Risco.
  */
 export const paraglidersVoxel: ParagliderVoxelConfig[] = [
   {
@@ -409,45 +409,46 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
   },
   {
     options: {
-      // The same lime Rush as Magne's
-      glider: MAGNE_RUSH,
-      pilot: { characterType: CharacterType.BERNT },
-    },
-    // Halfway to the Mirador, 6.5 km up the Risco, the second highest after Magne
-    startProgress: 0.8,
-    pathOffset: new THREE.Vector3(2929, 625, -5649),
-    // He likes to twist round and fly looking backwards: a 1.5 s spin, 8-15 s facing back,
-    // then 30 s to a minute and a half facing forward
-    twist: { spin: 1.5, hold: [8, 15], rest: [30, 90] },
-  },
-  {
-    options: {
       glider: JEHOSUA_RUSH,
       pilot: { characterType: CharacterType.JEHOSUA },
       // He flies for the Piratas Aéreos
       pirateFlag: true,
     },
-    // Five-eighths of the way, 8.1 km up
+    // Halfway to the Mirador, 6.5 km up
     startProgress: 0.35,
-    pathOffset: new THREE.Vector3(3564, 380, -7061),
+    pathOffset: new THREE.Vector3(2929, 380, -5649),
   },
   {
     options: {
       glider: FABIO_IKUMA,
       pilot: { characterType: CharacterType.FABIO },
     },
-    // Three-quarters of the way, 9.7 km up
+    // Six-tenths of the way, 7.8 km up
     startProgress: 0.5,
-    pathOffset: new THREE.Vector3(4344, 390, -8473),
+    pathOffset: new THREE.Vector3(3465, 390, -6778),
   },
   {
     options: {
       glider: FRANZ_BUZZ,
       pilot: { characterType: CharacterType.FRANZ },
     },
-    // Seven-eighths of the way, 11.3 km up, the last before the Mirador
+    // Seven-tenths of the way, 9.1 km up, the last before Bernt
     startProgress: 0.9,
-    pathOffset: new THREE.Vector3(5313, 260, -9885),
+    pathOffset: new THREE.Vector3(3851, 370, -7908),
+  },
+  {
+    options: {
+      // The same lime Rush as Magne's
+      glider: MAGNE_RUSH,
+      pilot: { characterType: CharacterType.BERNT },
+    },
+    // Second only to Magne, farther and higher than the rest: 85% of the way to the Mirador,
+    // 11 km up the Risco
+    startProgress: 0.8,
+    pathOffset: new THREE.Vector3(5154, 625, -9602),
+    // He likes to twist round and fly looking backwards: a 1.5 s spin, 8-15 s facing back,
+    // then 30 s to a minute and a half facing forward
+    twist: { spin: 1.5, hold: [8, 15], rest: [30, 90] },
   },
   {
     // Magne is the best of them: the farthest out and the highest, at the Mirador del Río at
@@ -488,7 +489,7 @@ export const cessnaConfig: CessnaConfig = {
   obstacleAvoidanceDistance: 200,
   forwardAxis: 'x',
   // An oval 1-3 km out to sea off the Risco, parallel to it, at 1230-1260 m: 200+ m above the
-  // pilots on the ridge loop and at least 990 m from every pilot (Bernt is the closest);
+  // pilots on the ridge loop and at least 950 m from every pilot (Jehosua is the closest);
   // under the Hercules (2000+). At least 969 m over the ground.
   waypoints: [
     new THREE.Vector3(4785, 1240, -870),
