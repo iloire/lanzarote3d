@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 12:12 UTC
+
+### Fixed
+- **Loading progress**: the loading label was stuck at "LOADING 0 %" because nothing ever updated it. It now follows the island model's download in percent (or in MB when the server sends no file size, as the dev server does), shows "BUILDING SCENE…" while the mesh is processed, and disappears once the scene is ready
+
 ## 2026-10-27 11:59 UTC
 
 ### Changed

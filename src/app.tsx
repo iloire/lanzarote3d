@@ -10,6 +10,7 @@ import { StoryOptions } from './shared/types';
 import { getAppConfig } from './config/app-registry';
 import { isDevFlagSet } from './devMode';
 import { logger } from './foundation/utils/logger';
+import Models, { DownloadProgress } from './foundation/utils/models';
 
 const gui = new GUI();
 gui.hide();
@@ -90,12 +91,27 @@ function shouldShowSidebar(story?: string): boolean {
   return true;
 }
 
+/**
+ * Download progress of the models, then "building scene" while the meshes are processed
+ * (BVH, coast field, shaders), which takes a few seconds after the last byte arrives.
+ */
+function loadingLabel({ loaded, total }: DownloadProgress): string {
+  if (total > 0) {
+    return loaded >= total
+      ? 'BUILDING SCENE…'
+      : `LOADING ${Math.floor((loaded / total) * 100)} %`;
+  }
+  // No Content-Length from the server: show the bytes received instead
+  return loaded > 0 ? `LOADING ${(loaded / 1e6).toFixed(1)} MB` : 'LOADING…';
+}
+
 const App: React.FC<AppProps> = ({
   initialStory,
   showAppSelection: initialShowAppSelection = false,
   showPrivate = false,
 }) => {
-  const [loadingProcess] = useState(0);
+  const [download, setDownload] = useState<DownloadProgress>({ loaded: 0, total: 0 });
+  const [loaded, setLoaded] = useState(false);
   const [showAppSelection] = useState(initialShowAppSelection);
   const [renderer, setRenderer] = useState<THREE.WebGLRenderer | null>(null);
 
@@ -161,10 +177,16 @@ const App: React.FC<AppProps> = ({
     };
 
     // Load the selected app
-    if (initialStory && hasApp(initialStory)) {
-      await loadApp(initialStory, storyOptions);
-    } else {
-      logger.error(`App "${initialStory}" not found in registry`);
+    const stopProgress = Models.onProgress(setDownload);
+    try {
+      if (initialStory && hasApp(initialStory)) {
+        await loadApp(initialStory, storyOptions);
+      } else {
+        logger.error(`App "${initialStory}" not found in registry`);
+      }
+    } finally {
+      stopProgress();
+      setLoaded(true);
     }
 
     // Rendering complete
@@ -183,9 +205,9 @@ const App: React.FC<AppProps> = ({
 
   return (
     <div className="lanzarote">
-      {loadingProcess !== 100 && (
+      {!loaded && (
         <div className="loading">
-          <span className="progress">LOADING {loadingProcess} %</span>
+          <span className="progress">{loadingLabel(download)}</span>
         </div>
       )}
       {showAppSelection && shouldShowSidebar(initialStory) && <Menu showPrivate={showPrivate} />}

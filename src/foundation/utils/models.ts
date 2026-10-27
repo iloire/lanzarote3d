@@ -6,6 +6,25 @@ import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 
 const defaultManager = new THREE.LoadingManager();
 
+export type DownloadProgress = { loaded: number; total: number };
+type ProgressListener = (progress: DownloadProgress) => void;
+
+// Bytes received per model URL; total is 0 when the server sends no Content-Length.
+const downloads = new Map<string, DownloadProgress>();
+const progressListeners = new Set<ProgressListener>();
+
+function trackProgress(url: string) {
+  return (event: ProgressEvent) => {
+    downloads.set(url, { loaded: event.loaded, total: event.lengthComputable ? event.total : 0 });
+    const sum = { loaded: 0, total: 0 };
+    downloads.forEach(d => {
+      sum.loaded += d.loaded;
+      sum.total += d.total;
+    });
+    progressListeners.forEach(listener => listener(sum));
+  };
+}
+
 function modelLoader(url: string, draco: boolean, manager?: THREE.LoadingManager): Promise<GLTF> {
   const man = manager || defaultManager;
   const loader = draco ? new DRACOLoader(man) : new GLTFLoader(man);
@@ -14,7 +33,7 @@ function modelLoader(url: string, draco: boolean, manager?: THREE.LoadingManager
     // loader.preload();
   }
   return new Promise<GLTF>((resolve, reject) => {
-    loader.load(url, data => resolve(data as GLTF), undefined, reject);
+    loader.load(url, data => resolve(data as GLTF), trackProgress(url), reject);
   });
 }
 
@@ -22,12 +41,17 @@ function objLoader(url: string, manager?: THREE.LoadingManager): Promise<THREE.G
   const man = manager || defaultManager;
   const loader = new OBJLoader(man);
   return new Promise<THREE.Group>((resolve, reject) => {
-    loader.load(url, data => resolve(data), undefined, reject);
+    loader.load(url, data => resolve(data), trackProgress(url), reject);
   });
 }
 
 const Models = {
   manager: defaultManager,
+  /** Listen to the summed download progress of every model; returns an unsubscribe. */
+  onProgress: (listener: ProgressListener): (() => void) => {
+    progressListeners.add(listener);
+    return () => progressListeners.delete(listener);
+  },
   loadObj: async (model: string, manager?: THREE.LoadingManager): Promise<THREE.Group> => {
     const obj = await objLoader(model, manager);
     return obj;
