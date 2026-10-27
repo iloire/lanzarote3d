@@ -556,7 +556,7 @@ export const ANIMATION_DURATION_MS = 6000; // 6 seconds
  */
 export const CAMERA_FOLLOW: CameraFollowSettings = {
   smoothTime: 1.2,
-  switchTime: 0.75,
+  switchTime: 0.4,
   lookAhead: 2,
   velocityResponse: 2,
   rollShare: 0.25,
@@ -568,11 +568,11 @@ export const CAMERA_ARRIVAL_OFFSET = new THREE.Vector3(-100, 50, 200);
 
 /**
  * Switching pilots with the arrows after zooming out brings the camera back in to the fly-in's
- * distance as it glides across, most of the way within about 1.5 s; zoomed in closer, it stays.
+ * distance as it glides across, most of the way within about 0.75 s; zoomed in closer, it stays.
  */
 export const CAMERA_ZOOM_IN: ZoomInSettings = {
   distance: CAMERA_ARRIVAL_OFFSET.length(),
-  response: 2,
+  response: 4,
 };
 
 /** La Graciosa, off the north tip of the island, about 14 km from the ridge */
