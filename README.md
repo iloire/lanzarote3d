@@ -2,14 +2,17 @@
 
 [![CI](https://github.com/iloire/lanzarote3d/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/iloire/lanzarote3d/actions/workflows/ci.yml)
 
-A 3D, voxel-styled Lanzarote you can watch paragliders fly over, in the browser. The island is a
-real height map drawn as a wireframe over sunlit ground, with a living sea, gulls in thermals,
-towns, boats and planes, and voxel pilots soaring the Famara cliffs. The home scene flies in to Ivan,
-Miguel, Jehosua and Roos ridge-soaring a loop along the Famara cliff and follows Ivan round it;
-Famara and Boats are standalone camera animations, and the static
-Famara and Town scenes show the landscape and the models up close.
+A low-poly Lanzarote in the browser: paragliders ridge-soar the Famara cliffs over a real height
+map, with a living sea, gulls, towns, boats and planes.
 
-![Ivan, Miguel and Jehosua soaring the Famara cliffs on the home scene](docs/screenshots/home.png)
+![Paragliders soaring the Famara cliffs on the home scene](docs/screenshots/home.png)
+
+| | |
+| --- | --- |
+| ![A paraglider over Famara beach and the islands to the north](docs/screenshots/famara-animation.png) | ![Famara cliffs and the northern islands with no pilots](docs/screenshots/famara-static.png) |
+| **Famara animation:** a camera flight along the cliff | **Famara static:** the landscape on its own |
+| ![A generated town of low-poly houses seen from above](docs/screenshots/town.png) | ![The fishing boat on the model viewer's turntable](docs/screenshots/models.png) |
+| **Town:** a generated town up close | **Models:** every model on a turntable |
 
 Built with three.js, React and webpack. How a frame is drawn (the filmic pipeline, the sea, the
 shaded wireframe, adaptive quality) is in [docs/RENDERING.md](docs/RENDERING.md); the rest of the
