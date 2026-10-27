@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 20:55 UTC
+
+### Changed
+- **Roos re-exported** from `3d-characters`: a bulky open harness with a deep, tall back and two red lines, a large red front container with a black lid and the GPS vario on top instead of the flight deck bag, and grey-green olive trousers; her registry description matches
+
 ## 2026-10-27 20:45 UTC
 
 ### Changed

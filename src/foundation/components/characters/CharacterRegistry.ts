@@ -172,7 +172,7 @@ export class CharacterRegistry {
         id: CharacterType.ROOS,
         name: 'Roos',
         description:
-          'Black carbon Charly helmet, white sunglasses, dark jacket, open harness, flight deck',
+          'Black carbon Charly helmet, white sunglasses, dark jacket, olive trousers, bulky open harness, red front container',
       },
     ];
     pilots.forEach(({ id, name, description }) => {
