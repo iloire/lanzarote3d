@@ -2,7 +2,7 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
-## 2026-10-27 11:05 UTC
+## 2026-10-27 10:41 UTC
 
 ### Fixed
 - **The roller is flat**, as the real one is: its arc only shortens the span about 11% (it was nearly a half circle), and it is sized from Niviuk's data, flat aspect ratio 4.3 and three quarters of the Rush's area, instead of half the area on a stubby plan
