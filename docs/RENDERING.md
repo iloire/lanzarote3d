@@ -140,7 +140,10 @@ scenes share `FAMARA_GULL_FLOCKS` from `shared/env/environment.ts`.
   little ahead along the pilot's flight and rolls with a quarter of the pilot's bank. It keeps
   La Graciosa, Famara beach and the ocean behind the pilots, swaying ±18° about a line just
   seaward of Graciosa (`CAMERA_SWAY`, `LA_GRACIOSA`) rather than circling round to the cliff,
-  until someone takes the controls.
+  until someone takes the controls. Once it has landed, ‹ › arrows at the bottom
+  (`home/PilotPicker.tsx`) step it through every paraglider and the hangglider, numbered,
+  never named; the spring retargets and glides across, starting at `switchTime` (3 s) and
+  tightening back to `smoothTime`. They are hidden when the scene is embedded.
 - **Follow mode** (`CameraTargetController`) is a chase camera. It sits behind the
   target's direction of travel, its distance is sized from the target's meshes, and it
   eases only its offset, so it moves with the target instead of trailing behind it.

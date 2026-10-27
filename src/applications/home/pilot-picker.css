@@ -1,0 +1,68 @@
+/* Pilot arrows - pick which pilot the camera follows, in the title's pixel style */
+
+.pilot-picker {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transform: translateX(-50%);
+  font-family: 'Press Start 2P', monospace;
+  animation: pilotPickerFadeIn 1s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes pilotPickerFadeIn {
+  to {
+    opacity: 0.9;
+  }
+}
+
+.pilot-picker button {
+  width: 40px;
+  height: 40px;
+  padding: 0 0 4px;
+  border: 2px solid #ffffff;
+  background: rgba(13, 31, 51, 0.45);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 #0d1f33;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.pilot-picker button:hover,
+.pilot-picker button:focus-visible {
+  border-color: #4aff9e;
+  color: #4aff9e;
+  outline: none;
+}
+
+.pilot-picker button:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+.pilot-picker-count {
+  min-width: 48px;
+  font-size: 9px;
+  text-align: center;
+  color: #ffffff;
+  text-shadow: 1px 1px 0 #0d1f33;
+}
+
+@media (max-width: 500px) {
+  .pilot-picker {
+    bottom: 16px;
+    left: auto;
+    right: 16px;
+    transform: none;
+  }
+}

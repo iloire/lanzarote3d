@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 11:21 UTC
+
+### Added
+- **Arrows to follow any pilot**: ‹ › buttons at the bottom of the home scene, shown once the fly-in lands, step the camera through every paraglider and the hangglider (1/11, 2/11, … no names). The follow spring glides across to the new pilot instead of jumping, even the ones 4–6 km up the Risco; `switchTime` in `CAMERA_FOLLOW` sets how slow the glide starts. Hidden when embedded
+
 ## 2026-10-27 11:15 UTC
 
 ### Changed

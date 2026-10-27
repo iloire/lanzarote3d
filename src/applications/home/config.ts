@@ -464,10 +464,12 @@ export const ANIMATION_DURATION_MS = 6000; // 6 seconds
  * How the camera follows the lead pilot once the intro has landed: it trails on a spring that
  * settles in `smoothTime` and aims `lookAhead` seconds along the pilot's flight, so at a steady
  * speed it sits (lookAhead - smoothTime) × speed ahead, about 12 m for a paraglider, and swings
- * into turns ahead of the pilot. It rolls with a quarter of the pilot's bank.
+ * into turns ahead of the pilot. It rolls with a quarter of the pilot's bank. Switching pilots
+ * with the arrows glides the camera across on a spring that starts at `switchTime` and tightens.
  */
 export const CAMERA_FOLLOW: CameraFollowSettings = {
   smoothTime: 1.2,
+  switchTime: 3,
   lookAhead: 2,
   velocityResponse: 2,
   rollShare: 0.25,

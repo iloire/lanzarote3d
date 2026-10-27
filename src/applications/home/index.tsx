@@ -44,6 +44,7 @@ import { loadParagliders, loadHangglider, loadCessna, loadHercules } from './veh
 import { setupCameraAnimation, applyFloatingMotion } from './cameraAnimation';
 import { BackdropSway, CameraFollow } from './cameraFollow';
 import { createTitleOverlay } from './TitleOverlay';
+import { createPilotPicker } from './PilotPicker';
 import type { ParagliderMotion } from './paragliderMotion';
 import type { SmokeTrail } from '../../foundation/components/effects/SmokeTrail';
 
@@ -68,6 +69,11 @@ class HomeApp extends TerrainBase {
   private herculesSmokeTrail: SmokeTrail | undefined;
   private targetController: CameraTargetController | null = null;
   private removeTitleOverlay: (() => void) | null = null;
+  private removePilotPicker: (() => void) | null = null;
+  /** Everyone the camera can follow, paragliders then the hangglider, with how each banks */
+  private pilots: { mesh: THREE.Object3D; motion?: ParagliderMotion }[] = [];
+  /** Which of `pilots` the camera follows */
+  private leadIndex = 0;
 
   constructor() {
     const appConfig = getAppConfig('home');
@@ -126,6 +132,7 @@ class HomeApp extends TerrainBase {
         r.flyingBehavior ? [r.flyingBehavior] : []
       );
       this.paragliderMotions = paragliderResults.flatMap(r => (r.motion ? [r.motion] : []));
+      this.pilots = paragliderResults.map(({ mesh, motion }) => ({ mesh, motion }));
 
       if (SHOW_HANGGLIDER) {
         const hanggliderResult = await loadHangglider(
@@ -137,6 +144,7 @@ class HomeApp extends TerrainBase {
           this.hanggliderMesh = hanggliderResult.mesh;
           this.hanggliderFlyingBehavior = hanggliderResult.flyingBehavior;
           if (hanggliderResult.motion) this.paragliderMotions.push(hanggliderResult.motion);
+          this.pilots.push({ mesh: hanggliderResult.mesh, motion: hanggliderResult.motion });
         }
       }
 
@@ -309,12 +317,12 @@ class HomeApp extends TerrainBase {
     renderer: THREE.WebGLRenderer,
     scene: THREE.Scene
   ): void {
-    const lead = this.paragliderMeshes[0];
+    const lead = this.pilots[0]?.mesh;
     if (!lead) {
       throw new Error('No paraglider loaded for the camera to follow');
     }
 
-    this.startAnimationLoop(renderer, scene, camera, controls, lead);
+    this.startAnimationLoop(renderer, scene, camera, controls);
 
     setupCameraAnimation(camera, controls, {
       target: lead,
@@ -324,6 +332,12 @@ class HomeApp extends TerrainBase {
       },
       onAnimationComplete: () => {
         this.isAnimating = false;
+        // The arrows only steer the follow camera, so they appear once the intro has landed
+        if (!isEmbedded() && !this.targetController && this.pilots.length > 1) {
+          this.removePilotPicker = createPilotPicker(this.pilots.length, index => {
+            this.leadIndex = index;
+          });
+        }
       },
     });
   }
@@ -332,14 +346,14 @@ class HomeApp extends TerrainBase {
     renderer: THREE.WebGLRenderer,
     scene: THREE.Scene,
     camera: THREE.Camera,
-    controls: OrbitControls,
-    lead: THREE.Object3D
+    controls: OrbitControls
   ): void {
     const startTime = Date.now();
     let lastTime: number | null = null;
     const follow = new CameraFollow(CAMERA_FOLLOW);
     const cameraMove = new THREE.Vector3();
     let wasFollowing = false;
+    let followed = this.pilots[this.leadIndex];
     // Sways the camera with La Graciosa behind the pilots until someone takes the controls
     const sway = new BackdropSway(LA_GRACIOSA, CAMERA_SWAY);
     let swaying = true;
@@ -380,9 +394,11 @@ class HomeApp extends TerrainBase {
         // Carry the camera after the lead pilot on a spring; the intro animation places it itself.
         const following = !this.isAnimating && !this.targetController;
         if (following) {
-          if (!wasFollowing) follow.reset(lead.position);
-          const leadBank = this.paragliderMotions[0]?.bankAngle ?? 0;
-          follow.update(deltaTime, lead.position, leadBank, cameraMove);
+          const pilot = this.pilots[this.leadIndex];
+          if (!wasFollowing) follow.reset(pilot.mesh.position);
+          else if (pilot !== followed) follow.retarget(pilot.mesh.position);
+          followed = pilot;
+          follow.update(deltaTime, pilot.mesh.position, pilot.motion?.bankAngle ?? 0, cameraMove);
           camera.position.add(cameraMove);
           controls.target.add(cameraMove);
           if (swaying) sway.update(deltaTime, camera.position, controls.target);
@@ -432,6 +448,13 @@ class HomeApp extends TerrainBase {
       this.removeTitleOverlay();
       this.removeTitleOverlay = null;
     }
+
+    if (this.removePilotPicker) {
+      this.removePilotPicker();
+      this.removePilotPicker = null;
+    }
+    this.pilots.length = 0;
+    this.leadIndex = 0;
 
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);

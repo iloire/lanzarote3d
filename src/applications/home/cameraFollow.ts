@@ -3,6 +3,8 @@ import * as THREE from 'three';
 export type CameraFollowSettings = {
   /** Seconds the spring takes to catch up; at a steady speed it trails by speed × smoothTime */
   smoothTime: number;
+  /** Seconds the spring takes when switching to another lead, easing back to smoothTime */
+  switchTime: number;
   /** Seconds of the lead's flight the camera aims ahead at; above smoothTime it leads, below it lags */
   lookAhead: number;
   /** How fast the measured lead velocity is smoothed, per second */
@@ -25,6 +27,8 @@ export class CameraFollow {
   readonly anchor = new THREE.Vector3();
   /** Radians to roll the camera about its view axis */
   roll = 0;
+  /** The spring's current settle time: switchTime just after a switch, smoothTime once settled */
+  private springTime: number;
   private readonly anchorVelocity = new THREE.Vector3();
   private readonly leadVelocity = new THREE.Vector3();
   private readonly lastLead = new THREE.Vector3();
@@ -32,7 +36,9 @@ export class CameraFollow {
   private readonly step = new THREE.Vector3();
   private readonly before = new THREE.Vector3();
 
-  constructor(private readonly settings: CameraFollowSettings) {}
+  constructor(private readonly settings: CameraFollowSettings) {
+    this.springTime = settings.smoothTime;
+  }
 
   /** Starts following from where the lead is now, at rest, so taking over doesn't jump */
   reset(leadPosition: THREE.Vector3): void {
@@ -41,6 +47,17 @@ export class CameraFollow {
     this.anchorVelocity.set(0, 0, 0);
     this.leadVelocity.set(0, 0, 0);
     this.roll = 0;
+    this.springTime = this.settings.smoothTime;
+  }
+
+  /**
+   * Switches to following another lead: the anchor keeps moving from where it is, so the
+   * camera glides across on a slower spring instead of jumping
+   */
+  retarget(leadPosition: THREE.Vector3): void {
+    this.lastLead.copy(leadPosition);
+    this.leadVelocity.set(0, 0, 0);
+    this.springTime = this.settings.switchTime;
   }
 
   /** Advances by `deltaTime` seconds and writes how far the anchor moved into `move` */
@@ -48,6 +65,9 @@ export class CameraFollow {
     move.set(0, 0, 0);
     if (deltaTime <= 0) return;
     const { smoothTime, lookAhead, velocityResponse, rollShare, rollResponse } = this.settings;
+    // After a switch the spring tightens back to smoothTime as the glide arrives.
+    this.springTime +=
+      (smoothTime - this.springTime) * Math.min(1, deltaTime / this.settings.switchTime);
 
     // FlyingBehavior steps on its own frames, so the measured velocity is smoothed.
     this.step.subVectors(leadPosition, this.lastLead).divideScalar(deltaTime);
@@ -56,7 +76,7 @@ export class CameraFollow {
     this.goal.copy(leadPosition).addScaledVector(this.leadVelocity, lookAhead);
 
     this.before.copy(this.anchor);
-    smoothDamp(this.anchor, this.goal, this.anchorVelocity, smoothTime, deltaTime);
+    smoothDamp(this.anchor, this.goal, this.anchorVelocity, this.springTime, deltaTime);
     move.subVectors(this.anchor, this.before);
 
     this.roll += (leadBank * rollShare - this.roll) * Math.min(1, deltaTime * rollResponse);
