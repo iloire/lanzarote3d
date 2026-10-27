@@ -35,15 +35,6 @@ class BoatsAnimationApp extends TerrainBase {
     super({
       name: appConfig.name,
       description: appConfig.description,
-      requiredComponents: ['scene', 'camera', 'renderer', 'terrain', 'water', 'controls'],
-      scene: {
-        environment: 'lanzarote',
-        lighting: 'dynamic',
-      },
-      performance: {
-        monitoring: true,
-        logIntervalMs: 12000,
-      },
     });
   }
 
@@ -65,7 +56,6 @@ class BoatsAnimationApp extends TerrainBase {
       await ThemeEngine.apply(options, theme);
 
       // Initialize core systems from TerrainBase
-      this.initializeCore(options);
 
       // Load full environment (island, water, sky) from TerrainBase
       await this.initializeEnvironment(options);
@@ -118,7 +108,6 @@ class BoatsAnimationApp extends TerrainBase {
       // Restore canvas visibility after everything is loaded
       canvas.style.opacity = originalOpacity || '1';
 
-      this.isLoaded = true;
       logger.info(
         `✅ ${this.config.name} loaded successfully with ${this.paragliderMeshes.length} paragliders`
       );
@@ -222,8 +211,6 @@ class BoatsAnimationApp extends TerrainBase {
 
     const animate = () => {
       try {
-        this.updatePerformance();
-
         // Update environment components (boats, etc.)
         if (this.environment) {
           const deltaTime = 0.016; // Assume 60fps for deltaTime
@@ -299,9 +286,6 @@ const BoatsAnimation = {
   },
   dispose: () => {
     return boatsAnimationApp.dispose();
-  },
-  getAppInfo: () => {
-    return boatsAnimationApp.getAppInfo();
   },
 };
 

@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 21:20 UTC
+
+### Removed
+- **PerformanceMonitor and SceneManager**: every app sampled frame times into a monitor whose `logPerformance()` was empty, on a timer that was never cleared, and built a `SceneManager` scene with its own lights that nothing rendered. Both are gone, with the `scene`/`performance`/`requiredComponents` app config, `getAppInfo()` and `isLoaded` that only it reported, and the `onAppStart`/`onAppStop` hooks no app implemented. `AppBase` is now a name, `handleError` and `dispose`
+
 ## 2026-10-27 21:05 UTC
 
 ### Removed

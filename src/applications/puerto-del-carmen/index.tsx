@@ -57,15 +57,6 @@ class PuertoDelCarmenApp extends TerrainBase {
     super({
       name: appConfig.name,
       description: appConfig.description,
-      requiredComponents: ['scene', 'camera', 'renderer', 'terrain', 'water', 'controls'],
-      scene: {
-        environment: 'lanzarote',
-        lighting: 'dynamic',
-      },
-      performance: {
-        monitoring: true,
-        logIntervalMs: 10000,
-      },
     });
   }
 
@@ -79,7 +70,6 @@ class PuertoDelCarmenApp extends TerrainBase {
       camera.position.copy(CAMERA.position);
       camera.lookAt(CAMERA.lookAt);
 
-      this.initializeCore(options);
       await this.initializeEnvironment(options);
 
       const { terrain, water } = options;
@@ -131,7 +121,6 @@ class PuertoDelCarmenApp extends TerrainBase {
       this.startAnimationLoop(renderer, scene, camera, controls);
 
       canvas.style.opacity = originalOpacity || '1';
-      this.isLoaded = true;
       console.log(`✅ ${this.config.name} loaded successfully`);
     } catch (error) {
       this.handleError(error as Error, 'load');
@@ -214,7 +203,6 @@ class PuertoDelCarmenApp extends TerrainBase {
         const deltaTime = lastTime === null ? 0 : Math.min((now - lastTime) / 1000, 0.1);
         lastTime = now;
 
-        this.updatePerformance();
         this.paragliderMotions.forEach(motion => motion.update(deltaTime));
 
         if (this.intro) {
@@ -253,7 +241,6 @@ const app = new PuertoDelCarmenApp();
 const PuertoDelCarmen = {
   load: async (options: StoryOptions) => app.load(options),
   dispose: () => app.dispose(),
-  getAppInfo: () => app.getAppInfo(),
 };
 
 export default PuertoDelCarmen;

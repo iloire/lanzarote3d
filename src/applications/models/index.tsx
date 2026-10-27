@@ -50,7 +50,6 @@ class ModelsViewer extends WorkshopDemoBase {
     this.startAnimationLoop(renderer, scene, camera, controls, () => {
       sharedUniforms.uTime.value += clock.getDelta();
     });
-    this.isLoaded = true;
   }
 
   private async show(entry: ModelEntry): Promise<void> {

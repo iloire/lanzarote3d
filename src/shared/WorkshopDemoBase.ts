@@ -5,8 +5,7 @@ import { AppBase, AppConfig } from './AppBase';
 import { StoryOptions } from './types';
 import Sky from '../foundation/components/environment/Sky';
 
-export interface WorkshopDemoConfig extends Omit<AppConfig, 'scene' | 'requiredComponents'> {
-  requiredComponents?: string[]; // Allow custom required components
+export interface WorkshopDemoConfig extends AppConfig {
   ground?: {
     create?: boolean;
     size?: { width: number; height: number };
@@ -41,29 +40,7 @@ export abstract class WorkshopDemoBase extends AppBase {
   protected animationId?: number;
 
   constructor(config: WorkshopDemoConfig) {
-    // Provide workshop-specific defaults
-    super({
-      ...config,
-      requiredComponents: [
-        'scene',
-        'camera',
-        'renderer',
-        'terrain',
-        'water',
-        'sky',
-        'controls',
-        ...(config.requiredComponents || []),
-      ],
-      scene: {
-        environment: 'custom',
-        lighting: 'static',
-      },
-      performance: {
-        monitoring: true,
-        logIntervalMs: 20000,
-        ...config.performance,
-      },
-    });
+    super(config);
   }
 
   /**
@@ -130,9 +107,7 @@ export abstract class WorkshopDemoBase extends AppBase {
   /**
    * Override initializeCore to automatically set up clean environment
    */
-  protected override initializeCore(options: StoryOptions): void {
-    super.initializeCore(options);
-
+  protected initializeCore(options: StoryOptions): void {
     // Automatically set up clean environment for workshop demos
     this.setupCleanEnvironment(options, this.config as WorkshopDemoConfig);
   }
@@ -188,8 +163,6 @@ export abstract class WorkshopDemoBase extends AppBase {
     const animate = () => {
       try {
         // Update performance monitoring
-        this.updatePerformance();
-
         // Call custom update function
         if (onUpdate) {
           onUpdate();

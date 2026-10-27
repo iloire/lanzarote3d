@@ -34,16 +34,6 @@ class FamaraApp extends TerrainBase {
       // Use metadata from app registry
       name: appConfig.name,
       description: appConfig.description,
-      // App-specific configuration
-      requiredComponents: ['scene', 'camera', 'renderer', 'terrain', 'water', 'controls'],
-      scene: {
-        environment: 'lanzarote',
-        lighting: 'dynamic',
-      },
-      performance: {
-        monitoring: true,
-        logIntervalMs: 10000, // Log performance every 10 seconds
-      },
     });
   }
 
@@ -64,7 +54,6 @@ class FamaraApp extends TerrainBase {
       camera.lookAt(lookAtPos);
 
       // Initialize core systems from DemoBase
-      this.initializeCore(options);
 
       // Load full environment (island, water, sky) from DemoBase
       await this.initializeEnvironment(options);
@@ -114,7 +103,6 @@ class FamaraApp extends TerrainBase {
       // Restore canvas visibility after everything is loaded
       canvas.style.opacity = originalOpacity || '1';
 
-      this.isLoaded = true;
       console.log(`✅ ${this.config.name} loaded successfully`);
     } catch (error) {
       this.handleError(error as Error, 'load');
@@ -179,9 +167,6 @@ class FamaraApp extends TerrainBase {
   ): void {
     const animate = () => {
       try {
-        // Update performance monitoring
-        this.updatePerformance();
-
         // Update controls for damping
         OrbitControlsHelper.update(controls);
 
@@ -230,9 +215,6 @@ const Famara = {
   },
   dispose: () => {
     return famaraApp.dispose();
-  },
-  getAppInfo: () => {
-    return famaraApp.getAppInfo();
   },
 };
 

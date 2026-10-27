@@ -98,7 +98,6 @@ class TownWorkshop extends WorkshopDemoBase {
         });
       });
 
-      this.isLoaded = true;
       logger.info(
         `✅ ${this.config.name} loaded successfully with ${this.neighborhoodMeshes.length} houses`
       );
@@ -471,9 +470,6 @@ const TownDemo = {
   },
   dispose: () => {
     return townWorkshop.dispose();
-  },
-  getAppInfo: () => {
-    return townWorkshop.getAppInfo();
   },
 };
 

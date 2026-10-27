@@ -65,16 +65,6 @@ class AnimationApp extends TerrainBase {
       // Use metadata from app registry
       name: appConfig.name,
       description: appConfig.description,
-      // App-specific configuration
-      requiredComponents: ['scene', 'camera', 'renderer', 'terrain', 'water', 'controls'],
-      scene: {
-        environment: 'lanzarote',
-        lighting: 'dynamic',
-      },
-      performance: {
-        monitoring: true,
-        logIntervalMs: 12000, // Log performance every 12 seconds
-      },
     });
   }
 
@@ -103,7 +93,6 @@ class AnimationApp extends TerrainBase {
       // );
 
       // Initialize core systems from DemoBase
-      this.initializeCore(options);
 
       // Load full environment (island, water, sky) from DemoBase
       await this.initializeEnvironment(options);
@@ -245,7 +234,6 @@ class AnimationApp extends TerrainBase {
       // Restore canvas visibility after everything is loaded
       canvas.style.opacity = originalOpacity || '1';
 
-      this.isLoaded = true;
       const vehicleCount =
         this.paragliderMeshes.length +
         (this.hanggliderMesh ? 1 : 0) +
@@ -299,9 +287,6 @@ class AnimationApp extends TerrainBase {
         const currentTime = Date.now();
         const deltaTime = (currentTime - lastTime) / 1000; // Convert to seconds
         lastTime = currentTime;
-
-        // Update performance monitoring
-        this.updatePerformance();
 
         // Update Camera Target Controller if enabled
         if (this.targetController) {
@@ -493,9 +478,6 @@ const Animation = {
   },
   dispose: () => {
     return animationApp.dispose();
-  },
-  getAppInfo: () => {
-    return animationApp.getAppInfo();
   },
 };
 

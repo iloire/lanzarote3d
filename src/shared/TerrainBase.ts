@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { AppBase, AppConfig } from './AppBase';
+import { AppBase } from './AppBase';
 import { StoryOptions } from './types';
 import Sky from '../foundation/components/environment/Sky';
 import Water from '../foundation/components/environment/Water';
@@ -9,13 +9,6 @@ import { bakeCoastField } from '../foundation/rendering/CoastField';
 import { OceanMaterial } from '../foundation/rendering/OceanMaterial';
 import { ThemeEngine } from '../foundation/systems/ThemeEngine';
 import { getDefaultTheme } from '../foundation/themes';
-
-export interface TerrainConfig extends Omit<AppConfig, 'scene'> {
-  scene?: {
-    environment?: 'lanzarote' | 'custom';
-    lighting?: 'dynamic' | 'static';
-  };
-}
 
 /**
  * TerrainBase - Specialized base that injects terrain (island) environment
@@ -30,23 +23,6 @@ export interface TerrainConfig extends Omit<AppConfig, 'scene'> {
 export abstract class TerrainBase extends AppBase {
   protected loadingManager?: THREE.LoadingManager;
   protected pipeline?: RenderPipeline;
-
-  constructor(config: TerrainConfig) {
-    // Provide demo-specific defaults
-    super({
-      ...config,
-      scene: {
-        environment: 'lanzarote',
-        lighting: 'dynamic',
-        ...config.scene,
-      },
-      performance: {
-        monitoring: true,
-        logIntervalMs: 15000, // Regular monitoring for showcase demos
-        ...config.performance,
-      },
-    });
-  }
 
   /**
    * Load full environment for demos
@@ -133,7 +109,7 @@ export abstract class TerrainBase extends AppBase {
   }
 
   /**
-   * Apps that need terrain should call this after initializeCore
+   * Apps that need terrain call this first
    */
   protected async initializeEnvironment(options: StoryOptions): Promise<void> {
     await this.loadEnvironment(options);

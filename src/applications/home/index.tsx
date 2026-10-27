@@ -84,15 +84,6 @@ class HomeApp extends TerrainBase {
     super({
       name: appConfig.name,
       description: appConfig.description,
-      requiredComponents: ['scene', 'camera', 'renderer', 'terrain', 'water', 'controls'],
-      scene: {
-        environment: 'lanzarote',
-        lighting: 'dynamic',
-      },
-      performance: {
-        monitoring: true,
-        logIntervalMs: 12000,
-      },
     });
   }
 
@@ -111,7 +102,6 @@ class HomeApp extends TerrainBase {
       const theme = getDefaultTheme();
       await ThemeEngine.apply(options, theme);
 
-      this.initializeCore(options);
       await this.initializeEnvironment(options);
 
       const { terrain, water } = options;
@@ -241,7 +231,6 @@ class HomeApp extends TerrainBase {
 
       canvas.style.opacity = originalOpacity || '1';
 
-      this.isLoaded = true;
       const vehicleCount =
         this.paragliderMeshes.length +
         (this.hanggliderMesh ? 1 : 0) +
@@ -340,8 +329,6 @@ class HomeApp extends TerrainBase {
         // The frame's own timestamp, and a capped step so returning to the tab doesn't jump
         const deltaTime = lastTime === null ? 0 : Math.min((now - lastTime) / 1000, 0.1);
         lastTime = now;
-
-        this.updatePerformance();
 
         if (this.targetController) {
           this.targetController.update(deltaTime);
@@ -536,9 +523,6 @@ const Home = {
   },
   dispose: () => {
     return homeApp.dispose();
-  },
-  getAppInfo: () => {
-    return homeApp.getAppInfo();
   },
 };
 
