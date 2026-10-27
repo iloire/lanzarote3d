@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 10:53 UTC
+
+### Changed
+- **Miguel flies the pink roller** (`PURPLE_ROLLER`) instead of the green one, which Luc keeps
+
 ## 2026-10-27 10:50 UTC
 
 ### Added

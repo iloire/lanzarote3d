@@ -190,7 +190,7 @@ const niviukRoller = (colors: { base: string; accent: string; tip: string }): Gl
     { color: colors.accent, from: [0.3, 0.62], to: [1.1, 0.62], width: 0.05 },
   ],
   // Cells as wide as the Rush's, so the smaller wing has fewer of them
-  numeroCajones: 26,
+  numeroCajones: 28,
 });
 
 /** A common roller: teal, yellow accents, black tip */
@@ -234,8 +234,8 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
   },
   {
     options: {
-      // On a roller, so he laps the loop half as fast again as the others
-      glider: GREEN_ROLLER,
+      // On the pink roller, so he laps the loop half as fast again as the others
+      glider: PURPLE_ROLLER,
       pilot: { characterType: CharacterType.MIGUEL },
     },
     startProgress: 0.04,
