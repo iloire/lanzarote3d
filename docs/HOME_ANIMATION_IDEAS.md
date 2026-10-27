@@ -17,9 +17,12 @@ Top picks: **1** (pendulum pilot), **5** (spring camera with roll) and **7** (cl
    bank by up to 10° and swings out about as far past it before settling. A pitch pendulum is
    driven by the speed measured along the path, which varies because the curve isn't
    arc-length parameterised. Covered by `tests/elements/paragliderMotion.test.ts`.
-2. **Make the canopy breathe.** A small vertex-shader offset along the span
+2. ~~**Make the canopy breathe.** A small vertex-shader offset along the span
    (`sin(time + aSpan * k)`) so the cells billow and the tips flex. GPU only, no CPU cost; the
-   gulls already do the same with `aWing`.
+   gulls already do the same with `aWing`.~~ ✅ `Glider.ts` patches the canopy material: the cells
+   swell in a ripple running out along the span, each tip flexes along the arc and the trailing
+   edge flutters, each wing on a random phase. `WingShape.breath` scales it (0.6 standard and
+   Rush, 0.3 roller).
 3. **Vary what the pilots do.** All four fly the same ridge loop. `THERMAL_SITES` in
    `shared/env/environment.ts` already gives thermal positions: a pilot could peel off, circle up in a thermal and glide back to the
    ridge, and now and then one could throw a wingover. Only a different set of waypoints.

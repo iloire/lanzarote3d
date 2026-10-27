@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { sharedUniforms } from '../../../rendering/sharedUniforms';
 
 /**
  * Paraglider wing, in millimetres, in its own frame: origin between the carabiners, +x forward,
@@ -23,6 +24,8 @@ type WingShape = {
   cellBillow: number; // profile scale midway between two ribs
   /** Trim speed against a standard wing's */
   speedFactor: number;
+  /** How strongly the canopy breathes and flexes in flight, 1 = CANOPY_BEGIN_VERTEX as written */
+  breath: number;
 };
 
 /**
@@ -42,6 +45,7 @@ export const WING_SHAPES = {
     arcExponent: 1.6,
     cellBillow: 1.12,
     speedFactor: 1,
+    breath: 0.6,
   },
   /** Ozone Rush: a touch more chord than the standard wing and a deeper arc */
   rush: {
@@ -55,6 +59,7 @@ export const WING_SHAPES = {
     arcExponent: 1.5,
     cellBillow: 1.12,
     speedFactor: 1,
+    breath: 0.6,
   },
   /**
    * Niviuk Roller: nearly flat across the top for the middle 60% of the span, then the ears
@@ -74,6 +79,7 @@ export const WING_SHAPES = {
     arcExponent: 3.5,
     cellBillow: 1.3,
     speedFactor: 1.7,
+    breath: 0.3, // a small, highly loaded wing is stiffer
   },
 } satisfies Record<string, WingShape>;
 
@@ -246,6 +252,54 @@ const ribOutline = (rib: Rib, billow: number): THREE.Vector3[] => {
   return [...top, ...bottom];
 };
 
+/**
+ * The canopy breathes: the cells swell and ease off in a slow ripple running out along the span,
+ * the tips flex in and out along the arc, and the trailing edge flutters. All on the GPU, in
+ * millimetres, kept small enough that the lines still meet the lower surface by eye. Flat shading
+ * takes its normals from screen-space derivatives, so the moved faces light correctly.
+ */
+const CANOPY_VERTEX_PARS = /* glsl */ `
+  uniform float uTime;
+  uniform float uPhase;
+  uniform float uBreath;
+  attribute vec3 aLift; // chord line to this point, so scaling it swells the profile
+  attribute vec3 aUp; // canopy normal at the rib, rolled outwards towards the tips
+  attribute vec3 aStation; // span -1..1, 1 midway between ribs, chord 0 (nose)..1 (tail)
+`;
+
+const CANOPY_BEGIN_VERTEX = /* glsl */ `
+  vec3 transformed = vec3(position);
+  float t = aStation.x;
+  float span = abs(t);
+  float breath = sin(uTime * 1.4 + uPhase - span * 3.0);
+  transformed += aLift * aStation.y * 0.07 * uBreath * breath;
+  // Each tip on its own beat, a little out of step with the other
+  float flex = sin(uTime * 1.1 + uPhase + sign(t) * 1.3);
+  transformed += aUp * pow(span, 3.0) * 110.0 * uBreath * flex;
+  float flutter = sin(uTime * 7.0 + uPhase + t * 14.0);
+  transformed += aUp * pow(aStation.z, 4.0) * (10.0 + 25.0 * span) * uBreath * flutter;
+`;
+
+const createCanopyMaterial = (shape: WingShape): THREE.MeshLambertMaterial => {
+  const material = new THREE.MeshLambertMaterial({
+    vertexColors: true,
+    flatShading: true,
+    side: THREE.DoubleSide,
+  });
+  // Each wing breathes out of step with the others
+  const phase = { value: Math.random() * Math.PI * 2 };
+  material.onBeforeCompile = shader => {
+    shader.uniforms['uTime'] = sharedUniforms.uTime;
+    shader.uniforms['uPhase'] = phase;
+    shader.uniforms['uBreath'] = { value: shape.breath };
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', `#include <common>\n${CANOPY_VERTEX_PARS}`)
+      .replace('#include <begin_vertex>', CANOPY_BEGIN_VERTEX);
+  };
+  material.customProgramCacheKey = () => 'lz-canopy';
+  return material;
+};
+
 const createCanopy = (ribs: Rib[], options: GliderOptions): THREE.Mesh => {
   const top = new THREE.Color(options.wingColor1);
   const tips = new THREE.Color(options.wingColor2);
@@ -268,21 +322,27 @@ const createCanopy = (ribs: Rib[], options: GliderOptions): THREE.Mesh => {
 
   const positions: number[] = [];
   const colors: number[] = [];
-  const pushTriangle = (
-    a: THREE.Vector3,
-    b: THREE.Vector3,
-    c: THREE.Vector3,
-    color: THREE.Color
-  ) => {
-    positions.push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
-    for (let k = 0; k < 3; k++) colors.push(color.r, color.g, color.b);
+  // What the breathing shader needs per vertex: see CANOPY_VERTEX_PARS
+  const lifts: number[] = [];
+  const ups: number[] = [];
+  const stations: number[] = [];
+  /** A triangle by its corners, each a (rib, outline point) pair */
+  const pushTriangle = (corners: [number, number][], color: THREE.Color) => {
+    corners.forEach(([r, p]) => {
+      const rib = ribs[r]!;
+      const point = outlines[r]![p]!;
+      const lift = point.clone().sub(ribPoint(rib, outlineX[p]!, 0));
+      positions.push(point.x, point.y, point.z);
+      colors.push(color.r, color.g, color.b);
+      lifts.push(lift.x, lift.y, lift.z);
+      ups.push(rib.up.x, rib.up.y, rib.up.z);
+      stations.push(rib.t, r % 2, outlineX[p]!);
+    });
   };
 
   for (let r = 0; r < ribs.length - 1; r++) {
     const signedT = (ribs[r]!.t + ribs[r + 1]!.t) / 2;
     const t = Math.abs(signedT);
-    const a = outlines[r]!;
-    const b = outlines[r + 1]!;
     for (let p = 0; p < pointsPerRib; p++) {
       const q = (p + 1) % pointsPerRib;
       const onTop = p < topPoints - 1;
@@ -307,30 +367,49 @@ const createCanopy = (ribs: Rib[], options: GliderOptions): THREE.Mesh => {
                 ? tips
                 : top
               : bottom;
-      pushTriangle(a[p]!, b[p]!, b[q]!, color);
-      pushTriangle(a[p]!, b[q]!, a[q]!, color);
+      pushTriangle(
+        [
+          [r, p],
+          [r + 1, p],
+          [r + 1, q],
+        ],
+        color
+      );
+      pushTriangle(
+        [
+          [r, p],
+          [r + 1, q],
+          [r, q],
+        ],
+        color
+      );
     }
   }
 
   // Close the wingtips
-  [outlines[0]!, outlines[outlines.length - 1]!].forEach((outline, side) => {
+  [0, ribs.length - 1].forEach((r, side) => {
     for (let p = 1; p < pointsPerRib - 1; p++) {
-      const [b, c] = side === 0 ? [outline[p + 1]!, outline[p]!] : [outline[p]!, outline[p + 1]!];
-      pushTriangle(outline[0]!, b, c, tips);
+      const [b, c] = side === 0 ? [p + 1, p] : [p, p + 1];
+      pushTriangle(
+        [
+          [r, 0],
+          [r, b],
+          [r, c],
+        ],
+        tips
+      );
     }
   });
 
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+  geometry.setAttribute('aLift', new THREE.Float32BufferAttribute(lifts, 3));
+  geometry.setAttribute('aUp', new THREE.Float32BufferAttribute(ups, 3));
+  geometry.setAttribute('aStation', new THREE.Float32BufferAttribute(stations, 3));
   geometry.computeVertexNormals();
 
-  const material = new THREE.MeshLambertMaterial({
-    vertexColors: true,
-    flatShading: true,
-    side: THREE.DoubleSide,
-  });
-  const canopy = new THREE.Mesh(geometry, material);
+  const canopy = new THREE.Mesh(geometry, createCanopyMaterial(ribs[0]!.shape));
   canopy.name = 'canopy';
   canopy.castShadow = true;
   return canopy;

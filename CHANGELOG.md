@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 23:47 UTC
+
+### Added
+- **The canopy breathes**: a vertex shader on the paraglider canopy swells and eases the cells in a slow ripple out along the span, flexes each tip in and out on its own beat and flutters the trailing edge, each wing out of step with the others. GPU only. Strength per wing shape (`WingShape.breath`): 0.6 for standard and Rush, 0.3 for the stiffer roller
+
 ## 2026-10-27 23:38 UTC
 
 ### Fixed
