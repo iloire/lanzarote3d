@@ -152,39 +152,11 @@ export class FlyingBehavior {
   }
 
   /**
-   * Add obstacles to avoid
-   */
-  public addObstacles(obstacles: THREE.Object3D[]): void {
-    this.obstacles.push(...obstacles);
-  }
-
-  /**
-   * Add single obstacle to avoid
-   */
-  public addObstacle(obstacle: THREE.Object3D): void {
-    this.obstacles.push(obstacle);
-  }
-
-  /**
    * Update flight speed (for GUI controls)
    */
   public setSpeed(speed: number): void {
     this.speed = speed;
     this.baseSpeed = speed;
-  }
-
-  /**
-   * Update turn speed (for GUI controls)
-   */
-  public setTurnSpeed(turnSpeed: number): void {
-    this.turnSpeed = turnSpeed;
-  }
-
-  /**
-   * Update flight radius (for GUI controls)
-   */
-  public setFlightRadius(radius: number): void {
-    this.flightRadius = radius;
   }
 
   /**
@@ -229,13 +201,6 @@ export class FlyingBehavior {
     this.mesh.position.copy(this.waypointCurve.getPoint(this.waypointProgress));
     const tangent = this.waypointCurve.getTangent(this.waypointProgress);
     this.mesh.quaternion.copy(this.getTargetQuaternion(tangent));
-  }
-
-  /**
-   * Get waypoints array
-   */
-  public getWaypoints(): THREE.Vector3[] {
-    return this.waypoints.map(p => p.clone());
   }
 
   /**
@@ -776,38 +741,11 @@ export class FlyingBehavior {
   /**
    * Get current flight state for debugging
    */
-  /**
-   * Get current flight state information
-   */
-  public getFlightState(): FlightState {
-    return {
-      isFlying: this.isFlying,
-      position: this.mesh?.position.clone(),
-      velocity: this.currentVelocity.clone(),
-      direction: this.targetDirection.clone(),
-      distanceFromCenter: this.mesh ? this.mesh.position.distanceTo(this.centerPoint) : 0,
-      pattern: this.pattern,
-    };
-  }
 
   /**
    * Get the current velocity vector
    */
   public getVelocity(): THREE.Vector3 {
     return this.currentVelocity.clone();
-  }
-
-  /**
-   * Update the center point for flight patterns
-   */
-  public updateCenterPoint(point: THREE.Vector3): void {
-    this.centerPoint.copy(point);
-  }
-
-  /**
-   * Check if currently flying
-   */
-  public isFlyingActive(): boolean {
-    return this.isFlying;
   }
 }

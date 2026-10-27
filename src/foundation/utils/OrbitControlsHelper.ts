@@ -208,23 +208,6 @@ export class OrbitControlsHelper {
   }
 
   /**
-   * Apply a preset configuration to orbit controls
-   */
-  static applyPreset(
-    controls: ExtendedOrbitControls,
-    presetName: keyof typeof ORBIT_CONTROLS_PRESETS
-  ): void {
-    const preset = ORBIT_CONTROLS_PRESETS[presetName];
-    if (!preset) {
-      console.warn(`OrbitControlsHelper: Preset '${presetName}' not found`);
-      return;
-    }
-
-    this.applyLimits(controls, preset);
-    console.log(`🎮 Applied orbit controls preset: ${presetName}`);
-  }
-
-  /**
    * Create custom limits centered around a specific position
    */
   static createCenteredLimits(
@@ -265,23 +248,6 @@ export class OrbitControlsHelper {
     }
 
     console.log(`🎯 Orbit controls focused on target:`, target);
-  }
-
-  /**
-   * Smoothly transition controls to new limits over time
-   * Note: This is a basic implementation - could be enhanced with proper tweening
-   */
-  static transitionToLimits(
-    controls: ExtendedOrbitControls,
-    newLimits: OrbitControlsLimits,
-    duration: number = 1000
-  ): Promise<void> {
-    return new Promise(resolve => {
-      // For now, just apply immediately
-      // TODO: Implement smooth transitions using tweening
-      this.applyLimits(controls, newLimits);
-      setTimeout(resolve, duration);
-    });
   }
 
   /**

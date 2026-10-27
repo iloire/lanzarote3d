@@ -67,31 +67,6 @@ export abstract class MovableBoatComponent extends FloatingThreeComponent {
     return object;
   }
 
-  // Movement control methods (only work if movement is enabled)
-  public startMoving(): void {
-    if (this.movingBehavior) {
-      this.movingBehavior.start();
-    }
-  }
-
-  public stopMoving(): void {
-    if (this.movingBehavior) {
-      this.movingBehavior.stop();
-    }
-  }
-
-  public setMovementSpeed(speed: number): void {
-    if (this.movingBehavior) {
-      this.movingBehavior.setSpeed(speed);
-    }
-  }
-
-  public setMovementPattern(pattern: MovementPattern): void {
-    if (this.movingBehavior) {
-      this.movingBehavior.setPattern(pattern);
-    }
-  }
-
   public setWaypoints(waypoints: THREE.Vector3[]): void {
     if (this.movingBehavior) {
       this.movingBehavior.setWaypoints(waypoints);
@@ -106,19 +81,6 @@ export abstract class MovableBoatComponent extends FloatingThreeComponent {
 
   public isMoving(): boolean {
     return this.movingBehavior ? this.movingBehavior.isActive() : false;
-  }
-
-  public hasMovementCapability(): boolean {
-    return this.enableMovement;
-  }
-
-  // Combined state info
-  public getMovementInfo(): Record<string, any> {
-    return {
-      isFloating: this.isFloating(),
-      isMoving: this.isMoving(),
-      hasMovement: this.hasMovementCapability(),
-    };
   }
 
   public override dispose(): void {

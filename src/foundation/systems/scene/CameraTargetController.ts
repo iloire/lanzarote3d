@@ -94,20 +94,6 @@ export class CameraTargetController extends THREE.PerspectiveCamera {
   }
 
   /**
-   * Remove a target by index
-   */
-  removeTarget(index: number): void {
-    if (index < 0 || index >= this.targets.length) return;
-
-    this.targets.splice(index, 1);
-
-    // Adjust current index if needed
-    if (this.currentTargetIndex >= this.targets.length) {
-      this.currentTargetIndex = Math.max(0, this.targets.length - 1);
-    }
-  }
-
-  /**
    * Switch to a different target with smooth transition
    */
   switchToTarget(

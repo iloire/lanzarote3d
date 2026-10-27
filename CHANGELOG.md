@@ -7,6 +7,11 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ### Changed
 - **Cloud bases**: darker, and no two clouds alike - each cloud draws a random darkness, so its underside ranges from a light blue-grey to a slate about twice as dark, and the grey reaches a third to over half way up its sides; the default base colour goes from #636f86 to #556079
 
+## 2026-10-27 21:45 UTC
+
+### Removed
+- **73 methods nothing called**: the speculative API left over from earlier designs, in `CharacterRegistry` (search, tags, authors, export, validation), `PilotVoxel`, `ComponentRegistry`, `ThemeEngine` (custom themes, validation), `TerrainNavigator` (slope and path analysis; only `getHeightAt` is used), `FlyingBehavior`, `MovingBehavior`, `FloatingThreeComponent`, `MovableBoatComponent`, `LODComponent`, `OrbitControlsHelper`, `CameraTargetController`, `ResourceManager` textures, `SimpleAnimator`, `WorkshopDemoBase` labels and `WebGL` 2 checks. Private fields and options that were set but never read went with them: the legacy tree's colours, the Cessna's climb rate, the navigator's options, the town GUI handle and the house creator's component registry
+
 ## 2026-10-27 21:25 UTC
 
 ### Removed

@@ -17,7 +17,6 @@ import {
   RoundBungalow,
 } from '../../foundation/components/scenery/buildings';
 import { LevelOfDetail, getLODFromLegacy } from '../../foundation/types/lod';
-import { ComponentRegistry } from '../../foundation/systems/ComponentRegistry';
 import { HouseConfig, HouseGroupConfig, HouseStyle } from './house-group-types';
 import { logger } from '../../foundation/utils/logger';
 import { calculateHousePositions, generateMixedNeighborhood } from './house-group-utils';
@@ -27,14 +26,12 @@ import { calculateHousePositions, generateMixedNeighborhood } from './house-grou
  */
 export class HouseGroupCreator {
   private scene: THREE.Scene;
-  private componentRegistry: ComponentRegistry;
   private lowPoly: boolean = false; // Deprecated - kept for backward compatibility
   private levelOfDetail: LevelOfDetail = LevelOfDetail.HIGH;
   private createdObjects: THREE.Object3D[] = []; // Track all created objects
 
-  constructor(scene: THREE.Scene, componentRegistry: ComponentRegistry) {
+  constructor(scene: THREE.Scene) {
     this.scene = scene;
-    this.componentRegistry = componentRegistry;
   }
 
   /**

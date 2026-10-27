@@ -19,7 +19,6 @@ class TownWorkshop extends WorkshopDemoBase {
   private houseGroupCreator!: HouseGroupCreator;
   private componentRegistry!: ComponentRegistry;
   private currentScene!: THREE.Scene;
-  private currentGui: GUI | undefined;
   private isLowPoly: boolean = true; // Start in low-poly mode by default
   private performanceUI!: PerformanceUI;
   private performanceSettings: PerformanceSettings = {
@@ -67,11 +66,10 @@ class TownWorkshop extends WorkshopDemoBase {
 
       // Store references for reconstruction
       this.currentScene = scene;
-      this.currentGui = gui;
 
       // Initialize component registry and house group creator
       this.componentRegistry = new ComponentRegistry();
-      this.houseGroupCreator = new HouseGroupCreator(scene, this.componentRegistry);
+      this.houseGroupCreator = new HouseGroupCreator(scene);
 
       // Set initial low-poly mode
       this.houseGroupCreator.setLowPolyMode(this.isLowPoly);

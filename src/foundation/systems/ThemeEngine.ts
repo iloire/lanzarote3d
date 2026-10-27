@@ -7,8 +7,6 @@ import { OceanMaterial } from '../rendering/OceanMaterial';
 import { setSharedWind } from '../rendering/sharedUniforms';
 
 export class ThemeEngine {
-  private static currentTheme: Theme | null = null;
-
   /**
    * Apply a theme to the entire scene and its components
    */
@@ -20,9 +18,6 @@ export class ThemeEngine {
     const { skipComponents = [] } = applicationOptions;
 
     logger.info(`Applying theme: ${theme.name}`);
-
-    // Store current theme reference
-    this.currentTheme = theme;
 
     try {
       // Apply sky/lighting settings
@@ -131,63 +126,6 @@ export class ThemeEngine {
 
     // Note: Lighting intensity modifications would need access to the lighting system
     // This could be extended based on how lighting is structured in the Sky component
-  }
-
-  /**
-   * Get current applied theme
-   */
-  static getCurrentTheme(): Theme | null {
-    return this.currentTheme;
-  }
-
-  /**
-   * Check if a theme is currently applied
-   */
-  static hasTheme(): boolean {
-    return this.currentTheme !== null;
-  }
-
-  /**
-   * Clear current theme
-   */
-  static clearTheme(): void {
-    this.currentTheme = null;
-  }
-
-  /**
-   * Create a custom theme by merging base theme with overrides
-   */
-  static createCustomTheme(baseTheme: Theme, overrides: Partial<Theme>): Theme {
-    return {
-      ...baseTheme,
-      ...overrides,
-      sky: { ...baseTheme.sky, ...overrides.sky },
-      clouds: { ...baseTheme.clouds, ...overrides.clouds },
-      terrain: { ...baseTheme.terrain, ...overrides.terrain },
-      water: { ...baseTheme.water, ...overrides.water },
-      weather: { ...baseTheme.weather, ...overrides.weather },
-      ambient: { ...baseTheme.ambient, ...overrides.ambient },
-    };
-  }
-
-  /**
-   * Validate theme structure
-   */
-  static validateTheme(theme: unknown): theme is Theme {
-    return (
-      typeof theme === 'object' &&
-      theme !== null &&
-      'id' in theme &&
-      'name' in theme &&
-      'description' in theme &&
-      'sky' in theme &&
-      'clouds' in theme &&
-      'terrain' in theme &&
-      'water' in theme &&
-      'weather' in theme &&
-      typeof (theme as Theme).id === 'string' &&
-      typeof (theme as Theme).name === 'string'
-    );
   }
 }
 

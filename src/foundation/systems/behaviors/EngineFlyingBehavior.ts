@@ -5,7 +5,6 @@ import { logger } from '../../utils/logger';
 export interface EngineFlyingBehaviorOptions extends FlyingBehaviorOptions {
   // Engine-specific options
   cruiseAltitude?: number; // Preferred flying altitude
-  climbRate?: number; // How fast the aircraft climbs (units per second)
   terrainClearance?: number; // Minimum clearance above terrain
   lookAheadDistance?: number; // How far ahead to check terrain
 }
@@ -21,7 +20,6 @@ export interface EngineFlyingBehaviorOptions extends FlyingBehaviorOptions {
  */
 export class EngineFlyingBehavior extends FlyingBehavior {
   private cruiseAltitude: number;
-  private climbRate: number;
   private terrainClearance: number;
   private lookAheadDistance: number;
 
@@ -44,7 +42,6 @@ export class EngineFlyingBehavior extends FlyingBehavior {
     });
 
     this.cruiseAltitude = options.cruiseAltitude || 200;
-    this.climbRate = options.climbRate || 2.0;
     this.terrainClearance = options.terrainClearance || 80;
     this.lookAheadDistance = options.lookAheadDistance || 150;
   }
@@ -179,19 +176,5 @@ export class EngineFlyingBehavior extends FlyingBehavior {
     }
 
     return altitudeForce;
-  }
-
-  /**
-   * Get info about engine aircraft state
-   */
-  public getEngineFlightInfo() {
-    const baseInfo = this.getFlightState();
-    return {
-      ...baseInfo,
-      cruiseAltitude: this.cruiseAltitude,
-      currentAltitude: this.mesh?.position.y || 0,
-      climbRate: this.climbRate,
-      terrainClearance: this.terrainClearance,
-    };
   }
 }

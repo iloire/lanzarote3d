@@ -249,7 +249,7 @@ class Environment {
     const terrainAdaptedCenter = new THREE.Vector3(center.x, terrainHeight, center.z);
 
     // Create house group creator
-    const houseGroupCreator = new HouseGroupCreator(this.scene, this.componentRegistry);
+    const houseGroupCreator = new HouseGroupCreator(this.scene);
 
     // Use levelOfDetail if provided, otherwise fall back to lowPoly for backward compatibility
     if (levelOfDetail !== undefined) {

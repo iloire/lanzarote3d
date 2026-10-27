@@ -103,33 +103,11 @@ export class SimpleAnimator {
   }
 
   /**
-   * Stop a specific animation
-   */
-  stopAnimation(id: string): void {
-    const animation = this.animations.get(id);
-    if (animation) {
-      animation.isRunning = false;
-      this.animations.delete(id);
-    }
-  }
-
-  /**
    * Check if an animation is running
    */
   isAnimating(id: string): boolean {
     const animation = this.animations.get(id);
     return animation ? animation.isRunning : false;
-  }
-
-  /**
-   * Get debug info
-   */
-  getDebugInfo(): { isRunning: boolean; activeAnimations: string[]; count: number } {
-    return {
-      isRunning: this.isRunning,
-      activeAnimations: Array.from(this.animations.keys()),
-      count: this.animations.size,
-    };
   }
 
   /**

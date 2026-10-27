@@ -113,44 +113,6 @@ export abstract class WorkshopDemoBase extends AppBase {
   }
 
   /**
-   * Utility to create standard HTML label container
-   */
-  protected createLabelContainer(): HTMLDivElement {
-    const labelContainer = document.createElement('div');
-    labelContainer.style.position = 'absolute';
-    labelContainer.style.top = '0';
-    labelContainer.style.left = '0';
-    labelContainer.style.width = '100%';
-    labelContainer.style.height = '100%';
-    labelContainer.style.pointerEvents = 'none';
-    document.body.appendChild(labelContainer);
-    return labelContainer;
-  }
-
-  /**
-   * Utility to create standard styled labels
-   */
-  protected createStandardLabel(text: string, subtitle?: string): HTMLDivElement {
-    const label = document.createElement('div');
-    label.style.position = 'absolute';
-    label.style.color = 'white';
-    label.style.padding = '10px';
-    label.style.background = 'rgba(0, 0, 0, 0.5)';
-    label.style.borderRadius = '5px';
-    label.style.textAlign = 'center';
-    label.style.fontSize = '14px';
-    label.style.fontFamily = 'Arial, sans-serif';
-
-    let html = `<strong>${text}</strong>`;
-    if (subtitle) {
-      html += `<br><span style="font-size: 12px">${subtitle}</span>`;
-    }
-    label.innerHTML = html;
-
-    return label;
-  }
-
-  /**
    * Utility to start standard animation loop
    */
   protected startAnimationLoop(

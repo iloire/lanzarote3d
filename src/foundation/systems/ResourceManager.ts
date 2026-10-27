@@ -176,24 +176,6 @@ export class ResourceManager {
   }
 
   /**
-   * Load and cache texture
-   */
-  public async getTexture(url: string, options?: ResourceOptions): Promise<THREE.Texture> {
-    const cacheKey = `texture_${url}`;
-
-    if (this.textureCache.has(cacheKey)) {
-      const texture = this.textureCache.get(cacheKey)!;
-      this.updateReferenceCount(cacheKey, 1);
-      return texture;
-    }
-
-    const texture = await this.loadTexture(url, options);
-    this.storeTexture(cacheKey, texture, url);
-
-    return texture;
-  }
-
-  /**
    * Release reference to a resource
    */
   public releaseResource(id: string): void {
@@ -348,30 +330,6 @@ export class ResourceManager {
     return material;
   }
 
-  private async loadTexture(url: string, options?: ResourceOptions): Promise<THREE.Texture> {
-    return new Promise((resolve, reject) => {
-      const loader = new THREE.TextureLoader();
-
-      const timeout = options?.timeout || 10000;
-      const timeoutId = setTimeout(() => {
-        reject(new Error(`Texture loading timeout: ${url}`));
-      }, timeout);
-
-      loader.load(
-        url,
-        texture => {
-          clearTimeout(timeoutId);
-          resolve(texture);
-        },
-        undefined,
-        error => {
-          clearTimeout(timeoutId);
-          reject(error);
-        }
-      );
-    });
-  }
-
   private storeMaterial(id: string, material: THREE.Material, _config: MaterialConfig): void {
     this.materialPool.set(id, material);
 
@@ -399,23 +357,6 @@ export class ResourceManager {
       lastAccessed: Date.now(),
       referenceCount: 1,
       type: 'geometry',
-    };
-
-    this.cache.set(id, entry);
-  }
-
-  private storeTexture(id: string, texture: THREE.Texture, url: string): void {
-    this.textureCache.set(id, texture);
-
-    const size = this.calculateTextureSize(texture);
-    const entry: CacheEntry = {
-      id,
-      data: texture,
-      size,
-      lastAccessed: Date.now(),
-      referenceCount: 1,
-      url,
-      type: 'texture',
     };
 
     this.cache.set(id, entry);

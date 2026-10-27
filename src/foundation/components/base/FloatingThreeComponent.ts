@@ -41,27 +41,6 @@ export abstract class FloatingThreeComponent extends SimpleThreeComponent {
     return object;
   }
 
-  // Floating control methods
-  public startFloating(): void {
-    this.floatingBehavior.start();
-  }
-
-  public stopFloating(): void {
-    this.floatingBehavior.stop();
-  }
-
-  public setFloatingScale(scale: number): void {
-    this.floatingBehavior.setScale(scale);
-  }
-
-  /**
-   * Legacy compatibility method
-   * @deprecated Use setFloatingScale instead
-   */
-  public setScaleMultiplier(scale: number): void {
-    this.setFloatingScale(scale);
-  }
-
   public isFloating(): boolean {
     return this.floatingBehavior.isActive();
   }

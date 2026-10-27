@@ -143,41 +143,6 @@ export class MovingBehavior {
   }
 
   /**
-   * Alias for updateOriginalPosition for backward compatibility
-   */
-  public updateOrigin(): void {
-    this.updateOriginalPosition();
-  }
-
-  /**
-   * Set the movement radius
-   */
-  public setRadius(radius: number): void {
-    this.radius = radius;
-  }
-
-  /**
-   * Get the movement radius
-   */
-  public getRadius(): number {
-    return this.radius;
-  }
-
-  /**
-   * Get the movement pattern
-   */
-  public getPattern(): MovementPattern {
-    return this.pattern;
-  }
-
-  /**
-   * Get the movement speed
-   */
-  public getSpeed(): number {
-    return this.speed;
-  }
-
-  /**
    * Dispose of the movement behavior
    */
   public dispose(): void {

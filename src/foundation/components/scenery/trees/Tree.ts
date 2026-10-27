@@ -7,18 +7,8 @@ const mat_grey = new THREE.MeshLambertMaterial({ color: 0xf3f2f7 });
 const mat_yellow = new THREE.MeshLambertMaterial({ color: 0xfeb42b });
 const mat_green = new THREE.MeshLambertMaterial({ color: 0xb2d2a4 });
 
-export interface LegacyTreeOptions extends SimpleComponentOptions {
-  trunkColor?: number;
-  crownColor?: number;
-  leafColor?: number;
-}
-
 class LegacyTree extends SimpleThreeComponent {
-  private trunkColor: number = 0xf3f2f7;
-  private crownColor: number = 0xb2d2a4;
-  private leafColor: number = 0xfeb42b;
-
-  constructor(options: LegacyTreeOptions = {}) {
+  constructor(options: SimpleComponentOptions = {}) {
     const metadata: ComponentMetadata = {
       name: 'LegacyTree',
       version: '1.0.0',
@@ -27,10 +17,6 @@ class LegacyTree extends SimpleThreeComponent {
     };
 
     super(metadata, options);
-
-    this.trunkColor = options.trunkColor || 0xf3f2f7;
-    this.crownColor = options.crownColor || 0xb2d2a4;
-    this.leafColor = options.leafColor || 0xfeb42b;
   }
 
   protected createGeometry(): THREE.BufferGeometry {

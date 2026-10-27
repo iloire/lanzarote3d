@@ -106,13 +106,6 @@ export abstract class LODComponent extends SimpleThreeComponent {
   protected abstract createHighLODContent(): THREE.Object3D;
 
   /**
-   * Get current LOD level
-   */
-  public getLOD(): LevelOfDetail {
-    return this.currentLOD;
-  }
-
-  /**
    * Change LOD level and recreate mesh
    * Useful for dynamic LOD switching based on camera distance
    */
@@ -134,26 +127,4 @@ export abstract class LODComponent extends SimpleThreeComponent {
    * Subclasses can override this to define common materials
    */
   protected createSharedMaterials?(): Record<string, THREE.Material>;
-
-  /**
-   * Get polygon count for current LOD (for debugging/monitoring)
-   */
-  public getPolygonCount(): number {
-    let count = 0;
-    const obj = this.getObject();
-    obj.traverse((child: THREE.Object3D) => {
-      if (child instanceof THREE.Mesh && child.geometry) {
-        const geometry = child.geometry;
-        if (geometry.index !== null) {
-          count += geometry.index.count / 3;
-        } else {
-          const positionAttribute = geometry.getAttribute('position');
-          if (positionAttribute) {
-            count += positionAttribute.count / 3;
-          }
-        }
-      }
-    });
-    return Math.floor(count);
-  }
 }

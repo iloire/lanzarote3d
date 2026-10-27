@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { SimpleThreeComponent } from '../base/SimpleThreeComponent';
 import { ComponentOptions } from '../base/IThreeComponent';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
-import { CharacterType, characterRegistry, CharacterDefinition } from './CharacterRegistry';
+import { CharacterType, characterRegistry } from './CharacterRegistry';
 
 /**
  * Options for pilot voxel component
@@ -44,8 +44,6 @@ export interface PilotVoxelOptions extends ComponentOptions {
  * - Configurable material and texture properties
  */
 export class PilotVoxel extends SimpleThreeComponent {
-  private characterType: CharacterType;
-
   constructor(options: PilotVoxelOptions = {}) {
     // Get character or default to ADRI
     const charType = options.characterType || CharacterType.ADRI;
@@ -99,8 +97,6 @@ export class PilotVoxel extends SimpleThreeComponent {
         },
       }
     );
-
-    this.characterType = charType;
   }
 
   // Required by SimpleThreeComponent but not used for loaded models
@@ -195,48 +191,6 @@ export class PilotVoxel extends SimpleThreeComponent {
         }
       );
     });
-  }
-
-  /**
-   * Get current character type
-   */
-  public getCharacterType(): CharacterType {
-    return this.characterType;
-  }
-
-  /**
-   * Get character information
-   */
-  public getCharacterInfo(): CharacterDefinition | undefined {
-    return characterRegistry.getCharacter(this.characterType);
-  }
-
-  /**
-   * Get all available character types
-   */
-  public static getAvailableCharacters(): CharacterDefinition[] {
-    return characterRegistry.getAllCharacters();
-  }
-
-  /**
-   * Create a random character variant
-   */
-  public static createRandomCharacter(baseOptions?: Partial<PilotVoxelOptions>): PilotVoxel {
-    const randomCharacter = characterRegistry.getRandomCharacter();
-
-    const options: PilotVoxelOptions = {
-      characterType: randomCharacter.id,
-      ...baseOptions,
-    };
-
-    // Randomly select alternative textures if available
-    if (randomCharacter.assets.alternativeTextures && Math.random() > 0.5) {
-      options.useAlternativeTexture = Math.floor(
-        Math.random() * randomCharacter.assets.alternativeTextures.length
-      );
-    }
-
-    return new PilotVoxel(options);
   }
 }
 

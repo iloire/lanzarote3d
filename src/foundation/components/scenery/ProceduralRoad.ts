@@ -89,9 +89,7 @@ export class ProceduralRoad extends SimpleThreeComponent {
     // Initialize terrain navigator if terrain provided
     const opts = this.options as ProceduralRoadOptions;
     if (opts.terrain) {
-      this.terrainNavigator = new TerrainNavigator({
-        smoothingFactor: 0.1,
-      });
+      this.terrainNavigator = new TerrainNavigator();
       this.terrainNavigator.setTerrain(opts.terrain);
     }
   }
@@ -401,19 +399,6 @@ export class ProceduralRoad extends SimpleThreeComponent {
       return 0;
     }
     return this.curve.getLength();
-  }
-
-  /**
-   * Get point on road at specific distance along path
-   */
-  public getPointAtDistance(distance: number): THREE.Vector3 | null {
-    if (!this.curve) {
-      return null;
-    }
-
-    const length = this.curve.getLength();
-    const t = Math.min(Math.max(distance / length, 0), 1);
-    return this.curve.getPoint(t);
   }
 
   public override validate(): string[] {

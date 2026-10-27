@@ -55,13 +55,6 @@ export class FloatingBehavior {
   }
 
   /**
-   * Update the scale multiplier for floating amplitudes
-   */
-  public setScale(scale: number): void {
-    this.scaleMultiplier = scale;
-  }
-
-  /**
    * Get current floating state
    */
   public isActive(): boolean {

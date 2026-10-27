@@ -11,21 +11,8 @@ class WebGL {
     }
   }
 
-  static isWebGL2Available() {
-    try {
-      const canvas = document.createElement('canvas');
-      return !!(window.WebGL2RenderingContext && canvas.getContext('webgl2'));
-    } catch (e) {
-      return false;
-    }
-  }
-
   static getWebGLErrorMessage() {
     return this.getErrorMessage(1);
-  }
-
-  static getWebGL2ErrorMessage() {
-    return this.getErrorMessage(2);
   }
 
   static getErrorMessage(version: 1 | 2) {
