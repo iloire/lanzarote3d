@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { rndBetween, rndIntBetween } from '../../utils/math';
-import { animator } from '../../systems/animation/SimpleAnimator';
 
 const generateCloudPart = (radius: number, scale: number, material: THREE.Material) => {
   const geo_cloudPart = new THREE.IcosahedronGeometry(radius, 0);
@@ -57,36 +56,29 @@ const generateCloud = async (options: CloudOptions): Promise<THREE.Object3D> => 
   return group;
 };
 
-const tweakSize = (mesh: THREE.Object3D, interval: number) => {
-  const min = 0.95,
-    max = 1.05;
-  const multiplier = rndBetween(min, max);
-  const scaleX = mesh.scale.x * multiplier;
-  const scaleY = mesh.scale.y * multiplier;
-  const scaleZ = mesh.scale.z * multiplier;
+/** How far the parts breathe: their scale by ±5 %, their offset from the cloud's centre by ±10 % */
+const PART_SCALE_SWING = 0.05;
+const PART_OFFSET_SWING = 0.1;
+/** The whole cloud bobs ±60 units over about a minute */
+const BOB_HEIGHT = 60;
+const BOB_RATE = 0.1;
 
-  const startScale = mesh.scale.clone();
-  const targetPosition = new THREE.Vector3(scaleX, scaleY, scaleZ);
-
-  animator.animate(`cloud-scale-${Math.random()}`, interval, progress => {
-    mesh.scale.lerpVectors(startScale, targetPosition, progress);
-  });
+type PartRest = {
+  part: THREE.Object3D;
+  scale: THREE.Vector3;
+  position: THREE.Vector3;
+  phase: number;
 };
 
-const tweakPos = (mesh: THREE.Object3D, interval: number) => {
-  const min = 0.9,
-    max = 1.1;
-  const multiplier = rndBetween(min, max);
-  const posX = mesh.position.x * multiplier;
-  const posY = mesh.position.y * multiplier;
-  const posZ = mesh.position.z * multiplier;
-
-  const startPosition = mesh.position.clone();
-  const targetPosition = new THREE.Vector3(posX, posY, posZ);
-
-  animator.animate(`cloud-pos-${Math.random()}`, interval, progress => {
-    mesh.position.lerpVectors(startPosition, targetPosition, progress);
-  });
+/**
+ * All clouds move on one shared requestAnimationFrame, and the motion is a pure function of
+ * time around each piece's rest pose, so it neither drifts nor depends on the frame rate
+ */
+const activeClouds = new Set<Cloud>();
+let tickerId: number | null = null;
+const tick = (now: number) => {
+  activeClouds.forEach(cloud => cloud.update(now / 1000));
+  tickerId = activeClouds.size > 0 ? requestAnimationFrame(tick) : null;
 };
 
 export type CloudOptions = {
@@ -95,10 +87,11 @@ export type CloudOptions = {
 
 class Cloud {
   options: CloudOptions;
-  private interval: number | null = null;
-  private animationId: number | null = null;
-  private isAnimating: boolean = false;
   private mesh: THREE.Object3D | null = null;
+  private rest: PartRest[] = [];
+  // Read on the first update: whoever loads the cloud places it after load() returns
+  private restY: number | null = null;
+  private readonly phase = Math.random() * 100;
 
   constructor(options: CloudOptions) {
     this.options = options;
@@ -106,52 +99,38 @@ class Cloud {
 
   async load(): Promise<THREE.Object3D> {
     this.mesh = await generateCloud(this.options);
-    const interval = 3000;
-    this.interval = setInterval(() => {
-      if (this.mesh) {
-        this.mesh.children.forEach(m => {
-          tweakSize(m, interval);
-          tweakPos(m, interval);
-        });
-      }
-    }, interval) as unknown as number;
-
+    this.rest = this.mesh.children.map(part => ({
+      part,
+      scale: part.scale.clone(),
+      position: part.position.clone(),
+      phase: Math.random() * Math.PI * 2,
+    }));
     this.animate();
     return this.mesh;
   }
 
   animate() {
-    if (!this.isAnimating && this.mesh) {
-      this.isAnimating = true;
-      this.startAnimation();
-    }
-  }
-
-  private startAnimation() {
-    const startTime = performance.now();
-    const randomOffset = Math.random() * 1000;
-
-    const animateLoop = (currentTime: number) => {
-      if (!this.isAnimating || !this.mesh) return;
-
-      const elapsed = (currentTime - startTime + randomOffset) * 0.0001;
-      this.mesh.position.y = this.mesh.position.y + Math.sin(elapsed) * 0.1;
-
-      this.animationId = requestAnimationFrame(animateLoop);
-    };
-    this.animationId = requestAnimationFrame(animateLoop);
+    if (!this.mesh) return;
+    activeClouds.add(this);
+    if (tickerId === null) tickerId = requestAnimationFrame(tick);
   }
 
   stop() {
-    this.isAnimating = false;
-    if (this.animationId !== null) {
-      cancelAnimationFrame(this.animationId);
-      this.animationId = null;
-    }
-    if (this.interval !== null) {
-      clearInterval(this.interval);
-      this.interval = null;
-    }
+    activeClouds.delete(this);
+  }
+
+  /** Poses the cloud for `time` in seconds */
+  update(time: number) {
+    if (!this.mesh) return;
+    if (this.restY === null) this.restY = this.mesh.position.y;
+    const t = time + this.phase;
+    this.mesh.position.y = this.restY + Math.sin(t * BOB_RATE) * BOB_HEIGHT;
+    this.rest.forEach(({ part, scale, position, phase }) => {
+      part.scale.copy(scale).multiplyScalar(1 + Math.sin(t * 0.7 + phase) * PART_SCALE_SWING);
+      part.position
+        .copy(position)
+        .multiplyScalar(1 + Math.sin(t * 0.4 + phase * 2) * PART_OFFSET_SWING);
+    });
   }
 
   /**

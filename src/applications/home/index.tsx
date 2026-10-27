@@ -41,6 +41,7 @@ import { loadParagliders, loadHangglider, loadCessna, loadHercules } from './veh
 import { setupCameraAnimation, applyFloatingMotion } from './cameraAnimation';
 import { createTitleOverlay } from './TitleOverlay';
 import type { ParagliderMotion } from './paragliderMotion';
+import type { SmokeTrail } from '../../foundation/components/effects/SmokeTrail';
 
 /**
  * Home App - Landing scene with the voxel title
@@ -59,8 +60,8 @@ class HomeApp extends TerrainBase {
   private hanggliderFlyingBehavior: FlyingBehavior | undefined;
   private cessnaFlyingBehavior: FlyingBehavior | undefined;
   private herculesFlyingBehavior: FlyingBehavior | undefined;
-  private cessnaSmokeTrail: any | undefined;
-  private herculesSmokeTrail: any | undefined;
+  private cessnaSmokeTrail: SmokeTrail | undefined;
+  private herculesSmokeTrail: SmokeTrail | undefined;
   private targetController: CameraTargetController | null = null;
   private removeTitleOverlay: (() => void) | null = null;
 
@@ -348,15 +349,31 @@ class HomeApp extends TerrainBase {
     lead: THREE.Object3D
   ): void {
     const startTime = Date.now();
-    let lastTime = Date.now();
+    let lastTime: number | null = null;
     const lastLeadPosition = lead.position.clone();
     const leadMove = new THREE.Vector3();
+    const enginePos = new THREE.Vector3();
+    const tail = new THREE.Vector3();
 
-    const animate = () => {
+    // Puffs smoke from `tailOffset` behind the aircraft's origin, reusing the scratch vectors
+    const updateSmoke = (
+      trail: SmokeTrail,
+      mesh: THREE.Object3D,
+      behavior: FlyingBehavior,
+      tailOffset: number,
+      deltaTime: number
+    ) => {
+      mesh.getWorldPosition(enginePos);
+      tail.set(1, 0, 0).applyQuaternion(mesh.quaternion);
+      enginePos.addScaledVector(tail, -tailOffset);
+      trail.update(deltaTime, enginePos, behavior.getVelocity());
+    };
+
+    const animate = (now: number) => {
       try {
-        const currentTime = Date.now();
-        const deltaTime = (currentTime - lastTime) / 1000;
-        lastTime = currentTime;
+        // The frame's own timestamp, and a capped step so returning to the tab doesn't jump
+        const deltaTime = lastTime === null ? 0 : Math.min((now - lastTime) / 1000, 0.1);
+        lastTime = now;
 
         this.updatePerformance();
 
@@ -378,25 +395,22 @@ class HomeApp extends TerrainBase {
         OrbitControlsHelper.update(controls);
 
         if (this.cessnaSmokeTrail && this.cessnaMesh && this.cessnaFlyingBehavior) {
-          const velocity = this.cessnaFlyingBehavior.getVelocity();
-          const enginePos = new THREE.Vector3();
-          this.cessnaMesh.getWorldPosition(enginePos);
-          const direction = new THREE.Vector3(1, 0, 0);
-          direction.applyQuaternion(this.cessnaMesh.quaternion);
-          enginePos.sub(direction.multiplyScalar(3));
-
-          this.cessnaSmokeTrail.update(deltaTime, enginePos, velocity);
+          updateSmoke(
+            this.cessnaSmokeTrail,
+            this.cessnaMesh,
+            this.cessnaFlyingBehavior,
+            3,
+            deltaTime
+          );
         }
-
         if (this.herculesSmokeTrail && this.herculesMesh && this.herculesFlyingBehavior) {
-          const velocity = this.herculesFlyingBehavior.getVelocity();
-          const enginePos = new THREE.Vector3();
-          this.herculesMesh.getWorldPosition(enginePos);
-          const direction = new THREE.Vector3(1, 0, 0);
-          direction.applyQuaternion(this.herculesMesh.quaternion);
-          enginePos.sub(direction.multiplyScalar(5));
-
-          this.herculesSmokeTrail.update(deltaTime, enginePos, velocity);
+          updateSmoke(
+            this.herculesSmokeTrail,
+            this.herculesMesh,
+            this.herculesFlyingBehavior,
+            5,
+            deltaTime
+          );
         }
 
         const renderCamera =
@@ -407,7 +421,7 @@ class HomeApp extends TerrainBase {
         this.handleError(error as Error, 'animation loop');
       }
     };
-    animate();
+    this.animationId = requestAnimationFrame(animate);
   }
 
   public override dispose(): void {

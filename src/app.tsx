@@ -142,14 +142,14 @@ const App: React.FC<AppProps> = ({
       controls.enabled = false;
     }
 
-    // Simple, direct animation loop - no complex manager needed
-    const animate = () => {
-      requestAnimationFrame(animate);
-      if (process.env.NODE_ENV === 'development') {
+    // Ticks the FPS panel; production has no panel, so no loop either
+    if (process.env.NODE_ENV === 'development') {
+      const animate = () => {
+        requestAnimationFrame(animate);
         stats.update();
-      }
-    };
-    animate();
+      };
+      animate();
+    }
 
     const storyOptions: StoryOptions = {
       camera,

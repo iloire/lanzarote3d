@@ -2,6 +2,14 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 00:00 UTC
+
+### Changed
+- **The clouds share one animation loop**: each cloud ran its own `requestAnimationFrame`, about 40 of them, plus a 3-second timer that started two tweens per cloud part. Now one loop poses every cloud, and the bob and breathing are sines around the rest pose, so clouds no longer drift by an amount that depends on the frame rate and their parts no longer wander apart over time
+- **The home loop steps by the frame's own timestamp, capped at 0.1 s**, so pilots no longer jump after you switch back to the tab, and the smoke trails reuse their vectors instead of allocating per frame
+- **Production no longer runs an empty `requestAnimationFrame` loop**; it only ever ticked the dev FPS panel
+- Together these halve the callbacks per frame on the home scene, 84 to 39; script time and frame rate are unchanged within noise. Numbers and the ideas list are in `docs/HOME_ANIMATION_IDEAS.md`
+
 ## 2026-10-26 23:54 UTC
 
 ### Changed
