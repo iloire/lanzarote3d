@@ -2,6 +2,17 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 10:39 UTC
+
+### Added
+- **Wing models**: `GliderOptions.kind` picks the canopy's shape from `WING_SHAPES` in `Glider.ts`: `standard` (the default), `rush` (Ozone Rush: a touch more chord, deeper arc) and `roller` (Niviuk Roller, a speed wing: about half the area, thin flat section, short lines, a nearly rectangular plan with square tips and an even, almost half-circle arc). A roller flies 1.5× faster in the home scene and Puerto del Carmen (`gliderSpeedFactor`)
+- **Wing designs from the real ones**: `GliderOptions.patches` paints straight bands on the top surface, `undersideColor` the lower surface and `stripeChord` how far back the tip stripes run. `ozoneRush()` and `niviukRoller()` in the home config draw each model's design in any colours
+- Ivan flies a red Rush (navy swoosh, yellow hooks), Jehosua a black Rush with a red swoosh, Magne a lime Rush (deep blue swoosh, steel blue hooks), Miguel the green roller
+- The model viewer (`?story=models`) shows the bare wings: standard, Ozone Rush, roller green and purple
+
+### Changed
+- The canopy profile has 12 points per rib instead of 8, so the bands keep their shape across the chord
+
 ## 2026-10-27 10:09 UTC
 
 ### Added

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { ParagliderVoxel } from '../../foundation/components/vehicles';
+import { ParagliderVoxel, gliderSpeedFactor } from '../../foundation/components/vehicles';
 import { Hangglider } from '../../foundation/components/vehicles';
 import { Cessna } from '../../foundation/components/vehicles';
 import { Hercules } from '../../foundation/components/vehicles';
@@ -45,6 +45,8 @@ export async function loadParagliders(
     configs.map(async (p): Promise<VehicleLoadResult | null> => {
       try {
         const paraglider = new ParagliderVoxel(p.options);
+        // A roller flies faster than a standard wing
+        const speed = PARAGLIDER_SPEED * gliderSpeedFactor(p.options.glider);
         const mesh = await paraglider.load();
         const scale = 0.01;
         mesh.scale.set(scale, scale, scale);
@@ -60,7 +62,7 @@ export async function loadParagliders(
 
         const flyingBehavior = new FlyingBehavior({
           pattern: FlightPattern.WAYPOINT,
-          speed: PARAGLIDER_SPEED,
+          speed,
           turnSpeed: 1.0,
           forwardAxis: '-z',
           debugVectors: DEBUG_VECTORS,
@@ -76,7 +78,7 @@ export async function loadParagliders(
         return {
           mesh: rig,
           flyingBehavior,
-          motion: new ParagliderMotion(rig, body, PARAGLIDER_SPEED, paraglider.getPilotSwing()),
+          motion: new ParagliderMotion(rig, body, speed, paraglider.getPilotSwing()),
         };
       } catch (error) {
         errorHandler(error as Error, 'loading voxel paraglider');

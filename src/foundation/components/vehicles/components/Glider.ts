@@ -10,14 +10,70 @@ import * as THREE from 'three';
  * straight. Cells billow between the ribs, and flat shading picks the ribs out.
  */
 
-const HALF_SPAN = 4300; // flat, along the canopy
-const ROOT_CHORD = 2100;
-const TIP_CHORD = 0.3; // of the root chord
-const THICKNESS = 0.15; // of the chord
-const CAMBER = 0.045;
-const LINE_HEIGHT = 4200; // carabiners to the centre of the lower surface
-const TIP_ARC = 1.15; // radians the canopy has turned down by at the tip
-const ARC_EXPONENT = 1.6; // > 1 keeps the centre flat and curls the tips
+/** The canopy's size and shape; everything else (lines, risers, colours) is shared */
+type WingShape = {
+  halfSpan: number; // flat, along the canopy
+  rootChord: number;
+  tipChord: number; // of the root chord
+  thickness: number; // of the chord
+  camber: number;
+  lineHeight: number; // carabiners to the centre of the lower surface
+  tipArc: number; // radians the canopy has turned down by at the tip
+  arcExponent: number; // > 1 keeps the centre flat and curls the tips
+  /** Trim speed against a standard wing's */
+  speedFactor: number;
+};
+
+/**
+ * A standard wing is big and thick for lift, tapers to its tips and stays flat in the middle. A
+ * roller (speed wing) has about half the area, a thinner, flatter section, shorter lines, a
+ * nearly rectangular plan with square tips, and an arc that bends evenly from centre to tip into
+ * almost a half circle; it flies half as fast again.
+ */
+export const WING_SHAPES = {
+  standard: {
+    halfSpan: 4300,
+    rootChord: 2100,
+    tipChord: 0.3,
+    thickness: 0.15,
+    camber: 0.045,
+    lineHeight: 4200,
+    tipArc: 1.15,
+    arcExponent: 1.6,
+    speedFactor: 1,
+  },
+  /** Ozone Rush: a touch more chord than the standard wing and a deeper arc */
+  rush: {
+    halfSpan: 4300,
+    rootChord: 2300,
+    tipChord: 0.28,
+    thickness: 0.14,
+    camber: 0.045,
+    lineHeight: 4200,
+    tipArc: 1.2,
+    arcExponent: 1.5,
+    speedFactor: 1,
+  },
+  /** Niviuk Roller */
+  roller: {
+    halfSpan: 3300,
+    rootChord: 1500,
+    tipChord: 0.85,
+    thickness: 0.1,
+    camber: 0.03,
+    lineHeight: 3300,
+    tipArc: 1.35,
+    arcExponent: 1,
+    speedFactor: 1.5,
+  },
+} satisfies Record<string, WingShape>;
+
+export type GliderKind = keyof typeof WING_SHAPES;
+
+/** How much faster than a standard wing a glider with these options flies */
+export const gliderSpeedFactor = (options: GliderOptions): number =>
+  WING_SHAPES[options.kind ?? 'standard'].speedFactor;
+
 const CELL_BILLOW = 1.12; // profile scale midway between two ribs
 const TIP_ACCENT = 0.72; // span fraction where wingColor2 takes over on the top surface
 /** Span bands of the stripes near each tip, and how far back from the nose they run */
@@ -25,13 +81,12 @@ const STRIPE_BANDS: [number, number][] = [
   [0.76, 0.81],
   [0.85, 0.88],
 ];
-const STRIPE_CHORD = 0.45;
 const CARABINER_HALF_GAP = 150;
 const RISER_LENGTH = 450;
 const HANDS = new THREE.Vector3(-150, 380, 330); // z mirrored per side
 
 /** Chord positions (0 = leading edge) of the airfoil outline, finer at the nose */
-const PROFILE_X = [0, 0.02, 0.07, 0.15, 0.3, 0.5, 0.75, 1];
+const PROFILE_X = [0, 0.02, 0.07, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.875, 1];
 /** Chord positions of the A, B and C line rows on the lower surface */
 const LINE_ROWS = [0.12, 0.4, 0.72];
 const BRAKE_FROM = 0.35; // span fraction from which the brakes pull the trailing edge
@@ -45,20 +100,57 @@ const DEFAULT_OPTIONS: GliderOptions = {
 };
 
 export type GliderOptions = {
+  /** The wing's shape: standard (the default), a particular model, or roller, the small fast wing */
+  kind?: GliderKind;
   /** Canopy */
   wingColor1?: string;
   /** Top surface of the wingtips */
   wingColor2?: string;
   /** Cell openings along the leading edge */
   inletsColor?: string;
+  /** Lower surface; the canopy colour a shade darker when unset */
+  undersideColor?: string;
   /** Two stripes across the front of each tip, top and bottom; none when unset */
   stripeColor?: string;
+  /** How far back from the nose the stripes run, in chords (default 0.45, 1 for all the way) */
+  stripeChord?: number;
+  /** Coloured panels on the top surface, drawn over the canopy and tip colours */
+  patches?: GliderPatch[];
   lineColor?: string;
   /** Cells per half wing */
   numeroCajones?: number;
 };
 
+/**
+ * A straight band on the top surface, from one (span, chord) point to another: span runs from -1
+ * at the left tip to 1 at the right, chord from 0 at the leading edge to 1 at the trailing edge.
+ * `width` is in span, as is the distance a cell is measured by, with chord counted at half (a
+ * chord is about half the half span), so the band keeps its width whichever way it runs.
+ */
+export type GliderPatch = {
+  color: string;
+  from: [number, number];
+  to: [number, number];
+  width: number;
+};
+
+const CHORD_IN_SPAN = 0.5;
+
+/** Distance from (t, x) to the patch's centre line, in span */
+const patchDistance = (patch: GliderPatch, t: number, x: number): number => {
+  const [ax, ay] = [patch.from[0], patch.from[1] * CHORD_IN_SPAN];
+  const [bx, by] = [patch.to[0], patch.to[1] * CHORD_IN_SPAN];
+  const [px, py] = [t, x * CHORD_IN_SPAN];
+  const lengthSq = (bx - ax) ** 2 + (by - ay) ** 2;
+  const k =
+    lengthSq === 0
+      ? 0
+      : THREE.MathUtils.clamp(((px - ax) * (bx - ax) + (py - ay) * (by - ay)) / lengthSq, 0, 1);
+  return Math.hypot(px - (ax + k * (bx - ax)), py - (ay + k * (by - ay)));
+};
+
 type Rib = {
+  shape: WingShape;
   /** Point on the arc the chord hangs from */
   origin: THREE.Vector3;
   /** Canopy normal at this rib, rolled outwards towards the tips */
@@ -70,48 +162,51 @@ type Rib = {
 };
 
 /** NACA-style cambered section: upper and lower surface heights, in chords, at chord position x */
-const airfoil = (x: number): { upper: number; lower: number } => {
+const airfoil = (shape: WingShape, x: number): { upper: number; lower: number } => {
   const thickness =
     5 *
-    THICKNESS *
+    shape.thickness *
     (0.2969 * Math.sqrt(x) - 0.126 * x - 0.3516 * x ** 2 + 0.2843 * x ** 3 - 0.1036 * x ** 4);
   const p = 0.4;
   const camber =
     x < p
-      ? (CAMBER / p ** 2) * (2 * p * x - x ** 2)
-      : (CAMBER / (1 - p) ** 2) * (1 - 2 * p + 2 * p * x - x ** 2);
+      ? (shape.camber / p ** 2) * (2 * p * x - x ** 2)
+      : (shape.camber / (1 - p) ** 2) * (1 - 2 * p + 2 * p * x - x ** 2);
   return { upper: camber + thickness, lower: camber - thickness };
 };
 
-const chordAt = (t: number) => ROOT_CHORD * (TIP_CHORD + (1 - TIP_CHORD) * Math.sqrt(1 - t * t));
-const arcAngleAt = (t: number) => Math.sign(t) * TIP_ARC * Math.abs(t) ** ARC_EXPONENT;
+const chordAt = (shape: WingShape, t: number) =>
+  shape.rootChord * (shape.tipChord + (1 - shape.tipChord) * Math.sqrt(1 - t * t));
+const arcAngleAt = (shape: WingShape, t: number) =>
+  Math.sign(t) * shape.tipArc * Math.abs(t) ** shape.arcExponent;
 
 /**
  * Ribs from the left tip to the right one, two stations per cell (rib, then mid-cell). The arc is
  * walked step by step so that its length stays the flat span however tightly it curls.
  */
-const createRibs = (cellsPerHalf: number): Rib[] => {
+const createRibs = (shape: WingShape, cellsPerHalf: number): Rib[] => {
   const stations = cellsPerHalf * 2;
-  const step = HALF_SPAN / stations;
+  const step = shape.halfSpan / stations;
   const half: { y: number; z: number }[] = [{ y: 0, z: 0 }];
   for (let i = 1; i <= stations; i++) {
-    const angle = arcAngleAt((i - 0.5) / stations);
+    const angle = arcAngleAt(shape, (i - 0.5) / stations);
     const prev = half[i - 1]!;
     half.push({ y: prev.y - Math.sin(angle) * step, z: prev.z + Math.cos(angle) * step });
   }
 
-  const rootLeadingEdge = ROOT_CHORD * 0.38;
+  const rootLeadingEdge = shape.rootChord * 0.38;
   const ribs: Rib[] = [];
   for (let i = -stations; i <= stations; i++) {
     const t = i / stations;
     const { y, z } = half[Math.abs(i)]!;
-    const angle = arcAngleAt(t);
-    const chord = chordAt(t);
+    const angle = arcAngleAt(shape, t);
+    const chord = chordAt(shape, t);
     ribs.push({
-      origin: new THREE.Vector3(0, LINE_HEIGHT + y, Math.sign(i) * z),
+      shape,
+      origin: new THREE.Vector3(0, shape.lineHeight + y, Math.sign(i) * z),
       up: new THREE.Vector3(0, Math.cos(angle), Math.sin(angle)),
       chord,
-      leadingEdgeX: rootLeadingEdge - 0.65 * (ROOT_CHORD - chord),
+      leadingEdgeX: rootLeadingEdge - 0.65 * (shape.rootChord - chord),
       t,
     });
   }
@@ -126,17 +221,28 @@ const ribPoint = (rib: Rib, x: number, h: number, billow = 1): THREE.Vector3 =>
 
 /** Outline of a rib: top surface from trailing edge to nose, then bottom surface back */
 const ribOutline = (rib: Rib, billow: number): THREE.Vector3[] => {
-  const top = [...PROFILE_X].reverse().map(x => ribPoint(rib, x, airfoil(x).upper, billow));
-  const bottom = PROFILE_X.slice(1, -1).map(x => ribPoint(rib, x, airfoil(x).lower, billow));
+  const top = [...PROFILE_X]
+    .reverse()
+    .map(x => ribPoint(rib, x, airfoil(rib.shape, x).upper, billow));
+  const bottom = PROFILE_X.slice(1, -1).map(x =>
+    ribPoint(rib, x, airfoil(rib.shape, x).lower, billow)
+  );
   return [...top, ...bottom];
 };
 
 const createCanopy = (ribs: Rib[], options: GliderOptions): THREE.Mesh => {
   const top = new THREE.Color(options.wingColor1);
   const tips = new THREE.Color(options.wingColor2);
-  const bottom = top.clone().lerp(new THREE.Color('#000000'), 0.25);
+  const bottom = options.undersideColor
+    ? new THREE.Color(options.undersideColor)
+    : top.clone().lerp(new THREE.Color('#000000'), 0.25);
   const inlets = new THREE.Color(options.inletsColor);
   const stripe = options.stripeColor ? new THREE.Color(options.stripeColor) : null;
+  const stripeChord = options.stripeChord ?? 0.45;
+  const patches = (options.patches ?? []).map(patch => ({
+    patch,
+    color: new THREE.Color(patch.color),
+  }));
 
   const outlines = ribs.map((rib, i) => ribOutline(rib, i % 2 === 0 ? 1 : CELL_BILLOW));
   const pointsPerRib = outlines[0]!.length;
@@ -157,7 +263,8 @@ const createCanopy = (ribs: Rib[], options: GliderOptions): THREE.Mesh => {
   };
 
   for (let r = 0; r < ribs.length - 1; r++) {
-    const t = Math.abs((ribs[r]!.t + ribs[r + 1]!.t) / 2);
+    const signedT = (ribs[r]!.t + ribs[r + 1]!.t) / 2;
+    const t = Math.abs(signedT);
     const a = outlines[r]!;
     const b = outlines[r + 1]!;
     for (let p = 0; p < pointsPerRib; p++) {
@@ -165,19 +272,25 @@ const createCanopy = (ribs: Rib[], options: GliderOptions): THREE.Mesh => {
       const onTop = p < topPoints - 1;
       // The segment just under the nose is where the cells breathe
       const isInlet = p === topPoints - 1 && t < 0.9;
+      const x = (outlineX[p]! + outlineX[q]!) / 2;
       const isStripe =
         stripe !== null &&
-        (outlineX[p]! + outlineX[q]!) / 2 < STRIPE_CHORD &&
+        x < stripeChord &&
         STRIPE_BANDS.some(([from, to]) => t >= from && t <= to);
+      const patch = onTop
+        ? patches.find(({ patch }) => patchDistance(patch, signedT, x) <= patch.width / 2)
+        : undefined;
       const color = isInlet
         ? inlets
         : isStripe
           ? stripe
-          : onTop
-            ? t > TIP_ACCENT
-              ? tips
-              : top
-            : bottom;
+          : patch
+            ? patch.color
+            : onTop
+              ? t > TIP_ACCENT
+                ? tips
+                : top
+              : bottom;
       pushTriangle(a[p]!, b[p]!, b[q]!, color);
       pushTriangle(a[p]!, b[q]!, a[q]!, color);
     }
@@ -236,7 +349,7 @@ const createLines = (
     LINE_ROWS.forEach(x => {
       groups.forEach(group => {
         if (group.length === 0) return;
-        const attachments = group.map(rib => ribPoint(rib, x, airfoil(x).lower));
+        const attachments = group.map(rib => ribPoint(rib, x, airfoil(rib.shape, x).lower));
         const mean = attachments
           .reduce((sum, p) => sum.add(p), new THREE.Vector3())
           .divideScalar(attachments.length);
@@ -248,7 +361,7 @@ const createLines = (
 
     const hand = HANDS.clone().setZ(side * HANDS.z);
     const brakeRibs = halfRibs.filter(rib => Math.abs(rib.t) >= BRAKE_FROM);
-    const trailingEdges = brakeRibs.map(rib => ribPoint(rib, 1, airfoil(1).lower));
+    const trailingEdges = brakeRibs.map(rib => ribPoint(rib, 1, airfoil(rib.shape, 1).lower));
     const mean = trailingEdges
       .reduce((sum, p) => sum.add(p), new THREE.Vector3())
       .divideScalar(Math.max(1, trailingEdges.length));
@@ -293,7 +406,7 @@ class Glider {
 
   async load(): Promise<THREE.Group> {
     const cells = this.options.numeroCajones ?? 40;
-    const ribs = createRibs(cells);
+    const ribs = createRibs(WING_SHAPES[this.options.kind ?? 'standard'], cells);
     const wing = new THREE.Group();
     wing.name = 'glider';
     wing.add(createCanopy(ribs, this.options));

@@ -4,6 +4,7 @@ import {
   Hangglider,
   Cessna,
   Hercules,
+  Glider,
 } from '../../foundation/components/vehicles';
 import {
   House,
@@ -30,7 +31,14 @@ import {
 import { Cloud } from '../../foundation/components/environment';
 import { Gulls } from '../../foundation/components/wildlife/Gulls';
 import { LevelOfDetail } from '../../foundation/types/lod';
-import { paraglidersVoxel, cessnaConfig, herculesConfig } from '../home/config';
+import {
+  paraglidersVoxel,
+  cessnaConfig,
+  herculesConfig,
+  GREEN_ROLLER,
+  PURPLE_ROLLER,
+  IVAN_RUSH,
+} from '../home/config';
 import { HARBOUR_FEATURES } from '../puerto-del-carmen/harbour';
 
 /** Anything the viewer can show: every scene component, and Cloud, load like this */
@@ -79,6 +87,35 @@ const STILL = { enableMovement: false, autoStartFloating: false };
 
 export const MODEL_CATALOG: ModelEntry[] = [
   ...pilots,
+  // The bare wing models: the standard one, the Ozone Rush and the smaller, flatter roller
+  {
+    id: 'wing-standard',
+    name: 'Wing (standard)',
+    group: 'Aerial',
+    scale: 0.01,
+    create: () => new Glider({}),
+  },
+  {
+    id: 'wing-rush',
+    name: 'Wing (Ozone Rush)',
+    group: 'Aerial',
+    scale: 0.01,
+    create: () => new Glider(IVAN_RUSH),
+  },
+  {
+    id: 'wing-roller',
+    name: 'Wing (roller)',
+    group: 'Aerial',
+    scale: 0.01,
+    create: () => new Glider(GREEN_ROLLER),
+  },
+  {
+    id: 'wing-roller-purple',
+    name: 'Wing (roller, purple)',
+    group: 'Aerial',
+    scale: 0.01,
+    create: () => new Glider(PURPLE_ROLLER),
+  },
   { id: 'hangglider', name: 'Hangglider', group: 'Aerial', create: () => new Hangglider() },
   { id: 'cessna', name: 'Cessna', group: 'Aerial', create: () => new Cessna(cessnaConfig) },
   { id: 'hercules', name: 'Hercules', group: 'Aerial', create: () => new Hercules(herculesConfig) },
