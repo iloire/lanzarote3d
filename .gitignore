@@ -8,3 +8,4 @@ built/*
 TODO.md
 .next
 .claude/settings.local.json
+coverage/
