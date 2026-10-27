@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 11:49 UTC
+
+### Changed
+- **Favicon**: a drawn SVG mark (an orange paraglider wing and pilot over a dark volcano on a sky-blue tile) replaces the 🪂 emoji, which rendered differently on every OS and was hard to read at 16 px
+
 ## 2026-10-27 11:42 UTC
 
 ### Added
