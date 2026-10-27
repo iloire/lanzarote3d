@@ -71,6 +71,16 @@ export const TOWN_SOO = town(29.09932, -13.62235);
 export const TOWN_CALETA_DE_SEBO = town(29.2311, -13.5035); // La Graciosa, where the ferry docks
 export const TOWN_PEDRO_BARBA = town(29.2437, -13.4747); // La Graciosa's east-end hamlet
 
+/**
+ * Boat clusters in El Río as [x, z, count], in world units read off the model's coast: each
+ * centre is 550+ units from land, so boats placed and circling within ~400 of it stay afloat.
+ */
+const EL_RIO_BOATS: [number, number, number][] = [
+  [12000, -12950, 4],
+  [12800, -13300, 4],
+  [13200, -13650, 3],
+];
+
 /** Urbanización Famara: whitewashed round bungalows, woodwork in blue or Canarian green */
 const FAMARA_BUNGALOWS: HouseStyle = {
   types: { RoundBungalow: 1 },
@@ -200,6 +210,17 @@ class Environment {
       3,
       'random'
     );
+
+    // El Río, the strait between Lanzarote and La Graciosa, busier than the open coast: off
+    // Caleta de Sebo, mid-channel, and towards Punta Fariones, each clear of both shores
+    for (const [x, z, count] of EL_RIO_BOATS) {
+      await this.boatGroupCreator.createRecreationalBoats(
+        water,
+        new THREE.Vector3(x, 0, z),
+        count,
+        'random'
+      );
+    }
 
     // Fix movement origins for all boats after positioning
     this.updateAllBoatMovementOrigins();

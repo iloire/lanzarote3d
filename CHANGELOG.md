@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 22:12 UTC
+
+### Added
+- **Boats in El Río**: eleven more boats in three clusters in the strait between Lanzarote and La Graciosa (off Caleta de Sebo, mid-channel and towards Punta Fariones), more than off Famara as in reality; each centre is read off the model's coast at least 550 units from either shore, so boats wandering within ~400 of it stay on water
+
 ## 2026-10-27 22:05 UTC
 
 ### Changed
