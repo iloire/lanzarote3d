@@ -2,6 +2,12 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 10:54 UTC
+
+### Changed
+- **The roller is plainly the smaller wing**: 0.65 of the Rush's area, as a 16 m² roller is against the 24-26 m² wings flown here, on shorter lines and with fewer cells of the same width
+- The model viewer has **Wings side by side**: the standard wing, the Rush and the roller in a row at the same scale
+
 ## 2026-10-27 10:53 UTC
 
 ### Changed

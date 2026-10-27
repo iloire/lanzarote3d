@@ -54,16 +54,17 @@ export const WING_SHAPES = {
     speedFactor: 1,
   },
   /**
-   * Niviuk Roller: Niviuk's flat aspect ratio of 4.3, three quarters of the Rush's area (a 16
-   * against a 21), and a shallow arc: the real 16 spans 8.3 m flat and 7.2 m projected
+   * Niviuk Roller: Niviuk's flat aspect ratio of 4.3 and a shallow arc (the real 16 spans 8.3 m
+   * flat and 7.2 m projected), with 0.65 of the Rush's area: rollers flown here are about 16 m²
+   * against 24 to 26 for the other wings
    */
   roller: {
-    halfSpan: 3700,
-    rootChord: 1900,
+    halfSpan: 3400,
+    rootChord: 1740,
     tipChord: 0.55,
     thickness: 0.09,
     camber: 0.03,
-    lineHeight: 3300,
+    lineHeight: 3000,
     tipArc: 0.95,
     arcExponent: 1.4,
     speedFactor: 1.5,

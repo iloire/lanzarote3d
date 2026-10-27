@@ -64,6 +64,21 @@ const pilots: ModelEntry[] = paraglidersVoxel.map(p => ({
   create: () => new ParagliderVoxel(p.options),
 }));
 
+/** The standard wing, the Rush and the roller in a row at the same scale, to compare their size */
+const wingsSideBySide = (): Loadable => ({
+  load: async () => {
+    const row = new THREE.Group();
+    const wings = await Promise.all(
+      [{}, IVAN_RUSH, GREEN_ROLLER].map(options => new Glider(options).load())
+    );
+    wings.forEach((wing, i) => {
+      wing.position.z = (i - 1) * 10000;
+      row.add(wing);
+    });
+    return row;
+  },
+});
+
 /** A small flock on tighter circles than the scenes', so the birds stay in frame; they fly in the shader */
 const gullFlock = (): Loadable => {
   const gulls = new Gulls([{ center: new THREE.Vector3(), count: 8 }], {
@@ -115,6 +130,13 @@ export const MODEL_CATALOG: ModelEntry[] = [
     group: 'Aerial',
     scale: 0.01,
     create: () => new Glider(PURPLE_ROLLER),
+  },
+  {
+    id: 'wings-side-by-side',
+    name: 'Wings side by side',
+    group: 'Aerial',
+    scale: 0.01,
+    create: wingsSideBySide,
   },
   { id: 'hangglider', name: 'Hangglider', group: 'Aerial', create: () => new Hangglider() },
   { id: 'cessna', name: 'Cessna', group: 'Aerial', create: () => new Cessna(cessnaConfig) },
