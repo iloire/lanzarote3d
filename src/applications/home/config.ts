@@ -189,7 +189,8 @@ const niviukRoller = (colors: { base: string; accent: string; tip: string }): Gl
     { color: colors.accent, from: [-0.12, 0.05], to: [0.3, 0.6], width: 0.08 },
     { color: colors.accent, from: [0.3, 0.62], to: [1.1, 0.62], width: 0.05 },
   ],
-  numeroCajones: 30,
+  // Cells as wide as the Rush's, so the smaller wing has fewer of them
+  numeroCajones: 26,
 });
 
 /** A common roller: teal, yellow accents, black tip */
@@ -197,6 +198,29 @@ export const GREEN_ROLLER = niviukRoller({ base: '#17806f', accent: '#f0b830', t
 
 /** The same roller in purple */
 export const PURPLE_ROLLER = niviukRoller({ base: '#b45be0', accent: '#f0c020', tip: '#1c1c1c' });
+
+/**
+ * The Niviuk Ikuma's design, the same on both halves: the front of each tip in the tip colour,
+ * edged by a thin white line running back to the trailing edge, a white flash swept back from
+ * the nose further in, and a pale underside.
+ */
+const niviukIkuma = (colors: { base: string; tip: string; inlets: string }): GliderOptions => ({
+  wingColor1: colors.base,
+  wingColor2: colors.base,
+  undersideColor: '#e6e6e6',
+  inletsColor: colors.inlets,
+  patches: (
+    [
+      { color: colors.tip, from: [0.96, 0], to: [0.96, 0.45], width: 0.22 },
+      { color: '#f4f4f4', from: [0.82, 0], to: [0.88, 1], width: 0.025 },
+      { color: '#f4f4f4', from: [0.55, 0.05], to: [0.74, 0.35], width: 0.07 },
+    ] satisfies GliderPatch[]
+  ).flatMap(mirrored),
+  numeroCajones: 27,
+});
+
+/** Fabio's: pink with black tips */
+export const FABIO_IKUMA = niviukIkuma({ base: '#9c1a58', tip: '#161616', inlets: '#6a1040' });
 
 /** The first pilot leads: the camera flies in to it and follows it round the loop */
 export const paraglidersVoxel: ParagliderVoxelConfig[] = [
@@ -257,13 +281,7 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
   },
   {
     options: {
-      // Red and black, like his clothes
-      glider: {
-        wingColor1: '#c8102e',
-        wingColor2: '#141414',
-        inletsColor: '#141414',
-        numeroCajones: 35,
-      },
+      glider: FABIO_IKUMA,
       pilot: { characterType: CharacterType.FABIO },
     },
     startProgress: 0.5,

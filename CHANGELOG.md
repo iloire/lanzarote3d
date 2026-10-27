@@ -5,7 +5,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ## 2026-10-27 10:50 UTC
 
 ### Added
-- **Five more pilots on the Famara ridge**, from `3d-characters`, so ten fly the home scene: David on a blue Ozone Rush with a white swoosh, Luc on the green roller like Miguel's, Fabio on a red wing with black tips, Bernt on the same lime Rush as Magne's (on the shared loop, below Magne) and Franz on a sky-blue wing with pink tips. Each starts at its own point on the loop with its own offset, all below Magne's loop
+- **Five more pilots on the Famara ridge**, from `3d-characters`, so ten fly the home scene: David on a blue Ozone Rush with a white swoosh, Luc on the green roller like Miguel's, Fabio on a pink Niviuk Ikuma (black tips edged by a thin white line, a white flash further in, a pale underside), Bernt on the same lime Rush as Magne's (on the shared loop, below Magne) and Franz on a sky-blue wing with pink tips. Each starts at its own point on the loop with its own offset, all below Magne's loop
 
 ### Changed
 - **Ivan, Magne and Roos re-exported** from `3d-characters`: Ivan's gunmetal helmet with red panels, camera mount and devil horns, and Magne and Roos in the Charly No Limit full-face helmet
