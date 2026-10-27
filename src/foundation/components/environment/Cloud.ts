@@ -53,8 +53,8 @@ export type CloudPlacement = { offset?: THREE.Vector3; yaw?: number };
 
 /**
  * One low-poly cumulus as a single non-indexed geometry, its base flat at y = 0. Every
- * vertex carries its lobe (aLobe) and the cloud's phase and its height up the cloud
- * (aCloud), which cloudMaterial uses to animate and shade it.
+ * vertex carries its lobe (aLobe) and the cloud's phase, its height up the cloud and how
+ * dark the cloud's base is (aCloud), which cloudMaterial uses to animate and shade it.
  */
 export const buildCloudGeometry = (
   kind: CloudKind,
@@ -62,6 +62,7 @@ export const buildCloudGeometry = (
 ): THREE.BufferGeometry => {
   const turn = new THREE.Matrix4().makeRotationY(yaw).setPosition(offset);
   const phase = Math.random() * 100;
+  const dark = Math.random();
   const positions: number[] = [];
   const lobeAttr: number[] = [];
   const v = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
@@ -103,12 +104,12 @@ export const buildCloudGeometry = (
   let top = 0;
   for (let i = 1; i < positions.length; i += 3) top = Math.max(top, positions[i]!);
   const cloudAttr: number[] = [];
-  for (let i = 1; i < positions.length; i += 3) cloudAttr.push(phase, positions[i]! / top);
+  for (let i = 1; i < positions.length; i += 3) cloudAttr.push(phase, positions[i]! / top, dark);
 
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   geometry.setAttribute('aLobe', new THREE.Float32BufferAttribute(lobeAttr, 4));
-  geometry.setAttribute('aCloud', new THREE.Float32BufferAttribute(cloudAttr, 2));
+  geometry.setAttribute('aCloud', new THREE.Float32BufferAttribute(cloudAttr, 3));
   // Non-indexed, so every face gets its own flat normal: the facets of the low-poly look
   geometry.computeVertexNormals();
   return geometry;

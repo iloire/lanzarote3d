@@ -114,12 +114,14 @@ The clouds aren't lit by the scene's lights. They all share one `ShaderMaterial`
 them itself:
 
 - `light` on faces turned to the sun, `shade` on faces turned away;
-- `base` on the flat underside and the lowest third;
+- `base` on the flat underside and the lower part of the sides. Each cloud draws a random
+  darkness: the darkest are about twice as dark as the lightest underneath, and their grey
+  climbs further up the sides (a third to over half the cloud);
 - a `rim` silver lining when the camera looks towards the sun;
 - `setCloudSun` (called from `refreshSky`) warms everything as the sun nears the horizon;
 - the scene's fog, so distant clouds fade into the horizon haze.
 
-Each vertex carries its lobe's centre and phase and its cloud's phase. The vertex shader
+Each vertex carries its lobe's centre and phase and its cloud's phase and darkness. The vertex shader
 uses these to make the lobes breathe (±5 %) and each cloud bob (±40 units), so no CPU work
 runs per frame. The Models viewer shows a single `cloud` and `cloud-tower`.
 

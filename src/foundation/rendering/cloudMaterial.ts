@@ -6,7 +6,7 @@ import { CloudTheme } from '../types/Theme';
 export const DEFAULT_CLOUDS: Required<CloudTheme> = {
   light: '#ffffff',
   shade: '#b4c0d4',
-  base: '#636f86', // dark, like the base of a cumulus over a good thermal
+  base: '#556079', // dark, like the base of a cumulus over a good thermal; each cloud varies it
   rim: '#fff3dc',
   brightness: 1.35,
 };
@@ -27,7 +27,8 @@ const uniforms = {
 /**
  * One material for every cloud. It is unlit by the scene's lights and shades the faceted
  * lobes itself: white where a face turns to the sun, blue-grey where it turns away, the
- * flat underside darker still, and a silver edge when the camera looks towards the sun.
+ * flat underside darker still (how dark varies from cloud to cloud), and a silver edge
+ * when the camera looks towards the sun.
  * The lobes breathe and the cloud bobs in the vertex shader, so clouds cost no CPU per frame.
  */
 export const cloudMaterial = new THREE.ShaderMaterial({
@@ -37,11 +38,12 @@ export const cloudMaterial = new THREE.ShaderMaterial({
     uniform float uTime;
     // xyz: centre of the lobe the vertex belongs to, w: its phase
     attribute vec4 aLobe;
-    // x: phase of the whole cloud, y: height above the cloud base, 0-1
-    attribute vec2 aCloud;
+    // x: phase of the whole cloud, y: height above the cloud base, 0-1, z: how dark its base is, 0-1
+    attribute vec3 aCloud;
     varying vec3 vNormal;
     varying vec3 vWorldPosition;
     varying float vHeight;
+    varying float vDark;
     #include <common>
     #include <fog_pars_vertex>
     void main() {
@@ -52,6 +54,7 @@ export const cloudMaterial = new THREE.ShaderMaterial({
       vWorldPosition = worldPosition.xyz;
       vNormal = normalize(mat3(modelMatrix) * normal);
       vHeight = aCloud.y;
+      vDark = aCloud.z;
       vec4 mvPosition = viewMatrix * worldPosition;
       gl_Position = projectionMatrix * mvPosition;
       #include <fog_vertex>
@@ -67,6 +70,7 @@ export const cloudMaterial = new THREE.ShaderMaterial({
     varying vec3 vNormal;
     varying vec3 vWorldPosition;
     varying float vHeight;
+    varying float vDark;
     #include <common>
     #include <fog_pars_fragment>
     void main() {
@@ -74,8 +78,9 @@ export const cloudMaterial = new THREE.ShaderMaterial({
       vec3 v = normalize(cameraPosition - vWorldPosition);
       float lit = smoothstep(-0.35, 0.9, dot(n, uSunDirection));
       vec3 color = mix(uShade, uLight * uSunTint, lit);
-      float under = max(1.0 - smoothstep(0.0, 0.35, vHeight), smoothstep(-0.2, -0.9, n.y));
-      color = mix(color, uBase, under * 0.85);
+      // Darker clouds are darker underneath and their grey climbs further up the sides
+      float under = max(1.0 - smoothstep(0.0, mix(0.35, 0.6, vDark), vHeight), smoothstep(-0.2, -0.9, n.y));
+      color = mix(color, uBase * mix(1.3, 0.6, vDark), under * 0.92);
       float rim = pow(1.0 - max(dot(n, v), 0.0), 3.0)
         * (0.25 + 0.75 * max(dot(-v, uSunDirection), 0.0));
       color += uRim * uSunTint * rim;
