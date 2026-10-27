@@ -2,6 +2,12 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 10:59 UTC
+
+### Changed
+- **David flies an Ozone Delta 4**: blue at the front and red behind, split by a yellow line along the span that steps forward round a red bump in the middle, over a red underside (`DAVID_DELTA`)
+- **Franz flies an Ozone Buzz Z6**: lime across the middle, then out towards each tip a thin white line, a grey band and blue tips, nose to tail, over a white underside (`FRANZ_BUZZ`)
+
 ## 2026-10-27 10:58 UTC
 
 ### Changed

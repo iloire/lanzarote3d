@@ -165,13 +165,49 @@ export const MAGNE_RUSH = ozoneRush({
   inlets: '#8a9a1c',
 });
 
-/** David's, to go with his OZONE helmet: blue, white swoosh, navy accents */
-export const DAVID_RUSH = ozoneRush({
-  base: '#1d4fa8',
-  swoosh: '#f4f4f4',
-  accent: '#0c1f44',
-  inlets: '#123a7a',
-});
+/**
+ * David's Ozone Delta 4: blue at the front, red behind, split by a thin yellow line along the
+ * span that steps forward round a red bump in the middle of the wing.
+ */
+const DELTA_YELLOW = '#f2cc2a';
+const DELTA_RED = '#d6322a';
+export const DAVID_DELTA: GliderOptions = {
+  wingColor1: '#3f6ea8',
+  wingColor2: '#3f6ea8',
+  undersideColor: '#b02a22',
+  inletsColor: '#2a4a78',
+  patches: [
+    // The bump: yellow sides slanting out from its front edge, red filled in row by row
+    { color: DELTA_YELLOW, from: [0.1, 0.2], to: [0.18, 0.5], width: 0.03 },
+    { color: DELTA_YELLOW, from: [-0.1, 0.2], to: [-0.18, 0.5], width: 0.03 },
+    { color: DELTA_YELLOW, from: [-0.1, 0.2], to: [0.1, 0.2], width: 0.03 },
+    { color: DELTA_RED, from: [-0.12, 0.3], to: [0.12, 0.3], width: 0.02 },
+    { color: DELTA_RED, from: [-0.14, 0.4], to: [0.14, 0.4], width: 0.02 },
+    { color: DELTA_RED, from: [-0.17, 0.5], to: [0.17, 0.5], width: 0.02 },
+    { color: DELTA_YELLOW, from: [-1.1, 0.5], to: [1.1, 0.5], width: 0.03 },
+    { color: DELTA_RED, from: [-1.1, 0.775], to: [1.1, 0.775], width: 0.2 },
+  ],
+  numeroCajones: 32,
+};
+
+/**
+ * Franz's Ozone Buzz Z6: lime across the middle, then out towards each tip a thin white line,
+ * a grey band and blue tips, all the way from nose to tail, over a white underside.
+ */
+export const FRANZ_BUZZ: GliderOptions = {
+  wingColor1: '#9ccf28',
+  wingColor2: '#2f7fd6',
+  undersideColor: '#e8ecef',
+  inletsColor: '#86ac22',
+  patches: (
+    [
+      { color: '#f4f6f6', from: [0.5, -0.1], to: [0.5, 1.1], width: 0.035 },
+      { color: '#727e7a', from: [0.58, -0.1], to: [0.58, 1.1], width: 0.12 },
+      { color: '#2f7fd6', from: [0.85, -0.1], to: [0.85, 1.1], width: 0.42 },
+    ] satisfies GliderPatch[]
+  ).flatMap(mirrored),
+  numeroCajones: 27,
+};
 
 /**
  * The Niviuk Roller's design, on the top surface: the front half of the right tip in the tip
@@ -264,7 +300,7 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
   },
   {
     options: {
-      glider: DAVID_RUSH,
+      glider: DAVID_DELTA,
       pilot: { characterType: CharacterType.DAVID },
     },
     startProgress: 0.12,
@@ -298,13 +334,7 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
   },
   {
     options: {
-      // Sky blue with pink tips, like his helmet and its clown sticker
-      glider: {
-        wingColor1: '#5ab4e6',
-        wingColor2: '#f06aa8',
-        inletsColor: 'white',
-        numeroCajones: 35,
-      },
+      glider: FRANZ_BUZZ,
       pilot: { characterType: CharacterType.FRANZ },
     },
     startProgress: 0.9,
