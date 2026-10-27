@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 00:13 UTC
+
+### Changed
+- **Paraglider pilots swing under their wings**: wing and pilot used to bank as one rigid piece. Now the pilot hangs from the carabiners on a spring-damped pendulum: the wing rolls into a turn first, the pilot trails, swings out past it by about 10°, and settles in line with the banked wing within a few seconds; rolling out swings the pilot the other way. Speeding up along the path swings the pilot back and slowing down swings it forward. `ParagliderVoxel` exposes the pivot (`getPilotSwing()`), and `ParagliderMotion` drives it with two extra rotations per pilot. The hang glider is unchanged
+
 ## 2026-10-27 00:00 UTC
 
 ### Changed

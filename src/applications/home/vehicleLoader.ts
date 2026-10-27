@@ -36,12 +36,13 @@ export async function loadParagliders(
   const loaded = await Promise.all(
     configs.map(async (p): Promise<VehicleLoadResult | null> => {
       try {
-        const mesh = await new ParagliderVoxel(p.options).load();
+        const paraglider = new ParagliderVoxel(p.options);
+        const mesh = await paraglider.load();
         const scale = 0.01;
         mesh.scale.set(scale, scale, scale);
 
         // FlyingBehavior owns the rig's rotation, so the paraglider keeps its own inside it,
-        // and ParagliderMotion banks and sways the body between the two.
+        // and ParagliderMotion banks and sways the body between the two and swings the pilot.
         const rig = new THREE.Group();
         rig.name = `paraglider-${p.options.pilot.characterType}`;
         const body = new THREE.Group();
@@ -67,7 +68,7 @@ export async function loadParagliders(
         return {
           mesh: rig,
           flyingBehavior,
-          motion: new ParagliderMotion(rig, body, PARAGLIDER_SPEED),
+          motion: new ParagliderMotion(rig, body, PARAGLIDER_SPEED, paraglider.getPilotSwing()),
         };
       } catch (error) {
         errorHandler(error as Error, 'loading voxel paraglider');

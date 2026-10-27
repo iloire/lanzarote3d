@@ -8,10 +8,15 @@ Top picks: **1** (pendulum pilot), **5** (spring camera with roll) and **7** (cl
 
 ## Make the flying feel alive
 
-1. **Let the pilot swing under the wing.** `ParagliderMotion` banks wing and pilot as one rigid
+1. ~~**Let the pilot swing under the wing.** `ParagliderMotion` banks wing and pilot as one rigid
    piece. Split them and hang the pilot from a spring-damped pendulum below the canopy: the wing
    rolls in first, the pilot swings out, overshoots and settles; speeding up or slowing down
-   pitches them fore and aft. Two extra rotations per pilot.
+   pitches them fore and aft. Two extra rotations per pilot.~~ ✅ The pilot hangs from a pivot at
+   the carabiners (`ParagliderVoxel.getPilotSwing()`), the real hinge between wing and harness,
+   so the risers stay attached. A roll pendulum (about a 3 s period, damping ratio 0.22) lags the
+   bank by up to 10° and swings out about as far past it before settling. A pitch pendulum is
+   driven by the speed measured along the path, which varies because the curve isn't
+   arc-length parameterised. Covered by `tests/elements/paragliderMotion.test.ts`.
 2. **Make the canopy breathe.** A small vertex-shader offset along the span
    (`sin(time + aSpan * k)`) so the cells billow and the tips flex. GPU only, no CPU cost; the
    gulls already do the same with `aWing`.

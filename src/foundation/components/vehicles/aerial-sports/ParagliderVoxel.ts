@@ -22,6 +22,7 @@ export class ParagliderVoxel extends SimpleThreeComponent {
   private glider?: Glider;
   private pilot?: PilotVoxel;
   private pilotMesh?: THREE.Object3D;
+  private pilotSwing?: THREE.Object3D;
 
   constructor(options: ParagliderVoxelOptions) {
     const metadata: ComponentMetadata = {
@@ -66,6 +67,19 @@ export class ParagliderVoxel extends SimpleThreeComponent {
     this.pilotMesh.rotation.y = Math.PI / 2; // Rotate pilot 90 degrees left
     group.add(this.pilotMesh);
 
+    // The pilot hangs from a pivot at the carabiners, the wing's origin, where wing and harness
+    // really are hinged, so the risers stay attached however the pilot swings. The pivot's
+    // frame is turned back to the paraglider's outer one: X right, Y up, -Z forward.
+    const hangPoint = new THREE.Object3D();
+    hangPoint.position.copy(wing.position);
+    hangPoint.rotation.y = -Math.PI / 2;
+    group.add(hangPoint);
+    this.pilotSwing = new THREE.Object3D();
+    this.pilotSwing.name = 'pilot-swing';
+    hangPoint.add(this.pilotSwing);
+    group.updateMatrixWorld(true);
+    this.pilotSwing.attach(this.pilotMesh);
+
     // Rotate entire group 90 degrees left to align with forward axis
     group.rotation.y = Math.PI / 2;
 
@@ -100,9 +114,15 @@ export class ParagliderVoxel extends SimpleThreeComponent {
 
     // Clear references
     this.pilotMesh = undefined;
+    this.pilotSwing = undefined;
 
     // Call parent dispose
     super.dispose();
+  }
+
+  /** The pivot the pilot hangs from, at the carabiners; rotate it to swing the pilot */
+  public getPilotSwing(): THREE.Object3D | undefined {
+    return this.pilotSwing;
   }
 
   public getInfo(): Record<string, unknown> {
