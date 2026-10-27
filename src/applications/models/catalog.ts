@@ -23,7 +23,6 @@ import {
   Tree,
   Stone,
   BarrelCactus,
-  SaguaroCactus,
   PricklyPearCactus,
   OrganPipeCactus,
   Pool,
@@ -270,12 +269,6 @@ export const MODEL_CATALOG: ModelEntry[] = [
     name: 'Barrel cactus',
     group: 'Nature',
     create: () => new BarrelCactus(lod),
-  },
-  {
-    id: 'saguaro-cactus',
-    name: 'Saguaro cactus',
-    group: 'Nature',
-    create: () => new SaguaroCactus(lod),
   },
   {
     id: 'prickly-pear-cactus',

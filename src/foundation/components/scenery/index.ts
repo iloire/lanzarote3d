@@ -11,7 +11,6 @@ export { default as Tree } from './trees/Tree';
 export * from './trees';
 
 // Cactus Components (organized in cactus subfolder)
-export { default as SaguaroCactus } from './cactus/SaguaroCactus';
 export { default as BarrelCactus } from './cactus/BarrelCactus';
 export { default as PricklyPearCactus } from './cactus/PricklyPearCactus';
 export { default as OrganPipeCactus } from './cactus/OrganPipeCactus';

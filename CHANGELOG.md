@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 21:25 UTC
+
+### Removed
+- **Saguaro cactus**: an Arizona cactus that never grew on Lanzarote and was only on the models page
+
 ## 2026-10-27 21:20 UTC
 
 ### Removed

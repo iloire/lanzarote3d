@@ -254,7 +254,6 @@ class TownWorkshop extends WorkshopDemoBase {
           // Cactus patterns
           else if (
             allNames.includes('cactus') ||
-            allNames.includes('saguaro') ||
             allNames.includes('barrel') ||
             allNames.includes('prickly') ||
             allNames.includes('organ')
