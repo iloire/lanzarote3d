@@ -406,6 +406,18 @@ class Environment {
     ].forEach(({ x, z }) =>
       sites.push({ position: new THREE.Vector3(x, cloudBase, z), kind: 'puff', scale: 1 })
     );
+    // The trade wind piles cloud up on the Risco de Famara, so its crest from the takeoff
+    // to the Mirador del Río is rarely clear
+    [
+      { x: 7800, z: -1300 },
+      { x: 9300, z: -2700 },
+      { x: 10200, z: -4300 },
+      { x: 11200, z: -6200 },
+      { x: 12000, z: -8200 },
+      { x: 12700, z: -10200 },
+    ].forEach(({ x, z }) =>
+      sites.push({ position: new THREE.Vector3(x, cloudBase, z), kind: 'puff', scale: 1.2 })
+    );
 
     const clouds = await Promise.all(
       sites.map(async site => {

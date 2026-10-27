@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 13:35 UTC
+
+### Added
+- **Clouds over the Risco de Famara**: six more cumulus clusters, 1.2× size, along the crest from the Famara takeoff to the Mirador del Río, where the trade wind piles cloud up and the ridge is rarely clear
+
 ## 2026-10-27 13:27 UTC
 
 ### Changed
