@@ -183,20 +183,24 @@ class HomeApp extends TerrainBase {
 
       const roadOffset = 200;
 
+      // Dusty tracks a shade lighter than the terrain underlay (#34302d): no markings, which read as
+      // bright 1px wires at island scale, and opaque so they don't sort badly
+      const roadStyle = {
+        terrain,
+        width: 11,
+        roadColor: '#3e3833',
+        showCenterLine: false,
+        showEdgeLines: false,
+        heightOffset: 1.5,
+      };
+
       const road1 = new ProceduralRoad({
         controlPoints: [
           new THREE.Vector3(TOWN_TEGUISE_TOP.x, 0, TOWN_TEGUISE_TOP.z - roadOffset),
           new THREE.Vector3(TOWN_FAMARA.x, 0, TOWN_FAMARA.z + roadOffset),
         ],
-        terrain,
-        width: 8,
+        ...roadStyle,
         segments: 50,
-        roadColor: '#f2f2f2',
-        showCenterLine: true,
-        showEdgeLines: true,
-        heightOffset: 5,
-        opacity: 0.2,
-        transparent: true,
       });
 
       const road2 = new ProceduralRoad({
@@ -205,15 +209,8 @@ class HomeApp extends TerrainBase {
           new THREE.Vector3(6705.5, 0, -3263.7),
           new THREE.Vector3(TOWN_NORUEGOS.x - roadOffset, 0, TOWN_NORUEGOS.z),
         ],
-        terrain,
-        width: 8,
+        ...roadStyle,
         segments: 80,
-        roadColor: '#f2f2f2',
-        showCenterLine: true,
-        showEdgeLines: true,
-        heightOffset: 5,
-        opacity: 0.2,
-        transparent: true,
       });
 
       const road3 = new ProceduralRoad({
@@ -221,15 +218,8 @@ class HomeApp extends TerrainBase {
           new THREE.Vector3(TOWN_LA_CALETA.x + roadOffset, 0, TOWN_LA_CALETA.z),
           new THREE.Vector3(TOWN_FAMARA.x - roadOffset, 0, TOWN_FAMARA.z),
         ],
-        terrain,
-        width: 8,
+        ...roadStyle,
         segments: 60,
-        roadColor: '#f2f2f2',
-        showCenterLine: true,
-        showEdgeLines: true,
-        heightOffset: 5,
-        opacity: 0.2,
-        transparent: true,
       });
 
       const road4 = new ProceduralRoad({
@@ -237,15 +227,8 @@ class HomeApp extends TerrainBase {
           new THREE.Vector3(TOWN_TEGUISE.x, 0, TOWN_TEGUISE.z - roadOffset),
           new THREE.Vector3(TOWN_TEGUISE_TOP.x, 0, TOWN_TEGUISE_TOP.z + roadOffset),
         ],
-        terrain,
-        width: 8,
+        ...roadStyle,
         segments: 40,
-        roadColor: '#f2f2f2',
-        showCenterLine: true,
-        showEdgeLines: true,
-        heightOffset: 5,
-        opacity: 0.2,
-        transparent: true,
       });
 
       const [roadMesh1, roadMesh2, roadMesh3, roadMesh4] = await Promise.all([
