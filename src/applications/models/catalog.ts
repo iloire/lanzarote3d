@@ -25,11 +25,13 @@ import {
   OrganPipeCactus,
   Pool,
   Park,
+  Harbour,
 } from '../../foundation/components/scenery';
 import { Cloud } from '../../foundation/components/environment';
 import { Gulls } from '../../foundation/components/wildlife/Gulls';
 import { LevelOfDetail } from '../../foundation/types/lod';
 import { paraglidersVoxel, cessnaConfig, herculesConfig } from '../home/config';
+import { HARBOUR_FEATURES } from '../puerto-del-carmen/harbour';
 
 /** Anything the viewer can show: every scene component, and Cloud, load like this */
 interface Loadable {
@@ -126,6 +128,12 @@ export const MODEL_CATALOG: ModelEntry[] = [
     create: () => new DesertHouseWithPool(lod),
   },
   { id: 'pool', name: 'Pool', group: 'Buildings', create: () => new Pool() },
+  {
+    id: 'harbour',
+    name: 'Harbour (Puerto del Carmen)',
+    group: 'Buildings',
+    create: () => new Harbour({ features: HARBOUR_FEATURES }),
+  },
   { id: 'park', name: 'Park', group: 'Buildings', create: () => new Park() },
 
   { id: 'tree', name: 'Tree', group: 'Nature', create: () => new Tree() },

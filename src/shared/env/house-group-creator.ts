@@ -18,7 +18,7 @@ import {
 } from '../../foundation/components/scenery/buildings';
 import { LevelOfDetail, getLODFromLegacy } from '../../foundation/types/lod';
 import { ComponentRegistry } from '../../foundation/systems/ComponentRegistry';
-import { HouseConfig, HouseGroupConfig } from './house-group-types';
+import { HouseConfig, HouseGroupConfig, HouseStyle } from './house-group-types';
 import { logger } from '../../foundation/utils/logger';
 import { calculateHousePositions, generateMixedNeighborhood } from './house-group-utils';
 
@@ -286,6 +286,7 @@ export class HouseGroupCreator {
 
     // Collect all element creation promises
     const elementPromises: Promise<void>[] = [];
+    const firstElement = this.createdObjects.length;
 
     for (let i = 0; i < elementCount; i++) {
       // Random position within the land plot
@@ -329,6 +330,11 @@ export class HouseGroupCreator {
 
     // Load all elements in parallel
     await Promise.all(elementPromises);
+
+    // Tag them with their house's position, so they go with it (removeHousesAtSea)
+    this.createdObjects.slice(firstElement).forEach(obj => {
+      obj.userData.parentHousePosition = centerPosition.clone();
+    });
   }
 
   private async addStone(position: THREE.Vector3): Promise<void> {
@@ -337,7 +343,6 @@ export class HouseGroupCreator {
 
     // Tag as landscape element for terrain adaptation
     stoneMesh.userData.isLandscapeElement = true;
-    stoneMesh.userData.parentHousePosition = position.clone();
 
     stoneMesh.position.copy(position);
     stoneMesh.scale.setScalar(0.3 + Math.random() * 0.4); // Random scale 0.3-0.7
@@ -356,7 +361,6 @@ export class HouseGroupCreator {
 
     // Tag as landscape element for terrain adaptation
     cactusMesh.userData.isLandscapeElement = true;
-    cactusMesh.userData.parentHousePosition = position.clone();
 
     cactusMesh.position.copy(position);
 
@@ -392,7 +396,6 @@ export class HouseGroupCreator {
 
     // Tag as landscape element for terrain adaptation
     cactusMesh.userData.isLandscapeElement = true;
-    cactusMesh.userData.parentHousePosition = position.clone();
 
     cactusMesh.position.copy(position);
     this.scene.add(cactusMesh);
@@ -408,7 +411,6 @@ export class HouseGroupCreator {
 
     // Tag as landscape element for terrain adaptation
     cactusMesh.userData.isLandscapeElement = true;
-    cactusMesh.userData.parentHousePosition = position.clone();
 
     cactusMesh.position.copy(position);
     this.scene.add(cactusMesh);
@@ -424,7 +426,6 @@ export class HouseGroupCreator {
 
     // Tag as landscape element for terrain adaptation
     cactusMesh.userData.isLandscapeElement = true;
-    cactusMesh.userData.parentHousePosition = position.clone();
 
     cactusMesh.position.copy(position);
     this.scene.add(cactusMesh);
@@ -449,6 +450,8 @@ export class HouseGroupCreator {
       poolMesh.position.copy(housePosition).add(poolOffset);
       poolMesh.scale.setScalar(0.6 + Math.random() * 0.4); // Vary pool size
       poolMesh.rotation.y = Math.random() * Math.PI * 2;
+      poolMesh.userData.isLandscapeElement = true;
+      poolMesh.userData.parentHousePosition = housePosition.clone();
 
       this.scene.add(poolMesh);
       this.createdObjects.push(poolMesh);
@@ -494,7 +497,8 @@ export class HouseGroupCreator {
     center: THREE.Vector3,
     count: number,
     formation: HouseGroupConfig['formation'] = 'suburban',
-    spacingMultiplier: number = 1.0
+    spacingMultiplier: number = 1.0,
+    style?: HouseStyle
   ): Promise<THREE.Object3D[]> {
     // Validate spacing multiplier
     if (spacingMultiplier < 0.1 || spacingMultiplier > 10) {
@@ -503,7 +507,7 @@ export class HouseGroupCreator {
       );
     }
 
-    const houses = generateMixedNeighborhood(count);
+    const houses = generateMixedNeighborhood(count, style);
     const baseSpacing = formation === 'rural' ? 250 : 90;
     const spacing = baseSpacing * spacingMultiplier;
 

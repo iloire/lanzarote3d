@@ -11,6 +11,14 @@ export interface BoatConfig {
   speed?: number;
   radius?: number;
   scale?: number;
+  /** Rotation about Y; a boat at 0 points its bow north (−z). Random when left out. */
+  heading?: number;
+}
+
+/** A berth: where a moored boat lies and which way its bow points */
+export interface Berth {
+  position: THREE.Vector3;
+  heading: number;
 }
 
 /**

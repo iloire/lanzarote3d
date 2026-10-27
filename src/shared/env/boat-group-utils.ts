@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { BoatConfig, BoatGroupConfig } from './boat-group-types';
+import { Berth, BoatConfig, BoatGroupConfig } from './boat-group-types';
 import { MovementPattern } from '../../foundation/systems/behaviors/MovingBehavior';
 
 /**
@@ -50,6 +50,34 @@ export function calculateBoatPositions(
   }
 
   return positions;
+}
+
+/**
+ * Berths along a pontoon or quay from `from` to `to`: as many as fit at `spacing`, centred on the
+ * segment and `offset` to its side (positive is to the right looking from `from` to `to`), each
+ * bow pointing from `from` towards `to`.
+ */
+export function mooredBerths(
+  from: THREE.Vector3,
+  to: THREE.Vector3,
+  spacing: number,
+  offset: number
+): Berth[] {
+  const along = to.clone().sub(from).setY(0);
+  const length = along.length();
+  along.normalize();
+  const right = new THREE.Vector3(-along.z, 0, along.x);
+  const heading = Math.atan2(-along.x, -along.z);
+  const count = Math.floor(length / spacing);
+  const margin = (length - count * spacing) / 2;
+
+  return Array.from({ length: count }, (_, i) => ({
+    position: from
+      .clone()
+      .addScaledVector(along, margin + (i + 0.5) * spacing)
+      .addScaledVector(right, offset),
+    heading,
+  }));
 }
 
 /**

@@ -8,6 +8,9 @@
   low poly and fast, and the speed fixes with before/after numbers.
 
 The scenes are in `src/applications/<story>/`, registered in `src/config/apps.json`, and picked with
-`?story=`: `home`, `famara-animation`, `boats-animation`, `famara` and `town`.
+`?story=`: `home`, `famara-animation`, `boats-animation`, `famara`, `puerto-del-carmen` and
+`town`. [PUERTO_DEL_CARMEN_PLAN.md](PUERTO_DEL_CARMEN_PLAN.md) is the plan for the Puerto del
+Carmen scene; its harbour data is described in
+[`src/applications/puerto-del-carmen/README.md`](../src/applications/puerto-del-carmen/README.md).
 
 For running, checking and deploying the project, see [../README.md](../README.md).

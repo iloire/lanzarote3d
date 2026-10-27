@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { SmallSailBoat, FishingBoat, Yacht, SpeedBoat } from '../../foundation/components/scenery';
 import { ComponentRegistry } from '../../foundation/systems/ComponentRegistry';
-import { BoatConfig, BoatGroupConfig } from './boat-group-types';
+import { Berth, BoatConfig, BoatGroupConfig } from './boat-group-types';
 import { calculateBoatPositions, generateMixedRecreationalBoats } from './boat-group-utils';
 
 type BoatComponent =
@@ -90,8 +90,10 @@ export class BoatGroupCreator {
     // Position the boat
     boatMesh.position.copy(position);
 
-    // Add some random rotation for variety
-    boatMesh.rotation.y = Math.random() * Math.PI * 2;
+    // Its heading, or a random one for variety. FloatingBehavior took the rotation it found at
+    // load as the one to sway about, so it needs telling about the new one.
+    boatMesh.rotation.y = boatConfig.heading ?? Math.random() * Math.PI * 2;
+    boatMesh.userData.originalRotationY = boatMesh.rotation.y;
 
     // Add to scene
     this.scene.add(boatMesh);
@@ -124,6 +126,24 @@ export class BoatGroupCreator {
     }
 
     return boatMeshes;
+  }
+
+  /**
+   * Moor boats at berths, one boat per berth, held still so they only bob
+   */
+  async createMooredBoats(boats: BoatConfig[], berths: Berth[]): Promise<THREE.Object3D[]> {
+    const count = Math.min(boats.length, berths.length);
+    const meshes = await Promise.all(
+      berths
+        .slice(0, count)
+        .map((berth, i) =>
+          this.createSingleBoat(
+            { ...boats[i]!, enableMovement: false, heading: berth.heading },
+            berth.position
+          )
+        )
+    );
+    return meshes.filter((mesh): mesh is THREE.Object3D => mesh !== null);
   }
 
   /**

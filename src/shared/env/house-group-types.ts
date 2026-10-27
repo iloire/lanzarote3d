@@ -28,6 +28,17 @@ export interface HouseGroupConfig {
 }
 
 /**
+ * How a town looks: the mix of house types by weight, and the colours each option is drawn from
+ * (option name, e.g. wallColor, to the hexes picked from at random)
+ */
+export interface HouseStyle {
+  types: Partial<Record<HouseConfig['type'], number>>;
+  palette: Record<string, string[]>;
+  /** The plot under each house: its size against the default, and its colours */
+  plot?: { scale: number; colors: string[] };
+}
+
+/**
  * Random variation settings for neighborhood generation
  */
 export interface NeighborhoodVariation {

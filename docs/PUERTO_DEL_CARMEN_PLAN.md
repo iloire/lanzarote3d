@@ -84,51 +84,40 @@ without converting anything by hand. Existing scenes keep their hand-placed coor
 
 ## Steps
 
-1. **Pin the location and fit `geoToWorld`.** Create the scene with the camera on the estimate
-   and temporary markers at the harbour and at Playa Quemada. Compare them with a map: the harbour
-   sits at the west end of the town, below the old quarter, with Montaña Tinasoria and the slope
-   behind it. Fit the origin and scale until both markers sit right, then remove them. Put
-   `geoToWorld` in `src/shared/geo.ts` with a unit test that the two anchors come back where
-   they were fitted.
-2. **Make the scene.** `src/applications/puerto-del-carmen/` with `index.tsx` and `config.ts`,
-   copied from `famara`: theme, island, sea, sky, clouds, a gull flock over the harbour. Register
-   it in `src/config/apps.json` as `puertodelcarmen`, route `/puerto-del-carmen`,
-   `"visibility": "private"`, so it appears under "Private" in the menu. The first camera is over
-   the sea, south of the harbour, at about 250 units high, looking north-west at the harbour, with
-   the seafront running off to the right and the slope and volcanoes behind.
-3. **Keep houses on land.** In `createHouseNeighborhood`, drop a house whose terrain height is
-   below a small threshold (about 2 units), with the land plots and cacti that go with it.
-   Famara's towns are inland, so they don't change. Add a unit test.
-4. **Build the town from data.** `config.ts` lists the clusters as `TownConfig` entries: a dense
-   `grid` for the old town above the harbour, `street` and `suburban` clusters strung along the
-   seafront eastward, and a sparse `rural` fringe on the slope. Use mostly `DesertHouse` and
-   `DesertHouseWithPool`, with a white-wall palette and green or blue doors and windows, the
-   island's building rule. The palette goes in config so it can be tuned. Merge everything as
-   `addTownsFromConfig` already does.
-5. **Build the real harbour.** Add `scenery/harbour/Harbour.ts`, a low-poly static component
-   driven by a data file, `puerto-del-carmen/harbour.json`, that holds the OSM lat/lon polylines
-   above, each with a kind: `breakwater` (rock-grey, wide, about 3 units above the sea, with a
-   higher wall on the seaward side), `quay` (concrete, lower), `pontoon` (thin, dark wood, just
-   above the water) and `beacon` (the green tower on the tip). Each polyline is extruded as boxes
-   along its segments after `geoToWorld`. The JSON schema is described in a README next to the
-   file. Add the harbour to the Models catalog so it can be checked on the turntable, and merge
-   it with the town.
-6. **Moor the boats.** Add a `moored` formation to `boat-group-utils.ts`: boats at even spacing
-   along a line segment, side by side, all with the same heading, with `enableMovement: false`
-   so they only bob. Use one segment along each side of the five pontoons, with the boats'
-   bows pointing north, and a row of fishing boats along the north quay. Mostly `SmallSailBoat`
-   and `Yacht` at the pontoons and `FishingBoat` at the quay. Check the boat scale against
-   the pontoon spacing (about 30 m, ≈ 20 units) so neighbours don't overlap. Outside the
-   breakwater, three or four boats use the existing `random` formation with movement on (a
-   speedboat, sailboats). Add a unit test for the `moored` positions and headings.
-7. **One paraglider over Playa Quemada.** Load a `ParagliderVoxel` the way the Famara scenes do,
-   flying a slow figure-of-eight on waypoints along the Los Ajaches ridge above Playa Quemada,
-   near the existing `pq` thermal (−6227, 14055), at about the ridge height plus 150 units. Take
-   the waypoints and wing colours from `config.ts`. From the default camera it is a small shape
-   against the hills to the west, with the town and the harbour in the foreground.
-8. **Check it and document it.** Screenshot it with `dev-browser`. Compare frame time and draw
-   calls with `famara` using the performance monitor and `?fx=0`. Add the story to
-   `docs/README.md` and `CHANGELOG.md`, with the OSM attribution for the harbour.
+1. ~~**Pin the location and fit `geoToWorld`.**~~ ✅ `src/shared/geo.ts`, with
+   `LANZAROTE_ANCHOR` at the harbour (−3600, 12600) and 0.74 units a metre, which puts Puerto
+   Calero and the turn of the coast at Matagorda where the model has them. The model's coast is
+   too coarse for a second anchor to sharpen it, so the harbour's own placement in `config.ts`
+   (`HARBOUR_PLACEMENT`) is tuned on screen instead: centre (−3500, 12795), turned 0.24 rad so the
+   breakwater's root meets the coast. Tested in `tests/utils/geo.test.ts`.
+2. ~~**Make the scene.**~~ ✅ `src/applications/puerto-del-carmen/`, registered as
+   `puertodelcarmen`, private. The camera starts at (−2950, 170, 13300), over the sea south-east of
+   the harbour, looking north-west at it with the town and the volcanoes behind.
+3. ~~**Keep houses on land.**~~ ✅ `removeHousesAtSea()` in `house-group-utils.ts`, called from
+   `createHouseNeighborhood`, drops houses whose ground is below 2 units, with their plot, pool
+   and garden (now all tagged with their house's position). Tested in
+   `tests/utils/removeHousesAtSea.test.ts`.
+4. ~~**Build the town from data.**~~ ✅ `TOWN` in `config.ts`: tight 3 × 3 `grid` blocks for the
+   old town, blocks of nine along the seafront and a row behind, and a `rural` fringe up the
+   slope. `HouseStyle` (`types`, `palette`, `plot`) on a `TownConfig` gives it white
+   `DesertHouse`s with green and blue trim on small grey and sand plots. The `random` and
+   `suburban` formations crowd houses together at this density, so blocks replaced them.
+5. ~~**Build the real harbour.**~~ ✅ `Harbour` component and `harbour.json`, schema in the README
+   next to it. The breakwater is a crown on a lower apron of armour rock rather than having a
+   seaward wall. 312 triangles, in the Models viewer, merged with the town.
+6. ~~**Moor the boats.**~~ ✅ `mooredBerths()` instead of a new formation: berths along a
+   segment, centred, offset to one side, bows pointing along it. 30 boats on the pontoons
+   (sail boats, yachts and speedboats at about twice life size) and fishing boats on the north
+   quay, four more out at sea. `BoatConfig.heading` sets a boat's heading; this also fixed every
+   boat's heading being undone by `FloatingBehavior`. Tested in
+   `tests/utils/mooredBerths.test.ts`.
+7. ~~**One paraglider over Playa Quemada.**~~ ✅ `loadParagliders()` now takes the loop to fly;
+   the pilot flies `PLAYA_QUEMADA_LOOP` (a closed loop, not a figure-of-eight) at 440–470 over
+   the slopes and the bay. It is about 3.5 km west of the harbour, so it is **not in the default
+   view**: orbit west to see it. A shot of it is in phase 2.
+8. ~~**Check it and document it.**~~ ✅ Over two frames it draws 123 calls and 389k triangles
+   against 108 calls and 975k for `famara`; both hold 120 fps. In `docs/README.md` and
+   `CHANGELOG.md` with the OSM attribution.
 
 ## Phase 2 (after the static scene looks right)
 

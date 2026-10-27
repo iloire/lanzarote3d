@@ -2,6 +2,19 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 09:18 UTC
+
+### Added
+- **Puerto del Carmen scene** (`?story=puerto-del-carmen`, private, in the menu's Private list): the island's south-east coast for the first time. White houses with green and blue trim in blocks along the seafront and packed above the harbour, the real harbour traced from OpenStreetMap (breakwater, west entrance with its green beacon, five pontoons, north quay; © OpenStreetMap contributors, ODbL), 30 boats moored along both sides of the pontoons and fishing boats at the quay, four more out at sea, gulls over the harbour, and one paraglider soaring the Los Ajaches slopes above Playa Quemada
+- **`geoToWorld`** (`src/shared/geo.ts`): latitude/longitude to scene x/z, fitted on the model at Puerto del Carmen's harbour (0.74 units a metre)
+- **`Harbour` component**: breakwaters, quays, pontoons and beacons built from polylines as one low-poly mesh; in the Models viewer
+- **Moored boats**: `mooredBerths()` lines boats up along a pontoon or quay with a shared heading; `BoatConfig.heading` sets a boat's heading
+- **Town styles**: a `TownConfig` can carry its own house mix, colours and plot size and colour (`HouseStyle`)
+
+### Fixed
+- **Houses in the sea**: a town on the coast put houses on the seabed under the water, because the island model carries on under the sea. Houses whose ground is below 2 units are now left out, with their plot, pool and garden
+- **Boat headings were lost**: `FloatingBehavior` kept the rotation a boat had when loaded and swayed about it, so the random heading given afterwards was undone and every boat faced the same way
+
 ## 2026-10-27 09:10 UTC
 
 ### Changed

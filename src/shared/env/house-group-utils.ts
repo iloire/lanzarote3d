@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { HouseConfig, HouseGroupConfig, DEFAULT_VARIATION } from './house-group-types';
+import { HouseConfig, HouseGroupConfig, HouseStyle, DEFAULT_VARIATION } from './house-group-types';
 
 /**
  * Calculate positions for houses based on neighborhood formation type
@@ -175,11 +175,13 @@ function generateRandomColors(): { [key: string]: string } {
 }
 
 /**
- * Generate a random land plot for a house based on house type and scale
+ * Generate a random land plot for a house based on house type and scale, sized and coloured by
+ * the town's style when it has one
  */
 function generateLandPlot(
   houseType: HouseConfig['type'],
-  scale: number = 1
+  scale: number = 1,
+  plot?: HouseStyle['plot']
 ): { width: number; depth: number; color?: string } {
   const baseWidths: Record<HouseConfig['type'], number> = {
     House: 60,
@@ -199,26 +201,37 @@ function generateLandPlot(
     DesertHouseWithPool: 100,
   };
 
-  const landColors = ['#D2B48C', '#DEB887', '#F5DEB3', '#D2691E', '#CD853F']; // Desert sand shades
+  const landColors = plot?.colors ?? ['#D2B48C', '#DEB887', '#F5DEB3', '#D2691E', '#CD853F']; // Desert sand shades
+  const plotScale = plot?.scale ?? 1;
 
   // Add some random variation to land plot size
   const widthVariation = 1 + (Math.random() - 0.5) * 0.4; // ±20% variation
   const depthVariation = 1 + (Math.random() - 0.5) * 0.4; // ±20% variation
 
   return {
-    width: Math.max(40, baseWidths[houseType] * scale * widthVariation),
-    depth: Math.max(40, baseDepths[houseType] * scale * depthVariation),
+    width: Math.max(40 * plotScale, baseWidths[houseType] * scale * widthVariation * plotScale),
+    depth: Math.max(40 * plotScale, baseDepths[houseType] * scale * depthVariation * plotScale),
     color: landColors[Math.floor(Math.random() * landColors.length)],
   };
 }
 
+/** One colour for each option in the palette */
+function pickColors(palette: Record<string, string[]>): { [key: string]: string } {
+  return Object.fromEntries(
+    Object.entries(palette).map(([option, hexes]) => [
+      option,
+      hexes[Math.floor(Math.random() * hexes.length)]!,
+    ])
+  );
+}
+
 /**
- * Create a mixed neighborhood with custom house distribution
+ * Create a mixed neighborhood with custom house distribution, or with a town's own style
  */
-export function generateMixedNeighborhood(count: number): HouseConfig[] {
+export function generateMixedNeighborhood(count: number, style?: HouseStyle): HouseConfig[] {
   const variation = DEFAULT_VARIATION;
   const houses: HouseConfig[] = [];
-  const distribution = {
+  const distribution = style?.types ?? {
     House: 0.4,
     Villa: 0.15,
     Townhouse: 0.15,
@@ -247,10 +260,47 @@ export function generateMixedNeighborhood(count: number): HouseConfig[] {
       scale: baseScale,
       includePool: Math.random() < variation.poolChance,
       rotation,
-      colors: variation.colorVariation ? generateRandomColors() : undefined,
-      landPlot: generateLandPlot(selectedType.type, baseScale),
+      colors: style
+        ? pickColors(style.palette)
+        : variation.colorVariation
+          ? generateRandomColors()
+          : undefined,
+      landPlot: generateLandPlot(selectedType.type, baseScale, style?.plot),
     });
   }
 
   return houses;
+}
+
+/**
+ * Removes the houses whose ground is below `minHeight` from the scene, with the land plot, pool
+ * and garden tagged with their position, and returns the ones left. The island model carries on
+ * under the sea as a seabed, so a town on the coast gets ground heights for houses in the water.
+ */
+export function removeHousesAtSea(
+  scene: THREE.Object3D,
+  houses: THREE.Object3D[],
+  groundHeight: (x: number, z: number) => number,
+  minHeight: number
+): THREE.Object3D[] {
+  const atSea = houses.filter(house => {
+    const height = groundHeight(house.position.x, house.position.z);
+    return isNaN(height) || height < minHeight;
+  });
+  if (atSea.length === 0) return houses;
+
+  const belongsTo = (obj: THREE.Object3D, house: THREE.Object3D) => {
+    const at = obj.userData?.parentHousePosition as THREE.Vector3 | undefined;
+    return (
+      at !== undefined &&
+      Math.abs(at.x - house.position.x) < 0.01 &&
+      Math.abs(at.z - house.position.z) < 0.01
+    );
+  };
+  const removed = scene.children.filter(
+    obj => atSea.includes(obj) || atSea.some(house => belongsTo(obj, house))
+  );
+  removed.forEach(obj => scene.remove(obj));
+
+  return houses.filter(house => !atSea.includes(house));
 }

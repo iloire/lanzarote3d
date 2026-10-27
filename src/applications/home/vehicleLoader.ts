@@ -24,14 +24,22 @@ export interface VehicleLoadResult {
 
 const DEBUG_VECTORS = false;
 
+/** A closed loop of waypoints to fly, and how tightly the curve through them turns */
+export interface FlightLoop {
+  waypoints: THREE.Vector3[];
+  tension: number;
+}
+
 /**
- * Loads the paragliders, each flying its copy of the ridge loop from its own start point.
- * They are placed on the loop straight away and fly from the first frame.
+ * Loads the paragliders, each flying its copy of the loop (the Famara ridge loop unless another
+ * is given) from its own start point. They are placed on the loop straight away and fly from the
+ * first frame.
  */
 export async function loadParagliders(
   scene: THREE.Scene,
   configs: ParagliderVoxelConfig[],
-  errorHandler: (error: Error, context: string) => void
+  errorHandler: (error: Error, context: string) => void,
+  loop: FlightLoop = { waypoints: RIDGE_LOOP, tension: RIDGE_LOOP_TENSION }
 ): Promise<VehicleLoadResult[]> {
   const loaded = await Promise.all(
     configs.map(async (p): Promise<VehicleLoadResult | null> => {
@@ -56,8 +64,8 @@ export async function loadParagliders(
           turnSpeed: 1.0,
           forwardAxis: '-z',
           debugVectors: DEBUG_VECTORS,
-          waypoints: RIDGE_LOOP.map(point => point.clone().add(p.pathOffset)),
-          waypointTension: RIDGE_LOOP_TENSION,
+          waypoints: loop.waypoints.map(point => point.clone().add(p.pathOffset)),
+          waypointTension: loop.tension,
           waypointLoop: true,
           waypointStartProgress: p.startProgress,
         });

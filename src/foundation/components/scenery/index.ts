@@ -17,6 +17,9 @@ export { default as PricklyPearCactus } from './cactus/PricklyPearCactus';
 export { default as OrganPipeCactus } from './cactus/OrganPipeCactus';
 export * from './cactus';
 
+export { default as Harbour } from './harbour/Harbour';
+export type { HarbourFeature, HarbourFeatureKind, HarbourOptions } from './harbour/Harbour';
+
 // Boat Components (organized in boats subfolder)
 export * from './boats';
 

@@ -20,6 +20,12 @@ interface MovableComponent extends IThreeComponent {
 import { BoatGroupCreator } from './boat-group-creator';
 import { HouseGroupCreator } from './house-group-creator';
 import { mergeStaticMeshes } from '../../foundation/utils/mergeStatic';
+import { removeHousesAtSea } from './house-group-utils';
+import { HouseStyle } from './house-group-types';
+import { Berth, BoatConfig } from './boat-group-types';
+
+/** Houses whose ground is lower than this are in the sea and are left out */
+const MIN_LAND_HEIGHT = 2;
 
 /**
  * Town configuration for placing settlements
@@ -29,6 +35,7 @@ export interface TownConfig {
   houseCount: number;
   formation: 'street' | 'grid' | 'suburban' | 'rural' | 'random';
   spacing?: number; // Optional spacing multiplier (default: 1.0, higher = more spread out)
+  style?: HouseStyle; // The town's own house mix and colours, instead of the default mix
 }
 
 /**
@@ -103,6 +110,17 @@ class Environment {
     this.updateAllBoatMovementOrigins();
   }
 
+  /** Boats moored at berths along pontoons and quays, still but for bobbing */
+  async addMooredBoats(boats: BoatConfig[], berths: Berth[]): Promise<THREE.Object3D[]> {
+    return this.boatGroupCreator.createMooredBoats(boats, berths);
+  }
+
+  /** A few boats out on the water around `center`, some moving */
+  async addBoatsAround(water: THREE.Mesh, center: THREE.Vector3, count: number) {
+    await this.boatGroupCreator.createRecreationalBoats(water, center, count, 'random');
+    this.updateAllBoatMovementOrigins();
+  }
+
   // Convenience aliases used by the scenes
   async addMixedBoats(water: THREE.Mesh) {
     await this.addBoats(water);
@@ -122,7 +140,8 @@ class Environment {
     terrain: THREE.Mesh,
     lowPoly: boolean = false,
     spacingMultiplier: number = 1.0,
-    levelOfDetail?: LevelOfDetail
+    levelOfDetail?: LevelOfDetail,
+    style?: HouseStyle
   ): Promise<THREE.Object3D[]> {
     // Get terrain height for the center position
     const terrainHeight = this.getTerrainHeight(center.x, center.z, terrain);
@@ -146,11 +165,18 @@ class Environment {
 
     try {
       // Use createMixedNeighborhood for all formations with the specified house count
-      const meshes = await houseGroupCreator.createMixedNeighborhood(
+      const created = await houseGroupCreator.createMixedNeighborhood(
         terrainAdaptedCenter,
         houseCount,
         formation,
-        spacingMultiplier
+        spacingMultiplier,
+        style
+      );
+      const meshes = removeHousesAtSea(
+        this.scene,
+        created,
+        (x, z) => this.getTerrainHeight(x, z, terrain),
+        MIN_LAND_HEIGHT
       );
 
       // Adapt all created houses to terrain height
@@ -223,6 +249,7 @@ class Environment {
       spacing?: number;
       lowPoly?: boolean;
       levelOfDetail?: LevelOfDetail;
+      style?: HouseStyle;
     }
   ): Promise<THREE.Object3D[]> {
     const {
@@ -231,6 +258,7 @@ class Environment {
       spacing = 1.0,
       lowPoly = true,
       levelOfDetail,
+      style,
     } = options || {};
 
     logger.info(
@@ -244,7 +272,8 @@ class Environment {
       terrain,
       lowPoly,
       spacing,
-      levelOfDetail
+      levelOfDetail,
+      style
     );
   }
 
@@ -272,6 +301,7 @@ class Environment {
         spacing: town.spacing,
         lowPoly,
         levelOfDetail,
+        style: town.style,
       });
       allHouses.push(...houses);
     }

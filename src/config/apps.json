@@ -53,6 +53,15 @@
       "requiresWebGL": true,
       "visibility": "private",
       "priority": 20
+    },
+    "puertodelcarmen": {
+      "name": "Puerto del Carmen",
+      "description": "The white town on the south-east coast, its real harbour with boats at the pontoons, and a paraglider over Playa Quemada",
+      "route": "/puerto-del-carmen",
+      "category": "demo",
+      "requiresWebGL": true,
+      "visibility": "private",
+      "priority": 5
     }
   }
 }

@@ -1,0 +1,101 @@
+{
+  "source": "© OpenStreetMap contributors, ODbL. Traced 2026-10-27 from the ways and nodes listed per feature.",
+  "centre": [28.92085, -13.67395],
+  "features": [
+    {
+      "kind": "breakwater",
+      "name": "Breakwater, east root to the beacon at the tip",
+      "osm": ["way/1334376151", "way/1334376172", "way/1334376135"],
+      "points": [
+        [28.9206, -13.6715],
+        [28.92048, -13.67225],
+        [28.92036, -13.67295],
+        [28.92028, -13.6737],
+        [28.92036, -13.67425],
+        [28.9204, -13.67495],
+        [28.9203, -13.6756],
+        [28.92029, -13.67609]
+      ]
+    },
+    {
+      "kind": "quay",
+      "name": "Entrance pier, from the breakwater tip north into the basin",
+      "osm": ["way/359380650"],
+      "points": [
+        [28.92036, -13.67617],
+        [28.92057, -13.67561],
+        [28.92104, -13.67573]
+      ]
+    },
+    {
+      "kind": "quay",
+      "name": "North quay along the old town",
+      "osm": ["way/159173350"],
+      "points": [
+        [28.9214, -13.67483],
+        [28.92133, -13.67394],
+        [28.92129, -13.67351]
+      ]
+    },
+    {
+      "kind": "quay",
+      "name": "Bridge from the north quay to the shore",
+      "osm": ["way/347428662", "way/1334376060"],
+      "points": [
+        [28.92133, -13.67394],
+        [28.92159, -13.67391]
+      ]
+    },
+    {
+      "kind": "pontoon",
+      "name": "Pontoon 1",
+      "osm": ["way/159173328"],
+      "points": [
+        [28.92046, -13.67381],
+        [28.92104, -13.67375]
+      ]
+    },
+    {
+      "kind": "pontoon",
+      "name": "Pontoon 2",
+      "osm": ["way/159173336"],
+      "points": [
+        [28.92049, -13.67411],
+        [28.92106, -13.67405]
+      ]
+    },
+    {
+      "kind": "pontoon",
+      "name": "Pontoon 3",
+      "osm": ["way/159173331"],
+      "points": [
+        [28.92052, -13.67442],
+        [28.92102, -13.67437]
+      ]
+    },
+    {
+      "kind": "pontoon",
+      "name": "Pontoon 4",
+      "osm": ["way/159173342"],
+      "points": [
+        [28.92056, -13.67479],
+        [28.92104, -13.67474]
+      ]
+    },
+    {
+      "kind": "pontoon",
+      "name": "Pontoon 5",
+      "osm": ["way/159173339"],
+      "points": [
+        [28.92051, -13.67518],
+        [28.92107, -13.67512]
+      ]
+    },
+    {
+      "kind": "beacon",
+      "name": "Green starboard beacon tower, flashing green (IALA-A)",
+      "osm": ["node/2279509587"],
+      "points": [[28.92029, -13.67609]]
+    }
+  ]
+}
