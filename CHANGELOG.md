@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 11:52 UTC
+
+### Changed
+- **Real roads and towns around Famara**: the roads follow their real routes from OpenStreetMap instead of running straight between towns: Teguise to Caleta de Famara (LZ-30, then LZ-402 past Las Laderas), the beach road from Caleta de Famara to Urbanización Famara, and Soo to Caleta de Famara (LZ-410). The towns move up to 1 km to their real places, and the two unclear ones are renamed to Las Laderas and Soo. A new island-wide `ISLAND_ANCHOR` (the OSM coastline fitted onto the model's coast, with a 2° turn) projects both, within about 170 units of the coast across the north where the Puerto del Carmen anchor was up to 1,900 off. Home and famara-animation share the roads through `shared/env/roads.ts` and `roads.json`
+
 ## 2026-10-27 11:49 UTC
 
 ### Changed

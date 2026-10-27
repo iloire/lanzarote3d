@@ -1,13 +1,5 @@
 import * as THREE from 'three';
-import Environment, {
-  FAMARA_GULL_FLOCKS,
-  LANZAROTE_TOWNS,
-  TOWN_TEGUISE_TOP,
-  TOWN_FAMARA,
-  TOWN_NORUEGOS,
-  TOWN_TEGUISE,
-  TOWN_LA_CALETA,
-} from '../../shared/env/environment';
+import Environment, { FAMARA_GULL_FLOCKS, LANZAROTE_TOWNS } from '../../shared/env/environment';
 import { StoryOptions } from '../../shared/types';
 import { getDefaultTheme } from '../../foundation/themes';
 import { ThemeEngine } from '../../foundation/systems/ThemeEngine';
@@ -21,7 +13,7 @@ import {
 } from '../../foundation/systems/scene/CameraTargetController';
 import { createCameraTargetUI } from '../../foundation/components/ui/CameraTargetUI';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { ProceduralRoad } from '../../foundation/components/scenery';
+import { createIslandRoads } from '../../shared/env/roads';
 import { LevelOfDetail } from '../../foundation/types/lod';
 import { logger } from '../../foundation/utils/logger';
 import {
@@ -192,90 +184,9 @@ class AnimationApp extends TerrainBase {
 
       // Create individual roads connecting each pair of towns
       // Roads stop ~200 units before town centers to avoid passing through houses
-      const roadOffset = 200;
-
-      // Road 1: Teguise top to Famara
-      const road1 = new ProceduralRoad({
-        controlPoints: [
-          new THREE.Vector3(TOWN_TEGUISE_TOP.x, 0, TOWN_TEGUISE_TOP.z - roadOffset),
-          new THREE.Vector3(TOWN_FAMARA.x, 0, TOWN_FAMARA.z + roadOffset),
-        ],
-        terrain,
-        width: 8,
-        segments: 50,
-        roadColor: '#f2f2f2',
-        showCenterLine: true,
-        showEdgeLines: true,
-        heightOffset: 5,
-        opacity: 0.2,
-        transparent: true,
-      });
-
-      // Road 2: Famara to Noruegos (via intermediate point)
-      const road2 = new ProceduralRoad({
-        controlPoints: [
-          new THREE.Vector3(TOWN_FAMARA.x + roadOffset, 0, TOWN_FAMARA.z),
-          new THREE.Vector3(6705.5, 0, -3263.7), // Intermediate point
-          new THREE.Vector3(TOWN_NORUEGOS.x - roadOffset, 0, TOWN_NORUEGOS.z),
-        ],
-        terrain,
-        width: 8,
-        segments: 80,
-        roadColor: '#f2f2f2',
-        showCenterLine: true,
-        showEdgeLines: true,
-        heightOffset: 5,
-        opacity: 0.2,
-        transparent: true,
-      });
-
-      // Road 3: La Caleta to Famara
-      const road3 = new ProceduralRoad({
-        controlPoints: [
-          new THREE.Vector3(TOWN_LA_CALETA.x + roadOffset, 0, TOWN_LA_CALETA.z),
-          new THREE.Vector3(TOWN_FAMARA.x - roadOffset, 0, TOWN_FAMARA.z),
-        ],
-        terrain,
-        width: 8,
-        segments: 60,
-        roadColor: '#f2f2f2',
-        showCenterLine: true,
-        showEdgeLines: true,
-        heightOffset: 5,
-        opacity: 0.2,
-        transparent: true,
-      });
-
-      // Road 4: Teguise to Teguise Top
-      const road4 = new ProceduralRoad({
-        controlPoints: [
-          new THREE.Vector3(TOWN_TEGUISE.x, 0, TOWN_TEGUISE.z - roadOffset),
-          new THREE.Vector3(TOWN_TEGUISE_TOP.x, 0, TOWN_TEGUISE_TOP.z + roadOffset),
-        ],
-        terrain,
-        width: 8,
-        segments: 40,
-        roadColor: '#f2f2f2',
-        showCenterLine: true,
-        showEdgeLines: true,
-        heightOffset: 5,
-        opacity: 0.2,
-        transparent: true,
-      });
-
-      // Load and add all roads to scene
-      const [roadMesh1, roadMesh2, roadMesh3, roadMesh4] = await Promise.all([
-        road1.load(),
-        road2.load(),
-        road3.load(),
-        road4.load(),
-      ]);
-
-      scene.add(roadMesh1);
-      scene.add(roadMesh2);
-      scene.add(roadMesh3);
-      scene.add(roadMesh4);
-      logger.info('✅ 4 roads connecting neighborhoods created');
+      const roads = await createIslandRoads(terrain);
+      roads.forEach(road => scene.add(road));
+      logger.info(`${roads.length} roads connecting the Famara towns created`);
 
       this.environment.addRandomBoats(water); // Use randomized boat types for variety
 

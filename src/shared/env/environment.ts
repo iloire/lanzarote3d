@@ -13,6 +13,7 @@ import { ThemeEngine } from '../../foundation/systems/ThemeEngine';
 import { IThreeComponent } from '../../foundation/components/base/IThreeComponent';
 import { ComponentRegistry } from '../../foundation/systems/ComponentRegistry';
 import { LevelOfDetail } from '../../foundation/types/lod';
+import { ISLAND_ANCHOR, geoToWorld } from '../geo';
 
 interface MovableComponent extends IThreeComponent {
   updateMovementOrigin?(): void;
@@ -38,26 +39,32 @@ export interface TownConfig {
   style?: HouseStyle; // The town's own house mix and colours, instead of the default mix
 }
 
+/** A town's centre from its OpenStreetMap place node; houses settle onto the terrain */
+const town = (lat: number, lon: number): THREE.Vector3 => {
+  const { x, z } = geoToWorld(lat, lon, ISLAND_ANCHOR);
+  return new THREE.Vector3(x, 0, z);
+};
+
 /**
  * Lanzarote island landmark positions
  * Named locations for major settlements on the island
  */
-export const TOWN_TEGUISE_TOP = new THREE.Vector3(6879, 0, 545);
-export const TOWN_FAMARA = new THREE.Vector3(6279, 0, -3155);
-export const TOWN_NORUEGOS = new THREE.Vector3(7827, 0, -3460);
-export const TOWN_TEGUISE = new THREE.Vector3(5600, 0, 1205);
-export const TOWN_LA_CALETA = new THREE.Vector3(2866.8, 270.8, -2598.7);
+export const TOWN_LAS_LADERAS = town(29.08746, -13.56208);
+export const TOWN_FAMARA = town(29.11885, -13.56599); // Caleta de Famara
+export const TOWN_NORUEGOS = town(29.11441, -13.54721); // Urbanización Famara
+export const TOWN_TEGUISE = town(29.05925, -13.56022);
+export const TOWN_SOO = town(29.09932, -13.62235);
 
 /**
  * Lanzarote island town configuration
  * Real locations of major settlements on the island
  */
 export const LANZAROTE_TOWNS: TownConfig[] = [
-  { position: TOWN_TEGUISE_TOP, houseCount: 50, formation: 'rural', spacing: 2.0 },
+  { position: TOWN_LAS_LADERAS, houseCount: 50, formation: 'rural', spacing: 2.0 },
   { position: TOWN_FAMARA, houseCount: 120, formation: 'rural', spacing: 2.0 },
   { position: TOWN_NORUEGOS, houseCount: 50, formation: 'grid' },
   { position: TOWN_TEGUISE, houseCount: 51, formation: 'suburban' },
-  { position: TOWN_LA_CALETA, houseCount: 40, formation: 'rural' },
+  { position: TOWN_SOO, houseCount: 40, formation: 'rural' },
 ];
 
 /** Gulls circling in the thermals off Famara, at about the pilots' height. */

@@ -10,6 +10,8 @@ export interface GeoAnchor {
   x: number;
   z: number;
   unitsPerMetre: number;
+  /** Radians the map is turned clockwise (seen from above) to sit on the model, default 0 */
+  rotation?: number;
 }
 
 const METRES_PER_DEGREE_LAT = 110574;
@@ -27,6 +29,21 @@ export const LANZAROTE_ANCHOR: GeoAnchor = {
   unitsPerMetre: 0.74,
 };
 
+/**
+ * Fitted on the whole island: the OpenStreetMap coastline laid onto the model's sea-level
+ * contour, scale and turn included. Within about 170 units of the model's coast from Playa
+ * Blanca to Órzola, where LANZAROTE_ANCHOR drifts up to 1900 units off in the north. The
+ * harbour keeps LANZAROTE_ANCHOR, which is closer at Puerto del Carmen itself.
+ */
+export const ISLAND_ANCHOR: GeoAnchor = {
+  lat: 28.92117,
+  lon: -13.67441,
+  x: -2330,
+  z: 12702,
+  unitsPerMetre: 0.772,
+  rotation: 0.0355,
+};
+
 export function geoToWorld(
   lat: number,
   lon: number,
@@ -34,9 +51,11 @@ export function geoToWorld(
 ): { x: number; z: number } {
   const east =
     (lon - anchor.lon) * Math.cos((anchor.lat * Math.PI) / 180) * METRES_PER_DEGREE_LON_AT_EQUATOR;
-  const north = (lat - anchor.lat) * METRES_PER_DEGREE_LAT;
+  const south = (anchor.lat - lat) * METRES_PER_DEGREE_LAT;
+  const cos = Math.cos(anchor.rotation ?? 0);
+  const sin = Math.sin(anchor.rotation ?? 0);
   return {
-    x: anchor.x + east * anchor.unitsPerMetre,
-    z: anchor.z - north * anchor.unitsPerMetre,
+    x: anchor.x + (east * cos - south * sin) * anchor.unitsPerMetre,
+    z: anchor.z + (east * sin + south * cos) * anchor.unitsPerMetre,
   };
 }

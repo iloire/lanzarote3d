@@ -1,13 +1,5 @@
 import * as THREE from 'three';
-import Environment, {
-  FAMARA_GULL_FLOCKS,
-  LANZAROTE_TOWNS,
-  TOWN_TEGUISE_TOP,
-  TOWN_FAMARA,
-  TOWN_NORUEGOS,
-  TOWN_TEGUISE,
-  TOWN_LA_CALETA,
-} from '../../shared/env/environment';
+import Environment, { FAMARA_GULL_FLOCKS, LANZAROTE_TOWNS } from '../../shared/env/environment';
 import { StoryOptions } from '../../shared/types';
 import { getDefaultTheme } from '../../foundation/themes';
 import { ThemeEngine } from '../../foundation/systems/ThemeEngine';
@@ -21,7 +13,7 @@ import {
 } from '../../foundation/systems/scene/CameraTargetController';
 import { createCameraTargetUI } from '../../foundation/components/ui/CameraTargetUI';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { ProceduralRoad } from '../../foundation/components/scenery';
+import { createIslandRoads } from '../../shared/env/roads';
 import { LevelOfDetail } from '../../foundation/types/lod';
 import { logger } from '../../foundation/utils/logger';
 import {
@@ -190,68 +182,9 @@ class HomeApp extends TerrainBase {
         LevelOfDetail.ULTRA_LOW
       );
 
-      const roadOffset = 200;
-
-      // Dusty tracks a shade lighter than the terrain underlay (#34302d): no markings, which read as
-      // bright 1px wires at island scale, and opaque so they don't sort badly
-      const roadStyle = {
-        terrain,
-        width: 11,
-        roadColor: '#3e3833',
-        showCenterLine: false,
-        showEdgeLines: false,
-        heightOffset: 1.5,
-      };
-
-      const road1 = new ProceduralRoad({
-        controlPoints: [
-          new THREE.Vector3(TOWN_TEGUISE_TOP.x, 0, TOWN_TEGUISE_TOP.z - roadOffset),
-          new THREE.Vector3(TOWN_FAMARA.x, 0, TOWN_FAMARA.z + roadOffset),
-        ],
-        ...roadStyle,
-        segments: 50,
-      });
-
-      const road2 = new ProceduralRoad({
-        controlPoints: [
-          new THREE.Vector3(TOWN_FAMARA.x + roadOffset, 0, TOWN_FAMARA.z),
-          new THREE.Vector3(6705.5, 0, -3263.7),
-          new THREE.Vector3(TOWN_NORUEGOS.x - roadOffset, 0, TOWN_NORUEGOS.z),
-        ],
-        ...roadStyle,
-        segments: 80,
-      });
-
-      const road3 = new ProceduralRoad({
-        controlPoints: [
-          new THREE.Vector3(TOWN_LA_CALETA.x + roadOffset, 0, TOWN_LA_CALETA.z),
-          new THREE.Vector3(TOWN_FAMARA.x - roadOffset, 0, TOWN_FAMARA.z),
-        ],
-        ...roadStyle,
-        segments: 60,
-      });
-
-      const road4 = new ProceduralRoad({
-        controlPoints: [
-          new THREE.Vector3(TOWN_TEGUISE.x, 0, TOWN_TEGUISE.z - roadOffset),
-          new THREE.Vector3(TOWN_TEGUISE_TOP.x, 0, TOWN_TEGUISE_TOP.z + roadOffset),
-        ],
-        ...roadStyle,
-        segments: 40,
-      });
-
-      const [roadMesh1, roadMesh2, roadMesh3, roadMesh4] = await Promise.all([
-        road1.load(),
-        road2.load(),
-        road3.load(),
-        road4.load(),
-      ]);
-
-      scene.add(roadMesh1);
-      scene.add(roadMesh2);
-      scene.add(roadMesh3);
-      scene.add(roadMesh4);
-      logger.info('4 roads connecting neighborhoods created');
+      const roads = await createIslandRoads(terrain);
+      roads.forEach(road => scene.add(road));
+      logger.info(`${roads.length} roads connecting the Famara towns created`);
 
       this.environment.addRandomBoats(water);
 
