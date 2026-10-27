@@ -12,10 +12,11 @@ THREE.Mesh.prototype.raycast = acceleratedRaycast;
 const loadFromBlenderModel = async (manager: THREE.LoadingManager) => {
   const object = await Models.loadSimple(model, manager);
   const mesh = object as THREE.Mesh;
+  // The GLB carries positions only (3d/slim-glb.py), so the lines are flat-shaded too.
   mesh.material = new THREE.MeshStandardMaterial({
-    // map: await loadTexture(manager),
     wireframe: true,
     depthTest: true,
+    flatShading: true,
   });
   addCloudShadows(mesh.material);
   addLineFade(mesh.material);

@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 14:02 UTC
+
+### Changed
+- **Island model 8.3 MB → 1.3 MB**: `lanzarote.glb` keeps only positions and triangles. Blender repeated each of the 58k points about four times (once per normal/UV around it) and shipped normals and UVs nothing reads; the new `3d/slim-glb.py` welds the points, drops both and stores 16-bit indices, keeping triangle order so the face jitter is unchanged. The island's line material is flat-shaded since it has no normals. Same look, 0.75 MB gzipped
+
 ## 2026-10-27 13:52 UTC
 
 ### Changed

@@ -106,7 +106,7 @@ the spin, `?model=<id>` links to one. A new model goes in `src/applications/mode
 
 ## Source art
 
-`3d/` holds the island's sources: the height map (`.xcf` / `.png`) and a Blender scene of the island (`lanzarote.blend`). The scenes load `assets/foundation/models/environment/lanzarote.glb`. The pilots are voxel models from the `3d-characters` repo, exported to `.obj`.
+`3d/` holds the island's sources: the height map (`.xcf` / `.png`) and a Blender scene of the island (`lanzarote.blend`). The scenes load `assets/foundation/models/environment/lanzarote.glb`. After exporting it from Blender, run `python3 3d/slim-glb.py <exported.glb> assets/foundation/models/environment/lanzarote.glb`: it welds the points and drops the normals and UVs the scenes don't use (8.3 MB → 1.3 MB). The pilots are voxel models from the `3d-characters` repo, exported to `.obj`.
 
 ## Credits / inspiration
 
