@@ -9,8 +9,8 @@ map, with a living sea, gulls, towns, boats and planes.
 
 | | |
 | --- | --- |
-| ![A paraglider over Famara beach and the islands to the north](docs/screenshots/famara-animation.png) | ![Famara cliffs and the northern islands with no pilots](docs/screenshots/famara-static.png) |
-| **Famara animation:** a camera flight along the cliff | **Famara static:** the landscape on its own |
+| ![The low-poly Hercules on the model viewer's turntable](docs/screenshots/hercules.png) | ![Famara cliffs and the northern islands with no pilots](docs/screenshots/famara-static.png) |
+| **Hercules:** one of the planes crossing the sky | **Famara static:** the landscape on its own |
 | ![A generated town of low-poly houses seen from above](docs/screenshots/town.png) | ![The fishing boat on the model viewer's turntable](docs/screenshots/models.png) |
 | **Town:** a generated town up close | **Models:** every model on a turntable |
 
