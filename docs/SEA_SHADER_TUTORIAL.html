@@ -1,0 +1,866 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>body { margin: 0; } [hidden] { display: none !important; }</style>
+<title>Lanzarote Sea Shader</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column (~68ch) under a full-width live demo; code blocks may run a little wider than the prose. */
+:root {
+  --bg: #f2f6f7;
+  --surface: #e3ecee;
+  --fg: #0f2431;
+  --muted: #4d6472;
+  --accent: #0c777b;
+  --accent-soft: #c9e7e6;
+  --rule: #c8d6da;
+  --code-bg: #0b1d29;
+  --code-fg: #d6e6ea;
+  --code-comment: #7f9aa8;
+  --code-num: #f2b880;
+  --code-kw: #6fd6d2;
+  --code-str: #b8d98a;
+  --plot-line: #0c777b;
+  --plot-grid: #c8d6da;
+  --plot-arrow: #d9622b;
+  --font-display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --font-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #071620; --surface: #0e2532; --fg: #dbe8ec; --muted: #8fa7b4;
+    --accent: #42c7c3; --accent-soft: #123b42; --rule: #1d3a49;
+    --code-bg: #030e15; --code-fg: #d6e6ea; --code-comment: #6f8b99; --code-num: #f2b880;
+    --code-kw: #6fd6d2; --code-str: #b8d98a;
+    --plot-line: #42c7c3; --plot-grid: #1d3a49; --plot-arrow: #f08a55;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #071620; --surface: #0e2532; --fg: #dbe8ec; --muted: #8fa7b4;
+  --accent: #42c7c3; --accent-soft: #123b42; --rule: #1d3a49;
+  --code-bg: #030e15; --code-fg: #d6e6ea; --code-comment: #6f8b99; --code-num: #f2b880;
+  --code-kw: #6fd6d2; --code-str: #b8d98a;
+  --plot-line: #42c7c3; --plot-grid: #1d3a49; --plot-arrow: #f08a55;
+  color-scheme: dark;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 1.075rem;
+  line-height: 1.65;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 2rem 4rem;
+}
+.wrap { max-width: 1100px; margin: 0 auto; display: grid; gap: 2.5rem; }
+.col { max-width: 46rem; width: 100%; margin: 0 auto; min-width: 0; display: grid; gap: 1.1rem; }
+.col > * { margin: 0; }
+
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; line-height: 1.12; margin: 0; }
+h1 { font-size: clamp(2.2rem, 6vw, 3.6rem); font-weight: 700; letter-spacing: -0.02em; }
+h2 { font-size: clamp(1.55rem, 3.6vw, 2.1rem); font-weight: 700; letter-spacing: -0.01em; }
+h3 { font-size: 1.2rem; font-weight: 500; }
+.step-label {
+  font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--accent);
+}
+.lede { font-size: 1.22rem; color: var(--muted); }
+a { color: var(--accent); }
+strong { font-weight: 600; }
+code { font-family: var(--font-mono); font-size: 0.86em; background: var(--surface); padding: 0.08em 0.35em; border-radius: 4px; }
+pre {
+  margin: 0; background: var(--code-bg); color: var(--code-fg);
+  border-radius: 10px; padding: 1rem 1.15rem; overflow-x: auto;
+  font-family: var(--font-mono); font-size: 0.82rem; line-height: 1.6;
+}
+pre code { background: none; padding: 0; font-size: inherit; color: inherit; }
+.file { font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); margin-bottom: -0.6rem !important; }
+.tk-c { color: var(--code-comment); font-style: italic; }
+.tk-n { color: var(--code-num); }
+.tk-k { color: var(--code-kw); }
+.tk-s { color: var(--code-str); }
+
+section { display: grid; gap: 1.1rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); }
+section > * { margin: 0; }
+ul, ol { padding-left: 1.3rem; display: grid; gap: 0.35rem; }
+
+.note {
+  background: var(--accent-soft); border-radius: 10px; padding: 0.9rem 1.1rem;
+  font-size: 0.98rem;
+}
+.note b { font-family: var(--font-display); font-weight: 700; }
+
+/* Live demo */
+.demo { display: grid; gap: 0.75rem; }
+.stage {
+  position: relative; width: 100%; max-width: 100%; aspect-ratio: 16 / 8;
+  border-radius: 14px; overflow: hidden; background: #0a2a3c;
+}
+.stage canvas { display: block; width: 100%; height: 100%; touch-action: pan-y; }
+.stage .hint {
+  position: absolute; left: 12px; bottom: 10px; color: #e8f3f5; font-family: var(--font-mono);
+  font-size: 0.72rem; opacity: 0.8; pointer-events: none; text-shadow: 0 1px 2px #0008;
+}
+.stage .err {
+  position: absolute; inset: 0; display: grid; place-items: center; color: #e8f3f5;
+  font-family: var(--font-mono); font-size: 0.85rem; padding: 1rem; text-align: center;
+}
+.controls {
+  display: flex; flex-wrap: wrap; gap: 0.5rem 0.6rem; align-items: center;
+  font-family: var(--font-mono); font-size: 0.8rem;
+}
+.chip { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.7rem;
+  border: 1px solid var(--rule); border-radius: 999px; cursor: pointer; user-select: none; background: var(--bg); }
+.chip:has(input:checked) { background: var(--accent-soft); border-color: var(--accent); }
+.chip input { accent-color: var(--accent); margin: 0; }
+.slider { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.2rem; }
+.slider input { accent-color: var(--accent); width: 8rem; }
+.slider output { min-width: 4.5ch; font-variant-numeric: tabular-nums; }
+button {
+  font: inherit; font-family: var(--font-mono); font-size: 0.8rem; color: var(--fg);
+  background: var(--bg); border: 1px solid var(--rule); border-radius: 999px; padding: 0.35rem 0.8rem; cursor: pointer;
+}
+button:hover { border-color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Small 2D figures */
+.figure { display: grid; gap: 0.5rem; background: var(--surface); border-radius: 12px; padding: 0.9rem; }
+.figure canvas { width: 100%; height: 190px; display: block; }
+.figure .controls { font-size: 0.75rem; }
+.caption { font-size: 0.9rem; color: var(--muted); }
+
+table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
+.tablebox { overflow-x: auto; }
+th, td { text-align: left; padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-family: var(--font-display); font-weight: 500; color: var(--muted); }
+td code { white-space: nowrap; }
+
+.map { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 0.6rem; }
+.map div { border: 1px solid var(--rule); border-radius: 10px; padding: 0.7rem 0.85rem; font-size: 0.93rem; display: grid; gap: 0.2rem; }
+.map b { font-family: var(--font-display); font-weight: 700; }
+.map span { color: var(--muted); }
+
+footer { color: var(--muted); font-size: 0.9rem; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<div class="wrap">
+
+  <header class="col">
+    <p class="step-label">A beginner's tutorial · three.js + GLSL</p>
+    <h1>How the Lanzarote sea is drawn</h1>
+    <p class="lede">The ocean in this project is one flat, square plane. It has no wave geometry at all. Everything you see on it, from the swell and the turquoise shallows to the surf and the whitecaps, is painted per pixel by a small shader. This page walks through that shader one layer at a time, using the real code from <code>src/foundation/rendering/</code>.</p>
+  </header>
+
+  <div class="demo" aria-label="Live demo of the sea shader">
+    <div class="stage" id="stage">
+      <canvas id="sea" aria-label="A 3D sea around a small island, rendered with the shader described on this page"></canvas>
+      <div class="hint">drag to look around · scroll the page as usual</div>
+    </div>
+    <div class="controls" role="group" aria-label="Shader layers">
+      <label class="chip"><input type="checkbox" id="t-waves" checked> waves</label>
+      <label class="chip"><input type="checkbox" id="t-shallow" checked> shallows</label>
+      <label class="chip"><input type="checkbox" id="t-surf" checked> surf + shore foam</label>
+      <label class="chip"><input type="checkbox" id="t-caps" checked> whitecaps</label>
+      <label class="chip"><input type="checkbox" id="t-clouds" checked> cloud shadows</label>
+      <label class="slider" for="t-wind">wind <input type="range" id="t-wind" min="0" max="15" step="0.5" value="7"><output id="o-wind">7 m/s</output></label>
+      <button type="button" id="t-pause">pause</button>
+    </div>
+    <p class="caption col" style="max-width:none">Live demo. Untick the layers to watch the sea fall back to a single flat colour. The island here is a simple cone; in the real app it is the Lanzarote terrain model.</p>
+  </div>
+
+  <article class="col">
+
+    <section>
+      <p class="step-label">Before we start</p>
+      <h2>What a shader is, in five minutes</h2>
+      <p>Your graphics card draws every frame in two stages, and each stage runs a tiny program called a <strong>shader</strong>. Shaders are written in <strong>GLSL</strong>, a small C-like language.</p>
+      <ol>
+        <li><strong>The vertex shader</strong> runs once for every corner (vertex) of a mesh. Its job is to say where that corner lands on the screen. Our sea plane has only 4 corners, so this runs 4 times.</li>
+        <li><strong>The fragment shader</strong> runs once for every pixel the mesh covers, and decides that pixel's colour. A sea filling half a 1080p screen means about a million runs, every frame, all in parallel.</li>
+      </ol>
+      <p>All the interesting work on this page happens in the fragment shader. Each pixel asks a few questions ("where am I in the world?", "how far am I from the beach?", "what time is it?") and works out its own colour from the answers. No pixel can see its neighbours, which is why the shader recomputes everything from scratch for each one.</p>
+      <p>Three words you'll see everywhere:</p>
+      <div class="tablebox"><table>
+        <tr><th>Word</th><th>Meaning</th><th>Example here</th></tr>
+        <tr><td><code>uniform</code></td><td>A value JavaScript hands to the shader. It is the same for every pixel in a frame.</td><td>the time, the wind, the shallow colour</td></tr>
+        <tr><td><code>varying</code></td><td>A value the vertex shader passes down to the fragment shader, blended smoothly across the triangle.</td><td>each pixel's world position</td></tr>
+        <tr><td><code>vec2 / vec3 / vec4</code></td><td>Small vectors of 2, 3 or 4 numbers. Used for positions, directions and colours alike.</td><td><code>vec3(0.92, 0.95, 0.96)</code> is foam white</td></tr>
+      </table></div>
+      <p>And the four GLSL functions that do most of the work:</p>
+      <div class="tablebox"><table>
+        <tr><th>Function</th><th>What it does</th></tr>
+        <tr><td><code>mix(a, b, t)</code></td><td>Blends from <code>a</code> (when t = 0) to <code>b</code> (when t = 1). Works on numbers and on colours.</td></tr>
+        <tr><td><code>smoothstep(e0, e1, x)</code></td><td>0 when x is below <code>e0</code>, 1 when x is above <code>e1</code>, and a smooth S-curve in between. The workhorse for soft edges.</td></tr>
+        <tr><td><code>sin(x)</code></td><td>The familiar wave, between −1 and 1. Add time inside it and it moves.</td></tr>
+        <tr><td><code>dot(a, b)</code></td><td>For a point <code>p</code> and a direction <code>d</code>, <code>dot(p, d)</code> is how far along <code>d</code> the point is. That is how waves get a travel direction.</td></tr>
+      </table></div>
+    </section>
+
+    <section>
+      <p class="step-label">Step 1</p>
+      <h2>A flat plane</h2>
+      <p>The sea starts as the simplest mesh three.js can make: a square of two triangles, rotated to lie flat.</p>
+      <p class="file">src/foundation/components/environment/Water.ts</p>
+<pre><code class="hl">load(_sunPosition: THREE.Vector3) {
+  const waterGeometry = new THREE.PlaneGeometry(this.options.size, this.options.size);
+  this.waterMesh = new THREE.Mesh(waterGeometry, new OceanMaterial());
+  this.waterMesh.rotation.x = -Math.PI / 2;   // a PlaneGeometry stands upright; lay it down
+  this.waterMesh.receiveShadow = true;        // the island casts shadows onto the water
+  return this.waterMesh;
+}</code></pre>
+      <p>All the magic is in <code>OceanMaterial</code>. A <strong>material</strong> in three.js decides how a mesh's surface looks, and behind every material sits a vertex shader and a fragment shader.</p>
+    </section>
+
+    <section>
+      <p class="step-label">Step 2</p>
+      <h2>Borrow a material, then patch it</h2>
+      <p>Writing a sea shader from nothing means also writing sunlight, sky reflections, shadows and fog. That is a lot of maths three.js already has in <code>MeshStandardMaterial</code>, its realistic, physically based material. So <code>OceanMaterial</code> <em>extends</em> it and slips a few extra lines into its shader.</p>
+      <p class="file">src/foundation/rendering/OceanMaterial.ts</p>
+<pre><code class="hl">export class OceanMaterial extends THREE.MeshStandardMaterial {
+  constructor(look: OceanLook = DEFAULT_OCEAN_LOOK) {
+    // deep-water colour, very smooth (shiny), not metal
+    super({ color: look.deepColor, roughness: 0.12, metalness: 0.0 });
+    ...
+  }
+}</code></pre>
+      <p>A low <code>roughness</code> makes the surface act like a mirror. Because the render pipeline sets <code>scene.environment</code> to a picture of the sky, a shiny surface automatically reflects that sky and shows a bright glint where the sun bounces off. We get both for free.</p>
+      <p>The patching happens in <code>onBeforeCompile</code>. three.js builds its shaders out of named chunks, written as <code>#include &lt;something&gt;</code>. Just before the shader is compiled, three.js hands us its source code as a string, and we use plain JavaScript <code>.replace()</code> to swap chunks for our own code:</p>
+<pre><code class="hl">this.onBeforeCompile = shader =&gt; {
+  // 1. hand our uniforms to the shader
+  Object.assign(shader.uniforms, this.oceanUniforms, {
+    uTime: sharedUniforms.uTime,
+    uWind: sharedUniforms.uWind,
+    uCloudShadow: sharedUniforms.uCloudShadow,
+  });
+
+  // 2. vertex shader: remember where each point is in the world (step 3)
+  shader.vertexShader = shader.vertexShader
+    .replace('#include &lt;common&gt;', '#include &lt;common&gt;\nvarying vec3 vLzWorld;')
+    .replace(
+      '#include &lt;project_vertex&gt;',
+      '#include &lt;project_vertex&gt;\nvLzWorld = (modelMatrix * vec4(transformed, 1.0)).xyz;'
+    );
+
+  // 3. fragment shader: our helpers, then colour, roughness, normal and shadow
+  shader.fragmentShader = shader.fragmentShader
+    .replace('#include &lt;common&gt;', `#include &lt;common&gt;\n${OCEAN_PARS_GLSL}`)
+    .replace('vec4 diffuseColor = vec4( diffuse, opacity );', OCEAN_COLOR_GLSL)
+    .replace(
+      '#include &lt;roughnessmap_fragment&gt;',
+      '#include &lt;roughnessmap_fragment&gt;\nroughnessFactor = mix(roughnessFactor, 0.85, lzFoam);'
+    )
+    .replace('#include &lt;normal_fragment_maps&gt;', OCEAN_NORMAL_GLSL)
+    .replace(
+      '#include &lt;opaque_fragment&gt;',
+      'outgoingLight *= lzCloudShadow(vLzWorld.xz);\n#include &lt;opaque_fragment&gt;'
+    );
+};</code></pre>
+      <p>Each replacement targets one spot in three.js's own pipeline:</p>
+      <div class="map">
+        <div><b>&lt;common&gt;</b><span>The top of the shader. We add our uniforms and helper functions here.</span></div>
+        <div><b>diffuseColor</b><span>Where the base colour is set. We swap in our own: deep, shallow or foam.</span></div>
+        <div><b>roughnessmap</b><span>How shiny the pixel is. Foam is matte, open water is glossy.</span></div>
+        <div><b>normal_fragment_maps</b><span>Which way the surface faces. This is where the waves live.</span></div>
+        <div><b>opaque_fragment</b><span>The final colour, after lighting. Cloud shadows darken it here.</span></div>
+      </div>
+      <div class="note"><b>Tip.</b> To see the full list of chunk names, open <code>node_modules/three/src/renderers/shaders/ShaderLib/meshphysical.glsl.js</code>. The replace strings must match that file exactly, which is why this technique can break when three.js is upgraded.</div>
+      <p>One more detail: <code>customProgramCacheKey()</code> returns <code>'lz-ocean'</code>. three.js reuses compiled shaders between materials of the same type, and this key tells it that our patched version is different from a plain <code>MeshStandardMaterial</code>.</p>
+    </section>
+
+    <section>
+      <p class="step-label">Step 3</p>
+      <h2>Tell each pixel where it is</h2>
+      <p>The fragment shader doesn't know where in the world its pixel is. The two vertex-shader lines above fix that. <code>transformed</code> is the vertex position inside the mesh; multiplying by <code>modelMatrix</code> turns it into a world position, which we store in the varying <code>vLzWorld</code>.</p>
+      <p>The GPU then blends <code>vLzWorld</code> across the triangles, so every pixel of the sea receives its own exact world position. From now on the shader uses <code>vLzWorld.xz</code>, the position on the ground plane (east–west and north–south), as the input to everything. Because the patterns are tied to world positions, they stay fixed to the sea while the camera moves.</p>
+    </section>
+
+    <section>
+      <p class="step-label">Step 4</p>
+      <h2>A clock and a wind</h2>
+      <p>Movement needs time. One shared object holds the uniforms that every weather-related shader in the app uses: the ocean, the cloud shadows on the terrain and the gulls.</p>
+      <p class="file">src/foundation/rendering/sharedUniforms.ts</p>
+<pre><code class="hl">export const sharedUniforms = {
+  uTime: { value: 0 },
+  // Wind on the ground plane (x = east, y = south), in metres per second.
+  uWind: { value: new THREE.Vector2(5, 0) },
+  // 0 = no cloud shadows, 1 = full strength.
+  uCloudShadow: { value: 0.35 },
+};</code></pre>
+      <p>Every frame, the render pipeline adds the elapsed seconds to the clock:</p>
+      <p class="file">src/foundation/rendering/RenderPipeline.ts</p>
+<pre><code class="hl">render(camera: THREE.Camera): void {
+  const delta = Math.min(this.clock.getDelta(), 0.1);
+  sharedUniforms.uTime.value += delta;
+  ...
+}</code></pre>
+      <p>Uniforms are wrapped as <code>{ value: ... }</code> on purpose. The ocean's shader holds a reference to the same object, so changing <code>.value</code> in JavaScript updates the shader on the next frame with no extra work. One clock moves the waves, the clouds and the birds together.</p>
+      <p>Inside the shader, the wind vector is split into a speed and a direction:</p>
+<pre><code class="hl">float lzWindSpeed = length(uWind);                       // metres per second
+vec2 lzWindDir = lzWindSpeed &gt; 0.01 ? uWind / lzWindSpeed // a direction of length 1
+                                    : vec2(1.0, 0.0);      // calm day: pick east</code></pre>
+    </section>
+
+    <section>
+      <p class="step-label">Step 5</p>
+      <h2>Noise: randomness that looks natural</h2>
+      <p>Real water is never perfectly regular. To break up patterns, the shader uses <strong>noise</strong>: a function that returns a "random" number between 0 and 1 for any position, but changes smoothly as you move. It is built in three layers.</p>
+      <p class="file">src/foundation/rendering/shaderChunks.ts</p>
+<pre><code class="hl">// 1. Hash: a jumbled number for a point. Same input, same output, but no visible pattern.
+float lzHash(vec2 p) {
+  p = fract(p * vec2(123.34, 456.21));
+  p += dot(p, p + 45.32);
+  return fract(p.x * p.y);
+}
+
+// 2. Value noise: hash the four corners of the grid square we're in, blend between them.
+float lzNoise(vec2 p) {
+  vec2 i = floor(p);                   // which grid square
+  vec2 f = fract(p);                   // where inside it (0..1)
+  vec2 u = f * f * (3.0 - 2.0 * f);    // ease the blend so the grid lines don't show
+  return mix(
+    mix(lzHash(i), lzHash(i + vec2(1.0, 0.0)), u.x),
+    mix(lzHash(i + vec2(0.0, 1.0)), lzHash(i + vec2(1.0, 1.0)), u.x),
+    u.y
+  );
+}
+
+// 3. fbm ("fractal Brownian motion"): stack 4 layers, each twice as fine and half as strong.
+float lzFbm(vec2 p) {
+  float v = 0.0;
+  float a = 0.5;
+  for (int i = 0; i &lt; 4; i++) {
+    v += a * lzNoise(p);
+    p = p * 2.03 + vec2(17.1, 9.2);    // finer detail, shifted so layers don't line up
+    a *= 0.5;
+  }
+  return v;
+}</code></pre>
+      <p>Think of fbm like a coastline: big bays, smaller coves inside them, rocks inside those. One call gives you all the scales at once. The sea uses it for chop on the waves, the wobble of the surf lines, the whitecap patches and the cloud shadows.</p>
+      <p>The number you multiply the position by sets the size of the pattern. <code>lzFbm(p * 0.012)</code> gives blobs about 80 world units wide; <code>lzFbm(p * 0.006)</code> gives blobs twice as large.</p>
+    </section>
+
+    <section>
+      <p class="step-label">Step 6</p>
+      <h2>Waves without moving anything</h2>
+      <p>This is the central trick. The plane stays perfectly flat, but we lie to the lighting about which way it faces.</p>
+      <p>Light reflects off a surface according to its <strong>normal</strong>, an arrow pointing straight out of it. A flat plane's normal points straight up everywhere, so it reflects like one big mirror. If each pixel gets a normal that tilts the way a wave's slope would tilt, the sun glint and sky reflection break up exactly as they would on real waves. At a distance your eye can't tell the difference.</p>
+      <p>First, a function that describes how high the water would be at any point:</p>
+<pre><code class="hl">// Height of the sea surface: a few long swells along the wind plus choppy noise.
+float lzWaveHeight(vec2 p, vec2 dir, float t) {
+  vec2 side = vec2(-dir.y, dir.x);     // 90° to the wind
+  float h = 0.0;
+  // three swells, each a bit off the wind direction, shorter, faster and smaller
+  h += sin(dot(p, dir) * 0.018 - t * 0.9) * 1.0;
+  h += sin(dot(p, normalize(dir + side * 0.6)) * 0.031 - t * 1.3) * 0.55;
+  h += sin(dot(p, normalize(dir - side * 0.45)) * 0.047 - t * 1.7) * 0.35;
+  // plus random chop drifting slowly downwind
+  h += (lzFbm(p * 0.012 + dir * t * 0.05) - 0.5) * 2.2;
+  return h;
+}</code></pre>
+      <p>Read one line like this: <code>dot(p, dir)</code> is how far downwind the point is. Multiply by <code>0.018</code> and the wave repeats every 2π / 0.018 ≈ 350 units. Subtract <code>t * 0.9</code> and the crests slide forward as time passes. Three such waves at slightly different angles cross each other, so the sea never looks like corduroy.</p>
+      <p>Then the shader turns height into a normal. It asks for the height here, a little to the east, and a little to the south. The differences give the slope:</p>
+<pre><code class="hl">{
+  // Fade wave detail with distance so far water doesn't shimmer, and calm it near the beach.
+  float camDist = length(vLzWorld - cameraPosition);
+  float amp = 8.0 * (1.0 / (1.0 + camDist / 6000.0)) * mix(0.35, 1.0, lzDepth);
+  amp *= mix(0.6, 1.4, smoothstep(2.0, 12.0, lzWindSpeed));   // stronger wind, steeper waves
+
+  vec2 p = vLzWorld.xz;
+  float e = 4.0;                                       // look 4 units away
+  float h0 = lzWaveHeight(p, lzWindDir, uTime);              // here
+  float hx = lzWaveHeight(p + vec2(e, 0.0), lzWindDir, uTime);  // a step east
+  float hz = lzWaveHeight(p + vec2(0.0, e), lzWindDir, uTime);  // a step south
+
+  // slope east = (hx - h0) / e. Tilt the "up" arrow against the slope.
+  vec3 worldNormal = normalize(vec3(-(hx - h0) / e * amp, 1.0, -(hz - h0) / e * amp));
+
+  // three.js does its lighting in camera ("view") space, so convert before handing it back
+  normal = normalize((viewMatrix * vec4(worldNormal, 0.0)).xyz);
+}</code></pre>
+      <div class="figure">
+        <canvas id="wave2d" aria-label="A side view of the wave height with normal arrows tilting along the slopes"></canvas>
+        <div class="controls">
+          <label class="chip"><input type="checkbox" id="w-normals" checked> normal arrows</label>
+          <label class="slider" for="w-amp">amp <input type="range" id="w-amp" min="0" max="30" step="1" value="12"><output id="o-amp">12</output></label>
+        </div>
+        <p class="caption">A side view of <code>lzWaveHeight</code> along the wind. The line is the height the shader imagines; the arrows are the normals it hands to the lighting. The real plane stays flat. Turn <code>amp</code> up and the arrows lean harder, which is what a windy day does.</p>
+      </div>
+      <p>Two details make it look right from a paraglider's height:</p>
+      <ul>
+        <li><strong>Distance fade.</strong> Far away, one screen pixel covers many metres of sea, and detailed waves would flicker. <code>amp</code> shrinks as <code>camDist</code> grows, so the far sea calms into a smooth reflection of the sky, as it does in real life.</li>
+        <li><strong>Calm shallows.</strong> <code>lzDepth</code> (next step) is 0 at the beach and 1 in deep water, so waves near the shore are about a third as steep.</li>
+      </ul>
+    </section>
+
+    <section>
+      <p class="step-label">Step 7</p>
+      <h2>Turquoise shallows: knowing where the beach is</h2>
+      <p>Shallow water over sand looks turquoise, deep water looks navy. To blend between them, each pixel needs to know <strong>how far it is from the nearest coast</strong>. Measuring that live for a million pixels would be far too slow, so it is measured once, when the island loads, and saved into a texture.</p>
+      <p class="file">src/foundation/rendering/CoastField.ts</p>
+      <ol>
+        <li>A camera looks straight down at the island and renders it into an off-screen image: white where the ground is above sea level, black where it is sea.</li>
+        <li>The pixels are read back into JavaScript, and a <strong>distance transform</strong> runs over them. It sweeps the image twice, top-left to bottom-right and back, and each sea pixel takes its neighbour's distance plus one step. After two sweeps every pixel holds its distance to the nearest land.</li>
+        <li>The distances are packed into a greyscale <code>DataTexture</code>: 0 at the beach, 1 at 2,500 units or more out to sea.</li>
+      </ol>
+<pre><code class="hl">// after the island has loaded (src/shared/TerrainBase.ts)
+ocean.setCoast(bakeCoastField(renderer, island));</code></pre>
+      <p>In the shader, a pixel converts its world position into a texture coordinate and reads its distance back:</p>
+<pre><code class="hl">// Distance to the nearest beach, in world units (uCoastMax far out at sea).
+float lzCoastDistance(vec2 xz) {
+  if (uHasCoast &lt; 0.5) return uCoastMax;              // no island baked yet: open sea
+  vec2 uv = (xz - uCoastBounds.xy) / uCoastBounds.zw;  // world position -&gt; 0..1 on the texture
+  uv.y = 1.0 - uv.y;
+  if (any(lessThan(uv, vec2(0.0))) || any(greaterThan(uv, vec2(1.0)))) return uCoastMax;
+  return texture2D(uCoast, uv).r * uCoastMax;          // 0..1 back to world units
+}</code></pre>
+      <p>Then the colour is just one <code>smoothstep</code> and one <code>mix</code>:</p>
+<pre><code class="hl">float lzCoast = lzCoastDistance(vLzWorld.xz);
+float lzDepth = smoothstep(0.0, uShallowDistance, lzCoast);  // 0 at the beach, 1 out at sea
+vec3 lzWater = mix(uShallow, diffuse, lzDepth);              // turquoise -&gt; deep navy</code></pre>
+      <p><code>diffuse</code> is three.js's name for the material's <code>color</code>, the deep blue we passed to <code>super()</code>. <code>uShallowDistance</code> is 700 by default, so the turquoise fades out over about 700 metres. Both colours and the distance come from the theme (<code>water.color</code>, <code>water.shallowColor</code>, <code>water.shallowDistance</code>).</p>
+      <div class="note"><b>Why bake?</b> Baking turns an expensive question ("where is the nearest land?") into a single texture read. This is one of the most useful habits in real-time graphics: work out anything that never changes once, ahead of time, and look it up per pixel.</div>
+    </section>
+
+    <section>
+      <p class="step-label">Step 8</p>
+      <h2>Surf, shore foam and whitecaps</h2>
+      <p>Foam is a single number per pixel, <code>lzFoam</code>, from 0 (clear water) to 1 (solid white). Three sources feed it.</p>
+      <h3>Surf lines rolling onto the beach</h3>
+<pre><code class="hl">// Only in a band 15–140 units from the beach.
+float lzSurfZone = 1.0 - smoothstep(15.0, 140.0, lzCoast);
+// A sine wave of the coast distance makes rings parallel to the shore.
+// "+ uTime * 1.6" makes them travel inwards; the fbm bends them so they're not perfect rings.
+float lzSurfBand = sin(lzCoast * 0.11 + uTime * 1.6 + lzFbm(vLzWorld.xz * 0.01) * 6.0);
+// Keep only the very tops of the sine wave, so you get thin white lines.
+float lzSurf = lzSurfZone * smoothstep(0.75, 0.98, lzSurfBand) * 0.85;</code></pre>
+      <p>This shows how much the coast distance is worth. Feed it to <code>sin()</code> and you get rings that follow the shape of every bay automatically, with no extra data.</p>
+      <div class="figure">
+        <canvas id="smooth2d" aria-label="A plot of the surf zone: one minus smoothstep of the coast distance"></canvas>
+        <div class="controls">
+          <label class="slider" for="s-e0">edge0 <input type="range" id="s-e0" min="0" max="200" step="5" value="15"><output id="o-e0">15</output></label>
+          <label class="slider" for="s-e1">edge1 <input type="range" id="s-e1" min="0" max="300" step="5" value="140"><output id="o-e1">140</output></label>
+        </div>
+        <p class="caption">The surf zone, <code>1.0 - smoothstep(edge0, edge1, lzCoast)</code>, plotted against distance from the beach. The faint line is the surf band inside it at time 0. Drag the edges to see how <code>smoothstep</code> sets where an effect starts and ends.</p>
+      </div>
+      <h3>A white rim right at the water's edge</h3>
+<pre><code class="hl">float lzShoreFoam = (1.0 - smoothstep(0.0, 18.0, lzCoast)) * 0.9;</code></pre>
+      <h3>Whitecaps out at sea</h3>
+<pre><code class="hl">// Big, slowly drifting noise patches...
+float lzCapNoise = lzFbm(vLzWorld.xz * 0.006 - lzWindDir * uTime * 0.35);
+// ...but only the highest peaks turn white. More wind lowers the bar, so more caps appear.
+float lzCapThreshold = mix(0.95, 0.72, smoothstep(3.0, 12.0, lzWindSpeed));
+float lzCaps = smoothstep(lzCapThreshold, lzCapThreshold + 0.05, lzCapNoise) * lzDepth;</code></pre>
+      <p>Thresholding noise is a classic trick: noise is a landscape of hills, and <code>smoothstep</code> with a high edge keeps only the summits. Lowering the threshold floods fewer hills, so more islands of white show. Try the wind slider in the demo.</p>
+      <h3>Combine and paint</h3>
+<pre><code class="hl">lzFoam = clamp(max(max(lzSurf, lzShoreFoam), lzCaps * 0.8) * uHasCoast
+             + lzCaps * (1.0 - uHasCoast), 0.0, 1.0);
+vec4 diffuseColor = vec4(mix(lzWater, vec3(0.92, 0.95, 0.96), lzFoam), opacity);</code></pre>
+      <p><code>max()</code> takes whichever foam is strongest, so overlapping sources don't add up to something brighter than white. The <code>uHasCoast</code> part means: before the island is baked, show whitecaps only. The last line is the line we replaced in step 2. three.js lights <code>diffuseColor</code> as if it had always been its own.</p>
+    </section>
+
+    <section>
+      <p class="step-label">Step 9</p>
+      <h2>Finishing touches: matte foam and cloud shadows</h2>
+<pre><code class="hl">// after three.js works out roughness: foam is rough (0.85), open water stays glossy
+roughnessFactor = mix(roughnessFactor, 0.85, lzFoam);
+
+// after all lighting: darken under drifting clouds
+outgoingLight *= lzCloudShadow(vLzWorld.xz);</code></pre>
+      <p>Real foam doesn't mirror the sun, so foamy pixels get a high roughness and lose the glint. Cloud shadows are one more fbm, scaled to cloud size and slid downwind over time:</p>
+<pre><code class="hl">float lzCloudShadow(vec2 worldXZ) {
+  vec2 p = (worldXZ - uWind * uTime * 8.0) / 2600.0;   // patches ~2.6 km wide, moving with the wind
+  float c = smoothstep(0.52, 0.72, lzFbm(p));          // keep the bigger blobs, soft edges
+  return 1.0 - c * uCloudShadow;                        // 1 = full light, less under a cloud
+}</code></pre>
+      <p>The same function is patched into the terrain material via <code>addCloudShadows()</code>. Since both read the same <code>uTime</code> and <code>uWind</code>, a shadow slides off the sea and up the cliffs without a seam.</p>
+    </section>
+
+    <section>
+      <p class="step-label">Recap</p>
+      <h2>The whole recipe on one page</h2>
+      <ol>
+        <li>One flat plane with a shiny <code>MeshStandardMaterial</code>, so sky reflections and sun glint come for free.</li>
+        <li><code>onBeforeCompile</code> plus <code>.replace()</code> slips our GLSL into three.js's own shader.</li>
+        <li>The vertex shader passes each pixel its world position.</li>
+        <li>A shared clock and wind, updated from JavaScript each frame, drive all motion.</li>
+        <li>Fake waves: sum of sines plus noise gives a height; the slope of that height becomes the normal.</li>
+        <li>A coast-distance texture, baked once, drives the shallows, the surf rings and the calm near the shore.</li>
+        <li>Foam comes from thresholded sines and noise, painted white and made matte.</li>
+        <li>Cloud shadows darken the final colour.</li>
+      </ol>
+      <p>If you want to experiment, the safest knobs are the plain numbers. Each one maps to something you can see:</p>
+      <div class="tablebox"><table>
+        <tr><th>Change this</th><th>And you get</th></tr>
+        <tr><td><code>0.018</code>, <code>0.031</code>, <code>0.047</code></td><td>Longer or shorter swells (smaller number, longer wave)</td></tr>
+        <tr><td><code>t * 0.9</code>, <code>t * 1.3</code> …</td><td>Faster or slower wave travel</td></tr>
+        <tr><td><code>8.0</code> in <code>amp</code></td><td>Rougher or glassier sea</td></tr>
+        <tr><td><code>15.0, 140.0</code> in <code>lzSurfZone</code></td><td>Where the surf breaks</td></tr>
+        <tr><td><code>lzCoast * 0.11</code></td><td>Spacing between surf lines</td></tr>
+        <tr><td><code>0.95, 0.72</code> in <code>lzCapThreshold</code></td><td>How many whitecaps on calm and windy days</td></tr>
+        <tr><td><code>water.shallowColor</code>, <code>shallowDistance</code> in the theme</td><td>The colour and width of the turquoise band, no shader edit needed</td></tr>
+      </table></div>
+      <div class="note"><b>Debugging tip.</b> When something looks wrong, paint the suspect value as a colour. Temporarily set <code>diffuseColor = vec4(vec3(lzDepth), 1.0);</code> and the sea turns into a black-to-white map of depth. It is the shader version of <code>console.log</code>.</div>
+    </section>
+
+    <footer>
+      <p>Code excerpts are from <code>OceanMaterial.ts</code>, <code>CoastField.ts</code>, <code>shaderChunks.ts</code>, <code>sharedUniforms.ts</code> and <code>Water.ts</code> in lanzarote3d. The live demo runs the same GLSL on three.js r160. It swaps the baked coast texture for a formula that describes the cone island, and adds an on/off switch for each layer.</p>
+    </footer>
+  </article>
+</div>
+
+<script>
+// Minimal syntax colouring for the code blocks: comments, strings, numbers, keywords.
+(function () {
+  const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const re = /(\/\/[^\n]*)|('[^'\n]*')|\b(\d+\.?\d*)\b|\b(const|let|new|return|if|for|float|int|vec2|vec3|vec4|uniform|varying|void|this|class|export|extends|super|constructor)\b/g;
+  document.querySelectorAll('code.hl').forEach(el => {
+    const src = el.textContent;
+    let out = '', last = 0, m;
+    while ((m = re.exec(src))) {
+      out += esc(src.slice(last, m.index));
+      const cls = m[1] ? 'c' : m[2] ? 's' : m[3] ? 'n' : 'k';
+      out += `<span class="tk-${cls}">${esc(m[0])}</span>`;
+      last = m.index + m[0].length;
+    }
+    el.innerHTML = out + esc(src.slice(last));
+  });
+})();
+
+// 2D figures
+(function () {
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function fit(canvas) {
+    const r = canvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.max(1, Math.round(r.width * dpr));
+    canvas.height = Math.max(1, Math.round(r.height * dpr));
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { ctx, w: r.width, h: r.height };
+  }
+
+  // 1D version of lzWaveHeight, with a cheap 1D value noise standing in for fbm.
+  const hash = i => { const s = Math.sin(i * 127.1) * 43758.5453; return s - Math.floor(s); };
+  const noise = x => { const i = Math.floor(x), f = x - i, u = f * f * (3 - 2 * f); return hash(i) * (1 - u) + hash(i + 1) * u; };
+  const fbm = x => { let v = 0, a = 0.5; for (let k = 0; k < 4; k++) { v += a * noise(x); x = x * 2.03 + 17.1; a *= 0.5; } return v; };
+  const height = (x, t) =>
+    Math.sin(x * 0.018 - t * 0.9) + Math.sin(x * 0.031 * 0.83 - t * 1.3) * 0.55 +
+    Math.sin(x * 0.047 * 0.9 - t * 1.7) * 0.35 + (fbm(x * 0.012 + t * 0.05) - 0.5) * 2.2;
+
+  const wave = document.getElementById('wave2d');
+  const showN = document.getElementById('w-normals');
+  const ampIn = document.getElementById('w-amp');
+  const ampOut = document.getElementById('o-amp');
+  let t = 0;
+  function drawWave() {
+    const { ctx, w, h } = fit(wave);
+    const span = 900, sx = w / span, mid = h * 0.55, sy = h * 0.11;
+    ctx.clearRect(0, 0, w, h);
+    ctx.strokeStyle = css('--plot-grid'); ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(0, mid); ctx.lineTo(w, mid); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = css('--muted'); ctx.font = '11px ' + css('--font-mono');
+    ctx.fillText('the real (flat) plane', 6, mid + 14);
+    ctx.fillText('wind →', w - 52, 14);
+    ctx.strokeStyle = css('--plot-line'); ctx.lineWidth = 2; ctx.beginPath();
+    for (let px = 0; px <= w; px += 2) {
+      const y = mid - height(px / sx, t) * sy;
+      px ? ctx.lineTo(px, y) : ctx.moveTo(px, y);
+    }
+    ctx.stroke();
+    if (showN.checked) {
+      const amp = +ampIn.value, e = 4;
+      ctx.strokeStyle = css('--plot-arrow'); ctx.fillStyle = css('--plot-arrow'); ctx.lineWidth = 1.6;
+      for (let px = 18; px < w; px += Math.max(22, w / 28)) {
+        const x = px / sx, h0 = height(x, t), hx = height(x + e, t);
+        let nx = -(hx - h0) / e * amp, ny = 1; const l = Math.hypot(nx, ny); nx /= l; ny /= l;
+        const len = 30, ax = px + nx * len, ay = mid - ny * len;
+        ctx.beginPath(); ctx.moveTo(px, mid); ctx.lineTo(ax, ay); ctx.stroke();
+        ctx.beginPath(); ctx.arc(ax, ay, 2.2, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+  }
+  ampIn.addEventListener('input', () => { ampOut.textContent = ampIn.value; drawWave(); });
+  showN.addEventListener('change', drawWave);
+
+  const sm = document.getElementById('smooth2d');
+  const e0In = document.getElementById('s-e0'), e1In = document.getElementById('s-e1');
+  const e0Out = document.getElementById('o-e0'), e1Out = document.getElementById('o-e1');
+  const smoothstep = (a, b, x) => { if (a === b) return x < a ? 0 : 1; const k = Math.min(1, Math.max(0, (x - a) / (b - a))); return k * k * (3 - 2 * k); };
+  function drawSmooth() {
+    const { ctx, w, h } = fit(sm);
+    const padL = 34, padB = 22, padT = 10, maxD = 300;
+    const X = d => padL + (d / maxD) * (w - padL - 8), Y = v => padT + (1 - v) * (h - padT - padB);
+    const e0 = +e0In.value, e1 = +e1In.value;
+    ctx.clearRect(0, 0, w, h);
+    ctx.font = '11px ' + css('--font-mono'); ctx.fillStyle = css('--muted'); ctx.strokeStyle = css('--plot-grid'); ctx.lineWidth = 1;
+    for (const d of [0, 50, 100, 150, 200, 250, 300]) {
+      ctx.beginPath(); ctx.moveTo(X(d), padT); ctx.lineTo(X(d), h - padB); ctx.stroke();
+      ctx.fillText(String(d), X(d) - (d ? 9 : 0), h - 6);
+    }
+    for (const v of [0, 1]) { ctx.beginPath(); ctx.moveTo(padL, Y(v)); ctx.lineTo(w - 8, Y(v)); ctx.stroke(); ctx.fillText(v.toFixed(1), 4, Y(v) + 4); }
+    // surf band inside the zone, at time 0
+    ctx.strokeStyle = css('--plot-arrow'); ctx.globalAlpha = 0.55; ctx.lineWidth = 1.2; ctx.beginPath();
+    for (let px = padL; px <= w - 8; px += 1.5) {
+      const d = (px - padL) / (w - padL - 8) * maxD;
+      const v = (1 - smoothstep(e0, e1, d)) * smoothstep(0.75, 0.98, Math.sin(d * 0.11)) * 0.85;
+      px === padL ? ctx.moveTo(px, Y(v)) : ctx.lineTo(px, Y(v));
+    }
+    ctx.stroke(); ctx.globalAlpha = 1;
+    ctx.strokeStyle = css('--plot-line'); ctx.lineWidth = 2.2; ctx.beginPath();
+    for (let px = padL; px <= w - 8; px += 1.5) {
+      const d = (px - padL) / (w - padL - 8) * maxD;
+      const v = 1 - smoothstep(e0, e1, d);
+      px === padL ? ctx.moveTo(px, Y(v)) : ctx.lineTo(px, Y(v));
+    }
+    ctx.stroke();
+    ctx.fillStyle = css('--muted'); ctx.fillText('distance from beach →', w - 150, padT + 12);
+  }
+  [e0In, e1In].forEach(el => el.addEventListener('input', () => {
+    e0Out.textContent = e0In.value; e1Out.textContent = e1In.value; drawSmooth();
+  }));
+
+  let visible = false;
+  new IntersectionObserver(es => { visible = es[0].isIntersecting; }).observe(wave);
+  let prev = performance.now();
+  function loop(now) {
+    const dt = Math.min((now - prev) / 1000, 0.1); prev = now;
+    if (visible && !reduce) { t += dt; drawWave(); }
+    requestAnimationFrame(loop);
+  }
+  drawWave(); drawSmooth();
+  requestAnimationFrame(loop);
+  window.addEventListener('resize', () => { drawWave(); drawSmooth(); });
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { drawWave(); drawSmooth(); });
+  new MutationObserver(() => { drawWave(); drawSmooth(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+})();
+</script>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { Sky } from 'three/addons/objects/Sky.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const canvas = document.getElementById('sea');
+const stage = document.getElementById('stage');
+
+try {
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 0.55;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(50, 2, 5, 200000);
+  camera.position.set(-900, 380, 1500);
+
+  const controls = new OrbitControls(camera, canvas);
+  controls.target.set(0, 40, 0);
+  controls.enableDamping = true;
+  controls.enableZoom = false;
+  controls.enablePan = false;
+  controls.minPolarAngle = 0.6;
+  controls.maxPolarAngle = 1.45;
+
+  // Sky: the background, and (through PMREM) the environment the shiny sea reflects.
+  const sun = new THREE.Vector3().setFromSphericalCoords(1, THREE.MathUtils.degToRad(68), THREE.MathUtils.degToRad(160));
+  const makeSky = () => {
+    const s = new Sky();
+    s.scale.setScalar(100000);
+    const u = s.material.uniforms;
+    u.turbidity.value = 6; u.rayleigh.value = 1.6; u.mieCoefficient.value = 0.004; u.mieDirectionalG.value = 0.85;
+    u.sunPosition.value.copy(sun);
+    return s;
+  };
+  scene.add(makeSky());
+  const envScene = new THREE.Scene();
+  envScene.add(makeSky());
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(envScene).texture;
+  scene.environmentIntensity = 0.6;
+
+  const light = new THREE.DirectionalLight(0xfff1dc, 2.6);
+  light.position.copy(sun).multiplyScalar(5000);
+  scene.add(light, new THREE.HemisphereLight(0xbfd8ff, 0x3a3026, 0.5));
+
+  // Island: a cone whose shoreline follows coastRadius(angle), the same formula the shader uses.
+  const coastRadius = a => 520 + 60 * Math.sin(3 * a) + 30 * Math.sin(7 * a + 1);
+  const islandGeo = new THREE.ConeGeometry(1, 1, 160, 24, true);
+  const pos = islandGeo.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const t = pos.getY(i) + 0.5;                  // 0 at the base, 1 at the tip
+    const y = -30 + t * 230;                      // sea level is y = 0
+    const a = Math.atan2(pos.getZ(i), pos.getX(i));
+    const r = coastRadius(a) * (200 - y) / 200 * (1 + 0.04 * Math.sin(a * 13 + t * 9));
+    pos.setXYZ(i, Math.cos(a) * r, y + Math.max(0, y) * 0.15 * Math.sin(a * 5), Math.sin(a) * r);
+  }
+  islandGeo.computeVertexNormals();
+  const island = new THREE.Mesh(islandGeo, new THREE.MeshStandardMaterial({ color: 0x7a5d46, roughness: 0.95, flatShading: true }));
+  scene.add(island);
+
+  // ---- The sea: the same patch as OceanMaterial, plus a 0/1 switch per layer ----
+  const NOISE_GLSL = `
+    float lzHash(vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
+    float lzNoise(vec2 p) {
+      vec2 i = floor(p); vec2 f = fract(p); vec2 u = f * f * (3.0 - 2.0 * f);
+      return mix(mix(lzHash(i), lzHash(i + vec2(1.0, 0.0)), u.x),
+                 mix(lzHash(i + vec2(0.0, 1.0)), lzHash(i + vec2(1.0, 1.0)), u.x), u.y);
+    }
+    float lzFbm(vec2 p) {
+      float v = 0.0; float a = 0.5;
+      for (int i = 0; i < 4; i++) { v += a * lzNoise(p); p = p * 2.03 + vec2(17.1, 9.2); a *= 0.5; }
+      return v;
+    }`;
+
+  const PARS = `
+    varying vec3 vLzWorld;
+    uniform float uTime; uniform vec2 uWind; uniform float uCloudShadow;
+    uniform vec3 uShallow; uniform float uShallowDistance;
+    uniform float uWaves, uShallows, uSurf, uCaps, uClouds;
+    ${NOISE_GLSL}
+    float lzFoam = 0.0;
+    // Demo stand-in for the baked texture: distance outside a wobbly circle.
+    float lzCoastDistance(vec2 xz) {
+      float a = atan(xz.y, xz.x);
+      float r = 520.0 + 60.0 * sin(3.0 * a) + 30.0 * sin(7.0 * a + 1.0);
+      return clamp(length(xz) - r, 0.0, 2500.0);
+    }
+    float lzWaveHeight(vec2 p, vec2 dir, float t) {
+      vec2 side = vec2(-dir.y, dir.x);
+      float h = 0.0;
+      h += sin(dot(p, dir) * 0.018 - t * 0.9) * 1.0;
+      h += sin(dot(p, normalize(dir + side * 0.6)) * 0.031 - t * 1.3) * 0.55;
+      h += sin(dot(p, normalize(dir - side * 0.45)) * 0.047 - t * 1.7) * 0.35;
+      h += (lzFbm(p * 0.012 + dir * t * 0.05) - 0.5) * 2.2;
+      return h;
+    }
+    float lzCloudShadow(vec2 worldXZ) {
+      vec2 p = (worldXZ - uWind * uTime * 8.0) / 2600.0;
+      float c = smoothstep(0.52, 0.72, lzFbm(p));
+      return 1.0 - c * uCloudShadow * uClouds;
+    }`;
+
+  const COLOR = `
+    float lzWindSpeed = length(uWind);
+    vec2 lzWindDir = lzWindSpeed > 0.01 ? uWind / lzWindSpeed : vec2(1.0, 0.0);
+    float lzCoast = lzCoastDistance(vLzWorld.xz);
+    float lzDepth = smoothstep(0.0, uShallowDistance, lzCoast);
+    vec3 lzWater = mix(diffuse, mix(uShallow, diffuse, lzDepth), uShallows);
+    float lzSurfZone = 1.0 - smoothstep(15.0, 140.0, lzCoast);
+    float lzSurfBand = sin(lzCoast * 0.11 + uTime * 1.6 + lzFbm(vLzWorld.xz * 0.01) * 6.0);
+    float lzSurf = lzSurfZone * smoothstep(0.75, 0.98, lzSurfBand) * 0.85 * uSurf;
+    float lzShoreFoam = (1.0 - smoothstep(0.0, 18.0, lzCoast)) * 0.9 * uSurf;
+    float lzCapNoise = lzFbm(vLzWorld.xz * 0.006 - lzWindDir * uTime * 0.35);
+    float lzCapThreshold = mix(0.95, 0.72, smoothstep(3.0, 12.0, lzWindSpeed));
+    float lzCaps = smoothstep(lzCapThreshold, lzCapThreshold + 0.05, lzCapNoise) * lzDepth * uCaps;
+    lzFoam = clamp(max(max(lzSurf, lzShoreFoam), lzCaps * 0.8), 0.0, 1.0);
+    vec4 diffuseColor = vec4(mix(lzWater, vec3(0.92, 0.95, 0.96), lzFoam), opacity);`;
+
+  const NORMAL = `
+    {
+      float camDist = length(vLzWorld - cameraPosition);
+      float amp = 8.0 * (1.0 / (1.0 + camDist / 6000.0)) * mix(0.35, 1.0, lzDepth);
+      amp *= mix(0.6, 1.4, smoothstep(2.0, 12.0, lzWindSpeed)) * uWaves;
+      vec2 p = vLzWorld.xz;
+      float e = 4.0;
+      float h0 = lzWaveHeight(p, lzWindDir, uTime);
+      float hx = lzWaveHeight(p + vec2(e, 0.0), lzWindDir, uTime);
+      float hz = lzWaveHeight(p + vec2(0.0, e), lzWindDir, uTime);
+      vec3 worldNormal = normalize(vec3(-(hx - h0) / e * amp, 1.0, -(hz - h0) / e * amp));
+      normal = normalize((viewMatrix * vec4(worldNormal, 0.0)).xyz);
+    }`;
+
+  const u = {
+    uTime: { value: 0 },
+    uWind: { value: new THREE.Vector2(7, 0) },
+    uCloudShadow: { value: 0.35 },
+    uShallow: { value: new THREE.Color('#1fa5a8') },
+    uShallowDistance: { value: 700 },
+    uWaves: { value: 1 }, uShallows: { value: 1 }, uSurf: { value: 1 }, uCaps: { value: 1 }, uClouds: { value: 1 },
+  };
+
+  const sea = new THREE.MeshStandardMaterial({ color: '#06283f', roughness: 0.12, metalness: 0 });
+  sea.onBeforeCompile = shader => {
+    Object.assign(shader.uniforms, u);
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vLzWorld;')
+      .replace('#include <project_vertex>', '#include <project_vertex>\nvLzWorld = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', '#include <common>\n' + PARS)
+      .replace('vec4 diffuseColor = vec4( diffuse, opacity );', COLOR)
+      .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, 0.85, lzFoam);')
+      .replace('#include <normal_fragment_maps>', NORMAL)
+      .replace('#include <opaque_fragment>', 'outgoingLight *= lzCloudShadow(vLzWorld.xz);\n#include <opaque_fragment>');
+  };
+  sea.customProgramCacheKey = () => 'lz-ocean-demo';
+
+  const water = new THREE.Mesh(new THREE.PlaneGeometry(120000, 120000), sea);
+  water.rotation.x = -Math.PI / 2;
+  scene.add(water);
+
+  // Controls
+  const bind = (id, key) => {
+    const el = document.getElementById(id);
+    const set = () => { u[key].value = el.checked ? 1 : 0; };
+    el.addEventListener('change', set); set();
+  };
+  bind('t-waves', 'uWaves'); bind('t-shallow', 'uShallows'); bind('t-surf', 'uSurf'); bind('t-caps', 'uCaps'); bind('t-clouds', 'uClouds');
+  const wind = document.getElementById('t-wind'), windOut = document.getElementById('o-wind');
+  const setWind = () => {
+    // wind blowing towards the island from the west-south-west
+    const s = +wind.value; u.uWind.value.set(Math.cos(0.35) * s, Math.sin(0.35) * s);
+    windOut.textContent = s + ' m/s';
+  };
+  wind.addEventListener('input', setWind); setWind();
+
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let playing = !reduce;
+  const pauseBtn = document.getElementById('t-pause');
+  const syncBtn = () => { pauseBtn.textContent = playing ? 'pause' : 'play'; };
+  pauseBtn.addEventListener('click', () => { playing = !playing; syncBtn(); });
+  syncBtn();
+
+  function resize() {
+    const r = stage.getBoundingClientRect();
+    renderer.setSize(r.width, r.height, false);
+    camera.aspect = r.width / Math.max(1, r.height);
+    camera.updateProjectionMatrix();
+  }
+  new ResizeObserver(resize).observe(stage);
+  resize();
+
+  let visible = true;
+  new IntersectionObserver(es => { visible = es[0].isIntersecting; }).observe(stage);
+  const clock = new THREE.Clock();
+  u.uTime.value = 6;
+  renderer.setAnimationLoop(() => {
+    const dt = Math.min(clock.getDelta(), 0.1);
+    if (!visible) return;
+    if (playing) u.uTime.value += dt;
+    controls.update();
+    renderer.render(scene, camera);
+  });
+} catch (err) {
+  const msg = document.createElement('div');
+  msg.className = 'err';
+  msg.textContent = 'The live demo needs WebGL, which this browser could not start. The rest of the tutorial works without it.';
+  stage.appendChild(msg);
+}
+</script>
+</html>

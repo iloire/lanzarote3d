@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 21:22 UTC
+
+### Added
+- **Sea shader tutorial**: `docs/SEA_SHADER_TUTORIAL.html`, a beginner's walkthrough of how the ocean is drawn (flat plane, patched MeshStandardMaterial, fake wave normals, baked coast distance, surf, whitecaps, cloud shadows) using the real code, with a live three.js demo that toggles each layer
+
 ## 2026-10-27 22:25 UTC
 
 ### Changed
