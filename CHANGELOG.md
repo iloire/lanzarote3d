@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 12:40 UTC
+
+### Added
+- **Bernt twists**: now and then Bernt spins half a turn round his risers and flies looking backwards for 8-15 s while the wing flies on, then spins back; he does it every 30 s to a minute and a half, and straight away when the camera lands on him, from the fly-in (`?pilot=bernt`) or the ‹ › arrows. Tuned by `twist` on his entry in `home/config.ts`
+
 ## 2026-10-27 12:15 UTC
 
 ### Added

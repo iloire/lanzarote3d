@@ -7,7 +7,7 @@ import type {
 import { CharacterType } from '../../foundation/components/characters/CharacterRegistry';
 import { FlightPattern } from '../../foundation/systems/behaviors/FlyingBehavior';
 import type { BackdropSwaySettings, CameraFollowSettings } from './cameraFollow';
-import type { WingoverSettings } from './paragliderMotion';
+import type { TwistSettings, WingoverSettings } from './paragliderMotion';
 
 export type ParagliderVoxelConfig = {
   options: ParagliderVoxelOptions;
@@ -17,6 +17,8 @@ export type ParagliderVoxelConfig = {
   pathOffset: THREE.Vector3;
   /** A loop of this pilot's own, flown instead of the shared one (pathOffset still applies) */
   waypoints?: THREE.Vector3[];
+  /** Twists thrown now and then, spinning round to fly looking backwards */
+  twist?: TwistSettings;
 };
 
 export type HanggliderConfig = {
@@ -440,6 +442,9 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
     startProgress: 0.8,
     pathOffset: new THREE.Vector3(3000, 0, -5200),
     waypoints: liftLoop(450, 1),
+    // He likes to twist round and fly looking backwards: a 1.5 s spin, 8-15 s facing back,
+    // then 30 s to a minute and a half facing forward
+    twist: { spin: 1.5, hold: [8, 15], rest: [30, 90] },
   },
   {
     // Magne is the best of them: his loop is widened 1.5x, raised above everyone's (1625-1687 m;

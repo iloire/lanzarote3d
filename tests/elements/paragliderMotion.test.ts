@@ -130,3 +130,58 @@ test('wingovers come in bursts, with straight flying in between', () => {
   expect(widest(8, 37)).toBeLessThan(1e-6);
   expect(widest(37, 46)).toBeGreaterThan(20);
 });
+
+test('a twist spins the pilot half a turn to face backwards, holds it and spins back', () => {
+  const rig = new THREE.Object3D();
+  const body = new THREE.Object3D();
+  const swing = new THREE.Object3D();
+  rig.add(body);
+  // No wait before the first twist, the shortest hold, and spinning to the right
+  const random = jest.spyOn(Math, 'random').mockReturnValue(0);
+  const motion = new ParagliderMotion(rig, body, SPEED, swing, undefined, {
+    spin: 1.5,
+    hold: [8, 15],
+    rest: [30, 90],
+  });
+
+  /** The pilot's twist after flying straight on to `to` seconds */
+  let t = 0;
+  const twistAt = (to: number) => {
+    for (; t < to; t += STEP) {
+      rig.position.z -= SPEED * STEP;
+      motion.update(STEP);
+    }
+    return swing.rotation.y;
+  };
+
+  expect(Math.abs(twistAt(0.75))).toBeGreaterThan(1);
+  expect(twistAt(2)).toBeCloseTo(-Math.PI, 5);
+  expect(twistAt(9)).toBeCloseTo(-Math.PI, 5);
+  // Hold ends at 9.5 s; it spins back and faces forward again by 11 s, then rests 30 s
+  expect(Math.abs(twistAt(11.2))).toBeLessThan(1e-6);
+  expect(Math.abs(twistAt(40))).toBeLessThan(1e-6);
+  random.mockRestore();
+});
+
+test('startTwist twists straight away instead of waiting out the rest', () => {
+  const rig = new THREE.Object3D();
+  const body = new THREE.Object3D();
+  const swing = new THREE.Object3D();
+  rig.add(body);
+  const random = jest.spyOn(Math, 'random').mockReturnValue(0.99);
+  const motion = new ParagliderMotion(rig, body, SPEED, swing, undefined, {
+    spin: 1.5,
+    hold: [8, 15],
+    rest: [30, 90],
+  });
+  random.mockRestore();
+
+  const fly = (seconds: number) => {
+    for (let t = 0; t < seconds; t += STEP) motion.update(STEP);
+  };
+  fly(5);
+  expect(swing.rotation.y).toBe(0);
+  motion.startTwist();
+  fly(2);
+  expect(Math.abs(swing.rotation.y)).toBeCloseTo(Math.PI, 5);
+});

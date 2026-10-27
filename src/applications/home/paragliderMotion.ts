@@ -29,6 +29,18 @@ export type WingoverSettings = {
   rest: [number, number];
 };
 
+/**
+ * A twist thrown now and then: holding the risers, the pilot spins half a turn round the hang
+ * line to fly looking backwards while the wing flies on. The spin takes `spin` seconds each
+ * way, the pilot holds it for a random time between `hold`, spins back the way they came and
+ * rests for a random time between `rest`, in seconds.
+ */
+export type TwistSettings = {
+  spin: number;
+  hold: [number, number];
+  rest: [number, number];
+};
+
 const randomBetween = ([min, max]: [number, number]) => min + Math.random() * (max - min);
 
 /**
@@ -77,23 +89,37 @@ export class ParagliderMotion {
   private burstLength = 0;
   private restLeft: number;
   private readonly weaveLast = { x: 0, y: 0 };
+  /** Seconds into the current twist, or null while facing forward */
+  private twistTime: number | null = null;
+  private twistLength = 0;
+  private twistDirection = 1;
+  private twistRestLeft: number;
 
   constructor(
     private readonly rig: THREE.Object3D,
     private readonly body: THREE.Object3D,
     private readonly speed: number,
     private readonly pilotSwing?: THREE.Object3D,
-    private readonly wingover?: WingoverSettings
+    private readonly wingover?: WingoverSettings,
+    private readonly twist?: TwistSettings
   ) {
     // Yaw before banking and pitching, as a wing weaving across its path does
     body.rotation.order = 'YXZ';
+    // The pilot twists round the hang line first, then swings on it
+    if (pilotSwing) pilotSwing.rotation.order = 'XZY';
     // Somewhere into a rest, so the pilots don't start their wingovers together
     this.restLeft = wingover ? Math.random() * wingover.rest[1] : 0;
+    this.twistRestLeft = twist ? Math.random() * twist.rest[1] : 0;
   }
 
   /** The wing's bank in radians, positive in a left turn */
   get bankAngle(): number {
     return this.bank;
+  }
+
+  /** Twists now, if this pilot twists and isn't already, instead of waiting out the rest */
+  startTwist(): void {
+    if (this.twistTime === null) this.twistRestLeft = 0;
   }
 
   update(deltaTime: number): void {
@@ -219,5 +245,32 @@ export class ParagliderMotion {
       MAX_SWING
     );
     pilotSwing.rotation.x = THREE.MathUtils.clamp(this.pitch.angle, -MAX_SWING, MAX_SWING);
+    pilotSwing.rotation.y = this.twistAngle(deltaTime);
+  }
+
+  /** How far the pilot is turned round the hang line, eased in and out of each spin */
+  private twistAngle(deltaTime: number): number {
+    if (!this.twist) return 0;
+    const { spin, hold, rest } = this.twist;
+
+    if (this.twistTime === null) {
+      this.twistRestLeft -= deltaTime;
+      if (this.twistRestLeft > 0) return 0;
+      this.twistTime = 0;
+      this.twistLength = spin * 2 + randomBetween(hold);
+      this.twistDirection = Math.random() < 0.5 ? -1 : 1;
+    }
+    this.twistTime += deltaTime;
+    const time = this.twistTime;
+    if (time >= this.twistLength) {
+      this.twistTime = null;
+      this.twistRestLeft = randomBetween(rest);
+      return 0;
+    }
+
+    const turned =
+      THREE.MathUtils.smoothstep(time, 0, spin) *
+      THREE.MathUtils.smoothstep(this.twistLength - time, 0, spin);
+    return this.twistDirection * Math.PI * turned;
   }
 }

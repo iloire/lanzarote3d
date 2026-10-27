@@ -274,10 +274,13 @@ class HomeApp extends TerrainBase {
       },
       onAnimationComplete: () => {
         this.isAnimating = false;
+        // A pilot who twists (Bernt) shows it off as the camera arrives, and again when picked
+        this.pilots[this.leadIndex]?.motion?.startTwist();
         // The arrows only steer the follow camera, so they appear once the intro has landed
         if (!isEmbedded() && !this.targetController && this.pilots.length > 1) {
           this.removePilotPicker = createPilotPicker(this.pilots.length, this.leadIndex, index => {
             this.leadIndex = index;
+            this.pilots[index]?.motion?.startTwist();
             // Keeps the address on the pilot in view, so it can be shared
             history.replaceState(null, '', searchWithPilot(window.location.search, index));
           });
