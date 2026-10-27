@@ -82,6 +82,11 @@ export class ParagliderVoxel extends SimpleThreeComponent {
     hangPoint.add(this.pilotSwing);
     group.updateMatrixWorld(true);
     this.pilotSwing.attach(this.pilotMesh);
+    // The brake handles are in the pilot's fists; their lines follow them as the pilot swings
+    wing
+      .getObjectByName('brakes')
+      ?.children.filter(child => child.name === 'brake-handle')
+      .forEach(handle => this.pilotSwing?.attach(handle));
 
     // Under the seat, so it swings with the pilot and streams back behind them
     if (options.pirateFlag) {

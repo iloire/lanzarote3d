@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 23:38 UTC
+
+### Fixed
+- **Brake lines end in the pilot's hands**: they ran to a point about 100 units inside each fist; they now end on top of the voxel pilot's fists in brake handles (a grip through the fist and a swivel on top). The handles hang from the pilot swing and the lines follow them every frame, so they stay in the hands as the pilot swings. Brake lines and handles get their own `brakeColor` (default `#6b3a2c`, a dark rust a shade off the grey lines)
+
 ## 2026-10-27 21:22 UTC
 
 ### Added
