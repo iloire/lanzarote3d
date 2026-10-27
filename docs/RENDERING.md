@@ -160,7 +160,7 @@ Everything here is driven from `DEFAULT_THEME` in `src/foundation/themes/index.t
 
 ```ts
 clouds: {                    // defaults: DEFAULT_CLOUDS in cloudMaterial.ts
-  light: '#ffffff', shade: '#b4c0d4', base: '#77849c', rim: '#fff3dc',
+  light: '#ffffff', shade: '#b4c0d4', base: '#636f86', rim: '#fff3dc',
   brightness: 1.35,          // scales all four
 },
 water: {
