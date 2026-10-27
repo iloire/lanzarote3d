@@ -4,7 +4,7 @@ import { Weather } from '../../foundation/components/physics';
 import { Thermal } from '../../foundation/components/physics';
 import Tree from '../../foundation/components/scenery/trees/Tree';
 import { logger } from '../../foundation/utils/logger';
-import { Gulls, GullFlock } from '../../foundation/components/wildlife/Gulls';
+import { Gulls, GullFlock, RAVEN } from '../../foundation/components/wildlife/Gulls';
 import { addMeshAroundArea } from './mesh-utils';
 import { generateThermalPair, ThermalGenerationOptions } from './thermal-utils';
 import { setCloudColors } from '../../foundation/rendering/cloudMaterial';
@@ -92,8 +92,21 @@ export const FAMARA_GULL_FLOCKS: GullFlock[] = [
   { center: new THREE.Vector3(5600, 1050, -650), count: 10 },
 ];
 
+/**
+ * Ravens riding the updraft along the edge of the Risco, in pairs and threes just over the
+ * cliff top, from above Famara to the Mirador.
+ */
+export const RISCO_RAVEN_FLOCKS: GullFlock[] = [
+  { center: new THREE.Vector3(8516, 1080, -2248), count: 3 },
+  { center: new THREE.Vector3(9587, 1420, -4507), count: 4 },
+  { center: new THREE.Vector3(10259, 1150, -6766), count: 2 },
+  { center: new THREE.Vector3(11748, 1110, -9591), count: 3 },
+  { center: new THREE.Vector3(12702, 1080, -11285), count: 3 },
+];
+
 class Environment {
   gulls?: Gulls;
+  ravens?: Gulls;
   cloudInstances: Clouds[] = [];
   private componentRegistry: ComponentRegistry = new ComponentRegistry();
   private boatGroupCreator: BoatGroupCreator;
@@ -111,6 +124,23 @@ class Environment {
     this.gulls = new Gulls(flocks);
     this.scene.add(this.gulls.mesh);
     return this.gulls;
+  }
+
+  /**
+   * Ravens along the cliff: the gulls' flight in black, smaller and in tighter circles, kept
+   * close to the edge. One more instanced draw call.
+   */
+  addRavens(flocks: GullFlock[]): Gulls {
+    this.ravens = new Gulls(flocks, {
+      wingspan: 4,
+      minRadius: 25,
+      maxRadius: 80,
+      spread: 0.4,
+      plumage: RAVEN,
+    });
+    this.ravens.mesh.name = 'ravens';
+    this.scene.add(this.ravens.mesh);
+    return this.ravens;
   }
 
   async addBoats(water: THREE.Mesh) {

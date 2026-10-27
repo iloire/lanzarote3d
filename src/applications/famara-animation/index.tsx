@@ -1,5 +1,9 @@
 import * as THREE from 'three';
-import Environment, { FAMARA_GULL_FLOCKS, LANZAROTE_TOWNS } from '../../shared/env/environment';
+import Environment, {
+  FAMARA_GULL_FLOCKS,
+  LANZAROTE_TOWNS,
+  RISCO_RAVEN_FLOCKS,
+} from '../../shared/env/environment';
 import { StoryOptions } from '../../shared/types';
 import { getDefaultTheme } from '../../foundation/themes';
 import { ThemeEngine } from '../../foundation/systems/ThemeEngine';
@@ -15,6 +19,7 @@ import { createCameraTargetUI } from '../../foundation/components/ui/CameraTarge
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { createIslandRoads } from '../../shared/env/roads';
 import { createLandmarks } from '../../shared/env/landmarks';
+import { createFerryCrossing } from '../../shared/env/ferry';
 import { LevelOfDetail } from '../../foundation/types/lod';
 import { logger } from '../../foundation/utils/logger';
 import {
@@ -191,6 +196,7 @@ class AnimationApp extends TerrainBase {
 
       const landmarks = createLandmarks(terrain);
       landmarks.forEach(landmark => scene.add(landmark));
+      scene.add(createFerryCrossing());
 
       this.environment.addRandomBoats(water); // Use randomized boat types for variety
 
@@ -199,6 +205,7 @@ class AnimationApp extends TerrainBase {
 
       // Gulls circling in the thermals (animated on the GPU)
       this.environment.addGulls(FAMARA_GULL_FLOCKS);
+      this.environment.addRavens(RISCO_RAVEN_FLOCKS);
 
       // Setup Camera Target Controller if enabled
       if (SHOW_CAMERA_TARGET_UI) {

@@ -1,6 +1,6 @@
 # Shared environment
 
-Towns, boats, thermals, gulls, roads and landmarks shared by the island scenes (home, famara-animation).
+Towns, boats, thermals, gulls and ravens, roads, landmarks and the La Graciosa ferry shared by the island scenes (home, famara-animation).
 
 ## `roads.json`
 
@@ -40,7 +40,7 @@ each with `ISLAND_ANCHOR`, sets it on the terrain and builds it from
   "landmarks": [
     {
       "name": "…", // free text, also the object's name in the scene
-      "kind": "radar" | "ermita" | "mast" | "windsock" | "mirador" | "palms",
+      "kind": "radar" | "ermita" | "mast" | "windsock" | "mirador" | "palms" | "castle",
       "osm": "node/…", // the feature it was placed from
       "at": [lat, lon],
       "heading": 315, // optional: compass bearing the front faces; the windsock turns to the wind
@@ -55,3 +55,11 @@ each with `ISLAND_ANCHOR`, sets it on the terrain and builds it from
 
 Use `top` for anything that stands on a summit or the cliff edge: the projection can be ~170
 units off near the coast, which on the Risco puts a summit on the cliff face.
+
+## `ferry.ts`
+
+The Órzola – Caleta de Sebo ferry. `FERRY` holds its route (world x/z, traced on the model's own
+coast round Punta Fariones rather than projected from OSM, which would cut the headland), its
+speed in world units a second, the seconds it lies alongside at each end and its scale. It moves
+itself on the shared clock (`crossing()` gives where it is at a time), so nothing in the scene's
+loop drives it.

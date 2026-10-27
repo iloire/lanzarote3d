@@ -42,8 +42,10 @@ import {
   IVAN_RUSH,
 } from '../home/config';
 import { HARBOUR_FEATURES } from '../puerto-del-carmen/harbour';
+import { createFerry } from '../../foundation/components/scenery/boats/Ferry';
 import {
   createErmita,
+  createCastillo,
   createMast,
   createMirador,
   createRadarStation,
@@ -65,7 +67,7 @@ export interface ModelEntry {
   create: () => Loadable;
 }
 
-/** A landmark built as a plain mesh, wrapped so the viewer can load it */
+/** A model built as a plain mesh, wrapped so the viewer can load it */
 const landmark = (create: () => THREE.Object3D) => (): Loadable => ({
   load: async () => create(),
 });
@@ -164,6 +166,13 @@ export const MODEL_CATALOG: ModelEntry[] = [
     create: () => new FishingBoat(STILL),
   },
   {
+    id: 'ferry',
+    name: 'Ferry (Órzola – La Graciosa)',
+    group: 'Boats',
+    scale: 2.5,
+    create: landmark(createFerry),
+  },
+  {
     id: 'sail-boat',
     name: 'Small sail boat',
     group: 'Boats',
@@ -222,6 +231,13 @@ export const MODEL_CATALOG: ModelEntry[] = [
     group: 'Landmarks',
     scale: 2,
     create: landmark(createRadarStation),
+  },
+  {
+    id: 'castillo',
+    name: 'Castillo de Santa Bárbara',
+    group: 'Landmarks',
+    scale: 2,
+    create: landmark(createCastillo),
   },
   {
     id: 'mirador',

@@ -2,6 +2,13 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 13:45 UTC
+
+### Added
+- **Castillo de Santa Bárbara**: the fort on the rim of Guanapay above Teguise, from OSM relation 3396286: an ochre stone keep on a battered base, a taller tower with a flag, crenellated parapets, round sentry boxes on the corners, pale dressed stone and a gateway with a bridge (628 triangles)
+- **The Órzola – La Graciosa ferry**: a blue-hulled passenger ferry (`boats/Ferry.ts`) plying back and forth across El Río between Órzola and Caleta de Sebo, round Punta Fariones, easing in and out of each harbour and waiting 40 s alongside, with a wake under way. Its route is traced on the model's coast (`FERRY` in `shared/env/ferry.ts`) and it moves itself on the shared clock, so the scene loop doesn't drive it
+- **Ravens on the Risco**: five small flocks of black ravens circling just over the cliff edge from above Famara to the Mirador. The gull flock code takes a `plumage` now, so they are one more instanced draw call
+
 ## 2026-10-27 13:32 UTC
 
 ### Changed

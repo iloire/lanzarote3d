@@ -12,9 +12,36 @@ export interface GullsOptions {
   maxRadius?: number;
   /** Scales how far the birds of a flock scatter and drift up and down, 1 in the scenes */
   spread?: number;
+  /** Body, wing and wingtip colours as [r, g, b] in 0-1: a gull's white, grey and black */
+  plumage?: Plumage;
 }
 
-const DEFAULTS: Required<GullsOptions> = { wingspan: 6, minRadius: 40, maxRadius: 160, spread: 1 };
+export interface Plumage {
+  body: number[];
+  wing: number[];
+  tip: number[];
+}
+
+const GULL: Plumage = {
+  body: [0.95, 0.95, 0.93],
+  wing: [0.62, 0.66, 0.7],
+  tip: [0.08, 0.08, 0.09],
+};
+
+/** The ravens of the Risco: black all over, the wings a touch glossier than the body */
+export const RAVEN: Plumage = {
+  body: [0.06, 0.06, 0.07],
+  wing: [0.11, 0.11, 0.13],
+  tip: [0.04, 0.04, 0.05],
+};
+
+const DEFAULTS: Required<GullsOptions> = {
+  wingspan: 6,
+  minRadius: 40,
+  maxRadius: 160,
+  spread: 1,
+  plumage: GULL,
+};
 const DRIFT = 60; // how far a gull climbs and sinks round its thermal, at spread 1
 
 /**
@@ -29,7 +56,7 @@ export class Gulls {
 
   constructor(flocks: GullFlock[], options: GullsOptions = {}) {
     const o = { ...DEFAULTS, ...options };
-    const geometry = createGullGeometry(o.wingspan);
+    const geometry = createGullGeometry(o.wingspan, o.plumage);
     const total = flocks.reduce((n, f) => n + (f.count ?? 10), 0);
 
     const orbit = new Float32Array(total * 4);
@@ -77,14 +104,12 @@ export class Gulls {
  * A gull facing +z: a slim body and gull-winged arms, each wing split at the wrist so the
  * outer half can lag the inner half in the wingbeat. aWing is 0 at the body, 1 at the tip.
  */
-function createGullGeometry(span: number): THREE.BufferGeometry {
+function createGullGeometry(span: number, plumage: Plumage): THREE.BufferGeometry {
   const s = span / 2;
   const positions: number[] = [];
   const wing: number[] = [];
   const colors: number[] = [];
-  const white = [0.95, 0.95, 0.93];
-  const grey = [0.62, 0.66, 0.7];
-  const black = [0.08, 0.08, 0.09];
+  const { body: white, wing: grey, tip: black } = plumage;
 
   const tri = (a: number[], b: number[], c: number[], w: number[], col: number[][]) => {
     positions.push(...a, ...b, ...c);

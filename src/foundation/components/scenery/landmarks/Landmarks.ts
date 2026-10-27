@@ -252,6 +252,95 @@ export const createMirador = (): THREE.Mesh => {
   return asMesh(mesh, 'Mirador del Río');
 };
 
+const FORT_STONE = new THREE.Color('#8A7258');
+const FORT_STONE_DARK = new THREE.Color('#725E48');
+const FORT_TRIM = new THREE.Color('#CFC5AE');
+
+/** A row of merlons along one side of a parapet from (x0, z0) to (x1, z1) */
+const merlons = (
+  mesh: MeshBuilder,
+  [x0, z0]: [number, number],
+  [x1, z1]: [number, number],
+  y: number,
+  c: THREE.Color
+) => {
+  const length = Math.hypot(x1 - x0, z1 - z0);
+  const count = Math.max(2, Math.round(length / 2.4));
+  for (let i = 0; i < count; i++) {
+    const t = (i + 0.5) / count;
+    block(mesh, volume(x0 + (x1 - x0) * t, z0 + (z1 - z0) * t, 1.1, 1.1, y, y + 1.1), c);
+  }
+};
+
+/** A sentry box (garita) on a corner: a little round turret with a cone cap */
+const garita = (mesh: MeshBuilder, x: number, z: number, y: number) => {
+  cylinder(mesh, x, z, 1.3, y - 1.5, y + 2.2, FORT_TRIM, 6);
+  cone(mesh, x, z, 1.6, y + 2.2, 1.6, FORT_STONE_DARK, 6);
+};
+
+/**
+ * The Castillo de Santa Bárbara on the rim of Guanapay above Teguise, the island's old watch
+ * over its capital, now the pirate museum: a squat keep of ochre volcanic stone on a battered
+ * base, a taller tower at one end, crenellated parapets, a round sentry box on each corner,
+ * pale dressed stone at the edges and a dark gateway reached by a short bridge.
+ */
+export const createCastillo = (): THREE.Mesh => {
+  const mesh = new MeshBuilder();
+  const keep = volume(0, 0, 26, 14, 2, 9);
+
+  // Battered base: a sloping skirt from the rock up to the walls
+  const skirt = volume(0, 0, 30, 18, -FOOTING, -FOOTING);
+  const corners = (v: typeof keep, y: number) => [
+    new THREE.Vector3(v.x0, y, v.z0),
+    new THREE.Vector3(v.x1, y, v.z0),
+    new THREE.Vector3(v.x1, y, v.z1),
+    new THREE.Vector3(v.x0, y, v.z1),
+  ];
+  const [low, high] = [corners(skirt, -FOOTING), corners(keep, 2)];
+  low.forEach((p, i) =>
+    mesh.quad(p, low[(i + 1) % 4]!, high[(i + 1) % 4]!, high[i]!, FORT_STONE_DARK)
+  );
+
+  walls(mesh, keep, FORT_STONE);
+  lid(mesh, keep, 8, FORT_STONE_DARK);
+  panel(mesh, keep, '+z', 0, 2, 26, 0.6, FORT_TRIM);
+  panel(mesh, keep, '-z', 0, 2, 26, 0.6, FORT_TRIM);
+  merlons(mesh, [keep.x0, keep.z1], [keep.x1, keep.z1], 9, FORT_STONE);
+  merlons(mesh, [keep.x0, keep.z0], [keep.x1, keep.z0], 9, FORT_STONE);
+  merlons(mesh, [keep.x0, keep.z0], [keep.x0, keep.z1], 9, FORT_STONE);
+
+  // The tower at the east end, a storey higher, with its own parapet
+  const tower = volume(9, 0, 9, 11, 8, 14);
+  walls(mesh, tower, FORT_STONE);
+  lid(mesh, tower, 13.2, FORT_STONE_DARK);
+  [
+    [tower.x0, tower.z0],
+    [tower.x1, tower.z0],
+    [tower.x1, tower.z1],
+    [tower.x0, tower.z1],
+  ].forEach(([x, z], i, all) =>
+    merlons(mesh, [x!, z!], all[(i + 1) % 4] as [number, number], 14, FORT_STONE)
+  );
+  opening(mesh, tower, '+z', 0, 10, 1, 1.6, { pane: SHADOW, frame: FORT_TRIM, frameWidth: 0.25 });
+
+  // Corner sentry boxes, arrow slits and the gateway with its bridge
+  [keep.x0, keep.x1].forEach(x => [keep.z0, keep.z1].forEach(z => garita(mesh, x, z, 9)));
+  [-8, -3].forEach(u => opening(mesh, keep, '+z', u, 5, 0.5, 1.6, { pane: SHADOW }));
+  opening(mesh, keep, '+z', 2, 2, 2.6, 3.6, { pane: SHADOW, frame: FORT_TRIM, frameWidth: 0.5 });
+  block(mesh, volume(2, keep.z1 + 3, 3, 6, 1.4, 2), WOOD);
+
+  // A flag on the tower
+  mesh.rod(new THREE.Vector3(11, 14, 2), new THREE.Vector3(11, 19, 2), 0.08, STEEL, 4);
+  mesh.quad(
+    new THREE.Vector3(11, 19, 2),
+    new THREE.Vector3(13.4, 18.7, 2),
+    new THREE.Vector3(13.4, 17.3, 2),
+    new THREE.Vector3(11, 17.6, 2),
+    SIGNAL_RED
+  );
+  return asMesh(mesh, 'Castillo de Santa Bárbara');
+};
+
 const SOCK_LENGTH = 5;
 
 /**

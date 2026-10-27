@@ -58,6 +58,14 @@
       "at": [29.14589, -13.5001],
       "count": 60,
       "radius": 450
+    },
+    {
+      "name": "Castillo de Santa Bárbara on Guanapay",
+      "kind": "castle",
+      "osm": "relation/3396286",
+      "at": [29.05793, -13.55005],
+      "heading": 250,
+      "top": 120
     }
   ]
 }

@@ -3,6 +3,7 @@ import landmarksData from './landmarks.json';
 import { ISLAND_ANCHOR, geoToWorld } from '../geo';
 import { getTerrainHeight } from './mesh-utils';
 import {
+  createCastillo,
   createErmita,
   createMast,
   createMirador,
@@ -13,7 +14,7 @@ import { MeshBuilder, lowPolyMaterial } from '../../foundation/components/base/l
 import { buildCanaryPalm } from '../../foundation/components/scenery/trees/CanaryPalm';
 import { LevelOfDetail } from '../../foundation/types/lod';
 
-type LandmarkKind = 'radar' | 'ermita' | 'mast' | 'windsock' | 'mirador' | 'palms';
+type LandmarkKind = 'radar' | 'ermita' | 'mast' | 'windsock' | 'mirador' | 'palms' | 'castle';
 
 interface LandmarksData {
   scale: number;
@@ -72,6 +73,7 @@ const build: Record<
   windsock: () => createWindsock(),
   mirador: () => createMirador(),
   palms: createPalmGrove,
+  castle: () => createCastillo(),
 };
 
 /** How many samples a side the `top` search takes over its square */
