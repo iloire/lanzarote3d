@@ -16,12 +16,6 @@ export enum CharacterType {
   MAGNE = 'magne',
   MIGUEL = 'miguel',
   ROOS = 'roos',
-  PILOT_CLASSIC = 'pilot-classic',
-  PILOT_MODERN = 'pilot-modern',
-  WARRIOR = 'warrior',
-  EXPLORER = 'explorer',
-  SCIENTIST = 'scientist',
-  ADVENTURER = 'adventurer',
 }
 
 /**

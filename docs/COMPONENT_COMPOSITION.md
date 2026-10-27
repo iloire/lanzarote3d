@@ -70,8 +70,7 @@ assembling them. Transforms and shadows are no longer applied for you: call `app
 and `applyShadows()` if you need them, or position the result from the scene.
 
 Used by ParagliderVoxel and Hangglider (a glider or wing plus a pilot), PilotVoxel (loads the voxel
-`.obj` and texture through `OBJLoader`), Pilot, PilotHead, BaseHead, HangGliderWing, and the floating
-and movable bases.
+`.obj` and texture through `OBJLoader`), HangGliderWing, and the floating and movable bases.
 
 ```typescript
 class ParagliderVoxel extends SimpleThreeComponent {

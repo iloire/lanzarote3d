@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 20:47 UTC
+
+### Removed
+- **Procedural three.js pilot**: `Pilot`, `PilotHead`, the cocoon/open/submarine harnesses, the four heads (default, devil, skeleton, warrior), three helmets and two glasses are gone, about 1,950 lines. Nothing had built them since the paraglider and tandem rigs were cut; every pilot is now a voxel model from `3d-characters` loaded by `PilotVoxel`. The six placeholder `CharacterType` values with no assets (pilot-classic, pilot-modern, warrior, explorer, scientist, adventurer) went with them
+
 ## 2026-10-27 20:43 UTC
 
 ### Added
