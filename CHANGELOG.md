@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 20:43 UTC
+
+### Added
+- **Houses on La Graciosa**: Caleta de Sebo (45 houses, a tight grid where the ferry docks) and Pedro Barba (10, scattered), placed from their OSM place nodes as flat-roofed white cubes with blue or green woodwork. They reuse the Famara bungalows' colours, so the town merge folds them into the existing meshes: still 19 town meshes, no extra draw calls
+
 ## 2026-10-27 20:55 UTC
 
 ### Changed

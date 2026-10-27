@@ -54,6 +54,8 @@ export const TOWN_FAMARA = town(29.11885, -13.56599); // Caleta de Famara
 export const TOWN_NORUEGOS = town(29.11441, -13.54721); // Urbanización Famara
 export const TOWN_TEGUISE = town(29.05925, -13.56022);
 export const TOWN_SOO = town(29.09932, -13.62235);
+export const TOWN_CALETA_DE_SEBO = town(29.2311, -13.5035); // La Graciosa, where the ferry docks
+export const TOWN_PEDRO_BARBA = town(29.2437, -13.4747); // La Graciosa's east-end hamlet
 
 /** Urbanización Famara: whitewashed round bungalows, woodwork in blue or Canarian green */
 const FAMARA_BUNGALOWS: HouseStyle = {
@@ -65,6 +67,16 @@ const FAMARA_BUNGALOWS: HouseStyle = {
   },
   // Small sandy plots, packed close the way the village is
   plot: { scale: 0.7, colors: ['#CFC3A8', '#D8CCB0', '#C4B89C'] },
+};
+
+/**
+ * La Graciosa: flat-roofed white cubes on sand streets, with blue or green woodwork. Only the
+ * Famara bungalows' colours, so the merge folds them into the same meshes: no new draw calls.
+ */
+const GRACIOSA_HOUSES: HouseStyle = {
+  types: { DesertHouse: 1 },
+  palette: FAMARA_BUNGALOWS.palette,
+  plot: FAMARA_BUNGALOWS.plot,
 };
 
 /**
@@ -83,6 +95,20 @@ export const LANZAROTE_TOWNS: TownConfig[] = [
   },
   { position: TOWN_TEGUISE, houseCount: 51, formation: 'suburban' },
   { position: TOWN_SOO, houseCount: 40, formation: 'rural' },
+  {
+    position: TOWN_CALETA_DE_SEBO,
+    houseCount: 45,
+    formation: 'grid',
+    spacing: 0.6,
+    style: GRACIOSA_HOUSES,
+  },
+  {
+    position: TOWN_PEDRO_BARBA,
+    houseCount: 10,
+    formation: 'rural',
+    spacing: 0.8,
+    style: GRACIOSA_HOUSES,
+  },
 ];
 
 /** Gulls circling in the thermals off Famara, at about the pilots' height. */
