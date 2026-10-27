@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 18:03 UTC
+
+### Added
+- **"Watch the real thing" link**: a small dimmed line under the Lanzarote Paragliding wordmark opens real paragliding footage of Lanzarote on YouTube in a new tab; clicks are counted in GA as `real_thing_click`
+
 ## 2026-10-27 17:53 UTC
 
 ### Changed

@@ -53,6 +53,35 @@
   text-shadow: 1px 1px 0 #0d2b22;
 }
 
+/* Subtle way out to real flying footage; the container ignores the pointer, the link takes it back */
+.voxel-title-link {
+  display: inline-block;
+  margin-top: 10px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #ffffff;
+  text-decoration: none;
+  text-shadow: 1px 1px 0 #0d1f33;
+  opacity: 0;
+  pointer-events: auto;
+  animation: titleLinkFadeIn 1.5s ease-out 1s forwards;
+  transition: color 0.15s;
+}
+
+@keyframes titleLinkFadeIn {
+  to {
+    opacity: 0.55;
+  }
+}
+
+.voxel-title-link:hover,
+.voxel-title-link:focus-visible {
+  color: #4aff9e;
+  outline: none;
+}
+
 @media (max-width: 500px) {
   .voxel-title-container {
     left: 16px;
