@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 22:25 UTC
+
+### Changed
+- **Fewer boats in El Río**: six instead of eleven, two per cluster, as the strait looked crowded
+
 ## 2026-10-27 22:12 UTC
 
 ### Added

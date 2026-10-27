@@ -76,9 +76,9 @@ export const TOWN_PEDRO_BARBA = town(29.2437, -13.4747); // La Graciosa's east-e
  * centre is 550+ units from land, so boats placed and circling within ~400 of it stay afloat.
  */
 const EL_RIO_BOATS: [number, number, number][] = [
-  [12000, -12950, 4],
-  [12800, -13300, 4],
-  [13200, -13650, 3],
+  [12000, -12950, 2],
+  [12800, -13300, 2],
+  [13200, -13650, 2],
 ];
 
 /** Urbanización Famara: whitewashed round bungalows, woodwork in blue or Canarian green */
