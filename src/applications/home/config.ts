@@ -183,6 +183,14 @@ export const MAGNE_RUSH = ozoneRush({
   inlets: '#8a9a1c',
 });
 
+/** Adri's: yellow, navy swoosh, white accents */
+export const ADRI_RUSH = ozoneRush({
+  base: '#f5c400',
+  swoosh: '#1f3a6e',
+  accent: '#ffffff',
+  inlets: '#b08c00',
+});
+
 /**
  * David's Ozone Delta 4: blue at the front, red behind, split by a thin yellow line along the
  * span that steps forward round a red bump in the middle of the wing.
@@ -320,6 +328,15 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
     },
     startProgress: 0,
     pathOffset: new THREE.Vector3(0, 0, 0),
+  },
+  {
+    options: {
+      glider: ADRI_RUSH,
+      pilot: { characterType: CharacterType.ADRI },
+    },
+    // 0.2 km up the cliff, between Ivan and Miguel
+    startProgress: 0.6,
+    pathOffset: new THREE.Vector3(74, 15, -221),
   },
   {
     options: {

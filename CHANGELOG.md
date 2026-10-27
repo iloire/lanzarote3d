@@ -2,6 +2,16 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 12:15 UTC
+
+### Added
+- **Adri joins the home scene**: the original voxel pilot flies a yellow Ozone Rush with a navy swoosh, 0.2 km up the cliff between Ivan and Miguel, as pilot 3 of 12 (`?pilot=adri`). The pilots after her shift up one number in `?pilot=<number>` links
+
+## 2026-10-27 12:14 UTC
+
+### Changed
+- **Fabio and Roos refreshed from 3d-characters**: Fabio films himself with a 360 camera held out in his right hand, and Roos has short brown hair and a flight deck bag on her lap. The other pilots' exports were already current
+
 ## 2026-10-27 12:12 UTC
 
 ### Fixed
