@@ -385,7 +385,7 @@ export const hanggliderConfig: HanggliderConfig = {
 };
 
 export const cessnaConfig: CessnaConfig = {
-  position: new THREE.Vector3(7200, 1000, 500),
+  position: new THREE.Vector3(4785, 1240, -870),
   scale: 3.0,
   bodyColor: '#F4F4F4',
   wingColor: '#E8E8E8',
@@ -397,18 +397,23 @@ export const cessnaConfig: CessnaConfig = {
   turnSpeed: 5.0,
   flightRadius: 250,
   returnDistance: 300,
-  minHeight: 1000,
-  maxHeight: 1500,
+  minHeight: 1200,
+  maxHeight: 1400,
   obstacleAvoidanceDistance: 200,
   forwardAxis: 'x',
+  // An oval 1-3 km out to sea off the Risco, parallel to it, at 1230-1260 m: 200+ m above the
+  // pilots on the ridge loop and at least 1 km from every pilot, Bernt and Magne included;
+  // under the Hercules (1400+). At least 969 m over the ground.
   waypoints: [
-    new THREE.Vector3(6600, 950, -705),
-    new THREE.Vector3(6279, 1000, -3155),
-    new THREE.Vector3(7879, 980, -5445),
-    new THREE.Vector3(8279, 950, -6455),
-    new THREE.Vector3(7827, 1050, -3460),
-    new THREE.Vector3(5600, 1100, 1205),
-    new THREE.Vector3(6200, 1000, 200),
+    new THREE.Vector3(4785, 1240, -870),
+    new THREE.Vector3(5985, 1250, -2070),
+    new THREE.Vector3(7585, 1260, -4070),
+    new THREE.Vector3(8385, 1250, -6070),
+    new THREE.Vector3(7700, 1240, -7100),
+    new THREE.Vector3(7170, 1230, -6940),
+    new THREE.Vector3(5570, 1230, -4140),
+    new THREE.Vector3(3570, 1240, -1740),
+    new THREE.Vector3(3900, 1240, -900),
   ],
   waypointTension: 0.6,
   waypointLoop: true,

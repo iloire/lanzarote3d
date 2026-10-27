@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 11:15 UTC
+
+### Changed
+- **The Cessna keeps clear of the paragliders and the Risco**: it flew its loop at 950–1100 m straight through the ridge beat (as close as 34 m to a pilot) and over the cliff; it now flies an oval 1–3 km out to sea, parallel to the Risco, at 1230–1260 m, at least 1 km from every pilot and under the Hercules
+
 ## 2026-10-27 11:14 UTC
 
 ### Changed
