@@ -5,7 +5,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ## 2026-10-27 11:55 UTC
 
 ### Changed
-- **Home zoom out**: once the intro hands over to the orbit controls you can scroll back to 20,000 units from the pilot (was 1,500), far enough to see most of the island
+- **Home zoom out**: once the intro hands over to the orbit controls you can scroll back to 3,000 units from the pilot, double the 1,500 it was
 
 ## 2026-10-27 11:52 UTC
 

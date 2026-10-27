@@ -85,8 +85,7 @@ export function setupCameraAnimation(
           const limits = OrbitControlsHelper.createCenteredLimits(config.target.position, {
             ...ORBIT_CONTROLS_PRESETS['closeSubject'],
             minDistance: 50,
-            // Far enough to pull back from the pilot to most of the island
-            maxDistance: 20000,
+            maxDistance: 3000,
             panBoundary: {
               center: config.target.position.clone(),
               radius: 500,
