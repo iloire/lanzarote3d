@@ -23,6 +23,13 @@ test('falls back to the first pilot', () => {
   expect(pilotFromSearch('?pilot=nobody', names)).toBe(0);
 });
 
+test('falls back to the given lead instead', () => {
+  expect(pilotFromSearch('', names, 1)).toBe(1);
+  expect(pilotFromSearch('?pilot=5', names, 1)).toBe(1);
+  expect(pilotFromSearch('?pilot=nobody', names, 1)).toBe(1);
+  expect(pilotFromSearch('?pilot=3', names, 1)).toBe(2);
+});
+
 test('writes the pilot by number and keeps other parameters', () => {
   expect(searchWithPilot('', 2)).toBe('?pilot=3');
   expect(searchWithPilot('?embed=1&pilot=bernt', 0)).toBe('?embed=1&pilot=1');

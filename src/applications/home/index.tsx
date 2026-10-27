@@ -28,6 +28,7 @@ import {
   SHOW_CAMERA_TARGET_UI,
   ANIMATION_DURATION_MS,
   CAMERA_FOLLOW,
+  LEAD_PILOT,
   CAMERA_SWAY,
   LA_GRACIOSA,
   isEmbedded,
@@ -253,7 +254,11 @@ class HomeApp extends TerrainBase {
   ): void {
     // ?pilot= picks who the fly-in lands on, by number or by the rig's name (e.g. bernt)
     const names = this.pilots.map(({ mesh }) => mesh.name.replace(/^paraglider-/, ''));
-    this.leadIndex = pilotFromSearch(window.location.search, names);
+    this.leadIndex = pilotFromSearch(
+      window.location.search,
+      names,
+      Math.max(0, names.indexOf(LEAD_PILOT))
+    );
     const lead = this.pilots[this.leadIndex]?.mesh;
     if (!lead) {
       throw new Error('No paraglider loaded for the camera to follow');

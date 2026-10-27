@@ -276,41 +276,16 @@ const niviukIkuma = (colors: { base: string; tip: string; inlets: string }): Gli
 /** Fabio's: pink with black tips */
 export const FABIO_IKUMA = niviukIkuma({ base: '#9c1a58', tip: '#161616', inlets: '#6a1040' });
 
+/** The pilot the camera flies in to and follows round the loop, unless ?pilot= picks another */
+export const LEAD_PILOT = CharacterType.IVAN;
+
 /**
- * The first pilot leads: the camera flies in to it and follows it round the loop.
- *
  * They spread out along the Risco: Roos low by takeoff at the south-west end, the middle group
  * stepped up the cliff towards La Graciosa every ~500 m, each higher than the last (865-1147 m,
  * every one at least 124 m clear of the ground), then Bernt and Magne far out and highest.
+ * They are listed in that order, so the arrows step from takeoff up the Risco.
  */
 export const paraglidersVoxel: ParagliderVoxelConfig[] = [
-  {
-    options: {
-      glider: IVAN_RUSH,
-      pilot: { characterType: CharacterType.IVAN },
-    },
-    startProgress: 0,
-    pathOffset: new THREE.Vector3(0, 0, 0),
-  },
-  {
-    options: {
-      // On the pink roller, so he flies faster and lower than the others, throwing wingovers
-      glider: PURPLE_ROLLER,
-      pilot: { characterType: CharacterType.MIGUEL },
-    },
-    // 0.45 km up the cliff (the roller's drop takes his 30 m rise to -10)
-    startProgress: 0.04,
-    pathOffset: new THREE.Vector3(147, 30, -442),
-  },
-  {
-    options: {
-      glider: JEHOSUA_RUSH,
-      pilot: { characterType: CharacterType.JEHOSUA },
-    },
-    // 1.95 km up the cliff
-    startProgress: 0.35,
-    pathOffset: new THREE.Vector3(1020, 120, -1663),
-  },
   {
     options: {
       glider: {
@@ -340,6 +315,24 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
   },
   {
     options: {
+      glider: IVAN_RUSH,
+      pilot: { characterType: CharacterType.IVAN },
+    },
+    startProgress: 0,
+    pathOffset: new THREE.Vector3(0, 0, 0),
+  },
+  {
+    options: {
+      // On the pink roller, so he flies faster and lower than the others, throwing wingovers
+      glider: PURPLE_ROLLER,
+      pilot: { characterType: CharacterType.MIGUEL },
+    },
+    // 0.45 km up the cliff (the roller's drop takes his 30 m rise to -10)
+    startProgress: 0.04,
+    pathOffset: new THREE.Vector3(147, 30, -442),
+  },
+  {
+    options: {
       glider: DAVID_DELTA,
       pilot: { characterType: CharacterType.DAVID },
     },
@@ -359,12 +352,30 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
   },
   {
     options: {
+      glider: JEHOSUA_RUSH,
+      pilot: { characterType: CharacterType.JEHOSUA },
+    },
+    // 1.95 km up the cliff
+    startProgress: 0.35,
+    pathOffset: new THREE.Vector3(1020, 120, -1663),
+  },
+  {
+    options: {
       glider: FABIO_IKUMA,
       pilot: { characterType: CharacterType.FABIO },
     },
     // 2.45 km up the cliff
     startProgress: 0.5,
     pathOffset: new THREE.Vector3(1245, 170, -2114),
+  },
+  {
+    options: {
+      glider: FRANZ_BUZZ,
+      pilot: { characterType: CharacterType.FRANZ },
+    },
+    // 2.95 km up the cliff, the highest of the middle group
+    startProgress: 0.9,
+    pathOffset: new THREE.Vector3(1569, 210, -2499),
   },
   {
     options: {
@@ -377,15 +388,6 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
     startProgress: 0.8,
     pathOffset: new THREE.Vector3(3000, 0, -5200),
     waypoints: liftLoop(450, 1),
-  },
-  {
-    options: {
-      glider: FRANZ_BUZZ,
-      pilot: { characterType: CharacterType.FRANZ },
-    },
-    // 2.95 km up the cliff, the highest of the middle group
-    startProgress: 0.9,
-    pathOffset: new THREE.Vector3(1569, 210, -2499),
   },
   {
     // Magne is the best of them: his loop is widened 1.5x, raised above everyone's (1625-1687 m;
@@ -496,7 +498,7 @@ export const ANIMATION_DURATION_MS = 6000; // 6 seconds
  */
 export const CAMERA_FOLLOW: CameraFollowSettings = {
   smoothTime: 1.2,
-  switchTime: 1.5,
+  switchTime: 0.75,
   lookAhead: 2,
   velocityResponse: 2,
   rollShare: 0.25,
