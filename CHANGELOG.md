@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 11:06 UTC
+
+### Fixed
+- **The roller is fitted to a photo of one from behind**: an even arc whose tips curl down to about 57°, 0.77 of the Rush's span (a 16 m² wing against 24-26 m²) with Niviuk's flat aspect ratio of 4.3, lines as long for its span as the Rush's, and 17 fat cells a side as on the real one (35 cells). The long, thin, flat-middled version read as wide as the Rushes in the scene. Cell billow is now part of each wing shape (`cellBillow`)
+
 ## 2026-10-27 11:05 UTC
 
 ### Fixed

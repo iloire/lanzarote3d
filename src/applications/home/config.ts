@@ -236,8 +236,8 @@ const niviukRoller = (colors: { base: string; accent: string; tip: string }): Gl
     { color: colors.accent, from: [-0.12, 0.05], to: [0.3, 0.6], width: 0.08 },
     { color: colors.accent, from: [0.3, 0.62], to: [1.1, 0.62], width: 0.05 },
   ],
-  // Cells as wide as the Rush's, so the smaller wing has fewer of them
-  numeroCajones: 28,
+  // The real one has 35 cells, so 17 a side: fewer and fatter than a Rush's
+  numeroCajones: 17,
 });
 
 /** A common roller: teal, yellow accents, black tip */

@@ -20,14 +20,15 @@ type WingShape = {
   lineHeight: number; // carabiners to the centre of the lower surface
   tipArc: number; // radians the canopy has turned down by at the tip
   arcExponent: number; // > 1 keeps the centre flat and curls the tips
+  cellBillow: number; // profile scale midway between two ribs
   /** Trim speed against a standard wing's */
   speedFactor: number;
 };
 
 /**
  * A standard wing is big and thick for lift, tapers to its tips and stays flat in the middle. A
- * roller (speed wing) is smaller, with a thin flat section, shorter lines and a shallow arc that
- * only drops towards the tips; it flies 1.7 times as fast.
+ * roller (speed wing) is smaller, with fewer, fatter cells, shorter lines and an arc that bends
+ * evenly from the centre out; it flies 1.7 times as fast.
  */
 export const WING_SHAPES = {
   standard: {
@@ -39,6 +40,7 @@ export const WING_SHAPES = {
     lineHeight: 4200,
     tipArc: 1.15,
     arcExponent: 1.6,
+    cellBillow: 1.12,
     speedFactor: 1,
   },
   /** Ozone Rush: a touch more chord than the standard wing and a deeper arc */
@@ -51,22 +53,25 @@ export const WING_SHAPES = {
     lineHeight: 4200,
     tipArc: 1.2,
     arcExponent: 1.5,
+    cellBillow: 1.12,
     speedFactor: 1,
   },
   /**
-   * Niviuk Roller: a shallow arc (the real 16 spans 8.3 m flat and 7.2 m projected), a slim
-   * chord, and about 0.6 of the Rush's area: rollers flown here are about 16 m² against 24 to
-   * 26 for the other wings
+   * Niviuk Roller, fitted to a photo from behind: an even arc whose tips curl down to about 57°,
+   * dropping about half its projected half span. A 16 m² roller against the 24 to 26 of the
+   * other wings here gives 0.77 of the Rush's span, and Niviuk's flat aspect ratio of 4.3 the
+   * chord. Lines as long for its span as the Rush's, and fat cells.
    */
   roller: {
-    halfSpan: 3700,
-    rootChord: 1450,
-    tipChord: 0.55,
-    thickness: 0.09,
-    camber: 0.03,
-    lineHeight: 3000,
-    tipArc: 0.95,
-    arcExponent: 1.4,
+    halfSpan: 3300,
+    rootChord: 1720,
+    tipChord: 0.5,
+    thickness: 0.12,
+    camber: 0.035,
+    lineHeight: 3200,
+    tipArc: 1.0,
+    arcExponent: 1,
+    cellBillow: 1.3,
     speedFactor: 1.7,
   },
 } satisfies Record<string, WingShape>;
@@ -77,7 +82,6 @@ export type GliderKind = keyof typeof WING_SHAPES;
 export const gliderSpeedFactor = (options: GliderOptions): number =>
   WING_SHAPES[options.kind ?? 'standard'].speedFactor;
 
-const CELL_BILLOW = 1.12; // profile scale midway between two ribs
 const TIP_ACCENT = 0.72; // span fraction where wingColor2 takes over on the top surface
 /** Span bands of the stripes near each tip, and how far back from the nose they run */
 const STRIPE_BANDS: [number, number][] = [
@@ -247,7 +251,7 @@ const createCanopy = (ribs: Rib[], options: GliderOptions): THREE.Mesh => {
     color: new THREE.Color(patch.color),
   }));
 
-  const outlines = ribs.map((rib, i) => ribOutline(rib, i % 2 === 0 ? 1 : CELL_BILLOW));
+  const outlines = ribs.map((rib, i) => ribOutline(rib, i % 2 === 0 ? 1 : rib.shape.cellBillow));
   const pointsPerRib = outlines[0]!.length;
   const topPoints = PROFILE_X.length;
   // Chord position of each outline point, in the order ribOutline lists them
