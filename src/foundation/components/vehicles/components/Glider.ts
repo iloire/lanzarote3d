@@ -58,12 +58,13 @@ export const WING_SHAPES = {
   },
   /**
    * Niviuk Roller: nearly flat across the top for the middle 60% of the span, then the ears
-   * fold down to about 85°, dropping about a third of its projected half span. A 16 m² roller against the 24 to 26 of the
-   * other wings here gives 0.77 of the Rush's span, and Niviuk's flat aspect ratio of 4.3 the
-   * chord. Lines as long for its span as the Rush's, and fat cells.
+   * fold down to about 85°, dropping about a third of its projected half span. A 16 m² roller
+   * against the 24 to 26 of the other wings here gives 0.77 of the Rush's span, trimmed by a
+   * tenth to look right on screen, and Niviuk's flat aspect ratio of 4.3 the chord. Lines as long
+   * as before, and fat cells.
    */
   roller: {
-    halfSpan: 3300,
+    halfSpan: 2970,
     rootChord: 1720,
     tipChord: 0.5,
     thickness: 0.12,
