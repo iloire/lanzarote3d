@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 10:58 UTC
+
+### Changed
+- **The roller is slimmer**: its chord is cut by a sixth and its span stretched a little, so it reads as a long, slim wing; it keeps about 0.6 of the Rush's area
+
 ## 2026-10-27 10:54 UTC
 
 ### Changed
