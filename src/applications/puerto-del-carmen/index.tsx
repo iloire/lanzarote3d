@@ -17,12 +17,14 @@ import { mooredBerths } from '../../shared/env/boat-group-utils';
 import { loadParagliders } from '../home/vehicleLoader';
 import { ParagliderMotion } from '../home/paragliderMotion';
 import { HARBOUR_FEATURES, NORTH_QUAY, PONTOONS } from './harbour';
+import { CameraShot } from './cameraShot';
 import {
   BERTH_SPACING,
   BOATS_OUTSIDE,
   CAMERA,
   HARBOUR_GULLS,
   HARBOUR_PLACEMENT,
+  INTRO_SHOT,
   PLAYA_QUEMADA_LOOP,
   PLAYA_QUEMADA_PILOT,
   PONTOON_BERTH_OFFSET,
@@ -35,13 +37,17 @@ import {
 /**
  * Puerto del Carmen, on the south-east coast: the white town along the seafront and up the
  * slope, the real harbour traced from OpenStreetMap with boats at its pontoons and quay, and one
- * paraglider soaring above Playa Quemada to the west.
+ * paraglider soaring above Playa Quemada to the west. It opens with a shot from the pilot down
+ * the coast and into the harbour (INTRO_SHOT).
  */
 class PuertoDelCarmenApp extends TerrainBase {
   private environment: Environment | undefined;
   private animationId: number | undefined;
   private flyingBehaviors: FlyingBehavior[] = [];
   private paragliderMotions: ParagliderMotion[] = [];
+  /** The opening shot while it runs, and how to end it early */
+  private intro: { shot: CameraShot; time: number; pilot: THREE.Object3D } | undefined;
+  private endIntro: (() => void) | undefined;
 
   constructor() {
     const appConfig = getAppConfig('puertodelcarmen');
@@ -119,6 +125,12 @@ class PuertoDelCarmenApp extends TerrainBase {
       this.flyingBehaviors = pilots.flatMap(p => (p.flyingBehavior ? [p.flyingBehavior] : []));
       this.paragliderMotions = pilots.flatMap(p => (p.motion ? [p.motion] : []));
 
+      // ?intro=0 opens on the harbour without the opening shot
+      const pilot = pilots[0]?.mesh;
+      if (pilot && new URLSearchParams(window.location.search).get('intro') !== '0') {
+        this.startIntro(pilot, camera, controls, canvas);
+      }
+
       this.startAnimationLoop(renderer, scene, camera, controls);
 
       canvas.style.opacity = originalOpacity || '1';
@@ -145,7 +157,51 @@ class PuertoDelCarmenApp extends TerrainBase {
     const quayBerths = mooredBerths(west, east, BERTH_SPACING * 1.4, QUAY_BERTH_OFFSET);
     await this.environment.addMooredBoats(QUAY_BOATS, quayBerths);
 
-    await this.environment.addBoatsAround(water, BOATS_OUTSIDE.center, BOATS_OUTSIDE.count);
+    await this.environment.addBoatsAround(
+      water,
+      BOATS_OUTSIDE.center,
+      BOATS_OUTSIDE.count,
+      BOATS_OUTSIDE.scale
+    );
+  }
+
+  /**
+   * Runs the opening shot with the orbit controls off. When it ends, or someone clicks or
+   * scrolls, the controls take over from wherever the camera is, aimed where it was looking.
+   */
+  private startIntro(
+    pilot: THREE.Object3D,
+    camera: THREE.Camera,
+    controls: OrbitControls,
+    canvas: HTMLCanvasElement
+  ): void {
+    this.intro = { shot: new CameraShot(INTRO_SHOT), time: 0, pilot };
+    controls.enabled = false;
+    this.placeCamera(camera, controls);
+
+    const events = ['pointerdown', 'wheel'] as const;
+    this.endIntro = () => {
+      events.forEach(type => canvas.removeEventListener(type, end));
+      this.intro = undefined;
+      this.endIntro = undefined;
+      controls.enabled = true;
+      OrbitControlsHelper.focusOnTarget(
+        controls,
+        controls.target.clone(),
+        ORBIT_CONTROLS_PRESETS['landscape']
+      );
+    };
+    const end = () => this.endIntro?.();
+    events.forEach(type => canvas.addEventListener(type, end));
+  }
+
+  /** Puts the camera where the opening shot has it now, and aims it */
+  private placeCamera(camera: THREE.Camera, controls: OrbitControls): void {
+    if (!this.intro) return;
+    const { position, lookAt } = this.intro.shot.at(this.intro.time, this.intro.pilot.position);
+    camera.position.copy(position);
+    camera.lookAt(lookAt);
+    controls.target.copy(lookAt);
   }
 
   private startAnimationLoop(
@@ -163,7 +219,14 @@ class PuertoDelCarmenApp extends TerrainBase {
 
         this.updatePerformance();
         this.paragliderMotions.forEach(motion => motion.update(deltaTime));
-        OrbitControlsHelper.update(controls);
+
+        if (this.intro) {
+          this.intro.time += deltaTime;
+          this.placeCamera(camera, controls);
+          if (this.intro.time >= this.intro.shot.duration) this.endIntro?.();
+        } else {
+          OrbitControlsHelper.update(controls);
+        }
 
         this.renderFrame(renderer, scene, camera);
         this.animationId = requestAnimationFrame(animate);
@@ -179,6 +242,7 @@ class PuertoDelCarmenApp extends TerrainBase {
       cancelAnimationFrame(this.animationId);
       this.animationId = undefined;
     }
+    this.endIntro?.();
     this.flyingBehaviors.forEach(behavior => behavior.dispose());
     this.flyingBehaviors = [];
     this.paragliderMotions = [];

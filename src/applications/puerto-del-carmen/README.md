@@ -4,10 +4,15 @@
 mode). The town on the south-east coast, its real harbour with boats moored at the pontoons and
 quay, and one paraglider soaring above Playa Quemada.
 
+It opens with a 36 s shot (`INTRO_SHOT` in `config.ts`): round the pilot, east down the coast,
+in among the moored boats and up to the overview. A click or scroll hands over to the orbit
+controls early; `?intro=0` opens on the overview.
+
 - `config.ts`: the camera, where the harbour sits and how it is scaled and turned, the boats, the
   town blocks and their house style, the gulls, and the paraglider's loop. Tune the scene here.
 - `harbour.json`: the harbour's outline, traced from OpenStreetMap (schema below).
 - `harbour.ts`: turns `harbour.json` into the `Harbour` component's shapes and the berth lines.
+- `cameraShot.ts`: plays a list of timed camera keys, some of them following the pilot.
 - `index.tsx`: loads it all.
 
 ## `harbour.json`

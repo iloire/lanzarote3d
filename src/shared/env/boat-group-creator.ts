@@ -3,6 +3,7 @@ import { SmallSailBoat, FishingBoat, Yacht, SpeedBoat } from '../../foundation/c
 import { ComponentRegistry } from '../../foundation/systems/ComponentRegistry';
 import { Berth, BoatConfig, BoatGroupConfig } from './boat-group-types';
 import { calculateBoatPositions, generateMixedRecreationalBoats } from './boat-group-utils';
+import { addBoatWake } from '../../foundation/components/effects/BoatWake';
 
 type BoatComponent =
   | InstanceType<typeof SmallSailBoat>
@@ -84,6 +85,11 @@ export class BoatGroupCreator {
         return null;
     }
 
+    // Boats under way leave a wake, sized from the boat before it is scaled
+    if (boatConfig.enableMovement) {
+      addBoatWake(boatMesh);
+    }
+
     // Apply scaling
     boatMesh.scale.set(scale, scale, scale);
 
@@ -153,9 +159,13 @@ export class BoatGroupCreator {
     water: THREE.Mesh,
     center: THREE.Vector3,
     count: number = 8,
-    formation: 'circle' | 'random' = 'random'
+    formation: 'circle' | 'random' = 'random',
+    scaleFactor: number = 1
   ): Promise<THREE.Object3D[]> {
-    const boats = generateMixedRecreationalBoats(count);
+    const boats = generateMixedRecreationalBoats(count).map(boat => ({
+      ...boat,
+      scale: (boat.scale ?? 2.5) * scaleFactor,
+    }));
 
     return this.createBoatGroup(water, boats, {
       center,

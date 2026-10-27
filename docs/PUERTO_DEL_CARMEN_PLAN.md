@@ -121,14 +121,19 @@ without converting anything by hand. Existing scenes keep their hand-placed coor
 
 ## Phase 2 (after the static scene looks right)
 
-- **Camera animation**: start low on the water among the moored boats, glide out past the
-  breakwater beacon and rise to show the whole seafront strip, then hand over to orbit
-  controls. Same structure as `boats-animation/cameraAnimation.ts`.
-- **A shot of the Playa Quemada pilot**: the camera follows the paraglider for a moment and then
-  turns east down the coast to the harbour.
-- **Boat wakes** (idea 9 in [HOME_ANIMATION_IDEAS.md](HOME_ANIMATION_IDEAS.md)) for the moving
-  boats.
-- **Making it public**, with a screenshot in the README grid.
+- ~~**Camera animation**~~ and ~~**a shot of the Playa Quemada pilot**~~ ✅ One 36 s opening
+  shot, `INTRO_SHOT` in `config.ts`, played by `CameraShot` (`cameraShot.ts`): round the pilot,
+  east down the coast, low over the sea to the beacon, in along the harbour between the
+  pontoons and the quay, then back and up to the overview, where the orbit controls take over.
+  It runs in the other direction from the first idea (into the harbour rather than out of it),
+  so the pilot comes first and the town is what it ends on. A click or scroll ends it early;
+  `?intro=0` skips it. Tested in `tests/elements/cameraShot.test.ts`.
+- ~~**Boat wakes**~~ ✅ `addBoatWake()` (`effects/BoatWake.ts`) gives every moving boat, in
+  every scene, a V of foam at the Kelvin angle and a wash astern, fading out. Making them showed
+  that moving boats sailed stern-first or sideways; `MovingBehavior` now has a `-z` forward axis
+  and `headingTowards()`, used by all four boats. Tested in `tests/elements/boatWake.test.ts`
+  and `tests/elements/headingTowards.test.ts`.
+- **Making it public**, with a screenshot in the README grid. Waiting for a go-ahead.
 
 ## Notes for whoever implements it
 

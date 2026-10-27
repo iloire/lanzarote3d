@@ -21,7 +21,7 @@ export interface MovableBoatComponentOptions
   // bounds?: { min: THREE.Vector3; max: THREE.Vector3 };
   // waypoints?: THREE.Vector3[];
   // faceDirection?: boolean;
-  // forwardAxis?: 'x' | 'z';
+  // forwardAxis?: ForwardAxis;
 }
 
 /**
@@ -47,7 +47,7 @@ export abstract class MovableBoatComponent extends FloatingThreeComponent {
         waypoints: options.waypoints,
         autoStart: options.autoStartMoving ?? true,
         faceDirection: options.faceDirection ?? true,
-        forwardAxis: options.forwardAxis || 'z', // Default changed to 'z' after boat rotation
+        forwardAxis: options.forwardAxis || '-z', // The models' bows point along −z
       });
     }
   }

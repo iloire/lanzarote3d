@@ -2,6 +2,16 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 09:35 UTC
+
+### Added
+- **Puerto del Carmen opening shot**: 36 s from the paraglider over Playa Quemada, east down the coast, low past the green beacon on the breakwater, in among the moored boats and up to the overview of the town, where the orbit controls take over. A click or scroll ends it early; `?intro=0` skips it. Its keys are `INTRO_SHOT` in the scene's `config.ts`
+- **Boat wakes**: every moving boat, in every scene, leaves a V of foam opening at the Kelvin angle (19.5°) and a wash astern, fading out three boat lengths behind
+
+### Fixed
+- **Moving boats sailed backwards**: the boat models point their bows along −z, but movement turned their +z (sail boats, fishing boats) or +x (yachts, speedboats) towards where they were going, so they went stern-first or crabbed sideways. `MovingBehavior` has a `-z` forward axis now and every boat uses it
+- **Boats out at sea in Puerto del Carmen** were drawn at the other scenes' size, twice that of the moored ones; they now match
+
 ## 2026-10-27 09:18 UTC
 
 ### Added

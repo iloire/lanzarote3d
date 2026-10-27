@@ -62,7 +62,7 @@ export class SmallSailBoat extends MovableBoatComponent {
         pattern: MovementPattern.CIRCULAR,
         speed: 0.08,
         radius: 150,
-        forwardAxis: 'z', // Boats have bow pointing in +Z direction after rotation
+        forwardAxis: '-z', // The bow points along −z after the model's quarter turn
         faceDirection: true, // FORWARD pattern handles its own rotation
         ...options,
       }

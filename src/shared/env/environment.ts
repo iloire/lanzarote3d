@@ -115,9 +115,9 @@ class Environment {
     return this.boatGroupCreator.createMooredBoats(boats, berths);
   }
 
-  /** A few boats out on the water around `center`, some moving */
-  async addBoatsAround(water: THREE.Mesh, center: THREE.Vector3, count: number) {
-    await this.boatGroupCreator.createRecreationalBoats(water, center, count, 'random');
+  /** A few boats out on the water around `center`, some moving, `scale` times their usual size */
+  async addBoatsAround(water: THREE.Mesh, center: THREE.Vector3, count: number, scale = 1) {
+    await this.boatGroupCreator.createRecreationalBoats(water, center, count, 'random', scale);
     this.updateAllBoatMovementOrigins();
   }
 

@@ -5,6 +5,9 @@ import type { BoatConfig } from '../../shared/env/boat-group-types';
 import type { FlightLoop } from '../home/vehicleLoader';
 import type { ParagliderVoxelConfig } from '../home/config';
 import { CharacterType } from '../../foundation/components/characters/CharacterRegistry';
+import type { ShotKey } from './cameraShot';
+
+const v = (x: number, y: number, z: number) => new THREE.Vector3(x, y, z);
 
 /** Where the camera starts: out to sea south-east of the harbour, the town and slope behind it */
 export const CAMERA = {
@@ -27,7 +30,7 @@ export const HARBOUR_PLACEMENT = {
 /** Spacing of the boats along a pontoon or quay, and how far off its centreline they lie */
 export const BERTH_SPACING = 28;
 export const PONTOON_BERTH_OFFSET = 7;
-export const QUAY_BERTH_OFFSET = 9;
+export const QUAY_BERTH_OFFSET = 15;
 
 /** Boats for the pontoons, taken in turn; their scale makes each about twice life size */
 export const PONTOON_BOATS: BoatConfig[] = [
@@ -43,8 +46,11 @@ export const QUAY_BOATS: BoatConfig[] = Array.from({ length: 4 }, () => ({
   scale: 1.0,
 }));
 
-/** A few boats out at sea south-east of the breakwater, some under way */
-export const BOATS_OUTSIDE = { center: new THREE.Vector3(-3000, 0, 13350), count: 4 };
+/**
+ * A few boats out at sea south-east of the breakwater, some under way; half their usual scale
+ * matches the moored ones
+ */
+export const BOATS_OUTSIDE = { center: new THREE.Vector3(-3000, 0, 13350), count: 4, scale: 0.5 };
 
 /**
  * The island's building rule: white walls with green or blue doors, windows and trim. Each
@@ -128,3 +134,19 @@ export const PLAYA_QUEMADA_LOOP: FlightLoop = {
   ],
   tension: 0.5,
 };
+
+/**
+ * The opening shot, 36 s: round the Playa Quemada pilot, east down the coast, low over the sea
+ * to the beacon on the breakwater tip, in along the harbour between the pontoons and the quay,
+ * then back and up to CAMERA, where the orbit controls take over. Any click or scroll ends it.
+ */
+export const INTRO_SHOT: ShotKey[] = [
+  { at: 0, position: v(220, 50, -260), lookAt: v(0, 0, 0), followPilot: true },
+  { at: 5, position: v(260, 20, 160), lookAt: v(0, 0, 0), followPilot: true },
+  { at: 10, position: v(-6300, 330, 13950), lookAt: v(-4300, 60, 12850) },
+  { at: 17, position: v(-4400, 110, 13350), lookAt: v(-3700, 20, 12900) },
+  { at: 22, position: v(-3830, 16, 13030), lookAt: v(-3620, 8, 12840) },
+  { at: 27, position: v(-3660, 13, 12775), lookAt: v(-3420, 10, 12715) },
+  { at: 31, position: v(-3350, 60, 12900), lookAt: v(-3550, 20, 12740) },
+  { at: 36, position: CAMERA.position, lookAt: CAMERA.lookAt },
+];

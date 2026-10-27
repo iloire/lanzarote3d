@@ -49,7 +49,8 @@ Top picks: **1** (pendulum pilot), **5** (spring camera with roll) and **7** (cl
 8. **Wind streaks along the ridge.** About 20 instanced, additive line quads flowing up the Famara
    cliff, showing why the pilots stay up.
 9. **Shore foam and boat wakes.** A foam band in `OceanMaterial` where water meets terrain, and a
-   V-shaped quad behind each boat.
+   V-shaped quad behind each boat. Wakes ✅: `addBoatWake()` in `effects/BoatWake.ts` puts one
+   behind every moving boat; the shore foam is still open.
 10. **Golden-hour light.** A warm low sun, a cool fill and height fog suit flat shading; a slowly
     shifting sun angle keeps the shading changing.
 
