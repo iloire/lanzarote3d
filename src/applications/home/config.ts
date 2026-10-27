@@ -330,10 +330,13 @@ export const ROOS_MOJO: GliderOptions = {
 export const LEAD_PILOT = CharacterType.IVAN;
 
 /**
- * They spread out along the Risco: Roos low by takeoff at the south-west end, the middle group
- * stepped up the cliff towards La Graciosa every ~500 m, each higher than the last (865-1147 m,
- * every one at least 124 m clear of the ground), then Bernt and Magne far out and highest.
- * They are listed in that order, so the arrows step from takeoff up the Risco.
+ * They spread out along the whole Risco, from takeoff to the Mirador del Río: Roos low by takeoff
+ * at the south-west end, Ivan on the takeoff beat, then a pilot every ~1.4 km up the cliff
+ * towards La Graciosa, with Bernt halfway and Magne at the Mirador. Each loop sits on the cliff
+ * edge where it flies. Magne is the farthest and the highest (1659-1753 m), then Bernt
+ * (1500-1562 m), then the rest at 875-1327 m, rising with the cliff and capped under Bernt; every
+ * one at least 173 m clear of the ground. They are listed in that order, so the arrows step from
+ * takeoff up the Risco.
  */
 export const paraglidersVoxel: ParagliderVoxelConfig[] = [
   {
@@ -371,9 +374,9 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
       glider: ADRI_RUSH,
       pilot: { characterType: CharacterType.ADRI },
     },
-    // 0.2 km up the cliff, between Ivan and Miguel
+    // A tenth of the way to the Mirador, 1.3 km up the cliff
     startProgress: 0.6,
-    pathOffset: new THREE.Vector3(74, 15, -221),
+    pathOffset: new THREE.Vector3(886, 90, -1130),
   },
   {
     options: {
@@ -381,18 +384,18 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
       glider: PURPLE_ROLLER,
       pilot: { characterType: CharacterType.MIGUEL },
     },
-    // 0.45 km up the cliff (the roller's drop takes his 30 m rise to -10)
+    // A fifth of the way, 2.6 km up (the rise allows for the roller's drop)
     startProgress: 0.04,
-    pathOffset: new THREE.Vector3(147, 30, -442),
+    pathOffset: new THREE.Vector3(1872, 370, -2259),
   },
   {
     options: {
       glider: DAVID_DELTA,
       pilot: { characterType: CharacterType.DAVID },
     },
-    // 0.95 km up the cliff
+    // 3.9 km up, in front of Peñas del Chache, where the cliff is highest
     startProgress: 0.12,
-    pathOffset: new THREE.Vector3(488, 80, -816),
+    pathOffset: new THREE.Vector3(2407, 380, -3389),
   },
   {
     options: {
@@ -400,9 +403,22 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
       glider: GREEN_ROLLER,
       pilot: { characterType: CharacterType.LUC },
     },
-    // 1.45 km up the cliff, out over the sea (the roller's drop takes his rise to 70)
+    // 5.2 km up, past the radar (the rise allows for the roller's drop)
     startProgress: 0.27,
-    pathOffset: new THREE.Vector3(671, 110, -1295),
+    pathOffset: new THREE.Vector3(2943, 420, -4519),
+  },
+  {
+    options: {
+      // The same lime Rush as Magne's
+      glider: MAGNE_RUSH,
+      pilot: { characterType: CharacterType.BERNT },
+    },
+    // Halfway to the Mirador, 6.5 km up the Risco, the second highest after Magne
+    startProgress: 0.8,
+    pathOffset: new THREE.Vector3(2929, 625, -5649),
+    // He likes to twist round and fly looking backwards: a 1.5 s spin, 8-15 s facing back,
+    // then 30 s to a minute and a half facing forward
+    twist: { spin: 1.5, hold: [8, 15], rest: [30, 90] },
   },
   {
     options: {
@@ -411,55 +427,38 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
       // He flies for the Piratas Aéreos
       pirateFlag: true,
     },
-    // 1.95 km up the cliff
+    // Five-eighths of the way, 8.1 km up
     startProgress: 0.35,
-    pathOffset: new THREE.Vector3(1020, 120, -1663),
+    pathOffset: new THREE.Vector3(3564, 380, -7061),
   },
   {
     options: {
       glider: FABIO_IKUMA,
       pilot: { characterType: CharacterType.FABIO },
     },
-    // 2.45 km up the cliff
+    // Three-quarters of the way, 9.7 km up
     startProgress: 0.5,
-    pathOffset: new THREE.Vector3(1245, 170, -2114),
+    pathOffset: new THREE.Vector3(4344, 390, -8473),
   },
   {
     options: {
       glider: FRANZ_BUZZ,
       pilot: { characterType: CharacterType.FRANZ },
     },
-    // 2.95 km up the cliff, the highest of the middle group
+    // Seven-eighths of the way, 11.3 km up, the last before the Mirador
     startProgress: 0.9,
-    pathOffset: new THREE.Vector3(1569, 210, -2499),
+    pathOffset: new THREE.Vector3(5313, 260, -9885),
   },
   {
-    options: {
-      // The same lime Rush as Magne's
-      glider: MAGNE_RUSH,
-      pilot: { characterType: CharacterType.BERNT },
-    },
-    // Out on his own, 6 km up the Risco towards La Graciosa and 450 m higher (1325-1387 m,
-    // at least 179 m clear of the ground)
-    startProgress: 0.8,
-    pathOffset: new THREE.Vector3(3000, 0, -5200),
-    waypoints: liftLoop(450, 1),
-    // He likes to twist round and fly looking backwards: a 1.5 s spin, 8-15 s facing back,
-    // then 30 s to a minute and a half facing forward
-    twist: { spin: 1.5, hold: [8, 15], rest: [30, 90] },
-  },
-  {
-    // Magne is the best of them: his loop is widened 1.5x, raised above everyone's (1625-1687 m;
-    // Bernt tops out at ~1387 m) and carried 8.5 km up the Risco towards La Graciosa, past
-    // Bernt, out along the cliff edge, so he is always higher and farther out.
-    // At least ~430 m clear of the ground.
+    // Magne is the best of them: the farthest out and the highest, at the Mirador del Río at
+    // the north end of the Risco, 12.9 km up, his loop widened 1.5x.
     options: {
       glider: MAGNE_RUSH,
       pilot: { characterType: CharacterType.MAGNE },
     },
     startProgress: 0.2,
-    pathOffset: new THREE.Vector3(4000, 0, -7500),
-    waypoints: liftLoop(750, 1.5),
+    pathOffset: new THREE.Vector3(6108, 0, -11297),
+    waypoints: liftLoop(800, 1.5),
   },
 ];
 
@@ -489,7 +488,7 @@ export const cessnaConfig: CessnaConfig = {
   obstacleAvoidanceDistance: 200,
   forwardAxis: 'x',
   // An oval 1-3 km out to sea off the Risco, parallel to it, at 1230-1260 m: 200+ m above the
-  // pilots on the ridge loop and at least 1 km from every pilot, Bernt and Magne included;
+  // pilots on the ridge loop and at least 990 m from every pilot (Bernt is the closest);
   // under the Hercules (2000+). At least 969 m over the ground.
   waypoints: [
     new THREE.Vector3(4785, 1240, -870),

@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 13:32 UTC
+
+### Changed
+- **Pilots spread along the whole Risco**: from takeoff to the Mirador del Río instead of the first 3 km. Roos and Ivan stay at takeoff, Adri, Miguel, David and Luc at a tenth to four-tenths of the way, Bernt halfway, Jehosua, Fabio and Franz at five-eighths to seven-eighths, and Magne at the Mirador, 12.9 km up. Each loop sits on the cliff edge where it flies. Magne is the farthest and highest (1659-1753 m), then Bernt (1500-1562 m), then the rest (875-1327 m, rising with the cliff); everyone at least 173 m clear of the ground. Bernt moves up the list to between Luc and Jehosua, so the arrows still step up the Risco
+
 ## 2026-10-27 13:35 UTC
 
 ### Added
