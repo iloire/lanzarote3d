@@ -165,6 +165,14 @@ export const MAGNE_RUSH = ozoneRush({
   inlets: '#8a9a1c',
 });
 
+/** David's, to go with his OZONE helmet: blue, white swoosh, navy accents */
+export const DAVID_RUSH = ozoneRush({
+  base: '#1d4fa8',
+  swoosh: '#f4f4f4',
+  accent: '#0c1f44',
+  inlets: '#123a7a',
+});
+
 /**
  * The Niviuk Roller's design, on the top surface: the front half of the right tip in the tip
  * colour, an accent line just behind it out to the tip, stepping forward to the nose left of
@@ -229,6 +237,60 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
     },
     startProgress: 0.65,
     pathOffset: new THREE.Vector3(-20, 40, -10),
+  },
+  {
+    options: {
+      glider: DAVID_RUSH,
+      pilot: { characterType: CharacterType.DAVID },
+    },
+    startProgress: 0.12,
+    pathOffset: new THREE.Vector3(25, 10, -20),
+  },
+  {
+    options: {
+      // The green roller, like Miguel's, so he laps faster than the rest
+      glider: GREEN_ROLLER,
+      pilot: { characterType: CharacterType.LUC },
+    },
+    startProgress: 0.27,
+    pathOffset: new THREE.Vector3(-25, 5, 15),
+  },
+  {
+    options: {
+      // Red and black, like his clothes
+      glider: {
+        wingColor1: '#c8102e',
+        wingColor2: '#141414',
+        inletsColor: '#141414',
+        numeroCajones: 35,
+      },
+      pilot: { characterType: CharacterType.FABIO },
+    },
+    startProgress: 0.5,
+    pathOffset: new THREE.Vector3(15, 20, 25),
+  },
+  {
+    options: {
+      // The same lime Rush as Magne's
+      glider: MAGNE_RUSH,
+      pilot: { characterType: CharacterType.BERNT },
+    },
+    startProgress: 0.8,
+    pathOffset: new THREE.Vector3(30, 30, -15),
+  },
+  {
+    options: {
+      // Sky blue with pink tips, like his helmet and its clown sticker
+      glider: {
+        wingColor1: '#5ab4e6',
+        wingColor2: '#f06aa8',
+        inletsColor: 'white',
+        numeroCajones: 35,
+      },
+      pilot: { characterType: CharacterType.FRANZ },
+    },
+    startProgress: 0.9,
+    pathOffset: new THREE.Vector3(-15, -10, -25),
   },
   {
     // Magne is the best of them: his loop is raised clear of everyone's (the others top out

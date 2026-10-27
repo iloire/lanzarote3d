@@ -6,8 +6,13 @@ import { logger } from '../../utils/logger';
  */
 export enum CharacterType {
   ADRI = 'adri',
+  BERNT = 'bernt',
+  DAVID = 'david',
+  FABIO = 'fabio',
+  FRANZ = 'franz',
   IVAN = 'ivan',
   JEHOSUA = 'jehosua',
+  LUC = 'luc',
   MAGNE = 'magne',
   MIGUEL = 'miguel',
   ROOS = 'roos',
@@ -123,14 +128,40 @@ export class CharacterRegistry {
     // Built from Ivan by 3d-characters tools/pilots and exported in Adri's frame like him.
     const pilots: { id: CharacterType; name: string; description: string }[] = [
       {
+        id: CharacterType.BERNT,
+        name: 'Bernt',
+        description: 'Blue Charly helmet, black top, dark green open harness with a lime line',
+      },
+      {
+        id: CharacterType.DAVID,
+        name: 'David',
+        description: 'Black OZONE helmet, blue mirrored sunglasses, black puffer, cocoon harness',
+      },
+      {
+        id: CharacterType.FABIO,
+        name: 'Fabio',
+        description: 'Black Charly helmet, black clothes with red stripes, black cocoon harness',
+      },
+      {
+        id: CharacterType.FRANZ,
+        name: 'Franz',
+        description: 'Sky-blue helmet with clown and shark stickers, red jacket, open harness',
+      },
+      {
         id: CharacterType.JEHOSUA,
         name: 'Jehosua',
         description: 'Piratas Aéreos pilot - skull helmet, open harness',
       },
       {
+        id: CharacterType.LUC,
+        name: 'Luc',
+        description: 'White open helmet, orange jacket, grey open harness, shorts',
+      },
+      {
         id: CharacterType.MAGNE,
         name: 'Magne',
-        description: 'Blue full-face helmet with a peak, blue jacket, black cocoon harness',
+        description:
+          'Royal blue Charly full-face helmet, striped blue jacket, black cocoon harness',
       },
       {
         id: CharacterType.MIGUEL,
