@@ -66,7 +66,11 @@ export function addBoatWake(boat: THREE.Object3D): THREE.Mesh {
         side: THREE.DoubleSide,
       })
   );
+  // Measured with the boat's own quarter turn applied, where the bow points along −z; undoing that
+  // turn on the wake keeps it there once it is a child, rather than turning it a second time
+  boat.updateMatrixWorld(true);
   const wake = new THREE.Mesh(wakeGeometry(new THREE.Box3().setFromObject(boat)), material);
+  wake.applyMatrix4(boat.matrixWorld.clone().invert());
   wake.name = 'BoatWake';
   wake.renderOrder = 1;
   boat.add(wake);

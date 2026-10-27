@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { wakeGeometry } from '../../src/foundation/components/effects/BoatWake';
+import { addBoatWake, wakeGeometry } from '../../src/foundation/components/effects/BoatWake';
 
 // A boat 20 long and 6 wide, bow at z = −10, stern at z = 10
 const bounds = new THREE.Box3(new THREE.Vector3(-3, -2, -10), new THREE.Vector3(3, 8, 10));
@@ -36,5 +36,26 @@ describe('wakeGeometry', () => {
   it('is foam at the stern and fades to nothing at its end', () => {
     points.filter(p => p.z === 10).forEach(p => expect(p.alpha).toBeCloseTo(0.6));
     points.filter(p => p.z > 10).forEach(p => expect(p.alpha).toBe(0));
+  });
+});
+
+describe('addBoatWake', () => {
+  it('trails from the stern of a boat built bow +x and given a quarter turn', () => {
+    // Hull 20 long along x, bow at +x, turned so the bow points along −z
+    const boat = new THREE.Mesh(new THREE.BoxGeometry(20, 4, 6));
+    boat.rotateY(Math.PI / 2);
+    const wake = addBoatWake(boat);
+    boat.rotation.y = 0.7; // any later heading carries the wake round with the hull
+    boat.updateMatrixWorld(true);
+
+    const bow = new THREE.Vector3(10, 0, 0).applyMatrix4(boat.matrixWorld);
+    const stern = new THREE.Vector3(-10, 0, 0).applyMatrix4(boat.matrixWorld);
+    const astern = stern.clone().sub(bow).normalize();
+    const position = wake.geometry.getAttribute('position');
+    for (let i = 0; i < position.count; i++) {
+      const p = new THREE.Vector3().fromBufferAttribute(position, i).applyMatrix4(wake.matrixWorld);
+      // Every vertex is at or behind the stern, along the hull's own line
+      expect(p.clone().sub(stern).dot(astern)).toBeGreaterThan(-1e-6);
+    }
   });
 });
