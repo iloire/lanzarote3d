@@ -1,13 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <defs>
-    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#0f5fa8"/>
-      <stop offset="1" stop-color="#5fb4e6"/>
+    <linearGradient id="dusk" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff8a3d"/>
+      <stop offset="1" stop-color="#e2445c"/>
     </linearGradient>
   </defs>
-  <rect width="64" height="64" rx="14" fill="url(#sky)"/>
-  <path d="M0 56 L20 44 Q24 41.5 28 44 L36 49 L46 46 L64 54 V64 H0 Z" fill="#2a1d1a"/>
-  <path d="M5 24 Q32 -2 59 24 Q32 12 5 24 Z" fill="#ff6a1a"/>
-  <path d="M8 22.5 L32 37 L56 22.5" fill="none" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
-  <circle cx="32" cy="37.5" r="4.5" fill="#fff"/>
+  <rect width="64" height="64" rx="14" fill="url(#dusk)"/>
+  <circle cx="32" cy="46" r="15" fill="#ffd36b"/>
+  <path d="M0 54 L18 43 Q22 40.5 26 43 L35 49 L46 45 L64 53 V64 H0 Z" fill="#1f1418"/>
+  <path d="M6 22 Q32 -2 58 22 Q32 11 6 22 Z" fill="#1f1418"/>
+  <path d="M9 20.5 L32 35 L55 20.5" fill="none" stroke="#1f1418" stroke-width="2.2" stroke-linejoin="round"/>
+  <circle cx="32" cy="35.5" r="4.2" fill="#1f1418"/>
 </svg>

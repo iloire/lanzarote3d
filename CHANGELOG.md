@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 11:59 UTC
+
+### Changed
+- **Favicon at sunset**: the wing, pilot and volcano are now black silhouettes against an orange-to-pink sky with a yellow sun on the horizon, instead of the blue-sky version; dark on warm reads better at 16 px than thin white lines on blue
+
 ## 2026-10-27 11:55 UTC
 
 ### Changed
