@@ -27,8 +27,8 @@ type WingShape = {
 
 /**
  * A standard wing is big and thick for lift, tapers to its tips and stays flat in the middle. A
- * roller (speed wing) is smaller, with fewer, fatter cells, shorter lines and an arc that bends
- * evenly from the centre out; it flies 1.7 times as fast.
+ * roller (speed wing) is smaller, with fewer, fatter cells, shorter lines and a top that stays
+ * almost flat before the tips fold down hard into ears; it flies 1.7 times as fast.
  */
 export const WING_SHAPES = {
   standard: {
@@ -57,8 +57,8 @@ export const WING_SHAPES = {
     speedFactor: 1,
   },
   /**
-   * Niviuk Roller, fitted to a photo from behind: an even arc whose tips curl down to about 57°,
-   * dropping about half its projected half span. A 16 m² roller against the 24 to 26 of the
+   * Niviuk Roller: nearly flat across the top for the middle 60% of the span, then the ears
+   * fold down to about 85°, dropping about a third of its projected half span. A 16 m² roller against the 24 to 26 of the
    * other wings here gives 0.77 of the Rush's span, and Niviuk's flat aspect ratio of 4.3 the
    * chord. Lines as long for its span as the Rush's, and fat cells.
    */
@@ -69,8 +69,8 @@ export const WING_SHAPES = {
     thickness: 0.12,
     camber: 0.035,
     lineHeight: 3200,
-    tipArc: 1.0,
-    arcExponent: 1,
+    tipArc: 1.5,
+    arcExponent: 3.5,
     cellBillow: 1.3,
     speedFactor: 1.7,
   },
