@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 12:24 UTC
+
+### Added
+- **Jehosua's pirate flag**: Jehosua flies for the Piratas Aéreos, so a black skull-and-crossbones flag hangs on a short pole under his harness, swings with him and ripples back in the airflow (`pirateFlag` on `ParagliderVoxel`, new `PirateFlag.ts`)
+
 ## 2026-10-27 12:40 UTC
 
 ### Added

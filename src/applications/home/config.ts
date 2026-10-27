@@ -408,6 +408,8 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
     options: {
       glider: JEHOSUA_RUSH,
       pilot: { characterType: CharacterType.JEHOSUA },
+      // He flies for the Piratas Aéreos
+      pirateFlag: true,
     },
     // 1.95 km up the cliff
     startProgress: 0.35,

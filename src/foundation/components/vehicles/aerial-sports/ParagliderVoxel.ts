@@ -3,10 +3,13 @@ import { SimpleThreeComponent, SimpleComponentOptions } from '../../base/SimpleT
 import { ComponentMetadata } from '../../base/IThreeComponent';
 import { PilotVoxel, PilotVoxelOptions } from '../../characters/PilotVoxel';
 import Glider, { GliderOptions } from '../components/Glider';
+import { createPirateFlag } from '../components/PirateFlag';
 
 export interface ParagliderVoxelOptions extends SimpleComponentOptions {
   glider: GliderOptions;
   pilot: PilotVoxelOptions;
+  /** Hang an open pirate flag on a pole under the pilot's harness */
+  pirateFlag?: boolean;
 }
 
 /**
@@ -79,6 +82,13 @@ export class ParagliderVoxel extends SimpleThreeComponent {
     hangPoint.add(this.pilotSwing);
     group.updateMatrixWorld(true);
     this.pilotSwing.attach(this.pilotMesh);
+
+    // Under the seat, so it swings with the pilot and streams back behind them
+    if (options.pirateFlag) {
+      const flag = createPirateFlag();
+      flag.position.set(0, -700, 150);
+      this.pilotSwing.add(flag);
+    }
 
     // Rotate entire group 90 degrees left to align with forward axis
     group.rotation.y = Math.PI / 2;
