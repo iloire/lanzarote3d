@@ -62,3 +62,34 @@ test('speeding up swings the pilot back and slowing down swings it forward', () 
   fly(glider, 1.5, 0, SPEED * 0.6);
   expect(glider.swing.rotation.x).toBeGreaterThan(THREE.MathUtils.degToRad(3));
 });
+
+test('a wingover banks hardest and climbs highest at each end of its weave', () => {
+  const rig = new THREE.Object3D();
+  const body = new THREE.Object3D();
+  rig.add(body);
+  const wingover = { period: 8, sway: 60, climb: 30, bank: THREE.MathUtils.degToRad(60) };
+  const motion = new ParagliderMotion(rig, body, SPEED, undefined, wingover);
+
+  // Flying straight, the wing alone weaves: record it at its farthest out to each side
+  let right = { x: -Infinity, y: 0, bank: 0 };
+  let left = { x: Infinity, y: 0, bank: 0 };
+  let lowest = Infinity;
+  for (let t = 0; t < 16; t += STEP) {
+    rig.position.z -= SPEED * STEP;
+    motion.update(STEP);
+    const at = { x: body.position.x, y: body.position.y, bank: motion.bankAngle };
+    if (at.x > right.x) right = at;
+    if (at.x < left.x) left = at;
+    lowest = Math.min(lowest, body.position.y);
+  }
+
+  expect(right.x).toBeGreaterThan(55);
+  expect(left.x).toBeLessThan(-55);
+  // Out to the right it turns back left (positive bank), and the other way on the left
+  expect(right.bank).toBeGreaterThan(THREE.MathUtils.degToRad(50));
+  expect(left.bank).toBeLessThan(THREE.MathUtils.degToRad(-50));
+  // High at the ends, low through the middle
+  expect(right.y).toBeGreaterThan(25);
+  expect(left.y).toBeGreaterThan(25);
+  expect(lowest).toBeLessThan(-25);
+});

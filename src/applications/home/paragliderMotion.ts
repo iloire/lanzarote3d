@@ -2,6 +2,8 @@ import * as THREE from 'three';
 
 const GRAVITY = 9.81;
 const MAX_BANK = THREE.MathUtils.degToRad(35);
+/** The most a wingover may add the path's bank up to */
+const MAX_WINGOVER_BANK = THREE.MathUtils.degToRad(80);
 /** How fast the bank follows the turn, per second: a wing rolls in over a second or two */
 const BANK_RESPONSE = 1.5;
 /** The pilot's pendulum under the wing: natural frequency in rad/s (a ~3 s period) and damping ratio */
@@ -10,6 +12,18 @@ const SWING_DAMPING = 0.22;
 const MAX_SWING = THREE.MathUtils.degToRad(25);
 /** How fast the measured speed and acceleration are smoothed, per second */
 const SPEED_SMOOTHING = 3;
+
+/**
+ * Wingovers flown on top of the path: the wing weaves `sway` to each side once a `period`,
+ * banking up to `bank` as it turns back at each end, where it also climbs `climb` above the
+ * path, and diving through the middle.
+ */
+export type WingoverSettings = {
+  period: number;
+  sway: number;
+  climb: number;
+  bank: number;
+};
 
 /**
  * A damped pendulum, integrated in absolute angle: it is pulled towards `target` and damped
@@ -42,6 +56,9 @@ export class ParagliderMotion {
   private readonly forward = new THREE.Vector3();
   private readonly lastPosition = new THREE.Vector3();
   private lastHeading: number | null = null;
+  /** The bank the path's turns call for */
+  private pathBank = 0;
+  /** That plus the wingover's, which the wing flies */
   private bank = 0;
   private speedMeasured: number | null = null;
   private acceleration = 0;
@@ -54,8 +71,12 @@ export class ParagliderMotion {
     private readonly rig: THREE.Object3D,
     private readonly body: THREE.Object3D,
     private readonly speed: number,
-    private readonly pilotSwing?: THREE.Object3D
-  ) {}
+    private readonly pilotSwing?: THREE.Object3D,
+    private readonly wingover?: WingoverSettings
+  ) {
+    // Yaw before banking and pitching, as a wing weaving across its path does
+    body.rotation.order = 'YXZ';
+  }
 
   /** The wing's bank in radians, positive in a left turn */
   get bankAngle(): number {
@@ -84,16 +105,45 @@ export class ParagliderMotion {
       -MAX_BANK,
       MAX_BANK
     );
+    this.pathBank += (targetBank - this.pathBank) * Math.min(1, deltaTime * BANK_RESPONSE);
+    const weave = this.flyWingover();
     const lastBank = this.bank;
-    this.bank += (targetBank - this.bank) * Math.min(1, deltaTime * BANK_RESPONSE);
+    this.bank = THREE.MathUtils.clamp(
+      this.pathBank + weave.bank,
+      -MAX_WINGOVER_BANK,
+      MAX_WINGOVER_BANK
+    );
     const bankRate = (this.bank - lastBank) / deltaTime;
 
     // Positive roll about the rig's Z lowers the left wing, which is a left turn here.
     this.body.rotation.z = this.bank + Math.sin(this.time * 0.9) * 0.03;
-    this.body.rotation.x = Math.sin(this.time * 0.6) * 0.04;
-    this.body.position.y = Math.sin(this.time * 0.35) * 1.5 + Math.sin(this.time * 0.9) * 0.4;
+    this.body.rotation.x = weave.pitch + Math.sin(this.time * 0.6) * 0.04;
+    this.body.rotation.y = weave.yaw;
+    this.body.position.x = weave.x;
+    this.body.position.y =
+      weave.y + Math.sin(this.time * 0.35) * 1.5 + Math.sin(this.time * 0.9) * 0.4;
 
     if (this.pilotSwing) this.swingPilot(this.pilotSwing, deltaTime, bankRate);
+  }
+
+  /**
+   * Where the wingover puts the wing off the path, and how it is turned. Across the path it
+   * runs x = sway·sin φ, so it turns hardest, and banks most, at the ends, where it is also
+   * highest: y = -climb·cos 2φ. Heading and pitch follow the slope of each.
+   */
+  private flyWingover(): { x: number; y: number; bank: number; yaw: number; pitch: number } {
+    if (!this.wingover) return { x: 0, y: 0, bank: 0, yaw: 0, pitch: 0 };
+    const { period, sway, climb, bank } = this.wingover;
+    const omega = (Math.PI * 2) / period;
+    const phase = this.time * omega;
+    return {
+      x: sway * Math.sin(phase),
+      y: -climb * Math.cos(phase * 2),
+      // Out to the right it turns back left, which is a positive bank
+      bank: bank * Math.sin(phase),
+      yaw: -Math.atan((sway * omega * Math.cos(phase)) / this.speed),
+      pitch: Math.atan((2 * climb * omega * Math.sin(phase * 2)) / this.speed),
+    };
   }
 
   private swingPilot(pilotSwing: THREE.Object3D, deltaTime: number, bankRate: number): void {

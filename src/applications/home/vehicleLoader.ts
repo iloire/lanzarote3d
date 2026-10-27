@@ -13,7 +13,7 @@ import type {
   CessnaConfig,
   HerculesConfig,
 } from './config';
-import { RIDGE_LOOP, RIDGE_LOOP_TENSION, PARAGLIDER_SPEED } from './config';
+import { RIDGE_LOOP, RIDGE_LOOP_TENSION, PARAGLIDER_SPEED, ROLLER_FLIGHT } from './config';
 
 export interface VehicleLoadResult {
   mesh: THREE.Object3D;
@@ -45,8 +45,12 @@ export async function loadParagliders(
     configs.map(async (p): Promise<VehicleLoadResult | null> => {
       try {
         const paraglider = new ParagliderVoxel(p.options);
-        // A roller flies faster than a standard wing
+        // A roller flies faster and lower than a standard wing, throwing wingovers
         const speed = PARAGLIDER_SPEED * gliderSpeedFactor(p.options.glider);
+        const roller = p.options.glider.kind === 'roller';
+        const offset = roller
+          ? p.pathOffset.clone().setY(p.pathOffset.y - ROLLER_FLIGHT.drop)
+          : p.pathOffset;
         const mesh = await paraglider.load();
         const scale = 0.01;
         mesh.scale.set(scale, scale, scale);
@@ -66,7 +70,7 @@ export async function loadParagliders(
           turnSpeed: 1.0,
           forwardAxis: '-z',
           debugVectors: DEBUG_VECTORS,
-          waypoints: (p.waypoints ?? loop.waypoints).map(point => point.clone().add(p.pathOffset)),
+          waypoints: (p.waypoints ?? loop.waypoints).map(point => point.clone().add(offset)),
           waypointTension: loop.tension,
           waypointLoop: true,
           waypointStartProgress: p.startProgress,
@@ -78,7 +82,13 @@ export async function loadParagliders(
         return {
           mesh: rig,
           flyingBehavior,
-          motion: new ParagliderMotion(rig, body, speed, paraglider.getPilotSwing()),
+          motion: new ParagliderMotion(
+            rig,
+            body,
+            speed,
+            paraglider.getPilotSwing(),
+            roller ? ROLLER_FLIGHT.wingover : undefined
+          ),
         };
       } catch (error) {
         errorHandler(error as Error, 'loading voxel paraglider');

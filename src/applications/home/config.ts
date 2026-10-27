@@ -7,6 +7,7 @@ import type {
 import { CharacterType } from '../../foundation/components/characters/CharacterRegistry';
 import { FlightPattern } from '../../foundation/systems/behaviors/FlyingBehavior';
 import type { BackdropSwaySettings, CameraFollowSettings } from './cameraFollow';
+import type { WingoverSettings } from './paragliderMotion';
 
 export type ParagliderVoxelConfig = {
   options: ParagliderVoxelOptions;
@@ -88,6 +89,16 @@ export const RIDGE_LOOP: THREE.Vector3[] = [
 ];
 export const RIDGE_LOOP_TENSION = 0.5;
 export const PARAGLIDER_SPEED = 15;
+
+/**
+ * How pilots on rollers fly: they keep the ridge loop but fly it `drop` lower, and throw
+ * wingovers along it the whole way (see WingoverSettings). Their speed is the roller's
+ * speedFactor in Glider.ts.
+ */
+export const ROLLER_FLIGHT: { drop: number; wingover: WingoverSettings } = {
+  drop: 40,
+  wingover: { period: 8, sway: 60, climb: 30, bank: THREE.MathUtils.degToRad(60) },
+};
 
 /** Raises the ridge loop by `rise` and widens it about its centre by `widen` */
 function liftLoop(rise: number, widen: number): THREE.Vector3[] {
@@ -191,21 +202,20 @@ export const DAVID_DELTA: GliderOptions = {
 };
 
 /**
- * Franz's Ozone Buzz Z6: lime across the middle, then out towards each tip a thin white line,
- * a grey band and blue tips, all the way from nose to tail, over a white underside.
+ * Franz's Ozone Buzz Z6, asymmetric on top: blue, except on the right half, where a white line
+ * edged in grey in front runs diagonally from the trailing edge by the centre to 45% of the
+ * chord at the tip, with lime behind it. The underside is lime.
  */
 export const FRANZ_BUZZ: GliderOptions = {
-  wingColor1: '#9ccf28',
-  wingColor2: '#2f7fd6',
-  undersideColor: '#e8ecef',
-  inletsColor: '#86ac22',
-  patches: (
-    [
-      { color: '#f4f6f6', from: [0.5, -0.1], to: [0.5, 1.1], width: 0.035 },
-      { color: '#727e7a', from: [0.58, -0.1], to: [0.58, 1.1], width: 0.12 },
-      { color: '#2f7fd6', from: [0.85, -0.1], to: [0.85, 1.1], width: 0.42 },
-    ] satisfies GliderPatch[]
-  ).flatMap(mirrored),
+  wingColor1: '#1f86d8',
+  wingColor2: '#1f86d8',
+  undersideColor: '#b6dc30',
+  inletsColor: '#16609c',
+  patches: [
+    { color: '#f4f6f6', from: [0.05, 0.95], to: [1.05, 0.42], width: 0.05 },
+    { color: '#7a8682', from: [0.036, 0.844], to: [1.036, 0.314], width: 0.06 },
+    { color: '#b6dc30', from: [0.133, 1.578], to: [1.133, 1.048], width: 0.6 },
+  ],
   numeroCajones: 27,
 };
 
@@ -270,7 +280,7 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
   },
   {
     options: {
-      // On the pink roller, so he laps the loop half as fast again as the others
+      // On the pink roller, so he flies faster and lower than the others, throwing wingovers
       glider: PURPLE_ROLLER,
       pilot: { characterType: CharacterType.MIGUEL },
     },

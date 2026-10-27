@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 11:04 UTC
+
+### Added
+- **Roller pilots fly wingovers**: anyone on a roller flies the ridge loop 40 lower and 1.7× as fast (was 1.5×), weaving 60 to each side every 8 s, banking up to 60° as they turn back at each end, where they climb 30, and diving through the middle. `ROLLER_FLIGHT` in the home config holds the numbers; `ParagliderMotion` flies the wingover on top of the path
+
 ## 2026-10-27 10:59 UTC
 
 ### Changed

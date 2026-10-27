@@ -27,7 +27,7 @@ type WingShape = {
 /**
  * A standard wing is big and thick for lift, tapers to its tips and stays flat in the middle. A
  * roller (speed wing) is smaller, with a thin flat section, shorter lines and a shallow arc that
- * only drops towards the tips; it flies half as fast again.
+ * only drops towards the tips; it flies 1.7 times as fast.
  */
 export const WING_SHAPES = {
   standard: {
@@ -67,7 +67,7 @@ export const WING_SHAPES = {
     lineHeight: 3000,
     tipArc: 0.95,
     arcExponent: 1.4,
-    speedFactor: 1.5,
+    speedFactor: 1.7,
   },
 } satisfies Record<string, WingShape>;
 
