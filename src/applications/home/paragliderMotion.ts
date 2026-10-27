@@ -14,16 +14,22 @@ const MAX_SWING = THREE.MathUtils.degToRad(25);
 const SPEED_SMOOTHING = 3;
 
 /**
- * Wingovers flown on top of the path: the wing weaves `sway` to each side once a `period`,
- * banking up to `bank` as it turns back at each end, where it also climbs `climb` above the
- * path, and diving through the middle.
+ * Wingovers flown on top of the path, now and then: the wing weaves `sway` to each side once a
+ * `period`, banking up to `bank` as it turns back at each end, where it also climbs `climb`
+ * above the path, and diving through the middle. A burst is a random whole number of them
+ * between `turns`, eased in and out over half a period, then the pilot rests for a random time
+ * between `rest`, in seconds.
  */
 export type WingoverSettings = {
   period: number;
   sway: number;
   climb: number;
   bank: number;
+  turns: [number, number];
+  rest: [number, number];
 };
+
+const randomBetween = ([min, max]: [number, number]) => min + Math.random() * (max - min);
 
 /**
  * A damped pendulum, integrated in absolute angle: it is pulled towards `target` and damped
@@ -66,6 +72,11 @@ export class ParagliderMotion {
   private readonly pitch = new Pendulum();
   // A random phase per pilot so they don't sway in step.
   private time = Math.random() * 100;
+  /** Seconds into the current burst of wingovers, or null while resting */
+  private burstTime: number | null = null;
+  private burstLength = 0;
+  private restLeft: number;
+  private readonly weaveLast = { x: 0, y: 0 };
 
   constructor(
     private readonly rig: THREE.Object3D,
@@ -76,6 +87,8 @@ export class ParagliderMotion {
   ) {
     // Yaw before banking and pitching, as a wing weaving across its path does
     body.rotation.order = 'YXZ';
+    // Somewhere into a rest, so the pilots don't start their wingovers together
+    this.restLeft = wingover ? Math.random() * wingover.rest[1] : 0;
   }
 
   /** The wing's bank in radians, positive in a left turn */
@@ -106,7 +119,7 @@ export class ParagliderMotion {
       MAX_BANK
     );
     this.pathBank += (targetBank - this.pathBank) * Math.min(1, deltaTime * BANK_RESPONSE);
-    const weave = this.flyWingover();
+    const weave = this.flyWingover(deltaTime);
     const lastBank = this.bank;
     this.bank = THREE.MathUtils.clamp(
       this.pathBank + weave.bank,
@@ -129,20 +142,53 @@ export class ParagliderMotion {
   /**
    * Where the wingover puts the wing off the path, and how it is turned. Across the path it
    * runs x = sway·sin φ, so it turns hardest, and banks most, at the ends, where it is also
-   * highest: y = -climb·cos 2φ. Heading and pitch follow the slope of each.
+   * highest: y = -climb·cos 2φ. Both are eased in and out at the ends of a burst, and heading
+   * and pitch follow the wing's movement.
    */
-  private flyWingover(): { x: number; y: number; bank: number; yaw: number; pitch: number } {
-    if (!this.wingover) return { x: 0, y: 0, bank: 0, yaw: 0, pitch: 0 };
-    const { period, sway, climb, bank } = this.wingover;
-    const omega = (Math.PI * 2) / period;
-    const phase = this.time * omega;
+  private flyWingover(deltaTime: number): {
+    x: number;
+    y: number;
+    bank: number;
+    yaw: number;
+    pitch: number;
+  } {
+    const still = { x: 0, y: 0, bank: 0, yaw: 0, pitch: 0 };
+    if (!this.wingover) return still;
+    const { period, sway, climb, bank, turns, rest } = this.wingover;
+
+    if (this.burstTime === null) {
+      this.restLeft -= deltaTime;
+      if (this.restLeft > 0) return still;
+      this.burstTime = 0;
+      this.burstLength = period * Math.round(randomBetween(turns));
+      this.weaveLast.x = this.weaveLast.y = 0;
+    }
+    this.burstTime += deltaTime;
+    const time = this.burstTime;
+    if (time >= this.burstLength) {
+      this.burstTime = null;
+      this.restLeft = randomBetween(rest);
+      return still;
+    }
+
+    const ease = period / 2;
+    const envelope =
+      THREE.MathUtils.smoothstep(time, 0, ease) *
+      THREE.MathUtils.smoothstep(this.burstLength - time, 0, ease);
+    const phase = (time * Math.PI * 2) / period;
+    const x = envelope * sway * Math.sin(phase);
+    const y = -envelope * climb * Math.cos(phase * 2);
+    const vx = (x - this.weaveLast.x) / deltaTime;
+    const vy = (y - this.weaveLast.y) / deltaTime;
+    this.weaveLast.x = x;
+    this.weaveLast.y = y;
     return {
-      x: sway * Math.sin(phase),
-      y: -climb * Math.cos(phase * 2),
+      x,
+      y,
       // Out to the right it turns back left, which is a positive bank
-      bank: bank * Math.sin(phase),
-      yaw: -Math.atan((sway * omega * Math.cos(phase)) / this.speed),
-      pitch: Math.atan((2 * climb * omega * Math.sin(phase * 2)) / this.speed),
+      bank: envelope * bank * Math.sin(phase),
+      yaw: -Math.atan(vx / this.speed),
+      pitch: Math.atan(vy / this.speed),
     };
   }
 

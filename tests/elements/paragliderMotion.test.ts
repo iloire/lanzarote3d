@@ -63,12 +63,20 @@ test('speeding up swings the pilot back and slowing down swings it forward', () 
   expect(glider.swing.rotation.x).toBeGreaterThan(THREE.MathUtils.degToRad(3));
 });
 
+const WINGOVER = {
+  period: 8,
+  sway: 60,
+  climb: 30,
+  bank: THREE.MathUtils.degToRad(60),
+  turns: [2, 2] as [number, number],
+  rest: [0, 0] as [number, number],
+};
+
 test('a wingover banks hardest and climbs highest at each end of its weave', () => {
   const rig = new THREE.Object3D();
   const body = new THREE.Object3D();
   rig.add(body);
-  const wingover = { period: 8, sway: 60, climb: 30, bank: THREE.MathUtils.degToRad(60) };
-  const motion = new ParagliderMotion(rig, body, SPEED, undefined, wingover);
+  const motion = new ParagliderMotion(rig, body, SPEED, undefined, WINGOVER);
 
   // Flying straight, the wing alone weaves: record it at its farthest out to each side
   let right = { x: -Infinity, y: 0, bank: 0 };
@@ -92,4 +100,33 @@ test('a wingover banks hardest and climbs highest at each end of its weave', () 
   expect(right.y).toBeGreaterThan(25);
   expect(left.y).toBeGreaterThan(25);
   expect(lowest).toBeLessThan(-25);
+});
+
+test('wingovers come in bursts, with straight flying in between', () => {
+  const rig = new THREE.Object3D();
+  const body = new THREE.Object3D();
+  rig.add(body);
+  // No wait before the first burst; one wingover a burst, then 30 s of rest
+  const random = jest.spyOn(Math, 'random').mockReturnValue(0);
+  const motion = new ParagliderMotion(rig, body, SPEED, undefined, {
+    ...WINGOVER,
+    turns: [1, 1],
+    rest: [30, 30],
+  });
+  random.mockRestore();
+
+  /** The farthest the wing weaves off the path between two times */
+  const widest = (from: number, to: number) => {
+    let farthest = 0;
+    for (let t = from; t < to; t += STEP) {
+      rig.position.z -= SPEED * STEP;
+      motion.update(STEP);
+      farthest = Math.max(farthest, Math.abs(body.position.x));
+    }
+    return farthest;
+  };
+
+  expect(widest(0, 8)).toBeGreaterThan(20);
+  expect(widest(8, 37)).toBeLessThan(1e-6);
+  expect(widest(37, 46)).toBeGreaterThan(20);
 });

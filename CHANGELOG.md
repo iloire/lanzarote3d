@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 11:09 UTC
+
+### Changed
+- **Roller pilots throw wingovers now and then, not all the time**: a burst of two to four, eased in and out, then they fly straight for a random 20 s to a minute before the next. Each pilot starts somewhere into a rest, so they don't go off together. `turns` and `rest` in `ROLLER_FLIGHT` set the ranges
+
 ## 2026-10-27 11:06 UTC
 
 ### Fixed

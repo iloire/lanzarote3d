@@ -91,13 +91,20 @@ export const RIDGE_LOOP_TENSION = 0.5;
 export const PARAGLIDER_SPEED = 15;
 
 /**
- * How pilots on rollers fly: they keep the ridge loop but fly it `drop` lower, and throw
- * wingovers along it the whole way (see WingoverSettings). Their speed is the roller's
- * speedFactor in Glider.ts.
+ * How pilots on rollers fly: they keep the ridge loop but fly it `drop` lower, and now and
+ * then throw two to four wingovers, then fly straight for 20 s to a minute (see
+ * WingoverSettings). Their speed is the roller's speedFactor in Glider.ts.
  */
 export const ROLLER_FLIGHT: { drop: number; wingover: WingoverSettings } = {
   drop: 40,
-  wingover: { period: 8, sway: 60, climb: 30, bank: THREE.MathUtils.degToRad(60) },
+  wingover: {
+    period: 8,
+    sway: 60,
+    climb: 30,
+    bank: THREE.MathUtils.degToRad(60),
+    turns: [2, 4],
+    rest: [20, 60],
+  },
 };
 
 /** Raises the ridge loop by `rise` and widens it about its centre by `widen` */
