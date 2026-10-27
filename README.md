@@ -79,8 +79,21 @@ the private scenes too (`famara`, `town`, `models`) and shows the sidebar everyw
 - **Turn off:** `?dev=0`
 
 It sticks in this browser (`localStorage.lanzarote_dev_mode`) until turned off, and the console logs
-"🔓 Dev mode enabled" on load. `enableDevMode()` / `disableDevMode()` in the console do the same,
-followed by a reload; run them on the scene's own page, not on a page that embeds it in an iframe.
+"🔓 Dev mode enabled" on load. These do the same from the browser console, followed by a reload; run
+them on the scene's own page, not on a page that embeds it in an iframe:
+
+```js
+enableDevMode();
+disableDevMode();
+```
+
+To show the sidebar on home without listing private scenes, run this in the console and reload:
+
+```js
+localStorage.setItem('lanzarote_show_menu', 'true');
+// to undo:
+localStorage.removeItem('lanzarote_show_menu');
+```
 
 At `localhost` the private scenes are always listed; home still hides its sidebar unless `?dev=1`.
 Private scenes also open directly without dev mode: `?story=famara`, `?story=town`.
@@ -90,9 +103,6 @@ Private scenes also open directly without dev mode: `?story=famara`, `?story=tow
 `?story=models` (Models in the dev menu) shows every model the scenes use, one at a time on a
 turntable, with its size and triangle count: pick one from the list, step with ← / →, space toggles
 the spin, `?model=<id>` links to one. A new model goes in `src/applications/models/catalog.ts`.
-
-To show the sidebar on home without listing private scenes:
-`localStorage.setItem('lanzarote_show_menu', 'true')` (remove the key to undo), then reload.
 
 ## Source art
 
