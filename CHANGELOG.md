@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 11:14 UTC
+
+### Changed
+- **Bernt and Magne fly far up the Risco towards La Graciosa, and high**: Bernt's copy of the ridge loop is carried 4.2 km along the cliff and raised 300 m (1175–1237 m, at least 608 m over the ground); Magne's, widened 1.5×, 6 km along and raised 550 m (1425–1487 m, at least ~240 m over the ground), so he stays the highest and farthest of all
+
 ## 2026-10-27 11:09 UTC
 
 ### Changed

@@ -347,8 +347,11 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
       glider: MAGNE_RUSH,
       pilot: { characterType: CharacterType.BERNT },
     },
+    // Out on his own, 4.2 km up the Risco towards La Graciosa and 300 m higher (1175-1237 m,
+    // at least 608 m clear of the ground)
     startProgress: 0.8,
-    pathOffset: new THREE.Vector3(30, 30, -15),
+    pathOffset: new THREE.Vector3(2300, 0, -3500),
+    waypoints: liftLoop(300, 1),
   },
   {
     options: {
@@ -359,16 +362,17 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
     pathOffset: new THREE.Vector3(-15, -10, -25),
   },
   {
-    // Magne is the best of them: his loop is raised clear of everyone's (the others top out
-    // at ~975 m, his lowest point is ~1005 m) and widened past the hang glider's, so he is
-    // always higher and farther out.
+    // Magne is the best of them: his loop is widened 1.5x, raised above everyone's (1425-1487 m;
+    // the others top out at ~1237 m) and carried 6 km up the Risco towards La Graciosa, past
+    // Bernt, out along the cliff edge, so he is always higher and farther out.
+    // At least ~240 m clear of the ground.
     options: {
       glider: MAGNE_RUSH,
       pilot: { characterType: CharacterType.MAGNE },
     },
     startProgress: 0.2,
-    pathOffset: new THREE.Vector3(0, 0, 0),
-    waypoints: liftLoop(130, 1.5),
+    pathOffset: new THREE.Vector3(3000, 0, -5200),
+    waypoints: liftLoop(550, 1.5),
   },
 ];
 
