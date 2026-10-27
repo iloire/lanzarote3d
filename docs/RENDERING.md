@@ -75,6 +75,12 @@ The ground is a solid **underlay** that also draws the wireframe. It's tinted fr
 the waterline, through the main ground colour, to the peak colour at altitude, and it
 casts and receives the sun's shadows.
 
+It's low poly: flat-shaded, and every triangle is one colour. `bakeFaceShading` gives the
+three corners of each face the same face height, flatness (the y of its unit normal) and
+seeded random, once at load. The shader tints by that face height, brightens level faces
+and darkens steep ones by `underlay.slopeShade`, and varies each face's tone at random by
+up to `underlay.faceJitter`, so neighbours differ and the cliffs read as rock.
+
 The lines are shaded into the underlay rather than drawn as GL lines. The underlay keeps
 its own non-indexed copy of the island in which every triangle corner carries a barycentric
 coordinate, so the fragment shader knows its distance to each edge in pixels (`fwidth`) and

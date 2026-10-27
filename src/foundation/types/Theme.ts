@@ -46,6 +46,8 @@ export interface TerrainTheme {
     color: string; // The bulk of the island
     peakColor?: string; // Blended in with altitude
     sandColor?: string; // Beaches, the last few metres above the sea
+    slopeShade?: number; // Level faces brighten and steep ones darken by this fraction (default 0.25)
+    faceJitter?: number; // Each face's tone varies at random by up to this fraction (default 0.12)
     lineOpacity?: number; // Wireframe opacity close to the camera (default 0.45)
     farLineOpacity?: number; // ...fading to this far away, where the mesh gets dense (default 0.12)
   };

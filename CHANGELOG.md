@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 00:36 UTC
+
+### Changed
+- **The island ground is faceted low poly**: each triangle of the solid ground under the wireframe is now one flat colour, flat-lit, instead of a smooth height gradient, so the plateau and cliffs no longer read as one even brown. Per-face data (centre height, flatness, a seeded random) is baked once at load in `bakeFaceShading`; the shader brightens level faces, darkens steep ones and jitters each face's tone a little. Strengths are theme fields (`underlay.slopeShade`, default 0.25, and `underlay.faceJitter`, default 0.12), no cost per frame
+
 ## 2026-10-27 00:29 UTC
 
 ### Changed

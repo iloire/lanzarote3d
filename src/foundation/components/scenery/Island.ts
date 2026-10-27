@@ -5,6 +5,7 @@ import { MeshBVH, acceleratedRaycast } from 'three-mesh-bvh';
 import { TerrainTheme } from '../../types/Theme';
 import { logger } from '../../utils/logger';
 import { addCloudShadows } from '../../rendering/shaderChunks';
+import { bakeFaceShading } from '../../rendering/faceShading';
 
 THREE.Mesh.prototype.raycast = acceleratedRaycast;
 
@@ -73,12 +74,20 @@ const toBarycentricGeometry = (geometry: THREE.BufferGeometry): THREE.BufferGeom
   const bary = new Uint8Array(count * 3);
   for (let i = 0; i < count; i++) bary[i * 3 + (i % 3)] = 1;
   ground.setAttribute('lzBarycentric', new THREE.BufferAttribute(bary, 3, true));
+  ground.setAttribute('lzFace', bakeFaceShading(ground));
   return ground;
 };
 
+// How much flat faces brighten and steep ones darken, and how much each face's tone
+// is jittered, when the theme doesn't say.
+const DEFAULT_SLOPE_SHADE = 0.25;
+const DEFAULT_FACE_JITTER = 0.12;
+
 /**
- * The solid ground, which also draws the wireframe. It's tinted from beach to peak, and
- * the lines are shaded into it from barycentric coordinates rather than drawn as GL
+ * The solid ground, which also draws the wireframe. Each triangle is flat-lit and one
+ * colour: tinted from beach to peak by its centre height, lighter when level, darker when
+ * steep, and jittered a little so neighbours differ (see bakeFaceShading). The lines are
+ * shaded into it from barycentric coordinates rather than drawn as GL
  * lines: 350k line segments into the 4x multisampled scene target cost more than the
  * rest of the frame put together. The lines fade with distance from `lineFade`.
  *
@@ -87,27 +96,37 @@ const toBarycentricGeometry = (geometry: THREE.BufferGeometry): THREE.BufferGeom
  * logarithmic depth buffer).
  */
 const createUnderlay = (geometry: THREE.BufferGeometry, lineFade: LineFade): THREE.Mesh => {
-  const material = new THREE.MeshStandardMaterial({ roughness: 0.95, metalness: 0 });
+  const material = new THREE.MeshStandardMaterial({
+    roughness: 0.95,
+    metalness: 0,
+    flatShading: true,
+  });
   material.userData['peakColor'] = { value: new THREE.Color() };
   material.userData['sandColor'] = { value: new THREE.Color() };
   material.userData['lineColor'] = { value: new THREE.Color() };
   material.userData['lineEmissive'] = { value: new THREE.Color() };
+  material.userData['facet'] = {
+    value: new THREE.Vector2(DEFAULT_SLOPE_SHADE, DEFAULT_FACE_JITTER),
+  };
   material.onBeforeCompile = shader => {
     shader.uniforms['uPeakColor'] = material.userData['peakColor'];
     shader.uniforms['uSandColor'] = material.userData['sandColor'];
     shader.uniforms['uLineColor'] = material.userData['lineColor'];
     shader.uniforms['uLineEmissive'] = material.userData['lineEmissive'];
+    shader.uniforms['uFacet'] = material.userData['facet'];
     Object.assign(shader.uniforms, lineFade);
     shader.vertexShader = shader.vertexShader
       .replace(
         '#include <common>',
-        '#include <common>\nvarying float vLzHeight;\nattribute vec3 lzBarycentric;\nvarying vec3 vLzBary;'
+        '#include <common>\nvarying float vLzHeight;\nattribute vec3 lzBarycentric;\nvarying vec3 vLzBary;\nattribute vec3 lzFace;\nvarying vec2 vLzFace;'
       )
       .replace(
         '#include <project_vertex>',
         `#include <project_vertex>
-        vLzHeight = (modelMatrix * vec4(transformed, 1.0)).y;
+        // The face's centre height, so the whole triangle takes one tint.
+        vLzHeight = (modelMatrix * vec4(transformed.x, lzFace.x, transformed.z, 1.0)).y;
         vLzBary = lzBarycentric;
+        vLzFace = lzFace.yz;
         mvPosition.xyz *= 1.003;
         gl_Position = projectionMatrix * mvPosition;`
       );
@@ -117,6 +136,8 @@ const createUnderlay = (geometry: THREE.BufferGeometry, lineFade: LineFade): THR
         `#include <common>
         varying float vLzHeight;
         varying vec3 vLzBary;
+        varying vec2 vLzFace;
+        uniform vec2 uFacet;
         uniform vec3 uPeakColor;
         uniform vec3 uSandColor;
         uniform vec3 uLineColor;
@@ -128,6 +149,8 @@ const createUnderlay = (geometry: THREE.BufferGeometry, lineFade: LineFade): THR
         'vec4 diffuseColor = vec4( diffuse, opacity );',
         `vec3 lzGround = mix( diffuse, uPeakColor, smoothstep( 60.0, 650.0, vLzHeight ) );
         lzGround = mix( uSandColor, lzGround, smoothstep( 4.0, 30.0, vLzHeight ) );
+        float lzSteep = 1.0 - smoothstep( 0.7, 0.98, vLzFace.x );
+        lzGround *= ( 1.0 + uFacet.x * ( 1.0 - 2.0 * lzSteep ) ) * ( 1.0 + uFacet.y * vLzFace.y );
         // Coverage of the nearest triangle edge, anti-aliased over one pixel.
         vec3 lzEdge = smoothstep( vec3( 0.0 ), fwidth( vLzBary ) * ${LINE_WIDTH_PX.toFixed(1)}, vLzBary );
         float lzLine = ( 1.0 - min( min( lzEdge.x, lzEdge.y ), lzEdge.z ) ) * mix( uLineNear, uLineFar,
@@ -268,6 +291,10 @@ class Island {
     material.color.set(underlay.color);
     material.userData['peakColor'].value.set(underlay.peakColor ?? underlay.color);
     material.userData['sandColor'].value.set(underlay.sandColor ?? underlay.color);
+    material.userData['facet'].value.set(
+      underlay.slopeShade ?? DEFAULT_SLOPE_SHADE,
+      underlay.faceJitter ?? DEFAULT_FACE_JITTER
+    );
     material.userData['lineColor'].value.copy(lines.color);
     material.userData['lineEmissive'].value
       .copy(lines.emissive)
