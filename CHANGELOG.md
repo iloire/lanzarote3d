@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 17:53 UTC
+
+### Changed
+- **Rollers' underside matches the top**: the purple and green Niviuk Rollers are now the base colour underneath too, instead of pale grey
+
 ## 2026-10-27 14:02 UTC
 
 ### Changed

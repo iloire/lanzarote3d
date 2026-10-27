@@ -240,13 +240,13 @@ export const FRANZ_BUZZ: GliderOptions = {
 /**
  * The Niviuk Roller's design, on the top surface: the front half of the right tip in the tip
  * colour, an accent line just behind it out to the tip, stepping forward to the nose left of
- * centre, and a pale underside.
+ * centre, and the underside in the base colour.
  */
 const niviukRoller = (colors: { base: string; accent: string; tip: string }): GliderOptions => ({
   kind: 'roller',
   wingColor1: colors.base,
   wingColor2: colors.base,
-  undersideColor: '#d8dbd6',
+  undersideColor: colors.base,
   inletsColor: colors.tip,
   patches: [
     { color: colors.tip, from: [0.48, 0.25], to: [1.1, 0.25], width: 0.25 },
