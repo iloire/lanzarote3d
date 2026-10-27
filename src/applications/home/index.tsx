@@ -36,11 +36,13 @@ import {
   SHOW_CAMERA_TARGET_UI,
   ANIMATION_DURATION_MS,
   CAMERA_FOLLOW,
+  CAMERA_SWAY,
+  LA_GRACIOSA,
   isEmbedded,
 } from './config';
 import { loadParagliders, loadHangglider, loadCessna, loadHercules } from './vehicleLoader';
 import { setupCameraAnimation, applyFloatingMotion } from './cameraAnimation';
-import { CameraFollow } from './cameraFollow';
+import { BackdropSway, CameraFollow } from './cameraFollow';
 import { createTitleOverlay } from './TitleOverlay';
 import type { ParagliderMotion } from './paragliderMotion';
 import type { SmokeTrail } from '../../foundation/components/effects/SmokeTrail';
@@ -355,6 +357,12 @@ class HomeApp extends TerrainBase {
     const follow = new CameraFollow(CAMERA_FOLLOW);
     const cameraMove = new THREE.Vector3();
     let wasFollowing = false;
+    // Sways the camera with La Graciosa behind the pilots until someone takes the controls
+    const sway = new BackdropSway(LA_GRACIOSA, CAMERA_SWAY);
+    let swaying = true;
+    controls.addEventListener('start', () => {
+      swaying = false;
+    });
     const enginePos = new THREE.Vector3();
     const tail = new THREE.Vector3();
 
@@ -394,6 +402,7 @@ class HomeApp extends TerrainBase {
           follow.update(deltaTime, lead.position, leadBank, cameraMove);
           camera.position.add(cameraMove);
           controls.target.add(cameraMove);
+          if (swaying) sway.update(deltaTime, camera.position, controls.target);
           applyFloatingMotion(camera, startTime, this.isAnimating);
         }
         wasFollowing = following;

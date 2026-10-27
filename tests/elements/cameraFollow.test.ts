@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { CameraFollow, smoothDamp } from '../../src/applications/home/cameraFollow';
+import { BackdropSway, CameraFollow, smoothDamp } from '../../src/applications/home/cameraFollow';
 
 const STEP = 1 / 60;
 const SETTINGS = {
@@ -85,5 +85,38 @@ describe('CameraFollow', () => {
     expect(follow.roll).toBeLessThan(bank * SETTINGS.rollShare);
     for (let t = 0; t < 10; t += STEP) follow.update(STEP, lead, bank, move);
     expect(follow.roll).toBeCloseTo(bank * SETTINGS.rollShare, 3);
+  });
+});
+
+describe('BackdropSway', () => {
+  const SWAY = { amplitude: 0.4, bias: 0, period: 60, response: 0.3 };
+  // The backdrop lies due -Z of the target, so facing it puts the camera at +Z.
+  const backdrop = new THREE.Vector3(0, 0, -10000);
+  const azimuth = (camera: THREE.Vector3, target: THREE.Vector3) =>
+    Math.atan2(camera.x - target.x, camera.z - target.z);
+
+  it('eases in from where the camera is', () => {
+    const target = new THREE.Vector3();
+    const camera = new THREE.Vector3(200, 50, 0); // side on, a quarter turn away
+    const sway = new BackdropSway(backdrop, SWAY);
+    sway.update(STEP, camera, target);
+    expect(azimuth(camera, target)).toBeCloseTo(Math.PI / 2, 1);
+  });
+
+  it('keeps the backdrop behind the target, within the sway, at the same range and height', () => {
+    const target = new THREE.Vector3(100, 900, 0);
+    const camera = new THREE.Vector3(300, 950, 0);
+    const range = camera.distanceTo(target);
+    const sway = new BackdropSway(backdrop, SWAY);
+    for (let t = 0; t < 20; t += STEP) sway.update(STEP, camera, target);
+    let widest = 0;
+    for (let t = 0; t < 60; t += STEP) {
+      sway.update(STEP, camera, target);
+      widest = Math.max(widest, Math.abs(azimuth(camera, target)));
+    }
+    expect(widest).toBeLessThan(SWAY.amplitude + 0.05);
+    expect(widest).toBeGreaterThan(SWAY.amplitude / 2);
+    expect(camera.distanceTo(target)).toBeCloseTo(range, 6);
+    expect(camera.y).toBeCloseTo(950, 6);
   });
 });

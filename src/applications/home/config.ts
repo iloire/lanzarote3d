@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import type { ParagliderVoxelOptions } from '../../foundation/components/vehicles';
 import { CharacterType } from '../../foundation/components/characters/CharacterRegistry';
 import { FlightPattern } from '../../foundation/systems/behaviors/FlyingBehavior';
-import type { CameraFollowSettings } from './cameraFollow';
+import type { BackdropSwaySettings, CameraFollowSettings } from './cameraFollow';
 
 export type ParagliderVoxelConfig = {
   options: ParagliderVoxelOptions;
@@ -245,6 +245,22 @@ export const CAMERA_FOLLOW: CameraFollowSettings = {
   velocityResponse: 2,
   rollShare: 0.25,
   rollResponse: 1.5,
+};
+
+/** La Graciosa, off the north tip of the island, about 14 km from the ridge */
+export const LA_GRACIOSA = new THREE.Vector3(10100, 0, -14800);
+
+/**
+ * After the intro the camera keeps La Graciosa, Famara beach and the ocean behind the pilots
+ * rather than circling round to the cliff: it sways ±18° about a line 5° seaward of Graciosa,
+ * so the cliff never fills the frame, there and back in a minute, until someone takes the
+ * controls.
+ */
+export const CAMERA_SWAY: BackdropSwaySettings = {
+  amplitude: THREE.MathUtils.degToRad(18),
+  bias: THREE.MathUtils.degToRad(5),
+  period: 60,
+  response: 0.3,
 };
 
 /**

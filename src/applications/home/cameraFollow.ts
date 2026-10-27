@@ -84,3 +84,52 @@ export function smoothDamp(
     current[axis] = target[axis] + (change + temp) * decay;
   }
 }
+
+export type BackdropSwaySettings = {
+  /** How far either side of its centre the camera swings, in radians */
+  amplitude: number;
+  /** Turns the centre of the swing off facing the backdrop, in radians; positive looks further left */
+  bias: number;
+  /** Seconds for one swing there and back */
+  period: number;
+  /** How fast the camera eases onto the swing, per second */
+  response: number;
+};
+
+/**
+ * Keeps a backdrop behind the subject: swings the camera round its target, at its current
+ * distance and height, on the side away from `backdrop`, swaying gently either side of it.
+ * It eases in from wherever the camera is, so taking over doesn't jump.
+ */
+export class BackdropSway {
+  private theta: number | null = null;
+  private time = 0;
+  private readonly offset = new THREE.Vector3();
+  private readonly spherical = new THREE.Spherical();
+
+  constructor(
+    private readonly backdrop: THREE.Vector3,
+    private readonly settings: BackdropSwaySettings
+  ) {}
+
+  /** Advances by `deltaTime` seconds, moving `camera` round `target` */
+  update(deltaTime: number, camera: THREE.Vector3, target: THREE.Vector3): void {
+    if (deltaTime <= 0) return;
+    const { amplitude, bias, period, response } = this.settings;
+    this.time += deltaTime;
+
+    this.offset.subVectors(camera, target);
+    this.spherical.setFromVector3(this.offset);
+    if (this.theta === null) this.theta = this.spherical.theta;
+
+    // Spherical's theta is the azimuth atan2(x, z); the camera sits opposite the backdrop.
+    const facing = Math.atan2(target.x - this.backdrop.x, target.z - this.backdrop.z);
+    const goal = facing + bias + amplitude * Math.sin((this.time * 2 * Math.PI) / period);
+    const turn =
+      THREE.MathUtils.euclideanModulo(goal - this.theta + Math.PI, 2 * Math.PI) - Math.PI;
+    this.theta += turn * Math.min(1, deltaTime * response);
+
+    this.spherical.theta = this.theta;
+    camera.copy(target).add(this.offset.setFromSpherical(this.spherical));
+  }
+}

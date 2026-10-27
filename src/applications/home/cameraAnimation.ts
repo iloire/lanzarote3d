@@ -93,13 +93,6 @@ export function setupCameraAnimation(
             },
           });
           OrbitControlsHelper.applyLimits(controls, limits);
-
-          // Drift slowly round the pilots until someone takes the controls.
-          controls.autoRotate = true;
-          controls.autoRotateSpeed = 0.3;
-          controls.addEventListener('start', () => {
-            controls.autoRotate = false;
-          });
         }
 
         state.isAnimating = false;

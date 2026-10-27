@@ -112,10 +112,12 @@ scenes share `FAMARA_GULL_FLOCKS` from `shared/env/environment.ts`.
 
 - **Home fly-in**: a centripetal Catmull-Rom spline through the three waypoints, walked by
   arc length with `Easing.approach`. That curve starts and ends at rest, peaks a third
-  of the way in, and then arrives slowly. After it lands, the camera drifts around the
-  pilots on OrbitControls auto-rotate until someone takes the controls, and follows the lead
-  pilot on a critically damped spring (`home/cameraFollow.ts`, tuned by `CAMERA_FOLLOW`): it
-  aims a little ahead along the pilot's flight and rolls with a quarter of the pilot's bank.
+  of the way in, and then arrives slowly. After it lands, the camera follows the lead pilot on
+  a critically damped spring (`home/cameraFollow.ts`, tuned by `CAMERA_FOLLOW`): it aims a
+  little ahead along the pilot's flight and rolls with a quarter of the pilot's bank. It keeps
+  La Graciosa, Famara beach and the ocean behind the pilots, swaying ±18° about a line just
+  seaward of Graciosa (`CAMERA_SWAY`, `LA_GRACIOSA`) rather than circling round to the cliff,
+  until someone takes the controls.
 - **Follow mode** (`CameraTargetController`) is a chase camera. It sits behind the
   target's direction of travel, its distance is sized from the target's meshes, and it
   eases only its offset, so it moves with the target instead of trailing behind it.

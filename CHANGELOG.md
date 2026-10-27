@@ -7,6 +7,11 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ### Docs
 - **The README shows four more scenes and has a shorter intro**: Famara animation, Famara static, Town and the Models viewer sit in a grid of screenshots under the home one, taken with the menu and dev panels hidden. The intro is now two lines and leaves out the pilots' names
 
+## 2026-10-27 08:41 UTC
+
+### Changed
+- **The home camera keeps La Graciosa and the ocean behind the pilots**: after the intro it auto-rotated all the way round them, so for much of each turn the Famara cliff filled the frame. Now it sways gently, ±18° there and back in a minute, about a line from the lead pilot to La Graciosa turned 5° seaward, so Famara beach, the bay, Graciosa and open ocean stay in the background and the cliff only frames one side. It eases in from where the intro lands and stops when you take the controls, as the auto-rotate did. Tuned by `CAMERA_SWAY` and `LA_GRACIOSA` in `home/config.ts`
+
 ## 2026-10-27 07:57 UTC
 
 ### Changed
