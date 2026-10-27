@@ -5,7 +5,7 @@
 A low-poly Lanzarote in the browser: paragliders ridge-soar the Famara cliffs over a real height
 map, with a living sea, gulls, towns, boats and planes.
 
-![Paragliders soaring the Famara cliffs on the home scene](docs/screenshots/home.png)
+![Two paragliders soaring over Famara beach on the home scene](docs/screenshots/home.png)
 
 | | |
 | --- | --- |

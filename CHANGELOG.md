@@ -5,7 +5,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ## 2026-10-27 08:14 UTC
 
 ### Docs
-- **The README shows four more scenes and has a shorter intro**: Famara animation, Famara static, Town and the Models viewer sit in a grid of screenshots under the home one, taken with the menu and dev panels hidden. The intro is now two lines and leaves out the pilots' names
+- **The README shows four more scenes and has a shorter intro**: Famara animation, Famara static, Town and the Models viewer sit in a grid of screenshots under the home one, taken with the menu and dev panels hidden. The home screenshot is retaken too: the old one showed the flat wings from before the pilots hung under arched canopies The intro is now two lines and leaves out the pilots' names
 
 ## 2026-10-27 08:41 UTC
 
