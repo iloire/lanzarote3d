@@ -38,7 +38,7 @@ export const cloudMaterial = new THREE.ShaderMaterial({
     uniform float uTime;
     // xyz: centre of the lobe the vertex belongs to, w: its phase
     attribute vec4 aLobe;
-    // x: phase of the whole cloud, y: height above the cloud base, 0-1, z: how dark its base is, 0-1
+    // x: phase of the whole cloud, y: height above the cloud base, 0-1 (below 0 in the belly), z: how dark its base is, 0-1
     attribute vec3 aCloud;
     varying vec3 vNormal;
     varying vec3 vWorldPosition;
@@ -49,7 +49,7 @@ export const cloudMaterial = new THREE.ShaderMaterial({
     void main() {
       float t = uTime + aCloud.x;
       vec3 p = aLobe.xyz + (position - aLobe.xyz) * (1.0 + 0.05 * sin(t * 0.7 + aLobe.w));
-      p.y = max(p.y, 0.0) + sin(t * 0.1) * 40.0;
+      p.y += sin(t * 0.1) * 40.0;
       vec4 worldPosition = modelMatrix * vec4(p, 1.0);
       vWorldPosition = worldPosition.xyz;
       vNormal = normalize(mat3(modelMatrix) * normal);

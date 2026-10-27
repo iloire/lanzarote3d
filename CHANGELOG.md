@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 21:55 UTC
+
+### Changed
+- **Cloud undersides**: rounded instead of cut flat - the part of each lobe below the cloud base is squashed to 30 % of its depth rather than clamped to the base, so clouds keep a shallow faceted belly instead of a stack of flat plates; lobes are also a little less squat
+
 ## 2026-10-27 21:40 UTC
 
 ### Changed

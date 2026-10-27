@@ -20,6 +20,9 @@ const SHAPES: Record<
 /** Lobes bigger than this get the finer icosahedron (80 faces instead of 20) */
 const FINE_LOBE_RADIUS = 150;
 
+/** How much of a lobe's depth below the base survives: a shallow belly, not a cut-off plate */
+const BELLY = 0.3;
+
 type Lobe = { centre: THREE.Vector3; radius: number };
 
 const stackLobes = (kind: CloudKind): Lobe[] => {
@@ -31,7 +34,7 @@ const stackLobes = (kind: CloudKind): Lobe[] => {
   for (let layer = 0; layer < layers; layer++) {
     const radius = width * rndBetween(0.22, 0.28);
     const count = layer === 0 ? rndIntBetween(3, 5) : rndIntBetween(2, 3);
-    // The bottom layer sinks below the base, which then cuts it flat
+    // The bottom layer sinks below the base, which then squashes it into a shallow belly
     y += radius * (layer === 0 ? 0.3 : shape.rise);
     for (let i = 0; i < count; i++) {
       const across = count === 1 ? 0 : i / (count - 1) - 0.5;
@@ -52,7 +55,7 @@ const stackLobes = (kind: CloudKind): Lobe[] => {
 export type CloudPlacement = { offset?: THREE.Vector3; yaw?: number };
 
 /**
- * One low-poly cumulus as a single non-indexed geometry, its base flat at y = 0. Every
+ * One low-poly cumulus as a single non-indexed geometry, its base near y = 0. Every
  * vertex carries its lobe (aLobe) and the cloud's phase, its height up the cloud and how
  * dark the cloud's base is (aCloud), which cloudMaterial uses to animate and shade it.
  */
@@ -66,8 +69,6 @@ export const buildCloudGeometry = (
   const positions: number[] = [];
   const lobeAttr: number[] = [];
   const v = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
-  const edgeA = new THREE.Vector3();
-  const edgeB = new THREE.Vector3();
 
   for (const { centre, radius } of stackLobes(kind)) {
     const lobe = new THREE.IcosahedronGeometry(1, radius > FINE_LOBE_RADIUS ? 1 : 0);
@@ -77,7 +78,7 @@ export const buildCloudGeometry = (
         new THREE.Quaternion().setFromEuler(
           new THREE.Euler(rndBetween(0, Math.PI), rndBetween(0, Math.PI), 0)
         ),
-        new THREE.Vector3(radius * rndBetween(1, 1.2), radius * rndBetween(0.8, 1), radius)
+        new THREE.Vector3(radius * rndBetween(1, 1.2), radius * rndBetween(0.9, 1.1), radius)
       )
     );
     const placedCentre = centre.clone().applyMatrix4(turn);
@@ -86,12 +87,8 @@ export const buildCloudGeometry = (
     for (let f = 0; f < corners.count; f += 3) {
       for (let k = 0; k < 3; k++) {
         v[k]!.fromBufferAttribute(corners, f + k);
-        v[k]!.y = Math.max(v[k]!.y, 0);
+        if (v[k]!.y < 0) v[k]!.y *= BELLY;
       }
-      // Faces wholly under the base collapse to nothing; the rest form its flat underside
-      edgeA.subVectors(v[1]!, v[0]!);
-      edgeB.subVectors(v[2]!, v[0]!);
-      if (edgeA.cross(edgeB).lengthSq() < 1e-6) continue;
       for (const corner of v) {
         corner.applyMatrix4(turn);
         positions.push(corner.x, corner.y, corner.z);
