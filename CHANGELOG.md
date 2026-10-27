@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 13:52 UTC
+
+### Changed
+- **Closer on the pilot**: the fly-in lands about 160 m behind and above the pilot instead of 230 m (`CAMERA_ARRIVAL_OFFSET` (-70, 35, 140)), and switching pilots after zooming out closes back in to the same 160 m
+
 ## 2026-10-27 13:48 UTC
 
 ### Changed

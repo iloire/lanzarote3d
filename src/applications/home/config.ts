@@ -564,8 +564,8 @@ export const CAMERA_FOLLOW: CameraFollowSettings = {
   rollResponse: 1.5,
 };
 
-/** Where the fly-in leaves the camera, relative to the lead pilot: about 230 m behind and above */
-export const CAMERA_ARRIVAL_OFFSET = new THREE.Vector3(-100, 50, 200);
+/** Where the fly-in leaves the camera, relative to the lead pilot: about 160 m behind and above */
+export const CAMERA_ARRIVAL_OFFSET = new THREE.Vector3(-70, 35, 140);
 
 /**
  * Switching pilots with the arrows after zooming out brings the camera back in to the fly-in's

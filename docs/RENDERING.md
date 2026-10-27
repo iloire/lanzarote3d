@@ -144,7 +144,7 @@ scenes share `FAMARA_GULL_FLOCKS` from `shared/env/environment.ts`.
   (`home/PilotPicker.tsx`) step it through every paraglider and the hangglider, numbered,
   never named; the spring retargets and glides across, starting at `switchTime` (1.5 s) and
   tightening back to `smoothTime`. If you had zoomed out, the camera also closes back in to
-  the fly-in's ~230 m (`CAMERA_ZOOM_IN`, `ZoomIn`) as it glides, unless you grab the controls;
+  the fly-in's ~160 m (`CAMERA_ZOOM_IN`, `ZoomIn`) as it glides, unless you grab the controls;
   zoomed in closer, it stays put. They are hidden when the scene is embedded. Each click
   sends a GA `pilot_switch` event (`pilot` number, `direction`) and rewrites the address to
   `?pilot=<number>`. `?pilot=3` or `?pilot=bernt` (`home/pilotParam.ts`; the name is the
