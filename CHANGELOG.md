@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 11:28 UTC
+
+### Changed
+- **Ivan, Magne, Roos and Fabio re-exported** from `3d-characters`: Ivan in an orange jacket with a yellow bandana, Magne in a dark navy carbon Charly helmet with gold aviators, Roos in the black carbon Charly with its logos and no visor, and Fabio with his dark visor down
+
 ## 2026-10-27 11:21 UTC
 
 ### Added

@@ -160,8 +160,7 @@ export class CharacterRegistry {
       {
         id: CharacterType.MAGNE,
         name: 'Magne',
-        description:
-          'Royal blue Charly full-face helmet, striped blue jacket, black cocoon harness',
+        description: 'Navy carbon Charly helmet, gold aviators, blue jacket, black cocoon harness',
       },
       {
         id: CharacterType.MIGUEL,
