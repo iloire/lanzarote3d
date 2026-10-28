@@ -1,0 +1,195 @@
+{
+  "id": "new-york",
+  "name": "New York",
+  "region": "United States",
+  "about": "Midtown Manhattan, river to river, from 34th Street up past the bottom of Central Park to 79th Street. Big scale (6 units a metre, about 8x Lanzarote) so the voxel paramotors, as big as they are, fit between the towers. Ground: uv run 3d/dem-to-glb.py src/locations/new-york.json assets/locations/new-york.glb; buildings: uv run 3d/city-to-glb.py src/locations/new-york.json assets/locations/new-york-city.glb",
+  "bbox": {
+    "south": 40.744,
+    "north": 40.781,
+    "west": -74.012,
+    "east": -73.96
+  },
+  "spacing": 30,
+  "unitsPerMetre": 6,
+  "verticalExaggeration": 1,
+  "flatLand": 6,
+  "city": {
+    "about": "Buildings from OpenStreetMap as 3 m voxels on a grid turned 29° to Manhattan's streets; a building with no height or levels is 12 m",
+    "voxel": 3,
+    "gridHeading": 29,
+    "defaultHeight": 12
+  },
+  "paramotor": true,
+  "places": {
+    "empireState": {
+      "name": "Empire State Building",
+      "at": [40.74844, -73.98566]
+    },
+    "chrysler": {
+      "name": "Chrysler Building",
+      "at": [40.75162, -73.97554]
+    },
+    "oneVanderbilt": {
+      "name": "One Vanderbilt",
+      "at": [40.753, -73.9785]
+    },
+    "bryantPark": {
+      "name": "Bryant Park",
+      "at": [40.7536, -73.9832]
+    },
+    "timesSquare": {
+      "name": "Times Square",
+      "at": [40.758, -73.9855]
+    },
+    "rockefeller": {
+      "name": "30 Rockefeller Plaza",
+      "at": [40.7593, -73.9794]
+    },
+    "centralParkTower": {
+      "name": "Central Park Tower, on Billionaires' Row",
+      "at": [40.7663, -73.981]
+    },
+    "grandArmyPlaza": {
+      "name": "Grand Army Plaza, the corner of Central Park",
+      "at": [40.7644, -73.9737]
+    }
+  },
+  "soaringLoop": {
+    "about": "The paramotors fly the street canyons at 100 m, under the towers' tops: north up 5th Avenue, round over the bottom of Central Park, south down 6th Avenue, then east over Bryant Park and the Library back to 5th. Avenues are 27-30 m between buildings, wings about 14 m; city-to-glb.py checks the curve keeps 10 m either side clear. [lat, lon, metres above sea level]",
+    "waypoints": [
+      [40.755954, -73.979091, 106],
+      [40.758724, -73.977078, 106],
+      [40.761494, -73.975064, 106],
+      [40.764265, -73.97305, 106],
+      [40.764428, -73.972996, 106],
+      [40.76459, -73.973057, 106],
+      [40.764707, -73.973216, 106],
+      [40.76576, -73.975706, 106],
+      [40.7658, -73.97592, 106],
+      [40.765754, -73.976133, 106],
+      [40.765633, -73.976286, 106],
+      [40.762862, -73.9783, 106],
+      [40.760092, -73.980314, 106],
+      [40.757322, -73.982328, 106],
+      [40.754551, -73.984342, 106],
+      [40.754388, -73.984395, 106],
+      [40.754226, -73.984334, 106],
+      [40.754109, -73.984175, 106],
+      [40.753056, -73.981686, 106],
+      [40.753016, -73.981471, 106],
+      [40.753062, -73.981259, 106],
+      [40.753183, -73.981105, 106]
+    ]
+  },
+  "camera": {
+    "about": "Over Bryant Park near 5th Avenue, just above the rooftops (78 m over the highest under its sway), looking north up the canyons of 5th and 6th Avenues; [lat, lon, metres]",
+    "at": [40.752654, -73.982568, 200.0],
+    "lookAt": [40.756107, -73.980464, 110.0],
+    "zoomOut": 2.5,
+    "pan": 9000
+  },
+  "cloudBase": 1500,
+  "clouds": [
+    {
+      "at": [40.775, -73.97],
+      "kind": "puff",
+      "scale": 1
+    },
+    {
+      "at": [40.76, -74.02],
+      "kind": "puff",
+      "scale": 1.2
+    },
+    {
+      "at": [40.745, -73.95],
+      "kind": "puff",
+      "scale": 1
+    }
+  ],
+  "regions": [
+    {
+      "name": "Streets and sidewalks",
+      "at": [40.758, -73.986],
+      "radius": 5000,
+      "color": "#5d5e62",
+      "strength": 1
+    },
+    {
+      "name": "Bryant Park",
+      "at": [40.7536, -73.9832],
+      "radius": 90,
+      "color": "#5f8a44",
+      "strength": 1
+    },
+    {
+      "name": "Central Park (1)",
+      "at": [40.76894, -73.97927],
+      "radius": 260,
+      "color": "#4f7a3a",
+      "strength": 1
+    },
+    {
+      "name": "Central Park (2)",
+      "at": [40.76684, -73.97429],
+      "radius": 260,
+      "color": "#4f7a3a",
+      "strength": 1
+    },
+    {
+      "name": "Central Park (3)",
+      "at": [40.77274, -73.97651],
+      "radius": 260,
+      "color": "#4f7a3a",
+      "strength": 1
+    },
+    {
+      "name": "Central Park (4)",
+      "at": [40.77063, -73.97153],
+      "radius": 260,
+      "color": "#4f7a3a",
+      "strength": 1
+    },
+    {
+      "name": "Central Park (5)",
+      "at": [40.77654, -73.97375],
+      "radius": 260,
+      "color": "#4f7a3a",
+      "strength": 1
+    },
+    {
+      "name": "Central Park (6)",
+      "at": [40.77443, -73.96877],
+      "radius": 260,
+      "color": "#4f7a3a",
+      "strength": 1
+    },
+    {
+      "name": "Central Park (7)",
+      "at": [40.78033, -73.97099],
+      "radius": 260,
+      "color": "#4f7a3a",
+      "strength": 1
+    },
+    {
+      "name": "Central Park (8)",
+      "at": [40.77823, -73.96601],
+      "radius": 260,
+      "color": "#4f7a3a",
+      "strength": 1
+    },
+    {
+      "name": "Central Park (9)",
+      "at": [40.78413, -73.96823],
+      "radius": 260,
+      "color": "#4f7a3a",
+      "strength": 1
+    },
+    {
+      "name": "Central Park (10)",
+      "at": [40.78202, -73.96325],
+      "radius": 260,
+      "color": "#4f7a3a",
+      "strength": 1
+    }
+  ]
+}

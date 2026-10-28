@@ -9,6 +9,7 @@ import { RIO_CONFIG, RIO_DE_JANEIRO } from '../../locations/rio-de-janeiro';
 import { TENERIFE, TENERIFE_CONFIG } from '../../locations/tenerife';
 import { CASTEJON_DE_SOS, CASTEJON_DE_SOS_CONFIG } from '../../locations/castejon-de-sos';
 import { EL_HIERRO, EL_HIERRO_CONFIG } from '../../locations/el-hierro';
+import { NEW_YORK, NEW_YORK_CITY, NEW_YORK_CONFIG } from '../../locations/new-york';
 import { DemLocationConfig, demAnchor, demPoint } from '../../locations/dem';
 import { geoToWorld } from '../../shared/geo';
 import { RIDGE_LOOP } from '../home/config';
@@ -33,6 +34,10 @@ export interface RelaxScene {
   towns?: TownConfig[];
   scatter?: ScatterArea[];
   landmarks?: { list: Landmark[]; anchor: GeoAnchor };
+  /** URL of the place's buildings, built by 3d/city-to-glb.py in the terrain's world units */
+  city?: string;
+  /** Fly paramotors, which need no ridge, instead of paragliders */
+  paramotor?: boolean;
 }
 
 /** The relax fields of a location JSON (see src/locations/README.md) */
@@ -55,9 +60,10 @@ interface DemSceneConfig extends DemLocationConfig {
     heading?: number;
   }[];
   landmarks?: { name: string; kind: string; at: number[]; heading?: number; top?: number }[];
+  paramotor?: boolean;
 }
 
-function demScene(location: Location, config: DemSceneConfig): RelaxScene {
+function demScene(location: Location, config: DemSceneConfig, city?: string): RelaxScene {
   const anchor = demAnchor(config);
   const toHeight = (metres?: number) =>
     metres === undefined ? undefined : metres * config.unitsPerMetre * config.verticalExaggeration;
@@ -103,6 +109,8 @@ function demScene(location: Location, config: DemSceneConfig): RelaxScene {
       })),
       anchor,
     },
+    city,
+    paramotor: config.paramotor,
   };
 }
 
@@ -123,6 +131,7 @@ export const RELAX_SCENES: Record<string, RelaxScene> = {
   'el-hierro': demScene(EL_HIERRO, EL_HIERRO_CONFIG),
   'castejon-de-sos': demScene(CASTEJON_DE_SOS, CASTEJON_DE_SOS_CONFIG),
   'rio-de-janeiro': demScene(RIO_DE_JANEIRO, RIO_CONFIG),
+  'new-york': demScene(NEW_YORK, NEW_YORK_CONFIG, NEW_YORK_CITY),
 };
 
 export const DEFAULT_SCENE = 'lanzarote';

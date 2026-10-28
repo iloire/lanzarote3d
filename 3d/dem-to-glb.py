@@ -13,7 +13,8 @@ writes the same slim GLB as 3d/slim-glb.py: positions and 16-bit triangle indice
 
 The GLB is in world units already (scale 1): x east, z south, y up, the bbox centre at
 x = z = 0, so the location's GeoAnchor is just the centre of the bbox. Ground at or below 0 m
-(the sea, the lagoons) is dropped to SEA_FLOOR, under the water plane.
+(the sea, the lagoons) is dropped to SEA_FLOOR, under the water plane. A city sets flatLand,
+and all its land is laid at that height.
 
 Usage: uv run 3d/dem-to-glb.py src/locations/rio-de-janeiro.json assets/locations/rio-de-janeiro.glb
 """
@@ -104,6 +105,10 @@ def build_grid(location):
     lon = lon0 + ee / metres_per_lon
     metres = sampler(bbox)(lat, lon)
 
+    # A city's model would carry its rooftops (the DEM is a surface model), so its land is
+    # laid flat at flatLand metres and the buildings come from 3d/city-to-glb.py instead.
+    if 'flatLand' in location:
+        metres = np.where(metres > 0, location['flatLand'], metres)
     y = np.where(metres > 0, metres * upm * location['verticalExaggeration'], SEA_FLOOR)
     points = np.stack([ee * upm, y, ss * upm], axis=-1).reshape(-1, 3).astype(np.float32)
 

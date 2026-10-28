@@ -13,3 +13,5 @@ coverage/
 
 # Copernicus DEM tiles downloaded by 3d/dem-to-glb.py
 3d/dem-cache/
+# OpenStreetMap buildings downloaded by 3d/city-to-glb.py
+3d/osm-cache/

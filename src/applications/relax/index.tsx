@@ -13,10 +13,20 @@ import { addScatter } from '../../shared/env/scatter';
 import { placeLandmarks } from '../../shared/env/landmarks';
 import { getTerrainHeight } from '../../shared/env/mesh-utils';
 import { LevelOfDetail } from '../../foundation/types/lod';
+import { CharacterType } from '../../foundation/components/characters/CharacterRegistry';
+import Models from '../../foundation/utils/models';
 import { DEFAULT_SCENE, RELAX_SCENES, RelaxScene } from './scenes';
 import { createLocationSwitcher } from './LocationSwitcher';
 
 const PILOTS = 5;
+// Who flies a paramotor where there's no ridge: Abel, whose it is, and pilots in open harnesses
+const PARAMOTOR_PILOTS = [
+  CharacterType.ABEL,
+  CharacterType.BERNT,
+  CharacterType.LUC,
+  CharacterType.FRANZ,
+  CharacterType.JEHOSUA,
+];
 // The camera drifts this far either side of where it starts, and takes this long to swing back
 const SWAY_ANGLE = THREE.MathUtils.degToRad(20);
 const SWAY_PERIOD = 90;
@@ -35,8 +45,9 @@ const definedOnly = <T extends object>(values: T | undefined): Partial<T> =>
   ) as Partial<T>;
 
 /**
- * Pick a place (?location=lanzarote | tenerife | el-hierro | castejon-de-sos | rio-de-janeiro) and watch a few
- * gliders soar its ridge while the camera drifts slowly from side to side. Dragging takes over the camera.
+ * Pick a place (?location=lanzarote | tenerife | el-hierro | castejon-de-sos | rio-de-janeiro | new-york)
+ * and watch a few gliders soar its ridge, or paramotors fly its streets, while the camera drifts slowly
+ * from side to side. Dragging takes over the camera.
  */
 class RelaxApp extends TerrainBase {
   private animationId: number | undefined;
@@ -82,11 +93,24 @@ class RelaxApp extends TerrainBase {
       await environment.addCloudsFromTheme(theme, relax.clouds, relax.cloudBase);
       options.environment = environment;
 
+      if (relax.city) {
+        const city = await Models.loadGltf(relax.city);
+        scene.add(city.scene);
+      }
+
+      const pilots = relax.paramotor
+        ? PARAMOTOR_PILOTS.flatMap(pilot =>
+            paraglidersVoxel
+              .filter(({ options }) => options.pilot.characterType === pilot)
+              .slice(0, 1)
+              .map(({ options }) => ({ options: { ...options, paramotor: true } }))
+          )
+        : paraglidersVoxel.slice(0, PILOTS);
       this.gliders = await loadParagliders(
         scene,
-        paraglidersVoxel.slice(0, PILOTS).map(({ options }, i) => ({
+        pilots.map(({ options }, i) => ({
           options,
-          startProgress: i / PILOTS,
+          startProgress: i / pilots.length,
           // Each a little higher and further out, so they don't fly through each other
           pathOffset: new THREE.Vector3(0, i * 25, 0),
         })),

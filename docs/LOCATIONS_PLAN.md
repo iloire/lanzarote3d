@@ -120,6 +120,24 @@ terrainPosition, anchor, regions }` — only what `TerrainBase` reads today~~ �
   Turbón; Castejón, Benasque, Cerler and the Ésera hamlets as stone houses under slate (a
   `village` scatter kind)~~ ✅
 
+### 3e. New York (curated)
+
+- ~~`src/locations/new-york.json`: Midtown Manhattan river to river, 34th Street to 79th
+  (40.744…40.781, −74.012…−73.96), at 6 units a metre (about 8× Lanzarote) so the voxel
+  paramotors, as big as they are, fit the 27–30 m avenues~~ ✅
+- ~~Ground from the DEM laid flat (`flatLand`, 6 m): the Copernicus model is a surface model and
+  would carry the rooftops; the rivers stay water~~ ✅
+- ~~Buildings from OpenStreetMap (Overpass, cached in `3d/osm-cache/`) by `3d/city-to-glb.py`:
+  16,797 footprints, 95% with a real height, as 3 m voxels on a grid turned 29° to the street
+  grid, merged roofs and walls only where neighbours differ, coloured per vertex (brownstone and
+  brick low, limestone mid, glass high); 209k triangles, 8.8 MB~~ ✅
+- ~~Paramotors instead of paragliders (`paramotor`): Abel, Bernt, Luc, Franz and Jehosua fly a loop
+  at 106 m up 5th Avenue, round over the bottom of Central Park, down 6th Avenue and back across
+  Bryant Park; the script checks the loop's curve keeps 10 m either side clear (41 m over the
+  Library, the lowest)~~ ✅
+- ~~Camera low over Bryant Park looking up the avenues; Central Park and Bryant Park green~~ ✅
+- Not done: windows and street detail, Central Park's trees and water, the rest of Manhattan.
+
 ### 4. The relax app
 
 - ~~Started as a private route of the Lanzarote build, `relax.html?location=lanzarote |

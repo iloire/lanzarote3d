@@ -9,7 +9,9 @@ longitude map onto it (`types.ts`). `TerrainBase` loads Lanzarote unless an app 
   Adeje: Taucho takeoff to La Caleta, El Teide behind), **El Hierro** (`el-hierro.json` + `.ts`,
   the whole island: ridge soaring on the cliff of El Golfo above Frontera) and **Castejón de Sos**
   (`castejon-de-sos.json` + `.ts`, the Ésera valley in the Pyrenees: the Liri takeoff under
-  Gallinero, El Turbón to the south) are built from elevation data, below.
+  Gallinero, El Turbón to the south) are built from elevation data, below. **New York**
+  (`new-york.json` + `.ts`, Midtown) is a city: flat ground from the same script, and its
+  buildings as voxels from OpenStreetMap, [below](#a-city).
 
 ## A place built from elevation data
 
@@ -42,8 +44,33 @@ Ground at or below 0 m becomes sea floor under the water plane.
 | `towns`                        | `{ name, at: [lat, lon], houseCount, formation: "street" \| "grid" \| "suburban" \| "rural" \| "random", spacing? }`, houses (with gardens, pools and palms) settled onto the terrain                                                                                                                                                                                                                                                                                                    |
 | `scatter`                      | `{ kind: "pine" \| "rock" \| "cardon" \| "broadleaf" \| "tower" \| "favela" \| "resort" \| "village", at: [lat, lon], radius (m), count, minAltitude?, maxAltitude?, heading? }`, things dropped onto the ground within that height band (never in the sea); one instanced mesh per kind. Buildings (`tower`, `favela`, `resort`) take their own size and colour and line up with `heading`, degrees from east towards north; `village` houses (Pyrenean stone under slate) face any way |
 | `landmarks`                    | `{ name, kind, at: [lat, lon], heading?, top? }`, the same format as `shared/env/landmarks.json`; `top` sets it on the highest ground within that many units. Rio has the Cristo Redentor (`kind: "cristo"`)                                                                                                                                                                                                                                                                             |
+| `flatLand`                     | Metres: lay all land flat at this height instead of the DEM's (a city, whose surface model carries its rooftops)                                                                                                                                                                                                                                                                                                                                                                         |
+| `city`                         | `{ voxel, gridHeading, defaultHeight }`: build the buildings with `3d/city-to-glb.py`, below                                                                                                                                                                                                                                                                                                                                                                                             |
+| `paramotor`                    | Fly paramotors, which need no ridge (Abel and the pilots in open harnesses), instead of paragliders                                                                                                                                                                                                                                                                                                                                                                                      |
 
 `about` keys are notes for people and are ignored.
+
+## A city
+
+A city's buildings come from OpenStreetMap, as voxels:
+
+```sh
+uv run 3d/dem-to-glb.py src/locations/new-york.json assets/locations/new-york.glb
+uv run 3d/city-to-glb.py src/locations/new-york.json assets/locations/new-york-city.glb
+```
+
+The first lays the ground flat (`flatLand`); the second fetches the bbox's buildings and building
+parts from the Overpass API once (cached in `3d/osm-cache/`, named by the bbox), rasterises them
+onto a grid of `city.voxel` metres turned `city.gridHeading` degrees east of north (Manhattan's
+avenues run 29°), so blocks sit square on the streets, each cell taking its tallest building
+(`height`, else `building:levels` × 3.5 m, else `city.defaultHeight`), and meshes them as blocks:
+merged roofs and walls only where neighbours differ, coloured per vertex. Canopies, bridges and
+overhangs (`min_height`) are left out, so the street under them stays open. The location's `.ts`
+exports the GLB, and the relax scene (`city` in `scenes.ts`) adds it.
+
+It also prints how far the `soaringLoop` clears the rooftops within 10 m either side, along the same
+Catmull-Rom curve the app flies. In a city the loop can fly the streets: on the turned grid an
+avenue is a run of open columns, so waypoints on one column keep the curve straight down it.
 
 The relax app has a place picker at the bottom: the current place with `<` and `>` to step to the
 previous and next, and a list of every place grouped by `region`, with a search box (accents and

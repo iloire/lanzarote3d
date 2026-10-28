@@ -2,6 +2,20 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-28 19:53 UTC
+
+### Added
+
+- New York in the relax site (`?location=new-york`): Midtown Manhattan river to river, 34th
+  Street to 79th, its 16,797 buildings from OpenStreetMap as voxels on Manhattan's turned street
+  grid (brownstone and brick low, limestone mid, glass high), at 6 units a metre so the
+  paramotors fit the avenues. Abel, Bernt, Luc, Franz and Jehosua fly paramotors through the street
+  canyons at 106 m: up 5th Avenue, round over the bottom of Central Park, down 6th Avenue and back
+  across Bryant Park, watched from low over Bryant Park.
+- `3d/city-to-glb.py` builds a city's buildings as a voxel GLB from OSM footprints and heights,
+  and checks the loop's curve clears the rooftops; `3d/dem-to-glb.py` takes `flatLand` to lay a
+  city's ground flat. A relax place may set `paramotor` to fly paramotors instead of paragliders.
+
 ## 2026-10-28 19:26 UTC
 
 ### Changed
