@@ -2,6 +2,14 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-28 17:05 UTC
+
+### Changed
+
+- The relax site's place picker holds many places: the current one with steps to the previous
+  and next, and a list grouped by region (Canary Islands, Pyrenees, Brazil) with a search that
+  ignores accents. A location JSON names its `region`
+
 ## 2026-10-28 16:40 UTC
 
 ### Added

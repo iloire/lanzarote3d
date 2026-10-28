@@ -1,6 +1,7 @@
 {
   "id": "tenerife",
   "name": "Tenerife",
+  "region": "Canary Islands",
   "bbox": {
     "south": 28.05,
     "north": 28.32,

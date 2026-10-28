@@ -1,6 +1,7 @@
 {
   "id": "rio-de-janeiro",
   "name": "Rio de Janeiro",
+  "region": "Brazil",
   "bbox": {
     "south": -23.04,
     "north": -22.935,

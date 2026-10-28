@@ -1,6 +1,7 @@
 {
   "id": "el-hierro",
   "name": "El Hierro",
+  "region": "Canary Islands",
   "bbox": {
     "south": 27.61,
     "north": 27.88,

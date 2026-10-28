@@ -1,6 +1,7 @@
 {
   "id": "castejon-de-sos",
   "name": "Castejón de Sos",
+  "region": "Pyrenees",
   "bbox": {
     "south": 42.4,
     "north": 42.63,
