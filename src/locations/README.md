@@ -6,7 +6,8 @@ longitude map onto it (`types.ts`). `TerrainBase` loads Lanzarote unless an app 
 - **Lanzarote** (`lanzarote.ts`) is hand-modelled in `3d/lanzarote.blend`; its anchor was fitted
   by hand (`shared/geo.ts`) and its regions live in `shared/env/terrain-regions.json`.
 - **Rio de Janeiro** (`rio-de-janeiro.json` + `.ts`), **Tenerife** (`tenerife.json` + `.ts`,
-  Adeje: Taucho takeoff to La Caleta, El Teide behind) and **Castejón de Sos**
+  Adeje: Taucho takeoff to La Caleta, El Teide behind), **El Hierro** (`el-hierro.json` + `.ts`,
+  the whole island: ridge soaring on the cliff of El Golfo above Frontera) and **Castejón de Sos**
   (`castejon-de-sos.json` + `.ts`, the Ésera valley in the Pyrenees: the Liri takeoff under
   Gallinero, El Turbón to the south) are built from elevation data, below.
 

@@ -35,7 +35,7 @@ const definedOnly = <T extends object>(values: T | undefined): Partial<T> =>
   ) as Partial<T>;
 
 /**
- * Pick a place (?location=lanzarote | tenerife | rio-de-janeiro | castejon-de-sos) and watch a few
+ * Pick a place (?location=lanzarote | tenerife | el-hierro | rio-de-janeiro | castejon-de-sos) and watch a few
  * gliders soar its ridge while the camera drifts slowly from side to side. Dragging takes over the camera.
  */
 class RelaxApp extends TerrainBase {

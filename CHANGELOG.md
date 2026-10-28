@@ -2,6 +2,14 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-28 16:40 UTC
+
+### Added
+
+- El Hierro in the relax site: the whole island from elevation data, gliders ridge soaring the
+  cliff of El Golfo in front of the takeoffs on its rim, Frontera below, El Pinar's pines and the
+  lava of La Restinga; zoom out and pan across the island like Lanzarote
+
 ## 2026-10-28 16:14 UTC
 
 ### Added

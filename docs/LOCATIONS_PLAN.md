@@ -95,6 +95,19 @@ terrainPosition, anchor, regions }` — only what `TerrainBase` reads today~~ �
 - ~~Costa Adeje, Fañabé and Las Américas as resort blocks: long white hotels and apartments of
   three to six floors under terracotta roofs~~ ✅
 
+### 3d. El Hierro (curated)
+
+- ~~`src/locations/el-hierro.json` → `assets/locations/el-hierro.glb`: the whole island with sea
+  all round (27.61…27.88, −18.19…−17.86), 125 m grid to stay within 16-bit indices, heights 1.5×
+  so El Golfo's 1,300 m cliff reads~~ ✅
+- ~~Takeoffs on the rim (Dos Hermanas, El Salvador, Montaña Colorada, Pico de la Naranja) and the
+  two landings in Frontera from OSM (Overpass `free_flying:site`); ridge loop along the
+  north-facing cliff at 1,200–1,350 m, ≥ 162 m clear~~ ✅
+- ~~Camera high over El Golfo looking south at the cliff; free zoom out (8×) and pan like
+  Lanzarote; cloud base 1,700 m~~ ✅
+- ~~El Pinar's pines, laurel along the rim, lava round La Restinga; Frontera, Valverde, El Pinar,
+  La Restinga and the hamlets~~ ✅
+
 ### 3c. Castejón de Sos (curated)
 
 - ~~`src/locations/castejon-de-sos.json` → `assets/locations/castejon-de-sos.glb`: the Ésera

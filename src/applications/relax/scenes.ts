@@ -8,6 +8,7 @@ import { LANZAROTE } from '../../locations/lanzarote';
 import { RIO_CONFIG, RIO_DE_JANEIRO } from '../../locations/rio-de-janeiro';
 import { TENERIFE, TENERIFE_CONFIG } from '../../locations/tenerife';
 import { CASTEJON_DE_SOS, CASTEJON_DE_SOS_CONFIG } from '../../locations/castejon-de-sos';
+import { EL_HIERRO, EL_HIERRO_CONFIG } from '../../locations/el-hierro';
 import { DemLocationConfig, demAnchor, demPoint } from '../../locations/dem';
 import { geoToWorld } from '../../shared/geo';
 import { RIDGE_LOOP } from '../home/config';
@@ -114,6 +115,7 @@ export const RELAX_SCENES: Record<string, RelaxScene> = {
     limits: { zoomOut: 8, pan: 20000 },
   },
   tenerife: demScene(TENERIFE, TENERIFE_CONFIG),
+  'el-hierro': demScene(EL_HIERRO, EL_HIERRO_CONFIG),
   'rio-de-janeiro': demScene(RIO_DE_JANEIRO, RIO_CONFIG),
   'castejon-de-sos': demScene(CASTEJON_DE_SOS, CASTEJON_DE_SOS_CONFIG),
 };

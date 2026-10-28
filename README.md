@@ -25,8 +25,8 @@ npm install
 npm run dev        # webpack dev server on http://localhost:8080, opens the home scene
 ```
 
-The same repo builds a second site, **relax**: pick a paragliding place (Lanzarote, Tenerife, Rio
-de Janeiro, Castejón de Sos) and watch a few gliders soar its ridge. It has its own build, so the Lanzarote site
+The same repo builds a second site, **relax**: pick a paragliding place (Lanzarote, Tenerife, El
+Hierro, Rio de Janeiro, Castejón de Sos) and watch a few gliders soar its ridge. It has its own build, so the Lanzarote site
 never ships it:
 
 ```bash

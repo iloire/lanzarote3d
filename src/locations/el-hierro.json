@@ -1,0 +1,245 @@
+{
+  "id": "el-hierro",
+  "name": "El Hierro",
+  "bbox": {
+    "south": 27.61,
+    "north": 27.88,
+    "west": -18.19,
+    "east": -17.86
+  },
+  "spacing": 125,
+  "unitsPerMetre": 0.772,
+  "verticalExaggeration": 1.5,
+  "places": {
+    "launch": {
+      "name": "Dos Hermanas takeoff, on the rim of El Golfo",
+      "at": [27.73276, -18.00692]
+    },
+    "elSalvador": {
+      "name": "El Salvador takeoff",
+      "at": [27.73141, -18.01562]
+    },
+    "montanaColorada": {
+      "name": "Montaña Colorada takeoff",
+      "at": [27.73976, -18.03043]
+    },
+    "picoDeLaNaranja": {
+      "name": "Pico de la Naranja takeoff, lower down the slope",
+      "at": [27.74519, -18.0124]
+    },
+    "landing": {
+      "name": "Landing by the coast below Frontera",
+      "at": [27.78115, -18.01048]
+    },
+    "landingFrontera": {
+      "name": "Landing at Tigaday, Frontera",
+      "at": [27.75501, -18.01167]
+    },
+    "malpaso": {
+      "name": "Malpaso, the island's top",
+      "at": [27.7293, -18.04047]
+    }
+  },
+  "soaringLoop": {
+    "about": "Ridge soaring along the north-facing cliff of El Golfo in the trade wind, at about the height of the rim; [lat, lon, metres above sea level]",
+    "waypoints": [
+      [27.741, -18.0, 1350],
+      [27.739, -18.012, 1300],
+      [27.741, -18.026, 1250],
+      [27.745, -18.036, 1250],
+      [27.749, -18.03, 1200],
+      [27.747, -18.016, 1200],
+      [27.746, -18.002, 1250]
+    ]
+  },
+  "camera": {
+    "about": "High over El Golfo near the coast, looking south across Frontera to the cliff with the takeoffs on its rim; the whole island has sea all round, so the viewer may zoom out and pan across it; [lat, lon, metres]",
+    "at": [27.772, -18.03, 1500],
+    "lookAt": [27.743, -18.016, 1150],
+    "zoomOut": 8,
+    "pan": 20000
+  },
+  "cloudBase": 1700,
+  "clouds": [
+    {
+      "about": "The trade-wind cloud banked against the rim",
+      "at": [27.725, -18.0],
+      "kind": "puff",
+      "scale": 1.3
+    },
+    {
+      "at": [27.722, -18.03],
+      "kind": "puff",
+      "scale": 1.2
+    },
+    {
+      "at": [27.73, -17.96],
+      "kind": "puff",
+      "scale": 1
+    },
+    {
+      "at": [27.76, -17.93],
+      "kind": "puff",
+      "scale": 1
+    },
+    {
+      "about": "Over Malpaso",
+      "at": [27.715, -18.05],
+      "kind": "tower",
+      "scale": 1.3
+    },
+    {
+      "at": [27.7, -17.99],
+      "kind": "puff",
+      "scale": 1
+    }
+  ],
+  "regions": [
+    {
+      "name": "El Pinar, the Canary pine forest on the southern slopes",
+      "at": [27.7, -18.01],
+      "radius": 5000,
+      "color": "#3d5233",
+      "strength": 0.7
+    },
+    {
+      "name": "Laurel and fayal-brezal along the top of the rim",
+      "at": [27.73, -18.0],
+      "radius": 3500,
+      "color": "#34502d",
+      "strength": 0.6
+    },
+    {
+      "name": "El Golfo's farmland and vineyards",
+      "at": [27.765, -18.03],
+      "radius": 4000,
+      "color": "#6b7a45",
+      "strength": 0.5
+    },
+    {
+      "name": "Dark lava round La Restinga",
+      "at": [27.645, -17.985],
+      "radius": 3500,
+      "color": "#2a2523",
+      "strength": 0.7
+    },
+    {
+      "name": "Lava of the west, towards Orchilla",
+      "at": [27.71, -18.13],
+      "radius": 4000,
+      "color": "#3a2a22",
+      "strength": 0.6
+    }
+  ],
+  "towns": [
+    {
+      "name": "Tigaday and Frontera",
+      "at": [27.75166, -18.01283],
+      "houseCount": 120,
+      "formation": "suburban"
+    },
+    {
+      "name": "Las Puntas",
+      "at": [27.78978, -17.99229],
+      "houseCount": 30,
+      "formation": "grid",
+      "spacing": 0.7
+    },
+    {
+      "name": "Los Llanillos",
+      "at": [27.765, -18.03],
+      "houseCount": 40,
+      "formation": "rural",
+      "spacing": 2
+    },
+    {
+      "name": "Sabinosa",
+      "at": [27.74758, -18.0968],
+      "houseCount": 30,
+      "formation": "rural",
+      "spacing": 1.5
+    },
+    {
+      "name": "Valverde",
+      "at": [27.80968, -17.91514],
+      "houseCount": 120,
+      "formation": "suburban"
+    },
+    {
+      "name": "El Pinar",
+      "at": [27.70768, -17.97712],
+      "houseCount": 60,
+      "formation": "rural",
+      "spacing": 1.5
+    },
+    {
+      "name": "Isora",
+      "at": [27.74497, -17.94801],
+      "houseCount": 25,
+      "formation": "rural",
+      "spacing": 2
+    },
+    {
+      "name": "La Restinga",
+      "at": [27.64169, -17.98086],
+      "houseCount": 50,
+      "formation": "grid",
+      "spacing": 0.6
+    }
+  ],
+  "scatter": [
+    {
+      "kind": "pine",
+      "about": "El Pinar",
+      "at": [27.7, -18.0],
+      "radius": 4500,
+      "count": 1100,
+      "minAltitude": 500,
+      "maxAltitude": 1400
+    },
+    {
+      "kind": "pine",
+      "about": "Pines towards Hoya del Morcillo",
+      "at": [27.715, -18.05],
+      "radius": 3500,
+      "count": 600,
+      "minAltitude": 600,
+      "maxAltitude": 1450
+    },
+    {
+      "kind": "broadleaf",
+      "about": "Laurel forest along the rim above El Golfo",
+      "at": [27.735, -18.0],
+      "radius": 3000,
+      "count": 600,
+      "minAltitude": 700,
+      "maxAltitude": 1400
+    },
+    {
+      "kind": "cardon",
+      "about": "Tabaibas and cardones on the low slopes of El Golfo",
+      "at": [27.765, -18.04],
+      "radius": 4000,
+      "count": 300,
+      "minAltitude": 20,
+      "maxAltitude": 300
+    },
+    {
+      "kind": "rock",
+      "about": "The cliff of El Golfo",
+      "at": [27.745, -18.02],
+      "radius": 3500,
+      "count": 300,
+      "minAltitude": 400,
+      "maxAltitude": 1200
+    },
+    {
+      "kind": "rock",
+      "about": "Lava fields of the south",
+      "at": [27.66, -17.99],
+      "radius": 4000,
+      "count": 300,
+      "minAltitude": 20
+    }
+  ]
+}
