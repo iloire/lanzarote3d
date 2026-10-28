@@ -1,0 +1,65 @@
+/* Place links - pick where to relax, in the pilot picker's pixel style */
+
+.location-switcher {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  z-index: 1000;
+  display: flex;
+  gap: 10px;
+  transform: translateX(-50%);
+  font-family: 'Press Start 2P', monospace;
+  animation: locationSwitcherFadeIn 1s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes locationSwitcherFadeIn {
+  to {
+    opacity: 0.9;
+  }
+}
+
+.location-switcher a {
+  padding: 10px 12px;
+  border: 2px solid #ffffff;
+  background: rgba(13, 31, 51, 0.45);
+  color: #ffffff;
+  font-size: 9px;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  text-shadow: 1px 1px 0 #0d1f33;
+  box-shadow: 2px 2px 0 #0d1f33;
+  transition:
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.location-switcher a:hover,
+.location-switcher a:focus-visible {
+  border-color: #4aff9e;
+  color: #4aff9e;
+  outline: none;
+}
+
+.location-switcher a[aria-current='page'] {
+  border-color: #4aff9e;
+  background: rgba(74, 255, 158, 0.2);
+  color: #4aff9e;
+}
+
+.location-switcher a:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+@media (max-width: 500px) {
+  .location-switcher {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    transform: none;
+  }
+}

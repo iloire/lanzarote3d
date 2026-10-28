@@ -72,7 +72,8 @@ Branch: `feature/locations`, in the worktree `~/code/lanzarote3d-locations`.
 - ~~Rainforest over Tijuca and the massifs below their bare tops; high-rises in São Conrado,
   Leblon, Ipanema, Copacabana, Lagoa, Botafogo and Barra; Rocinha and Vidigal up their
   hillsides; houses in Joá and Itanhangá; full orbit~~ ✅
-- Later: Cristo on Corcovado (a grey region there read as haze on the hillside, so it was
+- ~~Cristo Redentor on Corcovado: low-poly soapstone figure on its pedestal, at 2× like the
+  Lanzarote landmarks, facing the bay; in the models catalog too~~ ✅ (a grey region there read as haze on the hillside, so it was
   dropped), Cristo on Corcovado, frigatebirds and black vultures.
 
 ### 3b. Tenerife (curated)
@@ -93,6 +94,7 @@ Branch: `feature/locations`, in the worktree `~/code/lanzarote3d-locations`.
 - ~~Started as a private route of the Lanzarote build, `relax.html?location=lanzarote |
   rio-de-janeiro`: five gliders on the place's loop, camera swaying ±20° over 90 s, drag to take
   over (`src/applications/relax/`)~~ ✅
+- ~~Location switcher: one link per place at the bottom, the current one lit~~ ✅
 - ~~Camera limits so no terrain edge shows: pan ≤ 3,000 units, zoom out ≤ 1.5× the start,
   orbit ±60° unless the place allows more, camera and its target kept 40 units above the
   ground, panning along the ground~~ ✅

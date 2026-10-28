@@ -331,5 +331,15 @@
       "maxAltitude": 260,
       "heading": 20
     }
+  ],
+  "landmarks": [
+    {
+      "name": "Cristo Redentor",
+      "kind": "cristo",
+      "osm": "Corcovado peak node, Nominatim",
+      "at": [-22.95195, -43.21058],
+      "heading": 110,
+      "top": 200
+    }
   ]
 }

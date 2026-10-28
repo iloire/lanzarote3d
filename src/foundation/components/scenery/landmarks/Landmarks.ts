@@ -389,3 +389,46 @@ export const createWindsock = (): THREE.Group => {
   };
   return group;
 };
+
+const SOAPSTONE = new THREE.Color('#E4E2D9');
+const SOAPSTONE_SHADE = new THREE.Color('#C9C6BB');
+
+/**
+ * Cristo Redentor on Corcovado: the 30 m soapstone figure on its 8 m pedestal, arms spread 28 m.
+ * The robe tapers from the hem to the shoulders, the sleeves hang below the arms, and the head
+ * tilts down a little towards the city. Faces +z.
+ */
+export const createCristoRedentor = (): THREE.Mesh => {
+  const mesh = new MeshBuilder();
+  const solid = (v: ReturnType<typeof volume>, c: THREE.Color) => {
+    block(mesh, v, c);
+    lid(mesh, v, v.y1, c, 0);
+  };
+
+  // Pedestal with the chapel inside, on a wider plinth of steps
+  solid(volume(0, 0, 12, 12, -FOOTING, 1.2), CONCRETE);
+  solid(volume(0, 0, 8.5, 8.5, 1.2, 8), SOAPSTONE_SHADE);
+
+  // The robe, stepping in from the hem to the chest
+  const robe: [number, number, number, number][] = [
+    [6, 4.4, 8, 13],
+    [5.4, 4, 13, 18],
+    [4.9, 3.7, 18, 23],
+    [4.6, 3.5, 23, 27],
+  ];
+  robe.forEach(([w, d, y0, y1]) => solid(volume(0, 0, w, d, y0, y1), SOAPSTONE));
+
+  // Shoulders and outstretched arms, the sleeves hanging beneath them to the elbows
+  solid(volume(0, 0, 6.4, 3.4, 27, 29.6), SOAPSTONE);
+  solid(volume(0, 0, 28, 2, 27.6, 29.4), SOAPSTONE);
+  [-1, 1].forEach(side => {
+    solid(volume(side * 6.5, 0, 6, 2.6, 24.5, 27.6), SOAPSTONE_SHADE);
+    solid(volume(side * 13.6, 0, 0.8, 1.2, 26.8, 29.4), SOAPSTONE);
+  });
+
+  // Neck and head, leaning a little forward
+  solid(volume(0, 0.2, 1.2, 1.2, 29.6, 30.4), SOAPSTONE);
+  solid(volume(0, 0.4, 2.2, 2.4, 30.4, 33.6), SOAPSTONE);
+
+  return asMesh(mesh, 'Cristo Redentor');
+};

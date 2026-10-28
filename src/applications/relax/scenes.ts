@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import type { Location } from '../../locations/types';
 import type { CloudSite, TownConfig } from '../../shared/env/environment';
 import type { ScatterArea, ScatterKind } from '../../shared/env/scatter';
+import type { Landmark } from '../../shared/env/landmarks';
+import type { GeoAnchor } from '../../shared/geo';
 import { LANZAROTE } from '../../locations/lanzarote';
 import { RIO_CONFIG, RIO_DE_JANEIRO } from '../../locations/rio-de-janeiro';
 import { TENERIFE, TENERIFE_CONFIG } from '../../locations/tenerife';
@@ -21,6 +23,7 @@ export interface RelaxScene {
   orbit?: number;
   towns?: TownConfig[];
   scatter?: ScatterArea[];
+  landmarks?: { list: Landmark[]; anchor: GeoAnchor };
 }
 
 /** The relax fields of a location JSON (see src/locations/README.md) */
@@ -39,6 +42,7 @@ interface DemSceneConfig extends DemLocationConfig {
     /** Degrees, for buildings: the street grid's turn from east, towards north */
     heading?: number;
   }[];
+  landmarks?: { name: string; kind: string; at: number[]; heading?: number; top?: number }[];
 }
 
 function demScene(location: Location, config: DemSceneConfig): RelaxScene {
@@ -74,6 +78,14 @@ function demScene(location: Location, config: DemSceneConfig): RelaxScene {
       maxHeight: toHeight(area.maxAltitude),
       heading: area.heading === undefined ? undefined : THREE.MathUtils.degToRad(area.heading),
     })),
+    landmarks: config.landmarks && {
+      list: config.landmarks.map(landmark => ({
+        ...landmark,
+        kind: landmark.kind as Landmark['kind'],
+        at: [landmark.at[0]!, landmark.at[1]!],
+      })),
+      anchor,
+    },
   };
 }
 
@@ -87,8 +99,8 @@ export const RELAX_SCENES: Record<string, RelaxScene> = {
       target: new THREE.Vector3(6850, 880, -700),
     },
   },
-  'rio-de-janeiro': demScene(RIO_DE_JANEIRO, RIO_CONFIG),
   tenerife: demScene(TENERIFE, TENERIFE_CONFIG),
+  'rio-de-janeiro': demScene(RIO_DE_JANEIRO, RIO_CONFIG),
 };
 
 export const DEFAULT_SCENE = 'lanzarote';

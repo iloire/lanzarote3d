@@ -36,8 +36,12 @@ Ground at or below 0 m becomes sea floor under the water plane.
 | `camera.orbit`          | Degrees either side of the starting view the viewer may orbit; 60 unless given, 180 = all the way round                                                                                                                                                                                                                                                                                                         |
 | `towns`                 | `{ name, at: [lat, lon], houseCount, formation: "street" \| "grid" \| "suburban" \| "rural" \| "random", spacing? }`, houses (with gardens, pools and palms) settled onto the terrain                                                                                                                                                                                                                           |
 | `scatter`               | `{ kind: "pine" \| "rock" \| "cardon" \| "broadleaf" \| "tower" \| "favela" \| "resort", at: [lat, lon], radius (m), count, minAltitude?, maxAltitude?, heading? }`, things dropped onto the ground within that height band (never in the sea); one instanced mesh per kind. Buildings (`tower`, `favela`, `resort`) take their own size and colour and line up with `heading`, degrees from east towards north |
+| `landmarks`             | `{ name, kind, at: [lat, lon], heading?, top? }`, the same format as `shared/env/landmarks.json`; `top` sets it on the highest ground within that many units. Rio has the Cristo Redentor (`kind: "cristo"`)                                                                                                                                                                                                    |
 
 `about` keys are notes for people and are ignored.
+
+The relax app has a switcher at the bottom, one link per place (`?location=<id>`), in the order
+of `RELAX_SCENES` in `applications/relax/scenes.ts`.
 
 The relax app keeps the viewer near the gliders, so the terrain's edges never show: panning up to
 3,000 units from the start, zooming out to 1.5× the starting distance, orbiting `camera.orbit`

@@ -10,9 +10,11 @@ import { getAppConfig } from '../../config/app-registry';
 import { loadParagliders, VehicleLoadResult } from '../home/vehicleLoader';
 import { paraglidersVoxel, RIDGE_LOOP_TENSION } from '../home/config';
 import { addScatter } from '../../shared/env/scatter';
+import { placeLandmarks } from '../../shared/env/landmarks';
 import { getTerrainHeight } from '../../shared/env/mesh-utils';
 import { LevelOfDetail } from '../../foundation/types/lod';
 import { DEFAULT_SCENE, RELAX_SCENES, RelaxScene } from './scenes';
+import { createLocationSwitcher } from './LocationSwitcher';
 
 const PILOTS = 5;
 // The camera drifts this far either side of where it starts, and takes this long to swing back
@@ -35,6 +37,7 @@ const GROUND_CLEARANCE = 40;
 class RelaxApp extends TerrainBase {
   private animationId: number | undefined;
   private gliders: VehicleLoadResult[] = [];
+  private removeSwitcher: (() => void) | undefined;
 
   constructor() {
     const appConfig = getAppConfig('relax');
@@ -47,9 +50,17 @@ class RelaxApp extends TerrainBase {
   async load(options: StoryOptions): Promise<void> {
     try {
       const { camera, scene, renderer, controls } = options;
-      const id = new URLSearchParams(window.location.search).get('location') ?? DEFAULT_SCENE;
-      const relax = RELAX_SCENES[id] ?? RELAX_SCENES[DEFAULT_SCENE]!;
+      const asked = new URLSearchParams(window.location.search).get('location') ?? DEFAULT_SCENE;
+      const id = asked in RELAX_SCENES ? asked : DEFAULT_SCENE;
+      const relax = RELAX_SCENES[id]!;
       this.location = relax.location;
+      this.removeSwitcher = createLocationSwitcher(
+        Object.entries(RELAX_SCENES).map(([key, scene]) => ({
+          id: key,
+          name: scene.location.name,
+        })),
+        id
+      );
 
       const theme = getDefaultTheme();
       await ThemeEngine.apply(options, theme);
@@ -79,13 +90,17 @@ class RelaxApp extends TerrainBase {
       );
 
       const { terrain } = options;
-      if (terrain && (relax.towns || relax.scatter)) {
+      if (terrain && (relax.towns || relax.scatter || relax.landmarks)) {
         // Houses and scatter are dropped onto the ground, so its matrices must be current
         renderer.render(scene, camera);
         if (relax.towns) {
           await environment.addTownsFromConfig(relax.towns, terrain, true, LevelOfDetail.ULTRA_LOW);
         }
         if (relax.scatter) addScatter(scene, terrain, relax.scatter);
+        if (relax.landmarks) {
+          const { list, anchor } = relax.landmarks;
+          placeLandmarks(terrain, list, anchor).forEach(landmark => scene.add(landmark));
+        }
       }
 
       this.startAnimationLoop(renderer, scene, camera, controls, relax, terrain);
@@ -183,6 +198,8 @@ class RelaxApp extends TerrainBase {
       cancelAnimationFrame(this.animationId);
       this.animationId = undefined;
     }
+    this.removeSwitcher?.();
+    this.removeSwitcher = undefined;
     this.gliders.forEach(g => g.flyingBehavior?.dispose());
     this.gliders = [];
     super.dispose();
