@@ -17,16 +17,18 @@ import { CharacterType } from '../../foundation/components/characters/CharacterR
 import Models from '../../foundation/utils/models';
 import { DEFAULT_SCENE, RELAX_SCENES, RelaxScene } from './scenes';
 import { createLocationSwitcher } from './LocationSwitcher';
+import { PathTrail } from './pathTrail';
+import { addCityWindows, CityGrid } from '../../foundation/rendering/cityWindows';
 
 const PILOTS = 5;
-// Who flies a paramotor where there's no ridge: Abel, whose it is, and pilots in open harnesses
-const PARAMOTOR_PILOTS = [
-  CharacterType.ABEL,
-  CharacterType.BERNT,
-  CharacterType.LUC,
-  CharacterType.FRANZ,
-  CharacterType.JEHOSUA,
-];
+// Where there's no ridge Abel flies his paramotor alone, twice a wing's speed so the streets go
+// by, and the camera chases him: CHASE_LAG seconds back along his own path, which is clear of the
+// buildings, CHASE_RISE units above it, easing in over CHASE_EASE seconds
+const PARAMOTOR_PILOT = CharacterType.ABEL;
+const PARAMOTOR_SPEED = 2;
+const CHASE_LAG = 5;
+const CHASE_RISE = 45;
+const CHASE_EASE = 0.6;
 // The camera drifts this far either side of where it starts, and takes this long to swing back
 const SWAY_ANGLE = THREE.MathUtils.degToRad(20);
 const SWAY_PERIOD = 90;
@@ -46,8 +48,8 @@ const definedOnly = <T extends object>(values: T | undefined): Partial<T> =>
 
 /**
  * Pick a place (?location=lanzarote | tenerife | el-hierro | castejon-de-sos | rio-de-janeiro | new-york)
- * and watch a few gliders soar its ridge, or paramotors fly its streets, while the camera drifts slowly
- * from side to side. Dragging takes over the camera.
+ * and watch a few gliders soar its ridge while the camera drifts slowly from side to side, or, in a
+ * city, chase Abel's paramotor through its streets. Dragging takes over the camera.
  */
 class RelaxApp extends TerrainBase {
   private animationId: number | undefined;
@@ -95,16 +97,18 @@ class RelaxApp extends TerrainBase {
 
       if (relax.city) {
         const city = await Models.loadGltf(relax.city);
+        city.scene.traverse(object => {
+          const grid = object.userData['grid'] as CityGrid | undefined;
+          if (object instanceof THREE.Mesh && grid) addCityWindows(object, grid);
+        });
         scene.add(city.scene);
       }
 
       const pilots = relax.paramotor
-        ? PARAMOTOR_PILOTS.flatMap(pilot =>
-            paraglidersVoxel
-              .filter(({ options }) => options.pilot.characterType === pilot)
-              .slice(0, 1)
-              .map(({ options }) => ({ options: { ...options, paramotor: true } }))
-          )
+        ? paraglidersVoxel
+            .filter(({ options }) => options.pilot.characterType === PARAMOTOR_PILOT)
+            .slice(0, 1)
+            .map(({ options }) => ({ options: { ...options, paramotor: true } }))
         : paraglidersVoxel.slice(0, PILOTS);
       this.gliders = await loadParagliders(
         scene,
@@ -113,6 +117,7 @@ class RelaxApp extends TerrainBase {
           startProgress: i / pilots.length,
           // Each a little higher and further out, so they don't fly through each other
           pathOffset: new THREE.Vector3(0, i * 25, 0),
+          speedFactor: relax.paramotor ? PARAMOTOR_SPEED : 1,
         })),
         (error, context) => this.handleError(error, context),
         { waypoints: relax.loop, tension: RIDGE_LOOP_TENSION }
@@ -193,6 +198,15 @@ class RelaxApp extends TerrainBase {
     controls.addEventListener('start', () => {
       swaying = false;
     });
+    // A paramotor is chased along its path, and orbited once the viewer takes over
+    const lead = relax.paramotor ? this.gliders[0]?.mesh : undefined;
+    const trail = new PathTrail(CHASE_LAG * 2);
+    const chaseAt = new THREE.Vector3();
+    const lastLead = new THREE.Vector3();
+    if (lead) {
+      lastLead.copy(lead.position);
+      controls.target.copy(lead.position);
+    }
 
     let lastTime: number | null = null;
     let elapsed = 0;
@@ -203,7 +217,23 @@ class RelaxApp extends TerrainBase {
         elapsed += deltaTime;
         motions.forEach(motion => motion.update(deltaTime));
 
-        if (swaying) {
+        if (lead) {
+          trail.push(elapsed, lead.position);
+          if (swaying) {
+            trail.at(CHASE_LAG, chaseAt).y += CHASE_RISE;
+            camera.position.lerp(chaseAt, Math.min(1, deltaTime / CHASE_EASE));
+            controls.target.lerp(lead.position, Math.min(1, deltaTime / CHASE_EASE));
+            camera.lookAt(controls.target);
+          } else {
+            // Carry the orbit along with the paramotor
+            const moved = lead.position.clone().sub(lastLead);
+            camera.position.add(moved);
+            controls.target.add(moved);
+            OrbitControlsHelper.update(controls);
+            this.holdCamera(camera, controls, controls.target, Infinity, terrain);
+          }
+          lastLead.copy(lead.position);
+        } else if (swaying) {
           const angle = SWAY_ANGLE * Math.sin((elapsed / SWAY_PERIOD) * Math.PI * 2);
           camera.position.copy(relax.camera.target).add(offset.clone().applyAxisAngle(up, angle));
           camera.lookAt(relax.camera.target);

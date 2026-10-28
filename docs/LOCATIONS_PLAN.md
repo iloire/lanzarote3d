@@ -131,12 +131,14 @@ terrainPosition, anchor, regions }` — only what `TerrainBase` reads today~~ �
   16,797 footprints, 95% with a real height, as 3 m voxels on a grid turned 29° to the street
   grid, merged roofs and walls only where neighbours differ, coloured per vertex (brownstone and
   brick low, limestone mid, glass high); 209k triangles, 8.8 MB~~ ✅
-- ~~Paramotors instead of paragliders (`paramotor`): Abel, Bernt, Luc, Franz and Jehosua fly a loop
+- ~~Paramotors instead of paragliders (`paramotor`): first five pilots, now only Abel, fly a loop
   at 106 m up 5th Avenue, round over the bottom of Central Park, down 6th Avenue and back across
   Bryant Park; the script checks the loop's curve keeps 10 m either side clear (41 m over the
   Library, the lowest)~~ ✅
 - ~~Camera low over Bryant Park looking up the avenues; Central Park and Bryant Park green~~ ✅
-- Not done: windows and street detail, Central Park's trees and water, the rest of Manhattan.
+- ~~Windows drawn in the shader on the voxel grid (punched in masonry, curtain walls on towers)~~ ✅
+- ~~Only Abel's paramotor, chased along his own path (`pathTrail.ts`), at twice a wing's speed~~ ✅
+- Not done: street detail and cars, fog, Central Park's trees and water, the rest of Manhattan.
 
 ### 4. The relax app
 

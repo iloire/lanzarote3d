@@ -2,6 +2,19 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-28 20:00 UTC
+
+### Changed
+
+- New York's buildings have windows, drawn by a shader so they cost no geometry
+  (`cityWindows.ts`): one per voxel across and per 3.5 m storey up, punched windows in brick and
+  stone, glass curtain walls on towers over 120 m, each pane a slightly different dark glass
+  that catches the sun, fading into an even shade far off. `city-to-glb.py` marks each wall's
+  style (`_WINDOWS`) and writes the grid into the node's extras.
+- Only Abel flies in New York, at twice a wing's speed, and the camera chases him: five seconds
+  back along his own path, which is clear of the buildings, a little above it. Dragging hands
+  over to an orbit that travels with him.
+
 ## 2026-10-28 19:53 UTC
 
 ### Added

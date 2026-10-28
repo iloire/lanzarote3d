@@ -14,7 +14,8 @@ Overpass API once (cached in 3d/osm-cache/), rasterised onto the turned grid, ea
 its tallest building, and meshed as blocks: merged roofs, and walls only where neighbours differ.
 
 The GLB is in the terrain's world units (scale 1) and frame (bbox centre at x = z = 0), standing
-on the location's flatLand; facades and roofs are coloured per vertex. No normals: every face
+on the location's flatLand; facades and roofs are coloured per vertex, and each wall carries
+its window style (_WINDOWS) and the node the grid (extras), for the app to draw the windows. No normals: every face
 has its own vertices, so three.js shades them flat itself.
 
 It also prints how far above the rooftops the location's soaringLoop flies, along the same
@@ -113,6 +114,11 @@ def srgb_to_linear(hex_colour):
     return np.where(c <= 0.04045, c / 12.92, ((c + 0.055) / 1.055) ** 2.4)
 
 
+# Window styles, per vertex in _WINDOWS for the app's shader: none (roofs), punched windows in
+# brick and stone, glass curtain walls on the towers
+ROOF, PUNCHED, CURTAIN = 0, 1, 2
+
+
 def facade(tags, height, key):
     colour = tags.get('building:colour', '')
     if re.fullmatch(r'#[0-9a-fA-F]{6}', colour):
@@ -160,6 +166,21 @@ class Grid:
         north = u * self.street[1] + v * self.avenue[1]
         return east, -north
 
+    def extras(self, location):
+        """The grid as the app's window shader needs it, in the node's extras (userData in three.js)"""
+        up = location['unitsPerMetre'] * location['verticalExaggeration']
+        return {
+            'grid': {
+                'origin': [self.u0, self.v0],
+                'size': self.size,
+                'street': self.street.tolist(),
+                'avenue': self.avenue.tolist(),
+                'unitsPerMetre': location['unitsPerMetre'],
+                'ground': location['flatLand'] * up,
+                'up': up,
+            }
+        }
+
     def inside(self):
         """Cells whose centre lies in the bbox"""
         cc, rr = np.meshgrid(np.arange(self.cols) + 0.5, np.arange(self.rows) + 0.5)
@@ -172,7 +193,7 @@ def rasterise(location, grid, elements):
     default = location['city']['defaultHeight']
     heights = np.zeros((grid.rows, grid.cols), np.float32)
     owner = np.full((grid.rows, grid.cols), -1, np.int32)
-    colours = []
+    colours, styles = [], []
     for element in elements:
         tags = element.get('tags', {})
         if tags.get('building') in ('no', 'roof') or 'min_height' in tags or 'building:min_level' in tags:
@@ -200,15 +221,16 @@ def rasterise(location, grid, elements):
         region[wins] = height
         owner[r0:r1, c0:c1][wins] = len(colours)
         colours.append(facade(tags, height, f"{element['type']}{element['id']}"))
+        styles.append(CURTAIN if height >= 120 else PUNCHED)
     outside = ~grid.inside()
     heights[outside] = 0
     owner[outside] = -1
     print(f'{len(colours)} buildings on a {grid.cols}x{grid.rows} grid of {grid.size} m, tallest {heights.max():.0f} m')
-    return heights, owner, colours
+    return heights, owner, colours, styles
 
 
-def mesh(location, grid, heights, owner, colours):
-    """Merged roofs and walls as positions, colours and triangles"""
+def mesh(location, grid, heights, owner, colours, styles):
+    """Merged roofs and walls as positions, colours, window styles and triangles"""
     upm = location['unitsPerMetre']
     up = upm * location['verticalExaggeration']
     ground = location['flatLand'] * up
@@ -216,9 +238,9 @@ def mesh(location, grid, heights, owner, colours):
     linear = np.array([srgb_to_linear(c) for c in colours] or [[0, 0, 0]]) * 0.8
     # Roofs a darker, greyer shade of their facade
     roof_of = linear * 0.45 + srgb_to_linear('#4a4a4a') * 0.55
-    pos, col, idx = [], [], []
+    pos, col, win, idx = [], [], [], []
 
-    def quad(corners, normal, colour):
+    def quad(corners, normal, colour, style=ROOF):
         # Wound counter-clockwise seen from the side the normal points to
         e1, e2 = np.subtract(corners[1], corners[0]), np.subtract(corners[2], corners[0])
         if np.dot(np.cross(e1, e2), normal) < 0:
@@ -226,6 +248,7 @@ def mesh(location, grid, heights, owner, colours):
         base = len(pos)
         pos.extend(corners)
         col.extend([colour] * 4)
+        win.extend([style] * 4)
         idx.extend([base, base + 1, base + 2, base, base + 2, base + 3])
 
     def at(col_, row, h):
@@ -286,14 +309,15 @@ def mesh(location, grid, heights, owner, colours):
                 else:
                     p0, p1 = (k, i), (k, j + 1)
                     normal = tuple(sign * x for x in su)
-                quad([at(*p0, lo), at(*p1, lo), at(*p1, hi), at(*p0, hi)], normal, linear[taller])
+                quad([at(*p0, lo), at(*p1, lo), at(*p1, hi), at(*p0, hi)], normal, linear[taller], styles[taller])
                 i = j + 1
 
     positions = np.array(pos, np.float32)
     colours8 = np.round(np.clip(np.array(col), 0, 1) * 255).astype(np.uint8)
     triangles = np.array(idx, np.uint32)
     print(f'{len(positions)} vertices, {len(triangles) // 3} triangles')
-    return positions, colours8, triangles
+    windows = np.array(win, np.uint8)
+    return positions, colours8, windows, triangles
 
 
 def loop_curve(points, tension=LOOP_TENSION, per_leg=60):
@@ -331,22 +355,22 @@ def pad4(chunk, fill):
     return chunk + fill * ((4 - len(chunk) % 4) % 4)
 
 
-def write_glb(positions, colours, triangles, dst):
-    blobs = [positions.tobytes(), pad4(colours.tobytes(), b'\0'), triangles.tobytes()]
+def write_glb(positions, colours, windows, triangles, extras, dst):
+    blobs = [positions.tobytes(), pad4(colours.tobytes(), b'\0'), pad4(windows.tobytes(), b'\0'), triangles.tobytes()]
     views, offset = [], 0
-    for blob, target in zip(blobs, (34962, 34962, 34963)):
+    for blob, target in zip(blobs, (34962, 34962, 34962, 34963)):
         views.append({'buffer': 0, 'byteOffset': offset, 'byteLength': len(blob), 'target': target})
         offset += len(blob)
     gltf = {
         'asset': {'version': '2.0', 'generator': '3d/city-to-glb.py'},
         'scene': 0,
         'scenes': [{'nodes': [0]}],
-        'nodes': [{'mesh': 0, 'name': 'City'}],
+        'nodes': [{'mesh': 0, 'name': 'City', 'extras': extras}],
         'materials': [{'pbrMetallicRoughness': {'baseColorFactor': [1, 1, 1, 1], 'metallicFactor': 0, 'roughnessFactor': 0.85}}],
         'meshes': [
             {
                 'primitives': [
-                    {'attributes': {'POSITION': 0, 'COLOR_0': 1}, 'indices': 2, 'material': 0}
+                    {'attributes': {'POSITION': 0, 'COLOR_0': 1, '_WINDOWS': 2}, 'indices': 3, 'material': 0}
                 ]
             }
         ],
@@ -362,7 +386,8 @@ def write_glb(positions, colours, triangles, dst):
                 'max': positions.max(axis=0).tolist(),
             },
             {'bufferView': 1, 'componentType': UINT8, 'normalized': True, 'count': len(colours), 'type': 'VEC3'},
-            {'bufferView': 2, 'componentType': UINT32, 'count': len(triangles), 'type': 'SCALAR'},
+            {'bufferView': 2, 'componentType': UINT8, 'count': len(windows), 'type': 'SCALAR'},
+            {'bufferView': 3, 'componentType': UINT32, 'count': len(triangles), 'type': 'SCALAR'},
         ],
     }
     json_chunk = pad4(json.dumps(gltf, separators=(',', ':')).encode(), b' ')
@@ -381,6 +406,6 @@ if __name__ == '__main__':
         sys.exit(__doc__)
     location = json.load(open(sys.argv[1]))
     grid = Grid(location)
-    heights, owner, colours = rasterise(location, grid, fetch(location))
+    heights, owner, colours, styles = rasterise(location, grid, fetch(location))
     check_loop(location, grid, heights)
-    write_glb(*mesh(location, grid, heights, owner, colours), sys.argv[2])
+    write_glb(*mesh(location, grid, heights, owner, colours, styles), grid.extras(location), sys.argv[2])

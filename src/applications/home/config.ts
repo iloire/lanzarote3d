@@ -19,6 +19,8 @@ export type ParagliderVoxelConfig = {
   waypoints?: THREE.Vector3[];
   /** Twists thrown now and then, spinning round to fly looking backwards */
   twist?: TwistSettings;
+  /** Times the wing's own speed it flies at */
+  speedFactor?: number;
 };
 
 export type HanggliderConfig = {

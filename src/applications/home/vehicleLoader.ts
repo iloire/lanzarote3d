@@ -46,7 +46,7 @@ export async function loadParagliders(
       try {
         const paraglider = new ParagliderVoxel(p.options);
         // A roller flies faster and lower than a standard wing, throwing wingovers
-        const speed = PARAGLIDER_SPEED * gliderSpeedFactor(p.options.glider);
+        const speed = PARAGLIDER_SPEED * gliderSpeedFactor(p.options.glider) * (p.speedFactor ?? 1);
         const roller = p.options.glider.kind === 'roller';
         const offset = roller
           ? p.pathOffset.clone().setY(p.pathOffset.y - ROLLER_FLIGHT.drop)
