@@ -15,9 +15,15 @@ const PILOTS = 5;
 // The camera drifts this far either side of where it starts, and takes this long to swing back
 const SWAY_ANGLE = THREE.MathUtils.degToRad(20);
 const SWAY_PERIOD = 90;
+// How far the viewer may take the camera: a terrain ends at its box, so zooming out or
+// orbiting round behind the hills would show its edges.
+const MAX_ZOOM_OUT = 1.5;
+const MIN_DISTANCE = 150;
+const ORBIT_LIMIT = THREE.MathUtils.degToRad(60);
+const LOWEST_VIEW = THREE.MathUtils.degToRad(85);
 
 /**
- * Pick a place (?location=lanzarote | rio-de-janeiro) and watch a few gliders soar its ridge
+ * Pick a place (?location=lanzarote | tenerife | rio-de-janeiro) and watch a few gliders soar its ridge
  * while the camera drifts slowly from side to side. Dragging takes over the camera.
  */
 class RelaxApp extends TerrainBase {
@@ -47,6 +53,7 @@ class RelaxApp extends TerrainBase {
 
       controls.enabled = true;
       controls.target.copy(relax.camera.target);
+      this.limitControls(controls, relax);
       controls.update();
 
       const environment = new Environment(scene);
@@ -71,6 +78,18 @@ class RelaxApp extends TerrainBase {
       this.handleError(error as Error, 'load');
       throw error;
     }
+  }
+
+  /** Keep the viewer near the gliders: no panning, a little zoom, part of an orbit */
+  private limitControls(controls: OrbitControls, relax: RelaxScene): void {
+    const offset = relax.camera.position.clone().sub(relax.camera.target);
+    const azimuth = Math.atan2(offset.x, offset.z);
+    controls.enablePan = false;
+    controls.minDistance = MIN_DISTANCE;
+    controls.maxDistance = offset.length() * MAX_ZOOM_OUT;
+    controls.minAzimuthAngle = azimuth - ORBIT_LIMIT;
+    controls.maxAzimuthAngle = azimuth + ORBIT_LIMIT;
+    controls.maxPolarAngle = LOWEST_VIEW;
   }
 
   private startAnimationLoop(

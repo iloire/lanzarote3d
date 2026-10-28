@@ -72,16 +72,40 @@ Branch: `feature/locations`, in the worktree `~/code/lanzarote3d-locations`.
 - Later: built-up São Conrado (a grey region there read as haze on the hillside, so it was
   dropped), Cristo on Corcovado, frigatebirds and black vultures.
 
+### 3b. Tenerife (curated)
+- ~~`src/locations/tenerife.json` → `assets/locations/tenerife.glb`: Adeje, Los Cristianos to El
+  Teide (28.05…28.32, −16.8…−16.58), 100 m grid, heights unstretched (Teide reads 3,692 m)~~ ✅
+- ~~Taucho takeoff and La Caleta landing from OSM (Overpass `free_flying:site`); loop over the
+  slope around the takeoff at 1,000–1,100 m, ≥ 187 m clear~~ ✅
+- ~~Camera on the line from El Teide through the loop, so Teide stands behind the gliders;
+  pine belt green, Las Cañadas and the cones dark~~ ✅
+
 ### 4. The relax app
 - ~~Started as a private route of the Lanzarote build, `relax.html?location=lanzarote |
   rio-de-janeiro`: five gliders on the place's loop, camera swaying ±20° over 90 s, drag to take
   over (`src/applications/relax/`)~~ ✅
+- ~~Camera limits so no terrain edge shows: no pan, zoom out ≤ 1.5× the start, orbit ±60°~~ ✅
 - `src/relax/index.tsx` + `webpack.relax.config.js` → `dist-relax/`.
 - Picker (Lanzarote, Rio) → one slow scene per place: drifting camera along the ridge, a few
   gliders, sea, birds, time-of-day from the location's sun. No UI chrome once it starts.
 - `npm run start:relax`, `npm run build:relax`. Deploy script once the domain is chosen.
 
-### 5. Land it
+### 5. Anywhere: a place generated in the browser
+- Curated places stay the showcase; this adds a generated mode on top. A generated place uses
+  the same location JSON shape, so a good one can be saved as curated.
+- Elevation from AWS Terrain Tiles (terrarium PNGs, global ~30 m, CORS open — checked);
+  Copernicus stays build-time only (its bucket has no CORS). ~8 tiles / ~200 KB for a Rio-sized
+  area; `dem-to-glb.py`'s grid logic ported to TypeScript, building the geometry directly.
+- Search a place with Nominatim (CORS open; 1 req/s and attribution, so Photon or a paid
+  geocoder if traffic grows).
+- Automatic: height stretch from the area's relief, clouds over high ground, camera on the low
+  side, gliders thermalling over the point at ground + 300 m, clearance checked on the grid.
+- Colours from height and slope first.
+- Follow-ups: ridge loops at real launch sites (paraglidingearth.com database; check its API
+  terms), real ground colours (ESA WorldCover or averaged Sentinel-2 imagery; check licences),
+  lakes and rivers from OSM water outlines.
+
+### 6. Land it
 - Lanzarote site: `npm run build` output and routes unchanged; `deploy-prod` untouched.
 - README + `docs/README.md` updated (locations, the second build, the DEM script);
   CHANGELOG entry.

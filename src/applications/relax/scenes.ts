@@ -3,7 +3,8 @@ import type { Location } from '../../locations/types';
 import type { CloudSite } from '../../shared/env/environment';
 import { LANZAROTE } from '../../locations/lanzarote';
 import { RIO_CONFIG, RIO_DE_JANEIRO } from '../../locations/rio-de-janeiro';
-import { demAnchor, demPoint } from '../../locations/dem';
+import { TENERIFE, TENERIFE_CONFIG } from '../../locations/tenerife';
+import { DemLocationConfig, demAnchor, demPoint } from '../../locations/dem';
 import { geoToWorld } from '../../shared/geo';
 import { RIDGE_LOOP } from '../home/config';
 
@@ -17,7 +18,29 @@ export interface RelaxScene {
   clouds?: CloudSite[];
 }
 
-const rioAnchor = demAnchor(RIO_CONFIG);
+/** The relax fields of a location JSON (see src/locations/README.md) */
+interface DemSceneConfig extends DemLocationConfig {
+  soaringLoop: { waypoints: number[][] };
+  camera: { at: number[]; lookAt: number[] };
+  clouds: { at: number[]; kind: string; scale: number }[];
+}
+
+function demScene(location: Location, config: DemSceneConfig): RelaxScene {
+  const anchor = demAnchor(config);
+  return {
+    location,
+    loop: config.soaringLoop.waypoints.map(at => demPoint(config, at)),
+    camera: {
+      position: demPoint(config, config.camera.at),
+      target: demPoint(config, config.camera.lookAt),
+    },
+    clouds: config.clouds.map(({ at, kind, scale }) => ({
+      ...geoToWorld(at[0], at[1], anchor),
+      kind: kind as CloudSite['kind'],
+      scale,
+    })),
+  };
+}
 
 export const RELAX_SCENES: Record<string, RelaxScene> = {
   lanzarote: {
@@ -29,19 +52,8 @@ export const RELAX_SCENES: Record<string, RelaxScene> = {
       target: new THREE.Vector3(6850, 880, -700),
     },
   },
-  'rio-de-janeiro': {
-    location: RIO_DE_JANEIRO,
-    loop: RIO_CONFIG.soaringLoop.waypoints.map(at => demPoint(RIO_CONFIG, at)),
-    camera: {
-      position: demPoint(RIO_CONFIG, RIO_CONFIG.camera.at),
-      target: demPoint(RIO_CONFIG, RIO_CONFIG.camera.lookAt),
-    },
-    clouds: RIO_CONFIG.clouds.map(({ at, kind, scale }) => ({
-      ...geoToWorld(at[0], at[1], rioAnchor),
-      kind: kind as CloudSite['kind'],
-      scale,
-    })),
-  },
+  'rio-de-janeiro': demScene(RIO_DE_JANEIRO, RIO_CONFIG),
+  tenerife: demScene(TENERIFE, TENERIFE_CONFIG),
 };
 
 export const DEFAULT_SCENE = 'lanzarote';
