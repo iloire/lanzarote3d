@@ -20,9 +20,11 @@ const RESERVE = 0xd8262a;
 const RESERVE_LID = 0x1c1c1c;
 const HANDLE = 0xffd21f;
 
-/** Where the prop turns and how far it reaches */
+/** Where the prop turns and how far it reaches; the cage hoop sits just behind it, a little wider */
 const HUB_AT = new THREE.Vector3(0, 33, -40);
 const PROP_RADIUS = 38;
+const CAGE_RADIUS = 43;
+const CAGE_Z = -46;
 /** Turns a second, slow enough to read as a prop and not a flicker; the disc stands in for the blur */
 const PROP_SPIN = 25;
 
@@ -53,6 +55,13 @@ function line(v: Voxels, a: THREE.Vector3, b: THREE.Vector3, c: number, thick = 
     const [x, y, z] = [Math.round(p.x), Math.round(p.y), Math.round(p.z)];
     box(v, x, x + thick - 1, y, y + thick - 1, z, z + thick - 1, c);
   }
+}
+
+/** A ring in the plane across the flight, round (0, cy) at depth z */
+function ring(v: Voxels, cy: number, z: number, radius: number, c: number, thick = 0.8) {
+  for (let x = -radius - 1; x <= radius + 1; x++)
+    for (let y = cy - radius - 1; y <= cy + radius + 1; y++)
+      if (Math.abs(Math.hypot(x, y - cy) - radius) < thick) v.set(key(x, y, z), c);
 }
 
 const FACES: [number[], number[][]][] = [
@@ -147,7 +156,7 @@ function voxelMesh(v: Voxels, material: THREE.Material, origin = new THREE.Vecto
   return mesh;
 }
 
-/** Frame, engine, tank, exhaust and the reserve on the lap: everything but the prop */
+/** Frame, engine, tank, exhaust, cage hoop and the reserve on the lap: everything but the prop */
 function frameVoxels(): Voxels {
   const v: Voxels = new Map();
   const V = (x: number, y: number, z: number) => new THREE.Vector3(x, y, z);
@@ -166,6 +175,23 @@ function frameVoxels(): Voxels {
   line(v, V(6, 30, -35), V(9, 20, -35), EXHAUST);
   line(v, V(9, 20, -35), V(9, 14, -44), EXHAUST);
 
+  // The cage: one thin hoop round the prop, held off the frame by four thin struts
+  ring(v, HUB_AT.y, CAGE_Z, CAGE_RADIUS, SILVER);
+  for (const [x, y] of [
+    [-14, 9],
+    [12, 9],
+    [-14, 49],
+    [12, 49],
+  ]) {
+    const a = Math.atan2(y - HUB_AT.y, x);
+    line(
+      v,
+      V(x, y, -30),
+      V(Math.cos(a) * CAGE_RADIUS, HUB_AT.y + Math.sin(a) * CAGE_RADIUS, CAGE_Z),
+      SILVER,
+      1
+    );
+  }
   // The shaft from the engine back to the hub
   box(v, -1, 0, HUB_AT.y - 1, HUB_AT.y, HUB_AT.z, -38, HUB);
 
