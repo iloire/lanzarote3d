@@ -121,12 +121,15 @@ export class CharacterRegistry {
     });
 
     // Built from Ivan by 3d-characters tools/pilots and exported in Adri's frame like him.
-    const pilots: { id: CharacterType; name: string; description: string }[] = [
+    // `model` names a later version of the pilot, `<id>-<model>.obj` beside the original.
+    const pilots: { id: CharacterType; name: string; description: string; model?: string }[] = [
       {
         id: CharacterType.ABEL,
         name: 'Abel',
         description:
-          'Paramotor pilot - black helmet with ear cups, gold jet visor and intercom mic, navy jacket, open harness',
+          'Paramotor pilot - black helmet with ear cups, gold jet visor and intercom mic, blue T-shirt, shorts, legs crossed at the ankles, open harness',
+        // v2 crosses his legs, the way he flies; abel.obj is v1, legs hanging straight
+        model: 'v2',
       },
       {
         id: CharacterType.BERNT,
@@ -177,14 +180,15 @@ export class CharacterRegistry {
           'Black carbon Charly helmet, white sunglasses, dark jacket, olive trousers, bulky open harness, red front container',
       },
     ];
-    pilots.forEach(({ id, name, description }) => {
+    pilots.forEach(({ id, name, description, model }) => {
+      const file = model ? `${id}-${model}` : id;
       this.registerCharacter({
         id,
         name,
         description,
         assets: {
-          objFile: `/assets/foundation/models/characters/${id}/${id}.obj`,
-          textureFile: `/assets/foundation/models/characters/${id}/${id}.png`,
+          objFile: `/assets/foundation/models/characters/${id}/${file}.obj`,
+          textureFile: `/assets/foundation/models/characters/${id}/${file}.png`,
         },
         defaultScale: 0.01,
         defaultMaterialOptions: {

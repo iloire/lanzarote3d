@@ -2,6 +2,13 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-28 21:03 UTC
+
+### Changed
+
+- Abel flies with his legs crossed at the ankles, the way he does: the v2 voxel model from
+  3d-characters (`abel-v2.obj`); v1, legs hanging straight, stays beside it as `abel.obj`
+
 ## 2026-10-28 20:11 UTC
 
 ### Added
