@@ -37,15 +37,17 @@ Branch: `feature/locations`, in the worktree `~/code/lanzarote3d-locations`.
 - ~~Create `feature/locations` worktree; share the git-crypt key with the main checkout~~ ✅
 
 ### 1. A `Location` type, Lanzarote moved into it (no visible change)
-- `src/locations/types.ts`: `Location` = `{ id, name, country, loadTerrain(), terrainScale,
-  terrainOffset, anchor: GeoAnchor, regions: GroundRegion[], sun: { lat, lon }, views:
-  CameraView[], ridges: Ridge[] /* where gliders soar */, wildlife }`.
-- `src/locations/lanzarote/index.ts` re-exports today's data (anchors, regions, glb import).
-  Data files move only if it keeps the diff small; otherwise they stay and are imported.
-- `Island` becomes a generic `Terrain` taking the model URL; `TerrainBase` takes a `Location`
-  (default Lanzarote), so every existing app keeps working untouched.
-- Check: every existing route renders pixel-identical (screenshots before/after with
-  `dev-browser`), unit tests + lint + typecheck green.
+- ~~`src/locations/types.ts`: `Location` = `{ id, name, terrainModel, terrainScale,
+  terrainPosition, anchor, regions }` — only what `TerrainBase` reads today~~ ✅
+- ~~`src/locations/lanzarote.ts` points at today's data (glb, `ISLAND_ANCHOR`,
+  `TERRAIN_REGIONS`); the data files stay where they are~~ ✅
+- ~~`Island.load(model, manager)` takes the GLB URL instead of importing Lanzarote's; the unused
+  `IslandLegacy` default export is gone. The class keeps its name to keep the diff small~~ ✅
+- ~~`TerrainBase` has `protected location = LANZAROTE`, so every existing app is untouched~~ ✅
+- ~~Check: the five terrain routes render the same before/after (`dev-browser`; only the
+  random clouds and houses differ), typecheck, lint, format green~~ ✅
+- Views, ridges, sun and wildlife join `Location` in phase 4, when the relax app needs them.
+- Note: `tests/rendering/cloudGeometry.test.ts` (3 tests) already fails on `master`; unrelated.
 
 ### 2. Terrain pipeline for new places
 - `3d/dem-to-glb.py`: bbox in → Copernicus GLO-30 DEM (free, AWS open data) cropped and
