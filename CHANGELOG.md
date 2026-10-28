@@ -2,6 +2,14 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-28 19:26 UTC
+
+### Changed
+
+- The paramotor has no cage: its hoops, net and struts drew a big busy wheel round the pilot
+  from behind. The frame, engine, tank, the spinning prop with its blur disc and the red
+  reserve on the lap stay.
+
 ## 2026-10-28 19:11 UTC
 
 ### Added
