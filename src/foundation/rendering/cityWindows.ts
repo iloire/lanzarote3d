@@ -17,6 +17,9 @@ export interface CityGrid {
 
 /** Storey height, metres */
 const FLOOR = 3.5;
+/** Walls are this bright at the street, where little sky reaches them, and fully lit this high, metres */
+const WALL_FOOT = 0.55;
+const WALL_LIT = 30;
 
 /**
  * Draws windows on a city's walls in the shader, so they cost no geometry: one pane per voxel
@@ -24,7 +27,7 @@ const FLOOR = 3.5;
  * the middle of each cell, glass curtain walls (2) a pane filling it between thin mullions;
  * roofs (0) none. Each pane is a slightly different dark glass, and shinier than the wall, so it
  * catches the sun. Far off, where a cell is under a pixel or so, the grid fades into its average
- * so it doesn't shimmer.
+ * so it doesn't shimmer. Walls darken towards the street, as the sky they see narrows.
  */
 export function addCityWindows(mesh: THREE.Mesh, grid: CityGrid): void {
   const material = mesh.material as THREE.MeshStandardMaterial;
@@ -85,6 +88,8 @@ export function addCityWindows(mesh: THREE.Mesh, grid: CityGrid): void {
           float shade = fract( sin( dot( floor( cell ), vec2( 12.9898, 78.233 ) ) ) * 43758.5453 );
           vec3 glass = mix( vec3( 0.035, 0.05, 0.075 ), vec3( 0.14, 0.18, 0.24 ), shade );
           diffuseColor.rgb = mix( diffuseColor.rgb, glass, cityPane );
+          float above = ( vCityWorld.y - uCityGrid.z ) / uCityGrid.w;
+          diffuseColor.rgb *= mix( ${WALL_FOOT.toFixed(2)}, 1.0, smoothstep( 0.0, ${WALL_LIT.toFixed(1)}, above ) );
         }`
       )
       .replace(

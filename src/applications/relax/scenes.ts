@@ -40,6 +40,17 @@ export interface RelaxScene {
   paramotor?: boolean;
   /** FogExp2 density, thicker than the theme's to hide a city's far edges */
   fogDensity?: number;
+  look?: SceneLook;
+}
+
+/** How a place is lit, where it differs from the theme */
+export interface SceneLook {
+  /** Hours, for the sun's height and bearing */
+  timeOfDay?: number;
+  /** Share of the theme's flat ambient light to keep */
+  ambient?: number;
+  /** The fog's colour, instead of the sky's at the horizon */
+  fogColor?: string;
 }
 
 /** The relax fields of a location JSON (see src/locations/README.md) */
@@ -65,6 +76,7 @@ interface DemSceneConfig extends DemLocationConfig {
   paramotor?: boolean;
   /** Metres at which the fog has hidden half of what's behind it */
   fog?: number;
+  look?: SceneLook;
 }
 
 function demScene(location: Location, config: DemSceneConfig, city?: string): RelaxScene {
@@ -117,6 +129,7 @@ function demScene(location: Location, config: DemSceneConfig, city?: string): Re
     paramotor: config.paramotor,
     // FogExp2 hides half where (density × distance)² = ln 2
     fogDensity: config.fog && Math.sqrt(Math.LN2) / (config.fog * config.unitsPerMetre),
+    look: config.look,
   };
 }
 

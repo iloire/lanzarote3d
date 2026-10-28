@@ -12,6 +12,10 @@ The location JSON (src/locations/<id>.json) gives the bbox and world units per m
 a building OSM gives none for. Buildings and building parts in the bbox are fetched from the
 Overpass API once (cached in 3d/osm-cache/), rasterised onto the turned grid, each cell taking
 its tallest building, and meshed as blocks: merged roofs, and walls only where neighbours differ.
+Rock outcrops are meshed with them, a few metres high. The ground between is painted on one
+textured quad: roads, sidewalks and crosswalks, and parks with their woods, paths, ponds and
+grass of varying green, darker at the foot of the walls; the GLB carries the lanes cars drive and
+where the park's trees stand, for the app to draw.
 
 The GLB is in the terrain's world units (scale 1) and frame (bbox centre at x = z = 0), standing
 on the location's flatLand; facades and roofs are coloured per vertex, and each wall carries
@@ -65,7 +69,12 @@ LAYERS = {
     'buildings': ['["building"]', '["building:part"]'],
     'parks': ['["leisure"~"^(park|garden|playground|pitch)$"]', '["landuse"~"^(grass|recreation_ground)$"]'],
     'water': ['["natural"="water"]'],
+    'woods': ['["natural"~"^(wood|scrub)$"]', '["landuse"="forest"]'],
+    'rocks': ['["natural"~"^(bare_rock|rock)$"]'],
+    'paths': ['["highway"]'],
 }
+# Layers fetched as ways alone: a highway's relations are its bus and bike routes
+WAYS_ONLY = {'paths'}
 
 
 def fetch(location, layer):
@@ -75,7 +84,8 @@ def fetch(location, layer):
     # Named by the bbox too, so changing it fetches again
     path = CACHE / f"{location['id']}-{zlib.crc32(box.encode()):08x}-{layer}.json"
     if not path.exists():
-        parts = ''.join(f'way{f}({box});relation{f}({box});' for f in LAYERS[layer])
+        kinds = ('way',) if layer in WAYS_ONLY else ('way', 'relation')
+        parts = ''.join(f'{kind}{f}({box});' for f in LAYERS[layer] for kind in kinds)
         query = f'[out:json][timeout:300];({parts});out tags geom;'
         print(f'fetching {layer} from Overpass')
         request = urllib.request.Request(
@@ -233,6 +243,17 @@ def cells_of(grid, outer, inner):
     return (slice(r0, r1), slice(c0, c1)), np.array(mask, bool)
 
 
+def trace(grid, elements, width):
+    """Every cell the ways' lines run over, `width` cells wide"""
+    image = Image.new('1', (grid.cols, grid.rows), 0)
+    draw = ImageDraw.Draw(image)
+    for element in elements:
+        points = [grid.cell(p['lat'], p['lon']) for p in element.get('geometry', [])]
+        if len(points) >= 2:
+            draw.line([(x - 0.5, y - 0.5) for x, y in points], fill=1, width=width)
+    return np.array(image, bool)
+
+
 def coverage(grid, elements):
     """Every cell any of the elements' polygons covers"""
     covered = np.zeros((grid.rows, grid.cols), bool)
@@ -280,9 +301,24 @@ SURFACES = {
     'road': '#3b3d41',
     'crosswalk': '#e4e4de',
     'sidewalk': '#a19e95',
-    'grass': '#527c3b',
+    'grass': '#4a7236',
+    'wood': '#3d5a2c',
+    'path': '#a69b82',
+    'drive': '#3b3d41',
     'pond': '#2d5268',
 }
+# Park footways a cell wide, its drives two
+FOOTWAYS = {'footway', 'path', 'cycleway', 'bridleway', 'steps', 'pedestrian', 'track'}
+# How much darker the ground is with every cell round it built on, out to this many cells: the
+# street at the foot of a wall sees less sky
+GROUND_SHADE, GROUND_SHADE_RADIUS = 0.45, 3
+# Grass greener and yellower over ~120 m and ~25 m, so a park isn't one flat green
+GRASS_VARIES = 0.5
+# Trees a cell: woods dense, lawns in clumps with open meadows between
+WOOD_TREES, PARK_TREES = 0.16, 0.07
+# Rock outcrops: this high at their edge, metres, and this much higher a cell further in
+ROCK_BASE, ROCK_STEP, ROCK_STEPS = 1.2, 1.4, 3
+ROCK = '#8f8b84'
 # The street quad sits this far above the ground, metres, clear of the terrain under it
 STREET_LIFT = 0.1
 # Open runs at least this long, in cells, are avenues and streets; where both cross, a junction
@@ -297,6 +333,21 @@ def dem():
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def blur(mask, radius):
+    """The share of the cells in the square `radius` round each that are in the mask"""
+    k = 2 * radius + 1
+    summed = np.pad(np.pad(mask.astype(np.float32), radius).cumsum(0).cumsum(1), ((1, 0), (1, 0)))
+    return (summed[k:, k:] - summed[:-k, k:] - summed[k:, :-k] + summed[:-k, :-k]) / (k * k)
+
+
+def noise(shape, scale, seed):
+    """Smooth value noise in 0-1 that changes over about `scale` cells"""
+    rows, cols = shape
+    coarse = np.random.default_rng(seed).random((rows // scale + 2, cols // scale + 2)).astype(np.float32)
+    smooth = Image.fromarray(coarse, 'F').resize((coarse.shape[1] * scale, coarse.shape[0] * scale), Image.BICUBIC)
+    return np.clip(np.array(smooth)[:rows, :cols], 0, 1)
 
 
 def runs(mask, axis):
@@ -325,9 +376,10 @@ def grow(mask, steps=1):
 
 
 def lay_streets(location, grid, heights):
-    """Paint the land between the buildings as sidewalks, roads, crosswalks, grass and ponds,
-    and find the lanes cars drive: returns an RGBA image a pixel a cell (clear off the land) and
-    the lanes as grid (col, row) end points"""
+    """Paint the land between the buildings as sidewalks, roads, crosswalks, grass, woods, park
+    paths and ponds, and find the lanes cars drive: returns an RGBA image a pixel a cell (clear
+    off the land), the lanes as grid (col, row) end points, and the park cells trees may grow
+    on and which of them are woods"""
     cc, rr = np.meshgrid(np.arange(grid.cols) + 0.5, np.arange(grid.rows) + 0.5)
     east, south = grid.world(cc, rr)
     lat = grid.lat0 - south / METRES_PER_DEGREE_LAT
@@ -335,8 +387,15 @@ def lay_streets(location, grid, heights):
     land = dem().sampler(location['bbox'])(lat, lon) > 0
     built = heights > 0
     open_land = ~built & land & grid.inside()
-    parks = coverage(grid, fetch(location, 'parks')) & open_land
+    woods = coverage(grid, fetch(location, 'woods')) & open_land
+    parks = (coverage(grid, fetch(location, 'parks')) & open_land) | woods
     ponds = coverage(grid, fetch(location, 'water')) & open_land
+    woods &= ~ponds
+    highways = fetch(location, 'paths')
+    footways = trace(grid, [w for w in highways if w.get('tags', {}).get('highway') in FOOTWAYS], 1)
+    drives = trace(grid, [w for w in highways if w.get('tags', {}).get('highway') not in FOOTWAYS], 2)
+    drive = drives & parks & ~ponds
+    path = footways & parks & ~ponds & ~drive
     sidewalk = open_land & grow(built) & ~parks & ~ponds
     road = open_land & ~sidewalk & ~parks & ~ponds
 
@@ -361,13 +420,25 @@ def lay_streets(location, grid, heights):
         ('road', road & ~zebra),
         ('crosswalk', zebra),
         ('sidewalk', sidewalk),
-        ('grass', parks),
+        ('grass', parks & ~woods),
+        ('wood', woods),
+        ('path', path),
+        ('drive', drive),
         ('pond', ponds),
     ]
     image = np.zeros((grid.rows, grid.cols, 4), np.uint8)
     image[built & land] = [*bytes.fromhex(SURFACES['sidewalk'][1:]), 255]
     for name, mask in layers:
         image[mask] = [*bytes.fromhex(SURFACES[name][1:]), 255]
+    # Shade it: darker at the foot of the buildings, and the grass varying
+    shade = 1 - GROUND_SHADE * blur(built, GROUND_SHADE_RADIUS)
+    lawn = parks & ~path & ~drive & ~ponds
+    varies = 0.6 * noise(built.shape, 40, 1) + 0.4 * noise(built.shape, 8, 2)
+    shade[lawn] *= (1 - GRASS_VARIES / 2 + GRASS_VARIES * varies)[lawn]
+    rgb = image[..., :3].astype(np.float32) * shade[..., None]
+    # Yellower where the lawn is lighter, so the variation is in hue as well as light
+    rgb[..., 0][lawn] *= (0.92 + 0.16 * varies)[lawn]
+    image[..., :3] = np.clip(rgb, 0, 255).astype(np.uint8)
 
     # Lanes: down each run of roadway long enough, two to an avenue or street a third of the way
     # in from each side, one if it's narrow
@@ -395,7 +466,35 @@ def lay_streets(location, grid, heights):
                     lanes.append(ends if n % 2 == 0 else ends[::-1])
     counts = {name: int(mask.sum()) for name, mask in layers}
     print(f'streets: {counts}, {len(lanes)} lanes')
-    return image, lanes
+    free = parks & ~ponds & ~grow(path | drive) & ~grow(built, 2)
+    return image, lanes, free, woods
+
+
+def outcrops(location, grid, heights):
+    """Height in metres of the rock outcrops on open ground, higher a cell further in from their edge"""
+    rock = coverage(grid, fetch(location, 'rocks')) & (heights == 0) & grid.inside()
+    out = np.where(rock, ROCK_BASE, 0).astype(np.float32)
+    inner = rock
+    for _ in range(ROCK_STEPS):
+        inner = inner & ~grow(~inner)
+        out[inner] += ROCK_STEP
+    print(f'{int(rock.sum())} cells of rock')
+    return out
+
+
+def plant(location, grid, free, woods):
+    """Trees on the park cells free of paths and rocks: world x, z and a scale each, flat"""
+    rng = np.random.default_rng(3)
+    clumps = np.clip((noise(free.shape, 12, 4) - 0.35) / 0.4, 0, 1) ** 2
+    chance = np.where(woods, WOOD_TREES, PARK_TREES * clumps)
+    rows, cols = np.nonzero(free & (rng.random(free.shape) < chance))
+    col = cols + rng.random(len(cols))
+    row = rows + rng.random(len(rows))
+    east, south = grid.world(col, row)
+    upm = location['unitsPerMetre']
+    scale = rng.uniform(0.7, 1.3, len(cols))
+    print(f'{len(cols)} trees')
+    return np.round(np.stack([east * upm, south * upm, scale], 1), 2).ravel().tolist()
 
 
 def mesh(location, grid, heights, owner, colours, styles):
@@ -631,8 +730,15 @@ if __name__ == '__main__':
     grid = Grid(location)
     heights, owner, colours, styles = rasterise(location, grid, fetch(location, 'buildings'))
     check_loop(location, grid, heights)
-    image, lanes = lay_streets(location, grid, heights)
+    image, lanes, free, woods = lay_streets(location, grid, heights)
+    rocks = outcrops(location, grid, heights)
     extras = grid.extras(location)
     extras['lanes'] = [[coordinate for end in lane for coordinate in grid.world_xz(*end, location)] for lane in lanes]
+    extras['trees'] = plant(location, grid, free & (rocks == 0), woods)
+    # The rocks are meshed with the buildings, as one more owner without windows
+    owner[rocks > 0] = len(colours)
+    heights = np.maximum(heights, rocks)
+    colours.append(ROCK)
+    styles.append(ROOF)
     streets = (*street_quad(location, grid), image)
     write_glb(*mesh(location, grid, heights, owner, colours, styles), extras, streets, sys.argv[2])

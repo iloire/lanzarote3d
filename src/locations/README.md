@@ -82,8 +82,22 @@ a side, which the extras carry as `lanes` ([x0, z0, x1, z1] in world units) for
 `shared/env/cityTraffic.ts` to drive cars on: one instanced mesh, a third of them yellow cabs.
 Parks and water are fetched and cached like the buildings.
 
+Parks get woods (OSM `natural=wood|scrub`, `landuse=forest`) on a darker ground, footways a cell
+wide and drives two (OSM `highway` ways, painted only inside parks), and grass whose green and
+hue vary over about 120 m and 25 m. All of the ground is darker at the foot of the buildings, up
+to 45% where every cell within 3 is built on. Rock outcrops (`natural=bare_rock|rock`) are meshed
+with the buildings, 1.2 m high at their edge and 1.4 m higher each cell further in, without windows.
+Trees stand on the park cells clear of paths, rocks and buildings, densely in the woods and in
+clumps on the lawns; the extras carry them as `trees` ([x, z, scale] per tree, flat) for
+`shared/env/cityTrees.ts`, one instanced mesh of voxel trees, a few in autumn colours. The city,
+its streets, the trees and the cars all take the sun's shadows, and the window shader darkens
+walls towards the street.
+
 `fog` (metres at which the fog has hidden half the view) thickens the theme's fog, so the city's
-far edge fades out instead of ending.
+far edge fades out instead of ending. `look` changes the light from the theme's:
+`{ timeOfDay?, ambient?, fogColor? }`, the hour for the sun (later is lower here), the share of the
+flat ambient light to keep (less makes the shade read), and the fog's colour instead of the
+horizon's.
 
 It also prints how far the `soaringLoop` clears the rooftops within 10 m either side, along the same
 Catmull-Rom curve the app flies. In a city the loop can fly the streets: on the turned grid an

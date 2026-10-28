@@ -19,6 +19,7 @@ import { DEFAULT_SCENE, RELAX_SCENES, RelaxScene } from './scenes';
 import { createLocationSwitcher } from './LocationSwitcher';
 import { PathTrail } from './pathTrail';
 import { CityTraffic, Lane } from '../../shared/env/cityTraffic';
+import { cityTrees, TreeSpots } from '../../shared/env/cityTrees';
 import { addCityWindows, CityGrid } from '../../foundation/rendering/cityWindows';
 
 const PILOTS = 5;
@@ -86,13 +87,23 @@ class RelaxApp extends TerrainBase {
       );
 
       const base = getDefaultTheme();
-      const theme = relax.fogDensity
-        ? { ...base, atmosphere: { ...base.atmosphere, fogDensity: relax.fogDensity } }
-        : base;
-      await ThemeEngine.apply(options, theme);
+      const { look } = relax;
+      const theme = {
+        ...base,
+        sky: { ...base.sky, ...definedOnly({ timeOfDay: look?.timeOfDay }) },
+        atmosphere: {
+          ...base.atmosphere,
+          ...definedOnly({ fogDensity: relax.fogDensity, fogColor: look?.fogColor }),
+        },
+      };
       camera.position.copy(relax.camera.position);
       camera.lookAt(relax.camera.target);
       await this.initializeEnvironment(options);
+      // After the environment, which applies the default theme once its sky and pipeline exist
+      await ThemeEngine.apply(options, theme);
+      if (look?.ambient !== undefined && options.sky) {
+        options.sky.ambientLight.intensity *= look.ambient;
+      }
 
       controls.enabled = true;
       controls.target.copy(relax.camera.target);
@@ -106,9 +117,16 @@ class RelaxApp extends TerrainBase {
       if (relax.city) {
         const city = await Models.loadGltf(relax.city);
         city.scene.traverse(object => {
+          if (!(object instanceof THREE.Mesh)) return;
+          // The GLB has no normals (three.js shades its faces flat); shadows need them
+          object.geometry.computeVertexNormals();
+          object.castShadow = true;
+          object.receiveShadow = true;
           const grid = object.userData['grid'] as CityGrid | undefined;
-          if (!(object instanceof THREE.Mesh) || !grid) return;
+          if (!grid) return;
           addCityWindows(object, grid);
+          const trees = object.userData['trees'] as TreeSpots | undefined;
+          if (trees?.length) scene.add(cityTrees(trees, grid.unitsPerMetre, grid.ground));
           const lanes = object.userData['lanes'] as Lane[] | undefined;
           if (lanes?.length) {
             this.traffic = new CityTraffic(lanes, {
@@ -116,6 +134,7 @@ class RelaxApp extends TerrainBase {
               unitsPerMetre: grid.unitsPerMetre,
               road: grid.ground + TRAFFIC_LIFT * grid.up,
             });
+            this.traffic.mesh.receiveShadow = true;
             scene.add(this.traffic.mesh);
           }
         });

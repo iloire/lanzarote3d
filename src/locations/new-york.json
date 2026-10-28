@@ -21,6 +21,12 @@
   },
   "paramotor": true,
   "fog": 1800,
+  "look": {
+    "about": "A lower, later sun than the islands' so the towers throw long shadows down the streets, less flat ambient light so the shade reads, and a blue-grey haze for the fog",
+    "timeOfDay": 17.5,
+    "ambient": 0.45,
+    "fogColor": "#a3b1c2"
+  },
   "places": {
     "empireState": {
       "name": "Empire State Building",

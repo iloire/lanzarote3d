@@ -2,6 +2,23 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-28 22:53 UTC
+
+### Added
+
+- Central Park comes alive: 5,500 voxel trees in one instanced mesh (`cityTrees.ts`), dense in
+  OpenStreetMap's woods and in clumps on the lawns, a few in autumn colours; footways and drives
+  painted through the park, rock outcrops a few metres high, and grass that varies in green
+
+### Changed
+
+- New York is lit like a city: the buildings, streets, trees and cars take the sun's shadows, a
+  lower 17:30 sun throws them long down the avenues, the flat ambient light is cut to 45% (a new
+  `look` in the location JSON), walls and the ground darken towards the street, and the fog is a
+  blue-grey haze
+- The relax app applies its place's theme after the environment loads; before, the default
+  theme applied there replaced it, so New York's thicker fog never took
+
 ## 2026-10-28 21:03 UTC
 
 ### Changed
