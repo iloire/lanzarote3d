@@ -70,7 +70,8 @@
       "category": "experience",
       "requiresWebGL": true,
       "visibility": "private",
-      "priority": 6
+      "priority": 6,
+      "site": "relax"
     }
   }
 }

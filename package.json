@@ -43,6 +43,8 @@
     "start": "npm run clean && webpack serve --mode development --open --hot",
     "dev": "npm run start",
     "build": "npm run clean && webpack --mode production",
+    "start:relax": "SITE=relax webpack serve --mode development --open --hot",
+    "build:relax": "rm -rf dist-relax && SITE=relax webpack --mode production",
     "pre-build": "npm run lint:check && npm run format:check",
     "pre-deploy": "npm run lint:check && npm run format:check",
     "test": "jest --watch",

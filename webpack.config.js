@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const webpack = require('webpack');
 const Dotenv = require('dotenv-webpack');
 
 /**
@@ -12,12 +13,42 @@ const Dotenv = require('dotenv-webpack');
  * - Every page loads the same main bundle (./src/index.tsx), which picks the story from the URL
  *   and lazy-loads that app's chunk
  * - Apps are sorted by priority field
+ * - One repo, two sites: SITE=relax builds the relax site into dist-relax/, anything else the
+ *   Lanzarote site into dist/. Each builds only the apps whose "site" is its own (Lanzarote
+ *   unless set), so neither ships the other's code or terrain.
  */
 
 const appsConfig = require('./src/config/apps.json');
 
+const SITE = process.env.SITE === 'relax' ? 'relax' : 'lanzarote';
+const SITES = {
+  lanzarote: {
+    dist: 'dist',
+    open: 'home.html',
+    title: 'Lanzarote Paragliding',
+    description:
+      'Experience paragliding in Lanzarote with all your senses!. Tandem flights, pilot guides, real time wind conditions and more!',
+    // Search engines only know the Lanzarote site
+    extras: ['robots.txt', 'sitemap.xml'],
+  },
+  relax: {
+    dist: 'dist-relax',
+    open: 'index.html',
+    title: 'Relax - paragliding in 3D',
+    description: appsConfig.apps.relax.description,
+    extras: [],
+  },
+};
+const site = SITES[SITE];
+const siteApps = Object.entries(appsConfig.apps).filter(
+  ([_, app]) => (app.site || 'lanzarote') === SITE
+);
+// Lazy-loaded app folders this site may import: ./<folder> and anything under it
+const appFolders = siteApps.map(([_, app]) => app.route.replace(/^\//, ''));
+const appFolderPattern = new RegExp(`^\\./(${appFolders.join('|')})(/|$)`);
+
 // Build list of apps to compile
-const showcaseApps = Object.entries(appsConfig.apps)
+const showcaseApps = siteApps
   .filter(([_, app]) => app.visibility !== 'hidden')
   .map(([appKey, app]) => ({
     name: appKey,
@@ -33,12 +64,12 @@ const showcaseApps = Object.entries(appsConfig.apps)
     return priorityA - priorityB;
   });
 
-console.log(`Building ${showcaseApps.length} applications...`);
+console.log(`Building the ${SITE} site: ${showcaseApps.length} applications...`);
 
 module.exports = {
   entry: { main: './src/index.tsx' },
   output: {
-    path: path.join(__dirname, '/dist'),
+    path: path.join(__dirname, site.dist),
     filename: '[name].bundle.js',
   },
   externals: {
@@ -48,7 +79,7 @@ module.exports = {
   devServer: {
     port: 8080,
     open: {
-      target: ['home.html'], // Open default app instead of file browser
+      target: [site.open], // Open default app instead of file browser
     },
     static: [
       {
@@ -109,36 +140,33 @@ module.exports = {
           minify: false,
         })
     ),
-    // Create index.html that loads the home app
+    // Create index.html that loads the site's home app
     new HtmlWebpackPlugin({
       template: path.join(__dirname, 'src/templates/showcase.html'),
       chunks: ['main'],
       filename: 'index.html',
-      title: 'Lanzarote Paragliding',
-      description:
-        'Experience paragliding in Lanzarote with all your senses!. Tandem flights, pilot guides, real time wind conditions and more!',
+      title: site.title,
+      description: site.description,
       inject: 'body',
       minify: false,
     }),
+    // The app loader imports ../applications/<folder>: bundle only this site's folders
+    new webpack.ContextReplacementPlugin(/src[\\/]applications$/, appFolderPattern),
+    new webpack.DefinePlugin({ 'process.env.SITE': JSON.stringify(SITE) }),
     // Copy assets folder to dist for production deployment
     new CopyWebpackPlugin({
       patterns: [
         {
           from: 'assets',
           to: 'assets',
+          // Other places' terrain is imported by the relax app, so it ships only with that
+          globOptions: { ignore: ['**/locations/**'] },
         },
         {
           from: 'assets/favicon.svg',
           to: 'favicon.svg',
         },
-        {
-          from: 'assets/robots.txt',
-          to: 'robots.txt',
-        },
-        {
-          from: 'assets/sitemap.xml',
-          to: 'sitemap.xml',
-        },
+        ...site.extras.map(file => ({ from: `assets/${file}`, to: file })),
       ],
     }),
     // Load environment variables from .env file

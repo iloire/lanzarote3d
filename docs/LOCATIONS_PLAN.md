@@ -22,23 +22,25 @@ Branch: `feature/locations`, in the worktree `~/code/lanzarote3d-locations`.
 
 ## Where Lanzarote is hard-coded today
 
-| What | Where |
-| --- | --- |
-| Terrain mesh | `Island.ts` imports `assets/foundation/models/environment/lanzarote.glb` |
-| Terrain scale/offset | `TerrainBase.loadEnvironment`: `scale = 20000`, `position = [0, -10, 0]` |
-| Lat/lon → world | `src/shared/geo.ts`: `LANZAROTE_ANCHOR`, `ISLAND_ANCHOR` |
-| Ground colours | `src/shared/env/terrain-regions.json` via `terrainRegions.ts` |
-| Towns, roads, landmarks, boats | `src/shared/env/environment.ts`, `landmarks.json`, `roads.json` |
-| Page titles/descriptions | `webpack.config.js` (`Lanzarote - …`) |
+| What                           | Where                                                                    |
+| ------------------------------ | ------------------------------------------------------------------------ |
+| Terrain mesh                   | `Island.ts` imports `assets/foundation/models/environment/lanzarote.glb` |
+| Terrain scale/offset           | `TerrainBase.loadEnvironment`: `scale = 20000`, `position = [0, -10, 0]` |
+| Lat/lon → world                | `src/shared/geo.ts`: `LANZAROTE_ANCHOR`, `ISLAND_ANCHOR`                 |
+| Ground colours                 | `src/shared/env/terrain-regions.json` via `terrainRegions.ts`            |
+| Towns, roads, landmarks, boats | `src/shared/env/environment.ts`, `landmarks.json`, `roads.json`          |
+| Page titles/descriptions       | `webpack.config.js` (`Lanzarote - …`)                                    |
 
 ## Phases
 
 ### 0. Branch and worktree
+
 - ~~Create `feature/locations` worktree; share the git-crypt key with the main checkout~~ ✅
 
 ### 1. A `Location` type, Lanzarote moved into it (no visible change)
+
 - ~~`src/locations/types.ts`: `Location` = `{ id, name, terrainModel, terrainScale,
-  terrainPosition, anchor, regions }` — only what `TerrainBase` reads today~~ ✅
+terrainPosition, anchor, regions }` — only what `TerrainBase` reads today~~ ✅
 - ~~`src/locations/lanzarote.ts` points at today's data (glb, `ISLAND_ANCHOR`,
   `TERRAIN_REGIONS`); the data files stay where they are~~ ✅
 - ~~`Island.load(model, manager)` takes the GLB URL instead of importing Lanzarote's; the unused
@@ -50,6 +52,7 @@ Branch: `feature/locations`, in the worktree `~/code/lanzarote3d-locations`.
 - Note: `tests/rendering/cloudGeometry.test.ts` (3 tests) already fails on `master`; unrelated.
 
 ### 2. Terrain pipeline for new places
+
 - ~~`3d/dem-to-glb.py`: Copernicus GLO-30 tiles (public AWS bucket, cached in `3d/dem-cache/`)
   sampled on a regular grid → slim GLB (positions + 16-bit indices) in world units, 0.772 per
   metre like Lanzarote, heights stretched by `verticalExaggeration`; ground ≤ 0 m becomes sea
@@ -62,6 +65,7 @@ Branch: `feature/locations`, in the worktree `~/code/lanzarote3d-locations`.
   while Lanzarote keeps its own model.
 
 ### 3. Rio de Janeiro
+
 - ~~`src/locations/rio-de-janeiro.json`: bbox −23.04…−22.935, −43.4…−43.145 (Barra to the
   Sugarloaf, Pico da Tijuca on the north edge), 100 m grid, 1.5× heights~~ ✅
 - ~~Regions: Tijuca forest green, granite tops grey (Pedra da Gávea, Dois Irmãos, Corcovado,
@@ -77,6 +81,7 @@ Branch: `feature/locations`, in the worktree `~/code/lanzarote3d-locations`.
   dropped), Cristo on Corcovado, frigatebirds and black vultures.
 
 ### 3b. Tenerife (curated)
+
 - ~~`src/locations/tenerife.json` → `assets/locations/tenerife.glb`: Adeje, Los Cristianos to El
   Teide (28.05…28.32, −16.8…−16.58), 100 m grid, heights unstretched (Teide reads 3,692 m)~~ ✅
 - ~~Taucho takeoff and La Caleta landing from OSM (Overpass `free_flying:site`); loop over the
@@ -91,19 +96,23 @@ Branch: `feature/locations`, in the worktree `~/code/lanzarote3d-locations`.
   three to six floors under terracotta roofs~~ ✅
 
 ### 4. The relax app
+
 - ~~Started as a private route of the Lanzarote build, `relax.html?location=lanzarote |
-  rio-de-janeiro`: five gliders on the place's loop, camera swaying ±20° over 90 s, drag to take
+rio-de-janeiro`: five gliders on the place's loop, camera swaying ±20° over 90 s, drag to take
   over (`src/applications/relax/`)~~ ✅
 - ~~Location switcher: one link per place at the bottom, the current one lit~~ ✅
 - ~~Camera limits so no terrain edge shows: pan ≤ 3,000 units, zoom out ≤ 1.5× the start,
   orbit ±60° unless the place allows more, camera and its target kept 40 units above the
   ground, panning along the ground~~ ✅
-- `src/relax/index.tsx` + `webpack.relax.config.js` → `dist-relax/`.
-- Picker (Lanzarote, Rio) → one slow scene per place: drifting camera along the ridge, a few
-  gliders, sea, birds, time-of-day from the location's sun. No UI chrome once it starts.
-- `npm run start:relax`, `npm run build:relax`. Deploy script once the domain is chosen.
+- ~~Its own build from the same webpack config: `SITE=relax` → `dist-relax/`, only the apps
+  whose `site` in `apps.json` is `relax`, opening on the relax scene with no menu. The Lanzarote
+  build leaves out the relax app and `assets/locations/`~~ ✅
+- ~~`npm run start:relax`, `npm run build:relax`; CI builds both sites~~ ✅
+- Deploy script once the domain is chosen.
+- Later: time of day from the location's sun.
 
 ### 5. Anywhere: a place generated in the browser
+
 - Curated places stay the showcase; this adds a generated mode on top. A generated place uses
   the same location JSON shape, so a good one can be saved as curated.
 - Elevation from AWS Terrain Tiles (terrarium PNGs, global ~30 m, CORS open — checked);
@@ -119,11 +128,14 @@ Branch: `feature/locations`, in the worktree `~/code/lanzarote3d-locations`.
   lakes and rivers from OSM water outlines.
 
 ### 6. Land it
-- Lanzarote site: `npm run build` output and routes unchanged; `deploy-prod` untouched.
-- README + `docs/README.md` updated (locations, the second build, the DEM script);
-  CHANGELOG entry.
-- Merge to `master`, push, remove the worktree and delete the branch.
+
+- ~~Lanzarote site: `npm run build` output and routes unchanged (same files as `master`, no
+  `relax.html`, no other places' terrain); `deploy-prod` untouched~~ ✅
+- ~~README + `docs/README.md` updated (locations, the second build, the DEM script);
+  CHANGELOG entry~~ ✅
+- ~~Merge to `master`, push, remove the worktree and delete the branch~~ ✅
 
 ## Open questions
+
 - Domain and name for the relax app.
 - Rio's light: a morning sea-breeze look or golden hour?
