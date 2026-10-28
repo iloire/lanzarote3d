@@ -14,6 +14,8 @@ export interface GullsOptions {
   spread?: number;
   /** Body, wing and wingtip colours as [r, g, b] in 0-1: a gull's white, grey and black */
   plumage?: Plumage;
+  /** How hard the wingbeat bursts swing the wings: 1 for gulls, near 0 for soaring vultures */
+  flapping?: number;
 }
 
 export interface Plumage {
@@ -35,12 +37,20 @@ export const RAVEN: Plumage = {
   tip: [0.04, 0.04, 0.05],
 };
 
+/** The guirre, the Canary Egyptian vulture: dirty white, with black flight feathers */
+export const GUIRRE: Plumage = {
+  body: [0.88, 0.85, 0.78],
+  wing: [0.9, 0.88, 0.82],
+  tip: [0.05, 0.05, 0.05],
+};
+
 const DEFAULTS: Required<GullsOptions> = {
   wingspan: 6,
   minRadius: 40,
   maxRadius: 160,
   spread: 1,
   plumage: GULL,
+  flapping: 1,
 };
 const DRIFT = 60; // how far a gull climbs and sinks round its thermal, at spread 1
 
@@ -60,7 +70,7 @@ export class Gulls {
     const total = flocks.reduce((n, f) => n + (f.count ?? 10), 0);
 
     const orbit = new Float32Array(total * 4);
-    const material = createGullMaterial(DRIFT * o.spread);
+    const material = createGullMaterial(DRIFT * o.spread, o.flapping);
     this.mesh = new THREE.InstancedMesh(geometry, material, total);
     this.mesh.name = 'gulls';
     this.mesh.frustumCulled = false;
@@ -156,6 +166,7 @@ function createGullGeometry(span: number, plumage: Plumage): THREE.BufferGeometr
 const GULL_VERTEX_PARS = /* glsl */ `
   uniform float uTime;
   uniform float uDrift;
+  uniform float uFlap;
   attribute vec4 aOrbit; // radius, angular speed (sign = turn direction), phase, random
   attribute float aWing;
 
@@ -177,15 +188,16 @@ const GULL_VERTEX_PARS = /* glsl */ `
   float lzFlap() {
     float burst = smoothstep(0.55, 0.85, sin(uTime * 0.35 + aOrbit.w * 40.0));
     float beat = sin(uTime * (8.0 + aOrbit.w * 3.0) + aOrbit.z * 5.0 - aWing * 1.2);
-    return burst * beat;
+    return burst * beat * uFlap;
   }
 `;
 
-function createGullMaterial(drift: number): THREE.MeshLambertMaterial {
+function createGullMaterial(drift: number, flapping: number): THREE.MeshLambertMaterial {
   const material = new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide });
   material.onBeforeCompile = shader => {
     shader.uniforms['uTime'] = sharedUniforms.uTime;
     shader.uniforms['uDrift'] = { value: drift };
+    shader.uniforms['uFlap'] = { value: flapping };
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', `#include <common>\n${GULL_VERTEX_PARS}`)
       .replace(

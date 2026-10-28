@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import Environment, {
   FAMARA_GULL_FLOCKS,
   LANZAROTE_TOWNS,
+  RISCO_GUIRRE_FLOCKS,
   RISCO_RAVEN_FLOCKS,
 } from '../../shared/env/environment';
 import { StoryOptions } from '../../shared/types';
@@ -190,6 +191,7 @@ class HomeApp extends TerrainBase {
 
       this.environment.addGulls(FAMARA_GULL_FLOCKS);
       this.environment.addRavens(RISCO_RAVEN_FLOCKS);
+      this.environment.addGuirres(RISCO_GUIRRE_FLOCKS);
 
       if (SHOW_CAMERA_TARGET_UI) {
         this.targetController = new CameraTargetController(

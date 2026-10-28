@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { Clouds } from '../../foundation/components/environment';
 import Tree from '../../foundation/components/scenery/trees/Tree';
 import { logger } from '../../foundation/utils/logger';
-import { Gulls, GullFlock, RAVEN } from '../../foundation/components/wildlife/Gulls';
+import { Gulls, GullFlock, GUIRRE, RAVEN } from '../../foundation/components/wildlife/Gulls';
 import { addMeshAroundArea } from './mesh-utils';
 import { setCloudColors } from '../../foundation/rendering/cloudMaterial';
 import { Theme } from '../../foundation/types/Theme';
@@ -154,9 +154,18 @@ export const RISCO_RAVEN_FLOCKS: GullFlock[] = [
   { center: new THREE.Vector3(12702, 1080, -11285), count: 3 },
 ];
 
+/**
+ * A single pair of guirres, the Canary Egyptian vulture: rare on Lanzarote, so just the two,
+ * soaring high over the Risco between Famara and the Mirador.
+ */
+export const RISCO_GUIRRE_FLOCKS: GullFlock[] = [
+  { center: new THREE.Vector3(9900, 1650, -5600), count: 2 },
+];
+
 class Environment {
   gulls?: Gulls;
   ravens?: Gulls;
+  guirres?: Gulls;
   cloudInstances: Clouds[] = [];
   private componentRegistry: ComponentRegistry = new ComponentRegistry();
   private boatGroupCreator: BoatGroupCreator;
@@ -191,6 +200,24 @@ class Environment {
     this.ravens.mesh.name = 'ravens';
     this.scene.add(this.ravens.mesh);
     return this.ravens;
+  }
+
+  /**
+   * Guirres soaring on the ridge lift: barely a wingbeat, wide slow circles, the pair kept
+   * close together. Real ones span ~1.7 m; drawn at 5, like the ravens about 3x life size.
+   */
+  addGuirres(flocks: GullFlock[]): Gulls {
+    this.guirres = new Gulls(flocks, {
+      wingspan: 5,
+      minRadius: 70,
+      maxRadius: 140,
+      spread: 0.3,
+      plumage: GUIRRE,
+      flapping: 0.1,
+    });
+    this.guirres.mesh.name = 'guirres';
+    this.scene.add(this.guirres.mesh);
+    return this.guirres;
   }
 
   async addBoats(water: THREE.Mesh) {

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import Environment, {
   FAMARA_GULL_FLOCKS,
   LANZAROTE_TOWNS,
+  RISCO_GUIRRE_FLOCKS,
   RISCO_RAVEN_FLOCKS,
 } from '../../shared/env/environment';
 import { StoryOptions } from '../../shared/types';
@@ -191,6 +192,7 @@ class AnimationApp extends TerrainBase {
       // Gulls circling in the thermals (animated on the GPU)
       this.environment.addGulls(FAMARA_GULL_FLOCKS);
       this.environment.addRavens(RISCO_RAVEN_FLOCKS);
+      this.environment.addGuirres(RISCO_GUIRRE_FLOCKS);
 
       // Setup Camera Target Controller if enabled
       if (SHOW_CAMERA_TARGET_UI) {

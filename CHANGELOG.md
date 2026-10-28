@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-28 00:19 UTC
+
+### Added
+- **A pair of guirres over the Risco**: two Canary Egyptian vultures, rare on Lanzarote so only the one pair, soaring in wide slow circles a few hundred metres above the cliff between Famara and the Mirador. Dirty white with black flight feathers, drawn at 5 m span (about 3x life size, like the ravens). The gull flock code gains a `flapping` option so they glide on the ridge lift almost without a wingbeat
+
 ## 2026-10-27 23:59 UTC
 
 ### Changed

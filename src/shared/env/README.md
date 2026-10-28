@@ -1,6 +1,6 @@
 # Shared environment
 
-Towns, boats, thermals, gulls and ravens, roads, landmarks and the La Graciosa ferry shared by the island scenes (home, famara-animation).
+Towns, boats, thermals, gulls, ravens and a pair of guirres, roads, landmarks and the La Graciosa ferry shared by the island scenes (home, famara-animation).
 
 ## `roads.json`
 
