@@ -2,6 +2,21 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-28 19:11 UTC
+
+### Added
+
+- Abel joins the home scene on a paramotor, the first pilot who needs no ridge: he leaves it
+  below takeoff and flies a 9.4 km loop out over Famara beach and the sea, up to 5 km off the
+  cliff at 480-620 m, under every paraglider. He's last in the pilot arrows (`?pilot=abel`). His
+  wing is magenta with an orange leading edge and an orange swoosh; his model, from
+  3d-characters, wears a paramotor helmet with ear cups, a gold jet visor and an intercom mic,
+  a mid-blue T-shirt and khaki shorts.
+- A voxel paramotor (`Paramotor.ts`): frame, J-bars, engine, tank, exhaust, a netted cage and a
+  two-blade prop that spins on its own clock, and the reserve in front, a big red container on the
+  lap with a yellow handle, as paramotor pilots carry it; built in the voxel pilots' frame and block size so
+  any pilot can wear one with `paramotor: true` on `ParagliderVoxel`.
+
 ## 2026-10-28 17:05 UTC
 
 ### Changed

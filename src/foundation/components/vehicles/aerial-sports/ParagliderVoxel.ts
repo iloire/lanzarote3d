@@ -4,12 +4,15 @@ import { ComponentMetadata } from '../../base/IThreeComponent';
 import { PilotVoxel, PilotVoxelOptions } from '../../characters/PilotVoxel';
 import Glider, { GliderOptions } from '../components/Glider';
 import { createPirateFlag } from '../components/PirateFlag';
+import { createParamotor } from '../components/Paramotor';
 
 export interface ParagliderVoxelOptions extends SimpleComponentOptions {
   glider: GliderOptions;
   pilot: PilotVoxelOptions;
   /** Hang an open pirate flag on a pole under the pilot's harness */
   pirateFlag?: boolean;
+  /** Wear a paramotor on the pilot's back, its prop spinning */
+  paramotor?: boolean;
 }
 
 /**
@@ -68,6 +71,8 @@ export class ParagliderVoxel extends SimpleThreeComponent {
     const scale = 150;
     this.pilotMesh.scale.set(scale, scale, scale);
     this.pilotMesh.rotation.y = Math.PI / 2; // Rotate pilot 90 degrees left
+    // In the pilot model's own frame, so it sits on any pilot's back and swings with them
+    if (options.paramotor) this.pilotMesh.add(createParamotor());
     group.add(this.pilotMesh);
 
     // The pilot hangs from a pivot at the carabiners, the wing's origin, where wing and harness

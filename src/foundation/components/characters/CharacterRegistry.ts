@@ -5,6 +5,7 @@ import { logger } from '../../utils/logger';
  * Character types available in the system
  */
 export enum CharacterType {
+  ABEL = 'abel',
   ADRI = 'adri',
   BERNT = 'bernt',
   DAVID = 'david',
@@ -121,6 +122,12 @@ export class CharacterRegistry {
 
     // Built from Ivan by 3d-characters tools/pilots and exported in Adri's frame like him.
     const pilots: { id: CharacterType; name: string; description: string }[] = [
+      {
+        id: CharacterType.ABEL,
+        name: 'Abel',
+        description:
+          'Paramotor pilot - black helmet with ear cups, gold jet visor and intercom mic, navy jacket, open harness',
+      },
       {
         id: CharacterType.BERNT,
         name: 'Bernt',

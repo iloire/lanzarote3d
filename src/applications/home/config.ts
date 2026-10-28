@@ -333,6 +333,28 @@ export const ROOS_MOJO: GliderOptions = {
   numeroCajones: 35,
 };
 
+/**
+ * Abel's paramotor wing: magenta with an orange leading edge, and an orange swoosh behind it that
+ * dips back to a point a quarter of the way out on each half and again near the tips.
+ */
+const ABEL_ORANGE = '#f07a2a';
+export const ABEL_WING: GliderOptions = {
+  wingColor1: '#c8509a',
+  wingColor2: '#c8509a',
+  undersideColor: '#c05090',
+  inletsColor: '#c4601e',
+  patches: (
+    [
+      { color: ABEL_ORANGE, from: [0, 0.05], to: [1.1, 0.05], width: 0.06 },
+      { color: ABEL_ORANGE, from: [0.04, 0.1], to: [0.28, 0.3], width: 0.04 },
+      { color: ABEL_ORANGE, from: [0.28, 0.3], to: [0.5, 0.12], width: 0.04 },
+      { color: ABEL_ORANGE, from: [0.5, 0.12], to: [0.82, 0.4], width: 0.04 },
+      { color: ABEL_ORANGE, from: [0.82, 0.4], to: [1.0, 0.2], width: 0.05 },
+    ] satisfies GliderPatch[]
+  ).flatMap(mirrored),
+  numeroCajones: 30,
+};
+
 /** The pilot the camera flies in to and follows round the loop, unless ?pilot= picks another */
 export const LEAD_PILOT = CharacterType.ROOS;
 
@@ -468,6 +490,29 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
     startProgress: 0.2,
     pathOffset: MIRADOR_OFFSET,
     waypoints: liftLoop(800, 1.5),
+  },
+  {
+    // Abel flies a paramotor, so he needs no ridge: he leaves it below takeoff and flies a
+    // 9.4 km loop out over Famara beach and the sea, up to 5 km off the cliff, at 480-620 m,
+    // under every paraglider and at least 387 m clear of the ground. Last in the list, as he
+    // isn't on the Risco.
+    options: {
+      glider: ABEL_WING,
+      pilot: { characterType: CharacterType.ABEL },
+      paramotor: true,
+    },
+    startProgress: 0,
+    pathOffset: new THREE.Vector3(0, 0, 0),
+    waypoints: [
+      new THREE.Vector3(6600, 620, -1200),
+      new THREE.Vector3(6000, 540, -2200),
+      new THREE.Vector3(5600, 500, -3400),
+      new THREE.Vector3(6000, 480, -4600),
+      new THREE.Vector3(7000, 480, -5000),
+      new THREE.Vector3(7800, 500, -4200),
+      new THREE.Vector3(7600, 560, -3000),
+      new THREE.Vector3(7200, 620, -1900),
+    ],
   },
 ];
 
