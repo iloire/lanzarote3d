@@ -1,9 +1,10 @@
 import * as THREE from 'three';
 import landmarksData from './landmarks.json';
-import { ISLAND_ANCHOR, geoToWorld } from '../geo';
+import { GeoAnchor, ISLAND_ANCHOR, geoToWorld } from '../geo';
 import { getTerrainHeight } from './mesh-utils';
 import {
   createCastillo,
+  createCristoRedentor,
   createErmita,
   createMast,
   createMirador,
@@ -14,7 +15,15 @@ import { MeshBuilder, lowPolyMaterial } from '../../foundation/components/base/l
 import { buildCanaryPalm } from '../../foundation/components/scenery/trees/CanaryPalm';
 import { LevelOfDetail } from '../../foundation/types/lod';
 
-type LandmarkKind = 'radar' | 'ermita' | 'mast' | 'windsock' | 'mirador' | 'palms' | 'castle';
+type LandmarkKind =
+  | 'radar'
+  | 'ermita'
+  | 'mast'
+  | 'windsock'
+  | 'mirador'
+  | 'palms'
+  | 'castle'
+  | 'cristo';
 
 interface LandmarksData {
   scale: number;
@@ -33,7 +42,10 @@ interface LandmarksData {
 // JSON arrays type as number[] and kinds as string, not as the pairs and names they hold
 const data = landmarksData as unknown as LandmarksData;
 
-type Landmark = LandmarksData['landmarks'][number];
+export type Landmark = LandmarksData['landmarks'][number];
+
+/** How much larger than life the landmarks are drawn, so they read from the air */
+export const LANDMARK_SCALE = data.scale;
 
 /** Ground lower than this is sea: no palm grows there */
 const MIN_LAND_HEIGHT = 2;
@@ -57,7 +69,7 @@ const createPalmGrove = (
     const [px, pz] = [x + Math.cos(a) * r, z + Math.sin(a) * r];
     const py = getTerrainHeight(px, pz, terrain);
     if (!(py > MIN_LAND_HEIGHT)) continue;
-    const at = new THREE.Vector3(px - x, py - y, pz - z).divideScalar(data.scale);
+    const at = new THREE.Vector3(px - x, py - y, pz - z).divideScalar(LANDMARK_SCALE);
     buildCanaryPalm(mesh, at, 8 + ((i * 7) % 6), i + 1, LevelOfDetail.LOW);
   }
   return new THREE.Mesh(mesh.build(), lowPolyMaterial());
@@ -74,6 +86,7 @@ const build: Record<
   mirador: () => createMirador(),
   palms: createPalmGrove,
   castle: () => createCastillo(),
+  cristo: () => createCristoRedentor(),
 };
 
 /** How many samples a side the `top` search takes over its square */
@@ -96,9 +109,16 @@ const highestNear = (x: number, z: number, radius: number, terrain: THREE.Mesh) 
   return best;
 };
 
-/** The landmarks on the Risco, its takeoffs and Haría's palms, placed from OpenStreetMap and set on the terrain */
-export const createLandmarks = (terrain: THREE.Mesh): THREE.Object3D[] =>
-  data.landmarks.flatMap(landmark => {
+/**
+ * Landmarks placed from their lat/lon with `anchor` and set on the terrain: on the highest ground
+ * within `top` units when given, since a summit's map point can sit off the model's top.
+ */
+export const placeLandmarks = (
+  terrain: THREE.Mesh,
+  landmarks: Landmark[],
+  anchor: GeoAnchor
+): THREE.Object3D[] =>
+  landmarks.flatMap(landmark => {
     const {
       name,
       kind,
@@ -106,7 +126,7 @@ export const createLandmarks = (terrain: THREE.Mesh): THREE.Object3D[] =>
       heading,
       top,
     } = landmark;
-    const projected = geoToWorld(lat, lon, ISLAND_ANCHOR);
+    const projected = geoToWorld(lat, lon, anchor);
     const { x, z, y } = top
       ? highestNear(projected.x, projected.z, top, terrain)
       : { ...projected, y: getTerrainHeight(projected.x, projected.z, terrain) };
@@ -117,6 +137,10 @@ export const createLandmarks = (terrain: THREE.Mesh): THREE.Object3D[] =>
     // Compass heading of the front (+z): north is -z, clockwise seen from above. The windsock
     // has none, it turns itself to the wind.
     if (heading !== undefined) object.rotation.y = THREE.MathUtils.degToRad(180 - heading);
-    object.scale.setScalar(data.scale);
+    object.scale.setScalar(LANDMARK_SCALE);
     return [object];
   });
+
+/** The landmarks on the Risco, its takeoffs and Haría's palms, placed from OpenStreetMap and set on the terrain */
+export const createLandmarks = (terrain: THREE.Mesh): THREE.Object3D[] =>
+  placeLandmarks(terrain, data.landmarks, ISLAND_ANCHOR);

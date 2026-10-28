@@ -2,174 +2,227 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-28 15:49 UTC
+
+### Added
+
+- Other paragliding places, built from elevation data (Copernicus GLO-30, `3d/dem-to-glb.py`):
+  Tenerife (Taucho to La Caleta, El Teide behind, Costa Adeje's resorts) and Rio de Janeiro
+  (Pedra Bonita over São Conrado, Tijuca forest, towers and favelas, the Cristo Redentor on
+  Corcovado)
+- The relax site: pick a place and watch the gliders soar its ridge, with a switcher along the
+  bottom. Its own build (`npm run build:relax` → `dist-relax/`); the Lanzarote site
+  (`npm run build`, `deploy-prod`) leaves it out
+- Cristo Redentor in the models viewer
+
+### Changed
+
+- A `Location` type holds the terrain model and its geo anchor; Lanzarote is the default, so the
+  Lanzarote scenes are unchanged
+- Landmarks can be placed for any place from its own list and anchor
+
 ## 2026-10-28 09:01 UTC
 
 ### Added
+
 - **Pilot birthdays**: a pilot's birthday can be set as `'MM-DD'` in `src/applications/home/birthdays.ts` (Luc's is 28 October). On the day, by Lanzarote's clock, that pilot flies what nobody else could: halfway from the Mirador to La Graciosa, 2 km out over El Río, at 1875-1935 m, 200 m above Magne. Magne's pair of guirres leave him to escort the birthday pilot, visiting twice as often. A click on the scene (not a camera drag) while following the birthday pilot throws a small puff of voxel confetti that drifts down and is gone in 2-3 s; clicking on anyone else does nothing. `?birthday=<name>` previews it on any day
 
 ## 2026-10-28 08:44 UTC
 
 ### Added
+
 - **Terrain coloured by region**: the ground is no longer one brown. Timanfaya, La Geria and the Malpaís de la Corona are black lava with red cones at Montañas del Fuego, Haría and the Famara massif lean olive, the south and central plains are ochre and El Jable is pale sand. The regions live in `src/shared/env/terrain-regions.json` (lat/lon, radius, colour, strength) and are baked one colour per triangle into the underlay
 
 ## 2026-10-28 08:34 UTC
 
 ### Fixed
+
 - **No Google Analytics on localhost**: the gtag snippet now only loads off localhost, so dev sessions stop showing up in GA as a `localhost:3000` traffic source
 
 ## 2026-10-28 00:50 UTC
 
 ### Added
+
 - **Houses in Órzola**: the fishing village the La Graciosa ferry sails from had no town at its quay. 40 flat-roofed white houses with blue or green woodwork on sand plots, placed from its OpenStreetMap place node and drawn like Caleta de Sebo's across El Río, so they share its meshes and add no draw calls
 
 ## 2026-10-28 00:41 UTC
 
 ### Changed
+
 - **Magne's guirres stay with him and vary their visits**: both birds now travel with Magne instead of circling a fixed spot he flew 1.5 km away from. The visitor circles well above him (~150 up, 200 out) for 20-40 s, then comes down for 15-25 s in a different pattern each time (off a wingtip, out ahead, riding over the canopy, crossing over from one wingtip to the other, or dropping back and drawing level) before climbing away again; its mate only circles, a little further off. The visitor is sized from Magne's wing (14% of its span) since the gliders are drawn well over life size, and the home scene no longer uses the fixed-spot guirre flock
 
 ## 2026-10-28 00:31 UTC
 
 ### Added
+
 - **A guirre comes to fly with Magne**: in the home scene one of the pair keeps circling off the Mirador while the other circles for 35-60 s, flies over to Magne, glides just off one of his wingtips for 15-25 s, peels back to its circles and does it again (the first visit comes 10-20 s in). It's steered on the CPU each frame (`GuirreVisitor`), banking into its turns; the famara-animation scene, which has no Magne, keeps both birds circling
 
 ## 2026-10-28 00:26 UTC
 
 ### Changed
+
 - **The guirres come in closer to Magne**: down to ~1770 m, just over his loop, on tighter 80-150 m circles so they read from his glider
 
 ## 2026-10-28 00:23 UTC
 
 ### Changed
+
 - **The guirres circle above Magne**: the pair moved from mid-Risco to off the Mirador del Río, about 80 m above the top of Magne's loop (~1830 m), circling 150-300 m out over the middle of his beat
 
 ## 2026-10-28 00:19 UTC
 
 ### Added
+
 - **A pair of guirres over the Risco**: two Canary Egyptian vultures, rare on Lanzarote so only the one pair, soaring in wide slow circles a few hundred metres above the cliff between Famara and the Mirador. Dirty white with black flight feathers, drawn at 5 m span (about 3x life size, like the ravens). The gull flock code gains a `flapping` option so they glide on the ridge lift almost without a wingbeat
 
 ## 2026-10-27 23:59 UTC
 
 ### Changed
+
 - **Ivan, Fabio, Jehosua and Roos refreshed from 3d-characters**: Ivan wears dark sunglasses with red-orange temples, Fabio holds his 360 camera in his fist instead of on a floating stick, and Jehosua's and Roos's helmets lose their two small bumps. Franz's registry description now says T-shirt and shorts, as his model already did. The other pilots' exports were already current
 
 ## 2026-10-27 23:47 UTC
 
 ### Added
+
 - **The canopy breathes**: a vertex shader on the paraglider canopy swells and eases the cells in a slow ripple out along the span, flexes each tip in and out on its own beat and flutters the trailing edge, each wing out of step with the others. GPU only. Strength per wing shape (`WingShape.breath`): 0.6 for standard and Rush, 0.3 for the stiffer roller
 
 ## 2026-10-27 23:38 UTC
 
 ### Fixed
+
 - **Brake lines end in the pilot's hands**: they ran to a point about 100 units inside each fist; they now end on top of the voxel pilot's fists in brake handles (a grip through the fist and a swivel on top). The handles hang from the pilot swing and the lines follow them every frame, so they stay in the hands as the pilot swings. Brake lines and handles get their own `brakeColor` (default `#6b3a2c`, a dark rust a shade off the grey lines)
 
 ## 2026-10-27 21:22 UTC
 
 ### Added
+
 - **Sea shader tutorial**: `docs/SEA_SHADER_TUTORIAL.html`, a beginner's walkthrough of how the ocean is drawn (flat plane, patched MeshStandardMaterial, fake wave normals, baked coast distance, surf, whitecaps, cloud shadows) using the real code, with a live three.js demo that toggles each layer
 
 ## 2026-10-27 22:25 UTC
 
 ### Changed
+
 - **Fewer boats in El Río**: six instead of eleven, two per cluster, as the strait looked crowded
 
 ## 2026-10-27 22:12 UTC
 
 ### Added
+
 - **Boats in El Río**: eleven more boats in three clusters in the strait between Lanzarote and La Graciosa (off Caleta de Sebo, mid-channel and towards Punta Fariones), more than off Famara as in reality; each centre is read off the model's coast at least 550 units from either shore, so boats wandering within ~400 of it stay on water
 
 ## 2026-10-27 22:05 UTC
 
 ### Changed
+
 - **Cloud bases vary in height**: each cluster sits up to 100 units above or below the day's cloud base, and each cloud within a cluster up to 60 more (was 25), so the bases form a ragged layer rather than one plane
 
 ## 2026-10-27 21:55 UTC
 
 ### Changed
+
 - **Cloud undersides**: rounded instead of cut flat - the part of each lobe below the cloud base is squashed to 30 % of its depth rather than clamped to the base, so clouds keep a shallow faceted belly instead of a stack of flat plates; lobes are also a little less squat
 
 ## 2026-10-27 21:40 UTC
 
 ### Changed
+
 - **Cloud bases**: darker, and no two clouds alike - each cloud draws a random darkness, so its underside ranges from a light blue-grey to a slate about twice as dark, and the grey reaches a third to over half way up its sides; the default base colour goes from #636f86 to #556079
 
 ## 2026-10-27 21:45 UTC
 
 ### Removed
+
 - **73 methods nothing called**: the speculative API left over from earlier designs, in `CharacterRegistry` (search, tags, authors, export, validation), `PilotVoxel`, `ComponentRegistry`, `ThemeEngine` (custom themes, validation), `TerrainNavigator` (slope and path analysis; only `getHeightAt` is used), `FlyingBehavior`, `MovingBehavior`, `FloatingThreeComponent`, `MovableBoatComponent`, `LODComponent`, `OrbitControlsHelper`, `CameraTargetController`, `ResourceManager` textures, `SimpleAnimator`, `WorkshopDemoBase` labels and `WebGL` 2 checks. Private fields and options that were set but never read went with them: the legacy tree's colours, the Cessna's climb rate, the navigator's options, the town GUI handle and the house creator's component registry
 
 ## 2026-10-27 21:25 UTC
 
 ### Removed
+
 - **Saguaro cactus**: an Arizona cactus that never grew on Lanzarote and was only on the models page
 
 ## 2026-10-27 21:20 UTC
 
 ### Removed
+
 - **PerformanceMonitor and SceneManager**: every app sampled frame times into a monitor whose `logPerformance()` was empty, on a timer that was never cleared, and built a `SceneManager` scene with its own lights that nothing rendered. Both are gone, with the `scene`/`performance`/`requiredComponents` app config, `getAppInfo()` and `isLoaded` that only it reported, and the `onAppStart`/`onAppStop` hooks no app implemented. `AppBase` is now a name, `handleError` and `dispose`
 
 ## 2026-10-27 21:05 UTC
 
 ### Removed
+
 - **Thermals and Weather**: the red thermal cylinders were built for every scene and never added to it; they only told the clouds where to sit. `Weather` was created only to read the cloud base, and started a 5 s timer it never stopped. Both are gone with the whole `physics/` folder, `thermal-utils.ts` and the `physics` scene option every app turned off. The thermal positions are now a plain `THERMAL_SITES` list, and the clouds read the condensation level from `theme.weather.lclLevel`, so they look the same
 
 ## 2026-10-27 20:47 UTC
 
 ### Removed
+
 - **Procedural three.js pilot**: `Pilot`, `PilotHead`, the cocoon/open/submarine harnesses, the four heads (default, devil, skeleton, warrior), three helmets and two glasses are gone, about 1,950 lines. Nothing had built them since the paraglider and tandem rigs were cut; every pilot is now a voxel model from `3d-characters` loaded by `PilotVoxel`. The six placeholder `CharacterType` values with no assets (pilot-classic, pilot-modern, warrior, explorer, scientist, adventurer) went with them
 
 ## 2026-10-27 20:43 UTC
 
 ### Added
+
 - **Houses on La Graciosa**: Caleta de Sebo (45 houses, a tight grid where the ferry docks) and Pedro Barba (10, scattered), placed from their OSM place nodes as flat-roofed white cubes with blue or green woodwork. They reuse the Famara bungalows' colours, so the town merge folds them into the existing meshes: still 19 town meshes, no extra draw calls
 
 ## 2026-10-27 20:55 UTC
 
 ### Changed
+
 - **Roos re-exported** from `3d-characters`: a bulky open harness with a deep, tall back and two red lines, a large red front container with a black lid and the GPS vario on top instead of the flight deck bag, and grey-green olive trousers; her registry description matches
 
 ## 2026-10-27 20:45 UTC
 
 ### Changed
+
 - **Roos leads**: the fly-in lands on Roos, pilot number 1 at takeoff, instead of Ivan, number 2; `?pilot=` still picks anyone else
 
 ## 2026-10-27 20:21 UTC
 
 ### Changed
+
 - **Franz and Jehosua re-exported** from `3d-characters`: Franz flies in a red T-shirt with bare arms, blue shorts, bare legs and black sneakers, and Jehosua wears a grey jacket instead of the white jersey (Piratas Aéreos badge unchanged)
 
 ## 2026-10-27 18:03 UTC
 
 ### Added
+
 - **"Watch the real thing" link**: a small dimmed line under the Lanzarote Paragliding wordmark opens real paragliding footage of Lanzarote on YouTube in a new tab; clicks are counted in GA as `real_thing_click`
 
 ## 2026-10-27 17:53 UTC
 
 ### Changed
+
 - **Rollers' underside matches the top**: the purple and green Niviuk Rollers are now the base colour underneath too, instead of pale grey
 
 ## 2026-10-27 14:02 UTC
 
 ### Changed
+
 - **Island model 8.3 MB → 1.3 MB**: `lanzarote.glb` keeps only positions and triangles. Blender repeated each of the 58k points about four times (once per normal/UV around it) and shipped normals and UVs nothing reads; the new `3d/slim-glb.py` welds the points, drops both and stores 16-bit indices, keeping triangle order so the face jitter is unchanged. The island's line material is flat-shaded since it has no normals. Same look, 0.75 MB gzipped
 
 ## 2026-10-27 13:52 UTC
 
 ### Changed
+
 - **Closer on the pilot**: the fly-in lands about 160 m behind and above the pilot instead of 230 m (`CAMERA_ARRIVAL_OFFSET` (-70, 35, 140)), and switching pilots after zooming out closes back in to the same 160 m
 
 ## 2026-10-27 13:48 UTC
 
 ### Changed
+
 - **Bernt second farthest as well as second highest**: he moves from halfway to 85% of the way to the Mirador (11 km up the Risco, still 1500-1562 m), just short of Magne; Jehosua, Fabio and Franz close up to halfway, six-tenths and seven-tenths, and Bernt moves to just before Magne in the list, so the arrows still step up the Risco. Everyone at least 153 m clear of the ground
 
 ## 2026-10-27 13:45 UTC
 
 ### Changed
+
 - **Pilot arrows switch twice as fast again**: the camera glides to the next pilot on a 0.4 s spring instead of 0.75 s, and the zoom back in keeps pace (`CAMERA_ZOOM_IN.response` 4, most of the way within about 0.75 s)
 
 ## 2026-10-27 13:45 UTC
 
 ### Added
+
 - **Castillo de Santa Bárbara**: the fort on the rim of Guanapay above Teguise, from OSM relation 3396286: an ochre stone keep on a battered base, a taller tower with a flag, crenellated parapets, round sentry boxes on the corners, pale dressed stone and a gateway with a bridge (628 triangles)
 - **The Órzola – La Graciosa ferry**: a blue-hulled passenger ferry (`boats/Ferry.ts`) plying back and forth across El Río between Órzola and Caleta de Sebo, round Punta Fariones, easing in and out of each harbour and waiting 40 s alongside, with a wake under way. Its route is traced on the model's coast (`FERRY` in `shared/env/ferry.ts`) and it moves itself on the shared clock, so the scene loop doesn't drive it
 - **Ravens on the Risco**: five small flocks of black ravens circling just over the cliff edge from above Famara to the Mirador. The gull flock code takes a `plumage` now, so they are one more instanced draw call
@@ -177,196 +230,235 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ## 2026-10-27 13:32 UTC
 
 ### Changed
+
 - **Pilots spread along the whole Risco**: from takeoff to the Mirador del Río instead of the first 3 km. Roos and Ivan stay at takeoff, Adri, Miguel, David and Luc at a tenth to four-tenths of the way, Bernt halfway, Jehosua, Fabio and Franz at five-eighths to seven-eighths, and Magne at the Mirador, 12.9 km up. Each loop sits on the cliff edge where it flies. Magne is the farthest and highest (1659-1753 m), then Bernt (1500-1562 m), then the rest (875-1327 m, rising with the cliff); everyone at least 173 m clear of the ground. Bernt moves up the list to between Luc and Jehosua, so the arrows still step up the Risco
 
 ## 2026-10-27 13:35 UTC
 
 ### Added
+
 - **Clouds over the Risco de Famara**: six more cumulus clusters, 1.2× size, along the crest from the Famara takeoff to the Mirador del Río, where the trade wind piles cloud up and the ridge is rarely clear
 
 ## 2026-10-27 13:27 UTC
 
 ### Changed
+
 - **Cloud bases are darker**: the underside colour (`clouds.base`) goes from `#77849c` to `#636f86`, about 25 % darker than the original `#8b98b0`; the earlier step was too subtle once the 1.35 brightness lifted it. Tops and sides are unchanged
 
 ## 2026-10-27 13:18 UTC
 
 ### Added
+
 - **Canary palms**: a low-poly Phoenix canariensis (`CanaryPalm`: banded trunk, knob of frond bases, a round crown of rising and arching fronds, dates up close; 206 triangles at the towns' ULTRA_LOW). They replace the saguaro and organ-pipe cacti in the town gardens (30% of garden elements; barrel and prickly pear stay), and a grove of 60 grows in the valley of Haría (`kind: "palms"` in `shared/env/landmarks.json`, one mesh for the whole grove)
 - **Mirador del Río**: Manrique's lookout at the north end of the Risco, from OSM relation 19357684: a D-shaped body in dry lava stone with a curved glass band facing La Graciosa, an earth roof with two white cupolas and a stone terrace parapet
 - **Round bungalows at Urbanización Famara**: `RoundBungalow`, two whitewashed round rooms under flat roofs with blue or green woodwork; the town is now 80 of them on small sandy plots (`FAMARA_BUNGALOWS` style)
 
 ### Fixed
+
 - **Grid towns laid out square**: the `grid` formation had three columns whatever the count, so a big town ran off in a long strip (Urbanización Famara climbed the Risco); columns are now the square root of the count, which leaves the nine-house blocks of Puerto del Carmen as they were
 
 ## 2026-10-27 12:42 UTC
 
 ### Added
+
 - **Landmarks on the Risco de Famara**: the air-surveillance radar on Peñas del Chache (a faceted white radome, the operations block and a red-and-white lattice mast), the Ermita de las Nieves (whitewashed nave, tiled gable, stone quoins, bell gable, sacristy and forecourt wall), the two communication masts above Los Valles, and orange-and-white windsocks at the Famara takeoff and the landing field that swing round with the shared wind and flutter. Placed from OpenStreetMap through `shared/env/landmarks.json` with `ISLAND_ANCHOR`, drawn twice life size, in the home and famara-animation scenes and in the models viewer. A `top` radius lifts a landmark onto the highest ground nearby, because the projection can put a summit on the model's cliff face; 132–606 triangles each, one draw call apiece
 
 ## 2026-10-27 12:30 UTC
 
 ### Changed
+
 - **Pilot arrows zoom back in**: stepping to another pilot after zooming out brings the camera back in to the fly-in's distance (~230 m) as it glides across, keeping the viewing angle; grabbing the controls stops it, and a camera already closer is left alone (`ZoomIn`, `CAMERA_ZOOM_IN`; the fly-in's landing offset is now `CAMERA_ARRIVAL_OFFSET`, shared by both)
 
 ## 2026-10-27 12:24 UTC
 
 ### Fixed
+
 - **Pilot descriptions**: Roos's registry entry still said plum jacket and full-face helmet; it now matches her refreshed model (black carbon Charly, white sunglasses, dark jacket, flight deck), and Fabio's mentions his visor down and 360 camera
 
 ## 2026-10-27 12:24 UTC
 
 ### Added
+
 - **Jehosua's pirate flag**: Jehosua flies for the Piratas Aéreos, so a black skull-and-crossbones flag hangs on a short pole under his harness, swings with him and ripples back in the airflow (`pirateFlag` on `ParagliderVoxel`, new `PirateFlag.ts`)
 
 ## 2026-10-27 12:40 UTC
 
 ### Added
+
 - **Bernt twists**: now and then Bernt spins half a turn round his risers and flies looking backwards for 8-15 s while the wing flies on, then spins back; he does it every 30 s to a minute and a half, and straight away when the camera lands on him, from the fly-in (`?pilot=bernt`) or the ‹ › arrows. Tuned by `twist` on his entry in `home/config.ts`
 
 ## 2026-10-27 12:15 UTC
 
 ### Added
+
 - **Adri joins the home scene**: the original voxel pilot flies a yellow Ozone Rush with a navy swoosh, 0.2 km up the cliff between Ivan and Miguel, as pilot 3 of 12 (`?pilot=adri`). The pilots after her shift up one number in `?pilot=<number>` links
 
 ## 2026-10-27 12:14 UTC
 
 ### Changed
+
 - **Fabio and Roos refreshed from 3d-characters**: Fabio films himself with a 360 camera held out in his right hand, and Roos has short brown hair and a flight deck bag on her lap. The other pilots' exports were already current
 
 ## 2026-10-27 12:12 UTC
 
 ### Fixed
+
 - **Loading progress**: the loading label was stuck at "LOADING 0 %" because nothing ever updated it. It now follows the island model's download in percent (or in MB when the server sends no file size, as the dev server does), shows "BUILDING SCENE…" while the mesh is processed, and disappears once the scene is ready
 
 ## 2026-10-27 11:59 UTC
 
 ### Changed
+
 - **Favicon at sunset**: the wing, pilot and volcano are now black silhouettes against an orange-to-pink sky with a yellow sun on the horizon, instead of the blue-sky version; dark on warm reads better at 16 px than thin white lines on blue
 
 ## 2026-10-27 11:55 UTC
 
 ### Changed
+
 - **Home zoom out**: once the intro hands over to the orbit controls you can scroll back to 3,000 units from the pilot, double the 1,500 it was
 
 ## 2026-10-27 11:52 UTC
 
 ### Changed
+
 - **Real roads and towns around Famara**: the roads follow their real routes from OpenStreetMap instead of running straight between towns: Teguise to Caleta de Famara (LZ-30, then LZ-402 past Las Laderas), the beach road from Caleta de Famara to Urbanización Famara, and Soo to Caleta de Famara (LZ-410). The towns move up to 1 km to their real places, and the two unclear ones are renamed to Las Laderas and Soo. A new island-wide `ISLAND_ANCHOR` (the OSM coastline fitted onto the model's coast, with a 2° turn) projects both, within about 170 units of the coast across the north where the Puerto del Carmen anchor was up to 1,900 off. Home and famara-animation share the roads through `shared/env/roads.ts` and `roads.json`
 
 ## 2026-10-27 11:49 UTC
 
 ### Changed
+
 - **Favicon**: a drawn SVG mark (an orange paraglider wing and pilot over a dark volcano on a sky-blue tile) replaces the 🪂 emoji, which rendered differently on every OS and was hard to read at 16 px
 
 ## 2026-10-27 11:42 UTC
 
 ### Added
+
 - **Link to a pilot, and arrow use in GA**: `?pilot=3` or `?pilot=bernt` (any case; `hangglider` for the hangglider) makes the home fly-in land on that pilot, embedded or not, and the arrows start there. Clicking an arrow rewrites the address to `?pilot=<number>` so the view can be shared without naming anyone, and sends a GA `pilot_switch` event with the pilot's number and the direction
 
 ### Changed
+
 - **Switching pilots glides twice as fast**: `switchTime` 3 → 1.5 s; the pilots 4–6 km up the Risco arrive in 3–4 s instead of 6
 
 ## 2026-10-27 11:34 UTC
 
 ### Changed
+
 - **The pilots spread out along the Risco**: Roos stays low by takeoff at the south-west end; Miguel, David, Luc, Jehosua, Fabio and Franz step up the cliff towards La Graciosa every ~500 m (0.45–2.95 km), each higher than the last (865–1147 m, at least 124 m over the ground), instead of all sharing Ivan's loop a few tens of metres apart; Bernt moves out to 6 km and 1325–1387 m, Magne to 8.5 km and 1625–1687 m
 - **The Hercules passes high over everyone**: its loop is raised 600 m to 2000–2200 m, well above Magne
 
 ## 2026-10-27 11:30 UTC
 
 ### Changed
+
 - **Roos flies low and close to takeoff**: she leaves the shared ridge loop for a short beat of her own at the south-west end of the Risco, where the cliff bends round towards Teguise (away from La Graciosa), at 690–760 m, about 180 m under the others and at least 99 m over the ground
 
 ## 2026-10-27 11:28 UTC
 
 ### Changed
+
 - **Ivan, Magne, Roos and Fabio re-exported** from `3d-characters`: Ivan in an orange jacket with a yellow bandana, Magne in a dark navy carbon Charly helmet with gold aviators, Roos in the black carbon Charly with its logos and no visor, and Fabio with his dark visor down
 
 ## 2026-10-27 11:21 UTC
 
 ### Added
+
 - **Arrows to follow any pilot**: ‹ › buttons at the bottom of the home scene, shown once the fly-in lands, step the camera through every paraglider and the hangglider (1/11, 2/11, … no names). The follow spring glides across to the new pilot instead of jumping, even the ones 4–6 km up the Risco; `switchTime` in `CAMERA_FOLLOW` sets how slow the glide starts. Hidden when embedded
 
 ## 2026-10-27 11:15 UTC
 
 ### Changed
+
 - **The Cessna keeps clear of the paragliders and the Risco**: it flew its loop at 950–1100 m straight through the ridge beat (as close as 34 m to a pilot) and over the cliff; it now flies an oval 1–3 km out to sea, parallel to the Risco, at 1230–1260 m, at least 1 km from every pilot and under the Hercules
 
 ## 2026-10-27 11:14 UTC
 
 ### Changed
+
 - **Bernt and Magne fly far up the Risco towards La Graciosa, and high**: Bernt's copy of the ridge loop is carried 4.2 km along the cliff and raised 300 m (1175–1237 m, at least 608 m over the ground); Magne's, widened 1.5×, 6 km along and raised 550 m (1425–1487 m, at least ~240 m over the ground), so he stays the highest and farthest of all
 
 ## 2026-10-27 11:09 UTC
 
 ### Changed
+
 - **Roller pilots throw wingovers now and then, not all the time**: a burst of two to four, eased in and out, then they fly straight for a random 20 s to a minute before the next. Each pilot starts somewhere into a rest, so they don't go off together. `turns` and `rest` in `ROLLER_FLIGHT` set the ranges
 
 ## 2026-10-27 11:06 UTC
 
 ### Fixed
+
 - **The roller is fitted to a photo of one from behind**: an even arc whose tips curl down to about 57°, 0.77 of the Rush's span (a 16 m² wing against 24-26 m²) with Niviuk's flat aspect ratio of 4.3, lines as long for its span as the Rush's, and 17 fat cells a side as on the real one (35 cells). The long, thin, flat-middled version read as wide as the Rushes in the scene. Cell billow is now part of each wing shape (`cellBillow`)
 
 ## 2026-10-27 11:05 UTC
 
 ### Fixed
+
 - **Franz's Buzz Z6 has its real colours**: the top is blue, except on the right half, where a white line edged in grey runs diagonally from the trailing edge at the centre to 38% of the chord at the tip, with lime behind it; the underside is lime. The bands run along the span, not across it as before
 
 ## 2026-10-27 11:04 UTC
 
 ### Added
+
 - **Roller pilots fly wingovers**: anyone on a roller flies the ridge loop 40 lower and 1.7× as fast (was 1.5×), weaving 60 to each side every 8 s, banking up to 60° as they turn back at each end, where they climb 30, and diving through the middle. `ROLLER_FLIGHT` in the home config holds the numbers; `ParagliderMotion` flies the wingover on top of the path
 
 ## 2026-10-27 10:59 UTC
 
 ### Changed
+
 - **David flies an Ozone Delta 4**: blue at the front and red behind, split by a yellow line along the span that steps forward round a red bump in the middle, over a red underside (`DAVID_DELTA`)
 - **Franz flies an Ozone Buzz Z6**: lime across the middle, then out towards each tip a thin white line, a grey band and blue tips, nose to tail, over a white underside (`FRANZ_BUZZ`)
 
 ## 2026-10-27 10:58 UTC
 
 ### Changed
+
 - **The roller is slimmer**: its chord is cut by a sixth and its span stretched a little, so it reads as a long, slim wing; it keeps about 0.6 of the Rush's area
 
 ## 2026-10-27 10:54 UTC
 
 ### Changed
+
 - **The roller is plainly the smaller wing**: 0.65 of the Rush's area, as a 16 m² roller is against the 24-26 m² wings flown here, on shorter lines and with fewer cells of the same width
 - The model viewer has **Wings side by side**: the standard wing, the Rush and the roller in a row at the same scale
 
 ## 2026-10-27 10:53 UTC
 
 ### Changed
+
 - **Miguel flies the pink roller** (`PURPLE_ROLLER`) instead of the green one, which Luc keeps
 
 ## 2026-10-27 10:50 UTC
 
 ### Added
+
 - **Five more pilots on the Famara ridge**, from `3d-characters`, so ten fly the home scene: David on a blue Ozone Rush with a white swoosh, Luc on the green roller like Miguel's, Fabio on a pink Niviuk Ikuma (black tips edged by a thin white line, a white flash further in, a pale underside), Bernt on the same lime Rush as Magne's (on the shared loop, below Magne) and Franz on a sky-blue wing with pink tips. Each starts at its own point on the loop with its own offset, all below Magne's loop
 
 ### Changed
+
 - **Ivan, Magne and Roos re-exported** from `3d-characters`: Ivan's gunmetal helmet with red panels, camera mount and devil horns, and Magne and Roos in the Charly No Limit full-face helmet
 
 ## 2026-10-27 10:41 UTC
 
 ### Fixed
+
 - **The roller is flat**, as the real one is: its arc only shortens the span about 11% (it was nearly a half circle), and it is sized from Niviuk's data, flat aspect ratio 4.3 and three quarters of the Rush's area, instead of half the area on a stubby plan
 
 ## 2026-10-27 10:39 UTC
 
 ### Added
+
 - **Wing models**: `GliderOptions.kind` picks the canopy's shape from `WING_SHAPES` in `Glider.ts`: `standard` (the default), `rush` (Ozone Rush: a touch more chord, deeper arc) and `roller` (Niviuk Roller, a speed wing: about half the area, thin flat section, short lines, a nearly rectangular plan with square tips and an even, almost half-circle arc). A roller flies 1.5× faster in the home scene and Puerto del Carmen (`gliderSpeedFactor`)
 - **Wing designs from the real ones**: `GliderOptions.patches` paints straight bands on the top surface, `undersideColor` the lower surface and `stripeChord` how far back the tip stripes run. `ozoneRush()` and `niviukRoller()` in the home config draw each model's design in any colours
 - Ivan flies a red Rush (navy swoosh, yellow hooks), Jehosua a black Rush with a red swoosh, Magne a lime Rush (deep blue swoosh, steel blue hooks), Miguel the green roller
 - The model viewer (`?story=models`) shows the bare wings: standard, Ozone Rush, roller green and purple
 
 ### Changed
+
 - The canopy profile has 12 points per rib instead of 8, so the bands keep their shape across the chord
 
 ## 2026-10-27 10:09 UTC
 
 ### Added
+
 - **Magne joins the home pilots**: his voxel model from `3d-characters` (blue full-face helmet, blue jacket, black cocoon) under a lime Ozone Rush with navy stripes near the tips. He is the best of them, so he flies a loop of his own, the ridge loop raised 130 m and widened 1.5× (`liftLoop(130, 1.5)`): 1005–1067 m against the others' 875–977 m, 6.4 km a lap against 4.3 km, at least 267 m over the terrain, and farther out than the hang glider's
 - **Glider stripes**: `GliderOptions.stripeColor` paints two stripes across the front of each wingtip, top and bottom; wings without it are unchanged
 - A paraglider config can carry `waypoints` of its own instead of the shared ridge loop
@@ -374,16 +466,19 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ## 2026-10-27 09:35 UTC
 
 ### Added
+
 - **Puerto del Carmen opening shot**: 36 s from the paraglider over Playa Quemada, east down the coast, low past the green beacon on the breakwater, in among the moored boats and up to the overview of the town, where the orbit controls take over. A click or scroll ends it early; `?intro=0` skips it. Its keys are `INTRO_SHOT` in the scene's `config.ts`
 - **Boat wakes**: every moving boat, in every scene, leaves a V of foam opening at the Kelvin angle (19.5°) and a wash astern, fading out three boat lengths behind
 
 ### Fixed
+
 - **Moving boats sailed backwards**: the boat models point their bows along −z, but movement turned their +z (sail boats, fishing boats) or +x (yachts, speedboats) towards where they were going, so they went stern-first or crabbed sideways. `MovingBehavior` has a `-z` forward axis now and every boat uses it
 - **Boats out at sea in Puerto del Carmen** were drawn at the other scenes' size, twice that of the moored ones; they now match
 
 ## 2026-10-27 09:18 UTC
 
 ### Added
+
 - **Puerto del Carmen scene** (`?story=puerto-del-carmen`, private, in the menu's Private list): the island's south-east coast for the first time. White houses with green and blue trim in blocks along the seafront and packed above the harbour, the real harbour traced from OpenStreetMap (breakwater, west entrance with its green beacon, five pontoons, north quay; © OpenStreetMap contributors, ODbL), 30 boats moored along both sides of the pontoons and fishing boats at the quay, four more out at sea, gulls over the harbour, and one paraglider soaring the Los Ajaches slopes above Playa Quemada
 - **`geoToWorld`** (`src/shared/geo.ts`): latitude/longitude to scene x/z, fitted on the model at Puerto del Carmen's harbour (0.74 units a metre)
 - **`Harbour` component**: breakwaters, quays, pontoons and beacons built from polylines as one low-poly mesh; in the Models viewer
@@ -391,42 +486,50 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 - **Town styles**: a `TownConfig` can carry its own house mix, colours and plot size and colour (`HouseStyle`)
 
 ### Fixed
+
 - **Houses in the sea**: a town on the coast put houses on the seabed under the water, because the island model carries on under the sea. Houses whose ground is below 2 units are now left out, with their plot, pool and garden
 - **Boat headings were lost**: `FloatingBehavior` kept the rotation a boat had when loaded and swayed about it, so the random heading given afterwards was undone and every boat faced the same way
 
 ## 2026-10-27 09:10 UTC
 
 ### Changed
+
 - **Cloud bases are slightly darker**: the underside colour (`clouds.base`) goes from `#8b98b0` to `#77849c`, about 12 % darker, like the grey base of a cumulus over a good thermal; the tops and sides are unchanged
 
 ## 2026-10-27 08:54 UTC
 
 ### Changed
+
 - **The clouds are low-poly cumulus with flat bottoms, shaded like clouds**: they used to be loose piles of grey icosahedrons in four random greys, lit like rocks, and rotated so they stood as towers. Now each cloud is lobes stacked in narrowing layers and cut flat at a cloud base shared across the island, just above the thermals. Puffs are wide and low; the super thermal gets a tower. One shader shades every cloud: white where faces turn to the sun, blue-grey away from it, darker on the flat undersides, a silver edge when looking towards the sun, and warmer as the sun gets low. They fade into the horizon haze with the fog. Each cluster is one merged mesh and one draw call, and the breathing and bobbing moved from a JavaScript ticker into the vertex shader. The colours are theme fields (`clouds.light`, `shade`, `base`, `rim`, `brightness`); the unused `colors`, `density` and `opacity` are gone. The Models viewer gains a `cloud-tower`. Tests cover the flat base, the shapes, the normals and the heights
 
 ## 2026-10-27 08:14 UTC
 
 ### Docs
+
 - **The README shows four more scenes and has a shorter intro**: the Hercules, Famara static, Town and the Models viewer sit in a grid of screenshots under the home one, taken with the menu and dev panels hidden. The home screenshot is retaken too: the old one showed the flat wings from before the pilots hung under arched canopies. The intro is now two lines and leaves out the pilots' names
 
 ## 2026-10-27 08:41 UTC
 
 ### Changed
+
 - **The home camera keeps La Graciosa and the ocean behind the pilots**: after the intro it auto-rotated all the way round them, so for much of each turn the Famara cliff filled the frame. Now it sways gently, ±18° there and back in a minute, about a line from the lead pilot to La Graciosa turned 5° seaward, so Famara beach, the bay, Graciosa and open ocean stay in the background and the cliff only frames one side. It eases in from where the intro lands and stops when you take the controls, as the auto-rotate did. Tuned by `CAMERA_SWAY` and `LA_GRACIOSA` in `home/config.ts`
 
 ## 2026-10-27 07:57 UTC
 
 ### Changed
+
 - **The home camera follows the lead pilot on a spring, not rigidly**: it used to add the pilot's every movement straight to the camera, bolting the two together and passing on the jitter of the pilot's own update loop. Now a critically damped spring (settling in 1.2 s) chases a point 2 s along the pilot's flight, so the camera eases into the pilot's moves, aims about 12 m ahead of them and swings into turns early, without overshooting. It also rolls with a quarter of the pilot's bank. Orbiting and zooming work as before, and the settings are `CAMERA_FOLLOW` in `home/config.ts`
 
 ## 2026-10-27 00:36 UTC
 
 ### Changed
+
 - **The island ground is faceted low poly**: each triangle of the solid ground under the wireframe is now one flat colour, flat-lit, instead of a smooth height gradient, so the plateau and cliffs no longer read as one even brown. Per-face data (centre height, flatness, a seeded random) is baked once at load in `bakeFaceShading`; the shader brightens level faces, darkens steep ones and jitters each face's tone a little. Strengths are theme fields (`underlay.slopeShade`, default 0.25, and `underlay.faceJitter`, default 0.12), no cost per frame
 
 ## 2026-10-27 00:29 UTC
 
 ### Changed
+
 - **The town buildings are rebuilt low poly and lighter from afar**: each building is one flat-shaded, vertex-coloured mesh sharing a single material, so a whole town merges into one draw call for its buildings (the Famara scene's town now merges into 18 meshes instead of 26). The towns use ULTRA_LOW, which is now just massing and roof, because no window survives that distance: 10 to 26 triangles a building, about 21 on average across the town mix, against about 25 for the old two-box versions
   - **Townhouse**: three storeys under a flat roof behind a parapet; closer up, a window grid, cornice, string course, doorstep, chimney, shutters, a balcony and a rooftop water tank
   - **House**: a two-storey hip-roofed main block with lower wings (flat roofs for the modern type); closer up, framed and shuttered windows, a porch canopy and a chimney
@@ -442,11 +545,13 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ## 2026-10-27 00:13 UTC
 
 ### Changed
+
 - **Paraglider pilots swing under their wings**: wing and pilot used to bank as one rigid piece. Now the pilot hangs from the carabiners on a spring-damped pendulum: the wing rolls into a turn first, the pilot trails, swings out past it by about 10°, and settles in line with the banked wing within a few seconds; rolling out swings the pilot the other way. Speeding up along the path swings the pilot back and slowing down swings it forward. `ParagliderVoxel` exposes the pivot (`getPilotSwing()`), and `ParagliderMotion` drives it with two extra rotations per pilot. The hang glider is unchanged
 
 ## 2026-10-27 00:00 UTC
 
 ### Changed
+
 - **The clouds share one animation loop**: each cloud ran its own `requestAnimationFrame`, about 40 of them, plus a 3-second timer that started two tweens per cloud part. Now one loop poses every cloud, and the bob and breathing are sines around the rest pose, so clouds no longer drift by an amount that depends on the frame rate and their parts no longer wander apart over time
 - **The home loop steps by the frame's own timestamp, capped at 0.1 s**, so pilots no longer jump after you switch back to the tab, and the smoke trails reuse their vectors instead of allocating per frame
 - **Production no longer runs an empty `requestAnimationFrame` loop**; it only ever ticked the dev FPS panel
@@ -455,6 +560,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ## 2026-10-26 23:54 UTC
 
 ### Changed
+
 - **The boats are rebuilt low poly**: each hull is lofted through stations from transom to a raked stem and painted in bands, with a sheer line, topsides, a boot stripe at the waterline and antifouling below
   - **Small sail boat**: a cruiser with a teak deck, a coachroof with portlights, and a sloop rig of mast, boom, mainsail and jib with stays, shrouds and bow rails. The sails are now off-white (they were grey)
   - **Fishing boat**: a Canarian trawler in blue with white stripes. It has bulwarks round the working deck, a wheelhouse forward with a window band under an overhanging roof, radar, a mast with trawl booms, a stern A-frame, and fish crates, floats and nets aft. The mast is now light grey (it was brown)
@@ -467,81 +573,99 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ## 2026-10-26 23:42 UTC
 
 ### Changed
+
 - **The Cessna looks like a 172, still low poly**: a cowled nose with a spinner and a two-blade propeller, a cabin with a wraparound windscreen, side and rear windows, a high wing that tapers outboard and is braced by struts, a slim tailcone with the cheat line (`stripeColor`) running nose to tail, a swept fin with a dorsal fillet and a coloured cap, and fixed tricycle gear on spring legs with wheel fairings. Replaces a stack of boxes. It is one flat-shaded, vertex-coloured mesh, 660 triangles in 1 draw call where the old one had 1,148 in about 30. It keeps its 12-unit span but is shorter, 9.6 long instead of 13, which matches a real 172
 - **The aircraft share one low-poly builder**: `vehicles/aircraft/lowPolyMesh.ts` does the lofting, the airfoil surfaces, struts, spinners and propellers, and holds the one shared material. The Hercules now uses it too and looks the same
 
 ## 2026-10-26 23:38 UTC
 
 ### Changed
+
 - **The Hercules looks like a C-130, still low poly**: a blunt radome nose with a tinted windscreen, round-sided fuselage sweeping up at the tail over a darker loading ramp, main-gear sponsons, a high wing with a constant-chord centre section and tapered outer panels, four nacelles with chin intakes, six-sided spinners and pitched four-blade props with banded tips (`stripeColor`), and a tall fin with a dorsal fillet. Replaces a stack of boxes and cylinders. It is one flat-shaded, vertex-coloured mesh, 768 triangles in 1 draw call where the old one had 2,068 in about 60. The gear is retracted because the plane is only ever seen flying, and it is a little larger: 27 × 36 units, up from 30 wide
 
 ## 2026-10-26 23:36 UTC
 
 ### Changed
+
 - **The hang glider is a real flex wing and flies in the home scene again**: a billowed delta sail with a dark leading edge band on swept leading edges, keel, crossbar, kingpost and a triangular control frame, braced by flying and landing wires, with the pilot prone in a pod harness and hands on the basebar. It is 10 m across like the paragliders; the old one was a straight extruded airfoil ten times their size. It flies the ridge loop raised 110 m and widened by a quarter, at twice the paragliders' speed, and banks into turns with them. Its config is just scale, speed and loop; the unused wing design types and wing options are gone
 
 ## 2026-10-26 23:25 UTC
 
 ### Added
+
 - **Models scene** (`?story=models`, private, in the dev menu): every model the scenes place, one at a time on a turntable, framed to its size, with its dimensions and triangle count. Pick from the list or step with ← / →, space toggles the spin, and `?model=<id>` links straight to one. Paragliders, Cessna and Hercules come from the home scene's config, so they look as they do there; the catalog is `src/applications/models/catalog.ts`
 - **`Gulls` `spread` option** (default 1, unchanged in the scenes) scales how far a flock scatters and drifts, and the flock's bounding box now includes the circles the shader flies, so the viewer can frame it
 
 ### Changed
+
 - **Paraglider wings have a real paraglider shape**: the canopy is lofted through cambered airfoil ribs on an arc that stays flat in the middle and curls down at the tips, with an elliptical planform, a swept leading edge, billowing cells and dark inlets. `wingColor2`, set per pilot but never drawn, now colours the wingtips. Lines cascade from A, B and C rows into junctions and risers, and the brakes fan from the outer trailing edge to the pilot's hands. The old wing was a lopsided staircase of boxes with six lines a side
 - **Removed the paraglider brake controls** (`ParagliderVoxel.left()`/`right()`, `Glider.breakLeft()`…) and the unused glider options (`breakColor`, `lineFrontColor`, `lineBackColor`, `carabinersSeparationMM`, `bandLength`): nothing called them since the flyable game went
 
 ## 2026-10-26 23:24 UTC
 
 ### Added
+
 - **GitHub Actions CI** (`.github/workflows/ci.yml`) on every push to `master` and every pull request: `npm ci`, Jest, lint, format check, type-check and the production build, with the git-crypt `.env` removed first since CI has no key. Its badge heads the README
 
 ### Changed
+
 - **Prettier is checked once, by Prettier**: `eslint-plugin-prettier` is gone, so lint no longer reports formatting a second time as errors; `npm run format` / `format:check` now cover `tests/`, the root config files and the CI workflow as well as `src/`, and those files are formatted. `package-lock.json` is ignored
 
 ### Fixed
+
 - **The boats and famara animation files follow the Prettier style** — four were committed unformatted — and `loadParagliders` no longer takes an `animationDurationMs` it never read, the one lint error on master
 
 ## 2026-10-26 23:16 UTC
 
 ### Changed
+
 - **The entry setup runs once**: `src/index.tsx` alone imports `index.css` and turns on `THREE.Cache` (`app.tsx` repeated both), `getStoryName()` loses three branches that all returned `home`, and the `export default {}` webpack placeholder is gone
 
 ### Removed
+
 - **Dead types and helpers**: `foundation/types/components.ts`, `config.ts`, `systems.ts` and their barrel (none of their interfaces were used; `VehicleConfig` was only re-exported), the unused LOD helpers and tables in `foundation/types/lod.ts` (only the `LevelOfDetail` enum and `getLODFromLegacy` are used), `getCharacterAssetPath` / `createCharacterFolder`, `isThreeComponent`, `PartialTheme` and the registry's `getApp`
 
 ## 2026-10-26 23:08 UTC
 
 ### Removed
+
 - **Unused dependencies**: `ajv`, `react-ga4`, `stylus`, `stylus-loader`, `@testing-library/react`, `jsdom`, `source-map-loader`, `file-loader`, and the Babel toolchain (`babel-loader`, `@babel/*`, `.babelrc`) that only fed the dead `.jsx` rule. Also `.yarnrc.yml`, since the project installs with npm
 
 ### Fixed
+
 - **Jest maps CSS imports to `identity-obj-proxy`**: the key was misspelled `moduleNameMapping`, so Jest ignored it and any test importing a component with a stylesheet would have crashed. `jest-environment-jsdom` is now on 29, matching `jest`, instead of 30
 - **Webpack config holds only rules that do something**: the `.jsx` babel rule (no `.jsx` files, and it named a plugin that was never installed), the stylus rule (no `.styl` files) and the overwritten `showcaseApps` export are gone; images use webpack 5's `asset/resource` instead of the deprecated `file-loader`
 
 ### Changed
+
 - **Every page loads one shared `main.bundle.js`** instead of its own copy: the five app entries all pointed at `src/index.tsx`, so the build emitted five identical ~1 MB bundles and a visitor moving between scenes downloaded the same code again under another name. Each scene's code still loads as its own lazy chunk
 
 ## 2026-10-26 23:01 UTC
 
 ### Changed
+
 - **The scene menu has two sections**: the public scenes, plus a "Private" section in dev mode. The always-empty Tools and private Experiences sections are gone, as are the duplicate `showDev`/`showPublic` props, the `tool` category and the unused `getAppsByCategory`/`getVisibleApps` registry helpers. Desktop and mobile layouts render the same section list
 
 ### Fixed
+
 - **Home is listed first in the menu** — its priority 0 was treated as missing and sorted it last
 
 ## 2026-10-26 22:51 UTC
 
 ### Added
+
 - **`?dev=1` turns on dev mode** in this browser (`?dev=0` turns it off): the menu lists the private scenes (famara, town) and the sidebar shows on every scene, home included. `enableDevMode()` / `disableDevMode()` are now defined on localhost too, where they used to be missing. The logic lives in `src/devMode.ts`
 
 ## [Unreleased] - 2026-10-26 23:05 UTC
 
 ### Removed
+
 - **Themes.** The default look is the only one: the menu's Themes buttons, `ThemeManager` (switching and the saved choice), the Golden Hour, Arctic Winter, Storm, Autumn and Natural presets, and the per-app `theme` field (static Famara asked for a misspelt `artic` that never applied) are gone. `ThemeEngine` still applies `DEFAULT_THEME`; the presets are in git history if one is wanted back
 
 ## [Unreleased] - 2026-10-26 22:50 UTC
 
 ### Changed
+
 - **The home scene's pilots fly.** Ivan, plus Miguel, Jehosua and Roos from the 3d-characters repo, ridge-soar one closed loop along the Famara cliff (`RIDGE_LOOP` in `src/applications/home/config.ts`), each from its own point on it. The intro camera flies in to Ivan wherever he has got to and then follows him round
 - **Paragliders bank into turns** by the coordinated-turn angle for their speed, and the pilot swings gently under the wing (`src/applications/home/paragliderMotion.ts`)
 - **Glider lines are faint dark grey** instead of bright yellow brake lines, on every scene
@@ -551,17 +675,20 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ## [Unreleased] - 2026-10-26 22:40 UTC
 
 ### Fixed
+
 - **The sitemap and robots.txt pointed crawlers at lanzaroteparagliding.com**, but they are served from 3d.lanzaroteparagliding.com, where this project is deployed. Every URL now uses the subdomain, matching the canonical and og tags. The README names the production domain and the landing page's `?embed=1` embed
 
 ## [Unreleased] - 2026-10-26 22:33 UTC
 
 ### Removed
+
 - **The external embed package** (`external-embed/`, the `build-external-embed` / `run-external-embed` scripts, and the `data-story` root attribute that only embeds used). If a site still needs it, restore it from commit eda71a8
 - **`archive/video/`**, which held one old video
 
 ## [Unreleased] - 2026-10-26 22:27 UTC
 
 ### Removed
+
 - **The `island` and `boats` scenes.** Five scenes remain: `home`, `famara-animation`, `boats-animation`, `famara` and `town`
 - **Models and systems no scene uses any more**:
   - Models: Dome, Hospital, the coconut, date, fan and palm trees, Igloo, TownSquare, PineTree, the Paraglider and Tandem rigs and TandemPilot, Airliner, Jet, Truck, PatrolBoat, Wing, and the whole car stack (Car, AutonomousCar, MovableCarComponent, the car group creator, TerrainFollowingBehavior)
@@ -572,17 +699,20 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 - **Outdated docs**: the year-old technical-debt, refactoring and planning docs, the satellite tile doc, a FlyingBehavior doc whose defaults and API were wrong, a website-background guide built on a stub library, the components README and the OrbitControlsHelper examples, the assets README, both TODO files, and the README's game notebook (feature wishlist, fix list, credits for the audio)
 
 ### Fixed
+
 - **The external embed rendered Home, not Famara.** Every bundle shares one entry, which reads the scene from the URL. An embed page can now name its scene with `<div id="root" data-story="…">`, and `build-external-embed` clears stale bundles from `external-embed/dist` first
 - **`boats-animation` read its metadata from the `boats` registry entry.** It now uses its own entry
 - **`npm run lint:check` / `format:check` only checked part of `src`.** The globs were unquoted, so `sh` expanded `src/**/*` one level deep. They are quoted now, and the whole of `src` is formatted and passes ESLint (case-block scoping, `var`, and unused code removed rather than silenced)
 - **`assets/sitemap.xml`** no longer lists the deleted `island` and `island-flying` pages
 
 ### Changed
+
 - **`docs/COMPONENT_COMPOSITION.md` is rewritten** to describe the base classes that exist and the two ways of building a component. **`docs/README.md`** is a short index of the docs that remain
 
 ## [Unreleased] - 2026-10-26 21:49 UTC
 
 ### Removed
+
 - **Every story except `home`, `famara-animation`, `boats-animation`, `island`, `famara`, `boats` and `town`**, because the project is now just a few polished Lanzarote animations and models. Gone: the dev tools (`workshop-demo`, `flying-behavior-test`, `camera-switcher-demo`, `procedural-terrain`, `tile-mapper`, `satellite-terrain`, `terrain-gps`, `terrain`, `voxel`), the single-part demos (`head`, `helmet`, `pilot`, `paraglider`, `glider`), the vehicle demos (`cars`, `car`, `truck`, `plane`, `planes`), the scenery demos `buildings`, `roads`, `clouds` and `boat`, and the half-built `flyzones` app
 - **45 source files that none of the remaining stories reach**: novelty helmets, flock birds, the audio system, `ParagliderPhysics` and its input controller, the procedural terrain generator and noise, trajectory tracking, unused camera controllers, `NonRenderingAppBase`, the showcase stats helpers, `ThemeSelector`, and the barrel `index.ts` files that only re-exported them
 - **Custom app entries**: the `entry`/`webpackEntry` options in `apps.json`, which only tile-debug used. Every story now loads from `applications/<route>/`
@@ -590,32 +720,38 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ## [Unreleased] - 2026-10-26 21:36 UTC
 
 ### Removed
+
 - **Stories `island-flying`, `paraglider-voxel`, `hangglider`, `animals`, `editor` and `tile-debug`**, which were rough demos and tools, not part of the project's focus on a few polished Lanzarote animations and models. Their only dependencies went with them: the Crow/Eagle/Vulture bird models, the unregistered flyzone visualizer, `FlyzoneAPI` and its types, the flyzone API docs, and `webpack.flyzones.js` (which pointed at a `src/apps/` folder that no longer exists). The Hangglider and ParagliderVoxel models stay because Home and Famara use them
 
 ## [Unreleased] - 2026-10-26 21:17 UTC
 
 ### Changed
+
 - **Ivan flies the Home, Famara and Boats scenes** instead of Adri: red and white helmet, blue jacket, black pod. His model is now exported from his own `.vox` (3d-characters `tools/vox-to-obj.mjs`); the old `ivan.obj` was a copy of Adri's, so the `IVAN` character used to render as Adri. He's exported in Adri's frame, so he sits in the harness exactly where she did, and his `defaultScale` now matches hers (0.01)
 
 ## [Unreleased] - 2026-10-26 21:04 UTC
 
 ### Performance
+
 - **Full resolution on Retina screens**: from a pixel ratio of 1.5 up the scene pass takes 2 MSAA samples instead of 4, which looks the same and saves 3–5 ms of a ~25 ms frame at 2880×1800 (M3 Pro). That brings the home scene under the adaptive threshold, so it now keeps DPR 2 instead of dropping resolution. When frames still run long, the adaptive quality sheds samples (4 → 2 → 0) before it lowers the pixel ratio
 
 ## [Unreleased] - 2026-10-26 20:41 UTC
 
 ### Performance
+
 - **Island scenes render 1.6–3.3× faster**: the wireframe is shaded into the solid ground from barycentric coordinates instead of being drawn as 350k GL line segments into the 4× multisampled scene target. On the home scene (M3 Pro, 1440×900) a frame took 74 ms looking at the whole island and 36–44 ms closer in; it now takes about 22 ms from every view, and the lines look the same. The solid ground now casts the sun's shadow instead of the lines
 
 ## [Unreleased] - 2026-10-26 20:31 UTC
 
 ### Changed
+
 - **Brown wireframe** in the default theme (`#8a6248`, a few shades above the basalt ground) instead of near-white, so the grid sits in the landscape rather than on top of it
 - **Softer wireframe**: over the solid ground the lines are translucent and fade with distance (`terrain.underlay.lineOpacity` / `farLineOpacity`, 0.45 → 0.12 by 9 km), so the far island no longer turns into a white sheet of lines. Their brightness is capped before blending: lit far past white in HDR, they otherwise blended back to white at any opacity
 
 ## [Unreleased] - 2026-10-26 19:59 UTC
 
 ### Added
+
 - **Filmic look for every island scene** (`src/foundation/rendering/`, see `docs/RENDERING.md`): ACES tone mapping, 4× MSAA on the scene pass only, bloom on the sun and its glints, a colour grade with vignette, an environment map lit by the sky, and fog in the sky's own horizon colour, so the sea and the far island fade into one haze. `?fx=0` renders without it
 - **A real sea**: wave normals driven by the theme's wind, turquoise shallows, surf rolling onto the beaches and foam at the water's edge, worked out from a coast-distance field baked from the island at load; whitecaps; drifting cloud shadows on the sea and the ground
 - **Solid ground under the wireframe**: sand at the waterline, basalt, then rust towards the peaks; it receives the sun's shadows
@@ -623,23 +759,27 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 - Themes take `water.shallowColor` / `shallowDistance`, `terrain.underlay` and an `atmosphere` block (exposure, fog, bloom, grade, cloud shadows)
 
 ### Changed
+
 - **Home fly-in** follows one spline at a speed that never jumps (the old two-phase move stalled halfway), then drifts slowly round the pilots until touched
 - **Follow camera** is a chase camera: behind the target's heading, sized to the target, easing only its offset
 - The sun's shadow covers a 6 km box following the camera instead of the whole island, so shadows are sharper; they're soft grey rather than black
 - The pixel ratio adapts to frame time (1.5 at most when embedded)
 
 ### Fixed
+
 - **Island Flying rendered black**: OrbitControls had been handed the sky's own sun vector as its target
 - Themes are now applied to the sky, sea and island in every terrain scene; Home applied its theme before they existed
 
 ## [Unreleased] - 2026-10-04 10:09 UTC
 
 ### Removed
+
 - **Home scene shows only its title**: the scene cards, the "Are you ready to play?" tagline and the music button are gone, along with the music file (`assets/Looking-for-a-new-beginning.ogg`). `NavigationBoxes` is now `TitleOverlay`, which mounts just the voxel title
 
 ## [Unreleased] - 2026-10-03 23:25 UTC
 
 ### Fixed
+
 - **Scenes render about ten times faster**: the home scene issued about 8,100 draw calls a frame and now issues about 900 (measured in headless Chromium, where it went from 0.25 to 2.8 fps)
   - The sun's point light no longer casts shadows. A point light renders its shadow map six times (a cube), drawing every shadow caster in the scene again for each face, and the directional light already casts the scene's shadows
   - Towns are baked into one mesh per material after they are placed (`mergeStaticMeshes` in `src/foundation/utils/mergeStatic.ts`): about 6,300 house, plot, pool and cactus meshes become about 30
@@ -649,19 +789,23 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ## [Unreleased] - 2026-10-03 22:48 UTC
 
 ### Changed
+
 - **Home scene offers the other animations instead of outside links**: the Tandem card and the Conditions / Pilot Guide cards are gone (lanzaroteparagliding.com now carries those links), replaced by four cards that open the public scenes on this site: Famara, Boats, Island and Island Flying. The list lives in `SCENE_LINKS` in `src/applications/home/config.ts`, and each card takes its page from the app's route in `src/config/apps.json`
 
 ## [Unreleased] - 2026-10-03 16:19 UTC
 
 ### Changed
+
 - **Pages are addressed on `3d.lanzaroteparagliding.com`**: canonical, social URLs and the share image point at the build's own subdomain instead of `lanzaroteparagliding.com/3d/…`; the landing page there embeds and links to the subdomain directly rather than proxying it, and redirects the old `/3d/…` and `/<page>.html` addresses to it
 
 ## [Unreleased] - 2026-09-30 12:22 UTC
 
 ### Added
+
 - **Embed mode for the home scene**: `?embed=1` hides the title, music button and navigation cards, so the scene can sit inside the lanzaroteparagliding.com landing page
 
 ### Changed
+
 - **Pages are addressed under `/3d/`**: canonical and social URLs point at `/3d/…`, where this build is served once the landing page takes the root domain
 - **Tandem card carries campaign parameters**: it links to the operator's booking page with `utm_*` tags instead of `?ref=home`, so bookings from the 3D scene can be attributed
 - **npm is the only package manager**: scripts call `npm run` instead of `yarn`, `yarn.lock` is removed, and `package-lock.json` is resynced (it was missing `dotenv-webpack`)
@@ -669,6 +813,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ## [1.6.0] - 2025-10-02 00:00 UTC
 
 ### Added
+
 - **Comprehensive LOD (Level of Detail) System**: Implemented a flexible 4-level LOD system for optimal rendering performance
   - Created LevelOfDetail enum with ULTRA_LOW, LOW, MEDIUM, HIGH levels
   - Defined polygon budgets: ULTRA_LOW (10-100), LOW (100-500), MEDIUM (500-2000), HIGH (2000+)
@@ -725,6 +870,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
     - HIGH (~2500-3000 polys): Full medical facility with helipad, emergency entrance
 
 ### Changed
+
 - **Building Architecture**: Migrated 9 building components from SimpleThreeComponent to LODComponent
   - Buildings: TownSquare, Dome, House, Villa, Barn, Townhouse, DesertHouse, DesertHouseWithPool, Hospital
   - Replaces lowPoly boolean with levelOfDetail enum for finer control (4 levels)
@@ -749,6 +895,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ## [1.5.10] - 2025-10-01 15:00 UTC
 
 ### Added
+
 - **Low-Poly Building Options**: Added lowPoly option to TownSquare and Dome buildings for performance optimization
   - TownSquare lowPoly mode reduces from ~1000-5500 to ~60-150 polygons
   - Dome lowPoly mode reduces from ~1000-3000 to ~356 polygons
@@ -759,6 +906,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Example: `new TownSquare({ lowPoly: true })` or `new Dome({ lowPoly: true })`
 
 ### Fixed
+
 - **HouseGroupCreator Position Errors**: Fixed undefined position errors when creating houses
   - Fixed addLandPlot() and addPoolToHouse() to use houseMesh.position instead of invalid position parameter
   - Fixed createNeighborhood() to handle cases where positions.length < houses.length due to exclusion zones
@@ -773,6 +921,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Now correctly displays "0.0%" instead of "NaN%" for empty categories
 
 ### Refactored
+
 - **Building Content Methods**: Separated low-poly and high-poly content creation for better code organization
   - TownSquare now has `createLowPolyContent()` and `createHighPolyContent()` methods
   - Dome now has `createLowPolyDome()` and `createHighPolyDome()` methods
@@ -782,6 +931,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ## [1.5.9] - 2025-10-01 14:45 UTC
 
 ### Fixed
+
 - **PilotVoxel Asset Resolution**: Fixed character asset resolution to happen before validateOptions is called
   - Created static prepareOptions() method to resolve character assets before super() call
   - Moved asset resolution from instance method to static method to avoid accessing undefined state
@@ -793,6 +943,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ## [1.5.8] - 2025-10-01 14:30 UTC
 
 ### Added
+
 - **addTown Helper Function**: Created new environment helper to easily populate towns of different types and sizes
   - Added addTown() method to Environment class with configurable options for type, size, and lowPoly mode
   - Supports five town types: village, rural, suburban, town, and city with appropriate house counts and formations
@@ -806,6 +957,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ## [1.5.7] - 2025-10-01 13:17 UTC
 
 ### Refactored
+
 - **Remove LegacyPilotVoxel**: Replaced legacy implementation with modern AsyncThreeComponent-based PilotVoxel
   - Updated ParagliderVoxel to use modern PilotVoxel instead of LegacyPilotVoxel
   - Changed import from LegacyPilotVoxel to PilotVoxel in ParagliderVoxel.ts
@@ -815,18 +967,20 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Modern PilotVoxel provides better architecture with async loading, resource management, character registry support, and proper lifecycle management
 
 ### Fixed
+
 - **SubmarineHarness Scaling**: Made all dimensions proportional to DEFAULT_HEIGHT parameter for dynamic resizing
   - Changed DEFAULT_HEIGHT from 450 to 200 for shorter, sleeker profile
   - Changed DEFAULT_DEPTH from 800 to 1200 for longer pod-like appearance
-  - All Y positions now calculated relative to height parameter (centerY = -height * 2.0)
-  - All geometry sizes use proportional multipliers (width * 0.13, height * 0.32, depth * 0.0625, etc)
-  - Lowered center position to -height * 2.0 to make pilot head more visible above harness
+  - All Y positions now calculated relative to height parameter (centerY = -height \* 2.0)
+  - All geometry sizes use proportional multipliers (width _ 0.13, height _ 0.32, depth \* 0.0625, etc)
+  - Lowered center position to -height \* 2.0 to make pilot head more visible above harness
   - Harness now properly scales when DEFAULT_HEIGHT is adjusted
   - Window sizes, fins, panels, carabiners, and thruster all scale proportionally
 
 ## [1.5.6] - 2025-10-01 13:05 UTC
 
 ### Fixed
+
 - **Pilot Options Not Applied**: Fixed Pilot constructor to properly pass metadata and options as separate parameters
   - Changed super() call from single object to two parameters: metadata and options
   - Metadata object now contains only name and version
@@ -837,6 +991,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ## [1.5.5] - 2025-10-01 13:01 UTC
 
 ### Refactored
+
 - **Birds to FlockBirds Rename**: Renamed wildlife/Birds.ts to wildlife/FlockBirds.ts for more precise naming
   - Renamed file from Birds.ts to FlockBirds.ts using git mv
   - Updated class name from Birds to FlockBirds throughout the file
@@ -848,6 +1003,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ## [1.5.4] - 2025-10-01 13:08 UTC
 
 ### Added
+
 - **Multiple Harness Types for Pilot**: Created OpenHarness and SubmarineHarness variants to provide visual diversity
   - Created OpenHarness.ts with minimal strap-based harness design (climbing gear style)
   - Created SubmarineHarness.ts with enclosed pod-like harness design (submarine/spaceship style)
@@ -861,6 +1017,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ## [1.5.3] - 2025-10-01 12:54 UTC
 
 ### Fixed
+
 - **Pilot Head Loading**: Fixed missing head from Pilot component by properly handling async PilotHead loading
   - Changed `createContent()` to `createObject()` override to support async operations
   - Made `createHead()` method async to properly await PilotHead.load()
@@ -870,6 +1027,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ## [1.5.2] - 2025-10-01 12:43 UTC
 
 ### Added
+
 - **Hercules to Famara Animation**: Added Hercules military transport plane to Famara animation application
   - Added `HerculesConfig` type to config.ts with flight pattern, speed, and positioning parameters
   - Created `herculesConfig` constant with figure-eight flight pattern at 1200m altitude
@@ -881,6 +1039,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Vehicle count now includes Hercules in load success message
 
 ### Fixed
+
 - **Type Errors**: Fixed TypeScript compilation errors
   - Changed Birds.load gui parameter type from `typeof GuiHelper` to `any` to fix type mismatch
   - Changed environment.ts addBirds and addHangGlider gui parameter types to `any` to fix incompatible type errors
@@ -888,6 +1047,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ## [1.5.1] - 2025-10-01 12:16 UTC
 
 ### Fixed
+
 - **Town Generation Exclusion Zones**: Implemented exclusion zones to prevent buildings from being placed over town squares and parks
   - Added `ExclusionZone` interface to house-group-types with center and radius properties
   - Extended `HouseGroupConfig` to support exclusion zones array
@@ -900,6 +1060,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ## [1.5.0] - 2025-09-30 UTC
 
 ### Refactored
+
 - **Vehicle Folder Organization**: Reorganized vehicles into type-based folder structure
   - Created `aircraft/` folder for planes (Airliner, Cessna, Hercules, Jet)
   - Created `ground/` folder for ground vehicles (Car, AutonomousCar, Truck)
@@ -918,6 +1079,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Eliminated code duplication between legacy and modern implementations
 
 ### Added
+
 - **Hercules Aircraft**: Added military transport plane to vehicle collection
   - Four-engine turboprop design with military color scheme
   - Displayed in planes application alongside Jet, Airliner, and Cessna
@@ -925,6 +1087,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Scale option for size adjustment
 
 ### Added
+
 - **ProceduralRoad for famara-animation**: Added procedural road connecting neighborhoods
   - Modified Environment.addHouses() to return neighborhood center positions
   - Integrated ProceduralRoad in famara-animation using returned house positions
@@ -948,10 +1111,12 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Default theme button shows medium gray color (#616161) instead of green
 
 ### Fixed
+
 - **Roads demo height offset slider**: Fixed GUI slider range from 0-2 to 0-10 to match configured heightOffset of 5
   - Roads now properly render above terrain in the demo application
 
 ### Improved
+
 - **Famara-animation camera transitions**: Enhanced camera animation smoothness
   - Phase 1: Upgraded from smoothstep to cubic easing (ease-in-out cubic) for gentler acceleration/deceleration
   - Phase 2: Upgraded from quadratic to quartic easing (ease-out quartic) for ultra-smooth, buttery deceleration
@@ -960,12 +1125,14 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Result: Significantly smoother, more cinematic camera movement with no jarring transitions
 
 ### Removed
+
 - **FlightControls**: Removed unused FlightControls and DEFAULT_FLIGHT_KEYBINDINGS exports
   - FlightControls was exported but never used in the codebase
   - Cleaned up src/foundation/systems/controls/index.ts
   - Deleted src/foundation/systems/controls/FlightControls.ts
 
 ### Refactored
+
 - **Hangglider Component**: Simplified architecture by removing AutoFlier inheritance
   - No longer extends AutoFlier (removes tight coupling to path-following)
   - Now a simple component that returns THREE.Group
@@ -983,6 +1150,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - All applications now use the modern API
 
 ### Added
+
 - **CameraTargetController**: Modern camera system with multi-target support
   - Generic THREE.Object3D targeting (no Flier dependency)
   - Four camera modes: Follow, FirstPerson, Orbit, Static
@@ -992,6 +1160,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - 80% less code than deprecated CameraController
 
 #### New Features
+
 - **Multi-Target Management**: Add/remove targets dynamically with names and metadata
 - **Camera Modes**:
   - Follow: Chase camera behind target with configurable distance/height
@@ -1006,6 +1175,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Smooth hover effects and transitions
 
 #### New Applications
+
 - **Camera Switcher Demo** (`/camera-switcher-demo`): Comprehensive demonstration
   - Flying Cessna with autonomous flight behavior
   - Static ground and hill markers
@@ -1014,6 +1184,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Both React UI and lil-gui controls
 
 ### Enhanced
+
 - **StoryOptions Interface**: Changed camera type from CameraController to THREE.PerspectiveCamera
   - Increases flexibility for different camera implementations
   - Backward compatible with proper type checking
@@ -1024,6 +1195,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Graceful degradation for cameras without legacy methods
 
 ### Deprecated
+
 - **CameraController**: Marked as deprecated with migration guide
   - Replaced by CameraTargetController
   - Will be removed in future major version
@@ -1031,6 +1203,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Technical debt item created for removal
 
 ### Documentation
+
 - Comprehensive JSDoc comments in CameraTargetController
 - React UI component usage examples
 - Demo application showing best practices
@@ -1038,6 +1211,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ## [1.4.0] - 2025-09-30 UTC
 
 ### Added
+
 - **EngineFlyingBehavior**: Autonomous flight behavior for powered aircraft
   - Forward-looking terrain avoidance: Casts rays ahead to detect hills and initiates climbs proactively
   - Cruise altitude maintenance: Maintains preferred altitude when not avoiding obstacles
@@ -1046,6 +1220,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Extends FlyingBehavior with engine-specific characteristics
 
 ### Enhanced
+
 - **FlyingBehavior Base Class**: Changed visibility of methods from private to protected
   - Enables proper inheritance for EngineFlyingBehavior
   - Methods made protected: updateFlight, getDesiredDirection, calculateObstacleAvoidance, calculateBoundaryForce, calculateTerrainAvoidance, updateSpeedReduction, logDebugInfo, constrainHeight, orientToDirection, updateDebugArrows
@@ -1058,12 +1233,14 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Proper cleanup in dispose method
 
 ### Documentation
+
 - Updated behavior inheritance patterns for flight systems
 - Clarified distinction between wind-dependent (gliders) and engine-powered (planes) flight
 
 ## [1.3.0] - 2025-09-30 UTC
 
 ### Added
+
 - **Aircraft Components**: Three new procedural aircraft types
   - **Jet**: Military-style jet with swept wings, twin engines, and glowing exhausts
   - **Airliner**: Commercial passenger aircraft with wide body, windows, and detailed features
@@ -1073,6 +1250,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Shadow casting and receiving support
 
 #### New Applications
+
 - **Plane** (`/plane`): Single military jet aircraft showcase
   - Interactive camera controls
   - Rotation and scale adjustments via GUI
@@ -1084,6 +1262,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Interactive GUI controls for all aircraft
 
 ### Enhanced
+
 - **Vehicle System**: Extended vehicles index with aircraft exports
   - Added Jet, Airliner, and Cessna to vehicle exports
   - TypeScript type exports for all new aircraft options
@@ -1095,6 +1274,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ## [1.2.1] - 2025-09-29 14:30 UTC
 
 ### Added
+
 - **FlyingBehavior System**: Complete autonomous flight behavior system
   - Advanced obstacle avoidance using distance-based force calculations
   - Boundary detection with progressive return forces to prevent area escape
@@ -1105,6 +1285,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Alternative to path-based AutoFlier with dynamic environmental awareness
 
 #### New Applications
+
 - **Flying Behavior Test** (`/flying-behavior-test`): Comprehensive test environment
   - Hangglider with autonomous flight demonstration
   - Strategic wall obstacle placement for avoidance testing
@@ -1113,6 +1294,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Registered in apps.json configuration system
 
 ### Enhanced
+
 - **Animals Showcase**: Complete procedural bird geometry implementation
   - Replaced GLB model loading with Three.js shape-based bird creation
   - Enhanced bird appearance with wing shapes, eyes, natural beak colors
@@ -1122,6 +1304,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Wing animation now works with procedural geometry shapes
 
 ### Refactored
+
 - **Showcase Configuration**: Removed outdated indirection layer
   - Eliminated showcase-config.ts with hardcoded app mappings
   - Updated showcase-entry.tsx to use direct bundle name resolution
@@ -1131,6 +1314,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ## [1.2.0] - 2025-01-27 15:30 UTC
 
 ### Added
+
 - **Flyzone Management System**: Complete new system for paragliding location management
   - Interactive flyzone editor with terrain-based placement
   - Weather-based takeoff recommendation engine
@@ -1139,6 +1323,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Professional pilot tools for flight planning
 
 #### New Applications
+
 - **Flyzone Editor** (`/flyzone-editor`): Advanced terrain-based editor for creating and editing flyzone locations
   - Click-to-place takeoff and landing locations
   - Interactive flyzone boundary definition
@@ -1154,6 +1339,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Interactive 3D wind visualization
 
 #### New Components
+
 - **FlyzoneAPI**: Complete backend API with localStorage persistence
   - CRUD operations for flyzone locations
   - Weather analysis and recommendation engine
@@ -1173,12 +1359,14 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   - Real-time wind condition updates
 
 #### Data Structures
+
 - Comprehensive TypeScript interfaces for all flyzone entities
 - GPS and Three.js coordinate conversion
 - Wind condition analysis and safety information
 - Media attachment support for images and videos
 
 #### User Interface
+
 - Professional pilot-focused UI design
 - Weather condition input controls
 - Real-time takeoff recommendations
@@ -1186,17 +1374,20 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 - Responsive mobile-friendly design
 
 ### Enhanced
+
 - **App Registry**: Added flyzone management apps to central registry
   - Flyzone Editor registered as priority tool
   - Flyzone Visualizer for weather analysis
   - Updated location editor marked as legacy
 
 ### Documentation
+
 - **FLYZONE_MANAGEMENT.md**: Complete system documentation
 - **API.md**: Comprehensive API reference with examples
 - Usage examples and integration guidelines
 
 ### Technical
+
 - localStorage-based data persistence (production-ready for offline use)
 - Three.js integration for 3D terrain interaction
 - Real-time wind analysis calculations
@@ -1206,22 +1397,26 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 ## [1.1.0] - Previous
 
 ### Enhanced Boat System
+
 - Renamed `Boat.ts` to `SmallSailBoat.ts`
 - Added `FishingBoat`, `Yacht`, and `SpeedBoat` classes
 - Enhanced environment system with boat variety and randomization
 - Improved boat showcase with proper spacing and camera positioning
 
 ### Color Palette Improvements
+
 - Replaced random bright colors with professional palettes in helmet demos
 - Added military, gray, and steel color themes
 - Fixed head demo rendering issues with massive grids
 
 ### Architecture
+
 - Converted FlyZones and LocationEditor apps to extend TerrainBase
 - Added terrain access for better integration
 - Updated import paths and inheritance chains
 
 ### Previous Features
+
 - Three.js-based 3D paragliding simulation
 - Multiple demo applications and workshop tools
 - Terrain, weather, and environment systems

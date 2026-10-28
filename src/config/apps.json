@@ -62,6 +62,16 @@
       "requiresWebGL": true,
       "visibility": "private",
       "priority": 5
+    },
+    "relax": {
+      "name": "Relax",
+      "description": "Pick a paragliding site, Lanzarote, Tenerife or Rio de Janeiro, and watch the gliders soar its ridge",
+      "route": "/relax",
+      "category": "experience",
+      "requiresWebGL": true,
+      "visibility": "private",
+      "priority": 6,
+      "site": "relax"
     }
   }
 }

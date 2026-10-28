@@ -7,12 +7,12 @@ map, with a living sea, gulls, towns, boats and planes.
 
 ![Two paragliders soaring over Famara beach on the home scene](docs/screenshots/home.png)
 
-| | |
-| --- | --- |
+|                                                                                         |                                                                                              |
+| --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | ![The low-poly Hercules on the model viewer's turntable](docs/screenshots/hercules.png) | ![Famara cliffs and the northern islands with no pilots](docs/screenshots/famara-static.png) |
-| **Hercules:** one of the planes crossing the sky | **Famara static:** the landscape on its own |
-| ![A generated town of low-poly houses seen from above](docs/screenshots/town.png) | ![The fishing boat on the model viewer's turntable](docs/screenshots/models.png) |
-| **Town:** a generated town up close | **Models:** every model on a turntable |
+| **Hercules:** one of the planes crossing the sky                                        | **Famara static:** the landscape on its own                                                  |
+| ![A generated town of low-poly houses seen from above](docs/screenshots/town.png)       | ![The fishing boat on the model viewer's turntable](docs/screenshots/models.png)             |
+| **Town:** a generated town up close                                                     | **Models:** every model on a turntable                                                       |
 
 Built with three.js, React and webpack. How a frame is drawn (the filmic pipeline, the sea, the
 shaded wireframe, adaptive quality) is in [docs/RENDERING.md](docs/RENDERING.md); the rest of the
@@ -24,6 +24,19 @@ docs are indexed in [docs/README.md](docs/README.md).
 npm install
 npm run dev        # webpack dev server on http://localhost:8080, opens the home scene
 ```
+
+The same repo builds a second site, **relax**: pick a paragliding place (Lanzarote, Tenerife, Rio
+de Janeiro) and watch a few gliders soar its ridge. It has its own build, so the Lanzarote site
+never ships it:
+
+```bash
+npm run start:relax   # dev server, opens the relax scene
+npm run build:relax   # production build into dist-relax/
+```
+
+Each app in `src/config/apps.json` belongs to one site (`"site": "relax"`, Lanzarote otherwise).
+New places are described in [`src/locations/README.md`](src/locations/README.md). The relax site
+has no deploy script yet; it gets one with its domain.
 
 Scenes are picked with `?story=`: `home`, `famara-animation`, `boats-animation`, `famara`,
 `town` and `models`. Add `?fx=0` to render without post-processing, to
@@ -41,7 +54,7 @@ npm run test:ci    # Jest
 `npm run format` rewrites files into the Prettier style that `format:check` expects.
 
 GitHub Actions (`.github/workflows/ci.yml`) runs Jest, then all three checks and the production
-build, on every push to `master` and every pull request.
+build of both sites, on every push to `master` and every pull request.
 
 ## Deploying
 
@@ -58,7 +71,7 @@ aws s3 ls --profile lanzaroteparagliding             # check the profile works
 npm run deploy-prod
 ```
 
-`deploy-prod` builds into `dist/`, tags the commit `PROD-<date>_<time>` (locally), empties the
+`deploy-prod` builds the Lanzarote site into `dist/` (never the relax site), tags the commit `PROD-<date>_<time>` (locally), empties the
 bucket, uploads `dist/` and invalidates the CloudFront cache. Two things to know:
 
 - It builds the **working tree**, uncommitted changes included. Deploy from a clean checkout of

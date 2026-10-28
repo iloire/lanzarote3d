@@ -7,6 +7,7 @@
  */
 
 import appsConfig from './apps.json';
+import { SITE, Site } from './site';
 
 export interface AppMetadata {
   name: string;
@@ -17,13 +18,15 @@ export interface AppMetadata {
   requiresWebGL?: boolean;
   visibility: 'public' | 'private' | 'hidden';
   priority?: number; // For ordering in menus
+  site?: Site; // Which site builds it; Lanzarote unless set
 }
 
-// Generate APP_REGISTRY from JSON (now flat structure under 'apps')
-export const APP_REGISTRY: Record<string, AppMetadata> = appsConfig.apps as Record<
-  string,
-  AppMetadata
->;
+// Generate APP_REGISTRY from JSON (now flat structure under 'apps'): this site's apps only
+export const APP_REGISTRY: Record<string, AppMetadata> = Object.fromEntries(
+  Object.entries(appsConfig.apps as Record<string, AppMetadata>).filter(
+    ([, app]) => (app.site ?? 'lanzarote') === SITE
+  )
+);
 
 /**
  * Get all apps flattened

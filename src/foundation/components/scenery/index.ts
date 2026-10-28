@@ -1,5 +1,5 @@
 // Scenery Components
-export { default as Island } from './Island';
+export { Island } from './Island';
 export { default as Pool } from './Pool';
 export { default as Stone } from './Stone';
 export { default as ProceduralRoad } from './ProceduralRoad';

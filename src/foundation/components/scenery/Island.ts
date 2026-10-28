@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import model from '../../../../assets/foundation/models/environment/lanzarote.glb';
 import Models from '../../utils/models';
 import { MeshBVH, acceleratedRaycast } from 'three-mesh-bvh';
 import { TerrainTheme } from '../../types/Theme';
@@ -10,7 +9,7 @@ import { GroundRegion, bakeRegionTint } from '../../rendering/regionTint';
 
 THREE.Mesh.prototype.raycast = acceleratedRaycast;
 
-const loadFromBlenderModel = async (manager: THREE.LoadingManager) => {
+const loadFromBlenderModel = async (model: string, manager: THREE.LoadingManager) => {
   const object = await Models.loadSimple(model, manager);
   const mesh = object as THREE.Mesh;
   // The GLB carries positions only (3d/slim-glb.py), so the lines are flat-shaded too.
@@ -194,10 +193,10 @@ class Island {
   private underlay: THREE.Mesh | null = null;
   private regions: GroundRegion[] = [];
   /**
-   * Load the island mesh from the Blender model
+   * Load the terrain mesh from a location's GLB (positions and triangles only, see 3d/slim-glb.py)
    */
-  async load(manager: THREE.LoadingManager): Promise<THREE.Mesh> {
-    this.mesh = await loadFromBlenderModel(manager);
+  async load(model: string, manager: THREE.LoadingManager): Promise<THREE.Mesh> {
+    this.mesh = await loadFromBlenderModel(model, manager);
     return this.mesh;
   }
 
@@ -349,13 +348,4 @@ class Island {
   }
 }
 
-// Export both the class and a legacy-compatible static interface
-const IslandLegacy = {
-  load: async (manager: THREE.LoadingManager): Promise<THREE.Mesh> => {
-    const island = new Island();
-    return island.load(manager);
-  },
-};
-
 export { Island };
-export default IslandLegacy;

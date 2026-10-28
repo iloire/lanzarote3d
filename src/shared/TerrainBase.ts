@@ -9,7 +9,8 @@ import { bakeCoastField } from '../foundation/rendering/CoastField';
 import { OceanMaterial } from '../foundation/rendering/OceanMaterial';
 import { ThemeEngine } from '../foundation/systems/ThemeEngine';
 import { getDefaultTheme } from '../foundation/themes';
-import { TERRAIN_REGIONS } from './env/terrainRegions';
+import { LANZAROTE } from '../locations/lanzarote';
+import type { Location } from '../locations/types';
 
 /**
  * TerrainBase - Specialized base that injects terrain (island) environment
@@ -17,13 +18,14 @@ import { TERRAIN_REGIONS } from './env/terrainRegions';
  * Provides full terrain environment setup for apps that need:
  * - Island terrain with collision detection
  * - Water and sky components
- * - Full Lanzarote environment setup
+ * - The terrain of `location` (Lanzarote unless an app picks another)
  *
  * Used by demos like Animation, Photobooth, and Famara
  */
 export abstract class TerrainBase extends AppBase {
   protected loadingManager?: THREE.LoadingManager;
   protected pipeline?: RenderPipeline;
+  protected location: Location = LANZAROTE;
 
   /**
    * Load full environment for demos
@@ -45,17 +47,14 @@ export abstract class TerrainBase extends AppBase {
     scene.add(water);
     options.water = water;
 
-    // Island setup
+    // Terrain setup
+    const { terrainModel, terrainScale, terrainPosition, regions } = this.location;
     const islandInstance = new Island();
-    const island = await islandInstance.load(this.loadingManager);
+    const island = await islandInstance.load(terrainModel, this.loadingManager);
 
-    // Apply island configuration
-    const scale = 20000;
-    const position: [number, number, number] = [0, -10, 0];
-
-    island.scale.set(scale, scale, scale);
-    island.position.set(...position);
-    islandInstance.setRegions(TERRAIN_REGIONS);
+    island.scale.setScalar(terrainScale);
+    island.position.set(...terrainPosition);
+    islandInstance.setRegions(regions);
     scene.add(island);
 
     options.terrain = island;
@@ -86,7 +85,7 @@ export abstract class TerrainBase extends AppBase {
       (window as unknown as { __lz: unknown }).__lz = { renderer, pipeline: this.pipeline };
     }
 
-    console.log('✅ Terrain environment loaded: full Lanzarote setup with island terrain');
+    console.log(`✅ Terrain environment loaded: ${this.location.name}`);
   }
 
   /**

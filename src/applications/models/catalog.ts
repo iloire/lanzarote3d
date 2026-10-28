@@ -45,6 +45,7 @@ import { createFerry } from '../../foundation/components/scenery/boats/Ferry';
 import {
   createErmita,
   createCastillo,
+  createCristoRedentor,
   createMast,
   createMirador,
   createRadarStation,
@@ -246,6 +247,13 @@ export const MODEL_CATALOG: ModelEntry[] = [
     create: landmark(createMirador),
   },
   { id: 'mast', name: 'Mast', group: 'Landmarks', scale: 2, create: landmark(createMast) },
+  {
+    id: 'cristo',
+    name: 'Cristo Redentor',
+    group: 'Landmarks',
+    scale: 2,
+    create: landmark(createCristoRedentor),
+  },
   {
     id: 'ermita',
     name: 'Ermita de las Nieves',
