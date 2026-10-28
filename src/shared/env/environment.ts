@@ -156,10 +156,11 @@ export const RISCO_RAVEN_FLOCKS: GullFlock[] = [
 
 /**
  * A single pair of guirres, the Canary Egyptian vulture: rare on Lanzarote, so just the two,
- * soaring high over the Risco between Famara and the Mirador.
+ * circling off the Mirador del Río a little above Magne, over the middle of his loop (home
+ * config: 1659-1753 m, centred near x 12953, z -12028).
  */
 export const RISCO_GUIRRE_FLOCKS: GullFlock[] = [
-  { center: new THREE.Vector3(9900, 1650, -5600), count: 2 },
+  { center: new THREE.Vector3(12953, 1830, -12028), count: 2 },
 ];
 
 class Environment {
@@ -209,8 +210,8 @@ class Environment {
   addGuirres(flocks: GullFlock[]): Gulls {
     this.guirres = new Gulls(flocks, {
       wingspan: 5,
-      minRadius: 70,
-      maxRadius: 140,
+      minRadius: 150,
+      maxRadius: 300,
       spread: 0.3,
       plumage: GUIRRE,
       flapping: 0.1,

@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-28 00:23 UTC
+
+### Changed
+- **The guirres circle above Magne**: the pair moved from mid-Risco to off the Mirador del Río, about 80 m above the top of Magne's loop (~1830 m), circling 150-300 m out over the middle of his beat
+
 ## 2026-10-28 00:19 UTC
 
 ### Added
