@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-28 00:41 UTC
+
+### Changed
+- **Magne's guirres stay with him and vary their visits**: both birds now travel with Magne instead of circling a fixed spot he flew 1.5 km away from. The visitor circles well above him (~150 up, 200 out) for 20-40 s, then comes down for 15-25 s in a different pattern each time (off a wingtip, out ahead, riding over the canopy, crossing over from one wingtip to the other, or dropping back and drawing level) before climbing away again; its mate only circles, a little further off. The visitor is sized from Magne's wing (14% of its span) since the gliders are drawn well over life size, and the home scene no longer uses the fixed-spot guirre flock
+
 ## 2026-10-28 00:31 UTC
 
 ### Added

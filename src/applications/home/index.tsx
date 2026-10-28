@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import Environment, {
   FAMARA_GULL_FLOCKS,
   LANZAROTE_TOWNS,
-  RISCO_GUIRRE_FLOCKS,
   RISCO_RAVEN_FLOCKS,
 } from '../../shared/env/environment';
 import { StoryOptions } from '../../shared/types';
@@ -58,7 +57,7 @@ import { CharacterType } from '../../foundation/components/characters/CharacterR
  */
 class HomeApp extends TerrainBase {
   private environment: Environment | undefined;
-  private guirreVisitor: GuirreVisitor | undefined;
+  private guirres: GuirreVisitor[] = [];
   private animationId: number | undefined;
   private paragliderMeshes: THREE.Object3D[] = [];
   private paragliderFlyingBehaviors: FlyingBehavior[] = [];
@@ -194,12 +193,15 @@ class HomeApp extends TerrainBase {
 
       this.environment.addGulls(FAMARA_GULL_FLOCKS);
       this.environment.addRavens(RISCO_RAVEN_FLOCKS);
-      // One of the pair keeps circling; the other comes over to glide with Magne now and then
-      this.environment.addGuirres(RISCO_GUIRRE_FLOCKS.map(flock => ({ ...flock, count: 1 })));
+      // The pair of guirres keep Magne company: one circles well above him, now and then
+      // coming down to glide alongside; its mate only ever circles a little further off
       const magne = scene.getObjectByName(`paraglider-${CharacterType.MAGNE}`);
-      if (magne && RISCO_GUIRRE_FLOCKS[0]) {
-        this.guirreVisitor = new GuirreVisitor(RISCO_GUIRRE_FLOCKS[0].center, magne);
-        scene.add(this.guirreVisitor.mesh);
+      if (magne) {
+        this.guirres = [
+          new GuirreVisitor(magne),
+          new GuirreVisitor(magne, { visits: false, radius: 260, height: 190 }),
+        ];
+        this.guirres.forEach(guirre => scene.add(guirre.mesh));
       }
 
       if (SHOW_CAMERA_TARGET_UI) {
@@ -346,7 +348,7 @@ class HomeApp extends TerrainBase {
         }
 
         this.paragliderMotions.forEach(motion => motion.update(deltaTime));
-        this.guirreVisitor?.update(deltaTime);
+        this.guirres.forEach(guirre => guirre.update(deltaTime));
 
         // Carry the camera after the lead pilot on a spring; the intro animation places it itself.
         const following = !this.isAnimating && !this.targetController;
@@ -426,8 +428,8 @@ class HomeApp extends TerrainBase {
     this.paragliderFlyingBehaviors.length = 0;
     this.paragliderMotions.length = 0;
 
-    this.guirreVisitor?.dispose();
-    this.guirreVisitor = undefined;
+    this.guirres.forEach(guirre => guirre.dispose());
+    this.guirres.length = 0;
 
     if (this.hanggliderFlyingBehavior) {
       this.hanggliderFlyingBehavior.dispose();
