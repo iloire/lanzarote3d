@@ -36,6 +36,8 @@ interface DemSceneConfig extends DemLocationConfig {
     count: number;
     minAltitude?: number;
     maxAltitude?: number;
+    /** Degrees, for buildings: the street grid's turn from east, towards north */
+    heading?: number;
   }[];
 }
 
@@ -70,6 +72,7 @@ function demScene(location: Location, config: DemSceneConfig): RelaxScene {
       count: area.count,
       minHeight: toHeight(area.minAltitude),
       maxHeight: toHeight(area.maxAltitude),
+      heading: area.heading === undefined ? undefined : THREE.MathUtils.degToRad(area.heading),
     })),
   };
 }

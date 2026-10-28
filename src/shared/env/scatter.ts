@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils';
 import { rndBetween } from '../../foundation/utils/math';
 
-export type ScatterKind = 'pine' | 'rock' | 'cardon';
+export type ScatterKind = 'pine' | 'rock' | 'cardon' | 'broadleaf' | 'tower' | 'favela' | 'resort';
 
 /** Where to scatter one kind of thing over the ground, in world units */
 export interface ScatterArea {
@@ -14,6 +14,8 @@ export interface ScatterArea {
   /** Only on ground between these heights (world y); always above the sea */
   minHeight?: number;
   maxHeight?: number;
+  /** Buildings line up with this heading (radians from +x), turned only by quarter turns */
+  heading?: number;
 }
 
 // Ground lower than this is sea or the line of the surf
@@ -77,10 +79,77 @@ const cardon = (): THREE.BufferGeometry => {
   return part(mergeGeometries(stems), '#7d8b5c');
 };
 
-const TEMPLATES: Record<ScatterKind, { geometry: () => THREE.BufferGeometry; scale: number[] }> = {
-  pine: { geometry: pine, scale: [0.8, 1.25] },
-  rock: { geometry: rock, scale: [3, 9] },
-  cardon: { geometry: cardon, scale: [0.8, 1.4] },
+/** A rainforest tree: a short trunk under two lumpy rounded crowns, ~14 units high */
+const broadleaf = (): THREE.BufferGeometry => {
+  const trunk = new THREE.CylinderGeometry(0.5, 0.7, 6, 5).translate(0, 3, 0);
+  const crown = new THREE.IcosahedronGeometry(4.5, 0).scale(1, 0.75, 1).translate(0, 9, 0);
+  const top = new THREE.IcosahedronGeometry(3, 0).scale(1, 0.8, 1).translate(1.2, 12, -0.8);
+  return mergeGeometries([part(trunk, '#4f3b2b'), part(crown, '#2c4a26'), part(top, '#36592d')]);
+};
+
+/** A building: a white box standing on its base, sized and coloured per instance */
+const block = (): THREE.BufferGeometry =>
+  // Sunk a little, so it stays on the ground where the slope falls away from one corner
+  part(new THREE.BoxGeometry(1, 1, 1).translate(0, 0.42, 0), '#ffffff');
+
+/** A resort block: a white box with a terracotta roof slab, sized and coloured per instance */
+const resort = (): THREE.BufferGeometry =>
+  mergeGeometries([
+    part(new THREE.BoxGeometry(1, 1, 1).translate(0, 0.42, 0), '#ffffff'),
+    part(new THREE.BoxGeometry(1.04, 0.08, 1.04).translate(0, 0.96, 0), '#b8603f'),
+  ]);
+
+const uniform = (min: number, max: number) => () => {
+  const size = rndBetween(min, max);
+  return new THREE.Vector3(size, size, size);
+};
+
+interface Template {
+  geometry: () => THREE.BufferGeometry;
+  /** Width, height and depth of one instance */
+  size: () => THREE.Vector3;
+  /** Instances take one of these colours (the template is white where they should show) */
+  colors?: string[];
+  /** Square to the area's heading rather than turned any way */
+  aligned?: boolean;
+}
+
+const TEMPLATES: Record<ScatterKind, Template> = {
+  pine: { geometry: pine, size: uniform(0.8, 1.25) },
+  rock: { geometry: rock, size: uniform(3, 9) },
+  cardon: { geometry: cardon, size: uniform(0.8, 1.4) },
+  // Big enough that neighbours' crowns touch and the forest reads as a canopy
+  broadleaf: { geometry: broadleaf, size: uniform(1.8, 3) },
+  // Rio's apartment towers: 8 to 30 floors on narrow plots
+  tower: {
+    geometry: block,
+    size: () => new THREE.Vector3(rndBetween(12, 20), rndBetween(25, 90), rndBetween(12, 20)),
+    colors: ['#f2efe8', '#e6e0d4', '#d9d4cc', '#efe6d8', '#cfd3d6', '#e9dccb'],
+    aligned: true,
+  },
+  // Favela houses: two or three floors of brick and paint, packed up the hillside
+  favela: {
+    geometry: block,
+    size: () => new THREE.Vector3(rndBetween(5, 8), rndBetween(4, 9), rndBetween(5, 8)),
+    colors: [
+      '#b5651d',
+      '#c2703d',
+      '#9c5a3c',
+      '#d4a373',
+      '#e8d9b5',
+      '#8fb3c9',
+      '#e0c06a',
+      '#c9b8a6',
+    ],
+    aligned: true,
+  },
+  // Costa Adeje's hotels and apartments: long white blocks of three to six floors
+  resort: {
+    geometry: resort,
+    size: () => new THREE.Vector3(rndBetween(22, 50), rndBetween(9, 20), rndBetween(12, 20)),
+    colors: ['#ffffff', '#f7f1e6', '#f3e9d6', '#efe2c8'],
+    aligned: true,
+  },
 };
 
 /** Random points in each area, dropped onto the ground, keeping those that fit its heights */
@@ -121,21 +190,31 @@ export function addScatter(
     roughness: 0.9,
   });
   const kinds = [...new Set(areas.map(area => area.kind))];
+  const up = new THREE.Vector3(0, 1, 0);
   return kinds.map(kind => {
-    const points = areas.filter(a => a.kind === kind).flatMap(a => placements(a, terrain));
-    const { geometry, scale } = TEMPLATES[kind];
-    const mesh = new THREE.InstancedMesh(geometry(), material, points.length);
+    const template = TEMPLATES[kind];
+    const placed = areas
+      .filter(area => area.kind === kind)
+      .flatMap(area => placements(area, terrain).map(point => ({ point, area })));
+    const mesh = new THREE.InstancedMesh(template.geometry(), material, placed.length);
     mesh.name = `scatter-${kind}`;
     const matrix = new THREE.Matrix4();
     const turn = new THREE.Quaternion();
-    const up = new THREE.Vector3(0, 1, 0);
-    points.forEach((point, i) => {
-      const size = rndBetween(scale[0]!, scale[1]!);
-      turn.setFromAxisAngle(up, Math.random() * Math.PI * 2);
-      matrix.compose(point, turn, new THREE.Vector3(size, size, size));
+    const color = new THREE.Color();
+    placed.forEach(({ point, area }, i) => {
+      const angle = template.aligned
+        ? (area.heading ?? 0) + (Math.floor(Math.random() * 4) * Math.PI) / 2
+        : Math.random() * Math.PI * 2;
+      turn.setFromAxisAngle(up, angle);
+      matrix.compose(point, turn, template.size());
       mesh.setMatrixAt(i, matrix);
+      if (template.colors) {
+        const pick = template.colors[Math.floor(Math.random() * template.colors.length)]!;
+        mesh.setColorAt(i, color.set(pick));
+      }
     });
     mesh.receiveShadow = true;
+    mesh.castShadow = Boolean(template.colors);
     scene.add(mesh);
     return mesh;
   });

@@ -47,7 +47,8 @@
   "camera": {
     "about": "High over the sea off São Conrado, looking down at the beach and Pedra Bonita with Pedra da Gávea on the left; [lat, lon, metres]",
     "at": [-23.022, -43.266, 750],
-    "lookAt": [-22.992, -43.276, 320]
+    "lookAt": [-22.992, -43.276, 320],
+    "orbit": 180
   },
   "clouds": [
     {
@@ -146,6 +147,189 @@
       "radius": 2600,
       "color": "#8f8a80",
       "strength": 0.6
+    }
+  ],
+  "towns": [
+    {
+      "name": "Joá, houses on the hill between São Conrado and Barra",
+      "at": [-23.00778, -43.28723],
+      "houseCount": 40,
+      "formation": "suburban",
+      "spacing": 1.5
+    },
+    {
+      "name": "Itanhangá",
+      "at": [-22.98709, -43.30494],
+      "houseCount": 60,
+      "formation": "suburban"
+    }
+  ],
+  "scatter": [
+    {
+      "kind": "broadleaf",
+      "about": "Tijuca forest",
+      "at": [-22.96, -43.265],
+      "radius": 6500,
+      "count": 4000,
+      "minAltitude": 80,
+      "maxAltitude": 1000
+    },
+    {
+      "kind": "broadleaf",
+      "about": "Pedra Bonita and Pedra da Gávea, below their bare granite tops",
+      "at": [-22.99, -43.285],
+      "radius": 2200,
+      "count": 1200,
+      "minAltitude": 60,
+      "maxAltitude": 650
+    },
+    {
+      "kind": "broadleaf",
+      "about": "Corcovado's flanks",
+      "at": [-22.952, -43.21],
+      "radius": 1500,
+      "count": 500,
+      "minAltitude": 80,
+      "maxAltitude": 600
+    },
+    {
+      "kind": "broadleaf",
+      "about": "Dois Irmãos",
+      "at": [-22.9876, -43.2405],
+      "radius": 700,
+      "count": 200,
+      "minAltitude": 80,
+      "maxAltitude": 500
+    },
+    {
+      "kind": "tower",
+      "about": "São Conrado, behind Praia do Pepino",
+      "at": [-22.99136, -43.26753],
+      "radius": 800,
+      "count": 60,
+      "minAltitude": 2,
+      "maxAltitude": 25,
+      "heading": 0
+    },
+    {
+      "kind": "tower",
+      "about": "Leblon",
+      "at": [-22.98346, -43.22497],
+      "radius": 900,
+      "count": 220,
+      "minAltitude": 2,
+      "maxAltitude": 25,
+      "heading": 8
+    },
+    {
+      "kind": "tower",
+      "about": "Ipanema",
+      "at": [-22.98396, -43.20222],
+      "radius": 1100,
+      "count": 280,
+      "minAltitude": 2,
+      "maxAltitude": 25,
+      "heading": 8
+    },
+    {
+      "kind": "tower",
+      "about": "Copacabana, along the beach from Posto 6 to Leme",
+      "at": [-22.97197, -43.1843],
+      "radius": 1600,
+      "count": 420,
+      "minAltitude": 2,
+      "maxAltitude": 25,
+      "heading": 45
+    },
+    {
+      "kind": "tower",
+      "about": "Lagoa, round Lagoa Rodrigo de Freitas",
+      "at": [-22.96247, -43.20249],
+      "radius": 1500,
+      "count": 200,
+      "minAltitude": 2,
+      "maxAltitude": 25,
+      "heading": 0
+    },
+    {
+      "kind": "tower",
+      "about": "Jardim Botânico",
+      "at": [-22.96364, -43.22335],
+      "radius": 900,
+      "count": 90,
+      "minAltitude": 2,
+      "maxAltitude": 25,
+      "heading": 0
+    },
+    {
+      "kind": "tower",
+      "about": "Gávea",
+      "at": [-22.98142, -43.23832],
+      "radius": 700,
+      "count": 80,
+      "minAltitude": 2,
+      "maxAltitude": 40,
+      "heading": 0
+    },
+    {
+      "kind": "tower",
+      "about": "Humaitá",
+      "at": [-22.95464, -43.20048],
+      "radius": 700,
+      "count": 90,
+      "minAltitude": 2,
+      "maxAltitude": 25,
+      "heading": 0
+    },
+    {
+      "kind": "tower",
+      "about": "Botafogo",
+      "at": [-22.95151, -43.1863],
+      "radius": 1000,
+      "count": 160,
+      "minAltitude": 2,
+      "maxAltitude": 25,
+      "heading": 0
+    },
+    {
+      "kind": "tower",
+      "about": "Barra da Tijuca",
+      "at": [-22.99974, -43.36599],
+      "radius": 2600,
+      "count": 380,
+      "minAltitude": 2,
+      "maxAltitude": 25,
+      "heading": 0
+    },
+    {
+      "kind": "tower",
+      "about": "Jardim Oceânico",
+      "at": [-23.0107, -43.31235],
+      "radius": 1000,
+      "count": 120,
+      "minAltitude": 2,
+      "maxAltitude": 25,
+      "heading": 0
+    },
+    {
+      "kind": "favela",
+      "about": "Rocinha, up the hillside between Gávea and São Conrado",
+      "at": [-22.98852, -43.24821],
+      "radius": 800,
+      "count": 1400,
+      "minAltitude": 30,
+      "maxAltitude": 320,
+      "heading": 20
+    },
+    {
+      "kind": "favela",
+      "about": "Vidigal, on Dois Irmãos above Avenida Niemeyer",
+      "at": [-22.99521, -43.24086],
+      "radius": 550,
+      "count": 600,
+      "minAltitude": 20,
+      "maxAltitude": 260,
+      "heading": 20
     }
   ]
 }

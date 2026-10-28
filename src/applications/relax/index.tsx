@@ -101,6 +101,8 @@ class RelaxApp extends TerrainBase {
     const offset = relax.camera.position.clone().sub(relax.camera.target);
     const azimuth = Math.atan2(offset.x, offset.z);
     const orbit = relax.orbit ?? DEFAULT_ORBIT;
+    // Pan over the ground like a map, not up and down the screen into the hills
+    controls.screenSpacePanning = false;
     controls.minDistance = MIN_DISTANCE;
     controls.maxDistance = offset.length() * MAX_ZOOM_OUT;
     controls.minAzimuthAngle = orbit >= 180 ? -Infinity : azimuth - THREE.MathUtils.degToRad(orbit);
@@ -108,7 +110,10 @@ class RelaxApp extends TerrainBase {
     controls.maxPolarAngle = LOWEST_VIEW;
   }
 
-  /** Pull a pan back within PAN_LIMIT of the start, and lift the camera clear of the ground */
+  /**
+   * Pull a pan back within PAN_LIMIT of the start, and lift the camera and what it looks at
+   * clear of the ground
+   */
   private holdCamera(
     camera: THREE.PerspectiveCamera,
     controls: OrbitControls,
@@ -122,9 +127,11 @@ class RelaxApp extends TerrainBase {
       camera.position.sub(excess);
     }
     if (!terrain) return;
-    const ground = getTerrainHeight(camera.position.x, camera.position.z, terrain);
-    if (!isNaN(ground) && camera.position.y < ground + GROUND_CLEARANCE) {
-      camera.position.y = ground + GROUND_CLEARANCE;
+    for (const point of [camera.position, controls.target]) {
+      const ground = getTerrainHeight(point.x, point.z, terrain);
+      if (!isNaN(ground) && point.y < ground + GROUND_CLEARANCE) {
+        point.y = ground + GROUND_CLEARANCE;
+      }
     }
   }
 

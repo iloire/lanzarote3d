@@ -129,27 +129,6 @@
       "formation": "suburban"
     },
     {
-      "name": "Fañabé",
-      "at": [28.10753, -16.72971],
-      "houseCount": 90,
-      "formation": "grid",
-      "spacing": 0.7
-    },
-    {
-      "name": "Costa Adeje",
-      "at": [28.08698, -16.7358],
-      "houseCount": 200,
-      "formation": "grid",
-      "spacing": 0.6
-    },
-    {
-      "name": "Playa de las Américas",
-      "at": [28.0602, -16.73105],
-      "houseCount": 160,
-      "formation": "grid",
-      "spacing": 0.6
-    },
-    {
       "name": "La Caleta",
       "at": [28.102, -16.751],
       "houseCount": 40,
@@ -235,6 +214,36 @@
       "radius": 4000,
       "count": 300,
       "minAltitude": 2000
+    },
+    {
+      "kind": "resort",
+      "about": "Fañabé: hotels and apartment blocks",
+      "at": [28.10753, -16.72971],
+      "radius": 600,
+      "count": 120,
+      "minAltitude": 3,
+      "maxAltitude": 90,
+      "heading": -20
+    },
+    {
+      "kind": "resort",
+      "about": "Costa Adeje: hotels and apartment blocks",
+      "at": [28.08698, -16.7358],
+      "radius": 1100,
+      "count": 260,
+      "minAltitude": 3,
+      "maxAltitude": 90,
+      "heading": -20
+    },
+    {
+      "kind": "resort",
+      "about": "Playa de las Américas: hotels and apartment blocks",
+      "at": [28.0602, -16.73105],
+      "radius": 900,
+      "count": 200,
+      "minAltitude": 3,
+      "maxAltitude": 90,
+      "heading": -20
     }
   ]
 }
