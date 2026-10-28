@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-28 00:50 UTC
+
+### Added
+- **Houses in Órzola**: the fishing village the La Graciosa ferry sails from had no town at its quay. 40 flat-roofed white houses with blue or green woodwork on sand plots, placed from its OpenStreetMap place node and drawn like Caleta de Sebo's across El Río, so they share its meshes and add no draw calls
+
 ## 2026-10-28 00:41 UTC
 
 ### Changed

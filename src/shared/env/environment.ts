@@ -70,6 +70,7 @@ export const TOWN_TEGUISE = town(29.05925, -13.56022);
 export const TOWN_SOO = town(29.09932, -13.62235);
 export const TOWN_CALETA_DE_SEBO = town(29.2311, -13.5035); // La Graciosa, where the ferry docks
 export const TOWN_PEDRO_BARBA = town(29.2437, -13.4747); // La Graciosa's east-end hamlet
+export const TOWN_ORZOLA = town(29.2223, -13.4497); // The fishing village the ferry sails from
 
 /**
  * Boat clusters in El Río as [x, z, count], in world units read off the model's coast: each
@@ -94,7 +95,7 @@ const FAMARA_BUNGALOWS: HouseStyle = {
 };
 
 /**
- * La Graciosa: flat-roofed white cubes on sand streets, with blue or green woodwork. Only the
+ * La Graciosa and Órzola: flat-roofed white cubes on sand streets, with blue or green woodwork. Only the
  * Famara bungalows' colours, so the merge folds them into the same meshes: no new draw calls.
  */
 const GRACIOSA_HOUSES: HouseStyle = {
@@ -122,6 +123,13 @@ export const LANZAROTE_TOWNS: TownConfig[] = [
   {
     position: TOWN_CALETA_DE_SEBO,
     houseCount: 45,
+    formation: 'grid',
+    spacing: 0.6,
+    style: GRACIOSA_HOUSES,
+  },
+  {
+    position: TOWN_ORZOLA,
+    houseCount: 40,
     formation: 'grid',
     spacing: 0.6,
     style: GRACIOSA_HOUSES,
