@@ -43,9 +43,9 @@ Ground at or below 0 m becomes sea floor under the water plane.
 The relax app has a switcher at the bottom, one link per place (`?location=<id>`), in the order
 of `RELAX_SCENES` in `applications/relax/scenes.ts`.
 
-The relax app keeps the viewer near the gliders, so the terrain's edges never show: panning up to
-3,000 units from the start, zooming out to 1.5× the starting distance, orbiting `camera.orbit`
-degrees either way, panning over the ground like a map, and neither the camera nor the point it looks at ever under 40 units above the ground. Size the
+The relax app keeps the viewer near the gliders, so the terrain's edges never show: panning, zooming
+out and orbiting only as far as `camera.pan`, `camera.zoomOut` and `camera.orbit` allow (Lanzarote,
+the whole island with sea all round, is free), panning over the ground like a map, and neither the camera nor the point it looks at ever under 40 units above the ground. Size the
 bbox so the camera's view still has land behind the subject (Tenerife reaches north to El Teide
 for that).
 

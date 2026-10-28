@@ -20,15 +20,20 @@ const PILOTS = 5;
 // The camera drifts this far either side of where it starts, and takes this long to swing back
 const SWAY_ANGLE = THREE.MathUtils.degToRad(20);
 const SWAY_PERIOD = 90;
-// How far the viewer may take the camera: a terrain ends at its box, so zooming out, panning
-// far or orbiting round behind the hills would show its edges.
-const MAX_ZOOM_OUT = 1.5;
+// How far the viewer may take the camera unless the place says otherwise: a generated terrain
+// ends at its box, so zooming out, panning far or orbiting round behind the hills would show
+// its edges.
+const DEFAULT_LIMITS = { orbit: 60, zoomOut: 1.5, pan: 3000 };
 const MIN_DISTANCE = 150;
-const DEFAULT_ORBIT = 60;
-const PAN_LIMIT = 3000;
 const LOWEST_VIEW = THREE.MathUtils.degToRad(85);
 // The camera never goes nearer the ground than this
 const GROUND_CLEARANCE = 40;
+
+/** The fields that are set, so a spread over defaults doesn't overwrite them with undefined */
+const definedOnly = <T extends object>(values: T | undefined): Partial<T> =>
+  Object.fromEntries(
+    Object.entries(values ?? {}).filter(([, value]) => value !== undefined)
+  ) as Partial<T>;
 
 /**
  * Pick a place (?location=lanzarote | tenerife | rio-de-janeiro) and watch a few gliders soar its ridge
@@ -115,29 +120,30 @@ class RelaxApp extends TerrainBase {
   private limitControls(controls: OrbitControls, relax: RelaxScene): void {
     const offset = relax.camera.position.clone().sub(relax.camera.target);
     const azimuth = Math.atan2(offset.x, offset.z);
-    const orbit = relax.orbit ?? DEFAULT_ORBIT;
+    const { orbit, zoomOut } = { ...DEFAULT_LIMITS, ...definedOnly(relax.limits) };
     // Pan over the ground like a map, not up and down the screen into the hills
     controls.screenSpacePanning = false;
     controls.minDistance = MIN_DISTANCE;
-    controls.maxDistance = offset.length() * MAX_ZOOM_OUT;
+    controls.maxDistance = offset.length() * zoomOut;
     controls.minAzimuthAngle = orbit >= 180 ? -Infinity : azimuth - THREE.MathUtils.degToRad(orbit);
     controls.maxAzimuthAngle = orbit >= 180 ? Infinity : azimuth + THREE.MathUtils.degToRad(orbit);
     controls.maxPolarAngle = LOWEST_VIEW;
   }
 
   /**
-   * Pull a pan back within PAN_LIMIT of the start, and lift the camera and what it looks at
+   * Pull a pan back within the place's pan limit of the start, and lift the camera and what it looks at
    * clear of the ground
    */
   private holdCamera(
     camera: THREE.PerspectiveCamera,
     controls: OrbitControls,
     start: THREE.Vector3,
+    pan: number,
     terrain?: THREE.Mesh
   ): void {
     const drift = controls.target.clone().sub(start);
-    if (drift.length() > PAN_LIMIT) {
-      const excess = drift.setLength(drift.length() - PAN_LIMIT);
+    if (drift.length() > pan) {
+      const excess = drift.setLength(drift.length() - pan);
       controls.target.sub(excess);
       camera.position.sub(excess);
     }
@@ -159,6 +165,7 @@ class RelaxApp extends TerrainBase {
     terrain?: THREE.Mesh
   ): void {
     const motions = this.gliders.flatMap(g => (g.motion ? [g.motion] : []));
+    const { pan } = { ...DEFAULT_LIMITS, ...definedOnly(relax.limits) };
     const offset = relax.camera.position.clone().sub(relax.camera.target);
     const up = new THREE.Vector3(0, 1, 0);
     let swaying = true;
@@ -181,7 +188,7 @@ class RelaxApp extends TerrainBase {
           camera.lookAt(relax.camera.target);
         } else {
           OrbitControlsHelper.update(controls);
-          this.holdCamera(camera, controls, relax.camera.target, terrain);
+          this.holdCamera(camera, controls, relax.camera.target, pan, terrain);
         }
 
         this.renderFrame(renderer, scene, camera);

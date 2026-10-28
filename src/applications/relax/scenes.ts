@@ -19,8 +19,12 @@ export interface RelaxScene {
   camera: { position: THREE.Vector3; target: THREE.Vector3 };
   /** Lanzarote's cumulus unless given */
   clouds?: CloudSite[];
-  /** Degrees either side of the starting view the viewer may orbit (60 unless given) */
-  orbit?: number;
+  /**
+   * How far the viewer may take the camera, so a terrain's edges never show: degrees either
+   * side of the starting view (60), how many times the starting distance it may zoom out (1.5)
+   * and how far, in world units, it may pan (3000)
+   */
+  limits?: { orbit?: number; zoomOut?: number; pan?: number };
   towns?: TownConfig[];
   scatter?: ScatterArea[];
   landmarks?: { list: Landmark[]; anchor: GeoAnchor };
@@ -29,7 +33,7 @@ export interface RelaxScene {
 /** The relax fields of a location JSON (see src/locations/README.md) */
 interface DemSceneConfig extends DemLocationConfig {
   soaringLoop: { waypoints: number[][] };
-  camera: { at: number[]; lookAt: number[]; orbit?: number };
+  camera: { at: number[]; lookAt: number[]; orbit?: number; zoomOut?: number; pan?: number };
   clouds: { at: number[]; kind: string; scale: number }[];
   towns?: { at: number[]; houseCount: number; formation: string; spacing?: number }[];
   scatter?: {
@@ -61,7 +65,11 @@ function demScene(location: Location, config: DemSceneConfig): RelaxScene {
       kind: kind as CloudSite['kind'],
       scale,
     })),
-    orbit: config.camera.orbit,
+    limits: {
+      orbit: config.camera.orbit,
+      zoomOut: config.camera.zoomOut,
+      pan: config.camera.pan,
+    },
     // Houses settle onto the terrain, so the town centre's height doesn't matter
     towns: config.towns?.map(({ at, houseCount, formation, spacing }) => ({
       position: demPoint(config, [at[0]!, at[1]!, 0]),
@@ -98,6 +106,8 @@ export const RELAX_SCENES: Record<string, RelaxScene> = {
       position: new THREE.Vector3(5600, 980, -150),
       target: new THREE.Vector3(6850, 880, -700),
     },
+    // The whole island, sea all round: nothing to hide, so look anywhere
+    limits: { orbit: 180, zoomOut: 8, pan: 20000 },
   },
   tenerife: demScene(TENERIFE, TENERIFE_CONFIG),
   'rio-de-janeiro': demScene(RIO_DE_JANEIRO, RIO_CONFIG),
