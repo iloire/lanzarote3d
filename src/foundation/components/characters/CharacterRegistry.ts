@@ -140,7 +140,8 @@ export class CharacterRegistry {
       {
         id: CharacterType.FRANZ,
         name: 'Franz',
-        description: 'Sky-blue helmet with clown and shark stickers, red jacket, open harness',
+        description:
+          'Sky-blue helmet with clown and shark stickers, red T-shirt, shorts, open harness',
       },
       {
         id: CharacterType.JEHOSUA,

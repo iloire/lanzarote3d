@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-27 23:59 UTC
+
+### Changed
+- **Ivan, Fabio, Jehosua and Roos refreshed from 3d-characters**: Ivan wears dark sunglasses with red-orange temples, Fabio holds his 360 camera in his fist instead of on a floating stick, and Jehosua's and Roos's helmets lose their two small bumps. Franz's registry description now says T-shirt and shorts, as his model already did. The other pilots' exports were already current
+
 ## 2026-10-27 23:47 UTC
 
 ### Added
