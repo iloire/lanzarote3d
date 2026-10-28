@@ -38,6 +38,7 @@ import {
   CAMERA_SWAY,
   CAMERA_ZOOM_IN,
   LA_GRACIOSA,
+  BIRTHDAY_FLIGHT,
   isEmbedded,
 } from './config';
 import { loadParagliders, loadHangglider, loadCessna, loadHercules } from './vehicleLoader';
@@ -50,6 +51,8 @@ import type { ParagliderMotion } from './paragliderMotion';
 import type { SmokeTrail } from '../../foundation/components/effects/SmokeTrail';
 import { GuirreVisitor } from '../../foundation/components/wildlife/GuirreVisitor';
 import { CharacterType } from '../../foundation/components/characters/CharacterRegistry';
+import { birthdayPilots } from './birthdays';
+import { ConfettiBurst } from '../../foundation/components/effects/Confetti';
 
 /**
  * Home App - Landing scene with the voxel title
@@ -58,6 +61,8 @@ import { CharacterType } from '../../foundation/components/characters/CharacterR
 class HomeApp extends TerrainBase {
   private environment: Environment | undefined;
   private guirres: GuirreVisitor[] = [];
+  private confetti: ConfettiBurst[] = [];
+  private removeConfettiClick: (() => void) | null = null;
   private animationId: number | undefined;
   private paragliderMeshes: THREE.Object3D[] = [];
   private paragliderFlyingBehaviors: FlyingBehavior[] = [];
@@ -115,9 +120,13 @@ class HomeApp extends TerrainBase {
 
       renderer.render(scene, camera);
 
+      // Whoever's birthday it is flies out past everyone, halfway to La Graciosa
+      const birthdays = birthdayPilots(new Date(), window.location.search);
       const paragliderResults = await loadParagliders(
         scene,
-        paraglidersVoxel,
+        paraglidersVoxel.map(p =>
+          birthdays.includes(p.options.pilot.characterType) ? { ...p, ...BIRTHDAY_FLIGHT } : p
+        ),
         this.handleError.bind(this)
       );
       this.paragliderMeshes = paragliderResults.map(r => r.mesh);
@@ -194,15 +203,22 @@ class HomeApp extends TerrainBase {
       this.environment.addGulls(FAMARA_GULL_FLOCKS);
       this.environment.addRavens(RISCO_RAVEN_FLOCKS);
       // The pair of guirres keep Magne company: one circles well above him, now and then
-      // coming down to glide alongside; its mate only ever circles a little further off
-      const magne = scene.getObjectByName(`paraglider-${CharacterType.MAGNE}`);
-      if (magne) {
+      // coming down to glide alongside; its mate only ever circles a little further off. On a
+      // pilot's birthday they escort the birthday pilot instead, and visit twice as often.
+      const birthdayRigs = birthdays
+        .map(pilot => scene.getObjectByName(`paraglider-${pilot}`))
+        .filter((rig): rig is THREE.Object3D => rig !== undefined);
+      const birthdayPilot = birthdayRigs[0];
+      const companion = birthdayPilot ?? scene.getObjectByName(`paraglider-${CharacterType.MAGNE}`);
+      if (companion) {
+        const circling: [number, number] = birthdayPilot ? [10, 20] : [20, 40];
         this.guirres = [
-          new GuirreVisitor(magne),
-          new GuirreVisitor(magne, { visits: false, radius: 260, height: 190 }),
+          new GuirreVisitor(companion, { circling }),
+          new GuirreVisitor(companion, { visits: false, radius: 260, height: 190 }),
         ];
         this.guirres.forEach(guirre => scene.add(guirre.mesh));
       }
+      if (birthdayRigs.length) this.listenForConfetti(renderer.domElement, birthdayRigs);
 
       if (SHOW_CAMERA_TARGET_UI) {
         this.targetController = new CameraTargetController(
@@ -299,6 +315,40 @@ class HomeApp extends TerrainBase {
     });
   }
 
+  /**
+   * A click on the scene, not a drag of the camera, throws a puff of confetti from the pilot
+   * the camera is following, as long as it's their birthday; anyone else, nothing happens.
+   */
+  private listenForConfetti(canvas: HTMLCanvasElement, birthdayRigs: THREE.Object3D[]): void {
+    let down: { x: number; y: number; time: number } | null = null;
+    const onDown = (e: PointerEvent) => {
+      down = { x: e.clientX, y: e.clientY, time: e.timeStamp };
+    };
+    const onUp = (e: PointerEvent) => {
+      const click =
+        down &&
+        Math.hypot(e.clientX - down.x, e.clientY - down.y) < 6 &&
+        e.timeStamp - down.time < 400;
+      down = null;
+      const rig = this.pilots[this.leadIndex]?.mesh;
+      if (!click || this.isAnimating || !rig || !birthdayRigs.includes(rig)) return;
+      // From the carabiners, between pilot and wing, sized from the wing (~11 m at life size)
+      const origin = new THREE.Vector3();
+      rig.getObjectByName('pilot-swing')?.getWorldPosition(origin);
+      const span = new THREE.Box3().setFromObject(rig).getSize(new THREE.Vector3());
+      const burst = new ConfettiBurst(rig.worldToLocal(origin), Math.max(span.x, span.z) / 11);
+      rig.add(burst.mesh);
+      this.confetti.push(burst);
+      window.gtag?.('event', 'birthday_confetti', {});
+    };
+    canvas.addEventListener('pointerdown', onDown);
+    canvas.addEventListener('pointerup', onUp);
+    this.removeConfettiClick = () => {
+      canvas.removeEventListener('pointerdown', onDown);
+      canvas.removeEventListener('pointerup', onUp);
+    };
+  }
+
   private startAnimationLoop(
     renderer: THREE.WebGLRenderer,
     scene: THREE.Scene,
@@ -349,6 +399,11 @@ class HomeApp extends TerrainBase {
 
         this.paragliderMotions.forEach(motion => motion.update(deltaTime));
         this.guirres.forEach(guirre => guirre.update(deltaTime));
+        this.confetti = this.confetti.filter(burst => {
+          if (burst.update(deltaTime)) return true;
+          burst.dispose();
+          return false;
+        });
 
         // Carry the camera after the lead pilot on a spring; the intro animation places it itself.
         const following = !this.isAnimating && !this.targetController;
@@ -430,6 +485,10 @@ class HomeApp extends TerrainBase {
 
     this.guirres.forEach(guirre => guirre.dispose());
     this.guirres.length = 0;
+    this.removeConfettiClick?.();
+    this.removeConfettiClick = null;
+    this.confetti.forEach(burst => burst.dispose());
+    this.confetti.length = 0;
 
     if (this.hanggliderFlyingBehavior) {
       this.hanggliderFlyingBehavior.dispose();

@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-28 09:01 UTC
+
+### Added
+- **Pilot birthdays**: a pilot's birthday can be set as `'MM-DD'` in `src/applications/home/birthdays.ts` (Luc's is 28 October). On the day, by Lanzarote's clock, that pilot flies what nobody else could: halfway from the Mirador to La Graciosa, 2 km out over El Río, at 1875-1935 m, 200 m above Magne. Magne's pair of guirres leave him to escort the birthday pilot, visiting twice as often. A click on the scene (not a camera drag) while following the birthday pilot throws a small puff of voxel confetti that drifts down and is gone in 2-3 s; clicking on anyone else does nothing. `?birthday=<name>` previews it on any day
+
 ## 2026-10-28 08:44 UTC
 
 ### Added

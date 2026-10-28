@@ -109,20 +109,24 @@ export const ROLLER_FLIGHT: { drop: number; wingover: WingoverSettings } = {
   },
 };
 
+const RIDGE_CENTRE = RIDGE_LOOP.reduce((sum, p) => sum.add(p), new THREE.Vector3()).divideScalar(
+  RIDGE_LOOP.length
+);
+
 /** Raises the ridge loop by `rise` and widens it about its centre by `widen` */
 function liftLoop(rise: number, widen: number): THREE.Vector3[] {
-  const centre = RIDGE_LOOP.reduce((sum, p) => sum.add(p), new THREE.Vector3()).divideScalar(
-    RIDGE_LOOP.length
-  );
   return RIDGE_LOOP.map(p =>
     p
       .clone()
-      .sub(centre)
+      .sub(RIDGE_CENTRE)
       .multiplyScalar(widen)
-      .add(centre)
+      .add(RIDGE_CENTRE)
       .setY(p.y + rise)
   );
 }
+
+/** Where Magne's loop sits, off the Mirador del Río at the north end of the Risco */
+const MIRADOR_OFFSET = new THREE.Vector3(6108, 0, -11297);
 
 /** A panel and its mirror image on the other half */
 const mirrored = (patch: GliderPatch): GliderPatch[] => [
@@ -303,7 +307,10 @@ const MOJO_EDGE: [number, number][] = [
 ];
 /** The white band's chord position at span s, between the MOJO_EDGE points */
 const mojoEdgeAt = (s: number): number => {
-  const i = Math.max(1, MOJO_EDGE.findIndex(([span]) => span >= s));
+  const i = Math.max(
+    1,
+    MOJO_EDGE.findIndex(([span]) => span >= s)
+  );
   const [[s0, c0], [s1, c1]] = [MOJO_EDGE[i - 1], MOJO_EDGE[i]];
   return c0 + ((s - s0) / (s1 - s0)) * (c1 - c0);
 };
@@ -451,14 +458,15 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
     twist: { spin: 1.5, hold: [8, 15], rest: [30, 90] },
   },
   {
-    // Magne is the best of them: the farthest out and the highest, at the Mirador del Río at
+    // Magne is the best of them (bar a pilot on their birthday, see BIRTHDAY_FLIGHT): the
+    // farthest out and the highest, at the Mirador del Río at
     // the north end of the Risco, 12.9 km up, his loop widened 1.5x.
     options: {
       glider: MAGNE_RUSH,
       pilot: { characterType: CharacterType.MAGNE },
     },
     startProgress: 0.2,
-    pathOffset: new THREE.Vector3(6108, 0, -11297),
+    pathOffset: MIRADOR_OFFSET,
     waypoints: liftLoop(800, 1.5),
   },
 ];
@@ -578,6 +586,18 @@ export const CAMERA_ZOOM_IN: ZoomInSettings = {
 
 /** La Graciosa, off the north tip of the island, about 14 km from the ridge */
 export const LA_GRACIOSA = new THREE.Vector3(10100, 0, -14800);
+
+/**
+ * On their birthday a pilot flies what nobody could: out past Magne, halfway from the Mirador
+ * to La Graciosa over El Río, 2 km off the cliff, and higher than anyone, at 1875-1935 m, 200 m
+ * over Magne and still under the Hercules. His loop, widened the same, keeping their own start.
+ */
+export const BIRTHDAY_FLIGHT: Pick<ParagliderVoxelConfig, 'pathOffset' | 'waypoints'> = {
+  pathOffset: MIRADOR_OFFSET.clone().add(
+    LA_GRACIOSA.clone().sub(RIDGE_CENTRE).sub(MIRADOR_OFFSET).setY(0).multiplyScalar(0.5)
+  ),
+  waypoints: liftLoop(1000, 1.5),
+};
 
 /**
  * After the intro the camera keeps La Graciosa, Famara beach and the ocean behind the pilots
