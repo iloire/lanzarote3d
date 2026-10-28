@@ -38,6 +38,15 @@ const samplesFor = (pixelRatio: number): number => (pixelRatio >= 1.5 ? 2 : 4);
 
 // The sun's shadow covers a box this size round the camera instead of the whole island.
 const SHADOW_BOX = 3000;
+const SHADOW_MAP_SIZE = 1024;
+const BLOOM_RESOLUTION_SCALE = 0.5;
+
+/** Bloom is a soft glow; rendering its mip chain at half size preserves the look. */
+class HalfResolutionBloomPass extends UnrealBloomPass {
+  override setSize(width: number, height: number): void {
+    super.setSize(width * BLOOM_RESOLUTION_SCALE, height * BLOOM_RESOLUTION_SCALE);
+  }
+}
 
 const GradeShader = {
   uniforms: {
@@ -158,6 +167,7 @@ class MsaaScenePass extends Pass {
 
 interface SkySource {
   sky: SkyExample;
+  pointLight: THREE.PointLight;
   directionalLight: THREE.DirectionalLight;
   getSunPosition(): THREE.Vector3;
   setHaze(color: THREE.Color, strength: number): void;
@@ -208,8 +218,8 @@ export class RenderPipeline {
 
     this.renderPass = new MsaaScenePass(scene, camera);
     this.renderPass.samples = samplesFor(this.pixelRatio);
-    this.bloomPass = new UnrealBloomPass(
-      size.clone().multiplyScalar(0.5),
+    this.bloomPass = new HalfResolutionBloomPass(
+      size,
       DEFAULT_ATMOSPHERE.bloomStrength,
       DEFAULT_ATMOSPHERE.bloomRadius,
       DEFAULT_ATMOSPHERE.bloomThreshold
@@ -230,6 +240,10 @@ export class RenderPipeline {
   attachSky(sky: SkySource): void {
     this.sky = sky;
     sky.setLensflareVisible(false);
+    // The terrain pipeline uses the directional sun and sky environment; this distant,
+    // shadowless point light only exists for the lens flare, which the pipeline replaces
+    // with bloom. Leaving it active adds a redundant per-pixel light calculation.
+    sky.pointLight.visible = false;
     this.scene.add(sky.directionalLight.target);
     const shadowCamera = sky.directionalLight.shadow.camera as THREE.OrthographicCamera;
     shadowCamera.left = -SHADOW_BOX;
@@ -239,6 +253,7 @@ export class RenderPipeline {
     shadowCamera.near = 100;
     shadowCamera.far = 60000;
     shadowCamera.updateProjectionMatrix();
+    sky.directionalLight.shadow.mapSize.set(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
     // Shadows from the sun let skylight in: soft grey, not black holes in the ground.
     sky.directionalLight.shadow.intensity = 0.55;
     sky.directionalLight.shadow.bias = -0.0005;
