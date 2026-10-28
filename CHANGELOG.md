@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-28 08:34 UTC
+
+### Fixed
+- **No Google Analytics on localhost**: the gtag snippet now only loads off localhost, so dev sessions stop showing up in GA as a `localhost:3000` traffic source
+
 ## 2026-10-28 00:50 UTC
 
 ### Added
