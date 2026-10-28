@@ -68,6 +68,23 @@ merged roofs and walls only where neighbours differ, coloured per vertex. Canopi
 overhangs (`min_height`) are left out, so the street under them stays open. The location's `.ts`
 exports the GLB, and the relax scene (`city` in `scenes.ts`) adds it.
 
+Each wall carries its window style in a `_WINDOWS` vertex attribute (none on roofs, punched windows
+in masonry, glass curtain walls on towers of 120 m and more) and the node's extras carry the grid
+(`origin`, `size`, `street`, `avenue`, `unitsPerMetre`, `ground`, `up`), so
+`foundation/rendering/cityWindows.ts` draws a window per voxel and storey lined up with the blocks.
+
+The open land between the buildings becomes a street layer, painted a pixel a cell on one quad
+just over the ground (a second node, `Streets`): sidewalks a cell wide round every building, grass
+on OpenStreetMap's parks, gardens and pitches, water on its ponds, roadway elsewhere, and zebra
+crossings outside each junction (where an avenue's and a street's open runs of 40 cells or more
+cross). Off the land it's clear. Every run of roadway 60 cells or more long gets lanes, one or two
+a side, which the extras carry as `lanes` ([x0, z0, x1, z1] in world units) for
+`shared/env/cityTraffic.ts` to drive cars on: one instanced mesh, a third of them yellow cabs.
+Parks and water are fetched and cached like the buildings.
+
+`fog` (metres at which the fog has hidden half the view) thickens the theme's fog, so the city's
+far edge fades out instead of ending.
+
 It also prints how far the `soaringLoop` clears the rooftops within 10 m either side, along the same
 Catmull-Rom curve the app flies. In a city the loop can fly the streets: on the turned grid an
 avenue is a run of open columns, so waypoints on one column keep the curve straight down it.

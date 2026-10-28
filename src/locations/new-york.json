@@ -20,6 +20,7 @@
     "defaultHeight": 12
   },
   "paramotor": true,
+  "fog": 1800,
   "places": {
     "empireState": {
       "name": "Empire State Building",

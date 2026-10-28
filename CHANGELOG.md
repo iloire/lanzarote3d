@@ -2,6 +2,19 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-28 20:11 UTC
+
+### Added
+
+- New York's streets: `city-to-glb.py` paints the land between the buildings as roadway,
+  sidewalks round every block, zebra crossings at the junctions, grass on the parks and water on
+  the ponds (from OpenStreetMap, cached like the buildings), one texture on a single quad so it
+  adds no geometry, and writes the lanes it finds into the GLB. Cars drive them, a third of them
+  yellow cabs, all in one instanced mesh (`cityTraffic.ts`).
+- A thicker fog in New York (`fog`, metres at which it hides half the view), so the city's far
+  edge fades out.
+- Overpass fetches retry when the server is busy.
+
 ## 2026-10-28 20:00 UTC
 
 ### Changed

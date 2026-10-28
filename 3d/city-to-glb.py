@@ -1,7 +1,7 @@
 #!/usr/bin/env -S uv run --script
 # /// script
 # requires-python = ">=3.11"
-# dependencies = ["numpy", "pillow"]
+# dependencies = ["numpy", "pillow", "tifffile", "imagecodecs"]
 # ///
 """
 Build a city's buildings as voxels, from OpenStreetMap footprints and heights.
@@ -23,11 +23,15 @@ curve the app flies through it.
 
 Usage: uv run 3d/city-to-glb.py src/locations/new-york.json assets/locations/new-york-city.glb
 """
+import importlib.util
+import io
 import json
 import math
 import re
 import struct
 import sys
+import time
+import urllib.error
 import urllib.parse
 import urllib.request
 import zlib
@@ -41,7 +45,7 @@ METRES_PER_DEGREE_LAT = 110574
 METRES_PER_DEGREE_LON_AT_EQUATOR = 111320
 CACHE = Path(__file__).parent / 'osm-cache'
 OVERPASS = 'https://overpass-api.de/api/interpreter'
-FLOAT, UINT8, UINT32 = 5126, 5121, 5125
+FLOAT, UINT8, UINT16, UINT32 = 5126, 5121, 5123, 5125
 METRES_PER_LEVEL = 3.5
 # How far either side of the loop the rooftops count when checking its clearance, metres: a
 # paramotor's wing is about 14 m across at this scale
@@ -56,25 +60,40 @@ MID = ['#c9b99a', '#b8a585', '#a35f45', '#d4c7ad', '#9a8f84', '#bfae8f', '#8e524
 TALL = ['#6f8aa0', '#7d95a8', '#5c7389', '#8fa3b0', '#a7b4bb', '#4f6476']
 
 
-def fetch(location):
-    """The bbox's buildings and building parts, from the cache or Overpass"""
+# What to fetch from OpenStreetMap, as Overpass filters, each fetched as ways and relations
+LAYERS = {
+    'buildings': ['["building"]', '["building:part"]'],
+    'parks': ['["leisure"~"^(park|garden|playground|pitch)$"]', '["landuse"~"^(grass|recreation_ground)$"]'],
+    'water': ['["natural"="water"]'],
+}
+
+
+def fetch(location, layer):
+    """One layer of the bbox from OpenStreetMap, from the cache or Overpass"""
     b = location['bbox']
     box = f"{b['south']},{b['west']},{b['north']},{b['east']}"
     # Named by the bbox too, so changing it fetches again
-    path = CACHE / f"{location['id']}-{zlib.crc32(box.encode()):08x}-buildings.json"
+    path = CACHE / f"{location['id']}-{zlib.crc32(box.encode()):08x}-{layer}.json"
     if not path.exists():
-        query = (
-            f'[out:json][timeout:300];(way["building"]({box});relation["building"]({box});'
-            f'way["building:part"]({box});relation["building:part"]({box}););out tags geom;'
-        )
-        print('fetching buildings from Overpass')
+        parts = ''.join(f'way{f}({box});relation{f}({box});' for f in LAYERS[layer])
+        query = f'[out:json][timeout:300];({parts});out tags geom;'
+        print(f'fetching {layer} from Overpass')
         request = urllib.request.Request(
             OVERPASS,
             data=urllib.parse.urlencode({'data': query}).encode(),
             headers={'User-Agent': 'lanzarote3d city-to-glb'},
         )
         CACHE.mkdir(exist_ok=True)
-        path.write_bytes(urllib.request.urlopen(request, timeout=320).read())
+        # Overpass is busy now and then (429, 502, 504): wait and ask again
+        for attempt in range(4):
+            try:
+                path.write_bytes(urllib.request.urlopen(request, timeout=320).read())
+                break
+            except urllib.error.HTTPError as error:
+                if attempt == 3 or error.code not in (429, 502, 503, 504):
+                    raise
+                print(f'Overpass said {error.code}, trying again')
+                time.sleep(20 * (attempt + 1))
     return json.loads(path.read_text())['elements']
 
 
@@ -181,11 +200,47 @@ class Grid:
             }
         }
 
+    def world_xz(self, col, row, location):
+        """World x and z of a grid point, rounded, for the GLB's extras"""
+        east, south = self.world(col, row)
+        upm = location['unitsPerMetre']
+        return [round(float(east) * upm, 1), round(float(south) * upm, 1)]
+
     def inside(self):
         """Cells whose centre lies in the bbox"""
         cc, rr = np.meshgrid(np.arange(self.cols) + 0.5, np.arange(self.rows) + 0.5)
         east, south = self.world(cc, rr)
         return (np.abs(east) <= self.half_w) & (np.abs(south) <= self.half_d)
+
+
+def cells_of(grid, outer, inner):
+    """The cells a polygon with holes covers: (rows, cols) slices and a mask, or None"""
+    polygons = [[grid.cell(lat, lon) for lat, lon in ring] for ring in outer + inner]
+    xs = [x for poly in polygons for x, _ in poly]
+    ys = [y for poly in polygons for _, y in poly]
+    if not xs:
+        return None
+    c0, c1 = max(int(min(xs)), 0), min(int(max(xs)) + 1, grid.cols)
+    r0, r1 = max(int(min(ys)), 0), min(int(max(ys)) + 1, grid.rows)
+    if c1 <= c0 or r1 <= r0:
+        return None
+    mask = Image.new('1', (c1 - c0, r1 - r0), 0)
+    draw = ImageDraw.Draw(mask)
+    for k, poly in enumerate(polygons):
+        points = [(x - c0 - 0.5, y - r0 - 0.5) for x, y in poly]
+        if len(points) >= 3:
+            draw.polygon(points, fill=1 if k < len(outer) else 0)
+    return (slice(r0, r1), slice(c0, c1)), np.array(mask, bool)
+
+
+def coverage(grid, elements):
+    """Every cell any of the elements' polygons covers"""
+    covered = np.zeros((grid.rows, grid.cols), bool)
+    for element in elements:
+        found = cells_of(grid, *rings(element))
+        if found:
+            covered[found[0]] |= found[1]
+    return covered
 
 
 def rasterise(location, grid, elements):
@@ -202,24 +257,14 @@ def rasterise(location, grid, elements):
         if not outer:
             continue
         height = height_of(tags, default)
-        polygons = [[grid.cell(lat, lon) for lat, lon in ring] for ring in outer + inner]
-        xs = [x for poly in polygons for x, _ in poly]
-        ys = [y for poly in polygons for _, y in poly]
-        c0, c1 = max(int(min(xs)), 0), min(int(max(xs)) + 1, grid.cols)
-        r0, r1 = max(int(min(ys)), 0), min(int(max(ys)) + 1, grid.rows)
-        if c1 <= c0 or r1 <= r0:
+        found = cells_of(grid, outer, inner)
+        if not found:
             continue
-        mask = Image.new('1', (c1 - c0, r1 - r0), 0)
-        draw = ImageDraw.Draw(mask)
-        for k, poly in enumerate(polygons):
-            points = [(x - c0 - 0.5, y - r0 - 0.5) for x, y in poly]
-            if len(points) >= 3:
-                draw.polygon(points, fill=1 if k < len(outer) else 0)
-        cells = np.array(mask, bool)
-        region = heights[r0:r1, c0:c1]
+        where, cells = found
+        region = heights[where]
         wins = cells & (height > region)
         region[wins] = height
-        owner[r0:r1, c0:c1][wins] = len(colours)
+        owner[where][wins] = len(colours)
         colours.append(facade(tags, height, f"{element['type']}{element['id']}"))
         styles.append(CURTAIN if height >= 120 else PUNCHED)
     outside = ~grid.inside()
@@ -227,6 +272,130 @@ def rasterise(location, grid, elements):
     owner[outside] = -1
     print(f'{len(colours)} buildings on a {grid.cols}x{grid.rows} grid of {grid.size} m, tallest {heights.max():.0f} m')
     return heights, owner, colours, styles
+
+
+# The street layer, painted a texel a cell on one quad under the buildings (sRGB): as blocks it
+# came to 300k triangles, chopped up by crosswalks and park edges
+SURFACES = {
+    'road': '#3b3d41',
+    'crosswalk': '#e4e4de',
+    'sidewalk': '#a19e95',
+    'grass': '#527c3b',
+    'pond': '#2d5268',
+}
+# The street quad sits this far above the ground, metres, clear of the terrain under it
+STREET_LIFT = 0.1
+# Open runs at least this long, in cells, are avenues and streets; where both cross, a junction
+THROUGH = 40
+# A lane for cars needs a run this long, in cells
+LANE_MIN = 60
+
+
+def dem():
+    """3d/dem-to-glb.py, for its height sampler: land is where the DEM is above 0 m"""
+    spec = importlib.util.spec_from_file_location('dem_to_glb', Path(__file__).parent / 'dem-to-glb.py')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def runs(mask, axis):
+    """The length of the run of True each cell sits in, along rows (axis 1) or columns (axis 0)"""
+    out = np.zeros(mask.shape, np.int32)
+    lines = mask if axis == 1 else mask.T
+    target = out if axis == 1 else out.T
+    for k, line in enumerate(lines):
+        edges = np.flatnonzero(np.diff(np.concatenate(([0], line.astype(np.int8), [0]))))
+        for start, end in zip(edges[::2], edges[1::2]):
+            target[k, start:end] = end - start
+    return out
+
+
+def grow(mask, steps=1):
+    """The mask spread `steps` cells up, down, left and right"""
+    out = mask.copy()
+    for _ in range(steps):
+        spread = out.copy()
+        spread[1:] |= out[:-1]
+        spread[:-1] |= out[1:]
+        spread[:, 1:] |= out[:, :-1]
+        spread[:, :-1] |= out[:, 1:]
+        out = spread
+    return out
+
+
+def lay_streets(location, grid, heights):
+    """Paint the land between the buildings as sidewalks, roads, crosswalks, grass and ponds,
+    and find the lanes cars drive: returns an RGBA image a pixel a cell (clear off the land) and
+    the lanes as grid (col, row) end points"""
+    cc, rr = np.meshgrid(np.arange(grid.cols) + 0.5, np.arange(grid.rows) + 0.5)
+    east, south = grid.world(cc, rr)
+    lat = grid.lat0 - south / METRES_PER_DEGREE_LAT
+    lon = grid.lon0 + east / grid.mlon
+    land = dem().sampler(location['bbox'])(lat, lon) > 0
+    built = heights > 0
+    open_land = ~built & land & grid.inside()
+    parks = coverage(grid, fetch(location, 'parks')) & open_land
+    ponds = coverage(grid, fetch(location, 'water')) & open_land
+    sidewalk = open_land & grow(built) & ~parks & ~ponds
+    road = open_land & ~sidewalk & ~parks & ~ponds
+
+    # Avenues run up the columns, streets along the rows; where both are long, a junction
+    through = road | sidewalk
+    up, across = runs(through, 0), runs(through, 1)
+    junction = road & (up >= THROUGH) & (across >= THROUGH)
+    avenue = road & (up >= THROUGH) & ~junction
+    street = road & (across >= THROUGH) & ~junction
+    # Zebra stripes a cell wide just outside each junction, across the road they cross
+    zebra = np.zeros_like(road)
+    near_v = np.zeros_like(road)
+    near_v[1:] |= junction[:-1]
+    near_v[:-1] |= junction[1:]
+    near_u = np.zeros_like(road)
+    near_u[:, 1:] |= junction[:, :-1]
+    near_u[:, :-1] |= junction[:, 1:]
+    zebra |= avenue & near_v & (cc.astype(int) % 2 == 0)
+    zebra |= street & near_u & (rr.astype(int) % 2 == 0)
+
+    layers = [
+        ('road', road & ~zebra),
+        ('crosswalk', zebra),
+        ('sidewalk', sidewalk),
+        ('grass', parks),
+        ('pond', ponds),
+    ]
+    image = np.zeros((grid.rows, grid.cols, 4), np.uint8)
+    image[built & land] = [*bytes.fromhex(SURFACES['sidewalk'][1:]), 255]
+    for name, mask in layers:
+        image[mask] = [*bytes.fromhex(SURFACES[name][1:]), 255]
+
+    # Lanes: down each run of roadway long enough, two to an avenue or street a third of the way
+    # in from each side, one if it's narrow
+    lanes = []
+    for axis, mask in ((0, avenue | junction), (1, street | junction)):
+        lines = mask.T if axis == 0 else mask
+        length = runs(mask, axis).T if axis == 0 else runs(mask, axis)
+        long = (length >= LANE_MIN)
+        busy = long.any(axis=1)
+        k = 0
+        while k < len(lines):
+            if not busy[k]:
+                k += 1
+                continue
+            start = k
+            while k < len(lines) and busy[k]:
+                k += 1
+            width = k - start
+            middle = (start + k) // 2
+            picks = [start + width / 3, start + 2 * width / 3] if width >= 4 else [start + width / 2]
+            edges = np.flatnonzero(np.diff(np.concatenate(([0], long[middle].astype(np.int8), [0]))))
+            for a, b in zip(edges[::2], edges[1::2]):
+                for n, at in enumerate(picks):
+                    ends = [(at, a), (at, b)] if axis == 0 else [(a, at), (b, at)]
+                    lanes.append(ends if n % 2 == 0 else ends[::-1])
+    counts = {name: int(mask.sum()) for name, mask in layers}
+    print(f'streets: {counts}, {len(lanes)} lanes')
+    return image, lanes
 
 
 def mesh(location, grid, heights, owner, colours, styles):
@@ -355,25 +524,69 @@ def pad4(chunk, fill):
     return chunk + fill * ((4 - len(chunk) % 4) % 4)
 
 
-def write_glb(positions, colours, windows, triangles, extras, dst):
-    blobs = [positions.tobytes(), pad4(colours.tobytes(), b'\0'), pad4(windows.tobytes(), b'\0'), triangles.tobytes()]
+def street_quad(location, grid):
+    """The quad the street image is laid on: the whole grid, a little above the ground"""
+    upm = location['unitsPerMetre']
+    y = (location['flatLand'] + STREET_LIFT) * upm * location['verticalExaggeration']
+    corners = [(0, 0), (grid.cols, 0), (grid.cols, grid.rows), (0, grid.rows)]
+    points = []
+    for col, row in corners:
+        east, south = grid.world(col, row)
+        points.append((east * upm, y, south * upm))
+    uvs = [(col / grid.cols, row / grid.rows) for col, row in corners]
+    e1, e2 = np.subtract(points[1], points[0]), np.subtract(points[2], points[0])
+    # Counter-clockwise seen from above
+    order = [0, 1, 2, 0, 2, 3] if np.cross(e1, e2)[1] > 0 else [0, 2, 1, 0, 3, 2]
+    return np.array(points, np.float32), np.array(uvs, np.float32), np.array(order, np.uint16)
+
+
+def png(image):
+    buffer = io.BytesIO()
+    Image.fromarray(image, 'RGBA').save(buffer, 'PNG', optimize=True)
+    return buffer.getvalue()
+
+
+def write_glb(positions, colours, windows, triangles, extras, streets, dst):
+    """The buildings (node 0) and the street quad with its image (node 1)"""
+    quad_points, quad_uvs, quad_order, image = streets
+    blobs = [
+        (positions.tobytes(), 34962),
+        (pad4(colours.tobytes(), b'\0'), 34962),
+        (pad4(windows.tobytes(), b'\0'), 34962),
+        (triangles.tobytes(), 34963),
+        (quad_points.tobytes(), 34962),
+        (quad_uvs.tobytes(), 34962),
+        (pad4(quad_order.tobytes(), b'\0'), 34963),
+        (pad4(png(image), b'\0'), None),
+    ]
     views, offset = [], 0
-    for blob, target in zip(blobs, (34962, 34962, 34962, 34963)):
-        views.append({'buffer': 0, 'byteOffset': offset, 'byteLength': len(blob), 'target': target})
+    for blob, target in blobs:
+        view = {'buffer': 0, 'byteOffset': offset, 'byteLength': len(blob)}
+        if target:
+            view['target'] = target
+        views.append(view)
         offset += len(blob)
     gltf = {
         'asset': {'version': '2.0', 'generator': '3d/city-to-glb.py'},
         'scene': 0,
-        'scenes': [{'nodes': [0]}],
-        'nodes': [{'mesh': 0, 'name': 'City', 'extras': extras}],
-        'materials': [{'pbrMetallicRoughness': {'baseColorFactor': [1, 1, 1, 1], 'metallicFactor': 0, 'roughnessFactor': 0.85}}],
-        'meshes': [
+        'scenes': [{'nodes': [0, 1]}],
+        'nodes': [{'mesh': 0, 'name': 'City', 'extras': extras}, {'mesh': 1, 'name': 'Streets'}],
+        'materials': [
+            {'pbrMetallicRoughness': {'baseColorFactor': [1, 1, 1, 1], 'metallicFactor': 0, 'roughnessFactor': 0.85}},
             {
-                'primitives': [
-                    {'attributes': {'POSITION': 0, 'COLOR_0': 1, '_WINDOWS': 2}, 'indices': 3, 'material': 0}
-                ]
-            }
+                'pbrMetallicRoughness': {'baseColorTexture': {'index': 0}, 'metallicFactor': 0, 'roughnessFactor': 0.95},
+                'alphaMode': 'MASK',
+                'alphaCutoff': 0.5,
+            },
         ],
+        'meshes': [
+            {'primitives': [{'attributes': {'POSITION': 0, 'COLOR_0': 1, '_WINDOWS': 2}, 'indices': 3, 'material': 0}]},
+            {'primitives': [{'attributes': {'POSITION': 4, 'TEXCOORD_0': 5}, 'indices': 6, 'material': 1}]},
+        ],
+        # Crisp texels up close, like the voxels; mipmapped far off so it doesn't shimmer
+        'samplers': [{'magFilter': 9728, 'minFilter': 9987, 'wrapS': 33071, 'wrapT': 33071}],
+        'images': [{'bufferView': 7, 'mimeType': 'image/png'}],
+        'textures': [{'sampler': 0, 'source': 0}],
         'buffers': [{'byteLength': offset}],
         'bufferViews': views,
         'accessors': [
@@ -388,10 +601,20 @@ def write_glb(positions, colours, windows, triangles, extras, dst):
             {'bufferView': 1, 'componentType': UINT8, 'normalized': True, 'count': len(colours), 'type': 'VEC3'},
             {'bufferView': 2, 'componentType': UINT8, 'count': len(windows), 'type': 'SCALAR'},
             {'bufferView': 3, 'componentType': UINT32, 'count': len(triangles), 'type': 'SCALAR'},
+            {
+                'bufferView': 4,
+                'componentType': FLOAT,
+                'count': 4,
+                'type': 'VEC3',
+                'min': quad_points.min(axis=0).tolist(),
+                'max': quad_points.max(axis=0).tolist(),
+            },
+            {'bufferView': 5, 'componentType': FLOAT, 'count': 4, 'type': 'VEC2'},
+            {'bufferView': 6, 'componentType': UINT16, 'count': 6, 'type': 'SCALAR'},
         ],
     }
     json_chunk = pad4(json.dumps(gltf, separators=(',', ':')).encode(), b' ')
-    bin_chunk = b''.join(blobs)
+    bin_chunk = b''.join(blob for blob, _ in blobs)
     total = 12 + 8 + len(json_chunk) + 8 + len(bin_chunk)
     Path(dst).parent.mkdir(parents=True, exist_ok=True)
     with open(dst, 'wb') as out:
@@ -406,6 +629,10 @@ if __name__ == '__main__':
         sys.exit(__doc__)
     location = json.load(open(sys.argv[1]))
     grid = Grid(location)
-    heights, owner, colours, styles = rasterise(location, grid, fetch(location))
+    heights, owner, colours, styles = rasterise(location, grid, fetch(location, 'buildings'))
     check_loop(location, grid, heights)
-    write_glb(*mesh(location, grid, heights, owner, colours, styles), grid.extras(location), sys.argv[2])
+    image, lanes = lay_streets(location, grid, heights)
+    extras = grid.extras(location)
+    extras['lanes'] = [[coordinate for end in lane for coordinate in grid.world_xz(*end, location)] for lane in lanes]
+    streets = (*street_quad(location, grid), image)
+    write_glb(*mesh(location, grid, heights, owner, colours, styles), extras, streets, sys.argv[2])

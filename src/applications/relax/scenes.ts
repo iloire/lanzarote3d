@@ -38,6 +38,8 @@ export interface RelaxScene {
   city?: string;
   /** Fly paramotors, which need no ridge, instead of paragliders */
   paramotor?: boolean;
+  /** FogExp2 density, thicker than the theme's to hide a city's far edges */
+  fogDensity?: number;
 }
 
 /** The relax fields of a location JSON (see src/locations/README.md) */
@@ -61,6 +63,8 @@ interface DemSceneConfig extends DemLocationConfig {
   }[];
   landmarks?: { name: string; kind: string; at: number[]; heading?: number; top?: number }[];
   paramotor?: boolean;
+  /** Metres at which the fog has hidden half of what's behind it */
+  fog?: number;
 }
 
 function demScene(location: Location, config: DemSceneConfig, city?: string): RelaxScene {
@@ -111,6 +115,8 @@ function demScene(location: Location, config: DemSceneConfig, city?: string): Re
     },
     city,
     paramotor: config.paramotor,
+    // FogExp2 hides half where (density × distance)² = ln 2
+    fogDensity: config.fog && Math.sqrt(Math.LN2) / (config.fog * config.unitsPerMetre),
   };
 }
 

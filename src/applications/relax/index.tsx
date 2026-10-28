@@ -18,6 +18,7 @@ import Models from '../../foundation/utils/models';
 import { DEFAULT_SCENE, RELAX_SCENES, RelaxScene } from './scenes';
 import { createLocationSwitcher } from './LocationSwitcher';
 import { PathTrail } from './pathTrail';
+import { CityTraffic, Lane } from '../../shared/env/cityTraffic';
 import { addCityWindows, CityGrid } from '../../foundation/rendering/cityWindows';
 
 const PILOTS = 5;
@@ -29,6 +30,9 @@ const PARAMOTOR_SPEED = 2;
 const CHASE_LAG = 5;
 const CHASE_RISE = 45;
 const CHASE_EASE = 0.6;
+// Cars on a city's lanes, standing on the street layer city-to-glb.py lays a little over the ground
+const TRAFFIC = { maxCars: 1500, spacing: 25, speed: [7, 13] as [number, number] };
+const TRAFFIC_LIFT = 0.1;
 // The camera drifts this far either side of where it starts, and takes this long to swing back
 const SWAY_ANGLE = THREE.MathUtils.degToRad(20);
 const SWAY_PERIOD = 90;
@@ -55,6 +59,7 @@ class RelaxApp extends TerrainBase {
   private animationId: number | undefined;
   private gliders: VehicleLoadResult[] = [];
   private removeSwitcher: (() => void) | undefined;
+  private traffic: CityTraffic | undefined;
 
   constructor() {
     const appConfig = getAppConfig('relax');
@@ -80,7 +85,10 @@ class RelaxApp extends TerrainBase {
         id
       );
 
-      const theme = getDefaultTheme();
+      const base = getDefaultTheme();
+      const theme = relax.fogDensity
+        ? { ...base, atmosphere: { ...base.atmosphere, fogDensity: relax.fogDensity } }
+        : base;
       await ThemeEngine.apply(options, theme);
       camera.position.copy(relax.camera.position);
       camera.lookAt(relax.camera.target);
@@ -99,7 +107,17 @@ class RelaxApp extends TerrainBase {
         const city = await Models.loadGltf(relax.city);
         city.scene.traverse(object => {
           const grid = object.userData['grid'] as CityGrid | undefined;
-          if (object instanceof THREE.Mesh && grid) addCityWindows(object, grid);
+          if (!(object instanceof THREE.Mesh) || !grid) return;
+          addCityWindows(object, grid);
+          const lanes = object.userData['lanes'] as Lane[] | undefined;
+          if (lanes?.length) {
+            this.traffic = new CityTraffic(lanes, {
+              ...TRAFFIC,
+              unitsPerMetre: grid.unitsPerMetre,
+              road: grid.ground + TRAFFIC_LIFT * grid.up,
+            });
+            scene.add(this.traffic.mesh);
+          }
         });
         scene.add(city.scene);
       }
@@ -216,6 +234,7 @@ class RelaxApp extends TerrainBase {
         lastTime = now;
         elapsed += deltaTime;
         motions.forEach(motion => motion.update(deltaTime));
+        this.traffic?.update(deltaTime);
 
         if (lead) {
           trail.push(elapsed, lead.position);
@@ -260,6 +279,8 @@ class RelaxApp extends TerrainBase {
     this.removeSwitcher = undefined;
     this.gliders.forEach(g => g.flyingBehavior?.dispose());
     this.gliders = [];
+    this.traffic?.dispose();
+    this.traffic = undefined;
     super.dispose();
   }
 }

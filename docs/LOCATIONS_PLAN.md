@@ -138,7 +138,9 @@ terrainPosition, anchor, regions }` — only what `TerrainBase` reads today~~ �
 - ~~Camera low over Bryant Park looking up the avenues; Central Park and Bryant Park green~~ ✅
 - ~~Windows drawn in the shader on the voxel grid (punched in masonry, curtain walls on towers)~~ ✅
 - ~~Only Abel's paramotor, chased along his own path (`pathTrail.ts`), at twice a wing's speed~~ ✅
-- Not done: street detail and cars, fog, Central Park's trees and water, the rest of Manhattan.
+- ~~Street layer (roads, sidewalks, crosswalks, parks, ponds) as one textured quad, cars on its lanes~~ ✅
+- ~~Fog to fade the city's far edge (`fog`)~~ ✅
+- Not done: Central Park's trees, the rest of Manhattan.
 
 ### 4. The relax app
 
