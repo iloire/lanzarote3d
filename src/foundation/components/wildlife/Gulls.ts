@@ -114,7 +114,7 @@ export class Gulls {
  * A gull facing +z: a slim body and gull-winged arms, each wing split at the wrist so the
  * outer half can lag the inner half in the wingbeat. aWing is 0 at the body, 1 at the tip.
  */
-function createGullGeometry(span: number, plumage: Plumage): THREE.BufferGeometry {
+export function createGullGeometry(span: number, plumage: Plumage): THREE.BufferGeometry {
   const s = span / 2;
   const positions: number[] = [];
   const wing: number[] = [];

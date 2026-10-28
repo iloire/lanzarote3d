@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-28 00:31 UTC
+
+### Added
+- **A guirre comes to fly with Magne**: in the home scene one of the pair keeps circling off the Mirador while the other circles for 35-60 s, flies over to Magne, glides just off one of his wingtips for 15-25 s, peels back to its circles and does it again (the first visit comes 10-20 s in). It's steered on the CPU each frame (`GuirreVisitor`), banking into its turns; the famara-animation scene, which has no Magne, keeps both birds circling
+
 ## 2026-10-28 00:26 UTC
 
 ### Changed

@@ -49,6 +49,8 @@ import { createPilotPicker } from './PilotPicker';
 import { pilotFromSearch, searchWithPilot } from './pilotParam';
 import type { ParagliderMotion } from './paragliderMotion';
 import type { SmokeTrail } from '../../foundation/components/effects/SmokeTrail';
+import { GuirreVisitor } from '../../foundation/components/wildlife/GuirreVisitor';
+import { CharacterType } from '../../foundation/components/characters/CharacterRegistry';
 
 /**
  * Home App - Landing scene with the voxel title
@@ -56,6 +58,7 @@ import type { SmokeTrail } from '../../foundation/components/effects/SmokeTrail'
  */
 class HomeApp extends TerrainBase {
   private environment: Environment | undefined;
+  private guirreVisitor: GuirreVisitor | undefined;
   private animationId: number | undefined;
   private paragliderMeshes: THREE.Object3D[] = [];
   private paragliderFlyingBehaviors: FlyingBehavior[] = [];
@@ -191,7 +194,13 @@ class HomeApp extends TerrainBase {
 
       this.environment.addGulls(FAMARA_GULL_FLOCKS);
       this.environment.addRavens(RISCO_RAVEN_FLOCKS);
-      this.environment.addGuirres(RISCO_GUIRRE_FLOCKS);
+      // One of the pair keeps circling; the other comes over to glide with Magne now and then
+      this.environment.addGuirres(RISCO_GUIRRE_FLOCKS.map(flock => ({ ...flock, count: 1 })));
+      const magne = scene.getObjectByName(`paraglider-${CharacterType.MAGNE}`);
+      if (magne && RISCO_GUIRRE_FLOCKS[0]) {
+        this.guirreVisitor = new GuirreVisitor(RISCO_GUIRRE_FLOCKS[0].center, magne);
+        scene.add(this.guirreVisitor.mesh);
+      }
 
       if (SHOW_CAMERA_TARGET_UI) {
         this.targetController = new CameraTargetController(
@@ -337,6 +346,7 @@ class HomeApp extends TerrainBase {
         }
 
         this.paragliderMotions.forEach(motion => motion.update(deltaTime));
+        this.guirreVisitor?.update(deltaTime);
 
         // Carry the camera after the lead pilot on a spring; the intro animation places it itself.
         const following = !this.isAnimating && !this.targetController;
@@ -415,6 +425,9 @@ class HomeApp extends TerrainBase {
     this.paragliderFlyingBehaviors.forEach(behavior => behavior.dispose());
     this.paragliderFlyingBehaviors.length = 0;
     this.paragliderMotions.length = 0;
+
+    this.guirreVisitor?.dispose();
+    this.guirreVisitor = undefined;
 
     if (this.hanggliderFlyingBehavior) {
       this.hanggliderFlyingBehavior.dispose();
