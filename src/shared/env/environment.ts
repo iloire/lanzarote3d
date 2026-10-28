@@ -160,7 +160,7 @@ export const RISCO_RAVEN_FLOCKS: GullFlock[] = [
  * config: 1659-1753 m, centred near x 12953, z -12028).
  */
 export const RISCO_GUIRRE_FLOCKS: GullFlock[] = [
-  { center: new THREE.Vector3(12953, 1830, -12028), count: 2 },
+  { center: new THREE.Vector3(12953, 1770, -12028), count: 2 },
 ];
 
 class Environment {
@@ -210,8 +210,8 @@ class Environment {
   addGuirres(flocks: GullFlock[]): Gulls {
     this.guirres = new Gulls(flocks, {
       wingspan: 5,
-      minRadius: 150,
-      maxRadius: 300,
+      minRadius: 80,
+      maxRadius: 150,
       spread: 0.3,
       plumage: GUIRRE,
       flapping: 0.1,

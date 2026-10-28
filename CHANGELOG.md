@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-28 00:26 UTC
+
+### Changed
+- **The guirres come in closer to Magne**: down to ~1770 m, just over his loop, on tighter 80-150 m circles so they read from his glider
+
 ## 2026-10-28 00:23 UTC
 
 ### Changed
