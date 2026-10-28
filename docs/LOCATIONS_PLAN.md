@@ -69,7 +69,7 @@ Branch: `feature/locations`, in the worktree `~/code/lanzarote3d-locations`.
 - ~~Soaring loop on Pedra Bonita's east face, 580–670 m, ≥ 100 m over the ground; launch, landing
   and peaks from OSM (Nominatim)~~ ✅
 - ~~Camera high over the sea off São Conrado; cumulus over Tijuca, Corcovado and Pedra Branca~~ ✅
-- Later: built-up São Conrado (a grey region there read as haze on the hillside, so it was
+- Later: towns and scatter for Rio too (the same JSON fields); built-up São Conrado (a grey region there read as haze on the hillside, so it was
   dropped), Cristo on Corcovado, frigatebirds and black vultures.
 
 ### 3b. Tenerife (curated)
@@ -79,12 +79,17 @@ Branch: `feature/locations`, in the worktree `~/code/lanzarote3d-locations`.
   slope around the takeoff at 1,000–1,100 m, ≥ 187 m clear~~ ✅
 - ~~Camera on the line from El Teide through the loop, so Teide stands behind the gliders;
   pine belt green, Las Cañadas and the cones dark~~ ✅
+- ~~Towns from OSM (Adeje, Fañabé, Costa Adeje, Playa de las Américas, La Caleta, Armeñime,
+  Playa Paraíso, Callao Salvaje, Taucho, Ifonche); pines in the Corona Forestal, cardones and
+  boulders on the dry slopes, rocks in Las Cañadas (`shared/env/scatter.ts`, instanced)~~ ✅
+- ~~Full orbit so the viewer can turn to the beach; panning held within 3,000 units~~ ✅
 
 ### 4. The relax app
 - ~~Started as a private route of the Lanzarote build, `relax.html?location=lanzarote |
   rio-de-janeiro`: five gliders on the place's loop, camera swaying ±20° over 90 s, drag to take
   over (`src/applications/relax/`)~~ ✅
-- ~~Camera limits so no terrain edge shows: no pan, zoom out ≤ 1.5× the start, orbit ±60°~~ ✅
+- ~~Camera limits so no terrain edge shows: pan ≤ 3,000 units, zoom out ≤ 1.5× the start,
+  orbit ±60° unless the place allows more, camera kept 40 units above the ground~~ ✅
 - `src/relax/index.tsx` + `webpack.relax.config.js` → `dist-relax/`.
 - Picker (Lanzarote, Rio) → one slow scene per place: drifting camera along the ridge, a few
   gliders, sea, birds, time-of-day from the location's sun. No UI chrome once it starts.

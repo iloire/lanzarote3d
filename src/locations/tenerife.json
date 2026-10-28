@@ -45,9 +45,10 @@
     ]
   },
   "camera": {
-    "about": "On the line from El Teide through the loop, 2 km out towards the coast at the gliders' height, so Teide stands behind them; [lat, lon, metres]",
+    "about": "On the line from El Teide through the loop, 2 km out towards the coast at the gliders' height, so Teide stands behind them; orbit: degrees either side the viewer may turn (180 = all the way round, to the beach); [lat, lon, metres]",
     "at": [28.1257, -16.747, 1000],
-    "lookAt": [28.143, -16.735, 1000]
+    "lookAt": [28.143, -16.735, 1000],
+    "orbit": 180
   },
   "clouds": [
     {
@@ -118,6 +119,122 @@
       "radius": 1200,
       "color": "#4a2a1e",
       "strength": 0.7
+    }
+  ],
+  "towns": [
+    {
+      "name": "Adeje, the old town round the town hall",
+      "at": [28.1227, -16.72419],
+      "houseCount": 140,
+      "formation": "suburban"
+    },
+    {
+      "name": "Fañabé",
+      "at": [28.10753, -16.72971],
+      "houseCount": 90,
+      "formation": "grid",
+      "spacing": 0.7
+    },
+    {
+      "name": "Costa Adeje",
+      "at": [28.08698, -16.7358],
+      "houseCount": 200,
+      "formation": "grid",
+      "spacing": 0.6
+    },
+    {
+      "name": "Playa de las Américas",
+      "at": [28.0602, -16.73105],
+      "houseCount": 160,
+      "formation": "grid",
+      "spacing": 0.6
+    },
+    {
+      "name": "La Caleta",
+      "at": [28.102, -16.751],
+      "houseCount": 40,
+      "formation": "grid",
+      "spacing": 0.6
+    },
+    {
+      "name": "Armeñime",
+      "at": [28.12978, -16.75534],
+      "houseCount": 50,
+      "formation": "suburban"
+    },
+    {
+      "name": "Playa Paraíso",
+      "at": [28.12202, -16.77315],
+      "houseCount": 60,
+      "formation": "grid",
+      "spacing": 0.6
+    },
+    {
+      "name": "Callao Salvaje",
+      "at": [28.13068, -16.77734],
+      "houseCount": 50,
+      "formation": "grid",
+      "spacing": 0.7
+    },
+    {
+      "name": "Taucho, farmsteads below the takeoff",
+      "at": [28.15322, -16.72732],
+      "houseCount": 15,
+      "formation": "rural",
+      "spacing": 3
+    },
+    {
+      "name": "Ifonche",
+      "at": [28.13487, -16.68995],
+      "houseCount": 12,
+      "formation": "rural",
+      "spacing": 3
+    }
+  ],
+  "scatter": [
+    {
+      "kind": "pine",
+      "about": "Corona Forestal above Adeje",
+      "at": [28.19, -16.72],
+      "radius": 4500,
+      "count": 900,
+      "minAltitude": 1000,
+      "maxAltitude": 2100
+    },
+    {
+      "kind": "pine",
+      "about": "Corona Forestal towards Vilaflor",
+      "at": [28.18, -16.66],
+      "radius": 4000,
+      "count": 700,
+      "minAltitude": 1000,
+      "maxAltitude": 2100
+    },
+    {
+      "kind": "cardon",
+      "about": "Cardonal on the dry slopes between the coast and Taucho",
+      "at": [28.13, -16.73],
+      "radius": 4000,
+      "count": 500,
+      "minAltitude": 30,
+      "maxAltitude": 700
+    },
+    {
+      "kind": "rock",
+      "about": "Boulders on the barrancos and slopes",
+      "at": [28.14, -16.72],
+      "radius": 5000,
+      "count": 400,
+      "minAltitude": 100,
+      "maxAltitude": 1500
+    },
+    {
+      "kind": "rock",
+      "about": "Las Cañadas",
+      "at": [28.24, -16.63],
+      "radius": 4000,
+      "count": 300,
+      "minAltitude": 2000
     }
   ]
 }

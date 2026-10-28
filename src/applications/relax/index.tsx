@@ -9,18 +9,24 @@ import { OrbitControlsHelper } from '../../foundation/utils/OrbitControlsHelper'
 import { getAppConfig } from '../../config/app-registry';
 import { loadParagliders, VehicleLoadResult } from '../home/vehicleLoader';
 import { paraglidersVoxel, RIDGE_LOOP_TENSION } from '../home/config';
+import { addScatter } from '../../shared/env/scatter';
+import { getTerrainHeight } from '../../shared/env/mesh-utils';
+import { LevelOfDetail } from '../../foundation/types/lod';
 import { DEFAULT_SCENE, RELAX_SCENES, RelaxScene } from './scenes';
 
 const PILOTS = 5;
 // The camera drifts this far either side of where it starts, and takes this long to swing back
 const SWAY_ANGLE = THREE.MathUtils.degToRad(20);
 const SWAY_PERIOD = 90;
-// How far the viewer may take the camera: a terrain ends at its box, so zooming out or
-// orbiting round behind the hills would show its edges.
+// How far the viewer may take the camera: a terrain ends at its box, so zooming out, panning
+// far or orbiting round behind the hills would show its edges.
 const MAX_ZOOM_OUT = 1.5;
 const MIN_DISTANCE = 150;
-const ORBIT_LIMIT = THREE.MathUtils.degToRad(60);
+const DEFAULT_ORBIT = 60;
+const PAN_LIMIT = 3000;
 const LOWEST_VIEW = THREE.MathUtils.degToRad(85);
+// The camera never goes nearer the ground than this
+const GROUND_CLEARANCE = 40;
 
 /**
  * Pick a place (?location=lanzarote | tenerife | rio-de-janeiro) and watch a few gliders soar its ridge
@@ -72,7 +78,17 @@ class RelaxApp extends TerrainBase {
         { waypoints: relax.loop, tension: RIDGE_LOOP_TENSION }
       );
 
-      this.startAnimationLoop(renderer, scene, camera, controls, relax);
+      const { terrain } = options;
+      if (terrain && (relax.towns || relax.scatter)) {
+        // Houses and scatter are dropped onto the ground, so its matrices must be current
+        renderer.render(scene, camera);
+        if (relax.towns) {
+          await environment.addTownsFromConfig(relax.towns, terrain, true, LevelOfDetail.ULTRA_LOW);
+        }
+        if (relax.scatter) addScatter(scene, terrain, relax.scatter);
+      }
+
+      this.startAnimationLoop(renderer, scene, camera, controls, relax, terrain);
       console.log(`✅ ${this.config.name} loaded: ${relax.location.name}`);
     } catch (error) {
       this.handleError(error as Error, 'load');
@@ -80,16 +96,36 @@ class RelaxApp extends TerrainBase {
     }
   }
 
-  /** Keep the viewer near the gliders: no panning, a little zoom, part of an orbit */
+  /** Keep the viewer near the gliders: a little zoom, the scene's orbit, panning held below */
   private limitControls(controls: OrbitControls, relax: RelaxScene): void {
     const offset = relax.camera.position.clone().sub(relax.camera.target);
     const azimuth = Math.atan2(offset.x, offset.z);
-    controls.enablePan = false;
+    const orbit = relax.orbit ?? DEFAULT_ORBIT;
     controls.minDistance = MIN_DISTANCE;
     controls.maxDistance = offset.length() * MAX_ZOOM_OUT;
-    controls.minAzimuthAngle = azimuth - ORBIT_LIMIT;
-    controls.maxAzimuthAngle = azimuth + ORBIT_LIMIT;
+    controls.minAzimuthAngle = orbit >= 180 ? -Infinity : azimuth - THREE.MathUtils.degToRad(orbit);
+    controls.maxAzimuthAngle = orbit >= 180 ? Infinity : azimuth + THREE.MathUtils.degToRad(orbit);
     controls.maxPolarAngle = LOWEST_VIEW;
+  }
+
+  /** Pull a pan back within PAN_LIMIT of the start, and lift the camera clear of the ground */
+  private holdCamera(
+    camera: THREE.PerspectiveCamera,
+    controls: OrbitControls,
+    start: THREE.Vector3,
+    terrain?: THREE.Mesh
+  ): void {
+    const drift = controls.target.clone().sub(start);
+    if (drift.length() > PAN_LIMIT) {
+      const excess = drift.setLength(drift.length() - PAN_LIMIT);
+      controls.target.sub(excess);
+      camera.position.sub(excess);
+    }
+    if (!terrain) return;
+    const ground = getTerrainHeight(camera.position.x, camera.position.z, terrain);
+    if (!isNaN(ground) && camera.position.y < ground + GROUND_CLEARANCE) {
+      camera.position.y = ground + GROUND_CLEARANCE;
+    }
   }
 
   private startAnimationLoop(
@@ -97,7 +133,8 @@ class RelaxApp extends TerrainBase {
     scene: THREE.Scene,
     camera: THREE.PerspectiveCamera,
     controls: OrbitControls,
-    relax: RelaxScene
+    relax: RelaxScene,
+    terrain?: THREE.Mesh
   ): void {
     const motions = this.gliders.flatMap(g => (g.motion ? [g.motion] : []));
     const offset = relax.camera.position.clone().sub(relax.camera.target);
@@ -122,6 +159,7 @@ class RelaxApp extends TerrainBase {
           camera.lookAt(relax.camera.target);
         } else {
           OrbitControlsHelper.update(controls);
+          this.holdCamera(camera, controls, relax.camera.target, terrain);
         }
 
         this.renderFrame(renderer, scene, camera);
