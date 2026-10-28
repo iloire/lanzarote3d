@@ -1,0 +1,84 @@
+{
+  "regions": [
+    {
+      "name": "Timanfaya and the 1730-36 lava fields, Tinajo to Yaiza",
+      "kind": "volcanic",
+      "at": [29.01, -13.75],
+      "radius": 8500,
+      "color": "#1f1c1b",
+      "strength": 1
+    },
+    {
+      "name": "Montañas del Fuego, the red cones around Islote de Hilario",
+      "kind": "volcanic",
+      "at": [29.005, -13.755],
+      "radius": 2800,
+      "color": "#4a2419",
+      "strength": 0.9
+    },
+    {
+      "name": "La Geria, black lapilli over the vineyards",
+      "kind": "volcanic",
+      "at": [28.97, -13.71],
+      "radius": 3800,
+      "color": "#222020",
+      "strength": 0.9
+    },
+    {
+      "name": "Malpaís de la Corona, Volcán de la Corona's lava down to Órzola",
+      "kind": "volcanic",
+      "at": [29.17, -13.455],
+      "radius": 3500,
+      "color": "#242120",
+      "strength": 0.85
+    },
+    {
+      "name": "Haría, the valley of a thousand palms",
+      "kind": "green",
+      "at": [29.14, -13.5],
+      "radius": 3500,
+      "color": "#3a3d27",
+      "strength": 0.85
+    },
+    {
+      "name": "The Famara massif above the Risco",
+      "kind": "green",
+      "at": [29.12, -13.525],
+      "radius": 4500,
+      "color": "#3b3a2a",
+      "strength": 0.6
+    },
+    {
+      "name": "El Jable, the pale sand blown in from Famara beach",
+      "kind": "desert",
+      "at": [29.085, -13.6],
+      "radius": 3800,
+      "color": "#5e503b",
+      "strength": 0.7
+    },
+    {
+      "name": "The Teguise and San Bartolomé plains",
+      "kind": "desert",
+      "at": [29.03, -13.58],
+      "radius": 7000,
+      "color": "#4d3d2c",
+      "strength": 0.7
+    },
+    {
+      "name": "Los Ajaches and Femés, the old eroded south",
+      "kind": "desert",
+      "at": [28.895, -13.79],
+      "radius": 6000,
+      "color": "#5a412c",
+      "strength": 0.9
+    },
+    {
+      "name": "The Rubicón plain behind Playa Blanca",
+      "kind": "desert",
+      "at": [28.875, -13.84],
+      "radius": 4000,
+      "color": "#5e4a33",
+      "strength": 0.8
+    }
+  ]
+}

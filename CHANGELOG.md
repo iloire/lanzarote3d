@@ -2,6 +2,11 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-28 08:44 UTC
+
+### Added
+- **Terrain coloured by region**: the ground is no longer one brown. Timanfaya, La Geria and the Malpaís de la Corona are black lava with red cones at Montañas del Fuego, Haría and the Famara massif lean olive, the south and central plains are ochre and El Jable is pale sand. The regions live in `src/shared/env/terrain-regions.json` (lat/lon, radius, colour, strength) and are baked one colour per triangle into the underlay
+
 ## 2026-10-28 08:34 UTC
 
 ### Fixed

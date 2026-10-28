@@ -27,6 +27,31 @@ bends. The road's look (width, colour, height above the ground) is `ROAD_STYLE` 
 The towns the roads join (`TOWN_*` in `environment.ts`) are placed from their OSM place nodes
 with the same anchor, so roads and towns stay together.
 
+## `terrain-regions.json`
+
+The ground's colour by region, so the island reads like the satellite view: black lava in
+Timanfaya, La Geria and the Malpaís de la Corona, olive in Haría and on the Famara massif, ochre
+in the south and on the central plains, pale sand on El Jable. `terrainRegions.ts` projects each
+with `ISLAND_ANCHOR`; the underlay bakes one colour per triangle from them
+(`foundation/rendering/regionTint.ts`). Ground outside every region keeps the theme's colour.
+
+```jsonc
+{
+  "regions": [
+    {
+      "name": "…", // free text: what the patch is
+      "kind": "volcanic", // volcanic | green | desert, for reading only
+      "at": [lat, lon], // the centre
+      "radius": 8500, // metres; full strength out to 35% of it, then fading to nothing
+      "color": "#1f1c1b", // sRGB, about as dark as the theme's underlay colour: the sun brightens it a lot
+      "strength": 1 // 0-1, how much of the theme's colour it replaces at the centre
+    }
+  ]
+}
+```
+
+Where regions overlap their colours are averaged by weight. Beaches stay sand coloured on top.
+
 ## `landmarks.json`
 
 The landmarks on the Risco, at its takeoffs and in Haría, placed from OpenStreetMap. `landmarks.ts` projects

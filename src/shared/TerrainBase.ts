@@ -9,6 +9,7 @@ import { bakeCoastField } from '../foundation/rendering/CoastField';
 import { OceanMaterial } from '../foundation/rendering/OceanMaterial';
 import { ThemeEngine } from '../foundation/systems/ThemeEngine';
 import { getDefaultTheme } from '../foundation/themes';
+import { TERRAIN_REGIONS } from './env/terrainRegions';
 
 /**
  * TerrainBase - Specialized base that injects terrain (island) environment
@@ -54,6 +55,7 @@ export abstract class TerrainBase extends AppBase {
 
     island.scale.set(scale, scale, scale);
     island.position.set(...position);
+    islandInstance.setRegions(TERRAIN_REGIONS);
     scene.add(island);
 
     options.terrain = island;

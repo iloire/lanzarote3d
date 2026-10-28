@@ -6,6 +6,7 @@ import { TerrainTheme } from '../../types/Theme';
 import { logger } from '../../utils/logger';
 import { addCloudShadows } from '../../rendering/shaderChunks';
 import { bakeFaceShading } from '../../rendering/faceShading';
+import { GroundRegion, bakeRegionTint } from '../../rendering/regionTint';
 
 THREE.Mesh.prototype.raycast = acceleratedRaycast;
 
@@ -69,13 +70,18 @@ const LINE_WIDTH_PX = 1.0;
  * The underlay's copy of the island: one vertex per triangle corner, each tagged with a
  * barycentric coordinate, so the fragment shader knows how far it is from every edge.
  */
-const toBarycentricGeometry = (geometry: THREE.BufferGeometry): THREE.BufferGeometry => {
+const toBarycentricGeometry = (
+  geometry: THREE.BufferGeometry,
+  regions: GroundRegion[],
+  toWorld: THREE.Matrix4
+): THREE.BufferGeometry => {
   const ground = geometry.index ? geometry.toNonIndexed() : geometry.clone();
   const count = ground.getAttribute('position').count;
   const bary = new Uint8Array(count * 3);
   for (let i = 0; i < count; i++) bary[i * 3 + (i % 3)] = 1;
   ground.setAttribute('lzBarycentric', new THREE.BufferAttribute(bary, 3, true));
   ground.setAttribute('lzFace', bakeFaceShading(ground));
+  ground.setAttribute('lzRegion', bakeRegionTint(ground, regions, toWorld));
   return ground;
 };
 
@@ -86,7 +92,8 @@ const DEFAULT_FACE_JITTER = 0.12;
 
 /**
  * The solid ground, which also draws the wireframe. Each triangle is flat-lit and one
- * colour: tinted from beach to peak by its centre height, lighter when level, darker when
+ * colour: tinted from beach to peak by its centre height, recoloured by the region it sits in
+ * (volcanic, green or desert; see bakeRegionTint), lighter when level, darker when
  * steep, and jittered a little so neighbours differ (see bakeFaceShading). The lines are
  * shaded into it from barycentric coordinates rather than drawn as GL
  * lines: 350k line segments into the 4x multisampled scene target cost more than the
@@ -96,7 +103,12 @@ const DEFAULT_FACE_JITTER = 0.12;
  * else drawn on the ground stay in front of it (polygon offset doesn't work with the
  * logarithmic depth buffer).
  */
-const createUnderlay = (geometry: THREE.BufferGeometry, lineFade: LineFade): THREE.Mesh => {
+const createUnderlay = (
+  geometry: THREE.BufferGeometry,
+  lineFade: LineFade,
+  regions: GroundRegion[],
+  toWorld: THREE.Matrix4
+): THREE.Mesh => {
   const material = new THREE.MeshStandardMaterial({
     roughness: 0.95,
     metalness: 0,
@@ -119,7 +131,7 @@ const createUnderlay = (geometry: THREE.BufferGeometry, lineFade: LineFade): THR
     shader.vertexShader = shader.vertexShader
       .replace(
         '#include <common>',
-        '#include <common>\nvarying float vLzHeight;\nattribute vec3 lzBarycentric;\nvarying vec3 vLzBary;\nattribute vec3 lzFace;\nvarying vec2 vLzFace;'
+        '#include <common>\nvarying float vLzHeight;\nattribute vec3 lzBarycentric;\nvarying vec3 vLzBary;\nattribute vec3 lzFace;\nvarying vec2 vLzFace;\nattribute vec4 lzRegion;\nvarying vec4 vLzRegion;'
       )
       .replace(
         '#include <project_vertex>',
@@ -128,6 +140,7 @@ const createUnderlay = (geometry: THREE.BufferGeometry, lineFade: LineFade): THR
         vLzHeight = (modelMatrix * vec4(transformed.x, lzFace.x, transformed.z, 1.0)).y;
         vLzBary = lzBarycentric;
         vLzFace = lzFace.yz;
+        vLzRegion = lzRegion;
         mvPosition.xyz *= 1.003;
         gl_Position = projectionMatrix * mvPosition;`
       );
@@ -138,6 +151,7 @@ const createUnderlay = (geometry: THREE.BufferGeometry, lineFade: LineFade): THR
         varying float vLzHeight;
         varying vec3 vLzBary;
         varying vec2 vLzFace;
+        varying vec4 vLzRegion;
         uniform vec2 uFacet;
         uniform vec3 uPeakColor;
         uniform vec3 uSandColor;
@@ -149,6 +163,7 @@ const createUnderlay = (geometry: THREE.BufferGeometry, lineFade: LineFade): THR
       .replace(
         'vec4 diffuseColor = vec4( diffuse, opacity );',
         `vec3 lzGround = mix( diffuse, uPeakColor, smoothstep( 60.0, 650.0, vLzHeight ) );
+        lzGround = mix( lzGround, vLzRegion.rgb, vLzRegion.a );
         lzGround = mix( uSandColor, lzGround, smoothstep( 4.0, 30.0, vLzHeight ) );
         float lzSteep = 1.0 - smoothstep( 0.7, 0.98, vLzFace.x );
         lzGround *= ( 1.0 + uFacet.x * ( 1.0 - 2.0 * lzSteep ) ) * ( 1.0 + uFacet.y * vLzFace.y );
@@ -166,7 +181,7 @@ const createUnderlay = (geometry: THREE.BufferGeometry, lineFade: LineFade): THR
   material.customProgramCacheKey = () => 'lz-underlay';
   addCloudShadows(material);
 
-  const underlay = new THREE.Mesh(toBarycentricGeometry(geometry), material);
+  const underlay = new THREE.Mesh(toBarycentricGeometry(geometry, regions, toWorld), material);
   underlay.name = 'island-underlay';
   underlay.castShadow = true;
   underlay.receiveShadow = true;
@@ -177,12 +192,21 @@ const createUnderlay = (geometry: THREE.BufferGeometry, lineFade: LineFade): THR
 class Island {
   private mesh: THREE.Mesh | null = null;
   private underlay: THREE.Mesh | null = null;
+  private regions: GroundRegion[] = [];
   /**
    * Load the island mesh from the Blender model
    */
   async load(manager: THREE.LoadingManager): Promise<THREE.Mesh> {
     this.mesh = await loadFromBlenderModel(manager);
     return this.mesh;
+  }
+
+  /**
+   * Colour patches of ground by region. Baked when the underlay is built, so call it
+   * before the theme is applied, once the island is placed in the scene.
+   */
+  setRegions(regions: GroundRegion[]): void {
+    this.regions = regions;
   }
 
   /**
@@ -285,7 +309,8 @@ class Island {
     fade.uLineFar.value = lines.wireframe ? (underlay.farLineOpacity ?? 0.12) : 0;
     lines.visible = !lines.wireframe;
     if (!this.underlay) {
-      this.underlay = createUnderlay(this.mesh.geometry, fade);
+      this.mesh.updateMatrixWorld(true);
+      this.underlay = createUnderlay(this.mesh.geometry, fade, this.regions, this.mesh.matrixWorld);
       this.mesh.add(this.underlay);
     }
     const material = this.underlay.material as THREE.MeshStandardMaterial;
