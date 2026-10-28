@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { sharedUniforms } from './sharedUniforms';
-import { NOISE_GLSL, CLOUD_SHADOW_GLSL } from './shaderChunks';
+import { NOISE_GLSL } from './shaderChunks';
 import { CoastField } from './CoastField';
 
 export interface OceanLook {
@@ -61,7 +61,7 @@ export class OceanMaterial extends THREE.MeshStandardMaterial {
         .replace('#include <normal_fragment_maps>', OCEAN_NORMAL_GLSL)
         .replace(
           '#include <opaque_fragment>',
-          'outgoingLight *= lzCloudShadow(vLzWorld.xz);\n#include <opaque_fragment>'
+          'outgoingLight *= lzOceanCloudShadow(vLzWorld.xz);\n#include <opaque_fragment>'
         );
     };
   }
@@ -94,8 +94,27 @@ const OCEAN_PARS_GLSL = /* glsl */ `
   uniform vec4 uCoastBounds;
   uniform float uCoastMax;
   uniform float uHasCoast;
+  uniform float uTime;
+  uniform vec2 uWind;
+  uniform float uCloudShadow;
   ${NOISE_GLSL}
-  ${CLOUD_SHADOW_GLSL}
+
+  float lzOceanFbm(vec2 p) {
+    float v = 0.0;
+    float a = 0.5;
+    for (int i = 0; i < 3; i++) {
+      v += a * lzNoise(p);
+      p = p * 2.03 + vec2(17.1, 9.2);
+      a *= 0.5;
+    }
+    return v;
+  }
+
+  float lzOceanCloudShadow(vec2 worldXZ) {
+    vec2 p = (worldXZ - uWind * uTime * 8.0) / 2600.0;
+    float c = smoothstep(0.52, 0.72, lzOceanFbm(p));
+    return 1.0 - c * uCloudShadow;
+  }
 
   float lzFoam = 0.0;
 
@@ -108,16 +127,6 @@ const OCEAN_PARS_GLSL = /* glsl */ `
     return texture2D(uCoast, uv).r * uCoastMax;
   }
 
-  // Height of the sea surface: a few long swells along the wind plus choppy noise.
-  float lzWaveHeight(vec2 p, vec2 dir, float t) {
-    vec2 side = vec2(-dir.y, dir.x);
-    float h = 0.0;
-    h += sin(dot(p, dir) * 0.018 - t * 0.9) * 1.0;
-    h += sin(dot(p, normalize(dir + side * 0.6)) * 0.031 - t * 1.3) * 0.55;
-    h += sin(dot(p, normalize(dir - side * 0.45)) * 0.047 - t * 1.7) * 0.35;
-    h += (lzFbm(p * 0.012 + dir * t * 0.05) - 0.5) * 2.2;
-    return h;
-  }
 `;
 
 const OCEAN_COLOR_GLSL = /* glsl */ `
@@ -129,12 +138,12 @@ const OCEAN_COLOR_GLSL = /* glsl */ `
 
   // Surf: bands that roll in towards the beach and break in the last few tens of metres.
   float lzSurfZone = 1.0 - smoothstep(15.0, 140.0, lzCoast);
-  float lzSurfBand = sin(lzCoast * 0.11 + uTime * 1.6 + lzFbm(vLzWorld.xz * 0.01) * 6.0);
+  float lzSurfBand = sin(lzCoast * 0.11 + uTime * 1.6 + lzOceanFbm(vLzWorld.xz * 0.01) * 6.0);
   float lzSurf = lzSurfZone * smoothstep(0.75, 0.98, lzSurfBand) * 0.85;
   float lzShoreFoam = (1.0 - smoothstep(0.0, 18.0, lzCoast)) * 0.9;
 
   // Whitecaps out at sea, more of them as the wind picks up.
-  float lzCapNoise = lzFbm(vLzWorld.xz * 0.006 - lzWindDir * uTime * 0.35);
+  float lzCapNoise = lzOceanFbm(vLzWorld.xz * 0.006 - lzWindDir * uTime * 0.35);
   float lzCapThreshold = mix(0.95, 0.72, smoothstep(3.0, 12.0, lzWindSpeed));
   float lzCaps = smoothstep(lzCapThreshold, lzCapThreshold + 0.05, lzCapNoise) * lzDepth;
 
@@ -149,11 +158,27 @@ const OCEAN_NORMAL_GLSL = /* glsl */ `
     float amp = 8.0 * (1.0 / (1.0 + camDist / 6000.0)) * mix(0.35, 1.0, lzDepth);
     amp *= mix(0.6, 1.4, smoothstep(2.0, 12.0, lzWindSpeed));
     vec2 p = vLzWorld.xz;
+    vec2 side = vec2(-lzWindDir.y, lzWindDir.x);
+    vec2 dir2 = normalize(lzWindDir + side * 0.6);
+    vec2 dir3 = normalize(lzWindDir - side * 0.45);
+    float dhdx = cos(dot(p, lzWindDir) * 0.018 - uTime * 0.9) * lzWindDir.x * 0.018;
+    float dhdz = cos(dot(p, lzWindDir) * 0.018 - uTime * 0.9) * lzWindDir.y * 0.018;
+    float phase2 = dot(p, dir2) * 0.031 - uTime * 1.3;
+    dhdx += cos(phase2) * dir2.x * 0.031 * 0.55;
+    dhdz += cos(phase2) * dir2.y * 0.031 * 0.55;
+    float phase3 = dot(p, dir3) * 0.047 - uTime * 1.7;
+    dhdx += cos(phase3) * dir3.x * 0.047 * 0.35;
+    dhdz += cos(phase3) * dir3.y * 0.047 * 0.35;
+
+    // Keep fine chop while using one three-octave noise field instead of three
+    // four-octave height samples for the finite-difference normal.
     float e = 4.0;
-    float h0 = lzWaveHeight(p, lzWindDir, uTime);
-    float hx = lzWaveHeight(p + vec2(e, 0.0), lzWindDir, uTime);
-    float hz = lzWaveHeight(p + vec2(0.0, e), lzWindDir, uTime);
-    vec3 worldNormal = normalize(vec3(-(hx - h0) / e * amp, 1.0, -(hz - h0) / e * amp));
+    vec2 noisePoint = p * 0.012 + lzWindDir * uTime * 0.05;
+    float noise0 = lzOceanFbm(noisePoint);
+    dhdx += (lzOceanFbm(noisePoint + vec2(e * 0.012, 0.0)) - noise0) * 2.2 / e;
+    dhdz += (lzOceanFbm(noisePoint + vec2(0.0, e * 0.012)) - noise0) * 2.2 / e;
+
+    vec3 worldNormal = normalize(vec3(-dhdx * amp, 1.0, -dhdz * amp));
     normal = normalize((viewMatrix * vec4(worldNormal, 0.0)).xyz);
   }
 `;

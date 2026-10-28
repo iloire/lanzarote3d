@@ -39,6 +39,8 @@ Every frame the pipeline also:
   reverse order: pixel ratio first, then samples up to `samplesFor` that ratio. The pixel
   ratio's ceiling is the device's ratio (at most 2), or 1.5 when the scene is embedded
   (`?embed=1`).
+- renders the bloom mip chain at half width and height (one quarter of its previous pixel
+  count), and draws the terrain shadow map at 1024² instead of 2048².
 
 ## The sky lights everything
 
@@ -50,8 +52,9 @@ Every frame the pipeline also:
   looking across the sun. That colour becomes the `FogExp2` colour, and the sky shader
   is patched to fade into the same colour below about 8° (`Sky.setHaze`). The sea and
   the far end of the island fade into the haze without a hard line at the horizon.
-- The sprite lens flare is turned off. It reads the framebuffer, which doesn't work from
-  a multisampled target, and bloom gives the sun its glow anyway.
+- The sprite lens flare and its point light are turned off. The flare reads the framebuffer,
+  which doesn't work from a multisampled target, and bloom gives the sun its glow anyway;
+  the terrain scenes use the directional sun and sky environment for lighting.
 
 ## The sea (`OceanMaterial`)
 
@@ -59,8 +62,10 @@ The sea is still a single quad. It's a `MeshStandardMaterial` patched in `onBefo
 so physically based lighting supplies the reflection of the sky and the sun glint. The
 patch adds:
 
-- **Wave normals**: three long swells along the wind, plus fbm chop. The normals are
-  computed per pixel and faded with distance, so the far sea doesn't shimmer.
+- **Wave normals**: three long swells along the wind, plus fbm chop. Swell gradients are
+  analytic and the chop uses three three-octave samples instead of three four-octave
+  height samples. Surf, whitecap and cloud-shadow noise use three octaves too. The normals
+  are computed per pixel and faded with distance, so the far sea doesn't shimmer.
 - **Shallows and surf** from the **coast field** (`CoastField.ts`). At load, the island is
   drawn from directly above into a 2048-pixel mask (white above sea level). A two-pass
   chamfer distance transform then turns the mask into "metres to the nearest beach"
@@ -196,3 +201,4 @@ weather: { windDirectionDegreesFromNorth: 280, speedMetresPerSecond: 5 }, // dri
 Dev builds expose `window.__lz = { renderer, pipeline }`. `renderer.info.render` counts the
 whole frame, because the pipeline resets it once per frame rather than once per pass, and
 `pipeline.getStats()` returns the current pixel ratio, MSAA samples and average frame time.
+In development, press **F** to show or hide the FPS counter (hidden by default on Home).

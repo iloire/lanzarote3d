@@ -97,9 +97,7 @@ function shouldShowSidebar(story?: string): boolean {
  */
 function loadingLabel({ loaded, total }: DownloadProgress): string {
   if (total > 0) {
-    return loaded >= total
-      ? 'BUILDING SCENE…'
-      : `LOADING ${Math.floor((loaded / total) * 100)} %`;
+    return loaded >= total ? 'BUILDING SCENE…' : `LOADING ${Math.floor((loaded / total) * 100)} %`;
   }
   // No Content-Length from the server: show the bytes received instead
   return loaded > 0 ? `LOADING ${(loaded / 1e6).toFixed(1)} MB` : 'LOADING…';
@@ -123,9 +121,10 @@ const App: React.FC<AppProps> = ({
     const renderer = createRenderer(SCENE_CONFIG.sizes);
     setRenderer(renderer);
 
-    // Show FPS stats in development mode, but not for the home app
-    if (process.env.NODE_ENV === 'development' && initialStory !== 'home') {
+    const showStatsByDefault = process.env.NODE_ENV === 'development' && initialStory !== 'home';
+    if (process.env.NODE_ENV === 'development') {
       document.getElementById('stats')?.appendChild(stats.dom);
+      stats.dom.style.display = showStatsByDefault ? 'block' : 'none';
     }
 
     const scene = new THREE.Scene();
@@ -148,6 +147,23 @@ const App: React.FC<AppProps> = ({
     });
 
     document.addEventListener('keydown', event => {
+      const target = event.target;
+      const isEditing =
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target instanceof HTMLSelectElement ||
+        (target instanceof HTMLElement && target.isContentEditable);
+      if (
+        process.env.NODE_ENV === 'development' &&
+        event.key.toLowerCase() === 'f' &&
+        !event.repeat &&
+        !event.ctrlKey &&
+        !event.metaKey &&
+        !event.altKey &&
+        !isEditing
+      ) {
+        stats.dom.style.display = stats.dom.style.display === 'none' ? 'block' : 'none';
+      }
       if (event.key.toLowerCase() === 'z') {
         gui._hidden ? gui.show() : gui.hide();
       }
