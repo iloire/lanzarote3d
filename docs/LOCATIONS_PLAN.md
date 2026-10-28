@@ -95,6 +95,18 @@ terrainPosition, anchor, regions }` — only what `TerrainBase` reads today~~ �
 - ~~Costa Adeje, Fañabé and Las Américas as resort blocks: long white hotels and apartments of
   three to six floors under terracotta roofs~~ ✅
 
+### 3c. Castejón de Sos (curated)
+
+- ~~`src/locations/castejon-de-sos.json` → `assets/locations/castejon-de-sos.glb`: the Ésera
+  valley from El Turbón to Benasque (42.4…42.63, 0.4…0.62), 100 m grid, heights unstretched~~ ✅
+- ~~Liri and Rials takeoffs and the Castejón landing from OSM (Nominatim); loop in front of the
+  Liri takeoff (2,312 m) at 2,400–2,560 m, ≥ 139 m clear~~ ✅
+- ~~Camera over the valley above Arasán, looking down onto the takeoff with Gallinero behind;
+  cloud base 3,100 m (`cloudBase`), above the peaks~~ ✅
+- ~~Meadow green over the valley, pine and fir on the slopes, limestone tops on Gallinero and El
+  Turbón; Castejón, Benasque, Cerler and the Ésera hamlets as stone houses under slate (a
+  `village` scatter kind)~~ ✅
+
 ### 4. The relax app
 
 - ~~Started as a private route of the Lanzarote build, `relax.html?location=lanzarote |
@@ -102,7 +114,7 @@ rio-de-janeiro`: five gliders on the place's loop, camera swaying ±20° over 90
   over (`src/applications/relax/`)~~ ✅
 - ~~Location switcher: one link per place at the bottom, the current one lit~~ ✅
 - ~~Camera limits so no terrain edge shows: pan ≤ 3,000 units, zoom out ≤ 1.5× the start,
-  orbit ±60° unless the place allows more, camera and its target kept 40 units above the
+  orbit free all the way round in every place, camera and its target kept 40 units above the
   ground, panning along the ground~~ ✅
 - ~~Its own build from the same webpack config: `SITE=relax` → `dist-relax/`, only the apps
   whose `site` in `apps.json` is `relax`, opening on the relax scene with no menu. The Lanzarote

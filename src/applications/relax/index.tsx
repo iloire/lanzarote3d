@@ -21,9 +21,8 @@ const PILOTS = 5;
 const SWAY_ANGLE = THREE.MathUtils.degToRad(20);
 const SWAY_PERIOD = 90;
 // How far the viewer may take the camera unless the place says otherwise: a generated terrain
-// ends at its box, so zooming out, panning far or orbiting round behind the hills would show
-// its edges.
-const DEFAULT_LIMITS = { orbit: 60, zoomOut: 1.5, pan: 3000 };
+// ends at its box, so zooming out or panning far would show its edges. Orbiting is always free.
+const DEFAULT_LIMITS = { zoomOut: 1.5, pan: 3000 };
 const MIN_DISTANCE = 150;
 const LOWEST_VIEW = THREE.MathUtils.degToRad(85);
 // The camera never goes nearer the ground than this
@@ -36,8 +35,8 @@ const definedOnly = <T extends object>(values: T | undefined): Partial<T> =>
   ) as Partial<T>;
 
 /**
- * Pick a place (?location=lanzarote | tenerife | rio-de-janeiro) and watch a few gliders soar its ridge
- * while the camera drifts slowly from side to side. Dragging takes over the camera.
+ * Pick a place (?location=lanzarote | tenerife | rio-de-janeiro | castejon-de-sos) and watch a few
+ * gliders soar its ridge while the camera drifts slowly from side to side. Dragging takes over the camera.
  */
 class RelaxApp extends TerrainBase {
   private animationId: number | undefined;
@@ -79,7 +78,7 @@ class RelaxApp extends TerrainBase {
       controls.update();
 
       const environment = new Environment(scene);
-      await environment.addCloudsFromTheme(theme, relax.clouds);
+      await environment.addCloudsFromTheme(theme, relax.clouds, relax.cloudBase);
       options.environment = environment;
 
       this.gliders = await loadParagliders(
@@ -116,17 +115,14 @@ class RelaxApp extends TerrainBase {
     }
   }
 
-  /** Keep the viewer near the gliders: a little zoom, the scene's orbit, panning held below */
+  /** Keep the viewer near the gliders: a little zoom, all the way round, panning held below */
   private limitControls(controls: OrbitControls, relax: RelaxScene): void {
     const offset = relax.camera.position.clone().sub(relax.camera.target);
-    const azimuth = Math.atan2(offset.x, offset.z);
-    const { orbit, zoomOut } = { ...DEFAULT_LIMITS, ...definedOnly(relax.limits) };
+    const { zoomOut } = { ...DEFAULT_LIMITS, ...definedOnly(relax.limits) };
     // Pan over the ground like a map, not up and down the screen into the hills
     controls.screenSpacePanning = false;
     controls.minDistance = MIN_DISTANCE;
     controls.maxDistance = offset.length() * zoomOut;
-    controls.minAzimuthAngle = orbit >= 180 ? -Infinity : azimuth - THREE.MathUtils.degToRad(orbit);
-    controls.maxAzimuthAngle = orbit >= 180 ? Infinity : azimuth + THREE.MathUtils.degToRad(orbit);
     controls.maxPolarAngle = LOWEST_VIEW;
   }
 

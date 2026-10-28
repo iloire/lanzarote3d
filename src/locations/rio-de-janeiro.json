@@ -47,8 +47,7 @@
   "camera": {
     "about": "High over the sea off São Conrado, looking down at the beach and Pedra Bonita with Pedra da Gávea on the left; [lat, lon, metres]",
     "at": [-23.022, -43.266, 750],
-    "lookAt": [-22.992, -43.276, 320],
-    "orbit": 180
+    "lookAt": [-22.992, -43.276, 320]
   },
   "clouds": [
     {

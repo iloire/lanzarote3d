@@ -542,11 +542,15 @@ class Environment {
   // Theme-aware methods
 
   /**
-   * Add clouds coloured from the theme
+   * Add clouds coloured from the theme, at its cloud base unless a location brings its own
    */
-  async addCloudsFromTheme(theme: Theme, cloudSites?: CloudSite[]): Promise<THREE.Object3D[]> {
+  async addCloudsFromTheme(
+    theme: Theme,
+    cloudSites?: CloudSite[],
+    cloudBase = theme.weather.lclLevel
+  ): Promise<THREE.Object3D[]> {
     setCloudColors(theme.clouds);
-    return this.addClouds(theme.weather.lclLevel, cloudSites);
+    return this.addClouds(cloudBase, cloudSites);
   }
 
   /**

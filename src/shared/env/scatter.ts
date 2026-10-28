@@ -2,7 +2,15 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils';
 import { rndBetween } from '../../foundation/utils/math';
 
-export type ScatterKind = 'pine' | 'rock' | 'cardon' | 'broadleaf' | 'tower' | 'favela' | 'resort';
+export type ScatterKind =
+  | 'pine'
+  | 'rock'
+  | 'cardon'
+  | 'broadleaf'
+  | 'tower'
+  | 'favela'
+  | 'resort'
+  | 'village';
 
 /** Where to scatter one kind of thing over the ground, in world units */
 export interface ScatterArea {
@@ -99,6 +107,22 @@ const resort = (): THREE.BufferGeometry =>
     part(new THREE.BoxGeometry(1.04, 0.08, 1.04).translate(0, 0.96, 0), '#b8603f'),
   ]);
 
+/** A Pyrenean house: a stone box under a steep slate gable, sized and coloured per instance */
+const village = (): THREE.BufferGeometry =>
+  mergeGeometries([
+    part(new THREE.BoxGeometry(1, 1, 1).translate(0, 0.42, 0), '#ffffff'),
+    // A three-sided prism laid along x, apex up, its base on the walls: the ridge runs the
+    // length of the house
+    part(
+      new THREE.CylinderGeometry(0.62, 0.62, 1.08, 3)
+        .rotateZ(Math.PI / 2)
+        .rotateX(-Math.PI / 2)
+        .scale(1, 0.6, 1)
+        .translate(0, 1.11, 0),
+      '#4a4d52'
+    ),
+  ]);
+
 const uniform = (min: number, max: number) => () => {
   const size = rndBetween(min, max);
   return new THREE.Vector3(size, size, size);
@@ -149,6 +173,12 @@ const TEMPLATES: Record<ScatterKind, Template> = {
     size: () => new THREE.Vector3(rndBetween(22, 50), rndBetween(9, 20), rndBetween(12, 20)),
     colors: ['#ffffff', '#f7f1e6', '#f3e9d6', '#efe2c8'],
     aligned: true,
+  },
+  // Castejón de Sos and the Ésera villages: grey and ochre stone houses of two or three floors
+  village: {
+    geometry: village,
+    size: () => new THREE.Vector3(rndBetween(8, 14), rndBetween(6, 10), rndBetween(7, 10)),
+    colors: ['#b8ad9c', '#a89f92', '#c4b59a', '#9e958a', '#cbbfa8'],
   },
 };
 

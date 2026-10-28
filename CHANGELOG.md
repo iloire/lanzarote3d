@@ -2,6 +2,20 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-28 16:14 UTC
+
+### Added
+
+- Castejón de Sos in the relax site: the Ésera valley in the Pyrenees from elevation data, gliders
+  soaring in front of the Liri takeoff under Punta Gallinero, El Turbón to the south, the villages
+  as stone houses under slate (a `village` scatter kind) and the cumulus base at 3,100 m
+  (`cloudBase` in the location JSON)
+
+### Changed
+
+- The relax camera orbits all the way round in every place; the per-place `camera.orbit` limit
+  is gone
+
 ## 2026-10-28 15:49 UTC
 
 ### Added

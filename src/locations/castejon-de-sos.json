@@ -1,0 +1,285 @@
+{
+  "id": "castejon-de-sos",
+  "name": "Castejón de Sos",
+  "bbox": {
+    "south": 42.4,
+    "north": 42.63,
+    "west": 0.4,
+    "east": 0.62
+  },
+  "spacing": 100,
+  "unitsPerMetre": 0.772,
+  "verticalExaggeration": 1,
+  "places": {
+    "launch": {
+      "name": "Despegue de Castejón-Liri, on the west shoulder of Gallinero",
+      "at": [42.53369, 0.55236]
+    },
+    "lowLaunch": {
+      "name": "Despegue de Castejón-Rials, above the village",
+      "at": [42.5242, 0.49987]
+    },
+    "landing": {
+      "name": "Aterrizaje de Castejón, by the village",
+      "at": [42.5189, 0.4898]
+    },
+    "gallinero": {
+      "name": "Punta Gallinero",
+      "at": [42.54134, 0.55543]
+    },
+    "turbon": {
+      "name": "El Turbón",
+      "at": [42.41691, 0.50531]
+    }
+  },
+  "soaringLoop": {
+    "about": "A wide circuit in front of the Liri takeoff, over the slope that faces the valley; [lat, lon, metres above sea level]",
+    "waypoints": [
+      [42.541, 0.545, 2560],
+      [42.536, 0.547, 2540],
+      [42.53, 0.546, 2500],
+      [42.526, 0.54, 2420],
+      [42.529, 0.533, 2400],
+      [42.536, 0.534, 2440],
+      [42.541, 0.538, 2480]
+    ]
+  },
+  "camera": {
+    "about": "Out over the valley above Arasán, a little above the gliders, looking east down onto the Liri takeoff with Gallinero behind; [lat, lon, metres]",
+    "at": [42.531, 0.513, 2600],
+    "lookAt": [42.534, 0.543, 2350]
+  },
+  "cloudBase": 3100,
+  "clouds": [
+    {
+      "about": "Over Gallinero, the first to pop",
+      "at": [42.545, 0.565],
+      "kind": "tower",
+      "scale": 1.3
+    },
+    {
+      "at": [42.525, 0.56],
+      "kind": "puff",
+      "scale": 1.1
+    },
+    {
+      "about": "Tuca d'Erisué, across the valley",
+      "at": [42.565, 0.49],
+      "kind": "puff",
+      "scale": 1
+    },
+    {
+      "at": [42.505, 0.45],
+      "kind": "puff",
+      "scale": 1
+    },
+    {
+      "about": "El Turbón",
+      "at": [42.42, 0.505],
+      "kind": "tower",
+      "scale": 1.4
+    },
+    {
+      "at": [42.58, 0.53],
+      "kind": "puff",
+      "scale": 1
+    }
+  ],
+  "regions": [
+    {
+      "name": "Hay meadows and woods over the whole Ésera valley",
+      "at": [42.52, 0.51],
+      "radius": 14000,
+      "color": "#4f6b3a",
+      "strength": 0.75
+    },
+    {
+      "name": "Pine and fir on the slopes under the Liri takeoff",
+      "at": [42.53, 0.535],
+      "radius": 2500,
+      "color": "#2f4a2a",
+      "strength": 0.6
+    },
+    {
+      "name": "Punta Gallinero's bare limestone top",
+      "at": [42.54134, 0.55543],
+      "radius": 1200,
+      "color": "#8a8580",
+      "strength": 0.7
+    },
+    {
+      "name": "El Turbón's limestone top",
+      "at": [42.41691, 0.50531],
+      "radius": 1500,
+      "color": "#8f8a82",
+      "strength": 0.7
+    },
+    {
+      "name": "Tuca d'Erisué",
+      "at": [42.5616, 0.4881],
+      "radius": 700,
+      "color": "#7e7a74",
+      "strength": 0.5
+    }
+  ],
+  "scatter": [
+    {
+      "kind": "pine",
+      "about": "Pine and fir under the Liri takeoff",
+      "at": [42.53, 0.535],
+      "radius": 2500,
+      "count": 700,
+      "minAltitude": 1100,
+      "maxAltitude": 2000
+    },
+    {
+      "kind": "pine",
+      "about": "The west slopes, Chía and Ramastué",
+      "at": [42.53, 0.47],
+      "radius": 3500,
+      "count": 700,
+      "minAltitude": 1100,
+      "maxAltitude": 2000
+    },
+    {
+      "kind": "pine",
+      "about": "Up the valley towards Benasque",
+      "at": [42.575, 0.51],
+      "radius": 3500,
+      "count": 600,
+      "minAltitude": 1200,
+      "maxAltitude": 2000
+    },
+    {
+      "kind": "broadleaf",
+      "about": "Ash, walnut and oak along the river and lower slopes",
+      "at": [42.515, 0.49],
+      "radius": 4000,
+      "count": 500,
+      "minAltitude": 850,
+      "maxAltitude": 1250
+    },
+    {
+      "kind": "rock",
+      "about": "Scree round Gallinero",
+      "at": [42.545, 0.56],
+      "radius": 2000,
+      "count": 300,
+      "minAltitude": 2200
+    },
+    {
+      "kind": "rock",
+      "about": "El Turbón",
+      "at": [42.418, 0.505],
+      "radius": 2000,
+      "count": 250,
+      "minAltitude": 2000
+    },
+    {
+      "kind": "village",
+      "about": "Castejón de Sos",
+      "at": [42.5126, 0.4917],
+      "radius": 350,
+      "count": 140,
+      "maxAltitude": 960
+    },
+    {
+      "kind": "village",
+      "about": "El Run",
+      "at": [42.50334, 0.47647],
+      "radius": 150,
+      "count": 25
+    },
+    {
+      "kind": "village",
+      "about": "Liri",
+      "at": [42.5353, 0.50648],
+      "radius": 120,
+      "count": 15
+    },
+    {
+      "kind": "village",
+      "about": "Arasán",
+      "at": [42.52454, 0.50995],
+      "radius": 120,
+      "count": 15
+    },
+    {
+      "kind": "village",
+      "about": "Chía",
+      "at": [42.5207, 0.466],
+      "radius": 150,
+      "count": 30
+    },
+    {
+      "kind": "village",
+      "about": "Ramastué",
+      "at": [42.54342, 0.49358],
+      "radius": 100,
+      "count": 10
+    },
+    {
+      "kind": "village",
+      "about": "Villanova",
+      "at": [42.54743, 0.46202],
+      "radius": 150,
+      "count": 25
+    },
+    {
+      "kind": "village",
+      "about": "Sesué",
+      "at": [42.55117, 0.47204],
+      "radius": 150,
+      "count": 25
+    },
+    {
+      "kind": "village",
+      "about": "Eresué",
+      "at": [42.55119, 0.48356],
+      "radius": 100,
+      "count": 10
+    },
+    {
+      "kind": "village",
+      "about": "Eriste",
+      "at": [42.58718, 0.48971],
+      "radius": 150,
+      "count": 25
+    },
+    {
+      "kind": "village",
+      "about": "Benasque",
+      "at": [42.6053, 0.5237],
+      "radius": 450,
+      "count": 220
+    },
+    {
+      "kind": "village",
+      "about": "Cerler",
+      "at": [42.59274, 0.53842],
+      "radius": 200,
+      "count": 50
+    },
+    {
+      "kind": "village",
+      "about": "Bisaurri",
+      "at": [42.49658, 0.50662],
+      "radius": 120,
+      "count": 15
+    },
+    {
+      "kind": "village",
+      "about": "Gabás",
+      "at": [42.48274, 0.49054],
+      "radius": 100,
+      "count": 10
+    },
+    {
+      "kind": "village",
+      "about": "San Martín de Veri",
+      "at": [42.47033, 0.51066],
+      "radius": 100,
+      "count": 10
+    }
+  ]
+}

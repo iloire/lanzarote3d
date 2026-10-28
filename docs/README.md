@@ -15,7 +15,7 @@ The scenes are in `src/applications/<story>/`, registered in `src/config/apps.js
 Carmen scene; its harbour data is described in
 [`src/applications/puerto-del-carmen/README.md`](../src/applications/puerto-del-carmen/README.md).
 
-- **[LOCATIONS_PLAN.md](LOCATIONS_PLAN.md)**: other paragliding places (Tenerife, Rio de Janeiro)
+- **[LOCATIONS_PLAN.md](LOCATIONS_PLAN.md)**: other paragliding places (Tenerife, Rio de Janeiro, Castejón de Sos)
   built from elevation data, and the relax site that shows them; the data format is in
   [`src/locations/README.md`](../src/locations/README.md).
 

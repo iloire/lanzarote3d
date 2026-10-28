@@ -45,10 +45,9 @@
     ]
   },
   "camera": {
-    "about": "On the line from El Teide through the loop, 2 km out towards the coast at the gliders' height, so Teide stands behind them; orbit: degrees either side the viewer may turn (180 = all the way round, to the beach); [lat, lon, metres]",
+    "about": "On the line from El Teide through the loop, 2 km out towards the coast at the gliders' height, so Teide stands behind them; [lat, lon, metres]",
     "at": [28.1257, -16.747, 1000],
-    "lookAt": [28.143, -16.735, 1000],
-    "orbit": 180
+    "lookAt": [28.143, -16.735, 1000]
   },
   "clouds": [
     {
