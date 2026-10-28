@@ -1,3 +1,5 @@
+import type { GroundRegion } from '../foundation/rendering/regionTint';
+
 /**
  * From latitude and longitude to the scene's x/z. The island model is north-up (−z is north,
  * +x is east), so a local flat projection around one fitted point is enough at its size.
@@ -58,4 +60,27 @@ export function geoToWorld(
     x: anchor.x + (east * cos - south * sin) * anchor.unitsPerMetre,
     z: anchor.z + (east * sin + south * cos) * anchor.unitsPerMetre,
   };
+}
+
+/** A ground colour patch as the region JSON files give it: centre, radius in metres, colour */
+export interface RegionConfig {
+  at: number[];
+  radius: number;
+  color: string;
+  strength: number;
+}
+
+/** Ground colour patches projected into the scene with `anchor` */
+export function projectRegions(regions: RegionConfig[], anchor: GeoAnchor): GroundRegion[] {
+  return regions.map(region => {
+    const [lat, lon] = region.at;
+    const { x, z } = geoToWorld(lat, lon, anchor);
+    return {
+      x,
+      z,
+      radius: region.radius * anchor.unitsPerMetre,
+      color: region.color,
+      strength: region.strength,
+    };
+  });
 }

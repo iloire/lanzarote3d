@@ -39,6 +39,37 @@ const THERMAL_SITES = [
 ];
 const SUPER_THERMAL_SITE = { x: 15027, z: -12555 };
 
+/** Where a cluster of cumulus stands: its kind and how big */
+export interface CloudSite {
+  x: number;
+  z: number;
+  kind: 'puff' | 'tower';
+  scale: number;
+}
+
+/**
+ * A cluster over each thermal site, a towering one over the super thermal, a few clusters in
+ * between, and the trade wind piling cloud up on the Risco de Famara, so its crest from the
+ * takeoff to the Mirador del Río is rarely clear.
+ */
+const LANZAROTE_CLOUD_SITES: CloudSite[] = [
+  ...THERMAL_SITES.map(({ x, z }) => ({ x, z, kind: 'puff' as const, scale: 1 })),
+  { ...SUPER_THERMAL_SITE, kind: 'tower', scale: 1.6 },
+  ...[
+    { x: 5120, z: -10100 },
+    { x: 2600, z: 842 },
+    { x: -3600, z: 8042 },
+  ].map(({ x, z }) => ({ x, z, kind: 'puff' as const, scale: 1 })),
+  ...[
+    { x: 7800, z: -1300 },
+    { x: 9300, z: -2700 },
+    { x: 10200, z: -4300 },
+    { x: 11200, z: -6200 },
+    { x: 12000, z: -8200 },
+    { x: 12700, z: -10200 },
+  ].map(({ x, z }) => ({ x, z, kind: 'puff' as const, scale: 1.2 })),
+];
+
 /** Houses whose ground is lower than this are in the sea and are left out */
 const MIN_LAND_HEIGHT = 2;
 
@@ -476,46 +507,24 @@ class Environment {
   }
 
   /**
-   * A cluster of cumulus over each thermal site, their bases level just above the condensation
-   * level (the LCL, give or take 200), a towering one over the super thermal, and a few
-   * clusters in between.
+   * A cluster of cumulus over each site, their bases level just above the condensation level
+   * (the LCL, give or take 200). Lanzarote's sites unless a location brings its own.
    */
-  async addClouds(lclLevel: number): Promise<THREE.Object3D[]> {
+  async addClouds(
+    lclLevel: number,
+    cloudSites: CloudSite[] = LANZAROTE_CLOUD_SITES
+  ): Promise<THREE.Object3D[]> {
     this.cloudInstances.forEach(c => c.dispose());
     this.cloudInstances = [];
     const cloudBase = (lclLevel + rndIntBetween(-200, 200)) * 1.08;
     // Each cluster's base sits a little above or below the day's cloud base
     const CLUSTER_BASE_JITTER = 100;
 
-    const sites = THERMAL_SITES.map(({ x, z }) => ({
+    const sites = cloudSites.map(({ x, z, kind, scale }) => ({
       position: new THREE.Vector3(x, cloudBase, z),
-      kind: 'puff' as 'puff' | 'tower',
-      scale: 1,
+      kind,
+      scale,
     }));
-    sites.push({
-      position: new THREE.Vector3(SUPER_THERMAL_SITE.x, cloudBase, SUPER_THERMAL_SITE.z),
-      kind: 'tower',
-      scale: 1.6,
-    });
-    [
-      { x: 5120, z: -10100 },
-      { x: 2600, z: 842 },
-      { x: -3600, z: 8042 },
-    ].forEach(({ x, z }) =>
-      sites.push({ position: new THREE.Vector3(x, cloudBase, z), kind: 'puff', scale: 1 })
-    );
-    // The trade wind piles cloud up on the Risco de Famara, so its crest from the takeoff
-    // to the Mirador del Río is rarely clear
-    [
-      { x: 7800, z: -1300 },
-      { x: 9300, z: -2700 },
-      { x: 10200, z: -4300 },
-      { x: 11200, z: -6200 },
-      { x: 12000, z: -8200 },
-      { x: 12700, z: -10200 },
-    ].forEach(({ x, z }) =>
-      sites.push({ position: new THREE.Vector3(x, cloudBase, z), kind: 'puff', scale: 1.2 })
-    );
 
     const clouds = await Promise.all(
       sites.map(async site => {
@@ -535,9 +544,9 @@ class Environment {
   /**
    * Add clouds coloured from the theme
    */
-  async addCloudsFromTheme(theme: Theme): Promise<THREE.Object3D[]> {
+  async addCloudsFromTheme(theme: Theme, cloudSites?: CloudSite[]): Promise<THREE.Object3D[]> {
     setCloudColors(theme.clouds);
-    return this.addClouds(theme.weather.lclLevel);
+    return this.addClouds(theme.weather.lclLevel, cloudSites);
   }
 
   /**

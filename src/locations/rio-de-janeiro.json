@@ -1,0 +1,151 @@
+{
+  "id": "rio-de-janeiro",
+  "name": "Rio de Janeiro",
+  "bbox": {
+    "south": -23.04,
+    "north": -22.935,
+    "west": -43.4,
+    "east": -43.145
+  },
+  "spacing": 100,
+  "unitsPerMetre": 0.772,
+  "verticalExaggeration": 1.5,
+  "places": {
+    "launch": {
+      "name": "Rampa de Voo Livre da Pedra Bonita",
+      "at": [-22.98794, -43.27904]
+    },
+    "landing": {
+      "name": "Praia do Pepino, São Conrado",
+      "at": [-23.00059, -43.26879]
+    },
+    "pedraDaGavea": {
+      "name": "Pedra da Gávea",
+      "at": [-22.99898, -43.28297]
+    },
+    "corcovado": {
+      "name": "Corcovado",
+      "at": [-22.95195, -43.21058]
+    },
+    "sugarloaf": {
+      "name": "Pão de Açúcar",
+      "at": [-22.94949, -43.15616]
+    }
+  },
+  "soaringLoop": {
+    "about": "Ridge soaring the east face of Pedra Bonita in front of the launch, out over the valley towards São Conrado and back; [lat, lon, metres above sea level]",
+    "waypoints": [
+      [-22.984, -43.277, 670],
+      [-22.987, -43.2765, 650],
+      [-22.9905, -43.2775, 630],
+      [-22.9935, -43.279, 590],
+      [-22.993, -43.274, 580],
+      [-22.988, -43.2715, 600],
+      [-22.984, -43.273, 630]
+    ]
+  },
+  "camera": {
+    "about": "High over the sea off São Conrado, looking down at the beach and Pedra Bonita with Pedra da Gávea on the left; [lat, lon, metres]",
+    "at": [-23.022, -43.266, 750],
+    "lookAt": [-22.992, -43.276, 320]
+  },
+  "clouds": [
+    {
+      "about": "Pico da Tijuca, often capped",
+      "at": [-22.944, -43.287],
+      "kind": "tower",
+      "scale": 1.4
+    },
+    {
+      "at": [-22.955, -43.25],
+      "kind": "puff",
+      "scale": 1
+    },
+    {
+      "at": [-22.965, -43.228],
+      "kind": "puff",
+      "scale": 1
+    },
+    {
+      "about": "Corcovado",
+      "at": [-22.952, -43.21],
+      "kind": "puff",
+      "scale": 1
+    },
+    {
+      "about": "Behind Pedra Bonita",
+      "at": [-22.975, -43.295],
+      "kind": "puff",
+      "scale": 1.2
+    },
+    {
+      "at": [-22.962, -43.33],
+      "kind": "puff",
+      "scale": 1
+    },
+    {
+      "about": "Pedra Branca massif to the west",
+      "at": [-22.975, -43.385],
+      "kind": "puff",
+      "scale": 1.2
+    }
+  ],
+  "regions": [
+    {
+      "name": "Tijuca forest, from Pico da Tijuca down to Gávea",
+      "at": [-22.96, -43.265],
+      "radius": 6500,
+      "color": "#2e4a2b",
+      "strength": 0.85
+    },
+    {
+      "name": "Forest on the Pedra Bonita and Pedra da Gávea massif",
+      "at": [-22.99, -43.285],
+      "radius": 2500,
+      "color": "#2b4627",
+      "strength": 0.85
+    },
+    {
+      "name": "Pedra da Gávea's bare granite top",
+      "at": [-22.99898, -43.28297],
+      "radius": 600,
+      "color": "#8a8580",
+      "strength": 0.8
+    },
+    {
+      "name": "Dois Irmãos",
+      "at": [-22.9949, -43.2489],
+      "radius": 600,
+      "color": "#7e7a74",
+      "strength": 0.6
+    },
+    {
+      "name": "Corcovado's granite face",
+      "at": [-22.95195, -43.21058],
+      "radius": 500,
+      "color": "#85817b",
+      "strength": 0.7
+    },
+    {
+      "name": "Pão de Açúcar",
+      "at": [-22.94949, -43.15616],
+      "radius": 450,
+      "color": "#8a8580",
+      "strength": 0.8
+    },
+    {
+      "name": "Barra da Tijuca, the flats behind the beach",
+      "at": [-23.0, -43.36],
+      "radius": 4000,
+      "color": "#8c877d",
+      "strength": 0.6
+    },
+    {
+      "name": "Leblon, Ipanema and Copacabana",
+      "at": [-22.978, -43.2],
+      "radius": 2600,
+      "color": "#8f8a80",
+      "strength": 0.6
+    }
+  ]
+}

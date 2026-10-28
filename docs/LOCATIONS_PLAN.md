@@ -50,24 +50,32 @@ Branch: `feature/locations`, in the worktree `~/code/lanzarote3d-locations`.
 - Note: `tests/rendering/cloudGeometry.test.ts` (3 tests) already fails on `master`; unrelated.
 
 ### 2. Terrain pipeline for new places
-- `3d/dem-to-glb.py`: bbox in → Copernicus GLO-30 DEM (free, AWS open data) cropped and
-  resampled to a grid → triangles below 0 m dropped (sea) → GLB in the same slim format as
-  `3d/slim-glb.py` (positions + 16-bit indices), scaled so world units match Lanzarote's
-  (`unitsPerMetre` 0.74) — gliders and birds stay the right size.
-- Writes the matching `GeoAnchor` alongside, so no hand fitting.
-- Check: run it on Lanzarote's bbox and compare coastline/peaks with the hand-made model.
+- ~~`3d/dem-to-glb.py`: Copernicus GLO-30 tiles (public AWS bucket, cached in `3d/dem-cache/`)
+  sampled on a regular grid → slim GLB (positions + 16-bit indices) in world units, 0.772 per
+  metre like Lanzarote, heights stretched by `verticalExaggeration`; ground ≤ 0 m becomes sea
+  floor under the water~~ ✅
+- ~~No generated anchor file: the script and `src/locations/dem.ts` read the same location JSON,
+  and the anchor is the centre of its bbox~~ ✅ Schema in `src/locations/README.md`.
+- ~~Check: summits spot-checked against the DEM and OSM — Pedra Bonita 696 m (real 693), beach
+  4 m, lagoon 1 m; steep domes lose 70–80 m to the 30 m radar model~~ ✅
+- Not done: rebuilding Lanzarote from the DEM to compare with the hand-made model. Not needed
+  while Lanzarote keeps its own model.
 
 ### 3. Rio de Janeiro
-- Bbox around Pedra Bonita, Pedra da Gávea, São Conrado, Dois Irmãos and the Tijuca forest,
-  out to Corcovado and the lagoon (≈ −22.94…−23.03, −43.36…−43.18; confirm on OSM).
-- Regions: Tijuca rainforest dark green, granite domes bare grey, beaches pale sand, built-up
-  flats grey-ochre.
-- Ridge: launch at the Pedra Bonita ramp, soaring the face towards São Conrado, landing on
-  Praia do Pepino. Exact coordinates taken from OSM, not guessed.
-- Landmarks (later, low-poly): Cristo on Corcovado, Pedra da Gávea's profile is the terrain itself.
-- Wildlife: frigatebirds and black vultures instead of gulls/guirres.
+- ~~`src/locations/rio-de-janeiro.json`: bbox −23.04…−22.935, −43.4…−43.145 (Barra to the
+  Sugarloaf, Pico da Tijuca on the north edge), 100 m grid, 1.5× heights~~ ✅
+- ~~Regions: Tijuca forest green, granite tops grey (Pedra da Gávea, Dois Irmãos, Corcovado,
+  Sugarloaf), Barra and the Zona Sul grey~~ ✅
+- ~~Soaring loop on Pedra Bonita's east face, 580–670 m, ≥ 100 m over the ground; launch, landing
+  and peaks from OSM (Nominatim)~~ ✅
+- ~~Camera high over the sea off São Conrado; cumulus over Tijuca, Corcovado and Pedra Branca~~ ✅
+- Later: built-up São Conrado (a grey region there read as haze on the hillside, so it was
+  dropped), Cristo on Corcovado, frigatebirds and black vultures.
 
 ### 4. The relax app
+- ~~Started as a private route of the Lanzarote build, `relax.html?location=lanzarote |
+  rio-de-janeiro`: five gliders on the place's loop, camera swaying ±20° over 90 s, drag to take
+  over (`src/applications/relax/`)~~ ✅
 - `src/relax/index.tsx` + `webpack.relax.config.js` → `dist-relax/`.
 - Picker (Lanzarote, Rio) → one slow scene per place: drifting camera along the ridge, a few
   gliders, sea, birds, time-of-day from the location's sun. No UI chrome once it starts.

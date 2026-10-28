@@ -9,3 +9,6 @@ TODO.md
 .next
 .claude/settings.local.json
 coverage/
+
+# Copernicus DEM tiles downloaded by 3d/dem-to-glb.py
+3d/dem-cache/
