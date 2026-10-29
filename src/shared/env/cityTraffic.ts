@@ -14,6 +14,8 @@ export interface TrafficSettings {
   spacing: number;
   /** Metres a second, slowest and fastest lane */
   speed: [number, number];
+  /** Share of the cars that are yellow cabs, New York's unless given */
+  taxiShare?: number;
 }
 
 /** Share of the cars that are yellow cabs, and the colours of the rest (sRGB) */
@@ -107,7 +109,7 @@ export class CityTraffic {
     this.scale = new THREE.Vector3(upm, upm, upm);
     const colour = new THREE.Color();
     this.cars.forEach((_, i) => {
-      const taxi = hash(i * 3.3) < TAXI_SHARE;
+      const taxi = hash(i * 3.3) < (settings.taxiShare ?? TAXI_SHARE);
       colour.set(taxi ? TAXI : CAR_COLOURS[Math.floor(hash(i * 7.7) * CAR_COLOURS.length)]!);
       this.mesh.setColorAt(i, colour);
     });

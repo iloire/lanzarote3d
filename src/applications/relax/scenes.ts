@@ -11,6 +11,7 @@ import { CASTEJON_DE_SOS, CASTEJON_DE_SOS_CONFIG } from '../../locations/castejo
 import { EL_HIERRO, EL_HIERRO_CONFIG } from '../../locations/el-hierro';
 import { NEW_YORK, NEW_YORK_CITY, NEW_YORK_CONFIG } from '../../locations/new-york';
 import { GIZA, GIZA_CONFIG, GIZA_MONUMENTS } from '../../locations/giza';
+import { PARIS, PARIS_CITY, PARIS_CONFIG } from '../../locations/paris';
 import { DemLocationConfig, demAnchor, demPoint } from '../../locations/dem';
 import { geoToWorld } from '../../shared/geo';
 import { RIDGE_LOOP } from '../home/config';
@@ -44,6 +45,8 @@ export interface RelaxScene {
   paramotor?: boolean;
   /** How many times a wing's speed the paramotor flies; the app's own unless given */
   paramotorSpeed?: number;
+  /** Share of the city's cars that are yellow cabs, New York's unless given */
+  taxiShare?: number;
   /** FogExp2 density, thicker than the theme's to hide a city's far edges */
   fogDensity?: number;
   look?: SceneLook;
@@ -83,6 +86,8 @@ interface DemSceneConfig extends DemLocationConfig {
   landmarks?: { name: string; kind: string; at: number[]; heading?: number; top?: number }[];
   paramotor?: boolean;
   paramotorSpeed?: number;
+  /** Built by 3d/city-to-glb.py; `taxis` is the share of its cars that are yellow cabs */
+  city?: { voxel: number; taxis?: number };
   /** Metres at which the fog has hidden half of what's behind it */
   fog?: number;
   look?: SceneLook;
@@ -139,6 +144,7 @@ function demScene(location: Location, config: DemSceneConfig, city?: string): Re
     city,
     paramotor: config.paramotor,
     paramotorSpeed: config.paramotorSpeed,
+    taxiShare: config.city?.taxis,
     // FogExp2 hides half where (density × distance)² = ln 2
     fogDensity: config.fog && Math.sqrt(Math.LN2) / (config.fog * config.unitsPerMetre),
     look: config.look,
@@ -168,6 +174,7 @@ export const RELAX_SCENES: Record<string, RelaxScene> = {
   'rio-de-janeiro': demScene(RIO_DE_JANEIRO, RIO_CONFIG),
   'new-york': demScene(NEW_YORK, NEW_YORK_CONFIG, NEW_YORK_CITY),
   giza: demScene(GIZA, GIZA_CONFIG, GIZA_MONUMENTS),
+  paris: demScene(PARIS, PARIS_CONFIG, PARIS_CITY),
 };
 
 export const DEFAULT_SCENE = 'lanzarote';

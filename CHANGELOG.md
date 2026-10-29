@@ -2,6 +2,26 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-29 00:10 UTC
+
+### Added
+
+- Paris in the relax site (`?location=paris`): the Eiffel Tower and round it, Trocadéro and the
+  Seine to the Champ de Mars and the École Militaire, 9,047 buildings from OpenStreetMap as voxels
+  in cream limestone under zinc roofs. Abel's paramotor laps the tower at 125 m, between its second
+  floor and its top, and the chase camera keeps it in view
+- `city-to-glb.py` builds the Eiffel Tower (`city.eiffelTower`): 1.5 m voxels to its real profile,
+  hollow legs braced in X, the arches, three floors, the cabin and the spire, in a node of its own
+- A city's facade and roof colours (`city.facades`, `city.roof`) and share of yellow cabs
+  (`city.taxis`) come from its location JSON; road bridges are painted over water
+
+### Fixed
+
+- `city-to-glb.py` fetched multipolygon relations without their members (`out tags geom`), so
+  every multipolygon building, park and river came back empty; it now asks for `out body geom`
+  and joins the member ways into rings. New York's cached OSM data predates this: delete
+  `3d/osm-cache/new-york-*` before rebuilding it to pick the missing ones up
+
 ## 2026-10-29 00:08 UTC
 
 ### Added

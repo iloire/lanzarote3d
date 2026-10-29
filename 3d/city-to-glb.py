@@ -15,7 +15,8 @@ its tallest building, and meshed as blocks: merged roofs, and walls only where n
 Rock outcrops are meshed with them, a few metres high. The ground between is painted on one
 textured quad: roads, sidewalks and crosswalks, and parks with their woods, paths, ponds and
 grass of varying green, darker at the foot of the walls; the GLB carries the lanes cars drive and
-where the park's trees stand, for the app to draw.
+where the park's trees stand, for the app to draw. A location with `city.eiffelTower` gets the
+Eiffel Tower too, a lattice of finer voxels in a node of its own.
 
 The GLB is in the terrain's world units (scale 1) and frame (bbox centre at x = z = 0), standing
 on the location's flatLand; facades and roofs are coloured per vertex, and each wall carries
@@ -62,6 +63,8 @@ LOOP_TENSION = 0.5
 LOW = ['#8a5a44', '#9c5b43', '#7a4b3a', '#a8714f', '#b59a7a', '#8c6d5a']
 MID = ['#c9b99a', '#b8a585', '#a35f45', '#d4c7ad', '#9a8f84', '#bfae8f', '#8e5241']
 TALL = ['#6f8aa0', '#7d95a8', '#5c7389', '#8fa3b0', '#a7b4bb', '#4f6476']
+# What a roof is made of, mixed into its facade's colour; a city's `facades` and `roof` replace these
+ROOF_COLOUR = {'colour': '#4a4a4a', 'share': 0.55}
 
 
 # What to fetch from OpenStreetMap, as Overpass filters, each fetched as ways and relations
@@ -86,7 +89,8 @@ def fetch(location, layer):
     if not path.exists():
         kinds = ('way',) if layer in WAYS_ONLY else ('way', 'relation')
         parts = ''.join(f'{kind}{f}({box});' for f in LAYERS[layer] for kind in kinds)
-        query = f'[out:json][timeout:300];({parts});out tags geom;'
+        # body, not tags: a relation's members (and their geometry) come only with its body
+        query = f'[out:json][timeout:300];({parts});out body geom;'
         print(f'fetching {layer} from Overpass')
         request = urllib.request.Request(
             OVERPASS,
@@ -130,12 +134,33 @@ def rings(element):
     """Outer and inner rings of a way or a multipolygon relation, as [(lat, lon), ...]"""
     if element['type'] == 'way':
         return [[(p['lat'], p['lon']) for p in element.get('geometry', [])]], []
-    outer, inner = [], []
+    lines = {'outer': [], 'inner': []}
     for member in element.get('members', []):
         if member.get('type') == 'way' and 'geometry' in member:
-            ring = [(p['lat'], p['lon']) for p in member['geometry']]
-            (inner if member.get('role') == 'inner' else outer).append(ring)
-    return outer, inner
+            line = [(p['lat'], p['lon']) for p in member['geometry']]
+            lines['inner' if member.get('role') == 'inner' else 'outer'].append(line)
+    return join(lines['outer']), join(lines['inner'])
+
+
+def join(lines):
+    """A multipolygon's member ways joined end to end into rings: a river's bank is many ways"""
+    lines, out = [list(line) for line in lines if line], []
+    while lines:
+        ring = lines.pop()
+        while ring[0] != ring[-1]:
+            for k, line in enumerate(lines):
+                if line[0] == ring[-1]:
+                    ring += line[1:]
+                elif line[-1] == ring[-1]:
+                    ring += line[::-1][1:]
+                else:
+                    continue
+                del lines[k]
+                break
+            else:
+                break  # cut off by the bbox: close it straight across
+        out.append(ring)
+    return out
 
 
 def srgb_to_linear(hex_colour):
@@ -148,11 +173,11 @@ def srgb_to_linear(hex_colour):
 ROOF, PUNCHED, CURTAIN = 0, 1, 2
 
 
-def facade(tags, height, key):
+def facade(tags, height, key, palettes):
     colour = tags.get('building:colour', '')
     if re.fullmatch(r'#[0-9a-fA-F]{6}', colour):
         return colour
-    palette = TALL if height >= 120 else MID if height >= 30 else LOW
+    palette = palettes['tall'] if height >= 120 else palettes['mid'] if height >= 30 else palettes['low']
     return palette[zlib.crc32(key.encode()) % len(palette)]
 
 
@@ -267,6 +292,7 @@ def coverage(grid, elements):
 def rasterise(location, grid, elements):
     """Height in metres and facade colour index of every cell, the tallest building winning"""
     default = location['city']['defaultHeight']
+    palettes = {'low': LOW, 'mid': MID, 'tall': TALL, **location['city'].get('facades', {})}
     heights = np.zeros((grid.rows, grid.cols), np.float32)
     owner = np.full((grid.rows, grid.cols), -1, np.int32)
     colours, styles = [], []
@@ -286,7 +312,7 @@ def rasterise(location, grid, elements):
         wins = cells & (height > region)
         region[wins] = height
         owner[where][wins] = len(colours)
-        colours.append(facade(tags, height, f"{element['type']}{element['id']}"))
+        colours.append(facade(tags, height, f"{element['type']}{element['id']}", palettes))
         styles.append(CURTAIN if height >= 120 else PUNCHED)
     outside = ~grid.inside()
     heights[outside] = 0
@@ -325,6 +351,8 @@ STREET_LIFT = 0.1
 THROUGH = 40
 # A lane for cars needs a run this long, in cells
 LANE_MIN = 60
+# A road bridge this many cells wide
+BRIDGE = 7
 
 
 def dem():
@@ -390,8 +418,10 @@ def lay_streets(location, grid, heights):
     woods = coverage(grid, fetch(location, 'woods')) & open_land
     parks = (coverage(grid, fetch(location, 'parks')) & open_land) | woods
     ponds = coverage(grid, fetch(location, 'water')) & open_land
-    woods &= ~ponds
     highways = fetch(location, 'paths')
+    # Bridges carry the road over a river: roadway, not water
+    ponds &= ~trace(grid, [w for w in highways if w.get('tags', {}).get('bridge') and w['tags'].get('highway') not in FOOTWAYS], BRIDGE)
+    woods &= ~ponds
     footways = trace(grid, [w for w in highways if w.get('tags', {}).get('highway') in FOOTWAYS], 1)
     drives = trace(grid, [w for w in highways if w.get('tags', {}).get('highway') not in FOOTWAYS], 2)
     drive = drives & parks & ~ponds
@@ -504,8 +534,9 @@ def mesh(location, grid, heights, owner, colours, styles):
     ground = location['flatLand'] * up
     # A shade darker than the palette: the island's bright sun washes them out
     linear = np.array([srgb_to_linear(c) for c in colours] or [[0, 0, 0]]) * 0.8
-    # Roofs a darker, greyer shade of their facade
-    roof_of = linear * 0.45 + srgb_to_linear('#4a4a4a') * 0.55
+    # Roofs a darker, greyer shade of their facade, or mostly the city's own roof colour
+    roof = {**ROOF_COLOUR, **location['city'].get('roof', {})}
+    roof_of = linear * (1 - roof['share']) + srgb_to_linear(roof['colour']) * roof['share']
     pos, col, win, idx = [], [], [], []
 
     def quad(corners, normal, colour, style=ROOF):
@@ -588,6 +619,120 @@ def mesh(location, grid, heights, owner, colours, styles):
     return positions, colours8, windows, triangles
 
 
+# The Eiffel Tower, by height in metres: the half-width from its axis out to its faces, and to the
+# inner edge of its legs, where they part to leave the arches (0 once they've joined in one shaft);
+# its floors' heights; and a lattice of 1.5 m voxels, braced in X panels a leg's width tall
+EIFFEL_HALF = [(0, 61.5), (20, 51), (40, 42), (57.6, 34), (80, 28), (100, 23.5), (115.7, 20.5),
+               (160, 16), (200, 13), (240, 11), (276, 9.3), (300, 6)]
+EIFFEL_GAP = [(0, 37.5), (57.6, 20), (115.7, 6), (150, 0)]
+EIFFEL_FLOORS = [57.6, 115.7, 276.1]
+EIFFEL_TOP, EIFFEL_SPIRE = 300, 330
+# The arches spring from the legs this high and peak this high, under the first floor's girders
+EIFFEL_ARCH = (12, 45)
+EIFFEL_VOXEL = 1.5
+EIFFEL_COLOUR = '#7a6450'
+
+
+def eiffel(location, grid):
+    """The Eiffel Tower as voxels, square on the grid (its faces look along the street grid), as
+    positions and triangles: hollow lattice legs braced in X, the arches between them, the three
+    floors, the cabin and the spire. Returns them and the grid's (rows, cols) its feet cover."""
+    lat, lon = location['city']['eiffelTower']['at']
+    s = EIFFEL_VOXEL
+    n, levels = int(2 * EIFFEL_HALF[0][1] / s) + 2, int(EIFFEL_SPIRE / s)
+    # Cell centres across (x along the streets, y up the avenues) and up (z), metres from the axis
+    x = (np.arange(n) - n / 2 + 0.5) * s
+    ax, ay = np.abs(x)[None, :, None], np.abs(x)[None, None, :]
+    z = ((np.arange(levels) + 0.5) * s)[:, None, None]
+    half = np.interp(z, *zip(*EIFFEL_HALF))
+    gap = np.interp(z, *zip(*EIFFEL_GAP))
+    inside = (ax <= half) & (ay <= half)
+    # Each face braced in X panels: the diagonals and the girder across their top
+    panel = np.maximum(np.where(gap > 0, half - gap, 2 * half) / 2, 3 * s)
+
+    def braced(along):
+        return ((along + z) % panel < s) | ((along - z) % panel < s) | (z % panel < s)
+
+    outer_x, outer_y = ax > half - s, ay > half - s
+    legs = inside & (ax >= gap) & (ay >= gap)
+    inner_x, inner_y = legs & (ax < gap + s), legs & (ay < gap + s)
+    face_x, face_y = (outer_x | inner_x) & legs, (outer_y | inner_y) & legs
+    solid = (face_x & face_y) | (face_x & braced(ay)) | (face_y & braced(ax))
+    # The arches, in the outer faces between the legs
+    spring, peak = EIFFEL_ARCH
+    span = np.interp(spring, *zip(*EIFFEL_GAP))
+    for across, outer in ((ay, outer_x), (ax, outer_y)):
+        arch = spring + (peak - spring) * np.sqrt(np.clip(1 - (across / span) ** 2, 0, 1))
+        solid |= inside & outer & (across < span) & (z >= arch) & (z < arch + 2 * s)
+    # The floors, a girder band round the outside under each
+    for k, floor in enumerate(EIFFEL_FLOORS):
+        band = (z < floor) & (z >= floor - (6, 4, 3)[k])
+        edge = np.interp(floor, *zip(*EIFFEL_HALF)) + s
+        within = (ax <= edge) & (ay <= edge) & band
+        solid |= within & ((z >= floor - s) | (ax > edge - s) | (ay > edge - s))
+    # The cabin over the top floor, and the spire
+    cabin = (z >= EIFFEL_FLOORS[2]) & (z < EIFFEL_TOP)
+    solid |= cabin & (ax <= 7) & (ay <= 7)
+    solid |= (z >= EIFFEL_TOP) & (ax <= s) & (ay <= s)
+    solid &= z < EIFFEL_SPIRE
+
+    # Faces where a voxel meets air, merged into strips
+    upm = location['unitsPerMetre']
+    up = upm * location['verticalExaggeration']
+    ground = location['flatLand'] * up
+    centre = grid.en(lat, lon)
+    padded = np.pad(solid, 1)
+    pos, idx = [], []
+
+    def world(k, i, j):
+        """A corner in index space (level k, x index i, y index j) in world units"""
+        u, v = (i - n / 2) * s, (j - n / 2) * s
+        east, north = centre + u * grid.street + v * grid.avenue
+        return np.array([east * upm, ground + k * s * up, -north * upm])
+
+    for axis in range(3):
+        # Strips run along y, or along x on the faces that look along y
+        run = 2 if axis != 2 else 1
+        other = ({0, 1, 2} - {axis, run}).pop()
+        for sign in (1, -1):
+            step = np.eye(3, dtype=int)[axis] * sign
+            ahead = padded[tuple(slice(1 + d, size + 1 + d) for d, size in zip(step, solid.shape))]
+            exposed = solid & ~ahead
+            # Which way is out, in the world: the frame may mirror the index space
+            out = world(*step) - world(0, 0, 0)
+            for cell in zip(*np.nonzero(exposed)):
+                before = list(cell)
+                before[run] -= 1
+                if cell[run] > 0 and exposed[tuple(before)]:
+                    continue  # part of the strip it continues
+                length = 1
+                after = list(cell)
+                after[run] += 1
+                while after[run] < solid.shape[run] and exposed[tuple(after)]:
+                    length += 1
+                    after[run] += 1
+                lo = np.array(cell, float)
+                lo[axis] += sign > 0
+                corners = []
+                for a, b in ((0, 0), (1, 0), (1, 1), (0, 1)):
+                    c = lo.copy()
+                    c[run] += a * length
+                    c[other] += b
+                    corners.append(world(*c))
+                base = len(pos)
+                pos.extend(corners)
+                if np.dot(np.cross(corners[1] - corners[0], corners[2] - corners[0]), out) < 0:
+                    idx.extend([base, base + 2, base + 1, base, base + 3, base + 2])
+                else:
+                    idx.extend([base, base + 1, base + 2, base, base + 2, base + 3])
+    positions, triangles = np.array(pos, np.float32), np.array(idx, np.uint32)
+    print(f'Eiffel Tower: {int(solid.sum())} voxels, {len(triangles) // 3} triangles')
+    # The grid cells under its feet, cleared of the pillars' and pavilions' footprints
+    c, r = grid.cell(lat, lon)
+    feet = int(EIFFEL_HALF[0][1] / grid.size) + 1
+    return positions, triangles, (slice(max(int(r) - feet, 0), int(r) + feet + 1), slice(max(int(c) - feet, 0), int(c) + feet + 1))
+
+
 def loop_curve(points, tension=LOOP_TENSION, per_leg=60):
     """The closed Catmull-Rom curve three.js flies through the loop (CatmullRomCurve3 'catmullrom'), per leg"""
     pts = np.array(points, float)
@@ -645,8 +790,9 @@ def png(image):
     return buffer.getvalue()
 
 
-def write_glb(positions, colours, windows, triangles, extras, streets, dst):
-    """The buildings (node 0) and the street quad with its image (node 1)"""
+def write_glb(positions, colours, windows, triangles, extras, streets, dst, tower=None):
+    """The buildings (node 0), the street quad with its image (node 1) and a tower if there's one
+    (node 2, one colour)"""
     quad_points, quad_uvs, quad_order, image = streets
     blobs = [
         (positions.tobytes(), 34962),
@@ -712,6 +858,29 @@ def write_glb(positions, colours, windows, triangles, extras, streets, dst):
             {'bufferView': 6, 'componentType': UINT16, 'count': 6, 'type': 'SCALAR'},
         ],
     }
+    if tower is not None:
+        tower_points, tower_triangles = tower
+        for blob, target in ((tower_points.tobytes(), 34962), (tower_triangles.tobytes(), 34963)):
+            views.append({'buffer': 0, 'byteOffset': offset, 'byteLength': len(blob), 'target': target})
+            blobs.append((blob, target))
+            offset += len(blob)
+        gltf['buffers'][0]['byteLength'] = offset
+        gltf['scenes'][0]['nodes'].append(2)
+        gltf['nodes'].append({'mesh': 2, 'name': 'Tower'})
+        colour = srgb_to_linear(EIFFEL_COLOUR).tolist()
+        gltf['materials'].append({'pbrMetallicRoughness': {'baseColorFactor': [*colour, 1], 'metallicFactor': 0.3, 'roughnessFactor': 0.7}})
+        gltf['meshes'].append({'primitives': [{'attributes': {'POSITION': 7}, 'indices': 8, 'material': 2}]})
+        gltf['accessors'] += [
+            {
+                'bufferView': 8,
+                'componentType': FLOAT,
+                'count': len(tower_points),
+                'type': 'VEC3',
+                'min': tower_points.min(axis=0).tolist(),
+                'max': tower_points.max(axis=0).tolist(),
+            },
+            {'bufferView': 9, 'componentType': UINT32, 'count': len(tower_triangles), 'type': 'SCALAR'},
+        ]
     json_chunk = pad4(json.dumps(gltf, separators=(',', ':')).encode(), b' ')
     bin_chunk = b''.join(blob for blob, _ in blobs)
     total = 12 + 8 + len(json_chunk) + 8 + len(bin_chunk)
@@ -729,6 +898,12 @@ if __name__ == '__main__':
     location = json.load(open(sys.argv[1]))
     grid = Grid(location)
     heights, owner, colours, styles = rasterise(location, grid, fetch(location, 'buildings'))
+    tower = None
+    if 'eiffelTower' in location['city']:
+        *tower, feet = eiffel(location, grid)
+        # The tower stands on its own: clear the pillars and pavilions OSM draws under it
+        heights[feet] = 0
+        owner[feet] = -1
     check_loop(location, grid, heights)
     image, lanes, free, woods = lay_streets(location, grid, heights)
     rocks = outcrops(location, grid, heights)
@@ -741,4 +916,4 @@ if __name__ == '__main__':
     colours.append(ROCK)
     styles.append(ROOF)
     streets = (*street_quad(location, grid), image)
-    write_glb(*mesh(location, grid, heights, owner, colours, styles), extras, streets, sys.argv[2])
+    write_glb(*mesh(location, grid, heights, owner, colours, styles), extras, streets, sys.argv[2], tower)

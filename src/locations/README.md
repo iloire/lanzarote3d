@@ -10,8 +10,9 @@ longitude map onto it (`types.ts`). `TerrainBase` loads Lanzarote unless an app 
   the whole island: ridge soaring on the cliff of El Golfo above Frontera) and **Castejón de Sos**
   (`castejon-de-sos.json` + `.ts`, the Ésera valley in the Pyrenees: the Liri takeoff under
   Gallinero, El Turbón to the south) are built from elevation data, below. **New York**
-  (`new-york.json` + `.ts`, Midtown) is a city: flat ground from the same script, and its
-  buildings as voxels from OpenStreetMap, [below](#a-city). **Giza** (`giza.json` + `.ts`) is the
+  (`new-york.json` + `.ts`, Midtown) and **Paris** (`paris.json` + `.ts`, round the Eiffel
+  Tower) are cities: flat ground from the same script, and their buildings as voxels from
+  OpenStreetMap, [below](#a-city). **Giza** (`giza.json` + `.ts`) is the
   plateau from elevation data with its monuments built by their own script, [below](#giza).
 
 ## A place built from elevation data
@@ -46,7 +47,7 @@ Ground at or below 0 m becomes sea floor under the water plane.
 | `scatter`                      | `{ kind: "pine" \| "rock" \| "cardon" \| "broadleaf" \| "tower" \| "favela" \| "resort" \| "village", at: [lat, lon], radius (m), count, minAltitude?, maxAltitude?, heading? }`, things dropped onto the ground within that height band (never in the sea); one instanced mesh per kind. Buildings (`tower`, `favela`, `resort`) take their own size and colour and line up with `heading`, degrees from east towards north; `village` houses (Pyrenean stone under slate) face any way |
 | `landmarks`                    | `{ name, kind, at: [lat, lon], heading?, top? }`, the same format as `shared/env/landmarks.json`; `top` sets it on the highest ground within that many units. Rio has the Cristo Redentor (`kind: "cristo"`)                                                                                                                                                                                                                                                                             |
 | `flatLand`                     | Metres: lay all land flat at this height instead of the DEM's (a city, whose surface model carries its rooftops)                                                                                                                                                                                                                                                                                                                                                                         |
-| `city`                         | `{ voxel, gridHeading, defaultHeight }`: build the buildings with `3d/city-to-glb.py`, below                                                                                                                                                                                                                                                                                                                                                                                             |
+| `city`                         | `{ voxel, gridHeading, defaultHeight, facades?, roof?, taxis?, eiffelTower? }`: build the buildings with `3d/city-to-glb.py`, below                                                                                                                                                                                                                                                                                                                                                                                             |
 | `paramotor`                    | Abel flies his paramotor alone, which needs no ridge, chased by the camera along his path                                                                                                                                                                                                                                                                                                                                                                                                |
 | `paramotorSpeed`               | Times a wing's speed the paramotor flies (2 unless given). The app gives every leg of the loop the same time, so keep legs about the same length                                                                                                                                                                                                                                                                                                                                         |
 | `flatten`                      | `{ name, at: [lat, lon], size: [east-west, north-south] (m), height?, below? }`: squares of ground laid flat at `height` metres, else at the median round their edge, only where the surface model is lower than `below`. For what the scene models itself (a town's rooftops, a monument)                                                                                                                                                                                              |
@@ -84,8 +85,21 @@ on OpenStreetMap's parks, gardens and pitches, water on its ponds, roadway elsew
 crossings outside each junction (where an avenue's and a street's open runs of 40 cells or more
 cross). Off the land it's clear. Every run of roadway 60 cells or more long gets lanes, one or two
 a side, which the extras carry as `lanes` ([x0, z0, x1, z1] in world units) for
-`shared/env/cityTraffic.ts` to drive cars on: one instanced mesh, a third of them yellow cabs.
-Parks and water are fetched and cached like the buildings.
+`shared/env/cityTraffic.ts` to drive cars on: one instanced mesh, a third of them yellow cabs
+unless `city.taxis` sets the share (Paris has none). Parks and water are fetched and cached like
+the buildings; a multipolygon's member ways are joined into rings (the Seine is one), and road
+bridges over water are painted as roadway, 7 cells wide.
+
+A city sets its own colours with `city.facades` (`{ low?, mid?, tall? }`, lists of sRGB colours
+for buildings under 30 m, under 120 m and taller; New York's brownstone, limestone and glass
+otherwise) and `city.roof` (`{ colour, share }`, how much of the roof is that colour and how much
+its facade's; `#4a4a4a` and 0.55 otherwise). Paris is cream limestone under 85% zinc grey.
+
+`city.eiffelTower` (`{ at: [lat, lon] }`) builds the Eiffel Tower there, square on the grid (so
+set `gridHeading` to its faces, 44°): a lattice of 1.5 m voxels to its real profile (the
+half-widths, floor heights and arches are constants at the top of `eiffel()` in the script),
+meshed as merged strips into a third node, `Tower`, one bronze colour. OpenStreetMap's pillars and
+pavilions under it are cleared.
 
 Parks get woods (OSM `natural=wood|scrub`, `landuse=forest`) on a darker ground, footways a cell
 wide and drives two (OSM `highway` ways, painted only inside parks), and grass whose green and

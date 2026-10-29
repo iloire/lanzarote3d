@@ -161,6 +161,18 @@ terrainPosition, anchor, regions }` — only what `TerrainBase` reads today~~ �
   pyramids, morning sun, a sand plain to the horizon instead of the sea (`plain`)~~ ✅
 - Not done: palms and fields in the valley, the Grand Egyptian Museum to the north, camels.
 
+### 3g. Paris (curated)
+
+- ~~`src/locations/paris.json`: the Eiffel Tower and round it, Trocadéro to the École Militaire
+  (48.8485…48.868, 2.2795…2.3095), at 6 units a metre like New York, ground laid flat at 35 m~~ ✅
+- ~~9,047 buildings from OpenStreetMap as 3 m voxels on a grid turned 44°, square to the tower's
+  faces, the Champ de Mars and the quays; cream limestone under zinc roofs (`city.facades`,
+  `city.roof`), no yellow cabs (`city.taxis`)~~ ✅
+- ~~The Eiffel Tower built by `city-to-glb.py` (`city.eiffelTower`): 1.5 m voxels to its real
+  profile, hollow legs braced in X, the arches, three floors, cabin and spire; 67k triangles~~ ✅
+- ~~The Seine from its multipolygon (relation members joined into rings), road bridges over it~~ ✅
+- ~~Abel's paramotor laps the tower at 125 m, 110 m off its axis, so the chase keeps it in view~~ ✅
+
 ### 4. The relax app
 
 - ~~Started as a private route of the Lanzarote build, `relax.html?location=lanzarote |

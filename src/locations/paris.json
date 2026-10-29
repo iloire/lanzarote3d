@@ -1,0 +1,246 @@
+{
+  "id": "paris",
+  "name": "Paris",
+  "region": "France",
+  "about": "The Eiffel Tower and round it, from Trocadéro and the Seine to the Champ de Mars and the École Militaire. Big scale (6 units a metre) like New York, so the paramotor sits beside the tower. Ground: uv run 3d/dem-to-glb.py src/locations/paris.json assets/locations/paris.glb; buildings and the tower: uv run 3d/city-to-glb.py src/locations/paris.json assets/locations/paris-city.glb",
+  "bbox": {
+    "south": 48.8485,
+    "north": 48.868,
+    "west": 2.2795,
+    "east": 2.3095
+  },
+  "spacing": 30,
+  "unitsPerMetre": 6,
+  "verticalExaggeration": 1,
+  "flatLand": 35,
+  "city": {
+    "about": "Buildings from OpenStreetMap as 3 m voxels on a grid turned 44° to the Eiffel Tower's faces, which the Champ de Mars and the quays line up with; a building with no height or levels is 18 m, Haussmann's six storeys. The tower itself is built by city-to-glb.py, a lattice of 1.5 m voxels to its real profile, standing at `at`. Facades are Haussmann's cream limestone under grey zinc roofs, and no yellow cabs",
+    "voxel": 3,
+    "gridHeading": 44,
+    "defaultHeight": 18,
+    "eiffelTower": {
+      "at": [
+        48.85826,
+        2.29451
+      ]
+    },
+    "facades": {
+      "low": [
+        "#d9cdb3",
+        "#cfc1a3",
+        "#e2d7bf",
+        "#c9ba9a",
+        "#d5c7aa",
+        "#bdae90"
+      ],
+      "mid": [
+        "#d9cdb3",
+        "#cfc1a3",
+        "#e2d7bf",
+        "#c9ba9a",
+        "#d5c7aa",
+        "#bdae90",
+        "#b8a98b"
+      ]
+    },
+    "roof": {
+      "colour": "#6b747e",
+      "share": 0.85
+    },
+    "taxis": 0
+  },
+  "paramotor": true,
+  "fog": 1500,
+  "look": {
+    "about": "Late afternoon, the sun low over the Seine to the west lighting the tower's face, and a warm grey haze",
+    "timeOfDay": 17,
+    "ambient": 0.5,
+    "fogColor": "#b9b4ab"
+  },
+  "places": {
+    "eiffelTower": {
+      "name": "Eiffel Tower",
+      "at": [
+        48.85826,
+        2.29451
+      ]
+    },
+    "trocadero": {
+      "name": "Trocadéro, the Palais de Chaillot",
+      "at": [
+        48.8622,
+        2.2876
+      ]
+    },
+    "pontIena": {
+      "name": "Pont d'Iéna",
+      "at": [
+        48.8597,
+        2.2924
+      ]
+    },
+    "champDeMars": {
+      "name": "Champ de Mars",
+      "at": [
+        48.8556,
+        2.2986
+      ]
+    },
+    "ecoleMilitaire": {
+      "name": "École Militaire",
+      "at": [
+        48.8512,
+        2.3048
+      ]
+    }
+  },
+  "soaringLoop": {
+    "about": "The paramotor laps the Eiffel Tower at 125 m above the ground, between its second floor (116 m) and its top (330 m), 110 m off its axis, so the long legs head almost straight at it and the chase camera keeps it in view: out over the Pont d'Iéna and the Seine to the Trocadéro gardens, round, back past the tower and down the Champ de Mars to the École Militaire. [lat, lon, metres above sea level]",
+    "waypoints": [
+      [
+        48.855244,
+        2.299224,
+        160
+      ],
+      [
+        48.855748,
+        2.299265,
+        160
+      ],
+      [
+        48.856634,
+        2.298581,
+        160
+      ],
+      [
+        48.857767,
+        2.297278,
+        160
+      ],
+      [
+        48.858976,
+        2.295553,
+        160
+      ],
+      [
+        48.860075,
+        2.29367,
+        160
+      ],
+      [
+        48.860898,
+        2.291914,
+        160
+      ],
+      [
+        48.86132,
+        2.290554,
+        160
+      ],
+      [
+        48.861276,
+        2.289796,
+        160
+      ],
+      [
+        48.860772,
+        2.289755,
+        160
+      ],
+      [
+        48.859886,
+        2.290439,
+        160
+      ],
+      [
+        48.858753,
+        2.291742,
+        160
+      ],
+      [
+        48.857544,
+        2.293467,
+        160
+      ],
+      [
+        48.856445,
+        2.29535,
+        160
+      ],
+      [
+        48.855622,
+        2.297106,
+        160
+      ],
+      [
+        48.8552,
+        2.298466,
+        160
+      ]
+    ]
+  },
+  "camera": {
+    "about": "Over the Seine by Trocadéro, looking at the tower's waist; the chase takes over at once. [lat, lon, metres]",
+    "at": [
+      48.860652,
+      2.28566,
+      190
+    ],
+    "lookAt": [
+      48.85826,
+      2.29451,
+      150
+    ],
+    "zoomOut": 2.5,
+    "pan": 9000
+  },
+  "cloudBase": 1500,
+  "clouds": [
+    {
+      "at": [
+        48.87,
+        2.28
+      ],
+      "kind": "puff",
+      "scale": 1
+    },
+    {
+      "at": [
+        48.85,
+        2.32
+      ],
+      "kind": "puff",
+      "scale": 1.2
+    },
+    {
+      "at": [
+        48.84,
+        2.27
+      ],
+      "kind": "puff",
+      "scale": 1
+    }
+  ],
+  "regions": [
+    {
+      "name": "Streets and pavements",
+      "at": [
+        48.858,
+        2.2945
+      ],
+      "radius": 5000,
+      "color": "#6a6862",
+      "strength": 1
+    },
+    {
+      "name": "Champ de Mars",
+      "at": [
+        48.8556,
+        2.2986
+      ],
+      "radius": 250,
+      "color": "#5f8a44",
+      "strength": 1
+    }
+  ]
+}

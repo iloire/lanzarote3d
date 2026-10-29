@@ -57,8 +57,8 @@ const definedOnly = <T extends object>(values: T | undefined): Partial<T> =>
 
 /**
  * Pick a place (?location=lanzarote | tenerife | el-hierro | castejon-de-sos | rio-de-janeiro | new-york
- * | giza) and watch a few gliders soar its ridge while the camera drifts slowly from side to side, or,
- * in a city or round the pyramids, chase Abel's paramotor. Dragging takes over the camera.
+ * | paris | giza) and watch a few gliders soar its ridge while the camera drifts slowly from side to
+ * side, or, in a city or round the pyramids, chase Abel's paramotor. Dragging takes over the camera.
  */
 class RelaxApp extends TerrainBase {
   private animationId: number | undefined;
@@ -140,6 +140,7 @@ class RelaxApp extends TerrainBase {
           if (lanes?.length) {
             this.traffic = new CityTraffic(lanes, {
               ...TRAFFIC,
+              taxiShare: relax.taxiShare,
               unitsPerMetre: grid.unitsPerMetre,
               road: grid.ground + TRAFFIC_LIFT * grid.up,
             });
