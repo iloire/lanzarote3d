@@ -1,0 +1,184 @@
+{
+  "id": "mont-saint-michel",
+  "name": "Mont-Saint-Michel",
+  "region": "France",
+  "about": "The Bay of Mont-Saint-Michel at the turn of the tide: the Mount and Tombelaine on the flats, the salt meadows, the Couesnon and the Sée-Sélune channels, the Carolles cliffs to the north. 3 units a metre, true heights. Built by uv run 3d/mont-saint-michel-to-glb.py src/locations/mont-saint-michel.json assets/locations, which writes the terrain, the Mount and the bay texture",
+  "bbox": {
+    "south": 48.595,
+    "north": 48.765,
+    "west": -1.66,
+    "east": -1.4
+  },
+  "spacing": 80,
+  "unitsPerMetre": 3,
+  "verticalExaggeration": 1,
+  "tide": {
+    "about": "Metres above mean sea level and seconds: a spring tide of 14 m, compressed into a cycle the viewer can watch; the flood takes `flood` of it, so the sea comes in faster than it goes out",
+    "low": -6.5,
+    "high": 7.6,
+    "period": 150,
+    "flood": 0.4
+  },
+  "bay": {
+    "about": "How the flats are made, the DEM having them all at sea level: `shore` metres high at the edge of the land, falling to `low` `reach` metres out (a curve of power `steepness`); land is lifted by `landLift` and kept at least `meadow` high, so the salt meadows are only reached by the creeks at high water. Channels follow OpenStreetMap's rivers, `channelDepth` deep and `channelWidth` wide, with `braids` thinner threads wandering either side",
+    "shore": 6.0,
+    "low": -7.5,
+    "reach": 7000,
+    "steepness": 1.0,
+    "landLift": 3,
+    "meadow": 8.2,
+    "channelDepth": 3.2,
+    "channelWidth": 220,
+    "braids": 3,
+    "texture": 2048
+  },
+  "mount": {
+    "about": "The Mount, built from OpenStreetMap's walls, towers and houses on a granite rock rising from `sand` to `summit` metres under the abbey church, whose floor is at `floor` and whose spire carries Saint Michael's statue to `spire`",
+    "at": [48.636, -1.5115],
+    "sand": 5.2,
+    "summit": 76,
+    "floor": 80,
+    "spire": 170
+  },
+  "tombelaine": {
+    "about": "The granite islet 2.7 km north of the Mount: an ellipse `length` by `width` metres, its long side turned `heading` degrees from east, `height` metres high",
+    "at": [48.6601, -1.5123],
+    "length": 280,
+    "width": 140,
+    "heading": 15,
+    "height": 45
+  },
+  "walkers": {
+    "about": "A guided crossing on foot from Genêts to the Mount by way of Tombelaine, out on the sand whenever the tide leaves it dry; [lat, lon]",
+    "count": 36,
+    "path": [
+      [48.6378, -1.5072],
+      [48.6455, -1.5052],
+      [48.6545, -1.5085],
+      [48.6588, -1.5098],
+      [48.6625, -1.5085],
+      [48.6705, -1.4985],
+      [48.6772, -1.4885]
+    ]
+  },
+  "sheep": {
+    "about": "Salt meadow sheep: `flocks` flocks of up to `perFlock` on the meadows within `within` metres of the Mount",
+    "flocks": 70,
+    "perFlock": 60,
+    "within": 7000
+  },
+  "places": {
+    "mount": {
+      "name": "Mont-Saint-Michel abbey",
+      "at": [48.636, -1.5115]
+    },
+    "tombelaine": {
+      "name": "Tombelaine",
+      "at": [48.6601, -1.5123]
+    },
+    "carolles": {
+      "name": "Carolles cliffs, a paragliding site over the bay",
+      "at": [48.7505, -1.5685]
+    },
+    "genets": {
+      "name": "Genêts, where the walks across the bay start",
+      "at": [48.6833, -1.4833]
+    },
+    "barrage": {
+      "name": "The Couesnon dam",
+      "at": [48.6185, -1.5108]
+    }
+  },
+  "paramotor": true,
+  "soaringLoop": {
+    "about": "Paramotors circle the Mount and its spire, low over the flats on the south-west and up past the statue's height on the north-east; [lat, lon, metres above sea level]",
+    "waypoints": [
+      [48.6332, -1.5156, 120],
+      [48.6327, -1.5108, 112],
+      [48.6338, -1.5066, 125],
+      [48.6366, -1.5055, 145],
+      [48.6392, -1.5076, 165],
+      [48.6397, -1.5121, 175],
+      [48.6385, -1.5163, 160],
+      [48.6358, -1.5178, 135]
+    ]
+  },
+  "camera": {
+    "about": "Out over the flats south-east of the Mount, a little above the ramparts, looking north-west at the village and the abbey against the low sun; it circles the Mount once every `orbit` seconds; [lat, lon, metres]",
+    "at": [48.6316, -1.5052, 55],
+    "lookAt": [48.6358, -1.511, 58],
+    "zoomOut": 3,
+    "pan": 9000,
+    "orbit": 420
+  },
+  "fog": 9000,
+  "look": {
+    "about": "Golden hour: the sun low in the west rakes the granite, a warm haze over the sea, less flat ambient light so the shade reads",
+    "timeOfDay": 18.4,
+    "ambient": 0.55,
+    "fogColor": "#dcb48a",
+    "exposure": 0.8,
+    "warmth": 0.12
+  },
+  "cloudBase": 1400,
+  "clouds": [
+    {
+      "at": [48.7, -1.62],
+      "kind": "puff",
+      "scale": 1.2
+    },
+    {
+      "at": [48.66, -1.43],
+      "kind": "puff",
+      "scale": 1.0
+    },
+    {
+      "at": [48.74, -1.5],
+      "kind": "puff",
+      "scale": 1.1
+    },
+    {
+      "at": [48.6, -1.47],
+      "kind": "tower",
+      "scale": 1.0
+    },
+    {
+      "at": [48.61, -1.58],
+      "kind": "puff",
+      "scale": 1.3
+    },
+    {
+      "at": [48.68, -1.52],
+      "kind": "puff",
+      "scale": 0.9
+    },
+    {
+      "at": [48.63, -1.62],
+      "kind": "tower",
+      "scale": 0.8
+    }
+  ],
+  "regions": [
+    {
+      "name": "Bocage behind Avranches",
+      "at": [48.68, -1.4],
+      "radius": 7000,
+      "color": "#4f6a3a",
+      "strength": 0.8
+    },
+    {
+      "name": "Carolles and Champeaux heights",
+      "at": [48.745, -1.53],
+      "radius": 6000,
+      "color": "#566b3c",
+      "strength": 0.75
+    },
+    {
+      "name": "Polders",
+      "at": [48.605, -1.55],
+      "radius": 9000,
+      "color": "#6c7a46",
+      "strength": 0.7
+    }
+  ]
+}

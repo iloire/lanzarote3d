@@ -173,6 +173,21 @@ terrainPosition, anchor, regions }` — only what `TerrainBase` reads today~~ �
 - ~~The Seine from its multipolygon (relation members joined into rings), road bridges over it~~ ✅
 - ~~Abel's paramotor laps the tower at 125 m, 110 m off its axis, so the chase keeps it in view~~ ✅
 
+### 3h. Mont-Saint-Michel (curated)
+
+- ~~`src/locations/mont-saint-michel.json`: the bay from the Carolles cliffs to the polders
+  (48.595…48.765, −1.66…−1.40), 3 units a metre, true heights~~ ✅
+- ~~Flats, channels, sandbanks, creeks and salt meadows made by `3d/mont-saint-michel-to-glb.py`
+  (the DEM has the bay at sea level), with a bay texture for the ground and the water's depth~~ ✅
+- ~~The Mount from OpenStreetMap plus a drawn abbey church and spire; Tombelaine; stone, windows,
+  slate and gilding in the shader~~ ✅
+- ~~A tide that floods in faster than it ebbs, over the sand and round the Mount, wet sand drying
+  after it, the open sea following; a gauge on screen; `?tide=` to start anywhere in it~~ ✅
+- ~~Sheep on the salt meadows, a guided walk across the sand that leaves ahead of the water,
+  paramotors circling the spire, the camera orbiting the Mount at golden hour~~ ✅
+- Not done: gliders off the Carolles cliffs; shuttles on the bridge; the walkers jump back to
+  the start when their path wraps.
+
 ### 4. The relax app
 
 - ~~Started as a private route of the Lanzarote build, `relax.html?location=lanzarote |

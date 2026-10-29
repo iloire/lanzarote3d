@@ -1,0 +1,48 @@
+/* Tide gauge - how high the water stands, in the place picker's pixel style */
+
+.tide-gauge {
+  position: fixed;
+  left: 50%;
+  bottom: 92px;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  transform: translateX(-50%);
+  border: 2px solid #ffffff;
+  background: rgba(13, 31, 51, 0.45);
+  box-shadow: 2px 2px 0 #0d1f33;
+  color: #ffffff;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  text-shadow: 1px 1px 0 #0d1f33;
+  pointer-events: none;
+  animation: tideGaugeFadeIn 1.5s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes tideGaugeFadeIn {
+  to {
+    opacity: 0.9;
+  }
+}
+
+.tide-gauge__bar {
+  position: relative;
+  width: 84px;
+  height: 8px;
+  border: 1px solid #ffffff;
+  background: rgba(13, 31, 51, 0.6);
+}
+
+.tide-gauge__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: #4ab8d8;
+}
+
+.tide-gauge__state {
+  min-width: 9ch;
+  color: #9fd8ea;
+}

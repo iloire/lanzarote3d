@@ -22,6 +22,7 @@ import { CityTraffic, Lane } from '../../shared/env/cityTraffic';
 import { cityTrees, TreeSpots } from '../../shared/env/cityTrees';
 import { addCityWindows, CityGrid } from '../../foundation/rendering/cityWindows';
 import { addStoneCourses } from '../../foundation/rendering/stoneCourses';
+import type { SetPiece } from './setPiece';
 
 const PILOTS = 5;
 // Where there's no ridge Abel flies his paramotor alone, twice a wing's speed so the streets go
@@ -57,14 +58,17 @@ const definedOnly = <T extends object>(values: T | undefined): Partial<T> =>
 
 /**
  * Pick a place (?location=lanzarote | tenerife | el-hierro | castejon-de-sos | rio-de-janeiro | new-york
- * | paris | giza) and watch a few gliders soar its ridge while the camera drifts slowly from side to
- * side, or, in a city or round the pyramids, chase Abel's paramotor. Dragging takes over the camera.
+ * | paris | giza | mont-saint-michel) and watch a few gliders soar its ridge while the camera drifts
+ * slowly from side to side, or, in a city or round the pyramids, chase Abel's paramotor; at
+ * Mont-Saint-Michel the camera circles the Mount while the paramotors fly round it. Dragging takes
+ * over the camera.
  */
 class RelaxApp extends TerrainBase {
   private animationId: number | undefined;
   private gliders: VehicleLoadResult[] = [];
   private removeSwitcher: (() => void) | undefined;
   private traffic: CityTraffic | undefined;
+  private setPiece: SetPiece | undefined;
 
   constructor() {
     const appConfig = getAppConfig('relax');
@@ -97,7 +101,12 @@ class RelaxApp extends TerrainBase {
         sky: { ...base.sky, ...definedOnly({ timeOfDay: look?.timeOfDay }) },
         atmosphere: {
           ...base.atmosphere,
-          ...definedOnly({ fogDensity: relax.fogDensity, fogColor: look?.fogColor }),
+          ...definedOnly({
+            fogDensity: relax.fogDensity,
+            fogColor: look?.fogColor,
+            exposure: look?.exposure,
+            warmth: look?.warmth,
+          }),
         },
       };
       camera.position.copy(relax.camera.position);
@@ -151,12 +160,22 @@ class RelaxApp extends TerrainBase {
         scene.add(city.scene);
       }
 
-      const pilots = relax.paramotor
-        ? paraglidersVoxel
-            .filter(({ options }) => options.pilot.characterType === PARAMOTOR_PILOT)
-            .slice(0, 1)
-            .map(({ options }) => ({ options: { ...options, paramotor: true } }))
-        : paraglidersVoxel.slice(0, PILOTS);
+      if (relax.setPiece && options.terrain) {
+        this.setPiece = await relax.setPiece({ ...options, terrain: options.terrain });
+      }
+
+      // A circling camera watches the whole group, each on a paramotor if the place has them
+      const fleet = relax.orbit !== undefined;
+      const pilots = fleet
+        ? paraglidersVoxel.slice(0, PILOTS).map(({ options }) => ({
+            options: { ...options, paramotor: relax.paramotor ?? options.paramotor },
+          }))
+        : relax.paramotor
+          ? paraglidersVoxel
+              .filter(({ options }) => options.pilot.characterType === PARAMOTOR_PILOT)
+              .slice(0, 1)
+              .map(({ options }) => ({ options: { ...options, paramotor: true } }))
+          : paraglidersVoxel.slice(0, PILOTS);
       this.gliders = await loadParagliders(
         scene,
         pilots.map(({ options }, i) => ({
@@ -256,8 +275,8 @@ class RelaxApp extends TerrainBase {
     controls.addEventListener('start', () => {
       swaying = false;
     });
-    // A paramotor is chased along its path, and orbited once the viewer takes over
-    const lead = relax.paramotor ? this.gliders[0]?.mesh : undefined;
+    // A lone paramotor is chased along its path, and orbited once the viewer takes over
+    const lead = relax.paramotor && relax.orbit === undefined ? this.gliders[0]?.mesh : undefined;
     const trail = new PathTrail(CHASE_LAG * 2);
     const chaseAt = new THREE.Vector3();
     const lastLead = new THREE.Vector3();
@@ -275,6 +294,7 @@ class RelaxApp extends TerrainBase {
         elapsed += deltaTime;
         motions.forEach(motion => motion.update(deltaTime));
         this.traffic?.update(deltaTime);
+        this.setPiece?.update(deltaTime, elapsed);
 
         if (lead) {
           trail.push(elapsed, lead.position);
@@ -293,7 +313,9 @@ class RelaxApp extends TerrainBase {
           }
           lastLead.copy(lead.position);
         } else if (swaying) {
-          const angle = SWAY_ANGLE * Math.sin((elapsed / SWAY_PERIOD) * Math.PI * 2);
+          const angle = relax.orbit
+            ? (elapsed / relax.orbit) * Math.PI * 2
+            : SWAY_ANGLE * Math.sin((elapsed / SWAY_PERIOD) * Math.PI * 2);
           camera.position.copy(relax.camera.target).add(offset.clone().applyAxisAngle(up, angle));
           camera.lookAt(relax.camera.target);
         } else {
@@ -321,6 +343,8 @@ class RelaxApp extends TerrainBase {
     this.gliders = [];
     this.traffic?.dispose();
     this.traffic = undefined;
+    this.setPiece?.dispose();
+    this.setPiece = undefined;
     super.dispose();
   }
 }

@@ -2,6 +2,25 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-29 00:29 UTC
+
+### Added
+
+- Mont-Saint-Michel in the relax site, at the turn of the tide: the bay from the Carolles cliffs to
+  the polders with its flats, sandbanks, braided channels, creeks and salt meadows (made by the new
+  `3d/mont-saint-michel-to-glb.py`, the DEM having the bay at sea level), the Mount from
+  OpenStreetMap's walls, towers and houses with a drawn abbey church, flying buttresses and the
+  gilded Saint Michael on the spire, and Tombelaine; the stone shows its courses, the houses
+  their windows (a few lit) and the roofs their slates
+- A 14 m tide that floods in faster than it ebbs (`tidalBay.ts`, `tide.ts`): the water runs up the
+  channels and over the sand until the Mount is an island, the sand it leaves glistens and dries,
+  the open sea rises and falls with it; a gauge above the place picker, and `?tide=` to open
+  anywhere in the cycle
+- Sheep on the salt meadows, a guided walk out across the sand that leaves ahead of the water,
+  paramotors circling the spire and a camera orbiting the Mount at golden hour
+- A relax scene can carry a set piece (`setPiece.ts`) updated every frame, orbit the camera
+  (`camera.orbit`) and set the tone mapping's exposure and warmth (`look`)
+
 ## 2026-10-29 00:10 UTC
 
 ### Added

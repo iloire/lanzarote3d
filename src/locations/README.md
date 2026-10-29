@@ -47,11 +47,11 @@ Ground at or below 0 m becomes sea floor under the water plane.
 | `scatter`                      | `{ kind: "pine" \| "rock" \| "cardon" \| "broadleaf" \| "tower" \| "favela" \| "resort" \| "village", at: [lat, lon], radius (m), count, minAltitude?, maxAltitude?, heading? }`, things dropped onto the ground within that height band (never in the sea); one instanced mesh per kind. Buildings (`tower`, `favela`, `resort`) take their own size and colour and line up with `heading`, degrees from east towards north; `village` houses (Pyrenean stone under slate) face any way |
 | `landmarks`                    | `{ name, kind, at: [lat, lon], heading?, top? }`, the same format as `shared/env/landmarks.json`; `top` sets it on the highest ground within that many units. Rio has the Cristo Redentor (`kind: "cristo"`)                                                                                                                                                                                                                                                                             |
 | `flatLand`                     | Metres: lay all land flat at this height instead of the DEM's (a city, whose surface model carries its rooftops)                                                                                                                                                                                                                                                                                                                                                                         |
-| `city`                         | `{ voxel, gridHeading, defaultHeight, facades?, roof?, taxis?, eiffelTower? }`: build the buildings with `3d/city-to-glb.py`, below                                                                                                                                                                                                                                                                                                                                                                                             |
+| `city`                         | `{ voxel, gridHeading, defaultHeight, facades?, roof?, taxis?, eiffelTower? }`: build the buildings with `3d/city-to-glb.py`, below                                                                                                                                                                                                                                                                                                                                                      |
 | `paramotor`                    | Abel flies his paramotor alone, which needs no ridge, chased by the camera along his path                                                                                                                                                                                                                                                                                                                                                                                                |
 | `paramotorSpeed`               | Times a wing's speed the paramotor flies (2 unless given). The app gives every leg of the loop the same time, so keep legs about the same length                                                                                                                                                                                                                                                                                                                                         |
-| `flatten`                      | `{ name, at: [lat, lon], size: [east-west, north-south] (m), height?, below? }`: squares of ground laid flat at `height` metres, else at the median round their edge, only where the surface model is lower than `below`. For what the scene models itself (a town's rooftops, a monument)                                                                                                                                                                                              |
-| `plain`                        | `{ color, height }`: an inland place has no sea; its land runs on flat to the horizon at `height` metres                                                                                                                                                                                                                                                                                                                                                                                |
+| `flatten`                      | `{ name, at: [lat, lon], size: [east-west, north-south] (m), height?, below? }`: squares of ground laid flat at `height` metres, else at the median round their edge, only where the surface model is lower than `below`. For what the scene models itself (a town's rooftops, a monument)                                                                                                                                                                                               |
+| `plain`                        | `{ color, height }`: an inland place has no sea; its land runs on flat to the horizon at `height` metres                                                                                                                                                                                                                                                                                                                                                                                 |
 | `pyramids`, `sphinx`, …        | Giza's monuments, [below](#giza)                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 
 `about` keys are notes for people and are ignored.
@@ -164,6 +164,48 @@ show), and `foundation/rendering/stoneCourses.ts` draws the blocks: a joint betw
 every 1.2-2.2 m along them, offset course to course, each block its own shade, worn at its edges.
 
 The script prints how far the loop clears everything within 10 m of it, pyramids, ruins and town.
+
+## A tidal bay: Mont-Saint-Michel
+
+Mont-Saint-Michel is built by its own script, which writes three files:
+
+```sh
+uv run 3d/mont-saint-michel-to-glb.py src/locations/mont-saint-michel.json assets/locations
+```
+
+- `mont-saint-michel.glb`, the terrain. The DEM has the whole bay at sea level, so the script
+  makes the flats: `bay.shore` metres at the edge of the land falling to `bay.low` `bay.reach`
+  metres out, sandbanks, the Couesnon, Sée and Sélune channels along OpenStreetMap's rivers
+  (`channelDepth` deep, `channelWidth` wide, with `braids` thinner threads wandering either side),
+  creeks through the salt meadows (OSM `wetland=saltmarsh`), which are lifted to `bay.meadow`, and
+  the land behind lifted by `landLift`.
+- `mont-saint-michel-bay.png`, the bay texture over the whole bbox: R how far the true ground lies
+  under the terrain mesh (0 to 5 m, so a channel narrower than the mesh still holds water), G sand,
+  salt meadow or farmland, B a tone, A cover.
+- `mont-saint-michel-mount.glb`, the Mount and Tombelaine. The Mount is OpenStreetMap's walls,
+  towers and houses (the Merveille, the cloister, the village with gabled roofs, the ramparts with
+  merlons, the bridge on its piles) on a granite rock rising from `mount.sand` to `mount.summit`;
+  the abbey church (nave, transept, chancel with flying buttresses, belfry, spire and Saint
+  Michael in gold to `mount.spire`) is drawn by the script. Each face carries a `_KIND` (granite,
+  ashlar, house, church, slate, gold, leaves) for `foundation/rendering/mountStone.ts` to draw
+  stone courses, windows (some lit), slate rows and gilding. The `Mount` node's extras carry
+  `sheep` ([x, y, z, seed] per sheep on the meadows, `sheep.flocks` × `sheep.perFlock` within
+  `sheep.within` m) and `walkers` (the `walkers.path` across the sand, [x, y, z] each).
+
+`tide` runs the sea: `low` to `high` metres over `period` seconds, the flood taking `flood` of
+it (`shared/env/tide.ts`). `foundation/rendering/tidalBay.ts` lays the painted ground over the
+terrain (wet sand that dries after the ebb, glinting with the haze at a low angle) and a water
+sheet at the tide's level that is deep only where the bay texture says the ground lies below it,
+with a foam line where it meets the sand. The open sea rises and falls with it. `?tide=<0..1>`
+opens the scene at that share of the cycle (0 low water, 0.5 high water).
+
+A relax scene can carry a set piece (`setPiece` in `scenes.ts`, `applications/relax/setPiece.ts`):
+a loader that adds its own things to the scene and is updated every frame. Mont-Saint-Michel's
+(`applications/relax/montSaintMichel.ts`) adds the Mount, the bay, the sheep, the walkers (who
+leave the sand as the flood reaches them) and a tide gauge above the place picker. `camera.orbit`
+turns the camera once round the subject every that many seconds, with the paramotors flying the
+`soaringLoop` as a fleet. `look` also takes `exposure` and `warmth`, the tone mapping's, instead
+of the theme's (0.72 and 0.04).
 
 The relax app has a place picker at the bottom: the current place with `<` and `>` to step to the
 previous and next, and a list of every place grouped by `region`, with a search box (accents and

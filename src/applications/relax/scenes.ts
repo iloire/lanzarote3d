@@ -12,9 +12,12 @@ import { EL_HIERRO, EL_HIERRO_CONFIG } from '../../locations/el-hierro';
 import { NEW_YORK, NEW_YORK_CITY, NEW_YORK_CONFIG } from '../../locations/new-york';
 import { GIZA, GIZA_CONFIG, GIZA_MONUMENTS } from '../../locations/giza';
 import { PARIS, PARIS_CITY, PARIS_CONFIG } from '../../locations/paris';
+import { MONT_SAINT_MICHEL, MONT_SAINT_MICHEL_CONFIG } from '../../locations/mont-saint-michel';
 import { DemLocationConfig, demAnchor, demPoint } from '../../locations/dem';
 import { geoToWorld } from '../../shared/geo';
 import { RIDGE_LOOP } from '../home/config';
+import { montSaintMichel } from './montSaintMichel';
+import type { SetPieceLoader } from './setPiece';
 
 /** One place to relax in: where the gliders soar and where the camera watches from */
 export interface RelaxScene {
@@ -52,6 +55,13 @@ export interface RelaxScene {
   look?: SceneLook;
   /** Inland: no sea, the land runs on to the horizon as a plain instead */
   plain?: { color: string; height: number };
+  /**
+   * Seconds for the camera to circle the place once instead of swaying from side to side; with
+   * paramotors, the whole group flies the loop and the camera watches rather than chases
+   */
+  orbit?: number;
+  /** The place's own show, loaded after the environment (Mont-Saint-Michel's tide) */
+  setPiece?: SetPieceLoader;
 }
 
 /** How a place is lit, where it differs from the theme */
@@ -62,13 +72,16 @@ export interface SceneLook {
   ambient?: number;
   /** The fog's colour, instead of the sky's at the horizon */
   fogColor?: string;
+  /** Tone-mapping exposure and warmth, instead of the theme's (0.72 and 0.04) */
+  exposure?: number;
+  warmth?: number;
 }
 
 /** The relax fields of a location JSON (see src/locations/README.md) */
 interface DemSceneConfig extends DemLocationConfig {
   region: string;
   soaringLoop: { waypoints: number[][] };
-  camera: { at: number[]; lookAt: number[]; zoomOut?: number; pan?: number };
+  camera: { at: number[]; lookAt: number[]; zoomOut?: number; pan?: number; orbit?: number };
   clouds: { at: number[]; kind: string; scale: number }[];
   /** Metres above sea level */
   cloudBase?: number;
@@ -152,6 +165,7 @@ function demScene(location: Location, config: DemSceneConfig, city?: string): Re
       color: config.plain.color,
       height: config.plain.height * config.unitsPerMetre * config.verticalExaggeration,
     },
+    orbit: config.camera.orbit,
   };
 }
 
@@ -175,6 +189,10 @@ export const RELAX_SCENES: Record<string, RelaxScene> = {
   'new-york': demScene(NEW_YORK, NEW_YORK_CONFIG, NEW_YORK_CITY),
   giza: demScene(GIZA, GIZA_CONFIG, GIZA_MONUMENTS),
   paris: demScene(PARIS, PARIS_CONFIG, PARIS_CITY),
+  'mont-saint-michel': {
+    ...demScene(MONT_SAINT_MICHEL, MONT_SAINT_MICHEL_CONFIG),
+    setPiece: montSaintMichel,
+  },
 };
 
 export const DEFAULT_SCENE = 'lanzarote';
