@@ -2,6 +2,18 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-29 09:24 UTC
+
+### Changed
+
+- Models download 3-9x smaller: `deploy-prod` uploads every `.glb` and `.obj` brotli-compressed with
+  `Content-Encoding: br` (new `scripts/upload-dist.mjs`). CloudFront was sending them raw, since it
+  only compresses its own list of content types and nothing over 10 MB. The home scene's models go
+  from 3.9 MB to 1.2 MB; the Giza monuments would go from 9.6 MB to 1.05 MB.
+- `Models.loadGltf` and `Models.loadObj` fetch the file themselves and read the decompressed size from
+  `x-amz-meta-file-size`, so the loading percentage stays right when Content-Length is the
+  compressed size.
+
 ## 2026-10-29 00:58 UTC
 
 ### Added

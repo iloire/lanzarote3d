@@ -82,6 +82,10 @@ bucket, uploads `dist/` and invalidates the CloudFront cache. Two things to know
 - It builds the **working tree**, uncommitted changes included. Deploy from a clean checkout of
   `master` to ship exactly what's committed.
 - The bucket is **empty for the length of the upload**, so the site can briefly 404.
+- Models (`.glb`, `.obj`) are uploaded **brotli-compressed** with `Content-Encoding: br`
+  (`scripts/upload-dist.mjs`), since CloudFront compresses HTML and JS but not those. Their real size
+  goes in `x-amz-meta-file-size` for the loading percentage. Fetching one from S3 directly, not via
+  a browser, gives the compressed bytes.
 
 `npm run run-prod` builds and serves `dist/` locally on port 8080, to check a production build
 before deploying.

@@ -56,7 +56,7 @@
     "format:check": "prettier --check \"{src,tests}/**/*.{ts,tsx,css}\" \"*.{js,json}\" \".github/**/*.yml\"",
     "type-check": "tsc --noEmit",
     "delete-prod": "aws s3 rm s3://lanzaroteparagliding-placeholder --recursive --profile lanzaroteparagliding",
-    "upload-prod": "aws s3 cp dist s3://lanzaroteparagliding-placeholder --recursive --profile lanzaroteparagliding",
+    "upload-prod": "node scripts/upload-dist.mjs dist lanzaroteparagliding-placeholder lanzaroteparagliding",
     "run-prod": "npm run build && npx serve dist -p 8080",
     "deploy-prod": "npm run build && npm run tag-prod && npm run delete-prod && npm run upload-prod && npm run invalidate-prod-cache",
     "tag-prod": "git tag PROD-$(date '+%F_%H%M')",
