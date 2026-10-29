@@ -227,7 +227,10 @@ const App: React.FC<AppProps> = ({
         </div>
       )}
       {showAppSelection && shouldShowSidebar(initialStory) && <Menu showPrivate={showPrivate} />}
-      <div className="app-title">{appName}</div>
+      {/* A page using the scene as its hero background has its own title */}
+      {new URLSearchParams(window.location.search).get('embed') !== 'hero' && (
+        <div className="app-title">{appName}</div>
+      )}
       <canvas className="webgl" />
     </div>
   );

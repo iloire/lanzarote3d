@@ -8,6 +8,7 @@ import { CharacterType } from '../../foundation/components/characters/CharacterR
 import { FlightPattern } from '../../foundation/systems/behaviors/FlyingBehavior';
 import type { BackdropSwaySettings, CameraFollowSettings, ZoomInSettings } from './cameraFollow';
 import type { TwistSettings, WingoverSettings } from './paragliderMotion';
+import type { HeroSettings } from './heroEmbed';
 
 export type ParagliderVoxelConfig = {
   options: ParagliderVoxelOptions;
@@ -665,3 +666,18 @@ export const CAMERA_SWAY: BackdropSwaySettings = {
  * the scene renders without its overlay.
  */
 export const isEmbedded = (): boolean => new URLSearchParams(window.location.search).has('embed');
+
+/**
+ * True when a page shows the scene as its hero background (?embed=hero), behind its own
+ * text: the scene skips the fly-in and frames the pilot to the right of that text.
+ */
+export const isHeroEmbed = (): boolean =>
+  new URLSearchParams(window.location.search).get('embed') === 'hero';
+
+/** The pilot a quarter of the frame right of centre, the camera leaning up to ±6° after the pointer */
+export const HERO: HeroSettings = {
+  frameShift: 0.25,
+  yaw: THREE.MathUtils.degToRad(6),
+  pitch: THREE.MathUtils.degToRad(3),
+  response: 1.5,
+};

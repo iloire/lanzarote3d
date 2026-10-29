@@ -40,6 +40,9 @@ import {
   LA_GRACIOSA,
   BIRTHDAY_FLIGHT,
   isEmbedded,
+  isHeroEmbed,
+  HERO,
+  CAMERA_ARRIVAL_OFFSET,
 } from './config';
 import { loadParagliders, loadHangglider, loadCessna, loadHercules } from './vehicleLoader';
 import { setupCameraAnimation, applyFloatingMotion } from './cameraAnimation';
@@ -53,6 +56,7 @@ import { GuirreVisitor } from '../../foundation/components/wildlife/GuirreVisito
 import { CharacterType } from '../../foundation/components/characters/CharacterRegistry';
 import { birthdayPilots } from './birthdays';
 import { ConfettiBurst } from '../../foundation/components/effects/Confetti';
+import { HeroEmbed } from './heroEmbed';
 
 /**
  * Home App - Landing scene with the voxel title
@@ -83,6 +87,8 @@ class HomeApp extends TerrainBase {
   private pilots: { mesh: THREE.Object3D; motion?: ParagliderMotion }[] = [];
   /** Which of `pilots` the camera follows */
   private leadIndex = 0;
+  /** Set when the scene is a page's hero background */
+  private hero: HeroEmbed | null = null;
 
   constructor() {
     const appConfig = getAppConfig('home');
@@ -290,6 +296,16 @@ class HomeApp extends TerrainBase {
       throw new Error('No paraglider loaded for the camera to follow');
     }
 
+    if (isHeroEmbed()) {
+      // A background has no time for the fly-in: start beside the pilot, already following
+      this.hero = new HeroEmbed(camera as THREE.PerspectiveCamera, HERO);
+      camera.position.copy(lead.position).add(CAMERA_ARRIVAL_OFFSET);
+      controls.target.copy(lead.position);
+      controls.update();
+      this.startAnimationLoop(renderer, scene, camera, controls);
+      return;
+    }
+
     this.startAnimationLoop(renderer, scene, camera, controls);
 
     setupCameraAnimation(camera, controls, {
@@ -360,6 +376,7 @@ class HomeApp extends TerrainBase {
     const follow = new CameraFollow(CAMERA_FOLLOW);
     const cameraMove = new THREE.Vector3();
     let wasFollowing = false;
+    let heroShown = false;
     let followed = this.pilots[this.leadIndex];
     // Sways the camera with La Graciosa behind the pilots until someone takes the controls
     const sway = new BackdropSway(LA_GRACIOSA, CAMERA_SWAY);
@@ -392,6 +409,11 @@ class HomeApp extends TerrainBase {
         // The frame's own timestamp, and a capped step so returning to the tab doesn't jump
         const deltaTime = lastTime === null ? 0 : Math.min((now - lastTime) / 1000, 0.1);
         lastTime = now;
+
+        if (this.hero?.paused) {
+          this.animationId = requestAnimationFrame(animate);
+          return;
+        }
 
         if (this.targetController) {
           this.targetController.update(deltaTime);
@@ -447,10 +469,17 @@ class HomeApp extends TerrainBase {
 
         const renderCamera =
           this.isAnimating || !this.targetController ? camera : this.targetController;
-        // The roll is undone after the frame so the orbit controls never see it.
+        // The hero's lean and the roll are undone after the frame so the orbit controls never see them.
+        this.hero?.update(deltaTime);
+        if (following) this.hero?.apply(controls.target);
         if (following) camera.rotateZ(follow.roll);
         this.renderFrame(renderer, scene, renderCamera);
         if (following) camera.rotateZ(-follow.roll);
+        if (following) this.hero?.restore();
+        if (this.hero && !heroShown) {
+          heroShown = true;
+          this.hero.ready();
+        }
         this.animationId = requestAnimationFrame(animate);
       } catch (error) {
         this.handleError(error as Error, 'animation loop');
@@ -466,6 +495,9 @@ class HomeApp extends TerrainBase {
       this.removeTitleOverlay();
       this.removeTitleOverlay = null;
     }
+
+    this.hero?.dispose();
+    this.hero = null;
 
     if (this.removePilotPicker) {
       this.removePilotPicker();

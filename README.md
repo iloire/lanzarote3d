@@ -66,7 +66,10 @@ build of both sites, on every push to `master` and every pull request.
 Production is [3d.lanzaroteparagliding.com](https://3d.lanzaroteparagliding.com): an S3 bucket
 (`lanzaroteparagliding-placeholder`) behind CloudFront, deployed with the AWS CLI's
 `lanzaroteparagliding` profile. The lanzaroteparagliding.com landing page embeds the home scene with
-`?embed=1`, which hides the title overlay.
+`?embed=1`, which hides the title overlay. iloire.com uses it as its hero background with
+`?embed=hero`: no fly-in, no title, the pilot framed right of centre, the camera leaning after the
+`lz:pointer` messages the page posts, and no drawing while the page says `lz:visible: false`. The
+scene posts `lz:ready` to the page once it is drawn (`src/applications/home/heroEmbed.ts`).
 
 ```bash
 brew install awscli                                  # once

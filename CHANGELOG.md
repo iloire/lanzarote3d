@@ -2,6 +2,16 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-29 09:28 UTC
+
+### Added
+
+- `?embed=hero`: the home scene as another page's hero background (iloire.com). It skips the fly-in
+  and starts beside the lead pilot, shifts the frame so the pilot flies a quarter of the width right of
+  centre (`HERO.frameShift`), and hides the title. The host posts `lz:pointer` (-1..1) and the camera
+  leans up to ±6° round the pilot after it; `lz:visible` pauses drawing while the hero is scrolled
+  away. The scene posts `lz:ready` once it has drawn a frame (`home/heroEmbed.ts`).
+
 ## 2026-10-29 09:24 UTC
 
 ### Changed
