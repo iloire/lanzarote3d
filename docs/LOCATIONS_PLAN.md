@@ -142,6 +142,25 @@ terrainPosition, anchor, regions }` — only what `TerrainBase` reads today~~ �
 - ~~Fog to fade the city's far edge (`fog`)~~ ✅
 - Not done: Central Park's trees, the rest of Manhattan.
 
+### 3f. Giza (curated)
+
+- ~~The plateau from the Copernicus surface model at 15 m, at New York's 6 units a metre and no
+  height stretch, so the pyramids keep their true shape; `flatten` pads lay flat the ground under
+  each pyramid (its base plus 40 m, at the median round its edge: Khufu 61.6 m, Khafre's terrace
+  70.7 m), the Sphinx's enclosure and the town, whose rooftops the model carries~~ ✅
+- ~~`3d/giza-to-glb.py`: the three pyramids and their seven satellites course by course (203 on
+  Khufu), each course a step a little in from the slope; Khafre's casing cap, its granite first
+  course, Menkaure's granite casing and north-face gash, the step pyramids G3-b and G3-c,
+  Khentkawes' two-step tomb, Khufu's summit mast~~ ✅
+- ~~The Sphinx from blocks, the three causeways, and every other OpenStreetMap footprint on the
+  plateau raised (some 1,100: the mastaba fields, temples, the Wall of the Crow)~~ ✅
+- ~~Nazlet el-Samman, which OpenStreetMap barely maps, made up: 11,000 plots of brick and
+  concrete on a 3 m grid, meshed and windowed with New York's mesher and window shader~~ ✅
+- ~~A stone shader draws each course's blocks (`stoneCourses.ts`)~~ ✅
+- ~~Abel's paramotor tour at 12.5 m/s (`paramotorSpeed`), an oval along the line of the
+  pyramids, morning sun, a sand plain to the horizon instead of the sea (`plain`)~~ ✅
+- Not done: palms and fields in the valley, the Grand Egyptian Museum to the north, camels.
+
 ### 4. The relax app
 
 - ~~Started as a private route of the Lanzarote build, `relax.html?location=lanzarote |

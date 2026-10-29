@@ -15,3 +15,5 @@ coverage/
 3d/dem-cache/
 # OpenStreetMap buildings downloaded by 3d/city-to-glb.py
 3d/osm-cache/
+# Bytecode from the 3d scripts importing each other
+3d/__pycache__/

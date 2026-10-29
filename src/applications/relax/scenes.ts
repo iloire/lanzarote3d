@@ -10,6 +10,7 @@ import { TENERIFE, TENERIFE_CONFIG } from '../../locations/tenerife';
 import { CASTEJON_DE_SOS, CASTEJON_DE_SOS_CONFIG } from '../../locations/castejon-de-sos';
 import { EL_HIERRO, EL_HIERRO_CONFIG } from '../../locations/el-hierro';
 import { NEW_YORK, NEW_YORK_CITY, NEW_YORK_CONFIG } from '../../locations/new-york';
+import { GIZA, GIZA_CONFIG, GIZA_MONUMENTS } from '../../locations/giza';
 import { DemLocationConfig, demAnchor, demPoint } from '../../locations/dem';
 import { geoToWorld } from '../../shared/geo';
 import { RIDGE_LOOP } from '../home/config';
@@ -34,13 +35,20 @@ export interface RelaxScene {
   towns?: TownConfig[];
   scatter?: ScatterArea[];
   landmarks?: { list: Landmark[]; anchor: GeoAnchor };
-  /** URL of the place's buildings, built by 3d/city-to-glb.py in the terrain's world units */
+  /**
+   * URL of the place's buildings, in the terrain's world units: a city's from 3d/city-to-glb.py,
+   * Giza's monuments and town from 3d/giza-to-glb.py
+   */
   city?: string;
   /** Fly paramotors, which need no ridge, instead of paragliders */
   paramotor?: boolean;
+  /** How many times a wing's speed the paramotor flies; the app's own unless given */
+  paramotorSpeed?: number;
   /** FogExp2 density, thicker than the theme's to hide a city's far edges */
   fogDensity?: number;
   look?: SceneLook;
+  /** Inland: no sea, the land runs on to the horizon as a plain instead */
+  plain?: { color: string; height: number };
 }
 
 /** How a place is lit, where it differs from the theme */
@@ -74,9 +82,12 @@ interface DemSceneConfig extends DemLocationConfig {
   }[];
   landmarks?: { name: string; kind: string; at: number[]; heading?: number; top?: number }[];
   paramotor?: boolean;
+  paramotorSpeed?: number;
   /** Metres at which the fog has hidden half of what's behind it */
   fog?: number;
   look?: SceneLook;
+  /** Metres above sea level */
+  plain?: { color: string; height: number };
 }
 
 function demScene(location: Location, config: DemSceneConfig, city?: string): RelaxScene {
@@ -127,9 +138,14 @@ function demScene(location: Location, config: DemSceneConfig, city?: string): Re
     },
     city,
     paramotor: config.paramotor,
+    paramotorSpeed: config.paramotorSpeed,
     // FogExp2 hides half where (density × distance)² = ln 2
     fogDensity: config.fog && Math.sqrt(Math.LN2) / (config.fog * config.unitsPerMetre),
     look: config.look,
+    plain: config.plain && {
+      color: config.plain.color,
+      height: config.plain.height * config.unitsPerMetre * config.verticalExaggeration,
+    },
   };
 }
 
@@ -151,6 +167,7 @@ export const RELAX_SCENES: Record<string, RelaxScene> = {
   'castejon-de-sos': demScene(CASTEJON_DE_SOS, CASTEJON_DE_SOS_CONFIG),
   'rio-de-janeiro': demScene(RIO_DE_JANEIRO, RIO_CONFIG),
   'new-york': demScene(NEW_YORK, NEW_YORK_CONFIG, NEW_YORK_CITY),
+  giza: demScene(GIZA, GIZA_CONFIG, GIZA_MONUMENTS),
 };
 
 export const DEFAULT_SCENE = 'lanzarote';

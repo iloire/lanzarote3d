@@ -21,11 +21,13 @@ import { PathTrail } from './pathTrail';
 import { CityTraffic, Lane } from '../../shared/env/cityTraffic';
 import { cityTrees, TreeSpots } from '../../shared/env/cityTrees';
 import { addCityWindows, CityGrid } from '../../foundation/rendering/cityWindows';
+import { addStoneCourses } from '../../foundation/rendering/stoneCourses';
 
 const PILOTS = 5;
 // Where there's no ridge Abel flies his paramotor alone, twice a wing's speed so the streets go
-// by, and the camera chases him: CHASE_LAG seconds back along his own path, which is clear of the
-// buildings, CHASE_RISE units above it, easing in over CHASE_EASE seconds
+// by (unless the place sets its own), and the camera chases him: CHASE_LAG seconds back along
+// his own path, which is clear of the buildings, CHASE_RISE units above it, easing in over
+// CHASE_EASE seconds
 const PARAMOTOR_PILOT = CharacterType.ABEL;
 const PARAMOTOR_SPEED = 2;
 const CHASE_LAG = 5;
@@ -44,6 +46,8 @@ const MIN_DISTANCE = 150;
 const LOWEST_VIEW = THREE.MathUtils.degToRad(85);
 // The camera never goes nearer the ground than this
 const GROUND_CLEARANCE = 40;
+// An inland place's plain reaches this far, world units: past the fog
+const PLAIN_SIZE = 500000;
 
 /** The fields that are set, so a spread over defaults doesn't overwrite them with undefined */
 const definedOnly = <T extends object>(values: T | undefined): Partial<T> =>
@@ -52,9 +56,9 @@ const definedOnly = <T extends object>(values: T | undefined): Partial<T> =>
   ) as Partial<T>;
 
 /**
- * Pick a place (?location=lanzarote | tenerife | el-hierro | castejon-de-sos | rio-de-janeiro | new-york)
- * and watch a few gliders soar its ridge while the camera drifts slowly from side to side, or, in a
- * city, chase Abel's paramotor through its streets. Dragging takes over the camera.
+ * Pick a place (?location=lanzarote | tenerife | el-hierro | castejon-de-sos | rio-de-janeiro | new-york
+ * | giza) and watch a few gliders soar its ridge while the camera drifts slowly from side to side, or,
+ * in a city or round the pyramids, chase Abel's paramotor. Dragging takes over the camera.
  */
 class RelaxApp extends TerrainBase {
   private animationId: number | undefined;
@@ -104,6 +108,10 @@ class RelaxApp extends TerrainBase {
       if (look?.ambient !== undefined && options.sky) {
         options.sky.ambientLight.intensity *= look.ambient;
       }
+      if (relax.plain) {
+        if (options.water) options.water.visible = false;
+        scene.add(this.createPlain(relax.plain));
+      }
 
       controls.enabled = true;
       controls.target.copy(relax.camera.target);
@@ -122,6 +130,7 @@ class RelaxApp extends TerrainBase {
           object.geometry.computeVertexNormals();
           object.castShadow = true;
           object.receiveShadow = true;
+          if (object.userData['stone']) addStoneCourses(object);
           const grid = object.userData['grid'] as CityGrid | undefined;
           if (!grid) return;
           addCityWindows(object, grid);
@@ -154,7 +163,7 @@ class RelaxApp extends TerrainBase {
           startProgress: i / pilots.length,
           // Each a little higher and further out, so they don't fly through each other
           pathOffset: new THREE.Vector3(0, i * 25, 0),
-          speedFactor: relax.paramotor ? PARAMOTOR_SPEED : 1,
+          speedFactor: relax.paramotor ? (relax.paramotorSpeed ?? PARAMOTOR_SPEED) : 1,
         })),
         (error, context) => this.handleError(error, context),
         { waypoints: relax.loop, tension: RIDGE_LOOP_TENSION }
@@ -180,6 +189,17 @@ class RelaxApp extends TerrainBase {
       this.handleError(error as Error, 'load');
       throw error;
     }
+  }
+
+  /** The land past the terrain's edge, flat to the horizon, where an inland place has no sea */
+  private createPlain({ color, height }: { color: string; height: number }): THREE.Mesh {
+    const plain = new THREE.Mesh(
+      new THREE.PlaneGeometry(PLAIN_SIZE, PLAIN_SIZE).rotateX(-Math.PI / 2),
+      new THREE.MeshStandardMaterial({ color, roughness: 1 })
+    );
+    plain.position.y = height;
+    plain.receiveShadow = true;
+    return plain;
   }
 
   /** Keep the viewer near the gliders: a little zoom, all the way round, panning held below */

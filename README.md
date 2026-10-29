@@ -27,8 +27,10 @@ npm run dev        # webpack dev server on http://localhost:8080, opens the home
 
 The same repo builds a second site, **relax**: pick a paragliding place (Lanzarote, Tenerife, El
 Hierro, Rio de Janeiro, Castejón de Sos) and watch a few gliders soar its ridge, or New York, where
-paramotors fly the street canyons of a voxel Midtown. It has its own build, so the Lanzarote site
-never ships it:
+paramotors fly the street canyons of a voxel Midtown, or Giza, where Abel flies his paramotor round
+the pyramids, built course by course. It has its own build, so the Lanzarote site never ships it:
+
+![Abel's paramotor between Menkaure and Khafre on the Giza plateau](docs/screenshots/giza.png)
 
 ```bash
 npm run start:relax   # dev server, opens the relax scene

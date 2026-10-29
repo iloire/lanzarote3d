@@ -1,0 +1,314 @@
+{
+  "id": "giza",
+  "name": "Giza",
+  "region": "Egypt",
+  "about": "The Giza plateau: Khufu, Khafre and Menkaure with their queens' pyramids, the Sphinx, the temples and causeways, the mastaba fields, and Nazlet el-Samman at the foot of the escarpment. At New York's scale (6 units a metre) so Abel's paramotor flies between them at their true size. Ground: uv run 3d/dem-to-glb.py src/locations/giza.json assets/locations/giza.glb; monuments and town: uv run 3d/giza-to-glb.py src/locations/giza.json assets/locations/giza-monuments.glb",
+  "bbox": {
+    "south": 29.962,
+    "north": 29.99,
+    "west": 31.115,
+    "east": 31.152
+  },
+  "spacing": 15,
+  "unitsPerMetre": 6,
+  "verticalExaggeration": 1,
+  "flatten": [
+    {
+      "name": "Sphinx enclosure",
+      "about": "The pit the Sphinx was carved out of, open to its temples in the east",
+      "at": [29.97528, 31.13775],
+      "size": [100, 70],
+      "height": 20
+    },
+    {
+      "name": "Nazlet el-Samman",
+      "about": "The town on the valley floor: the surface model carries its rooftops, the buildings come from giza-to-glb.py",
+      "at": [29.976, 31.1458],
+      "size": [1200, 3200],
+      "height": 19,
+      "below": 32
+    },
+    {
+      "name": "Pyramids Road end",
+      "at": [29.98725, 31.1375],
+      "size": [900, 640],
+      "height": 19,
+      "below": 32
+    }
+  ],
+  "pyramids": [
+    {
+      "name": "Great Pyramid of Khufu",
+      "about": "230.3 m square, 146.6 m to its lost apex, 138.5 m standing: 203 courses of core blocks with every casing stone gone, a flat top 10 m across and the mast that marks the old apex",
+      "at": [29.97917, 31.134212],
+      "base": 230.3,
+      "height": 146.6,
+      "standing": 138.5,
+      "courses": 203,
+      "mast": true,
+      "color": "#c9a46f"
+    },
+    {
+      "name": "Pyramid of Khafre",
+      "about": "215.3 m square, 143.5 m, 136.4 m standing on a terrace 10 m above Khufu's; its top still wears the smooth white casing, and its first course was granite",
+      "at": [29.97599, 31.130737],
+      "base": 215.3,
+      "height": 143.5,
+      "standing": 136.4,
+      "courses": 160,
+      "casing": 102,
+      "granite": 1.5,
+      "color": "#c6a06c"
+    },
+    {
+      "name": "Pyramid of Menkaure",
+      "about": "102.2 by 104.6 m, 65.5 m, 61 m standing; the lowest sixteen courses cased in red granite, and the gash in its north face from 1196",
+      "at": [29.97251, 31.128261],
+      "base": [102.2, 104.6],
+      "height": 65.5,
+      "standing": 61,
+      "courses": 70,
+      "granite": 9,
+      "gash": [8, 32],
+      "color": "#c29c69"
+    },
+    {
+      "name": "Pyramid of Hetepheres I (G1-a)",
+      "at": [29.978868, 31.136212],
+      "base": 49.5,
+      "height": 30.25,
+      "standing": 20,
+      "courses": 26,
+      "ruined": true,
+      "color": "#bd9a6b"
+    },
+    {
+      "name": "Pyramid of Meritites I (G1-b)",
+      "at": [29.978342, 31.136214],
+      "base": 49.5,
+      "height": 30,
+      "standing": 21,
+      "courses": 27,
+      "ruined": true,
+      "color": "#bf9c6c"
+    },
+    {
+      "name": "Pyramid of Henutsen (G1-c)",
+      "at": [29.977878, 31.136204],
+      "base": 46.25,
+      "height": 29.6,
+      "standing": 22,
+      "courses": 28,
+      "ruined": true,
+      "color": "#bb986a"
+    },
+    {
+      "name": "Queen's Pyramid G3-a",
+      "at": [29.971622, 31.128303],
+      "base": 44.3,
+      "height": 28.4,
+      "standing": 21.2,
+      "courses": 26,
+      "color": "#bf9c6c"
+    },
+    {
+      "name": "Queen's Pyramid G3-b",
+      "about": "A step pyramid in four steps, never cased",
+      "at": [29.971631, 31.127809],
+      "base": 31.5,
+      "height": 21.2,
+      "standing": 21.2,
+      "steps": 4,
+      "color": "#c09d6d"
+    },
+    {
+      "name": "Queen's Pyramid G3-c",
+      "about": "A step pyramid in four steps, never cased",
+      "at": [29.971616, 31.12734],
+      "base": 31.5,
+      "height": 21.2,
+      "standing": 21.2,
+      "steps": 4,
+      "color": "#bd9a6b"
+    },
+    {
+      "name": "Tomb of Khentkawes I",
+      "about": "A giant sarcophagus on a block of bedrock: two steps",
+      "at": [29.973386, 31.135466],
+      "base": 45,
+      "height": 18.5,
+      "standing": 18.5,
+      "steps": 2,
+      "color": "#c2a072"
+    }
+  ],
+  "sphinx": {
+    "about": "73 m long, 20 m high, facing the sunrise; on the floor of its enclosure",
+    "at": [29.975281, 31.137595],
+    "heading": 90
+  },
+  "causeways": [
+    {
+      "name": "Causeway of Khafre",
+      "from": [29.97599, 31.1331],
+      "to": [29.97486, 31.13805],
+      "width": 5,
+      "height": 1.5
+    },
+    {
+      "name": "Causeway of Menkaure",
+      "from": [29.97252, 31.1298],
+      "to": [29.97251, 31.1361],
+      "width": 6,
+      "height": 1
+    },
+    {
+      "name": "Causeway of Khufu",
+      "from": [29.97905, 31.13668],
+      "to": [29.97765, 31.13985],
+      "width": 8,
+      "height": 2
+    }
+  ],
+  "ruins": {
+    "about": "Height in metres of the OpenStreetMap footprints giza-to-glb.py raises, by name; mastabas and other ruins are 2.5-6.5 m, modern buildings take their levels or 9 m",
+    "heights": {
+      "Valley Temple of Khafre": 10,
+      "Sphinx Temple": 6,
+      "Funerary Temple of Khafre": 5,
+      "Funerary Temple of Menkaure": 3,
+      "Valley Temple of Menkaure": 2.5,
+      "Amenhotep II Temple": 4,
+      "Tomb of Hemiunu": 8,
+      "Wall of the Crow": 10
+    },
+    "skip": [
+      "Boat Pits",
+      "Boat pits",
+      "Osirion",
+      "mine",
+      "la \"Maquette\"",
+      "Giza Pyramids Ticket Checkpoint"
+    ]
+  },
+  "town": {
+    "about": "Nazlet el-Samman and the end of Pyramids Road, which OpenStreetMap barely maps: blocks of brick and concrete four to six storeys high on the flat ground below the escarpment, clear of the Sphinx's temples",
+    "areas": [
+      { "south": 29.9645, "north": 29.9885, "west": 31.1394, "east": 31.149 },
+      { "south": 29.9845, "north": 29.9898, "west": 31.1325, "east": 31.1394 }
+    ],
+    "clear": [
+      { "at": [29.9751, 31.1386], "radius": 120 },
+      { "at": [29.9725, 31.1364], "radius": 55 },
+      { "at": [29.97765, 31.1398], "radius": 25 }
+    ],
+    "voxel": 3
+  },
+  "paramotor": true,
+  "paramotorSpeed": 5,
+  "fog": 1700,
+  "plain": {
+    "about": "Giza is inland: past the terrain the desert runs on, flat, at the valley floor's height",
+    "color": "#c9a36e",
+    "height": 18
+  },
+  "look": {
+    "about": "Morning over the desert: a low sun in the east lights the faces Abel flies towards and the Sphinx's face, which looks at the sunrise, through a warm dusty haze",
+    "timeOfDay": 8.5,
+    "ambient": 0.55,
+    "fogColor": "#d4bf9c"
+  },
+  "places": {
+    "khufu": {
+      "name": "Great Pyramid of Khufu",
+      "at": [29.97917, 31.134212]
+    },
+    "khafre": {
+      "name": "Pyramid of Khafre",
+      "at": [29.97599, 31.130737]
+    },
+    "menkaure": {
+      "name": "Pyramid of Menkaure",
+      "at": [29.97251, 31.128261]
+    },
+    "sphinx": {
+      "name": "Great Sphinx",
+      "at": [29.975281, 31.137595]
+    }
+  },
+  "soaringLoop": {
+    "about": "Abel's paramotor tour, [lat, lon, metres above sea level]: an oval along the line of the three pyramids, so one is nearly always ahead. In front of the Sphinx's face, west past the valley temples and south-west past Khafre to Menkaure, west between its top and its queens, north-east up the far side past Khafre to the Great Pyramid, round its north face, then south between it and its queens and on to the Sphinx. The app gives every leg the same time, so they're about the same length. giza-to-glb.py checks the curve keeps 10 m either side clear",
+    "waypoints": [
+      [29.9746, 31.1396, 60],
+      [29.9738, 31.1365, 90],
+      [29.9738, 31.1322, 110],
+      [29.9722, 31.1302, 112],
+      [29.9719, 31.127, 115],
+      [29.9732, 31.1258, 125],
+      [29.9762, 31.1278, 140],
+      [29.979, 31.1308, 140],
+      [29.9812, 31.1342, 135],
+      [29.9788, 31.136, 115],
+      [29.9765, 31.1375, 75]
+    ]
+  },
+  "camera": {
+    "about": "East of the Sphinx, looking west up at the three pyramids; [lat, lon, metres]",
+    "at": [29.9748, 31.1428, 90],
+    "lookAt": [29.9755, 31.1345, 80],
+    "zoomOut": 2.5,
+    "pan": 9000
+  },
+  "clouds": [],
+  "regions": [
+    {
+      "name": "Desert",
+      "at": [29.976, 31.133],
+      "radius": 9000,
+      "color": "#c9a36e",
+      "strength": 1
+    },
+    {
+      "name": "Plateau limestone",
+      "at": [29.9765, 31.1315],
+      "radius": 650,
+      "color": "#bea47c",
+      "strength": 0.8
+    },
+    {
+      "name": "Sand south of the plateau",
+      "at": [29.966, 31.128],
+      "radius": 900,
+      "color": "#d4ad73",
+      "strength": 0.9
+    },
+    {
+      "name": "Nazlet el-Samman (1)",
+      "at": [29.969, 31.145],
+      "radius": 700,
+      "color": "#8d7d69",
+      "strength": 1
+    },
+    {
+      "name": "Nazlet el-Samman (2)",
+      "at": [29.981, 31.1448],
+      "radius": 750,
+      "color": "#8d7d69",
+      "strength": 1
+    },
+    {
+      "name": "Pyramids Road end",
+      "at": [29.9875, 31.1365],
+      "radius": 450,
+      "color": "#8d7d69",
+      "strength": 0.9
+    },
+    {
+      "name": "Sphinx enclosure",
+      "at": [29.97528, 31.13775],
+      "radius": 70,
+      "color": "#b89c74",
+      "strength": 1
+    }
+  ]
+}

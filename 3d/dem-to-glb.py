@@ -14,7 +14,8 @@ writes the same slim GLB as 3d/slim-glb.py: positions and 16-bit triangle indice
 The GLB is in world units already (scale 1): x east, z south, y up, the bbox centre at
 x = z = 0, so the location's GeoAnchor is just the centre of the bbox. Ground at or below 0 m
 (the sea, the lagoons) is dropped to SEA_FLOOR, under the water plane. A city sets flatLand,
-and all its land is laid at that height.
+and all its land is laid at that height. `flatten` pads, and a pad under each of `pyramids`, lay
+squares of ground flat where the surface model carries what the scene models itself.
 
 Usage: uv run 3d/dem-to-glb.py src/locations/rio-de-janeiro.json assets/locations/rio-de-janeiro.glb
 """
@@ -35,6 +36,9 @@ SEA_FLOOR = -6.0
 CACHE = Path(__file__).parent / 'dem-cache'
 BUCKET = 'https://copernicus-dem-30m.s3.amazonaws.com'
 FLOAT, UINT16 = 5126, 5123
+# A pyramid's pad reaches this far past its base on every side, metres: the 30 m surface model
+# smears a pyramid well beyond its foot
+PYRAMID_PAD_MARGIN = 40
 
 
 def tile_name(lat_floor, lon_floor):
@@ -85,6 +89,64 @@ def sampler(bbox):
     return height
 
 
+def pads(location):
+    """The squares of ground the location lays flat: its `flatten` list, and one under each
+    pyramid, each with `at`, `size` ([east-west, north-south] metres) and optionally `height`
+    and `below` (metres)"""
+    under = [
+        {'name': p['name'], 'at': p['at'], 'size': [s + 2 * PYRAMID_PAD_MARGIN for s in sides(p)]}
+        for p in location.get('pyramids', [])
+    ]
+    return location.get('flatten', []) + under
+
+
+def sides(pyramid):
+    """A pyramid's base, [east-west, north-south] metres"""
+    base = pyramid['base']
+    return base if isinstance(base, list) else [base, base]
+
+
+def pad_box(pad, lat0, lon0):
+    """A pad's centre and half-size in metres east and north of (lat0, lon0)"""
+    metres_per_lon = math.cos(math.radians(lat0)) * METRES_PER_DEGREE_LON_AT_EQUATOR
+    east = (pad['at'][1] - lon0) * metres_per_lon
+    north = (pad['at'][0] - lat0) * METRES_PER_DEGREE_LAT
+    return east, north, pad['size'][0] / 2, pad['size'][1] / 2
+
+
+def ground(location):
+    """Height (m) of the location's ground at any lat/lon: the surface model with the pads laid
+    flat, each at its `height` or else the median round its edge, and only where the model is
+    lower than its `below`"""
+    bbox = location['bbox']
+    height = sampler(bbox)
+    lat0 = (bbox['north'] + bbox['south']) / 2
+    lon0 = (bbox['east'] + bbox['west']) / 2
+    metres_per_lon = math.cos(math.radians(lat0)) * METRES_PER_DEGREE_LON_AT_EQUATOR
+    levelled = []
+    for pad in pads(location):
+        east, north, half_e, half_n = pad_box(pad, lat0, lon0)
+        level = pad.get('height')
+        if level is None:
+            t = np.linspace(-1, 1, 41)
+            edge_e = np.concatenate([east + half_e * t, east + half_e * t, np.full(41, east - half_e), np.full(41, east + half_e)])
+            edge_n = np.concatenate([np.full(41, north - half_n), np.full(41, north + half_n), north + half_n * t, north + half_n * t])
+            level = float(np.median(height(lat0 + edge_n / METRES_PER_DEGREE_LAT, lon0 + edge_e / metres_per_lon)))
+            print(f"{pad.get('name', 'pad')}: laid flat at {level:.1f} m")
+        levelled.append((east, north, half_e, half_n, level, pad.get('below', math.inf)))
+
+    def at(lat, lon):
+        metres = height(lat, lon)
+        east = (lon - lon0) * metres_per_lon
+        north = (lat - lat0) * METRES_PER_DEGREE_LAT
+        for pe, pn, half_e, half_n, level, below in levelled:
+            inside = (np.abs(east - pe) <= half_e) & (np.abs(north - pn) <= half_n) & (metres < below)
+            metres = np.where(inside, level, metres)
+        return metres
+
+    return at
+
+
 def build_grid(location):
     bbox = location['bbox']
     upm = location['unitsPerMetre']
@@ -103,7 +165,7 @@ def build_grid(location):
     ee, ss = np.meshgrid(east, south)
     lat = lat0 - ss / METRES_PER_DEGREE_LAT
     lon = lon0 + ee / metres_per_lon
-    metres = sampler(bbox)(lat, lon)
+    metres = ground(location)(lat, lon)
 
     # A city's model would carry its rooftops (the DEM is a surface model), so its land is
     # laid flat at flatLand metres and the buildings come from 3d/city-to-glb.py instead.

@@ -2,6 +2,24 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-29 00:08 UTC
+
+### Added
+
+- Giza in the relax site: the plateau from elevation data, Khufu, Khafre and Menkaure built course
+  by course as real steps (203 on Khufu), Khafre's white casing cap and granite first course,
+  Menkaure's granite casing and the gash in its north face, Khufu's queens, Menkaure's two step
+  pyramids, Khentkawes' tomb and the mast on Khufu's flat top; the Sphinx sculpted from blocks in
+  its enclosure, the three causeways, some 1,100 mastabas, temples and walls raised from
+  OpenStreetMap, and Nazlet el-Samman below the escarpment (new `3d/giza-to-glb.py`)
+- A stone shader draws each course's blocks, offset course to course, each its own shade
+  (`stoneCourses.ts`)
+- Abel flies his paramotor round the pyramids under a morning sun: in front of the Sphinx, past
+  Khafre, between Menkaure and its queens, up to the Great Pyramid and back
+- Location JSON: `flatten` pads lay ground flat (and one goes under each of `pyramids`), `plain`
+  runs an inland place's land on to the horizon instead of the sea, `paramotorSpeed` sets how fast
+  the paramotor flies
+
 ## 2026-10-28 22:53 UTC
 
 ### Added

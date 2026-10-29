@@ -11,7 +11,8 @@ longitude map onto it (`types.ts`). `TerrainBase` loads Lanzarote unless an app 
   (`castejon-de-sos.json` + `.ts`, the Ésera valley in the Pyrenees: the Liri takeoff under
   Gallinero, El Turbón to the south) are built from elevation data, below. **New York**
   (`new-york.json` + `.ts`, Midtown) is a city: flat ground from the same script, and its
-  buildings as voxels from OpenStreetMap, [below](#a-city).
+  buildings as voxels from OpenStreetMap, [below](#a-city). **Giza** (`giza.json` + `.ts`) is the
+  plateau from elevation data with its monuments built by their own script, [below](#giza).
 
 ## A place built from elevation data
 
@@ -47,6 +48,10 @@ Ground at or below 0 m becomes sea floor under the water plane.
 | `flatLand`                     | Metres: lay all land flat at this height instead of the DEM's (a city, whose surface model carries its rooftops)                                                                                                                                                                                                                                                                                                                                                                         |
 | `city`                         | `{ voxel, gridHeading, defaultHeight }`: build the buildings with `3d/city-to-glb.py`, below                                                                                                                                                                                                                                                                                                                                                                                             |
 | `paramotor`                    | Abel flies his paramotor alone, which needs no ridge, chased by the camera along his path                                                                                                                                                                                                                                                                                                                                                                                                |
+| `paramotorSpeed`               | Times a wing's speed the paramotor flies (2 unless given). The app gives every leg of the loop the same time, so keep legs about the same length                                                                                                                                                                                                                                                                                                                                         |
+| `flatten`                      | `{ name, at: [lat, lon], size: [east-west, north-south] (m), height?, below? }`: squares of ground laid flat at `height` metres, else at the median round their edge, only where the surface model is lower than `below`. For what the scene models itself (a town's rooftops, a monument)                                                                                                                                                                                              |
+| `plain`                        | `{ color, height }`: an inland place has no sea; its land runs on flat to the horizon at `height` metres                                                                                                                                                                                                                                                                                                                                                                                |
+| `pyramids`, `sphinx`, …        | Giza's monuments, [below](#giza)                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 
 `about` keys are notes for people and are ignored.
 
@@ -102,6 +107,49 @@ horizon's.
 It also prints how far the `soaringLoop` clears the rooftops within 10 m either side, along the same
 Catmull-Rom curve the app flies. In a city the loop can fly the streets: on the turned grid an
 avenue is a run of open columns, so waypoints on one column keep the curve straight down it.
+
+## Giza
+
+```sh
+uv run 3d/dem-to-glb.py src/locations/giza.json assets/locations/giza.glb
+uv run 3d/giza-to-glb.py src/locations/giza.json assets/locations/giza-monuments.glb
+```
+
+The ground is the surface model, at New York's 6 units a metre and no height stretch so the
+pyramids keep their true shape. The model smears each pyramid into a 30 m-blurred hill, so
+`dem-to-glb.py` lays a pad flat under each of `pyramids` (its base plus 40 m a side, at the
+median height round the pad's edge), and the `flatten` pads do the same for the Sphinx's
+enclosure and the town. `giza-to-glb.py` reads the same ground, so everything stands on it.
+
+`pyramids` lists each one: `at`, `base` (metres, or `[east-west, north-south]`), `height` (to its
+lost apex) and `standing` (what is left), `courses`, `color`; then what makes it itself:
+`casing` (metres up from which the smooth casing survives, raggedly: Khafre's cap), `granite`
+(metres of red granite casing at the foot: Menkaure; Khafre's first course), `gash` (`[from, to]`
+metres, the scar in Menkaure's north face), `ruined` (more ragged: Khufu's queens), `steps` (a step
+pyramid of that many steps instead: G3-b, G3-c, Khentkawes) and `mast` (the mast marking Khufu's
+apex). Courses are thicker low down, with a thicker band every 20-35 courses, and each step sits
+in from the slope by a little, a different amount on each face and course; each face is cut in
+eight pieces along, so the casing's edge can be ragged.
+
+`sphinx` (`at`, `heading`) places the Sphinx, sculpted from blocks: body in two layers of stone,
+restoration masonry round its foot, haunch and tail, forelegs and paws with the Dream Stele between
+them, the nemes headdress and the face. `causeways` (`from`, `to`, `width`, `height`) are ramps
+laid down the slope. `ruins` raises every other OpenStreetMap building on the plateau (fetched like
+a city's, cached in `3d/osm-cache/`): heights by name in `heights`, mastabas and ruins 2.5-6.5 m
+with leaning walls, buildings in the valley or with storeys plain and modern; `skip` leaves out
+pits and tunnels.
+
+`town` makes up Nazlet el-Samman, which OpenStreetMap barely maps: on a grid of `voxel` metres,
+inside `areas` but clear of `clear` (the Sphinx's temples) and only where its `flatten` pad laid
+the ground flat, streets every 60-110 m each way, and between them plots two to seven storeys high
+in brick, concrete and plaster, meshed and windowed like a city (`city-to-glb.py`'s mesher, and
+`cityWindows.ts`).
+
+The monuments carry `_STONE` per vertex (metres along the face, course, how strongly the joints
+show), and `foundation/rendering/stoneCourses.ts` draws the blocks: a joint between courses and
+every 1.2-2.2 m along them, offset course to course, each block its own shade, worn at its edges.
+
+The script prints how far the loop clears everything within 10 m of it, pyramids, ruins and town.
 
 The relax app has a place picker at the bottom: the current place with `<` and `>` to step to the
 previous and next, and a list of every place grouped by `region`, with a search box (accents and
