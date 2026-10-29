@@ -1,5 +1,6 @@
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import * as THREE from 'three';
 import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
@@ -27,7 +28,10 @@ function trackProgress(url: string) {
 
 function modelLoader(url: string, draco: boolean, manager?: THREE.LoadingManager): Promise<GLTF> {
   const man = manager || defaultManager;
-  const loader = draco ? new DRACOLoader(man) : new GLTFLoader(man);
+  // Meshopt-packed GLBs (3d/meshopt-glb.mjs) decode in place; others load as before
+  const loader = draco
+    ? new DRACOLoader(man)
+    : new GLTFLoader(man).setMeshoptDecoder(MeshoptDecoder);
   if (draco) {
     // loader.setDecoderPath("/examples/jsm/libs/draco/");
     // loader.preload();

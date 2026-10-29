@@ -13,6 +13,11 @@ import { NEW_YORK, NEW_YORK_CITY, NEW_YORK_CONFIG } from '../../locations/new-yo
 import { GIZA, GIZA_CONFIG, GIZA_MONUMENTS } from '../../locations/giza';
 import { PARIS, PARIS_CITY, PARIS_CONFIG } from '../../locations/paris';
 import { MONT_SAINT_MICHEL, MONT_SAINT_MICHEL_CONFIG } from '../../locations/mont-saint-michel';
+import { HONG_KONG, HONG_KONG_CITY, HONG_KONG_CONFIG } from '../../locations/hong-kong';
+import type { AtmosphereTheme } from '../../foundation/types/Theme';
+import type { NightLook } from '../../foundation/rendering/nightSky';
+import type { CruiseRoute, FerryRoute } from '../../shared/env/harbourBoats';
+import type { LaserSite } from '../../shared/env/lightShow';
 import { DemLocationConfig, demAnchor, demPoint } from '../../locations/dem';
 import { geoToWorld } from '../../shared/geo';
 import { RIDGE_LOOP } from '../home/config';
@@ -62,6 +67,10 @@ export interface RelaxScene {
   orbit?: number;
   /** The place's own show, loaded after the environment (Mont-Saint-Michel's tide) */
   setPiece?: SetPieceLoader;
+  /** Boats on the harbour, in world x, z */
+  harbour?: { ferries: FerryRoute[]; cruises: CruiseRoute[] };
+  /** Rooftops that send beams into the night sky */
+  lasers?: LaserSite[];
 }
 
 /** How a place is lit, where it differs from the theme */
@@ -75,6 +84,10 @@ export interface SceneLook {
   /** Tone-mapping exposure and warmth, instead of the theme's (0.72 and 0.04) */
   exposure?: number;
   warmth?: number;
+  /** Exposure, bloom and grade, over the theme's */
+  atmosphere?: AtmosphereTheme;
+  /** Night instead of day: the sky, the moon and the light (nightSky.ts) */
+  night?: NightLook;
 }
 
 /** The relax fields of a location JSON (see src/locations/README.md) */
@@ -106,10 +119,19 @@ interface DemSceneConfig extends DemLocationConfig {
   look?: SceneLook;
   /** Metres above sea level */
   plain?: { color: string; height: number };
+  harbour?: {
+    ferries: { from: number[]; to: number[]; count: number }[];
+    cruises: { kind: string; speed: number; route: number[][] }[];
+  };
+  lasers?: { sites: { at: number[]; beams: number }[] };
 }
 
 function demScene(location: Location, config: DemSceneConfig, city?: string): RelaxScene {
   const anchor = demAnchor(config);
+  const xz = (at: number[]): [number, number] => {
+    const { x, z } = geoToWorld(at[0]!, at[1]!, anchor);
+    return [x, z];
+  };
   const toHeight = (metres?: number) =>
     metres === undefined ? undefined : metres * config.unitsPerMetre * config.verticalExaggeration;
   return {
@@ -166,6 +188,19 @@ function demScene(location: Location, config: DemSceneConfig, city?: string): Re
       height: config.plain.height * config.unitsPerMetre * config.verticalExaggeration,
     },
     orbit: config.camera.orbit,
+    harbour: config.harbour && {
+      ferries: config.harbour.ferries.map(({ from, to, count }) => ({
+        from: xz(from),
+        to: xz(to),
+        count,
+      })),
+      cruises: config.harbour.cruises.map(({ kind, speed, route }) => ({
+        kind: kind as CruiseRoute['kind'],
+        speed,
+        route: route.map(xz),
+      })),
+    },
+    lasers: config.lasers?.sites.map(({ at, beams }) => ({ at: demPoint(config, at), beams })),
   };
 }
 
@@ -193,6 +228,7 @@ export const RELAX_SCENES: Record<string, RelaxScene> = {
     ...demScene(MONT_SAINT_MICHEL, MONT_SAINT_MICHEL_CONFIG),
     setPiece: montSaintMichel,
   },
+  'hong-kong': demScene(HONG_KONG, HONG_KONG_CONFIG, HONG_KONG_CITY),
 };
 
 export const DEFAULT_SCENE = 'lanzarote';

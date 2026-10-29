@@ -23,6 +23,8 @@ import { cityTrees, TreeSpots } from '../../shared/env/cityTrees';
 import { addCityWindows, CityGrid } from '../../foundation/rendering/cityWindows';
 import { addStoneCourses } from '../../foundation/rendering/stoneCourses';
 import type { SetPiece } from './setPiece';
+import { applyNight } from '../../foundation/rendering/nightSky';
+import { addNightCity, NightCity } from './nightCity';
 
 const PILOTS = 5;
 // Where there's no ridge Abel flies his paramotor alone, twice a wing's speed so the streets go
@@ -58,10 +60,10 @@ const definedOnly = <T extends object>(values: T | undefined): Partial<T> =>
 
 /**
  * Pick a place (?location=lanzarote | tenerife | el-hierro | castejon-de-sos | rio-de-janeiro | new-york
- * | paris | giza | mont-saint-michel) and watch a few gliders soar its ridge while the camera drifts
- * slowly from side to side, or, in a city or round the pyramids, chase Abel's paramotor; at
- * Mont-Saint-Michel the camera circles the Mount while the paramotors fly round it. Dragging takes
- * over the camera.
+ * | paris | giza | mont-saint-michel | hong-kong) and watch a few gliders soar its ridge while the
+ * camera drifts slowly from side to side, or, in a city or round the pyramids, chase Abel's
+ * paramotor (in Hong Kong, at night); at Mont-Saint-Michel the camera circles the Mount while the
+ * paramotors fly round it. Dragging takes over the camera.
  */
 class RelaxApp extends TerrainBase {
   private animationId: number | undefined;
@@ -69,6 +71,7 @@ class RelaxApp extends TerrainBase {
   private removeSwitcher: (() => void) | undefined;
   private traffic: CityTraffic | undefined;
   private setPiece: SetPiece | undefined;
+  private nightCity: NightCity | undefined;
 
   constructor() {
     const appConfig = getAppConfig('relax');
@@ -107,6 +110,7 @@ class RelaxApp extends TerrainBase {
             exposure: look?.exposure,
             warmth: look?.warmth,
           }),
+          ...definedOnly(look?.atmosphere),
         },
       };
       camera.position.copy(relax.camera.position);
@@ -120,6 +124,9 @@ class RelaxApp extends TerrainBase {
       if (relax.plain) {
         if (options.water) options.water.visible = false;
         scene.add(this.createPlain(relax.plain));
+      }
+      if (look?.night) {
+        applyNight(scene, renderer, options.sky, options.water, look.night);
       }
 
       controls.enabled = true;
@@ -142,7 +149,7 @@ class RelaxApp extends TerrainBase {
           if (object.userData['stone']) addStoneCourses(object);
           const grid = object.userData['grid'] as CityGrid | undefined;
           if (!grid) return;
-          addCityWindows(object, grid);
+          addCityWindows(object, grid, Boolean(look?.night));
           const trees = object.userData['trees'] as TreeSpots | undefined;
           if (trees?.length) scene.add(cityTrees(trees, grid.unitsPerMetre, grid.ground));
           const lanes = object.userData['lanes'] as Lane[] | undefined;
@@ -158,6 +165,7 @@ class RelaxApp extends TerrainBase {
           }
         });
         scene.add(city.scene);
+        if (look?.night) this.nightCity = addNightCity(scene, city.scene, relax);
       }
 
       if (relax.setPiece && options.terrain) {
@@ -295,6 +303,7 @@ class RelaxApp extends TerrainBase {
         motions.forEach(motion => motion.update(deltaTime));
         this.traffic?.update(deltaTime);
         this.setPiece?.update(deltaTime, elapsed);
+        this.nightCity?.update(deltaTime);
 
         if (lead) {
           trail.push(elapsed, lead.position);
@@ -345,6 +354,8 @@ class RelaxApp extends TerrainBase {
     this.traffic = undefined;
     this.setPiece?.dispose();
     this.setPiece = undefined;
+    this.nightCity?.dispose();
+    this.nightCity = undefined;
     super.dispose();
   }
 }

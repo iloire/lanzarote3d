@@ -1,0 +1,290 @@
+{
+  "id": "hong-kong",
+  "name": "Hong Kong",
+  "region": "Asia",
+  "about": "Victoria Harbour at night: Central, Admiralty and Wan Chai under Victoria Peak, across the water to Tsim Sha Tsui and up Nathan Road to Mong Kok. The city's 14,000 buildings from OpenStreetMap as 4 m voxels standing on the bare ground of the elevation model, lit from within. Ground: uv run 3d/dem-to-glb.py src/locations/hong-kong.json assets/locations/hong-kong.glb; buildings: uv run 3d/city-on-hills.py src/locations/hong-kong.json assets/locations/hong-kong-city.glb",
+  "bbox": {
+    "south": 22.262,
+    "north": 22.325,
+    "west": 114.14,
+    "east": 114.195
+  },
+  "spacing": 30,
+  "unitsPerMetre": 6,
+  "verticalExaggeration": 1,
+  "bareEarth": {
+    "about": "Take the towers out of the surface model where OSM has buildings 20 m and taller: anything narrower than 240 m, blended in 60 m round them",
+    "radius": 120,
+    "reach": 60
+  },
+  "city": {
+    "voxel": 4,
+    "gridHeading": -6,
+    "defaultHeight": 12,
+    "lights": [
+      {
+        "name": "Bank of China Tower",
+        "at": [22.2793, 114.1616],
+        "radius": 35,
+        "style": "diamonds"
+      },
+      {
+        "name": "International Commerce Centre",
+        "at": [22.3034, 114.1601],
+        "radius": 45,
+        "style": "show"
+      },
+      {
+        "name": "Two International Finance Centre",
+        "at": [22.28529, 114.15928],
+        "radius": 35,
+        "style": "crown"
+      },
+      {
+        "name": "Central Plaza",
+        "at": [22.27995, 114.17364],
+        "radius": 35,
+        "style": "gold"
+      }
+    ],
+    "about": "Buildings from OpenStreetMap as 4 m voxels on a grid turned -6° to Kowloon's streets, each on the bare ground under it; a building with no height or levels is 6 m to 80 m by its footprint. `lights` gives the named towers their night lighting"
+  },
+  "paramotor": true,
+  "paramotorSpeed": 5,
+  "fog": 5200,
+  "look": {
+    "about": "Night: a deep blue sky with the moon over Kowloon's hills, no sun, little flat light, a blue-black haze; the bloom picks out the windows and the neon",
+    "fogColor": "#0b1424",
+    "atmosphere": {
+      "exposure": 1.0,
+      "bloomStrength": 0.6,
+      "bloomRadius": 0.55,
+      "bloomThreshold": 1.0,
+      "vignette": 0.4,
+      "saturation": 1.15,
+      "contrast": 1.08,
+      "warmth": 0.0,
+      "cloudShadow": 0
+    },
+    "night": {
+      "zenith": "#02040c",
+      "horizon": "#0b1424",
+      "skyGlow": "#40283a",
+      "skyGlowStrength": 0.7,
+      "moon": [60, 28],
+      "moonlight": 0.22,
+      "ambient": 0.2,
+      "stars": 0.7,
+      "sea": "#010409",
+      "shallowSea": "#03101a"
+    }
+  },
+  "neon": [
+    {
+      "about": "Nathan Road, Tsim Sha Tsui to Jordan",
+      "at": [22.3005, 114.1722],
+      "radius": 700,
+      "density": 1.6
+    },
+    {
+      "about": "Yau Ma Tei and Mong Kok",
+      "at": [22.315, 114.1705],
+      "radius": 800,
+      "density": 1.92
+    },
+    {
+      "about": "Wan Chai, Lockhart Road",
+      "at": [22.279, 114.176],
+      "radius": 500,
+      "density": 0.96
+    },
+    {
+      "about": "Causeway Bay",
+      "at": [22.28, 114.185],
+      "radius": 450,
+      "density": 1.28
+    },
+    {
+      "about": "Central and Sheung Wan",
+      "at": [22.284, 114.153],
+      "radius": 550,
+      "density": 0.56
+    }
+  ],
+  "places": {
+    "peak": {
+      "name": "Victoria Peak",
+      "at": [22.2759, 114.1455]
+    },
+    "peakTower": {
+      "name": "The Peak Tower",
+      "at": [22.2712, 114.1498]
+    },
+    "ifc": {
+      "name": "Two International Finance Centre",
+      "at": [22.28529, 114.15928]
+    },
+    "bankOfChina": {
+      "name": "Bank of China Tower",
+      "at": [22.2793, 114.1616]
+    },
+    "centralPlaza": {
+      "name": "Central Plaza",
+      "at": [22.27995, 114.17364]
+    },
+    "convention": {
+      "name": "Convention and Exhibition Centre",
+      "at": [22.2833, 114.1733]
+    },
+    "icc": {
+      "name": "International Commerce Centre",
+      "at": [22.3034, 114.1601]
+    },
+    "centralPier": {
+      "name": "Central Pier 7, Star Ferry",
+      "at": [22.2873, 114.161]
+    },
+    "tstPier": {
+      "name": "Tsim Sha Tsui Star Ferry Pier",
+      "at": [22.2939, 114.1686]
+    },
+    "nathanRoad": {
+      "name": "Nathan Road at Jordan",
+      "at": [22.305, 114.1714]
+    },
+    "mongKok": {
+      "name": "Mong Kok",
+      "at": [22.319, 114.1694]
+    }
+  },
+  "harbour": {
+    "about": "Star Ferries back and forth between Central and Tsim Sha Tsui (and Wan Chai), a junk and launches cruising the harbour; [lat, lon]",
+    "ferries": [
+      {
+        "from": [22.2878, 114.1612],
+        "to": [22.2928, 114.168],
+        "count": 2
+      },
+      {
+        "from": [22.2851, 114.1752],
+        "to": [22.2927, 114.169],
+        "count": 1
+      }
+    ],
+    "cruises": [
+      {
+        "kind": "junk",
+        "speed": 5,
+        "route": [
+          [22.2905, 114.164],
+          [22.2935, 114.1745],
+          [22.2905, 114.183],
+          [22.287, 114.176],
+          [22.288, 114.168]
+        ]
+      },
+      {
+        "kind": "launch",
+        "speed": 8,
+        "route": [
+          [22.289, 114.156],
+          [22.296, 114.161],
+          [22.292, 114.17],
+          [22.288, 114.165]
+        ]
+      },
+      {
+        "kind": "launch",
+        "speed": 7,
+        "route": [
+          [22.293, 114.179],
+          [22.2955, 114.188],
+          [22.288, 114.189],
+          [22.287, 114.18]
+        ]
+      },
+      {
+        "kind": "junk",
+        "speed": 4,
+        "route": [
+          [22.295, 114.156],
+          [22.299, 114.153],
+          [22.296, 114.15],
+          [22.2915, 114.153]
+        ]
+      }
+    ]
+  },
+  "lasers": {
+    "about": "A Symphony of Lights: beams from the roofs; [lat, lon, metres above sea level], beams",
+    "sites": [
+      {
+        "at": [22.28529, 114.15928, 412],
+        "beams": 3
+      },
+      {
+        "at": [22.3034, 114.1601, 486],
+        "beams": 3
+      },
+      {
+        "at": [22.2793, 114.1616, 370],
+        "beams": 2
+      },
+      {
+        "at": [22.27995, 114.17364, 376],
+        "beams": 2
+      },
+      {
+        "at": [22.286, 114.155, 180],
+        "beams": 1
+      },
+      {
+        "at": [22.2972, 114.1742, 120],
+        "beams": 2
+      }
+    ]
+  },
+  "soaringLoop": {
+    "about": "Abel's paramotor takes off over Victoria Peak, passes the Peak Tower, drops down the Mid-Levels among the towers, crosses Central between the Bank of China and the IFC, sweeps the harbour 35-45 m over the water past the Star Ferry, turns east along the Tsim Sha Tsui waterfront to Hung Hom, crosses back to the Convention Centre and climbs past Central Plaza and Admiralty to the Peak. city-on-hills.py checks the curve keeps 12 m either side clear (18 m at the Peak Tower, the lowest). [lat, lon, metres above sea level]",
+    "waypoints": [
+      [22.2765, 114.1455, 620],
+      [22.2728, 114.151, 540],
+      [22.2775, 114.1548, 350],
+      [22.283, 114.1612, 170],
+      [22.2875, 114.1628, 45],
+      [22.291, 114.1675, 35],
+      [22.2918, 114.1735, 40],
+      [22.294, 114.1795, 45],
+      [22.2978, 114.1838, 60],
+      [22.2915, 114.1865, 60],
+      [22.2862, 114.1775, 80],
+      [22.2822, 114.1705, 230],
+      [22.279, 114.164, 340],
+      [22.2752, 114.156, 540]
+    ]
+  },
+  "camera": {
+    "about": "Over the harbour off Tsim Sha Tsui, looking south at Central and the Peak; [lat, lon, metres]",
+    "at": [22.2955, 114.1665, 140],
+    "lookAt": [22.28, 114.159, 220],
+    "zoomOut": 3,
+    "pan": 12000
+  },
+  "clouds": [],
+  "regions": [
+    {
+      "name": "Hills under the forest",
+      "at": [22.268, 114.16],
+      "radius": 4000,
+      "color": "#1d2a1c",
+      "strength": 0.8
+    },
+    {
+      "name": "Kowloon",
+      "at": [22.31, 114.17],
+      "radius": 2500,
+      "color": "#25262a",
+      "strength": 0.9
+    }
+  ]
+}

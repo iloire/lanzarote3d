@@ -2,6 +2,21 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-29 00:32 UTC
+
+### Added
+
+- Hong Kong at night in the relax site (`?location=hong-kong`): Victoria Harbour, Central and Wan
+  Chai under the Peak, Tsim Sha Tsui and Nathan Road to Mong Kok. 14,275 OpenStreetMap buildings
+  as 4 m voxels standing on the elevation model's bare ground (new `3d/bare-earth.py` and
+  `3d/city-on-hills.py`), packed with meshopt to 9.3 MB (`3d/meshopt-glb.mjs`)
+- A night look for a place (`look.night`): stars, the moon and moonlight, a dark sea; the window
+  shader lights windows at night, and the Bank of China, ICC, IFC and Central Plaza their own way
+- Neon signs on Kowloon's and Wan Chai's main roads, the lit waterfront mirrored in the harbour,
+  cars with headlights and tail lights driving on the left, Star Ferries, junks and launches, and
+  a Symphony of Lights from the towers
+- Abel's paramotor flies off the Peak, down the Mid-Levels and low over the harbour
+
 ## 2026-10-29 00:29 UTC
 
 ### Added

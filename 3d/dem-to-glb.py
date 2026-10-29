@@ -1,7 +1,7 @@
 #!/usr/bin/env -S uv run --script
 # /// script
 # requires-python = ">=3.11"
-# dependencies = ["numpy", "tifffile", "imagecodecs"]
+# dependencies = ["numpy", "pillow", "tifffile", "imagecodecs"]
 # ///
 """
 Build a location's terrain GLB from the Copernicus GLO-30 elevation model.
@@ -19,6 +19,7 @@ squares of ground flat where the surface model carries what the scene models its
 
 Usage: uv run 3d/dem-to-glb.py src/locations/rio-de-janeiro.json assets/locations/rio-de-janeiro.glb
 """
+import importlib.util
 import json
 import math
 import struct
@@ -166,6 +167,12 @@ def build_grid(location):
     lat = lat0 - ss / METRES_PER_DEGREE_LAT
     lon = lon0 + ee / metres_per_lon
     metres = ground(location)(lat, lon)
+    # A city on hills: the buildings taken out of the surface model (3d/bare-earth.py)
+    if 'bareEarth' in location:
+        spec = importlib.util.spec_from_file_location('bare_earth', Path(__file__).parent / 'bare-earth.py')
+        bare = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(bare)
+        metres = np.where(metres > 0, bare.ground_sampler(location)(lat, lon), metres)
 
     # A city's model would carry its rooftops (the DEM is a surface model), so its land is
     # laid flat at flatLand metres and the buildings come from 3d/city-to-glb.py instead.

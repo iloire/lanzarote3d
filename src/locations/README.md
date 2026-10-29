@@ -14,6 +14,9 @@ longitude map onto it (`types.ts`). `TerrainBase` loads Lanzarote unless an app 
   Tower) are cities: flat ground from the same script, and their buildings as voxels from
   OpenStreetMap, [below](#a-city). **Giza** (`giza.json` + `.ts`) is the
   plateau from elevation data with its monuments built by their own script, [below](#giza).
+  **Hong Kong** (`hong-kong.json` + `.ts`, Victoria Harbour at night) is a city on hills: its
+  towers stand on the elevation model's bare ground, lit from within,
+  [below](#a-city-on-hills-at-night).
 
 ## A place built from elevation data
 
@@ -221,3 +224,53 @@ for that).
 
 The 30 m radar model rounds off sharp summits: Pedra Bonita comes out at 696 m (real 693 m), but
 Corcovado and the Sugarloaf lose 70–80 m. The `verticalExaggeration` more than makes up for it.
+
+## A city on hills, at night
+
+Hong Kong's towers climb the Peak, so its ground can't be laid flat. Three scripts build it:
+
+```sh
+uv run 3d/dem-to-glb.py src/locations/hong-kong.json assets/locations/hong-kong.glb
+uv run 3d/city-on-hills.py src/locations/hong-kong.json assets/locations/hong-kong-city.glb
+```
+
+- **`bareEarth`** (`{ radius, reach }`, metres): the Copernicus model carries the rooftops, so where
+  OpenStreetMap has buildings 20 m and taller `3d/bare-earth.py` opens it (the lowest ground within
+  `radius`, then the highest of those), which takes away anything narrower than twice the radius
+  and keeps the hills, blended in `reach` round the buildings. `dem-to-glb.py` builds the terrain
+  from that ground and `city-on-hills.py` stands every building on it: its walls go down a few
+  metres below the lowest ground under its footprint, and its roof is its height above that.
+- **`city-on-hills.py`** reuses `city-to-glb.py`'s fetching, grid, rasteriser, mesher and writer.
+  Buildings OSM gives no height get 6 m to 80 m by footprint; towers drawn from their podium up
+  (`min_height` ≤ 40 m under 100 m+) stand on the ground. The street layer is traced from OSM's
+  roads (by class: 5 m service lanes to 22 m motorways; no tunnels), sidewalks round the
+  buildings, parks and woods, clear elsewhere so the terrain shows, and draped over the terrain on
+  its own grid; a second image glows at night (lamplit roads, shopfronts by the main roads). The
+  GLB's extras carry `roads` (the main roads as polylines with heights, for the cars), `signs`
+  (neon) and `glows` (lit buildings near the water). Finally `3d/meshopt-glb.mjs` packs it
+  (16-bit positions, EXT_meshopt_compression): 26 MB as written, 9.3 MB packed. `Models.loadGltf`
+  decodes it.
+- **`city.lights`**: `{ name, at, radius (m), style }`, every building part within the radius
+  lights up its own way at night: `diamonds` (the Bank of China's white trusses), `show` (the
+  ICC's facade a screen of colour), `crown` (the IFC's white strips and lit top), `gold` (Central
+  Plaza's colour bands).
+- **`neon`**: `{ at, radius (m), density }` areas where the walls facing a main road carry neon
+  signs, two in three sticking out over the street, the rest flat; one instanced mesh
+  (`shared/env/neonSigns.ts`), each face drawn in the shader: a tube round the edge and glyphs.
+- **`look.night`** (`foundation/rendering/nightSky.ts`): `{ zenith, horizon, skyGlow,
+skyGlowStrength, moon: [azimuth, altitude], moonlight, ambient, stars, sea, shallowSea }`. The
+  day sky is hidden behind a dome with stars and the moon, the sun becomes dim blue moonlight from
+  the moon, the sea goes dark and mirrors the moon, and the window shader lights the windows
+  (homes flat by flat, warm or cool; offices floor by floor; some dark). `look.atmosphere`
+  overrides the theme's exposure, bloom and grade (the bloom picks out windows and neon).
+- **`harbour`**: `ferries` (`{ from, to, count }`, Star Ferries back and forth) and `cruises`
+  (`{ kind: "junk" | "launch", speed, route }`, closed loops), `[lat, lon]`
+  (`shared/env/harbourBoats.ts`). The lit buildings by the water are mirrored in it as streaks laid
+  towards the camera every frame (`shared/env/harbourGlow.ts`).
+- **`lasers`**: `{ sites: [{ at: [lat, lon, metres], beams }] }`, a Symphony of Lights from the
+  rooftops, 50 s on and 25 s off (`shared/env/lightShow.ts`).
+- Cars drive the `roads` on the left, headlights white and tail lights red
+  (`shared/env/roadTraffic.ts`). **`paramotorSpeed`** sets the paramotor's speed in paraglider
+  speeds (2 unless given; Hong Kong's 11 km loop flies at 5).
+
+`city-on-hills.py` also prints how far the loop clears the roofs and the ground within 12 m.

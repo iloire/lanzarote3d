@@ -188,6 +188,26 @@ terrainPosition, anchor, regions }` — only what `TerrainBase` reads today~~ �
 - Not done: gliders off the Carolles cliffs; shuttles on the bridge; the walkers jump back to
   the start when their path wraps.
 
+### 3i. Hong Kong at night (curated)
+
+- ~~`src/locations/hong-kong.json`: Victoria Harbour, the Peak and Pok Fu Lam to Mong Kok
+  (22.262…22.325, 114.14…114.195), 30 m terrain grid, 6 units a metre like New York~~ ✅
+- ~~Bare ground: the towers taken out of the surface model where OSM has tall buildings
+  (`bareEarth`, `3d/bare-earth.py`); the Peak keeps its 545 m~~ ✅
+- ~~14,275 buildings as 4 m voxels on a grid turned −6° to Kowloon's streets, each standing on the
+  ground under it (`3d/city-on-hills.py`); heights by footprint where OSM has none; IFC, ICC, the
+  Bank of China (its stepped shafts from building parts) and Central Plaza; 500k triangles, packed
+  with meshopt to 9.3 MB~~ ✅
+- ~~Night: a dome of deep blue with stars and the moon, moonlight, the windows lit (warm and cool,
+  floor by floor, some dark), the named towers' own lights, lamplit streets, bloom~~ ✅
+- ~~3,600 neon signs along the main roads of Tsim Sha Tsui, Jordan, Mong Kok, Wan Chai and
+  Causeway Bay; the harbour mirrors the lit waterfront; cars with their lights on, driving on the
+  left; Star Ferries, junks under red sails and launches; beams from the towers~~ ✅
+- ~~Abel's paramotor off the Peak, down the Mid-Levels, between the Bank of China and the IFC,
+  35–45 m over the harbour past the Star Ferry, along the Tsim Sha Tsui waterfront and back past
+  Central Plaza (26 m clear at the least)~~ ✅
+- Not done: the Peak's own tram and lookouts, Hong Kong Island east of Causeway Bay.
+
 ### 4. The relax app
 
 - ~~Started as a private route of the Lanzarote build, `relax.html?location=lanzarote |

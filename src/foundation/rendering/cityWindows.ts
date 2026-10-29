@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { sharedUniforms } from './sharedUniforms';
 
 /** The street grid a city was voxelised on, as 3d/city-to-glb.py writes it in the node's extras */
 export interface CityGrid {
@@ -29,9 +30,10 @@ const WALL_LIT = 30;
  * catches the sun. Far off, where a cell is under a pixel or so, the grid fades into its average
  * so it doesn't shimmer. Walls darken towards the street, as the sky they see narrows.
  */
-export function addCityWindows(mesh: THREE.Mesh, grid: CityGrid): void {
+export function addCityWindows(mesh: THREE.Mesh, grid: CityGrid, night = false): void {
   const material = mesh.material as THREE.MeshStandardMaterial;
   material.onBeforeCompile = shader => {
+    if (night) shader.uniforms['uTime'] = sharedUniforms.uTime;
     shader.uniforms['uCityOrigin'] = { value: new THREE.Vector2(...grid.origin) };
     shader.uniforms['uCityStreet'] = { value: new THREE.Vector2(...grid.street) };
     shader.uniforms['uCityAvenue'] = { value: new THREE.Vector2(...grid.avenue) };
@@ -62,7 +64,8 @@ export function addCityWindows(mesh: THREE.Mesh, grid: CityGrid): void {
         uniform vec2 uCityStreet;
         uniform vec2 uCityAvenue;
         uniform vec4 uCityGrid;
-        float cityPane = 0.0;`
+        float cityPane = 0.0;
+        ${night ? NIGHT_PARS : ''}`
       )
       .replace(
         '#include <color_fragment>',
@@ -90,6 +93,7 @@ export function addCityWindows(mesh: THREE.Mesh, grid: CityGrid): void {
           diffuseColor.rgb = mix( diffuseColor.rgb, glass, cityPane );
           float above = ( vCityWorld.y - uCityGrid.z ) / uCityGrid.w;
           diffuseColor.rgb *= mix( ${WALL_FOOT.toFixed(2)}, 1.0, smoothstep( 0.0, ${WALL_LIT.toFixed(1)}, above ) );
+          ${night ? NIGHT_GLOW : ''}
         }`
       )
       .replace(
@@ -97,7 +101,83 @@ export function addCityWindows(mesh: THREE.Mesh, grid: CityGrid): void {
         `#include <roughnessmap_fragment>
         roughnessFactor = mix( roughnessFactor, 0.2, cityPane );`
       );
+    if (night) {
+      shader.fragmentShader = shader.fragmentShader.replace(
+        '#include <emissivemap_fragment>',
+        '#include <emissivemap_fragment>\n        totalEmissiveRadiance += cityGlow;'
+      );
+    }
   };
-  material.customProgramCacheKey = () => 'city-windows';
+  material.customProgramCacheKey = () => (night ? 'city-windows-night' : 'city-windows');
   material.needsUpdate = true;
 }
+
+/** Linear brightness of a lit window at night */
+const NIGHT_LAMP = 1.0;
+
+const NIGHT_PARS = /* glsl */ `
+  uniform float uTime;
+  vec3 cityGlow = vec3( 0.0 );
+  float cityHash( vec2 p ) { return fract( sin( dot( p, vec2( 127.1, 311.7 ) ) ) * 43758.5453 ); }
+  vec3 cityHue( float h ) { return clamp( abs( mod( h * 6.0 + vec3( 0.0, 4.0, 2.0 ), 6.0 ) - 3.0 ) - 1.0, 0.0, 1.0 ); }
+`;
+
+/**
+ * At night (addCityWindows' `night`), windows light up: homes window by window in flats of three,
+ * warm or cool, offices a floor at a time in runs, and some dark. Far off the panes fade into
+ * their average glow, like the panes themselves. Named towers (the window styles 3-6 that
+ * 3d/city-on-hills.py gives them) get their own: white diamonds on the Bank of China, a light show
+ * on the ICC, white strips and a lit crown on the IFC, colour bands on Central Plaza.
+ */
+const NIGHT_GLOW = /* glsl */ `
+  {
+    // Walls are dark at night; the light is the windows'
+    diffuseColor.rgb *= 0.45;
+    vec2 pane = floor( cell );
+    // Which way the wall faces, rounded: the slope's normal wobbles a little from pixel to pixel
+    vec2 facingSign = floor( wallNormal.xz * 1.5 + 0.5 );
+    float facing = facingSign.x * 3.0 + facingSign.y * 7.0;
+    pane = mod( pane, 997.0 );
+    float unit = curtain
+      ? cityHash( vec2( pane.y, floor( pane.x / 7.0 ) ) + facing )
+      : cityHash( vec2( floor( pane.x / 3.0 ), pane.y ) + facing );
+    float litShare = curtain ? 0.45 : 0.55;
+    float lit = step( unit, litShare ) * step( 0.15, cityHash( pane + facing ) );
+    // Some whole towers are mostly dark, some blaze: by the wall's stretch of a hundred metres
+    float block = cityHash( floor( vec2( along, 0.0 ) / 100.0 ) + facing );
+    lit *= step( 0.12, block ) * mix( 0.7, 1.15, block );
+    float tone = cityHash( pane + 17.0 + facing );
+    vec3 warm = vec3( 1.0, 0.68, 0.38 );
+    vec3 cool = vec3( 0.75, 0.86, 1.0 );
+    vec3 lamp = curtain ? mix( cool, vec3( 1.0, 0.95, 0.85 ), step( 0.6, tone ) ) : mix( warm, cool, step( 0.72, tone ) );
+    float strength = ( 0.45 + 0.9 * cityHash( pane + 5.0 ) ) * ${NIGHT_LAMP.toFixed(2)};
+    vec3 near = lamp * lit * strength * inside.x * inside.y;
+    vec3 far = ( curtain ? cool : mix( warm, cool, 0.28 ) ) * litShare * 0.5 * ${NIGHT_LAMP.toFixed(2)} * area;
+    cityGlow = mix( near, far, smoothstep( 0.6, 1.3, max( w.x, w.y ) ) );
+
+    float style = floor( vCityWindows + 0.5 );
+    float metresUp = above;
+    if ( style == 3.0 ) {
+      // Bank of China: the trusses' diamonds outlined in white
+      vec2 m = vec2( along, metresUp ) / 26.0;
+      float fw = max( fwidth( m.x + m.y ), 0.002 );
+      float a = 1.0 - smoothstep( 0.02, 0.02 + fw * 1.5, abs( fract( m.x + m.y ) - 0.5 ) * 0.5 );
+      float b = 1.0 - smoothstep( 0.02, 0.02 + fw * 1.5, abs( fract( m.x - m.y ) - 0.5 ) * 0.5 );
+      cityGlow = cityGlow * 0.3 + vec3( 1.3, 1.35, 1.5 ) * max( a, b );
+    } else if ( style == 4.0 ) {
+      // ICC: the facade a screen, colour sweeping up it
+      float h = fract( metresUp / 260.0 - uTime * 0.04 + along / 900.0 );
+      float wave = 0.55 + 0.45 * sin( metresUp / 18.0 - uTime * 1.3 );
+      cityGlow = cityHue( h ) * wave * 1.1 * mix( inside.x * inside.y, area, smoothstep( 0.35, 0.8, max( w.x, w.y ) ) ) + cityGlow * 0.2;
+    } else if ( style == 5.0 ) {
+      // IFC: white strips up its edges every few metres, its crown lit
+      float strip = 1.0 - smoothstep( 0.04, 0.04 + fwidth( along / 8.0 ) * 1.5, abs( fract( along / 8.0 ) - 0.5 ) );
+      float crown = smoothstep( 362.0, 366.0, metresUp ) * ( 0.55 + 0.45 * step( 0.5, fract( metresUp / 7.0 ) ) );
+      cityGlow += vec3( 0.9, 1.0, 1.2 ) * strip * 0.5 + vec3( 0.4, 0.45, 0.55 ) * crown;
+    } else if ( style == 6.0 ) {
+      // Central Plaza: gold windows under colour bands every few floors, changing slowly
+      float band = 1.0 - smoothstep( 0.1, 0.1 + fwidth( metresUp / 14.0 ) * 1.5, abs( fract( metresUp / 14.0 ) - 0.5 ) );
+      cityGlow = cityGlow * vec3( 1.2, 0.95, 0.55 ) + cityHue( fract( floor( uTime / 6.0 ) * 0.17 + metresUp / 700.0 ) ) * band * 1.8;
+    }
+  }
+`;

@@ -230,7 +230,7 @@ class Grid:
                 'street': self.street.tolist(),
                 'avenue': self.avenue.tolist(),
                 'unitsPerMetre': location['unitsPerMetre'],
-                'ground': location['flatLand'] * up,
+                'ground': location.get('flatLand', 0) * up,
                 'up': up,
             }
         }
@@ -527,11 +527,13 @@ def plant(location, grid, free, woods):
     return np.round(np.stack([east * upm, south * upm, scale], 1), 2).ravel().tolist()
 
 
-def mesh(location, grid, heights, owner, colours, styles):
-    """Merged roofs and walls as positions, colours, window styles and triangles"""
+def mesh(location, grid, heights, owner, colours, styles, base=None):
+    """Merged roofs and walls as positions, colours, window styles and triangles. On hills
+    (3d/city-on-hills.py) heights are tops above sea level and `base` is where each owner's walls
+    go down to, metres, where nothing stands beside them"""
     upm = location['unitsPerMetre']
     up = upm * location['verticalExaggeration']
-    ground = location['flatLand'] * up
+    ground = location.get('flatLand', 0) * up
     # A shade darker than the palette: the island's bright sun washes them out
     linear = np.array([srgb_to_linear(c) for c in colours] or [[0, 0, 0]]) * 0.8
     # Roofs a darker, greyer shade of their facade, or mostly the city's own roof colour
@@ -600,6 +602,8 @@ def mesh(location, grid, heights, owner, colours, styles):
                     j += 1
                 lo, hi = sorted((float(ah[i]), float(bh[i])))
                 taller = ao[i] if ah[i] > bh[i] else bo[i]
+                if base is not None and lo == 0:
+                    lo = float(base[taller])
                 # The wall faces from the taller side towards the lower one
                 sign = 1 if ah[i] > bh[i] else -1
                 if axis == 0:
@@ -792,8 +796,9 @@ def png(image):
 
 def write_glb(positions, colours, windows, triangles, extras, streets, dst, tower=None):
     """The buildings (node 0), the street quad with its image (node 1) and a tower if there's one
-    (node 2, one colour)"""
-    quad_points, quad_uvs, quad_order, image = streets
+    (node 2, one colour); the streets may be any mesh with 16-bit indices, and may carry a second
+    image that glows (emissive), for the night"""
+    quad_points, quad_uvs, quad_order, image, *glow = streets
     blobs = [
         (positions.tobytes(), 34962),
         (pad4(colours.tobytes(), b'\0'), 34962),
@@ -804,6 +809,8 @@ def write_glb(positions, colours, windows, triangles, extras, streets, dst, towe
         (pad4(quad_order.tobytes(), b'\0'), 34963),
         (pad4(png(image), b'\0'), None),
     ]
+    if glow:
+        blobs.append((pad4(png(glow[0]), b'\0'), None))
     views, offset = [], 0
     for blob, target in blobs:
         view = {'buffer': 0, 'byteOffset': offset, 'byteLength': len(blob)}
@@ -830,8 +837,8 @@ def write_glb(positions, colours, windows, triangles, extras, streets, dst, towe
         ],
         # Crisp texels up close, like the voxels; mipmapped far off so it doesn't shimmer
         'samplers': [{'magFilter': 9728, 'minFilter': 9987, 'wrapS': 33071, 'wrapT': 33071}],
-        'images': [{'bufferView': 7, 'mimeType': 'image/png'}],
-        'textures': [{'sampler': 0, 'source': 0}],
+        'images': [{'bufferView': 7 + k, 'mimeType': 'image/png'} for k in range(1 + len(glow))],
+        'textures': [{'sampler': 0, 'source': k} for k in range(1 + len(glow))],
         'buffers': [{'byteLength': offset}],
         'bufferViews': views,
         'accessors': [
@@ -849,17 +856,21 @@ def write_glb(positions, colours, windows, triangles, extras, streets, dst, towe
             {
                 'bufferView': 4,
                 'componentType': FLOAT,
-                'count': 4,
+                'count': len(quad_points),
                 'type': 'VEC3',
                 'min': quad_points.min(axis=0).tolist(),
                 'max': quad_points.max(axis=0).tolist(),
             },
-            {'bufferView': 5, 'componentType': FLOAT, 'count': 4, 'type': 'VEC2'},
-            {'bufferView': 6, 'componentType': UINT16, 'count': 6, 'type': 'SCALAR'},
+            {'bufferView': 5, 'componentType': FLOAT, 'count': len(quad_uvs), 'type': 'VEC2'},
+            {'bufferView': 6, 'componentType': UINT16, 'count': len(quad_order), 'type': 'SCALAR'},
         ],
     }
+    if glow:
+        gltf['materials'][1]['emissiveTexture'] = {'index': 1}
+        gltf['materials'][1]['emissiveFactor'] = [1, 1, 1]
     if tower is not None:
         tower_points, tower_triangles = tower
+        first = len(views)
         for blob, target in ((tower_points.tobytes(), 34962), (tower_triangles.tobytes(), 34963)):
             views.append({'buffer': 0, 'byteOffset': offset, 'byteLength': len(blob), 'target': target})
             blobs.append((blob, target))
@@ -872,14 +883,14 @@ def write_glb(positions, colours, windows, triangles, extras, streets, dst, towe
         gltf['meshes'].append({'primitives': [{'attributes': {'POSITION': 7}, 'indices': 8, 'material': 2}]})
         gltf['accessors'] += [
             {
-                'bufferView': 8,
+                'bufferView': first,
                 'componentType': FLOAT,
                 'count': len(tower_points),
                 'type': 'VEC3',
                 'min': tower_points.min(axis=0).tolist(),
                 'max': tower_points.max(axis=0).tolist(),
             },
-            {'bufferView': 9, 'componentType': UINT32, 'count': len(tower_triangles), 'type': 'SCALAR'},
+            {'bufferView': first + 1, 'componentType': UINT32, 'count': len(tower_triangles), 'type': 'SCALAR'},
         ]
     json_chunk = pad4(json.dumps(gltf, separators=(',', ':')).encode(), b' ')
     bin_chunk = b''.join(blob for blob, _ in blobs)
