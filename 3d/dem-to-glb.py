@@ -14,8 +14,10 @@ writes the same slim GLB as 3d/slim-glb.py: positions and 16-bit triangle indice
 The GLB is in world units already (scale 1): x east, z south, y up, the bbox centre at
 x = z = 0, so the location's GeoAnchor is just the centre of the bbox. Ground at or below 0 m
 (the sea, the lagoons) is dropped to SEA_FLOOR, under the water plane. A city sets flatLand,
-and all its land is laid at that height. `flatten` pads, and a pad under each of `pyramids`, lay
-squares of ground flat where the surface model carries what the scene models itself.
+and all its land is laid at that height; one on the water (cityLand) gets its land from
+3d/city-to-glb.py, and this is all sea floor. `flatten` pads, and a pad under each of
+`pyramids`, lay squares of ground flat where the surface model carries what the scene models
+itself.
 
 Usage: uv run 3d/dem-to-glb.py src/locations/rio-de-janeiro.json assets/locations/rio-de-janeiro.glb
 """
@@ -166,7 +168,9 @@ def build_grid(location):
     ee, ss = np.meshgrid(east, south)
     lat = lat0 - ss / METRES_PER_DEGREE_LAT
     lon = lon0 + ee / metres_per_lon
-    metres = ground(location)(lat, lon)
+    # A city on the water whose land comes with its buildings (cityLand: Venice's canals are
+    # narrower than the DEM's 30 m) is all lagoon floor here, and needs no tiles
+    metres = np.full_like(lat, -1.0) if location.get('cityLand') else ground(location)(lat, lon)
     # A city on hills: the buildings taken out of the surface model (3d/bare-earth.py)
     if 'bareEarth' in location:
         spec = importlib.util.spec_from_file_location('bare_earth', Path(__file__).parent / 'bare-earth.py')

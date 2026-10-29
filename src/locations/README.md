@@ -16,7 +16,9 @@ longitude map onto it (`types.ts`). `TerrainBase` loads Lanzarote unless an app 
   plateau from elevation data with its monuments built by their own script, [below](#giza).
   **Hong Kong** (`hong-kong.json` + `.ts`, Victoria Harbour at night) is a city on hills: its
   towers stand on the elevation model's bare ground, lit from within,
-  [below](#a-city-on-hills-at-night).
+  [below](#a-city-on-hills-at-night). **Venice** (`venice.json` + `.ts`, the historic centre)
+  is a city on the water: its land and canals come from OpenStreetMap too,
+  [below](#a-city-on-the-water).
 
 ## A place built from elevation data
 
@@ -56,6 +58,8 @@ Ground at or below 0 m becomes sea floor under the water plane.
 | `flatten`                      | `{ name, at: [lat, lon], size: [east-west, north-south] (m), height?, below? }`: squares of ground laid flat at `height` metres, else at the median round their edge, only where the surface model is lower than `below`. For what the scene models itself (a town's rooftops, a monument)                                                                                                                                                                                               |
 | `plain`                        | `{ color, height }`: an inland place has no sea; its land runs on flat to the horizon at `height` metres                                                                                                                                                                                                                                                                                                                                                                                 |
 | `pyramids`, `sphinx`, …        | Giza's monuments, [below](#giza)                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `cityLand`                     | The land comes with the city GLB (a city on the water): the terrain is all sea floor                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `venetian`                     | `{ name, kind, at: [lat, lon], heading?, size? }`, Venice's hand-built landmarks (`shared/env/venetianLandmarks.ts`), on the quays                                                                                                                                                                                                                                                                                                                                                       |
 
 `about` keys are notes for people and are ignored.
 
@@ -97,6 +101,8 @@ A city sets its own colours with `city.facades` (`{ low?, mid?, tall? }`, lists 
 for buildings under 30 m, under 120 m and taller; New York's brownstone, limestone and glass
 otherwise) and `city.roof` (`{ colour, share }`, how much of the roof is that colour and how much
 its facade's; `#4a4a4a` and 0.55 otherwise). Paris is cream limestone under 85% zinc grey.
+`city.roof.colours` instead gives each building a roof of its own, one of that list (Venice's
+terracotta).
 
 `city.eiffelTower` (`{ at: [lat, lon] }`) builds the Eiffel Tower there, square on the grid (so
 set `gridHeading` to its faces, 44°): a lattice of 1.5 m voxels to its real profile (the
@@ -117,9 +123,9 @@ walls towards the street.
 
 `fog` (metres at which the fog has hidden half the view) thickens the theme's fog, so the city's
 far edge fades out instead of ending. `look` changes the light from the theme's:
-`{ timeOfDay?, ambient?, fogColor? }`, the hour for the sun (later is lower here), the share of the
-flat ambient light to keep (less makes the shade read), and the fog's colour instead of the
-horizon's.
+`{ timeOfDay?, ambient?, fogColor?, seaColor?, shallowColor? }`, the hour for the sun (later is
+lower here), the share of the flat ambient light to keep (less makes the shade read), the fog's
+colour instead of the horizon's, and the sea's colours instead of the theme's.
 
 It also prints how far the `soaringLoop` clears the rooftops within 10 m either side, along the same
 Catmull-Rom curve the app flies. In a city the loop can fly the streets: on the turned grid an
@@ -274,3 +280,35 @@ skyGlowStrength, moon: [azimuth, altitude], moonlight, ambient, stars, sea, shal
   speeds (2 unless given; Hong Kong's 11 km loop flies at 5).
 
 `city-on-hills.py` also prints how far the loop clears the roofs and the ground within 12 m.
+
+## A city on the water
+
+Venice's canals are narrower than the DEM's 30 m, so its land comes from OpenStreetMap as well.
+`cityLand` makes `dem-to-glb.py` lay the whole terrain as lagoon floor, and the `city` section
+switches on more of `city-to-glb.py` (New York and Paris use none of it):
+
+```sh
+uv run 3d/dem-to-glb.py src/locations/venice.json assets/locations/venice.glb
+uv run 3d/city-to-glb.py src/locations/venice.json assets/locations/venice-city.glb
+```
+
+| `city` field   | Meaning                                                                                                                                                                                                                                                                                                |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `water`        | Land is OSM's islands less its canal and basin polygons (not the lagoon) and the rii mapped only as lines (6 m unless tagged `width`). Buildings off the land are left out.                                                                                                                            |
+| `infill`       | Build up the land within 30 m of a mapped calle that OSM leaves empty (Venice's buildings have gaps): lots of about 18 m, 3–5 storeys, each its own colour; the calli, squares and parks stay open                                                                                                     |
+| `windows`      | `"arched"`: arched windows with green shutters on mottled plaster, and no glass curtain walls                                                                                                                                                                                                          |
+| `pitchedRoofs` | Hipped tiled roofs on every roof rectangle, sharing their six vertices (the app shades them flat, `flatShading` in the extras)                                                                                                                                                                         |
+| `buildings`    | Per OSM element (`"way/138803915"`): `height`, `colour`, `roof`, `windows` (`none`, `punched`, `arched`, `ducale` for the Doge's Palace's arcades and pink lozenges), `exclusive` (its footprint holds it alone, over OSM's building parts inside it) or `skip` (left empty for a hand-built landmark) |
+| `meshopt`      | Pack the GLB with `3d/meshopt-glb.mjs` (16-bit positions and meshopt, as Hong Kong; `Models.loadGltf` decodes it): Venice's 1.2M vertices go from 33 MB to 9.1 MB                                                                                                                                      |
+
+The street layer is paved instead of laid with roads: trachyte, white Istrian stone along the
+water and in a pattern over OSM's squares, and the bridges (`bridge=*` highways) carry the paving
+over the canals. A third node, `Quays`, walls every edge between land and water from under the
+water up to the paving, dark and wet at the foot. The extras carry `canals`, each canal
+centreline clipped to the water with its width from the distance to the land
+(`{ width, name, points }`), for `shared/env/cityBoats.ts`: gondolas in the rii and along the
+edges of canals 25 m and wider, where waterbuses, water taxis and barges run up one side and back
+down the other, each with a fading wake; every kind is one instanced mesh, all the wakes another.
+
+The relax app also takes `?progress=0.45` to start the paramotor that far round its loop, to
+share a moment of the flight.

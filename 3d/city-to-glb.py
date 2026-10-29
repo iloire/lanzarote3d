@@ -26,6 +26,12 @@ has its own vertices, so three.js shades them flat itself.
 It also prints how far above the rooftops the location's soaringLoop flies, along the same
 curve the app flies through it.
 
+A city on the water (city.water, Venice) takes its land from OSM's islands less its canals,
+fills the gaps OSM leaves between its calli (infill), paves its streets, walls its quays, writes
+its canals' centrelines for the boats, and can ask for arched windows, hipped tiled roofs in
+colours of their own and per-building overrides; city.meshopt packs it with 3d/meshopt-glb.mjs.
+See src/locations/README.md.
+
 Usage: uv run 3d/city-to-glb.py src/locations/new-york.json assets/locations/new-york-city.glb
 """
 import importlib.util
@@ -34,6 +40,7 @@ import json
 import math
 import re
 import struct
+import subprocess
 import sys
 import time
 import urllib.error
@@ -75,9 +82,15 @@ LAYERS = {
     'woods': ['["natural"~"^(wood|scrub)$"]', '["landuse"="forest"]'],
     'rocks': ['["natural"~"^(bare_rock|rock)$"]'],
     'paths': ['["highway"]'],
+    # A city on the water (city.water): its islands, its canals and basins as polygons (not the
+    # lagoon round them), the canals' centrelines and its squares
+    'islands': ['["place"~"^(island|islet)$"]'],
+    'canals': ['["natural"="water"]["water"!="lagoon"]'],
+    'waterways': ['["waterway"="canal"]'],
+    'squares': ['["place"="square"]'],
 }
 # Layers fetched as ways alone: a highway's relations are its bus and bike routes
-WAYS_ONLY = {'paths'}
+WAYS_ONLY = {'paths', 'waterways'}
 
 
 def fetch(location, layer):
@@ -153,6 +166,10 @@ def join(lines):
                     ring += line[1:]
                 elif line[-1] == ring[-1]:
                     ring += line[::-1][1:]
+                elif line[-1] == ring[0]:
+                    ring = line[:-1] + ring
+                elif line[0] == ring[0]:
+                    ring = line[:0:-1] + ring
                 else:
                     continue
                 del lines[k]
@@ -169,8 +186,22 @@ def srgb_to_linear(hex_colour):
 
 
 # Window styles, per vertex in _WINDOWS for the app's shader: none (roofs), punched windows in
-# brick and stone, glass curtain walls on the towers
+# brick and stone, glass curtain walls on the towers. 3-6 are 3d/city-on-hills.py's lit towers. A
+# city may ask for arched windows with shutters on plaster (city.windows: "arched"), tiled roofs
+# (city.pitchedRoofs), and the Doge's Palace's arcades and pink lozenges for a building
+# (city.buildings[...].windows: "ducale")
 ROOF, PUNCHED, CURTAIN = 0, 1, 2
+ARCHED, TILES, DUCALE = 7, 8, 9
+WINDOW_STYLES = {'none': ROOF, 'punched': PUNCHED, 'curtain': CURTAIN, 'arched': ARCHED, 'ducale': DUCALE}
+
+
+def pick(palette, key):
+    return palette[zlib.crc32(key.encode()) % len(palette)]
+
+
+def palettes_of(location):
+    """Facade colours by height, the city's `facades` over the defaults"""
+    return {'low': LOW, 'mid': MID, 'tall': TALL, **location['city'].get('facades', {})}
 
 
 def facade(tags, height, key, palettes):
@@ -178,7 +209,7 @@ def facade(tags, height, key, palettes):
     if re.fullmatch(r'#[0-9a-fA-F]{6}', colour):
         return colour
     palette = palettes['tall'] if height >= 120 else palettes['mid'] if height >= 30 else palettes['low']
-    return palette[zlib.crc32(key.encode()) % len(palette)]
+    return pick(palette, key)
 
 
 class Grid:
@@ -289,12 +320,23 @@ def coverage(grid, elements):
     return covered
 
 
-def rasterise(location, grid, elements):
-    """Height in metres and facade colour index of every cell, the tallest building winning"""
-    default = location['city']['defaultHeight']
-    palettes = {'low': LOW, 'mid': MID, 'tall': TALL, **location['city'].get('facades', {})}
+def rasterise(location, grid, elements, roofs=None):
+    """Height in metres and facade colour index of every cell, the tallest building winning.
+    `city.buildings` overrides a building by its "way/123" key: skip it (a hand-built landmark
+    stands there), give it its footprint alone, a height, colours or a window style. Pass a list as
+    `roofs` to get each building's own roof colour in it, or None (from city.roof.colours)"""
+    city = location['city']
+    default = city['defaultHeight']
+    palettes = palettes_of(location)
+    roof_colours = city.get('roof', {}).get('colours')
+    overrides = city.get('buildings', {})
+    arched = city.get('windows') == 'arched'
     heights = np.zeros((grid.rows, grid.cols), np.float32)
     owner = np.full((grid.rows, grid.cols), -1, np.int32)
+    # Footprints of the buildings a hand-built landmark replaces: nothing else stands there either
+    skipped = np.zeros((grid.rows, grid.cols), bool)
+    # Landmarks whose footprint holds them alone, over the building parts OSM draws inside them
+    alone = []
     colours, styles = [], []
     for element in elements:
         tags = element.get('tags', {})
@@ -303,18 +345,33 @@ def rasterise(location, grid, elements):
         outer, inner = rings(element)
         if not outer:
             continue
-        height = height_of(tags, default)
+        key = f"{element['type']}/{element['id']}"
+        override = overrides.get(key, {})
         found = cells_of(grid, outer, inner)
         if not found:
             continue
         where, cells = found
+        if override.get('skip'):
+            skipped[where] |= cells
+            continue
+        height = override.get('height') or height_of(tags, default)
         region = heights[where]
         wins = cells & (height > region)
         region[wins] = height
         owner[where][wins] = len(colours)
-        colours.append(facade(tags, height, f"{element['type']}{element['id']}", palettes))
-        styles.append(CURTAIN if height >= 120 else PUNCHED)
-    outside = ~grid.inside()
+        if override.get('exclusive'):
+            alone.append((where, cells, height, len(colours)))
+        colours.append(override.get('colour') or facade(tags, height, f"{element['type']}{element['id']}", palettes))
+        if 'windows' in override:
+            styles.append(WINDOW_STYLES[override['windows']])
+        else:
+            styles.append(ARCHED if arched else CURTAIN if height >= 120 else PUNCHED)
+        if roofs is not None:
+            roofs.append(override.get('roof') or (pick(roof_colours, key) if roof_colours else None))
+    for where, cells, height, index in alone:
+        heights[where][cells] = height
+        owner[where][cells] = index
+    outside = ~grid.inside() | skipped
     heights[outside] = 0
     owner[outside] = -1
     print(f'{len(colours)} buildings on a {grid.cols}x{grid.rows} grid of {grid.size} m, tallest {heights.max():.0f} m')
@@ -332,6 +389,11 @@ SURFACES = {
     'path': '#a69b82',
     'drive': '#3b3d41',
     'pond': '#2d5268',
+    # A city on the water: trachyte paving, white Istrian stone along the quays and in the
+    # squares' patterns, and the bridges' stone
+    'paving': '#8b867c',
+    'kerb': '#b9b2a3',
+    'bridge': '#cbc3b2',
 }
 # Park footways a cell wide, its drives two
 FOOTWAYS = {'footway', 'path', 'cycleway', 'bridleway', 'steps', 'pedestrian', 'track'}
@@ -403,16 +465,122 @@ def grow(mask, steps=1):
     return out
 
 
-def lay_streets(location, grid, heights):
+# Canals narrower than this, metres, are traced from their centreline when OSM has no water
+# polygon for them; a canal this wide or wider carries the big boats
+RIO_WIDTH, WIDE_CANAL = 6, 25
+# Bridges over the canals, cells wide
+CANAL_BRIDGE = 2
+# The squares' white Istrian stone lines, every this many cells
+SQUARE_PATTERN = 5
+
+
+def water_land(location, grid):
+    """A city on the water (city.water): its land is OpenStreetMap's islands less its canals,
+    basins and harbours, and less the rii it maps only as a line"""
+    islands = coverage(grid, fetch(location, 'islands'))
+    water = coverage(grid, fetch(location, 'canals'))
+    rii = np.zeros_like(water)
+    for canal in fetch(location, 'waterways'):
+        tags = canal.get('tags', {})
+        if tags.get('tunnel') or tags.get('layer', '0').startswith('-'):
+            continue
+        width = max(1, round((metres(tags.get('width')) or RIO_WIDTH) / grid.size))
+        rii |= trace(grid, [canal], width)
+    land = islands & ~water & ~rii & grid.inside()
+    print(f'land: {int(land.sum())} of {land.size} cells')
+    return land
+
+
+# Infill (city.infill): houses this many storeys high, on lots about this many cells a side, on
+# land within this many cells of a mapped calle
+INFILL_STOREYS, INFILL_LOT, INFILL_REACH = (3, 4, 4, 4, 5), 6, 10
+
+
+def shrink(mask):
+    return mask & ~grow(~mask)
+
+
+def infill(location, grid, heights, owner, colours, styles, roofs, land):
+    """OpenStreetMap leaves gaps in a dense old town's buildings: build the land between its calli
+    and squares up in lots of houses, each its own height and colour, keeping the calli, the
+    squares and the parks open. Slivers thinner than three cells are left open too"""
+    city = location['city']
+    highways = fetch(location, 'paths')
+    calli = trace(grid, [w for w in highways if w.get('tags', {}).get('area') != 'yes'], 1)
+    campi = coverage(grid, [w for w in highways if w.get('tags', {}).get('area') == 'yes'] + fetch(location, 'squares'))
+    parks = coverage(grid, fetch(location, 'parks') + fetch(location, 'woods'))
+    fill = land & (heights == 0) & ~calli & ~campi & ~parks & grow(calli | campi, INFILL_REACH)
+    fill = grow(shrink(fill)) & fill
+    # Lots on a lattice warped by noise, so they don't line up
+    rows, cols = np.nonzero(fill)
+    warp_r, warp_c = noise(fill.shape, 8, 11) * 4, noise(fill.shape, 8, 12) * 4
+    lot_r = ((rows + warp_r[rows, cols]) // INFILL_LOT).astype(np.int64)
+    lot_c = ((cols + warp_c[rows, cols]) // INFILL_LOT).astype(np.int64)
+    lots, which = np.unique(lot_r * 100000 + lot_c, return_inverse=True)
+    low = palettes_of(location)['low']
+    roof_colours = city.get('roof', {}).get('colours')
+    first = len(colours)
+    for k, lot in enumerate(lots):
+        key = f'infill{lot}'
+        colours.append(pick(low, key))
+        styles.append(ARCHED if city.get('windows') == 'arched' else PUNCHED)
+        roofs.append(pick(roof_colours, key) if roof_colours else None)
+    storeys = np.array([pick(INFILL_STOREYS, f'storeys{lot}') for lot in lots], np.float32)
+    heights[rows, cols] = storeys[which] * METRES_PER_LEVEL
+    owner[rows, cols] = first + which
+    print(f'infill: {len(rows)} cells in {len(lots)} lots')
+
+
+def canals(location, grid, land):
+    """The canals' centrelines boats follow, clipped to the water: [{width, points}] with the
+    water's width in metres and the points as world x, z, flat"""
+    # How far each water cell is from the land, in cells, out to WIDE_CANAL
+    reach = int(WIDE_CANAL / grid.size) + 1
+    distance = np.full(land.shape, reach, np.float32)
+    seen = land.copy()
+    for step in range(reach):
+        distance[seen & (distance == reach)] = step
+        seen = grow(seen)
+    water = ~land & grid.inside()
+    out = []
+    for canal in fetch(location, 'waterways'):
+        tags = canal.get('tags', {})
+        if tags.get('tunnel'):
+            continue
+        # Points every cell along the line, kept while they're on the water
+        points = [grid.cell(p['lat'], p['lon']) for p in canal.get('geometry', [])]
+        dense = []
+        for (c0, r0), (c1, r1) in zip(points, points[1:]):
+            steps = max(1, int(math.hypot(c1 - c0, r1 - r0)))
+            dense += [(c0 + (c1 - c0) * t / steps, r0 + (r1 - r0) * t / steps) for t in range(steps)]
+        run = []
+        for c, r in dense + [(None, None)]:
+            if c is not None and 0 <= r < grid.rows and 0 <= c < grid.cols and water[int(r), int(c)]:
+                run.append((c, r))
+                continue
+            # 40 m at least, so a boat has somewhere to go
+            if len(run) * grid.size >= 40:
+                widths = [distance[int(r_), int(c_)] for c_, r_ in run]
+                width = 2 * float(np.median(widths)) * grid.size
+                xz = [coordinate for c_, r_ in run[:: max(1, int(4 / grid.size))] for coordinate in grid.world_xz(c_, r_, location)]
+                out.append({'width': round(width, 1), 'name': tags.get('name', ''), 'points': xz})
+            run = []
+    print(f'{len(out)} canal runs for boats, {sum(1 for c in out if c["width"] >= WIDE_CANAL)} wide')
+    return out
+
+
+def lay_streets(location, grid, heights, land=None):
     """Paint the land between the buildings as sidewalks, roads, crosswalks, grass, woods, park
     paths and ponds, and find the lanes cars drive: returns an RGBA image a pixel a cell (clear
     off the land), the lanes as grid (col, row) end points, and the park cells trees may grow
-    on and which of them are woods"""
+    on and which of them are woods. A city on the water passes its land, and is paved instead"""
     cc, rr = np.meshgrid(np.arange(grid.cols) + 0.5, np.arange(grid.rows) + 0.5)
-    east, south = grid.world(cc, rr)
-    lat = grid.lat0 - south / METRES_PER_DEGREE_LAT
-    lon = grid.lon0 + east / grid.mlon
-    land = dem().sampler(location['bbox'])(lat, lon) > 0
+    on_water = land is not None
+    if land is None:
+        east, south = grid.world(cc, rr)
+        lat = grid.lat0 - south / METRES_PER_DEGREE_LAT
+        lon = grid.lon0 + east / grid.mlon
+        land = dem().sampler(location['bbox'])(lat, lon) > 0
     built = heights > 0
     open_land = ~built & land & grid.inside()
     woods = coverage(grid, fetch(location, 'woods')) & open_land
@@ -456,6 +624,25 @@ def lay_streets(location, grid, heights):
         ('drive', drive),
         ('pond', ponds),
     ]
+    if on_water:
+        # Calli and campi are paved, edged in white stone along the water, the squares laid in a
+        # pattern of white lines; the bridges carry the paving over the canals
+        paving = open_land & ~parks & ~ponds
+        water = ~land & grid.inside()
+        squares = coverage(grid, fetch(location, 'squares')) & paving
+        lines = (cc.astype(int) % SQUARE_PATTERN == 0) | (rr.astype(int) % SQUARE_PATTERN == 0)
+        bridges = trace(grid, [w for w in highways if w.get('tags', {}).get('bridge') not in (None, 'no')], CANAL_BRIDGE) & water
+        layers = [
+            ('paving', paving),
+            ('kerb', (paving & grow(water)) | (squares & lines)),
+            ('grass', parks & ~woods),
+            ('wood', woods),
+            ('path', path),
+            ('pond', ponds),
+            ('bridge', bridges),
+        ]
+        road[:] = False
+        avenue[:] = street[:] = junction[:] = False
     image = np.zeros((grid.rows, grid.cols, 4), np.uint8)
     image[built & land] = [*bytes.fromhex(SURFACES['sidewalk'][1:]), 255]
     for name, mask in layers:
@@ -465,6 +652,10 @@ def lay_streets(location, grid, heights):
     lawn = parks & ~path & ~drive & ~ponds
     varies = 0.6 * noise(built.shape, 40, 1) + 0.4 * noise(built.shape, 8, 2)
     shade[lawn] *= (1 - GRASS_VARIES / 2 + GRASS_VARIES * varies)[lawn]
+    if on_water:
+        # Worn stone: lighter and darker over a few metres
+        worn = paving & ~lawn
+        shade[worn] *= (0.9 + 0.2 * noise(built.shape, 3, 5))[worn]
     rgb = image[..., :3].astype(np.float32) * shade[..., None]
     # Yellower where the lawn is lighter, so the variation is in hue as well as light
     rgb[..., 0][lawn] *= (0.92 + 0.16 * varies)[lawn]
@@ -527,10 +718,17 @@ def plant(location, grid, free, woods):
     return np.round(np.stack([east * upm, south * upm, scale], 1), 2).ravel().tolist()
 
 
-def mesh(location, grid, heights, owner, colours, styles, base=None):
+# Pitched roofs (city.pitchedRoofs): each roof rectangle is hipped, its ridge down the long side,
+# this steep, and no higher than this, metres
+ROOF_PITCH, ROOF_RISE = 0.5, 3.5
+
+
+def mesh(location, grid, heights, owner, colours, styles, base=None, roofs=None, walls_only=False):
     """Merged roofs and walls as positions, colours, window styles and triangles. On hills
     (3d/city-on-hills.py) heights are tops above sea level and `base` is where each owner's walls
-    go down to, metres, where nothing stands beside them"""
+    go down to, metres, where nothing stands beside them. A building with a colour in `roofs` has
+    a roof of that colour, hipped and tiled if the city asks (city.pitchedRoofs); `walls_only`
+    leaves the tops open"""
     upm = location['unitsPerMetre']
     up = upm * location['verticalExaggeration']
     ground = location.get('flatLand', 0) * up
@@ -539,7 +737,30 @@ def mesh(location, grid, heights, owner, colours, styles, base=None):
     # Roofs a darker, greyer shade of their facade, or mostly the city's own roof colour
     roof = {**ROOF_COLOUR, **location['city'].get('roof', {})}
     roof_of = linear * (1 - roof['share']) + srgb_to_linear(roof['colour']) * roof['share']
+    pitched = location['city'].get('pitchedRoofs', False)
+    tiled = np.zeros(len(roof_of), bool)
+    for k, own in enumerate(roofs or []):
+        if own:
+            roof_of[k] = srgb_to_linear(own) * 0.8
+            tiled[k] = True
     pos, col, win, idx = [], [], [], []
+    def hip(corners, ridge, long_u, colour):
+        # Corners a, b, c, d round the rectangle from (c, r); the ridge ends nearest a and nearest c
+        base_ = len(pos)
+        pos.extend(corners + ridge)
+        col.extend([colour] * 6)
+        win.extend([TILES] * 6)
+        a, b, c_, d, r0, r1_ = range(base_, base_ + 6)
+        faces = [(a, b, r1_, r0), (c_, d, r0, r1_), (b, c_, r1_), (d, a, r0)] if long_u else [(a, b, r0), (b, c_, r1_, r0), (c_, d, r1_), (d, a, r0, r1_)]
+        for face in faces:
+            for k in range(1, len(face) - 1):
+                t = [face[0], face[k], face[k + 1]]
+                p0, p1, p2 = (np.array(pos[i]) for i in t)
+                # Wound counter-clockwise seen from above
+                if np.cross(p1 - p0, p2 - p0)[1] < 0:
+                    t = t[::-1]
+                idx.extend(t)
+
 
     def quad(corners, normal, colour, style=ROOF):
         # Wound counter-clockwise seen from the side the normal points to
@@ -577,7 +798,24 @@ def mesh(location, grid, heights, owner, colours, styles, base=None):
                     break
                 r1 += 1
             done[r : r1 + 1, c : c1 + 1] = True
-            quad([at(c, r, h), at(c, r1 + 1, h), at(c1 + 1, r1 + 1, h), at(c1 + 1, r, h)], (0, 1, 0), roof_of[o])
+            if walls_only:
+                continue
+            if not (pitched and tiled[o]):
+                quad([at(c, r, h), at(c, r1 + 1, h), at(c1 + 1, r1 + 1, h), at(c1 + 1, r, h)], (0, 1, 0), roof_of[o])
+                continue
+            # Hipped: a ridge down the middle of the long side, inset half the short side from
+            # each end, four tiled slopes sharing six vertices (the app shades them flat)
+            across, along = (r1 + 1 - r), (c1 + 1 - c)
+            rise = min(ROOF_PITCH * min(across, along) * grid.size / 2, ROOF_RISE)
+            top = h + rise / location['verticalExaggeration']
+            if along >= across:
+                m, inset = (r + r1 + 1) / 2, across / 2
+                ridge = [at(c + inset, m, top), at(c1 + 1 - inset, m, top)]
+            else:
+                m, inset = (c + c1 + 1) / 2, along / 2
+                ridge = [at(m, r + inset, top), at(m, r1 + 1 - inset, top)]
+            corners = [at(c, r, h), at(c1 + 1, r, h), at(c1 + 1, r1 + 1, h), at(c, r1 + 1, h)]
+            hip(corners, ridge, along >= across, roof_of[o])
 
     # Walls between neighbours of different height, facing the lower one, in the taller's colour
     padded_h = np.pad(heights, 1)
@@ -794,10 +1032,11 @@ def png(image):
     return buffer.getvalue()
 
 
-def write_glb(positions, colours, windows, triangles, extras, streets, dst, tower=None):
-    """The buildings (node 0), the street quad with its image (node 1) and a tower if there's one
-    (node 2, one colour); the streets may be any mesh with 16-bit indices, and may carry a second
-    image that glows (emissive), for the night"""
+def write_glb(positions, colours, windows, triangles, extras, streets, dst, tower=None, quays=None):
+    """The buildings (node 0), the street quad with its image (node 1), a tower if there's one
+    (one colour) and a city on the water's quay walls (positions, colours and triangles) in nodes
+    of their own; the streets may be any mesh with 16-bit indices, and may carry a second image
+    that glows (emissive), for the night"""
     quad_points, quad_uvs, quad_order, image, *glow = streets
     blobs = [
         (positions.tobytes(), 34962),
@@ -892,6 +1131,38 @@ def write_glb(positions, colours, windows, triangles, extras, streets, dst, towe
             },
             {'bufferView': first + 1, 'componentType': UINT32, 'count': len(tower_triangles), 'type': 'SCALAR'},
         ]
+    if quays is not None:
+        q_positions, q_colours, q_triangles = quays
+        first = len(views)
+        for blob, target in (
+            (q_positions.tobytes(), 34962),
+            (pad4(q_colours.tobytes(), b'\0'), 34962),
+            (q_triangles.tobytes(), 34963),
+        ):
+            views.append({'buffer': 0, 'byteOffset': offset, 'byteLength': len(blob), 'target': target})
+            blobs.append((blob, target))
+            offset += len(blob)
+        accessor = len(gltf['accessors'])
+        gltf['accessors'] += [
+            {
+                'bufferView': first,
+                'componentType': FLOAT,
+                'count': len(q_positions),
+                'type': 'VEC3',
+                'min': q_positions.min(axis=0).tolist(),
+                'max': q_positions.max(axis=0).tolist(),
+            },
+            {'bufferView': first + 1, 'componentType': UINT8, 'normalized': True, 'count': len(q_colours), 'type': 'VEC3'},
+            {'bufferView': first + 2, 'componentType': UINT32, 'count': len(q_triangles), 'type': 'SCALAR'},
+        ]
+        material, node = len(gltf['materials']), len(gltf['nodes'])
+        gltf['materials'].append({'pbrMetallicRoughness': {'baseColorFactor': [1, 1, 1, 1], 'metallicFactor': 0, 'roughnessFactor': 0.9}})
+        gltf['meshes'].append(
+            {'primitives': [{'attributes': {'POSITION': accessor, 'COLOR_0': accessor + 1}, 'indices': accessor + 2, 'material': material}]}
+        )
+        gltf['nodes'].append({'mesh': len(gltf['meshes']) - 1, 'name': 'Quays'})
+        gltf['scenes'][0]['nodes'].append(node)
+        gltf['buffers'][0]['byteLength'] = offset
     json_chunk = pad4(json.dumps(gltf, separators=(',', ':')).encode(), b' ')
     bin_chunk = b''.join(blob for blob, _ in blobs)
     total = 12 + 8 + len(json_chunk) + 8 + len(bin_chunk)
@@ -903,12 +1174,41 @@ def write_glb(positions, colours, windows, triangles, extras, streets, dst, towe
     print(f'wrote {dst}, {total} bytes')
 
 
+# Quay walls of a city on the water: from this far under the water, metres, up to the paving;
+# white Istrian stone at the top, green and dark where the tide wets them
+QUAY_FOOT = 0.8
+QUAY_TOP, QUAY_WET = '#a59d8e', '#3d4a3c'
+
+
+def quays(location, grid, land):
+    """The walls along every edge between land and water, as positions, colours and triangles"""
+    top = location['flatLand']
+    heights = np.where(land, top + QUAY_FOOT, 0).astype(np.float32)
+    owner = np.where(land, 0, -1).astype(np.int32)
+    # Standing QUAY_FOOT under the water instead of on the land
+    under = {**location, 'flatLand': -QUAY_FOOT}
+    positions, _, _, triangles = mesh(under, grid, heights, owner, [QUAY_TOP], [ROOF], walls_only=True)
+    up = location['unitsPerMetre'] * location['verticalExaggeration']
+    # The wet band: everything up to a little over the water is the dark algae colour
+    wet = np.clip((positions[:, 1] / up - 0.3) / (top - 0.3), 0, 1)[:, None]
+    colour = srgb_to_linear(QUAY_WET) * (1 - wet) + srgb_to_linear(QUAY_TOP) * 0.8 * wet
+    return positions, np.round(np.clip(colour, 0, 1) * 255).astype(np.uint8), triangles
+
+
 if __name__ == '__main__':
     if len(sys.argv) != 3:
         sys.exit(__doc__)
     location = json.load(open(sys.argv[1]))
     grid = Grid(location)
-    heights, owner, colours, styles = rasterise(location, grid, fetch(location, 'buildings'))
+    roofs = []
+    heights, owner, colours, styles = rasterise(location, grid, fetch(location, 'buildings'), roofs)
+    # A city on the water takes its land from OpenStreetMap's islands, less the canals
+    land = water_land(location, grid) if location['city'].get('water') else None
+    if land is not None:
+        heights[~land] = 0
+        owner[~land] = -1
+    if location['city'].get('infill'):
+        infill(location, grid, heights, owner, colours, styles, roofs, land)
     tower = None
     if 'eiffelTower' in location['city']:
         *tower, feet = eiffel(location, grid)
@@ -916,15 +1216,26 @@ if __name__ == '__main__':
         heights[feet] = 0
         owner[feet] = -1
     check_loop(location, grid, heights)
-    image, lanes, free, woods = lay_streets(location, grid, heights)
+    image, lanes, free, woods = lay_streets(location, grid, heights, land)
     rocks = outcrops(location, grid, heights)
     extras = grid.extras(location)
+    if location['city'].get('pitchedRoofs'):
+        # The hipped roofs share their vertices: the app shades them flat instead of by normals
+        extras['flatShading'] = True
     extras['lanes'] = [[coordinate for end in lane for coordinate in grid.world_xz(*end, location)] for lane in lanes]
     extras['trees'] = plant(location, grid, free & (rocks == 0), woods)
+    if land is not None:
+        extras['canals'] = canals(location, grid, land)
     # The rocks are meshed with the buildings, as one more owner without windows
     owner[rocks > 0] = len(colours)
     heights = np.maximum(heights, rocks)
     colours.append(ROCK)
     styles.append(ROOF)
+    roofs.append(None)
     streets = (*street_quad(location, grid), image)
-    write_glb(*mesh(location, grid, heights, owner, colours, styles), extras, streets, sys.argv[2], tower)
+    walls = quays(location, grid, land) if land is not None else None
+    write_glb(*mesh(location, grid, heights, owner, colours, styles, roofs=roofs), extras, streets, sys.argv[2], tower, walls)
+    if location['city'].get('meshopt'):
+        # A dense old town comes to five times New York's vertices: packed for the web (16-bit
+        # positions and EXT_meshopt_compression, which the app decodes), keeping nodes and extras
+        subprocess.run(['node', str(Path(__file__).parent / 'meshopt-glb.mjs'), sys.argv[2], sys.argv[2]], check=True)

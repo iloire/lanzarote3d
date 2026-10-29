@@ -18,6 +18,8 @@ import type { AtmosphereTheme } from '../../foundation/types/Theme';
 import type { NightLook } from '../../foundation/rendering/nightSky';
 import type { CruiseRoute, FerryRoute } from '../../shared/env/harbourBoats';
 import type { LaserSite } from '../../shared/env/lightShow';
+import { VENICE, VENICE_CITY, VENICE_CONFIG } from '../../locations/venice';
+import type { VenetianLandmark } from '../../shared/env/venetianLandmarks';
 import { DemLocationConfig, demAnchor, demPoint } from '../../locations/dem';
 import { geoToWorld } from '../../shared/geo';
 import { RIDGE_LOOP } from '../home/config';
@@ -49,6 +51,8 @@ export interface RelaxScene {
    * Giza's monuments and town from 3d/giza-to-glb.py
    */
   city?: string;
+  /** Venice's hand-built landmarks, standing on the quays at world height `ground` */
+  venetian?: { list: VenetianLandmark[]; anchor: GeoAnchor; ground: number; unitsPerMetre: number };
   /** Fly paramotors, which need no ridge, instead of paragliders */
   paramotor?: boolean;
   /** How many times a wing's speed the paramotor flies; the app's own unless given */
@@ -88,6 +92,9 @@ export interface SceneLook {
   atmosphere?: AtmosphereTheme;
   /** Night instead of day: the sky, the moon and the light (nightSky.ts) */
   night?: NightLook;
+  /** The sea's deep and shallow colours, instead of the theme's (a lagoon's green) */
+  seaColor?: string;
+  shallowColor?: string;
 }
 
 /** The relax fields of a location JSON (see src/locations/README.md) */
@@ -114,6 +121,8 @@ interface DemSceneConfig extends DemLocationConfig {
   paramotorSpeed?: number;
   /** Built by 3d/city-to-glb.py; `taxis` is the share of its cars that are yellow cabs */
   city?: { voxel: number; taxis?: number };
+  /** Metres: the city's land and quays */
+  flatLand?: number;
   /** Metres at which the fog has hidden half of what's behind it */
   fog?: number;
   look?: SceneLook;
@@ -124,6 +133,7 @@ interface DemSceneConfig extends DemLocationConfig {
     cruises: { kind: string; speed: number; route: number[][] }[];
   };
   lasers?: { sites: { at: number[]; beams: number }[] };
+  venetian?: { name: string; kind: string; at: number[]; heading?: number; size?: number }[];
 }
 
 function demScene(location: Location, config: DemSceneConfig, city?: string): RelaxScene {
@@ -177,6 +187,16 @@ function demScene(location: Location, config: DemSceneConfig, city?: string): Re
       anchor,
     },
     city,
+    venetian: config.venetian && {
+      list: config.venetian.map(landmark => ({
+        ...landmark,
+        kind: landmark.kind as VenetianLandmark['kind'],
+        at: [landmark.at[0]!, landmark.at[1]!],
+      })),
+      anchor,
+      ground: toHeight(config.flatLand ?? 0)!,
+      unitsPerMetre: config.unitsPerMetre,
+    },
     paramotor: config.paramotor,
     paramotorSpeed: config.paramotorSpeed,
     taxiShare: config.city?.taxis,
@@ -229,6 +249,7 @@ export const RELAX_SCENES: Record<string, RelaxScene> = {
     setPiece: montSaintMichel,
   },
   'hong-kong': demScene(HONG_KONG, HONG_KONG_CONFIG, HONG_KONG_CITY),
+  venice: demScene(VENICE, VENICE_CONFIG, VENICE_CITY),
 };
 
 export const DEFAULT_SCENE = 'lanzarote';

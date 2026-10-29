@@ -2,6 +2,28 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-10-29 00:58 UTC
+
+### Added
+
+- Venice from 80 m in the relax site (`?location=venice`): the historic centre from OpenStreetMap,
+  its islands less its canals as the land, 7,600 mapped buildings and the gaps between the calli
+  filled with Venetian houses, as 3 m voxels in ochre, rose and faded plaster with arched,
+  shuttered windows under hipped terracotta roofs; paved calli and campi, quay walls wet at the
+  foot, bridges over the rii, and the lagoon green under a golden 17:48 sun and a warm haze
+- Boats on the canals (`cityBoats.ts`): gondolas with their gondoliers in the rii, waterbuses,
+  water taxis and barges on the Grand Canal, the Giudecca and the Basin, each with a wake
+- Hand-built landmarks (`venetianLandmarks.ts`): the Campanile with its green spire and gold
+  angel, the Basilica's five domes, the Salute, San Giorgio's dome and campanile, the Rialto and
+  Accademia bridges and the Piazzetta's columns; the Doge's Palace's arcades and pink lozenges
+  drawn in the window shader
+- Abel's paramotor flies the Grand Canal's S-curve at 80 m, circles the Campanile at its spire
+  and San Giorgio's campanile, and comes back past the Salute; `?progress=` starts him partway
+- `3d/city-to-glb.py` learns a city on the water (`city.water`, `infill`, `windows: "arched"`,
+  `pitchedRoofs`, `roof.colours`, per-building overrides, and `meshopt`, which packs it with
+  `3d/meshopt-glb.mjs` from 33 MB to 9.1 MB), all opt-in: New York's and Paris's GLBs come out
+  byte for byte the same; a multipolygon cut by the bbox is now joined from both ends
+
 ## 2026-10-29 00:32 UTC
 
 ### Added

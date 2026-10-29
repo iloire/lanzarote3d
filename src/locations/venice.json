@@ -1,0 +1,365 @@
+{
+  "id": "venice",
+  "name": "Venice",
+  "region": "Italy",
+  "about": "The historic centre of Venice, from the station and Piazzale Roma to Sant'Elena, with the Giudecca and San Giorgio Maggiore across the water and San Michele to the north. The land and the canals both come from OpenStreetMap (cityLand): its islands less its canals, paved, its buildings as voxels under pitched terracotta roofs. Same scale as New York (6 units a metre) so the paramotors keep their size. Lagoon floor: uv run 3d/dem-to-glb.py src/locations/venice.json assets/locations/venice.glb; city: uv run 3d/city-to-glb.py src/locations/venice.json assets/locations/venice-city.glb",
+  "bbox": {
+    "south": 45.4215,
+    "north": 45.448,
+    "west": 12.312,
+    "east": 12.366
+  },
+  "spacing": 60,
+  "unitsPerMetre": 6,
+  "verticalExaggeration": 1,
+  "flatLand": 1.2,
+  "cityLand": true,
+  "city": {
+    "about": "Buildings from OpenStreetMap as 3 m voxels on an unturned grid (Venice has no street grid); a building with no height or levels is 13 m. water: the land is OSM's islands less the canals, paved in trachyte with white stone along the quays, and the canals' centrelines are written for the boats. The Campanile and the Salute are hand-built (src/shared/env/venetianLandmarks.ts), so their footprints are left empty; the Basilica, the Doge's Palace and San Giorgio keep their voxels, coloured and raised here",
+    "voxel": 3,
+    "gridHeading": 0,
+    "defaultHeight": 13,
+    "water": true,
+    "infill": true,
+    "meshopt": true,
+    "windows": "arched",
+    "pitchedRoofs": true,
+    "facades": {
+      "about": "Venetian plaster: ochre, rose, salmon, terracotta red, cream and faded white, with brick and Istrian stone among the taller (sRGB)",
+      "low": [
+        "#d9a55b",
+        "#d98c7a",
+        "#e3b4a0",
+        "#b5563f",
+        "#e8d6b0",
+        "#c2703f",
+        "#e6c27a",
+        "#e9e2d0",
+        "#a8432f",
+        "#e09a7b",
+        "#d4b48c",
+        "#cf9f86"
+      ],
+      "mid": ["#ece6d8", "#a65a42", "#e3c9a2", "#d9a07f", "#c98b62", "#e8dcc4"]
+    },
+    "roof": {
+      "about": "Terracotta tiles, a colour per building in place of the default grey mixed into the facade (sRGB)",
+      "colours": [
+        "#b5532e",
+        "#a8492b",
+        "#c0643a",
+        "#9c4a2e",
+        "#b86a45",
+        "#a3573a",
+        "#c47248",
+        "#8f4630"
+      ]
+    },
+    "buildings": {
+      "way/252637693": {
+        "about": "Campanile di San Marco, hand-built",
+        "skip": true
+      },
+      "way/138801509": {
+        "about": "Santa Maria della Salute, hand-built",
+        "skip": true
+      },
+      "way/138800932": {
+        "about": "Basilica di San Marco: marble walls up to the domes' drums, lead roofs, and none of OSM's dome parts inside; its domes are hand-built",
+        "height": 28,
+        "colour": "#d8c2a2",
+        "roof": "#8c8a86",
+        "windows": "none",
+        "exclusive": true
+      },
+      "way/138803915": {
+        "about": "Palazzo Ducale: two storeys of white arcades under the pink and white lozenges",
+        "height": 25,
+        "colour": "#e8c4b8",
+        "roof": "#8c8a86",
+        "windows": "ducale",
+        "exclusive": true
+      },
+      "way/138804537": {
+        "about": "San Giorgio Maggiore, Palladio's white church; its dome is hand-built",
+        "height": 26,
+        "colour": "#ece6d8",
+        "roof": "#a8492b",
+        "windows": "none",
+        "exclusive": true
+      },
+      "way/397824459": {
+        "about": "San Giorgio campanile, hand-built",
+        "skip": true
+      },
+      "way/777223382": {
+        "about": "San Giorgio campanile, hand-built",
+        "skip": true
+      },
+      "way/777223383": {
+        "about": "San Giorgio campanile, hand-built",
+        "skip": true
+      },
+      "way/813964256": {
+        "about": "San Giorgio campanile, hand-built",
+        "skip": true
+      },
+      "way/430963094": {
+        "about": "the Piazzetta columns, hand-built",
+        "skip": true
+      },
+      "way/430963095": {
+        "about": "the Piazzetta columns, hand-built",
+        "skip": true
+      },
+      "way/431003417": {
+        "about": "the Piazzetta columns, hand-built",
+        "skip": true
+      },
+      "way/431003430": {
+        "about": "the Piazzetta columns, hand-built",
+        "skip": true
+      },
+      "way/431003442": {
+        "about": "the Piazzetta columns, hand-built",
+        "skip": true
+      },
+      "way/431003455": {
+        "about": "the Piazzetta columns, hand-built",
+        "skip": true
+      },
+      "way/431003588": {
+        "about": "the Piazzetta columns, hand-built",
+        "skip": true
+      },
+      "way/431003609": {
+        "about": "the Piazzetta columns, hand-built",
+        "skip": true
+      },
+      "way/431003657": {
+        "about": "the Piazzetta columns, hand-built",
+        "skip": true
+      },
+      "way/431003679": {
+        "about": "the Piazzetta columns, hand-built",
+        "skip": true
+      },
+      "way/431003739": {
+        "about": "the Piazzetta columns, hand-built",
+        "skip": true
+      },
+      "way/431003743": {
+        "about": "the Piazzetta columns, hand-built",
+        "skip": true
+      },
+      "way/431003750": {
+        "about": "the Piazzetta columns, hand-built",
+        "skip": true
+      },
+      "way/452881851": {
+        "about": "the Piazzetta columns, hand-built",
+        "skip": true
+      },
+      "way/452881852": {
+        "about": "the Piazzetta columns, hand-built",
+        "skip": true
+      }
+    }
+  },
+  "paramotor": true,
+  "fog": 2600,
+  "look": {
+    "about": "Late golden afternoon, a warm low sun over a pale lagoon haze (Canaletto), and the lagoon green-teal instead of the ocean blue",
+    "timeOfDay": 17.8,
+    "ambient": 0.6,
+    "fogColor": "#d8c7a6",
+    "seaColor": "#2e5d5a",
+    "shallowColor": "#4f8a80"
+  },
+  "places": {
+    "campanile": {
+      "name": "Campanile di San Marco",
+      "at": [45.43404, 12.33904]
+    },
+    "basilica": {
+      "name": "Basilica di San Marco",
+      "at": [45.434544, 12.339686]
+    },
+    "palazzoDucale": {
+      "name": "Palazzo Ducale",
+      "at": [45.433815, 12.340334]
+    },
+    "rialto": {
+      "name": "Ponte di Rialto",
+      "at": [45.438055, 12.335935]
+    },
+    "accademia": {
+      "name": "Ponte dell'Accademia",
+      "at": [45.431678, 12.328942]
+    },
+    "salute": {
+      "name": "Santa Maria della Salute",
+      "at": [45.43068, 12.33472]
+    },
+    "sanGiorgio": {
+      "name": "San Giorgio Maggiore",
+      "at": [45.429363, 12.343395]
+    },
+    "station": {
+      "name": "Venezia Santa Lucia",
+      "at": [45.44122, 12.32107]
+    }
+  },
+  "soaringLoop": {
+    "about": "The paramotor flies at 80 m, under the Campanile's top: down the Grand Canal's S-curve from above the Rialto past Ca' Foscari, the Accademia and the Salute to the Basin, round the Campanile at the height of its spire, out over the water round San Giorgio's campanile, back past the Salute and north over San Marco's roofs. The canal stretch follows OSM's centreline of the Canal Grande, a point every 75 m. [lat, lon, metres above sea level]",
+    "waypoints": [
+      [45.439236, 12.33588, 80],
+      [45.438594, 12.336176, 80],
+      [45.437989, 12.335859, 80],
+      [45.437488, 12.335213, 80],
+      [45.437082, 12.334446, 80],
+      [45.436729, 12.333627, 80],
+      [45.436456, 12.332748, 80],
+      [45.436206, 12.331856, 80],
+      [45.435957, 12.330962, 80],
+      [45.435754, 12.330048, 80],
+      [45.435461, 12.329185, 80],
+      [45.43518, 12.328312, 80],
+      [45.434793, 12.327528, 80],
+      [45.43422, 12.327166, 80],
+      [45.433552, 12.327326, 80],
+      [45.432891, 12.327537, 80],
+      [45.432289, 12.327893, 80],
+      [45.431821, 12.328587, 80],
+      [45.431483, 12.329419, 80],
+      [45.431283, 12.330334, 80],
+      [45.431236, 12.331291, 80],
+      [45.431243, 12.332251, 80],
+      [45.431291, 12.333208, 80],
+      [45.431375, 12.334161, 80],
+      [45.431448, 12.335115, 80],
+      [45.431516, 12.336071, 80],
+      [45.433669, 12.338515, 80],
+      [45.433517, 12.338975, 80],
+      [45.43361, 12.339466, 80],
+      [45.433904, 12.339757, 80],
+      [45.434262, 12.339713, 80],
+      [45.434515, 12.339354, 80],
+      [45.434547, 12.338848, 80],
+      [45.434341, 12.338432, 80],
+      [45.433994, 12.3383, 80],
+      [45.429951, 12.343426, 80],
+      [45.429991, 12.344073, 80],
+      [45.429667, 12.344532, 80],
+      [45.42921, 12.344475, 80],
+      [45.428947, 12.343943, 80],
+      [45.429065, 12.343316, 80],
+      [45.430132, 12.335168, 80],
+      [45.430057, 12.334564, 80],
+      [45.430273, 12.334034, 80],
+      [45.43068, 12.333824, 80],
+      [45.430997, 12.333944, 80],
+      [45.4335, 12.3345, 80],
+      [45.4362, 12.3352, 80]
+    ]
+  },
+  "camera": {
+    "about": "Over the Basin of San Marco, looking north-west at the Piazzetta, the Campanile and the mouth of the Grand Canal; [lat, lon, metres]",
+    "at": [45.4305, 12.3445, 140],
+    "lookAt": [45.4335, 12.3385, 60],
+    "zoomOut": 2.5,
+    "pan": 9000
+  },
+  "cloudBase": 1500,
+  "clouds": [
+    {
+      "at": [45.455, 12.33],
+      "kind": "puff",
+      "scale": 1
+    },
+    {
+      "at": [45.41, 12.37],
+      "kind": "puff",
+      "scale": 1.2
+    },
+    {
+      "at": [45.44, 12.29],
+      "kind": "puff",
+      "scale": 1
+    }
+  ],
+  "regions": [],
+  "venetian": [
+    {
+      "name": "Campanile di San Marco",
+      "kind": "campanile",
+      "at": [45.43404, 12.33904],
+      "heading": 161
+    },
+    {
+      "name": "Basilica di San Marco: central dome",
+      "kind": "basilica-dome",
+      "at": [45.434563, 12.339905],
+      "size": 1.05
+    },
+    {
+      "name": "Basilica di San Marco: west dome",
+      "kind": "basilica-dome",
+      "at": [45.434513, 12.339674],
+      "size": 0.98
+    },
+    {
+      "name": "Basilica di San Marco: south dome",
+      "kind": "basilica-dome",
+      "at": [45.43439, 12.339981],
+      "size": 0.88
+    },
+    {
+      "name": "Basilica di San Marco: north dome",
+      "kind": "basilica-dome",
+      "at": [45.434735, 12.33983],
+      "size": 0.9
+    },
+    {
+      "name": "Basilica di San Marco: east dome",
+      "kind": "basilica-dome",
+      "at": [45.434603, 12.340127],
+      "size": 1.0
+    },
+    {
+      "name": "Colonne di San Marco e San Todaro",
+      "kind": "piazzetta-columns",
+      "at": [45.433318, 12.339779],
+      "heading": 160
+    },
+    {
+      "name": "Santa Maria della Salute",
+      "kind": "salute",
+      "at": [45.43068, 12.33472],
+      "heading": 345
+    },
+    {
+      "name": "San Giorgio Maggiore: dome",
+      "kind": "san-giorgio-dome",
+      "at": [45.429407, 12.3432]
+    },
+    {
+      "name": "San Giorgio Maggiore: campanile",
+      "kind": "san-giorgio-campanile",
+      "at": [45.429481, 12.34381]
+    },
+    {
+      "name": "Ponte di Rialto",
+      "kind": "rialto",
+      "at": [45.438055, 12.335935],
+      "heading": 130
+    },
+    {
+      "name": "Ponte dell'Accademia",
+      "kind": "accademia",
+      "at": [45.431678, 12.328942],
+      "heading": 29
+    }
+  ],
+  "paramotorSpeed": 3
+}

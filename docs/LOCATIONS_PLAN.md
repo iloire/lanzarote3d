@@ -208,6 +208,33 @@ terrainPosition, anchor, regions }` — only what `TerrainBase` reads today~~ �
   Central Plaza (26 m clear at the least)~~ ✅
 - Not done: the Peak's own tram and lookouts, Hong Kong Island east of Causeway Bay.
 
+### 3j. Venice from 80 m (curated)
+
+- ~~`src/locations/venice.json`: the historic centre, the station to Sant'Elena, the Giudecca,
+  San Giorgio and San Michele (45.4215…45.448, 12.312…12.366), 6 units a metre like New York~~ ✅
+- ~~Land from OpenStreetMap, not the DEM (`cityLand`): the 30 m model can't see a 6 m rio, so the
+  terrain is all lagoon floor and `city-to-glb.py` (`city.water`) takes OSM's islands less its
+  canal and basin polygons and the rii it maps only as lines (relations' ways joined into rings)~~ ✅
+- ~~Quay walls from under the water up to the paving, wet and dark at the foot; calli and campi
+  paved in trachyte, white stone along the water and in the squares' pattern; bridges carry the
+  paving over the canals~~ ✅
+- ~~OSM has gaps in Venice's buildings, so the land between the mapped calli is filled with lots of
+  3–5 storey houses (`city.infill`); Venetian plaster palette, arched windows with green shutters
+  (`windows: "arched"`), hipped terracotta roofs sharing their vertices (`pitchedRoofs`)~~ ✅
+- ~~1.2M vertices: packed with `3d/meshopt-glb.mjs` like Hong Kong (`city.meshopt`, 33 MB → 9.1 MB),
+  decoded by the GLTFLoader's meshopt decoder~~ ✅
+- ~~Boats on OSM's canal centrelines (`cityBoats.ts`): gondolas with gondoliers in the rii and at
+  the edges of the wide canals, waterbuses, water taxis and barges up one side and back down the
+  other, each with a fading wake~~ ✅
+- ~~Hand-built landmarks (`venetianLandmarks.ts`), placed from OSM's own dome and tower parts: the
+  Campanile, the Basilica's five domes, the Salute, San Giorgio's dome and campanile, the Rialto
+  and Accademia bridges, the Piazzetta's columns; the Doge's Palace drawn in the shader (arcades,
+  loggia, pink lozenges)~~ ✅
+- ~~Abel's paramotor at 80 m: down the Grand Canal's S-curve from the Rialto to the Basin, round
+  the Campanile at its spire, round San Giorgio's campanile, past the Salute and back over San
+  Marco, at three times a wing's speed; golden 17:48 sun, warm haze, green lagoon~~ ✅
+- Not done: Venetian chimneys, moored gondolas and the striped mooring poles, Murano and the Lido.
+
 ### 4. The relax app
 
 - ~~Started as a private route of the Lanzarote build, `relax.html?location=lanzarote |

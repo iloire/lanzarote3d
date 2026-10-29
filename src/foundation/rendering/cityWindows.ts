@@ -23,6 +23,115 @@ const WALL_FOOT = 0.55;
 const WALL_LIT = 30;
 
 /**
+ * The styles a city on the water asks for (3d/city-to-glb.py): arched windows with green
+ * shutters on mottled plaster (7), tiled roofs (8) and the Doge's Palace (9), its two storeys of
+ * white arcades under pink and white lozenges. They come after the styles
+ * other cities use (0-2, and Hong Kong's named towers 3-6).
+ */
+const VENETIAN_GLSL = /* glsl */ `
+  float venetianHash( vec2 p ) {
+    return fract( sin( dot( p, vec2( 12.9898, 78.233 ) ) ) * 43758.5453 );
+  }
+  float cityNoise( vec2 p ) {
+    vec2 i = floor( p );
+    vec2 f = fract( p );
+    f = f * f * ( 3.0 - 2.0 * f );
+    return mix(
+      mix( venetianHash( i ), venetianHash( i + vec2( 1.0, 0.0 ) ), f.x ),
+      mix( venetianHash( i + vec2( 0.0, 1.0 ) ), venetianHash( i + vec2( 1.0, 1.0 ) ), f.x ),
+      f.y
+    );
+  }
+  // Metres along the wall and up from the ground
+  vec2 cityWall() {
+    vec3 wallNormal = normalize( cross( dFdx( vCityWorld ), dFdy( vCityWorld ) ) );
+    vec2 metres = vec2( vCityWorld.x, -vCityWorld.z ) / uCityGrid.y;
+    float acrossTown = dot( metres, uCityStreet ) - uCityOrigin.x;
+    float upAvenue = dot( metres, uCityAvenue ) - uCityOrigin.y;
+    bool facesAvenue = abs( dot( vec2( wallNormal.x, -wallNormal.z ), uCityAvenue ) ) > 0.5;
+    return vec2( facesAvenue ? acrossTown : upAvenue, ( vCityWorld.y - uCityGrid.z ) / uCityGrid.w );
+  }
+  // Signed distance to an arched opening centred in its bay: half its width, sill and springing
+  float cityArch( vec2 p, float halfWidth, float sill, float spring ) {
+    vec2 q = vec2( abs( p.x ) - halfWidth, max( sill - p.y, p.y - spring ) );
+    float box = length( max( q, 0.0 ) ) + min( max( q.x, q.y ), 0.0 );
+    return min( box, length( p - vec2( 0.0, spring ) ) - halfWidth );
+  }
+  // Inside a shape given its signed distance, over about a pixel
+  float cityFill( float d ) {
+    float w = fwidth( d );
+    return 1.0 - smoothstep( -w, w, d );
+  }
+`;
+
+const VENETIAN_FRAGMENT = /* glsl */ `
+  else if ( vCityWindows > 6.5 && vCityWindows < 7.5 ) {
+    // Plaster faded unevenly, arched windows a voxel apart and a storey up, some shuttered
+    vec2 wall = cityWall();
+    diffuseColor.rgb *= 0.86 + 0.22 * cityNoise( wall * vec2( 0.35, 0.5 ) ) + 0.08 * cityNoise( wall * 2.1 );
+    vec2 cell = vec2( wall.x / uCityGrid.x, wall.y / ${FLOOR.toFixed(1)} );
+    vec2 p = vec2( ( fract( cell.x ) - 0.5 ) * uCityGrid.x, fract( cell.y ) * ${FLOOR.toFixed(1)} );
+    float seed = venetianHash( floor( cell ) );
+    float upper = step( 1.0, cell.y );
+    float pane = cityFill( cityArch( p, 0.42, 0.95, 2.2 ) );
+    float sill = cityFill( max( abs( p.x ) - 0.55, abs( p.y - 0.88 ) - 0.07 ) );
+    float shutter = upper * step( seed, 0.55 ) *
+      cityFill( max( abs( abs( p.x ) - 0.65 ) - 0.2, abs( p.y - 1.75 ) - 0.85 ) );
+    vec2 w = fwidth( cell );
+    float near = 1.0 - smoothstep( 0.35, 0.8, max( w.x, w.y ) );
+    vec3 glass = mix( vec3( 0.03, 0.035, 0.04 ), vec3( 0.11, 0.12, 0.13 ), seed );
+    vec3 green = mix( vec3( 0.07, 0.17, 0.09 ), vec3( 0.16, 0.24, 0.14 ), venetianHash( floor( cell ) + 7.0 ) );
+    vec3 detailed = mix( diffuseColor.rgb, vec3( 0.86, 0.84, 0.78 ), sill * 0.8 );
+    detailed = mix( detailed, glass, pane );
+    detailed = mix( detailed, green, shutter );
+    cityPane = pane * near;
+    diffuseColor.rgb = mix( mix( diffuseColor.rgb, glass, 0.16 ), detailed, near );
+    diffuseColor.rgb *= mix( ${WALL_FOOT.toFixed(2)}, 1.0, smoothstep( 0.0, ${WALL_LIT.toFixed(1)}, wall.y ) );
+  } else if ( vCityWindows > 7.5 && vCityWindows < 8.5 ) {
+    // Terracotta tiles: courses down the slope, channels across it, weathered in patches
+    vec3 roofNormal = normalize( cross( dFdx( vCityWorld ), dFdy( vCityWorld ) ) );
+    vec2 m = vCityWorld.xz / uCityGrid.y;
+    vec2 down = normalize( roofNormal.xz + vec2( 1e-4 ) );
+    vec2 t = vec2( dot( m, vec2( -down.y, down.x ) ) / 0.3, dot( m, down ) / 0.42 );
+    vec2 w = fwidth( t );
+    float near = 1.0 - smoothstep( 0.3, 0.7, max( w.x, w.y ) );
+    float channel = 0.82 + 0.18 * sin( fract( t.x ) * 3.14159 );
+    float course = 0.8 + 0.2 * smoothstep( 0.0, 0.18, fract( t.y ) );
+    float patches = cityNoise( m * 0.45 );
+    vec3 tile = diffuseColor.rgb * ( 0.8 + 0.4 * cityNoise( m * 1.7 ) );
+    tile = mix( tile, tile * vec3( 0.78, 0.8, 0.78 ), smoothstep( 0.55, 0.85, patches ) );
+    diffuseColor.rgb = mix( tile * 0.9, tile * channel * course, near );
+  } else if ( vCityWindows > 8.5 ) {
+    // The Doge's Palace: a white arcade, a white loggia of narrower arches with roundels, and
+    // above, pink and white lozenges pierced by a few tall pointed windows
+    vec2 wall = cityWall();
+    vec3 stone = vec3( 0.74, 0.69, 0.6 );
+    vec3 shadow = vec3( 0.06, 0.05, 0.05 );
+    vec2 arcade = vec2( ( fract( wall.x / 4.1 ) - 0.5 ) * 4.1, wall.y );
+    float open = cityFill( cityArch( arcade, 1.45, -1.0, 5.0 ) ) * step( wall.y, 7.0 );
+    float loggiaBand = step( 7.6, wall.y ) * step( wall.y, 13.0 );
+    vec2 loggia = vec2( ( fract( wall.x / 2.05 ) - 0.5 ) * 2.05, wall.y );
+    open = max( open, cityFill( cityArch( loggia, 0.62, 8.2, 11.3 ) ) * loggiaBand );
+    vec2 roundel = vec2( abs( fract( wall.x / 2.05 + 0.5 ) - 0.5 ) * 2.05, wall.y - 12.3 );
+    open = max( open, cityFill( length( roundel ) - 0.38 ) * loggiaBand );
+    vec2 l = wall / 1.1;
+    float lozenge = mod( floor( l.x + l.y ) + floor( l.x - l.y ), 2.0 );
+    vec3 pink = mix( vec3( 0.66, 0.3, 0.27 ), vec3( 0.82, 0.7, 0.6 ), lozenge );
+    vec2 tall = vec2( ( fract( wall.x / 9.4 ) - 0.5 ) * 9.4, wall.y );
+    float window = cityFill( cityArch( tall, 1.05, 14.6, 18.6 ) );
+    float frame = cityFill( cityArch( tall, 1.35, 14.3, 18.6 ) );
+    vec3 upper = mix( mix( pink, stone, frame ), shadow * 2.0, window );
+    vec3 colour = wall.y < 13.4 || wall.y > 24.0 ? stone : upper;
+    colour = mix( colour, shadow, open );
+    vec2 w = fwidth( wall );
+    float near = 1.0 - smoothstep( 0.4, 1.2, max( w.x, w.y ) );
+    vec3 far = wall.y < 13.4 ? mix( stone, shadow, 0.45 ) : vec3( 0.72, 0.47, 0.42 );
+    diffuseColor.rgb = mix( far, colour, near );
+    cityPane = window * near;
+  }
+`;
+
+/**
  * Draws windows on a city's walls in the shader, so they cost no geometry: one pane per voxel
  * across and per storey up, lined up with the voxels. Walls marked punched (1) get a window in
  * the middle of each cell, glass curtain walls (2) a pane filling it between thin mullions;
@@ -65,12 +174,13 @@ export function addCityWindows(mesh: THREE.Mesh, grid: CityGrid, night = false):
         uniform vec2 uCityAvenue;
         uniform vec4 uCityGrid;
         float cityPane = 0.0;
+        ${VENETIAN_GLSL}
         ${night ? NIGHT_PARS : ''}`
       )
       .replace(
         '#include <color_fragment>',
         `#include <color_fragment>
-        if ( vCityWindows > 0.5 ) {
+        if ( vCityWindows > 0.5 && vCityWindows < 6.5 ) {
           // The wall's normal from the faces' own slope, its position in metres east and north
           vec3 wallNormal = normalize( cross( dFdx( vCityWorld ), dFdy( vCityWorld ) ) );
           vec2 metres = vec2( vCityWorld.x, -vCityWorld.z ) / uCityGrid.y;
@@ -94,7 +204,8 @@ export function addCityWindows(mesh: THREE.Mesh, grid: CityGrid, night = false):
           float above = ( vCityWorld.y - uCityGrid.z ) / uCityGrid.w;
           diffuseColor.rgb *= mix( ${WALL_FOOT.toFixed(2)}, 1.0, smoothstep( 0.0, ${WALL_LIT.toFixed(1)}, above ) );
           ${night ? NIGHT_GLOW : ''}
-        }`
+        }
+        ${VENETIAN_FRAGMENT}`
       )
       .replace(
         '#include <roughnessmap_fragment>',

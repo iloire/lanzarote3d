@@ -25,8 +25,12 @@ import { addStoneCourses } from '../../foundation/rendering/stoneCourses';
 import type { SetPiece } from './setPiece';
 import { applyNight } from '../../foundation/rendering/nightSky';
 import { addNightCity, NightCity } from './nightCity';
+import { Canal, CityBoats } from '../../shared/env/cityBoats';
+import { venetianLandmarks } from '../../shared/env/venetianLandmarks';
 
 const PILOTS = 5;
+// ?progress=0.4 starts the first pilot that far round the loop, to share a moment of the flight
+const START_PROGRESS = Number(new URLSearchParams(window.location.search).get('progress')) || 0;
 // Where there's no ridge Abel flies his paramotor alone, twice a wing's speed so the streets go
 // by (unless the place sets its own), and the camera chases him: CHASE_LAG seconds back along
 // his own path, which is clear of the buildings, CHASE_RISE units above it, easing in over
@@ -60,10 +64,10 @@ const definedOnly = <T extends object>(values: T | undefined): Partial<T> =>
 
 /**
  * Pick a place (?location=lanzarote | tenerife | el-hierro | castejon-de-sos | rio-de-janeiro | new-york
- * | paris | giza | mont-saint-michel | hong-kong) and watch a few gliders soar its ridge while the
- * camera drifts slowly from side to side, or, in a city or round the pyramids, chase Abel's
- * paramotor (in Hong Kong, at night); at Mont-Saint-Michel the camera circles the Mount while the
- * paramotors fly round it. Dragging takes over the camera.
+ * | paris | giza | mont-saint-michel | hong-kong | venice) and watch a few gliders soar its ridge
+ * while the camera drifts slowly from side to side, or, in a city or round the pyramids, chase
+ * Abel's paramotor (in Hong Kong, at night; in Venice, down the Grand Canal); at Mont-Saint-Michel
+ * the camera circles the Mount while the paramotors fly round it. Dragging takes over the camera.
  */
 class RelaxApp extends TerrainBase {
   private animationId: number | undefined;
@@ -72,6 +76,7 @@ class RelaxApp extends TerrainBase {
   private traffic: CityTraffic | undefined;
   private setPiece: SetPiece | undefined;
   private nightCity: NightCity | undefined;
+  private boats: CityBoats | undefined;
 
   constructor() {
     const appConfig = getAppConfig('relax');
@@ -112,6 +117,10 @@ class RelaxApp extends TerrainBase {
           }),
           ...definedOnly(look?.atmosphere),
         },
+        water: {
+          ...base.water,
+          ...definedOnly({ color: look?.seaColor, shallowColor: look?.shallowColor }),
+        },
       };
       camera.position.copy(relax.camera.position);
       camera.lookAt(relax.camera.target);
@@ -149,7 +158,16 @@ class RelaxApp extends TerrainBase {
           if (object.userData['stone']) addStoneCourses(object);
           const grid = object.userData['grid'] as CityGrid | undefined;
           if (!grid) return;
+          // Hipped roofs share their vertices, so their faces are shaded flat in the shader
+          if (object.userData['flatShading']) {
+            (object.material as THREE.MeshStandardMaterial).flatShading = true;
+          }
           addCityWindows(object, grid, Boolean(look?.night));
+          const canals = object.userData['canals'] as Canal[] | undefined;
+          if (canals?.length) {
+            this.boats = new CityBoats(canals, { unitsPerMetre: grid.unitsPerMetre, water: 0 });
+            scene.add(this.boats.group);
+          }
           const trees = object.userData['trees'] as TreeSpots | undefined;
           if (trees?.length) scene.add(cityTrees(trees, grid.unitsPerMetre, grid.ground));
           const lanes = object.userData['lanes'] as Lane[] | undefined;
@@ -166,6 +184,12 @@ class RelaxApp extends TerrainBase {
         });
         scene.add(city.scene);
         if (look?.night) this.nightCity = addNightCity(scene, city.scene, relax);
+      }
+      if (relax.venetian) {
+        const { list, anchor, ground, unitsPerMetre } = relax.venetian;
+        venetianLandmarks(list, anchor, ground, unitsPerMetre).forEach(landmark =>
+          scene.add(landmark)
+        );
       }
 
       if (relax.setPiece && options.terrain) {
@@ -188,7 +212,7 @@ class RelaxApp extends TerrainBase {
         scene,
         pilots.map(({ options }, i) => ({
           options,
-          startProgress: i / pilots.length,
+          startProgress: (i / pilots.length + START_PROGRESS) % 1,
           // Each a little higher and further out, so they don't fly through each other
           pathOffset: new THREE.Vector3(0, i * 25, 0),
           speedFactor: relax.paramotor ? (relax.paramotorSpeed ?? PARAMOTOR_SPEED) : 1,
@@ -304,6 +328,7 @@ class RelaxApp extends TerrainBase {
         this.traffic?.update(deltaTime);
         this.setPiece?.update(deltaTime, elapsed);
         this.nightCity?.update(deltaTime);
+        this.boats?.update(deltaTime);
 
         if (lead) {
           trail.push(elapsed, lead.position);
@@ -356,6 +381,8 @@ class RelaxApp extends TerrainBase {
     this.setPiece = undefined;
     this.nightCity?.dispose();
     this.nightCity = undefined;
+    this.boats?.dispose();
+    this.boats = undefined;
     super.dispose();
   }
 }
