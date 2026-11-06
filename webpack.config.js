@@ -66,11 +66,13 @@ const showcaseApps = siteApps
 
 console.log(`Building the ${SITE} site: ${showcaseApps.length} applications...`);
 
-module.exports = {
+// Production bundles are named by their content, so a deploy never mixes with a cached copy of
+// the last one; the dev server keeps fixed names, which hot reloading needs
+module.exports = (env, argv) => ({
   entry: { main: './src/index.tsx' },
   output: {
     path: path.join(__dirname, site.dist),
-    filename: '[name].bundle.js',
+    filename: argv.mode === 'production' ? '[name].[contenthash].js' : '[name].bundle.js',
   },
   externals: {
     glStats: 'glStats',
@@ -174,4 +176,4 @@ module.exports = {
       systemvars: true, // Also load system env vars
     }),
   ],
-};
+});

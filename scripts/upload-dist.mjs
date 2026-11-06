@@ -7,7 +7,7 @@
  * Their decompressed size goes in `x-amz-meta-file-size`, which Models (src/foundation/utils/
  * models.ts) reads for the loading percentage, since Content-Length is now the compressed size.
  *
- * Everything else is uploaded as is. Compressed copies are written to a temp dir, so `dist/`
+ * Pages go up as no-cache and the content-hashed bundles as immutable; everything else as is. Compressed copies are written to a temp dir, so `dist/`
  * stays servable locally (`npm run run-prod`).
  *
  * Usage: node scripts/upload-dist.mjs <dist dir> <bucket> <aws profile>
@@ -40,14 +40,38 @@ function aws(...args) {
 const models = walk(dist).filter(file => path.extname(file) in CONTENT_TYPES);
 const stage = fs.mkdtempSync(path.join(os.tmpdir(), 'upload-dist-'));
 
-// Everything but the models, as before
+// The pages are checked on every visit, so a deploy shows up straight away. The bundles they
+// load are named by their content (webpack.config.js), so a browser can keep them for good.
+const CACHE = {
+  '*.html': 'no-cache',
+  '*.js': 'public, max-age=31536000, immutable',
+};
+for (const [pattern, cacheControl] of Object.entries(CACHE)) {
+  aws(
+    's3',
+    'cp',
+    dist,
+    `s3://${bucket}`,
+    '--recursive',
+    '--exclude',
+    '*',
+    '--include',
+    pattern,
+    '--cache-control',
+    cacheControl
+  );
+}
+
+// Everything else but the models, as is
 aws(
   's3',
   'cp',
   dist,
   `s3://${bucket}`,
   '--recursive',
-  ...Object.keys(CONTENT_TYPES).flatMap(ext => ['--exclude', `*${ext}`])
+  ...[...Object.keys(CACHE), ...Object.keys(CONTENT_TYPES).map(ext => `*${ext}`)].flatMap(
+    pattern => ['--exclude', pattern]
+  )
 );
 
 let before = 0;

@@ -2,6 +2,14 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-06 21:33 UTC
+
+### Fixed
+
+- **Stale pilots after a deploy**: bundles are named by their content hash and uploaded as
+  immutable, pages as no-cache, so a browser can no longer mix a cached chunk from the last
+  deploy with the new one (it followed the wrong pilot for ?pilot=)
+
 ## 2026-11-06 21:27 UTC
 
 ### Added
