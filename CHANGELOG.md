@@ -2,6 +2,13 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-06 21:15 UTC
+
+### Changed
+
+- **Daniel's latest voxel model**: Supair Pilot helmet, Salewa X-Alps jacket in royal blue,
+  Supair Access 3 harness in teal green, clean-shaven with a big smile.
+
 ## 2026-11-06 20:57 UTC
 
 ### Added
