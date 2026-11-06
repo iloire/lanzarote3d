@@ -2,6 +2,13 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-06 13:05 UTC
+
+### Changed
+
+- **Luc and Miguel refreshed from 3d-characters**: Luc's light open harness loses its bottom
+  bumper, and Miguel's cocoon ends in a rounded back just behind him instead of a tail
+
 ## 2026-11-06 12:49 UTC
 
 ### Changed
