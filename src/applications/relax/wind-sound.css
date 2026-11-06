@@ -1,0 +1,40 @@
+/* Wind toggle - top right under the title, in the place picker's pixel style */
+
+.wind-sound {
+  position: fixed;
+  top: 40px;
+  right: 20px;
+  z-index: 1000;
+  padding: 8px 10px;
+  border: 2px solid #ffffff;
+  background: rgba(13, 31, 51, 0.45);
+  box-shadow: 2px 2px 0 #0d1f33;
+  color: #ffffff;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  text-shadow: 1px 1px 0 #0d1f33;
+  cursor: pointer;
+  opacity: 0;
+  animation: windSoundFadeIn 1.5s ease-out forwards;
+  transition:
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.wind-sound[aria-pressed='true'] {
+  color: #4aff9e;
+  border-color: #4aff9e;
+}
+
+.wind-sound:hover,
+.wind-sound:focus-visible {
+  color: #4aff9e;
+  border-color: #4aff9e;
+  outline: none;
+}
+
+@keyframes windSoundFadeIn {
+  to {
+    opacity: 0.9;
+  }
+}

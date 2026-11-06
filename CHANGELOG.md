@@ -2,6 +2,15 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-06 20:07 UTC
+
+### Added
+
+- **Wind on the relax site**: soft wind made live in the browser (brown noise, a low layer
+  plus gusts that swell and ease at random), so there are no audio files. A WIND button under
+  the title turns it on or off and remembers the choice. It's on by default and fades in at
+  the first click or key press, because browsers block sound before then.
+
 ## 2026-11-06 19:49 UTC
 
 ### Changed

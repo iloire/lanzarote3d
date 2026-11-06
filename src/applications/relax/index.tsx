@@ -17,6 +17,7 @@ import { CharacterType } from '../../foundation/components/characters/CharacterR
 import Models from '../../foundation/utils/models';
 import { DEFAULT_SCENE, RELAX_SCENES, RelaxScene } from './scenes';
 import { createLocationSwitcher } from './LocationSwitcher';
+import { createWindSound } from './windSound';
 import { PathTrail } from './pathTrail';
 import { CityTraffic, Lane } from '../../shared/env/cityTraffic';
 import { cityTrees, TreeSpots } from '../../shared/env/cityTrees';
@@ -73,6 +74,7 @@ class RelaxApp extends TerrainBase {
   private animationId: number | undefined;
   private gliders: VehicleLoadResult[] = [];
   private removeSwitcher: (() => void) | undefined;
+  private removeWind: (() => void) | undefined;
   private traffic: CityTraffic | undefined;
   private setPiece: SetPiece | undefined;
   private nightCity: NightCity | undefined;
@@ -101,6 +103,7 @@ class RelaxApp extends TerrainBase {
         })),
         id
       );
+      this.removeWind = createWindSound();
 
       const base = getDefaultTheme();
       const { look } = relax;
@@ -373,6 +376,8 @@ class RelaxApp extends TerrainBase {
     }
     this.removeSwitcher?.();
     this.removeSwitcher = undefined;
+    this.removeWind?.();
+    this.removeWind = undefined;
     this.gliders.forEach(g => g.flyingBehavior?.dispose());
     this.gliders = [];
     this.traffic?.dispose();
