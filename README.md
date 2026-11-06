@@ -83,12 +83,14 @@ aws s3 ls --profile lanzaroteparagliding             # check the profile works
 npm run deploy-prod
 ```
 
-`deploy-prod` builds the Lanzarote site into `dist/` (with the relax app at `/relax.html`), tags the commit `PROD-<date>_<time>` (locally), empties the
-bucket, uploads `dist/` and invalidates the CloudFront cache. Two things to know:
+`deploy-prod` builds the Lanzarote site into `dist/` (with the relax app at `/relax.html`), tags the commit `PROD-<date>_<time>` (locally), uploads
+`dist/`, invalidates the CloudFront cache and prunes stale files. Two things to know:
 
 - It builds the **working tree**, uncommitted changes included. Deploy from a clean checkout of
   `master` to ship exactly what's committed.
-- The bucket is **empty for the length of the upload**, so the site can briefly 404.
+- There is **no downtime**: nothing is emptied first, and pages go up after the bundles and models
+  they load. Files the build no longer has are deleted once they are 7 days old, so open tabs
+  keep working (`npm run prune-prod -- --dry-run` lists them).
 - Models (`.glb`, `.obj`) are uploaded **brotli-compressed** with `Content-Encoding: br`
   (`scripts/upload-dist.mjs`), since CloudFront compresses HTML and JS but not those. Their real size
   goes in `x-amz-meta-file-size` for the loading percentage. Fetching one from S3 directly, not via

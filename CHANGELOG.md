@@ -2,14 +2,21 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-06 22:30 UTC
+
+### Added
+
+- **Stale files pruned on deploy**: `deploy-prod` ends with `prune-prod`, which deletes files
+  the build no longer has once they are 7 days old, so tabs open on an earlier deploy keep
+  working. `npm run prune-prod -- --dry-run` lists what it would delete
+
 ## 2026-11-06 22:15 UTC
 
 ### Fixed
 
 - **No downtime on deploy**: `deploy-prod` no longer empties the bucket before uploading, and
   pages go up last, after the models and bundles they load. The old site keeps working until
-  the new one is complete. Stale files are left behind; `npm run delete-prod` still wipes the
-  bucket by hand
+  the new one is complete. `npm run delete-prod` still wipes the bucket by hand
 
 ## 2026-11-06 22:01 UTC
 
