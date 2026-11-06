@@ -9,3 +9,8 @@ declare module '*.png';
 
 declare module 'glStats';
 declare module 'threeStats';
+
+interface Window {
+  /** Google Analytics, from the tag in showcase.html; missing if blocked or on localhost */
+  gtag?: (command: 'event', name: string, params: Record<string, string | number>) => void;
+}

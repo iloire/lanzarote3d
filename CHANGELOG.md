@@ -2,6 +2,18 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-06 21:27 UTC
+
+### Added
+
+- **Relax analytics**: GA events `relax_place_view` and `relax_camera_takeover` (with `location`),
+  `relax_sound_toggle` (`sound`, `state`) and `relax_music_credit_click`
+
+### Fixed
+
+- **No debug logs in production**: the logger read the environment in a way webpack doesn't
+  replace, so the live site logged at debug level (a flight status line per glider, nonstop)
+
 ## 2026-11-06 21:20 UTC
 
 ### Changed

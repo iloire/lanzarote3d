@@ -242,6 +242,8 @@ class RelaxApp extends TerrainBase {
       }
 
       this.startAnimationLoop(renderer, scene, camera, controls, relax, terrain);
+      // The place is in the URL too, but as a parameter GA can report on it directly
+      window.gtag?.('event', 'relax_place_view', { location: relax.location.id });
       console.log(`✅ ${this.config.name} loaded: ${relax.location.name}`);
     } catch (error) {
       this.handleError(error as Error, 'load');
@@ -311,6 +313,10 @@ class RelaxApp extends TerrainBase {
     const up = new THREE.Vector3(0, 1, 0);
     let swaying = true;
     controls.addEventListener('start', () => {
+      // Once a visit: did the viewer take the camera over?
+      if (swaying) {
+        window.gtag?.('event', 'relax_camera_takeover', { location: relax.location.id });
+      }
       swaying = false;
     });
     // A lone paramotor is chased along its path, and orbited once the viewer takes over

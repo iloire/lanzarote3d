@@ -43,6 +43,10 @@ function soundToggle(
   };
   button.addEventListener('click', () => {
     on = !on;
+    window.gtag?.('event', 'relax_sound_toggle', {
+      sound: label.toLowerCase(),
+      state: on ? 'on' : 'off',
+    });
     localStorage.setItem(storageKey, on ? 'on' : 'off');
     show();
     apply();
@@ -64,6 +68,7 @@ export function createSoundControls(): () => void {
   credit.href = 'https://incompetech.com';
   credit.target = '_blank';
   credit.rel = 'noopener';
+  credit.addEventListener('click', () => window.gtag?.('event', 'relax_music_credit_click', {}));
   credit.textContent = 'MUSIC: KEVIN MACLEOD · CC BY 4.0';
 
   const toggles = [

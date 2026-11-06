@@ -2,13 +2,6 @@ import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './pilot-picker.css';
 
-declare global {
-  interface Window {
-    /** Google Analytics, from the tag in showcase.html; missing if blocked */
-    gtag?: (command: 'event', name: string, params: Record<string, string | number>) => void;
-  }
-}
-
 type PilotPickerProps = {
   count: number;
   initial: number;
