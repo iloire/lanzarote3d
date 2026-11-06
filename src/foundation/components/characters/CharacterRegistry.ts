@@ -146,7 +146,8 @@ export class CharacterRegistry {
       {
         id: CharacterType.DAVID,
         name: 'David',
-        description: 'Black OZONE helmet, blue mirrored sunglasses, black puffer, cocoon harness',
+        description:
+          'Charcoal Supair helmet with slate blue band, blue mirrored sunglasses, black puffer, cocoon harness',
       },
       {
         id: CharacterType.FABIO,
@@ -178,7 +179,7 @@ export class CharacterRegistry {
       {
         id: CharacterType.MIGUEL,
         name: 'Miguel',
-        description: 'Venturi pilot - orange helmet, cocoon harness',
+        description: 'Venturi pilot - amber Supair helmet with coral band, cocoon harness',
       },
       {
         id: CharacterType.ROOS,

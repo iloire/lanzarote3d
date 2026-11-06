@@ -2,6 +2,14 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-06 19:42 UTC
+
+### Changed
+
+- **Miguel and David wear Supair Pilot helmets**, re-exported from 3d-characters: Miguel's in
+  Fire (amber shell, coral band, white swooshes and swirls), David's in Comet (charcoal shell,
+  slate blue band, swooshes and swirls) in place of his black OZONE helmet
+
 ## 2026-11-06 19:31 UTC
 
 ### Added
