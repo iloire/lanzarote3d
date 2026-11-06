@@ -2,6 +2,13 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-06 13:09 UTC
+
+### Added
+
+- **More pilot birthdays**: Miguel (23 January), Jehosua and Fabio (24 June, flying out
+  together) and Roos (24 August) now get the birthday flight and confetti on their day
+
 ## 2026-11-06 13:03 UTC
 
 ### Changed
