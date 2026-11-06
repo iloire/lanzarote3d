@@ -51,7 +51,7 @@
     "lookAt": [-22.992, -43.276, 320],
     "intro": {
       "about": "Opens on the Cristo's face (he stands on the model's top, at -22.9522, -43.2124), swings round his shoulder and flies down over Lagoa and Dois Irmãos to the gliders, ending where the camera starts; [lat, lon, metres]",
-      "seconds": 35,
+      "seconds": 25,
       "keys": [
         { "at": [-22.95266, -43.21103, 662], "lookAt": [-22.9522, -43.2124, 655] },
         { "at": [-22.95362, -43.21267, 672], "lookAt": [-22.9522, -43.2124, 650] },

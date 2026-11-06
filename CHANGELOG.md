@@ -2,6 +2,12 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-06 22:01 UTC
+
+### Changed
+
+- **Quicker Rio intro**: the flight from the Cristo to the gliders takes 25 s instead of 35 s
+
 ## 2026-11-06 21:53 UTC
 
 ### Added
