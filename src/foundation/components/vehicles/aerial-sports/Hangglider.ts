@@ -33,7 +33,6 @@ export class Hangglider extends SimpleThreeComponent {
     };
 
     super(metadata, {
-      sailColor: '#FF6B35',
       harnessColor: '#2B3A55',
       helmetColor: '#F2F2F2',
       scale: 1,
@@ -52,7 +51,9 @@ export class Hangglider extends SimpleThreeComponent {
 
     const options = this.options as HanggliderOptions;
 
-    this.wing = new HangGliderWing({ sailColor: options.sailColor });
+    this.wing = new HangGliderWing(
+      options.sailColor ? { sailColor: options.sailColor } : {}
+    );
     group.add(await this.wing.load());
     group.add(this.createPilot(options));
 

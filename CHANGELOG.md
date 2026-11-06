@@ -2,6 +2,14 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-06 19:18 UTC
+
+### Changed
+
+- **Hang glider livery**: the sail is black with a grey leading-edge band, red-yellow-red
+  stripes along the trailing edge, a light edge strip and a red zigzag logo on each half,
+  painted from a canvas texture; the frame is dark grey
+
 ## 2026-11-06 13:10 UTC
 
 ### Changed

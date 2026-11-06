@@ -5,6 +5,11 @@ import { resourceManager } from '../../../systems/ResourceManager';
 export interface HangGliderWingOptions extends SimpleComponentOptions {
   sailColor?: string;
   leadingEdgeColor?: string;
+  /** The stripes along the trailing edge: outer, inner, outer */
+  stripeColor?: string;
+  stripeInnerColor?: string;
+  trailingEdgeColor?: string;
+  logoColor?: string;
   frameColor?: string;
   wireColor?: string;
 }
@@ -21,6 +26,10 @@ const TIP_RISE = 0.25;
 const CAMBER = 0.07;
 /** The band of the sail behind the leading edge that is drawn in the leading edge colour */
 const LEADING_EDGE_BAND = 0.22;
+/** Stripe bands across the chord, as shares of chord from the leading edge */
+const STRIPES = { outerStart: 0.74, innerStart: 0.77, innerEnd: 0.84, outerEnd: 0.87, edgeStart: 0.95 };
+/** Sail texture resolution: span along x, chord along y */
+const TEXTURE_SIZE = { width: 512, height: 256 };
 
 const SPAN_SEGMENTS = 16;
 const CHORD_SEGMENTS = 10;
@@ -49,9 +58,13 @@ export class HangGliderWing extends SimpleThreeComponent {
         description: 'Flex wing delta with sail, frame and rigging',
       },
       {
-        sailColor: '#FF6B35',
-        leadingEdgeColor: '#1F2A44',
-        frameColor: '#C9CED6',
+        sailColor: '#141414',
+        leadingEdgeColor: '#5E6560',
+        stripeColor: '#D61F1F',
+        stripeInnerColor: '#D9E021',
+        trailingEdgeColor: '#D8DADC',
+        logoColor: '#E02020',
+        frameColor: '#3B3F45',
         wireColor: '#3A3F47',
         castShadow: true,
         receiveShadow: true,
@@ -96,10 +109,8 @@ export class HangGliderWing extends SimpleThreeComponent {
 
   private createSail(options: HangGliderWingOptions): THREE.Mesh {
     const positions: number[] = [];
-    const colors: number[] = [];
+    const uvs: number[] = [];
     const indices: number[] = [];
-    const sail = new THREE.Color(options.sailColor);
-    const band = new THREE.Color(options.leadingEdgeColor);
     const rowSize = CHORD_SEGMENTS + 1;
 
     // Each half is a grid from the keel (u = 0) to the tip, leading edge (v = 0) to trailing edge
@@ -116,8 +127,7 @@ export class HangGliderWing extends SimpleThreeComponent {
           // Billow fades out at the keel and the tip, where the sail is held tight
           p.y += CAMBER * chord * Math.sin(Math.PI * v) * Math.sin(Math.PI * Math.min(1, u * 1.15));
           positions.push(p.x, p.y, p.z);
-          const c = v < LEADING_EDGE_BAND ? band : sail;
-          colors.push(c.r, c.g, c.b);
+          uvs.push(u, v);
         }
       }
       for (let i = 0; i < SPAN_SEGMENTS; i++) {
@@ -133,15 +143,15 @@ export class HangGliderWing extends SimpleThreeComponent {
 
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
     geometry.setIndex(indices);
     geometry.computeVertexNormals();
 
     const material = resourceManager.getOrCreateMaterial(
-      'hangglider_sail',
+      `hangglider_sail_${options.sailColor}_${options.leadingEdgeColor}_${options.stripeColor}_${options.stripeInnerColor}_${options.trailingEdgeColor}_${options.logoColor}`,
       () =>
         new THREE.MeshStandardMaterial({
-          vertexColors: true,
+          map: this.createSailTexture(options),
           side: THREE.DoubleSide,
           roughness: 0.75,
           metalness: 0.05,
@@ -151,6 +161,50 @@ export class HangGliderWing extends SimpleThreeComponent {
     const mesh = new THREE.Mesh(geometry, material);
     mesh.name = 'sail';
     return mesh;
+  }
+
+  /**
+   * Paints the sail in UV space: u runs keel to tip (x), v leading to trailing edge (y).
+   * Both halves share it, so the logo appears mirrored on each side as on a real sail.
+   */
+  private createSailTexture(options: HangGliderWingOptions): THREE.CanvasTexture {
+    const { width: w, height: h } = TEXTURE_SIZE;
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d')!;
+    const band = (color: string | undefined, from: number, to: number) => {
+      ctx.fillStyle = color ?? '#000';
+      ctx.fillRect(0, from * h, w, (to - from) * h);
+    };
+
+    band(options.sailColor, 0, 1);
+    band(options.leadingEdgeColor, 0, LEADING_EDGE_BAND);
+    band(options.stripeColor, STRIPES.outerStart, STRIPES.outerEnd);
+    band(options.stripeInnerColor, STRIPES.innerStart, STRIPES.innerEnd);
+    band(options.trailingEdgeColor, STRIPES.edgeStart, 1);
+
+    // The zigzag logo, mid chord on the inner half of each wing
+    ctx.strokeStyle = options.logoColor ?? '#f00';
+    ctx.lineWidth = h * 0.045;
+    ctx.lineJoin = 'miter';
+    const zig = [
+      [0.28, 0.36],
+      [0.32, 0.5],
+      [0.36, 0.4],
+      [0.4, 0.54],
+      [0.47, 0.34],
+    ];
+    ctx.beginPath();
+    zig.forEach(([u, v], i) => (i ? ctx.lineTo(u * w, v * h) : ctx.moveTo(u * w, v * h)));
+    ctx.stroke();
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    // Canvas rows run top down, the same way v runs from the leading edge
+    texture.flipY = false;
+    texture.anisotropy = 4;
+    return texture;
   }
 
   private tube(from: THREE.Vector3, to: THREE.Vector3, radius: number, material: THREE.Material) {
