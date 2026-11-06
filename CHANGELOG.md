@@ -2,6 +2,12 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-06 20:10 UTC
+
+### Added
+
+- **Daniel's birthday**: 13 June, when he flies the birthday loop past Magne
+
 ## 2026-11-06 20:07 UTC
 
 ### Added

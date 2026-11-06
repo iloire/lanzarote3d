@@ -3,6 +3,7 @@ import { CharacterType } from '../../foundation/components/characters/CharacterR
 /** Each pilot's birthday as 'MM-DD', no year; leave a pilot out to keep theirs quiet */
 export const BIRTHDAYS: Partial<Record<CharacterType, string>> = {
   [CharacterType.MIGUEL]: '01-23',
+  [CharacterType.DANIEL]: '06-13',
   [CharacterType.FABIO]: '06-24',
   [CharacterType.JEHOSUA]: '06-24',
   [CharacterType.ROOS]: '08-24',
