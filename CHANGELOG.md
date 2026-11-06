@@ -2,6 +2,14 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-06 19:49 UTC
+
+### Changed
+
+- **Daniel closer to takeoff**: his beat at the foot of the cliff moves from 8 km up the Risco to
+  3.9 km, right under David where the cliff is highest, still at 350-430 m and at least 117 m
+  clear of the face
+
 ## 2026-11-06 19:48 UTC
 
 ### Added
