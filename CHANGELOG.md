@@ -2,6 +2,14 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-06 19:48 UTC
+
+### Added
+
+- **Venturi advert under Miguel's wing**: the purple roller carries the white Venturi wordmark
+  and venturilanzarote.com across its lower surface, readable from below. Gliders take an
+  `advert` option (logo URL and text), drawn to a canvas texture that keeps the canopy breathing
+
 ## 2026-11-06 19:45 UTC
 
 ### Changed

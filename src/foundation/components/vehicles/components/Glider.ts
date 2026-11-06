@@ -142,7 +142,11 @@ export type GliderOptions = {
   brakeColor?: string;
   /** Cells per half wing */
   numeroCajones?: number;
+  /** An advert across the lower surface: a white logo image (by URL) and a line of text under it */
+  advert?: GliderAdvert;
 };
+
+export type GliderAdvert = { logo: string; text: string };
 
 /**
  * A straight band on the top surface, from one (span, chord) point to another: span runs from -1
@@ -281,14 +285,17 @@ const CANOPY_BEGIN_VERTEX = /* glsl */ `
   transformed += aUp * pow(aStation.z, 4.0) * (10.0 + 25.0 * span) * uBreath * flutter;
 `;
 
-const createCanopyMaterial = (shape: WingShape): THREE.MeshLambertMaterial => {
+const createCanopyMaterial = (
+  shape: WingShape,
+  phase: { value: number },
+  map: THREE.Texture | null = null
+): THREE.MeshLambertMaterial => {
   const material = new THREE.MeshLambertMaterial({
     vertexColors: true,
     flatShading: true,
     side: THREE.DoubleSide,
+    map,
   });
-  // Each wing breathes out of step with the others
-  const phase = { value: Math.random() * Math.PI * 2 };
   material.onBeforeCompile = shader => {
     shader.uniforms['uTime'] = sharedUniforms.uTime;
     shader.uniforms['uPhase'] = phase;
@@ -301,12 +308,70 @@ const createCanopyMaterial = (shape: WingShape): THREE.MeshLambertMaterial => {
   return material;
 };
 
-const createCanopy = (ribs: Rib[], options: GliderOptions): THREE.Mesh => {
+/** The lower surface in millimetres, which the advert is laid out in: span by root chord */
+const ADVERT_MM = { span: 5340, chord: 1720 };
+
+/**
+ * The advert as a texture over the whole lower surface, so its background is the underside
+ * colour: u along the span from the right tip (so it reads from below, not mirrored), v along the
+ * chord from the nose. Drawn in millimetres and stretched onto the canvas, so the logo keeps its
+ * proportions on the wing.
+ */
+const createAdvertTexture = async (
+  advert: GliderAdvert,
+  background: THREE.Color
+): Promise<THREE.CanvasTexture> => {
+  const logo = new Image();
+  logo.src = advert.logo;
+  await logo.decode();
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 2048;
+  canvas.height = 1024;
+  const ctx = canvas.getContext('2d')!;
+  ctx.fillStyle = `#${background.getHexString()}`;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.scale(canvas.width / ADVERT_MM.span, canvas.height / ADVERT_MM.chord);
+
+  const logoWidth = 2000;
+  const logoHeight = (logoWidth * logo.height) / logo.width;
+  ctx.drawImage(logo, (ADVERT_MM.span - logoWidth) / 2, 150, logoWidth, logoHeight);
+  ctx.fillStyle = '#ffffff';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = '600 240px "Helvetica Neue", Arial, sans-serif';
+  ctx.fillText(advert.text, ADVERT_MM.span / 2, 150 + logoHeight + 200);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = 4;
+  return texture;
+};
+
+/** Vertex attributes for one material's triangles; see CANOPY_VERTEX_PARS */
+type CanopyBuffers = Record<'position' | 'color' | 'aLift' | 'aUp' | 'aStation' | 'uv', number[]>;
+const emptyBuffers = (): CanopyBuffers => ({
+  position: [],
+  color: [],
+  aLift: [],
+  aUp: [],
+  aStation: [],
+  uv: [],
+});
+
+const undersideColor = (options: GliderOptions): THREE.Color =>
+  options.undersideColor
+    ? new THREE.Color(options.undersideColor)
+    : new THREE.Color(options.wingColor1).lerp(new THREE.Color('#000000'), 0.25);
+
+const createCanopy = (
+  ribs: Rib[],
+  options: GliderOptions,
+  advert: THREE.Texture | null
+): THREE.Mesh => {
   const top = new THREE.Color(options.wingColor1);
   const tips = new THREE.Color(options.wingColor2);
-  const bottom = options.undersideColor
-    ? new THREE.Color(options.undersideColor)
-    : top.clone().lerp(new THREE.Color('#000000'), 0.25);
+  const bottom = undersideColor(options);
   const inlets = new THREE.Color(options.inletsColor);
   const stripe = options.stripeColor ? new THREE.Color(options.stripeColor) : null;
   const stripeChord = options.stripeChord ?? 0.45;
@@ -321,23 +386,22 @@ const createCanopy = (ribs: Rib[], options: GliderOptions): THREE.Mesh => {
   // Chord position of each outline point, in the order ribOutline lists them
   const outlineX = [...[...PROFILE_X].reverse(), ...PROFILE_X.slice(1, -1)];
 
-  const positions: number[] = [];
-  const colors: number[] = [];
-  // What the breathing shader needs per vertex: see CANOPY_VERTEX_PARS
-  const lifts: number[] = [];
-  const ups: number[] = [];
-  const stations: number[] = [];
+  // The plain canopy, and the lower surface when it carries the advert texture
+  const plain = emptyBuffers();
+  const textured = emptyBuffers();
+  const white = new THREE.Color('#ffffff');
   /** A triangle by its corners, each a (rib, outline point) pair */
-  const pushTriangle = (corners: [number, number][], color: THREE.Color) => {
+  const pushTriangle = (corners: [number, number][], color: THREE.Color, to = plain) => {
     corners.forEach(([r, p]) => {
       const rib = ribs[r]!;
       const point = outlines[r]![p]!;
       const lift = point.clone().sub(ribPoint(rib, outlineX[p]!, 0));
-      positions.push(point.x, point.y, point.z);
-      colors.push(color.r, color.g, color.b);
-      lifts.push(lift.x, lift.y, lift.z);
-      ups.push(rib.up.x, rib.up.y, rib.up.z);
-      stations.push(rib.t, r % 2, outlineX[p]!);
+      to.position.push(point.x, point.y, point.z);
+      to.color.push(color.r, color.g, color.b);
+      to.aLift.push(lift.x, lift.y, lift.z);
+      to.aUp.push(rib.up.x, rib.up.y, rib.up.z);
+      to.aStation.push(rib.t, r % 2, outlineX[p]!);
+      to.uv.push((1 - rib.t) / 2, 1 - outlineX[p]!);
     });
   };
 
@@ -368,13 +432,17 @@ const createCanopy = (ribs: Rib[], options: GliderOptions): THREE.Mesh => {
                 ? tips
                 : top
               : bottom;
+      // The texture carries the underside colour, so the vertices under it are left white
+      const onAdvert = advert !== null && color === bottom;
+      const [shade, to] = onAdvert ? [white, textured] : [color, plain];
       pushTriangle(
         [
           [r, p],
           [r + 1, p],
           [r + 1, q],
         ],
-        color
+        shade,
+        to
       );
       pushTriangle(
         [
@@ -382,7 +450,8 @@ const createCanopy = (ribs: Rib[], options: GliderOptions): THREE.Mesh => {
           [r + 1, q],
           [r, q],
         ],
-        color
+        shade,
+        to
       );
     }
   }
@@ -403,14 +472,22 @@ const createCanopy = (ribs: Rib[], options: GliderOptions): THREE.Mesh => {
   });
 
   const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-  geometry.setAttribute('aLift', new THREE.Float32BufferAttribute(lifts, 3));
-  geometry.setAttribute('aUp', new THREE.Float32BufferAttribute(ups, 3));
-  geometry.setAttribute('aStation', new THREE.Float32BufferAttribute(stations, 3));
+  (Object.keys(plain) as (keyof CanopyBuffers)[]).forEach(name => {
+    const values = [...plain[name], ...textured[name]];
+    geometry.setAttribute(name, new THREE.Float32BufferAttribute(values, name === 'uv' ? 2 : 3));
+  });
+  const plainCount = plain.position.length / 3;
+  geometry.addGroup(0, plainCount, 0);
+  geometry.addGroup(plainCount, textured.position.length / 3, 1);
   geometry.computeVertexNormals();
 
-  const canopy = new THREE.Mesh(geometry, createCanopyMaterial(ribs[0]!.shape));
+  // Each wing breathes out of step with the others, both its materials together
+  const shape = ribs[0]!.shape;
+  const phase = { value: Math.random() * Math.PI * 2 };
+  const canopy = new THREE.Mesh(geometry, [
+    createCanopyMaterial(shape, phase),
+    createCanopyMaterial(shape, phase, advert),
+  ]);
   canopy.name = 'canopy';
   canopy.castShadow = true;
   return canopy;
@@ -568,7 +645,10 @@ class Glider {
     const ribs = createRibs(WING_SHAPES[this.options.kind ?? 'standard'], cells);
     const wing = new THREE.Group();
     wing.name = 'glider';
-    wing.add(createCanopy(ribs, this.options));
+    const advert = this.options.advert
+      ? await createAdvertTexture(this.options.advert, undersideColor(this.options))
+      : null;
+    wing.add(createCanopy(ribs, this.options, advert));
     wing.add(createLines(ribs, cells, this.options));
     wing.add(createBrakes(ribs, cells, this.options));
     wing.add(createRisers());
