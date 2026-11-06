@@ -2,6 +2,14 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-06 12:49 UTC
+
+### Changed
+
+- **Roos flies her new wing**: royal blue with a lime leading edge edged in white, lime and white
+  at the tips with Ozone's swoosh, and a navy underside (`ROOS_BLUE`). Her old turquoise and purple
+  Mojo stays in `config.ts` as `ROOS_MOJO`
+
 ## 2026-10-29 09:28 UTC
 
 ### Added

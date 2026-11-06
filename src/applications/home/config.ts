@@ -337,6 +337,32 @@ export const ROOS_MOJO: GliderOptions = {
 };
 
 /**
+ * Roos's current wing (her Mojo above is the old one, kept for when she flies it again): royal
+ * blue on top with a lime leading edge along the whole span, edged in white behind, that widens
+ * at the tips with Ozone's white swoosh behind it; lime cell openings and a deep navy underside.
+ */
+const ROOS_LIME = '#c4e01c';
+const ROOS_WHITE = '#f4f6f8';
+export const ROOS_BLUE: GliderOptions = {
+  wingColor1: '#1f4fe0',
+  wingColor2: '#1f4fe0',
+  undersideColor: '#141c62',
+  inletsColor: ROOS_LIME,
+  patches: (
+    [
+      // The first patch that covers a cell wins, so the lime goes before the white behind it
+      { color: ROOS_LIME, from: [0, 0.03], to: [1.1, 0.03], width: 0.03 },
+      { color: ROOS_LIME, from: [0.8, 0.08], to: [1.1, 0.12], width: 0.06 },
+      { color: ROOS_WHITE, from: [0, 0.11], to: [0.8, 0.11], width: 0.02 },
+      { color: ROOS_WHITE, from: [0.8, 0.2], to: [1.1, 0.2], width: 0.02 },
+      { color: ROOS_WHITE, from: [0.72, 0.2], to: [0.78, 0.42], width: 0.035 },
+      { color: ROOS_WHITE, from: [0.78, 0.42], to: [0.86, 0.22], width: 0.035 },
+    ] satisfies GliderPatch[]
+  ).flatMap(mirrored),
+  numeroCajones: 35,
+};
+
+/**
  * Abel's paramotor wing: magenta with an orange leading edge, and an orange swoosh behind it that
  * dips back to a point a quarter of the way out on each half and again near the tips.
  */
@@ -373,7 +399,7 @@ export const LEAD_PILOT = CharacterType.ROOS;
 export const paraglidersVoxel: ParagliderVoxelConfig[] = [
   {
     options: {
-      glider: ROOS_MOJO,
+      glider: ROOS_BLUE,
       pilot: { characterType: CharacterType.ROOS },
     },
     // Low and close to takeoff: a short beat of her own at the south-west end of the Risco,
