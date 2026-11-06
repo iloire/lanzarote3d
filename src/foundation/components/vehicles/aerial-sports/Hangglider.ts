@@ -33,8 +33,8 @@ export class Hangglider extends SimpleThreeComponent {
     };
 
     super(metadata, {
-      harnessColor: '#2B3A55',
-      helmetColor: '#F2F2F2',
+      harnessColor: '#141414',
+      helmetColor: '#0A0A0A',
       scale: 1,
       ...options,
     });
@@ -65,11 +65,38 @@ export class Hangglider extends SimpleThreeComponent {
     return group;
   }
 
-  private material(color: string | undefined): THREE.Material {
+  private material(color: string | undefined, roughness = 0.8, metalness = 0): THREE.Material {
     return resourceManager.getOrCreateMaterial(
-      `hangglider_pilot_${color}`,
-      () => new THREE.MeshStandardMaterial({ color, roughness: 0.8 })
+      `hangglider_pilot_${color}_${roughness}_${metalness}`,
+      () => new THREE.MeshStandardMaterial({ color, roughness, metalness })
     );
+  }
+
+  /**
+   * Glossy aero helmet: a shell stretched into a tail that trails over the back,
+   * with a smoked visor wrapping the face. Faces +X like the pilot.
+   */
+  private createHelmet(color: string | undefined): THREE.Group {
+    const helmet = new THREE.Group();
+    helmet.name = 'helmet';
+
+    const shell = new THREE.Mesh(
+      new THREE.SphereGeometry(0.14, 20, 14),
+      this.material(color, 0.25, 0.4)
+    );
+    shell.scale.set(1.45, 0.95, 0.92);
+    shell.position.x = -0.05;
+    helmet.add(shell);
+
+    const visor = new THREE.Mesh(
+      new THREE.SphereGeometry(0.1, 16, 10),
+      this.material('#1C2630', 0.05, 0.9)
+    );
+    visor.scale.set(0.45, 0.5, 1.05);
+    visor.position.set(0.1, -0.01, 0);
+    helmet.add(visor);
+
+    return helmet;
   }
 
   /** Pod harness, helmet and arms reaching forward to the basebar */
@@ -83,10 +110,7 @@ export class Hangglider extends SimpleThreeComponent {
     pod.position.set(-0.2, -PILOT_DEPTH, 0);
     pilot.add(pod);
 
-    const helmet = new THREE.Mesh(
-      new THREE.SphereGeometry(0.14, 12, 10),
-      this.material(options.helmetColor)
-    );
+    const helmet = this.createHelmet(options.helmetColor);
     helmet.position.set(0.72, -PILOT_DEPTH + 0.06, 0);
     pilot.add(helmet);
 
