@@ -8,7 +8,7 @@ import type {
 import { CharacterType } from '../../foundation/components/characters/CharacterRegistry';
 import { FlightPattern } from '../../foundation/systems/behaviors/FlyingBehavior';
 import type { BackdropSwaySettings, CameraFollowSettings, ZoomInSettings } from './cameraFollow';
-import type { TwistSettings, WingoverSettings } from './paragliderMotion';
+import type { LoopSettings, TwistSettings, WingoverSettings } from './paragliderMotion';
 import type { HeroSettings } from './heroEmbed';
 
 export type ParagliderVoxelConfig = {
@@ -33,6 +33,8 @@ export type HanggliderConfig = {
   waypointTension: number;
   /** How close the camera comes in on him, in metres; nearer than the paragliders' fly-in */
   cameraDistance: number;
+  /** The 360° loops he throws now and then */
+  loop: LoopSettings;
 };
 
 export type CessnaConfig = {
@@ -623,6 +625,9 @@ export const hanggliderConfig: HanggliderConfig = {
   // A quarter of the paragliders' 160 m: his wing is life-size, theirs voxel-big, so he reads
   // small from as far
   cameraDistance: 40,
+  // About one a minute: a 35 m-radius loop over 7 s, fast enough round to fly backwards over
+  // the top against his 30 m/s
+  loop: { duration: 7, radius: 35, rest: [50, 70] },
 };
 
 export const cessnaConfig: CessnaConfig = {

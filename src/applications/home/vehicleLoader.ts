@@ -139,7 +139,19 @@ export async function loadHangglider(
     flyingBehavior.snapToWaypointCurve();
     flyingBehavior.start();
 
-    return { mesh: rig, flyingBehavior, motion: new ParagliderMotion(rig, body, config.speed) };
+    return {
+      mesh: rig,
+      flyingBehavior,
+      motion: new ParagliderMotion(
+        rig,
+        body,
+        config.speed,
+        undefined,
+        undefined,
+        undefined,
+        config.loop
+      ),
+    };
   } catch (error) {
     errorHandler(error as Error, 'loading hangglider');
     return null;

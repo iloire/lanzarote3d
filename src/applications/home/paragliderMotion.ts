@@ -41,6 +41,17 @@ export type TwistSettings = {
   rest: [number, number];
 };
 
+/**
+ * A loop thrown now and then: the wing pulls up and round a full turn in the vertical plane,
+ * `radius` metres across from the path, over `duration` seconds, and comes out where it went
+ * in. Between loops it rests for a random time between `rest`, in seconds.
+ */
+export type LoopSettings = {
+  duration: number;
+  radius: number;
+  rest: [number, number];
+};
+
 const randomBetween = ([min, max]: [number, number]) => min + Math.random() * (max - min);
 
 /**
@@ -94,6 +105,11 @@ export class ParagliderMotion {
   private twistLength = 0;
   private twistDirection = 1;
   private twistRestLeft: number;
+  /** Seconds into the current loop, or null while flying level */
+  private loopTime: number | null = null;
+  private loopRestLeft: number;
+  private loopPitch = 0;
+  private readonly loopLast = { forward: 0, up: 0 };
 
   constructor(
     private readonly rig: THREE.Object3D,
@@ -101,7 +117,8 @@ export class ParagliderMotion {
     private readonly speed: number,
     private readonly pilotSwing?: THREE.Object3D,
     private readonly wingover?: WingoverSettings,
-    private readonly twist?: TwistSettings
+    private readonly twist?: TwistSettings,
+    private readonly loop?: LoopSettings
   ) {
     // Yaw before banking and pitching, as a wing weaving across its path does
     body.rotation.order = 'YXZ';
@@ -110,6 +127,7 @@ export class ParagliderMotion {
     // Somewhere into a rest, so the pilots don't start their wingovers together
     this.restLeft = wingover ? Math.random() * wingover.rest[1] : 0;
     this.twistRestLeft = twist ? Math.random() * twist.rest[1] : 0;
+    this.loopRestLeft = loop ? randomBetween(loop.rest) : 0;
   }
 
   /** The wing's bank in radians, positive in a left turn */
@@ -146,6 +164,7 @@ export class ParagliderMotion {
     );
     this.pathBank += (targetBank - this.pathBank) * Math.min(1, deltaTime * BANK_RESPONSE);
     const weave = this.flyWingover(deltaTime);
+    const loop = this.flyLoop(deltaTime);
     const lastBank = this.bank;
     this.bank = THREE.MathUtils.clamp(
       this.pathBank + weave.bank,
@@ -156,11 +175,12 @@ export class ParagliderMotion {
 
     // Positive roll about the rig's Z lowers the left wing, which is a left turn here.
     this.body.rotation.z = this.bank + Math.sin(this.time * 0.9) * 0.03;
-    this.body.rotation.x = weave.pitch + Math.sin(this.time * 0.6) * 0.04;
+    this.body.rotation.x = weave.pitch + loop.pitch + Math.sin(this.time * 0.6) * 0.04;
     this.body.rotation.y = weave.yaw;
     this.body.position.x = weave.x;
     this.body.position.y =
-      weave.y + Math.sin(this.time * 0.35) * 1.5 + Math.sin(this.time * 0.9) * 0.4;
+      weave.y + loop.up + Math.sin(this.time * 0.35) * 1.5 + Math.sin(this.time * 0.9) * 0.4;
+    this.body.position.z = -loop.forward;
 
     if (this.pilotSwing) this.swingPilot(this.pilotSwing, deltaTime, bankRate);
   }
@@ -216,6 +236,46 @@ export class ParagliderMotion {
       yaw: -Math.atan(vx / this.speed),
       pitch: Math.atan(vy / this.speed),
     };
+  }
+
+  /**
+   * Where the loop puts the wing off the path and how far it is pitched round. Off the path it
+   * runs a circle, forward = radius·sin θ and up = radius·(1 − cos θ), with θ eased from 0 to a
+   * full turn; on top of the path's own speed that draws a loop over the ground. The nose
+   * follows the wing's real flight direction, so it points back along the path over the top.
+   */
+  private flyLoop(deltaTime: number): { forward: number; up: number; pitch: number } {
+    const still = { forward: 0, up: 0, pitch: 0 };
+    if (!this.loop) return still;
+    const { duration, radius, rest } = this.loop;
+
+    if (this.loopTime === null) {
+      this.loopRestLeft -= deltaTime;
+      if (this.loopRestLeft > 0) return still;
+      this.loopTime = 0;
+      this.loopPitch = 0;
+      this.loopLast.forward = this.loopLast.up = 0;
+    }
+    this.loopTime += deltaTime;
+    if (this.loopTime >= duration) {
+      this.loopTime = null;
+      this.loopRestLeft = randomBetween(rest);
+      return still;
+    }
+
+    const theta = Math.PI * 2 * THREE.MathUtils.smoothstep(this.loopTime, 0, duration);
+    const forward = radius * Math.sin(theta);
+    const up = radius * (1 - Math.cos(theta));
+    // The flight direction in the vertical plane, unwrapped so the pitch runs a whole turn
+    const direction = Math.atan2(
+      (up - this.loopLast.up) / deltaTime,
+      this.speed + (forward - this.loopLast.forward) / deltaTime
+    );
+    this.loopPitch +=
+      THREE.MathUtils.euclideanModulo(direction - this.loopPitch + Math.PI, Math.PI * 2) - Math.PI;
+    this.loopLast.forward = forward;
+    this.loopLast.up = up;
+    return { forward, up, pitch: this.loopPitch };
   }
 
   private swingPilot(pilotSwing: THREE.Object3D, deltaTime: number, bankRate: number): void {
