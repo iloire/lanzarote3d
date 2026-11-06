@@ -2,6 +2,13 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-06 13:30 UTC
+
+### Changed
+
+- **Roos's harness has a bulkier bumper**, re-exported from 3d-characters: a bigger, fuller
+  rounded bag under the seat, wider and longer than the other open harnesses', as she flies it
+
 ## 2026-11-06 13:05 UTC
 
 ### Changed
