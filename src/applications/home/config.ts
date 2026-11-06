@@ -31,6 +31,8 @@ export type HanggliderConfig = {
   /** The loop it flies: the ridge loop raised and widened, so it soars above the paragliders */
   waypoints: THREE.Vector3[];
   waypointTension: number;
+  /** How close the camera comes in on him, in metres; nearer than the paragliders' fly-in */
+  cameraDistance: number;
 };
 
 export type CessnaConfig = {
@@ -618,6 +620,9 @@ export const hanggliderConfig: HanggliderConfig = {
   speed: PARAGLIDER_SPEED * 2,
   waypoints: liftLoop(110, 1.25),
   waypointTension: RIDGE_LOOP_TENSION,
+  // A quarter of the paragliders' 160 m: his wing is life-size, theirs voxel-big, so he reads
+  // small from as far
+  cameraDistance: 40,
 };
 
 export const cessnaConfig: CessnaConfig = {

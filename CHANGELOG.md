@@ -2,6 +2,13 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-06 20:42 UTC
+
+### Changed
+
+- **Blay flies the hang glider**: `?pilot=blay` follows him, and the camera closes in to 40 m
+  on him instead of the paragliders' 160 m, where his life-size wing looked tiny
+
 ## 2026-11-06 20:10 UTC
 
 ### Added

@@ -84,7 +84,8 @@ class HomeApp extends TerrainBase {
   private removeTitleOverlay: (() => void) | null = null;
   private removePilotPicker: (() => void) | null = null;
   /** Everyone the camera can follow, paragliders then the hangglider, with how each banks */
-  private pilots: { mesh: THREE.Object3D; motion?: ParagliderMotion }[] = [];
+  private pilots: { mesh: THREE.Object3D; motion?: ParagliderMotion; cameraDistance?: number }[] =
+    [];
   /** Which of `pilots` the camera follows */
   private leadIndex = 0;
   /** Set when the scene is a page's hero background */
@@ -152,7 +153,11 @@ class HomeApp extends TerrainBase {
           this.hanggliderMesh = hanggliderResult.mesh;
           this.hanggliderFlyingBehavior = hanggliderResult.flyingBehavior;
           if (hanggliderResult.motion) this.paragliderMotions.push(hanggliderResult.motion);
-          this.pilots.push({ mesh: hanggliderResult.mesh, motion: hanggliderResult.motion });
+          this.pilots.push({
+            mesh: hanggliderResult.mesh,
+            motion: hanggliderResult.motion,
+            cameraDistance: hanggliderConfig.cameraDistance,
+          });
         }
       }
 
@@ -252,7 +257,7 @@ class HomeApp extends TerrainBase {
           this.targetController.addTarget(this.herculesMesh, 'Hercules');
         }
         if (this.hanggliderMesh) {
-          this.targetController.addTarget(this.hanggliderMesh, 'Hangglider');
+          this.targetController.addTarget(this.hanggliderMesh, 'Blay');
         }
 
         createCameraTargetUI(this.targetController, controls);
@@ -284,7 +289,7 @@ class HomeApp extends TerrainBase {
     renderer: THREE.WebGLRenderer,
     scene: THREE.Scene
   ): void {
-    // ?pilot= picks who the fly-in lands on, by number or by the rig's name (e.g. bernt)
+    // ?pilot= picks who the fly-in lands on, by number or by the rig's name (e.g. bernt, blay)
     const names = this.pilots.map(({ mesh }) => mesh.name.replace(/^paraglider-/, ''));
     this.leadIndex = pilotFromSearch(
       window.location.search,
@@ -431,10 +436,13 @@ class HomeApp extends TerrainBase {
         const following = !this.isAnimating && !this.targetController;
         if (following) {
           const pilot = this.pilots[this.leadIndex];
-          if (!wasFollowing) follow.reset(pilot.mesh.position);
-          else if (pilot !== followed) {
+          if (!wasFollowing) {
+            follow.reset(pilot.mesh.position);
+            // The fly-in lands at the paragliders' distance; a pilot seen closer (Blay) closes in
+            if (pilot.cameraDistance) zoomIn.start(pilot.cameraDistance);
+          } else if (pilot !== followed) {
             follow.retarget(pilot.mesh.position);
-            zoomIn.start();
+            zoomIn.start(pilot.cameraDistance);
           }
           followed = pilot;
           follow.update(deltaTime, pilot.mesh.position, pilot.motion?.bankAngle ?? 0, cameraMove);

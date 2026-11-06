@@ -163,15 +163,20 @@ export type ZoomInSettings = {
 
 /**
  * Brings a zoomed-out camera back in to `distance` from its target, along its line of sight so
- * the angle is kept. Started on each pilot switch; a camera already closer is left alone.
+ * the angle is kept. Started on each pilot switch, closing in to the pilot's own distance when
+ * they have one; a camera already closer is left alone.
  */
 export class ZoomIn {
   private active = false;
+  private distance: number;
   private readonly offset = new THREE.Vector3();
 
-  constructor(private readonly settings: ZoomInSettings) {}
+  constructor(private readonly settings: ZoomInSettings) {
+    this.distance = settings.distance;
+  }
 
-  start(): void {
+  start(distance = this.settings.distance): void {
+    this.distance = distance;
     this.active = true;
   }
 
@@ -182,7 +187,8 @@ export class ZoomIn {
   /** Advances by `deltaTime` seconds, moving `camera` towards `target` */
   update(deltaTime: number, camera: THREE.Vector3, target: THREE.Vector3): void {
     if (!this.active || deltaTime <= 0) return;
-    const { distance, response } = this.settings;
+    const { distance } = this;
+    const { response } = this.settings;
     this.offset.subVectors(camera, target);
     const current = this.offset.length();
     if (current <= distance + 0.5) {

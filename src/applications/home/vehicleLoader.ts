@@ -118,7 +118,8 @@ export async function loadHangglider(
     mesh.rotation.y = Math.PI / 2;
 
     const rig = new THREE.Group();
-    rig.name = 'hangglider';
+    // Blay flies it; the name is what ?pilot=blay picks him by
+    rig.name = 'blay';
     const body = new THREE.Group();
     body.add(mesh);
     rig.add(body);
