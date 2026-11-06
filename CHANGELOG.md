@@ -22,6 +22,16 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 
 - **Daniel's birthday**: 13 June, when he flies the birthday loop past Magne
 
+## 2026-11-06 21:05 UTC
+
+### Added
+
+- **Music on the relax site**: three calm tracks by Kevin MacLeod (incompetech.com, CC BY 4.0),
+  *Meditation Impromptu 01*, *Dreamer* and *Floating Cities*, re-encoded at 96 kbps (2-3 MB
+  each) in `assets/relax/music/`. They play in turn from a random start, quietly under the wind,
+  with a MUSIC toggle under the WIND one and the credit beneath while the music is on. Each
+  track downloads only when it plays.
+
 ## 2026-11-06 20:40 UTC
 
 ### Added

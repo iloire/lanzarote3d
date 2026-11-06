@@ -1,5 +1,3 @@
-import './wind-sound.css';
-
 // Soft wind made in the browser, no audio files: brown noise, a low layer for the air moving
 // and a band-passed layer for the breath of each gust, swelling and easing at random.
 const VOLUME = 0.35;
@@ -11,7 +9,6 @@ const GUST_EVERY = 4;
 const GUST_EASE = 2.5;
 const BODY = { cutoff: 380, gain: [0.5, 0.9] };
 const BREATH = { frequency: [280, 750], q: 0.9, gain: [0.08, 0.45] };
-const STORAGE_KEY = 'relax-wind';
 
 const between = ([low, high]: number[], amount: number) => low! + (high! - low!) * amount;
 
@@ -27,7 +24,7 @@ function brownNoise(context: AudioContext): AudioBuffer {
   return buffer;
 }
 
-class Wind {
+export class Wind {
   private readonly context = new AudioContext();
   private readonly master = this.context.createGain();
   private readonly bodyGain = this.context.createGain();
@@ -99,58 +96,4 @@ class Wind {
     window.clearInterval(this.gusts);
     void this.context.close();
   }
-}
-
-/**
- * A wind button in the corner. The wind is on unless the viewer turned it off last time; the
- * browser only lets it start after a click or key, so it fades in on the first one.
- */
-export function createWindSound(): () => void {
-  let wind: Wind | undefined;
-  let on = localStorage.getItem(STORAGE_KEY) !== 'off';
-
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.className = 'wind-sound';
-  const show = () => {
-    button.textContent = on ? 'WIND ~ ON' : 'WIND ~ OFF';
-    button.setAttribute('aria-pressed', String(on));
-  };
-  show();
-  document.body.appendChild(button);
-
-  const apply = () => {
-    if (on) {
-      wind ??= new Wind();
-      void wind.play();
-    } else {
-      wind?.stop();
-    }
-  };
-  const stopWaiting = () => {
-    window.removeEventListener('pointerdown', firstTouch);
-    window.removeEventListener('keydown', firstTouch);
-  };
-  // The button's own press is left to its click, which decides for itself
-  const firstTouch = (event: Event) => {
-    if (event.target === button) return;
-    stopWaiting();
-    apply();
-  };
-  window.addEventListener('pointerdown', firstTouch);
-  window.addEventListener('keydown', firstTouch);
-
-  button.addEventListener('click', () => {
-    stopWaiting();
-    on = !on;
-    localStorage.setItem(STORAGE_KEY, on ? 'on' : 'off');
-    show();
-    apply();
-  });
-
-  return () => {
-    stopWaiting();
-    wind?.close();
-    button.remove();
-  };
 }
