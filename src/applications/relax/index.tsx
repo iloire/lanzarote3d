@@ -96,11 +96,14 @@ class RelaxApp extends TerrainBase {
       const relax = RELAX_SCENES[id]!;
       this.location = relax.location;
       this.removeSwitcher = createLocationSwitcher(
-        Object.entries(RELAX_SCENES).map(([key, scene]) => ({
-          id: key,
-          name: scene.location.name,
-          region: scene.region,
-        })),
+        // An unlisted place shows only while it's the one open
+        Object.entries(RELAX_SCENES)
+          .filter(([key, scene]) => !scene.unlisted || key === id)
+          .map(([key, scene]) => ({
+            id: key,
+            name: scene.location.name,
+            region: scene.region,
+          })),
         id
       );
       this.removeWind = createWindSound();

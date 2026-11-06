@@ -71,7 +71,7 @@
       "requiresWebGL": true,
       "visibility": "private",
       "priority": 6,
-      "site": "relax"
+      "site": ["relax", "lanzarote"]
     }
   }
 }

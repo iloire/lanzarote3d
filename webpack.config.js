@@ -14,8 +14,8 @@ const Dotenv = require('dotenv-webpack');
  *   and lazy-loads that app's chunk
  * - Apps are sorted by priority field
  * - One repo, two sites: SITE=relax builds the relax site into dist-relax/, anything else the
- *   Lanzarote site into dist/. Each builds only the apps whose "site" is its own (Lanzarote
- *   unless set), so neither ships the other's code or terrain.
+ *   Lanzarote site into dist/. Each builds only the apps whose "site" is or lists its own
+ *   (Lanzarote unless set), so neither ships the other's code or terrain unless an app is on both.
  */
 
 const appsConfig = require('./src/config/apps.json');
@@ -40,8 +40,8 @@ const SITES = {
   },
 };
 const site = SITES[SITE];
-const siteApps = Object.entries(appsConfig.apps).filter(
-  ([_, app]) => (app.site || 'lanzarote') === SITE
+const siteApps = Object.entries(appsConfig.apps).filter(([_, app]) =>
+  [app.site || 'lanzarote'].flat().includes(SITE)
 );
 // Lazy-loaded app folders this site may import: ./<folder> and anything under it
 const appFolders = siteApps.map(([_, app]) => app.route.replace(/^\//, ''));

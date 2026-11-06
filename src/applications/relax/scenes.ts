@@ -75,6 +75,8 @@ export interface RelaxScene {
   harbour?: { ferries: FerryRoute[]; cruises: CruiseRoute[] };
   /** Rooftops that send beams into the night sky */
   lasers?: LaserSite[];
+  /** Left out of the place picker: reached only by its ?location= URL */
+  unlisted?: boolean;
 }
 
 /** How a place is lit, where it differs from the theme */
@@ -247,8 +249,9 @@ export const RELAX_SCENES: Record<string, RelaxScene> = {
   'mont-saint-michel': {
     ...demScene(MONT_SAINT_MICHEL, MONT_SAINT_MICHEL_CONFIG),
     setPiece: montSaintMichel,
+    unlisted: true,
   },
-  'hong-kong': demScene(HONG_KONG, HONG_KONG_CONFIG, HONG_KONG_CITY),
+  'hong-kong': { ...demScene(HONG_KONG, HONG_KONG_CONFIG, HONG_KONG_CITY), unlisted: true },
   venice: demScene(VENICE, VENICE_CONFIG, VENICE_CITY),
 };
 

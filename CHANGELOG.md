@@ -15,6 +15,19 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 
 - **Daniel's birthday**: 13 June, when he flies the birthday loop past Magne
 
+## 2026-11-06 20:40 UTC
+
+### Added
+
+- **Every place on 3d.lanzaroteparagliding.com**: the relax app now ships with the Lanzarote
+  site too, unlinked, at `/relax.html?location=<id>`. Each place's terrain loads only when that
+  place is opened. The home page is unchanged apart from 27 KB more in its main bundle.
+
+### Changed
+
+- **Hong Kong and Mont-Saint-Michel unlisted**: hidden from the place picker, still reachable by
+  `?location=hong-kong` and `?location=mont-saint-michel`
+
 ## 2026-11-06 20:07 UTC
 
 ### Added

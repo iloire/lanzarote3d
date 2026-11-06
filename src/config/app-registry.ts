@@ -18,13 +18,13 @@ export interface AppMetadata {
   requiresWebGL?: boolean;
   visibility: 'public' | 'private' | 'hidden';
   priority?: number; // For ordering in menus
-  site?: Site; // Which site builds it; Lanzarote unless set
+  site?: Site | Site[]; // Which sites build it; Lanzarote unless set
 }
 
 // Generate APP_REGISTRY from JSON (now flat structure under 'apps'): this site's apps only
 export const APP_REGISTRY: Record<string, AppMetadata> = Object.fromEntries(
-  Object.entries(appsConfig.apps as Record<string, AppMetadata>).filter(
-    ([, app]) => (app.site ?? 'lanzarote') === SITE
+  Object.entries(appsConfig.apps as Record<string, AppMetadata>).filter(([, app]) =>
+    [app.site ?? 'lanzarote'].flat().includes(SITE)
   )
 );
 

@@ -29,8 +29,8 @@ The same repo builds a second site, **relax**: pick a paragliding place (Lanzaro
 Hierro, Rio de Janeiro, Castejón de Sos) and watch a few gliders soar its ridge, or New York, where
 paramotors fly the street canyons of a voxel Midtown, Paris, where one laps the Eiffel Tower,
 Giza, where Abel flies his paramotor round the pyramids, built course by course, or Hong Kong at
-night, off the Peak and low over the harbour. It has its own
-build, so the Lanzarote site never ships it:
+night, off the Peak and low over the harbour. It has its own build, and the Lanzarote site carries
+it too, unlinked, at `/relax.html?location=<id>`:
 
 ![Abel's paramotor between Menkaure and Khafre on the Giza plateau](docs/screenshots/giza.png)
 
@@ -39,9 +39,13 @@ npm run start:relax   # dev server, opens the relax scene
 npm run build:relax   # production build into dist-relax/
 ```
 
-Each app in `src/config/apps.json` belongs to one site (`"site": "relax"`, Lanzarote otherwise).
+Each app in `src/config/apps.json` names the site or sites that build it (`"site": "relax"` or
+`["relax", "lanzarote"]`, Lanzarote otherwise). The relax app is on both: its code is a chunk of
+its own and each place's terrain is a separate file, loaded only when that place is opened, so the
+Lanzarote home page doesn't download them. A scene marked `unlisted` in `scenes.ts` (Hong Kong,
+Mont-Saint-Michel) is left out of the place picker but still opens by its `?location=` URL.
 New places are described in [`src/locations/README.md`](src/locations/README.md). The relax site
-has no deploy script yet; it gets one with its domain.
+has no deploy script of its own yet; it gets one with its domain.
 
 Scenes are picked with `?story=`: `home`, `famara-animation`, `boats-animation`, `famara`,
 `town` and `models`. Add `?fx=0` to render without post-processing, to
@@ -79,7 +83,7 @@ aws s3 ls --profile lanzaroteparagliding             # check the profile works
 npm run deploy-prod
 ```
 
-`deploy-prod` builds the Lanzarote site into `dist/` (never the relax site), tags the commit `PROD-<date>_<time>` (locally), empties the
+`deploy-prod` builds the Lanzarote site into `dist/` (with the relax app at `/relax.html`), tags the commit `PROD-<date>_<time>` (locally), empties the
 bucket, uploads `dist/` and invalidates the CloudFront cache. Two things to know:
 
 - It builds the **working tree**, uncommitted changes included. Deploy from a clean checkout of
