@@ -7,6 +7,8 @@ export interface GroundRegion {
   radius: number;
   color: string;
   strength: number;
+  /** World heights: the patch starts at the first and is at full strength from the second (snow) */
+  altitude?: [number, number];
 }
 
 // The fraction of the radius that keeps full strength before the edge starts to fade.
@@ -41,7 +43,10 @@ export function bakeRegionTint(
       const distance = Math.hypot(centre.x - region.x, centre.z - region.z) / region.radius;
       if (distance >= 1) return;
       const fade = THREE.MathUtils.smoothstep(distance, CORE, 1);
-      const weight = region.strength * (1 - fade);
+      const height = region.altitude
+        ? THREE.MathUtils.smoothstep(centre.y, region.altitude[0], region.altitude[1])
+        : 1;
+      const weight = region.strength * (1 - fade) * height;
       r += colors[n].r * weight;
       g += colors[n].g * weight;
       b += colors[n].b * weight;

@@ -47,6 +47,10 @@ export function demLocation(config: DemLocationConfig, terrainModel: string): Lo
     terrainScale: 1,
     terrainPosition: [0, 0, 0],
     anchor,
-    regions: projectRegions(config.regions, anchor),
+    regions: projectRegions(
+      config.regions,
+      anchor,
+      config.unitsPerMetre * config.verticalExaggeration
+    ),
   };
 }

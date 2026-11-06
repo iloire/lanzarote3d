@@ -68,10 +68,19 @@ export interface RegionConfig {
   radius: number;
   color: string;
   strength: number;
+  /** Metres above sea level: the patch starts at the first and is at full strength from the second */
+  altitude?: number[];
 }
 
-/** Ground colour patches projected into the scene with `anchor` */
-export function projectRegions(regions: RegionConfig[], anchor: GeoAnchor): GroundRegion[] {
+/**
+ * Ground colour patches projected into the scene with `anchor`; `verticalScale` takes metres of
+ * height to world units (a DEM's unitsPerMetre times its exaggeration)
+ */
+export function projectRegions(
+  regions: RegionConfig[],
+  anchor: GeoAnchor,
+  verticalScale = anchor.unitsPerMetre
+): GroundRegion[] {
   return regions.map(region => {
     const [lat, lon] = region.at;
     const { x, z } = geoToWorld(lat, lon, anchor);
@@ -81,6 +90,10 @@ export function projectRegions(regions: RegionConfig[], anchor: GeoAnchor): Grou
       radius: region.radius * anchor.unitsPerMetre,
       color: region.color,
       strength: region.strength,
+      altitude: region.altitude && [
+        region.altitude[0] * verticalScale,
+        region.altitude[1] * verticalScale,
+      ],
     };
   });
 }

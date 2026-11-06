@@ -2,6 +2,13 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-06 20:57 UTC
+
+### Added
+
+- **Snow on El Teide**: Tenerife's summit is white above 3,050 m, a dusting reaching Pico
+  Viejo. Ground colour regions take an optional `altitude: [from, full]` band in metres
+
 ## 2026-11-06 20:42 UTC
 
 ### Changed
