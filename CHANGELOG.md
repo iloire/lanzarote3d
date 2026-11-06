@@ -2,6 +2,15 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-06 22:15 UTC
+
+### Fixed
+
+- **No downtime on deploy**: `deploy-prod` no longer empties the bucket before uploading, and
+  pages go up last, after the models and bundles they load. The old site keeps working until
+  the new one is complete. Stale files are left behind; `npm run delete-prod` still wipes the
+  bucket by hand
+
 ## 2026-11-06 22:01 UTC
 
 ### Changed

@@ -7,8 +7,9 @@
  * Their decompressed size goes in `x-amz-meta-file-size`, which Models (src/foundation/utils/
  * models.ts) reads for the loading percentage, since Content-Length is now the compressed size.
  *
- * Pages go up as no-cache and the content-hashed bundles as immutable; everything else as is. Compressed copies are written to a temp dir, so `dist/`
- * stays servable locally (`npm run run-prod`).
+ * Pages go up as no-cache and the content-hashed bundles as immutable; everything else as is.
+ * Pages go up last and nothing is deleted, so the live site never breaks mid-deploy. Compressed
+ * copies are written to a temp dir, so `dist/` stays servable locally (`npm run run-prod`).
  *
  * Usage: node scripts/upload-dist.mjs <dist dir> <bucket> <aws profile>
  */
@@ -40,40 +41,25 @@ function aws(...args) {
 const models = walk(dist).filter(file => path.extname(file) in CONTENT_TYPES);
 const stage = fs.mkdtempSync(path.join(os.tmpdir(), 'upload-dist-'));
 
-// The pages are checked on every visit, so a deploy shows up straight away. The bundles they
-// load are named by their content (webpack.config.js), so a browser can keep them for good.
-const CACHE = {
-  '*.html': 'no-cache',
-  '*.js': 'public, max-age=31536000, immutable',
-};
-for (const [pattern, cacheControl] of Object.entries(CACHE)) {
-  aws(
-    's3',
-    'cp',
-    dist,
-    `s3://${bucket}`,
-    '--recursive',
-    '--exclude',
-    '*',
-    '--include',
-    pattern,
-    '--cache-control',
-    cacheControl
-  );
-}
+// Upload order is what keeps the live site working mid-deploy: what the pages depend on goes up
+// first and the pages themselves last, so a visitor sees either the old site or the new one,
+// never a new page pointing at a bundle that isn't there yet. Nothing is deleted, so a page
+// already open can still lazy-load its old chunks.
 
-// Everything else but the models, as is
+// 1. Everything but pages, bundles and models, as is
 aws(
   's3',
   'cp',
   dist,
   `s3://${bucket}`,
   '--recursive',
-  ...[...Object.keys(CACHE), ...Object.keys(CONTENT_TYPES).map(ext => `*${ext}`)].flatMap(
-    pattern => ['--exclude', pattern]
-  )
+  ...['*.html', '*.js', ...Object.keys(CONTENT_TYPES).map(ext => `*${ext}`)].flatMap(pattern => [
+    '--exclude',
+    pattern,
+  ])
 );
 
+// 2. Models, brotli-compressed
 let before = 0;
 let after = 0;
 for (const file of models) {
@@ -101,6 +87,28 @@ for (const file of models) {
   );
   before += raw.length;
   after += br.length;
+}
+
+// 3. Bundles, then 4. pages. The bundles are named by their content (webpack.config.js), so a
+// browser can keep them for good; the pages are checked on every visit, so a deploy shows up
+// straight away.
+for (const [pattern, cacheControl] of [
+  ['*.js', 'public, max-age=31536000, immutable'],
+  ['*.html', 'no-cache'],
+]) {
+  aws(
+    's3',
+    'cp',
+    dist,
+    `s3://${bucket}`,
+    '--recursive',
+    '--exclude',
+    '*',
+    '--include',
+    pattern,
+    '--cache-control',
+    cacheControl
+  );
 }
 
 fs.rmSync(stage, { recursive: true, force: true });
