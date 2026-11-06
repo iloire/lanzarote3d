@@ -262,19 +262,11 @@ class Environment {
 
   async addBoats(water: THREE.Mesh) {
     // Each call adds its boats to the scene; the returned meshes aren't needed here.
-    // First area (marina/harbor - more variety)
+    // Off Famara the open Atlantic sees few boats: just a couple
     await this.boatGroupCreator.createRecreationalBoats(
       water,
       new THREE.Vector3(7879, 0, -5445),
-      4,
-      'random'
-    );
-
-    // Second area (open water - different distribution)
-    await this.boatGroupCreator.createRecreationalBoats(
-      water,
-      new THREE.Vector3(8279, 0, -6455),
-      3,
+      2,
       'random'
     );
 
