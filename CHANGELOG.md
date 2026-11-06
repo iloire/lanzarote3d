@@ -2,6 +2,14 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-06 13:01 UTC
+
+### Changed
+
+- **Ivan flies his v2 voxel model from 3d-characters**: Magne's harness, a black cocoon with
+  lime zigzags and a red reserve handle, with the orange jacket, yellow bandana and dark
+  sunglasses
+
 ## 2026-11-06 13:30 UTC
 
 ### Changed
