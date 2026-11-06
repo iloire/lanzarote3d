@@ -430,7 +430,7 @@ export const LEAD_PILOT = CharacterType.ROOS;
  * towards La Graciosa. Magne is the farthest and the highest, at the Mirador (1659-1753 m); Bernt
  * is second in both, 85% of the way there (1500-1562 m); the rest step up the cliff between
  * takeoff and Bernt at 875-1327 m, rising with the cliff and capped under him, bar Daniel, new
- * and sinking out at the foot of the cliff before Bernt (250-330 m). Each loop sits on
+ * and sinking out at the foot of the cliff under Fabio (350-430 m). Each loop sits on
  * the cliff edge where it flies, every one at least 153 m clear of the ground. They are listed in
  * that order, so the arrows step from takeoff up the Risco.
  */
@@ -525,35 +525,35 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
   },
   {
     options: {
+      glider: DANIEL_WING,
+      pilot: { characterType: CharacterType.DANIEL },
+    },
+    // New to the Risco and sinking out: 8 km up it, right under Fabio, he scratches along the
+    // foot of the cliff face at 350-430 m, some 800 m under the edge, over the beach and at
+    // least 101 m clear of the face.
+    startProgress: 0.3,
+    pathOffset: new THREE.Vector3(0, 0, 0),
+    waypoints: [
+      new THREE.Vector3(10000, 430, -7300),
+      new THREE.Vector3(10030, 425, -7550),
+      new THREE.Vector3(10080, 420, -7800),
+      new THREE.Vector3(10230, 415, -8050),
+      new THREE.Vector3(10390, 410, -8300),
+      new THREE.Vector3(10250, 385, -8420),
+      new THREE.Vector3(10070, 365, -8150),
+      new THREE.Vector3(9860, 350, -7850),
+      new THREE.Vector3(9790, 355, -7550),
+      new THREE.Vector3(9780, 390, -7320),
+    ],
+  },
+  {
+    options: {
       glider: FRANZ_BUZZ,
       pilot: { characterType: CharacterType.FRANZ },
     },
     // Seven-tenths of the way, 9.1 km up, the last before Bernt
     startProgress: 0.9,
     pathOffset: new THREE.Vector3(3851, 370, -7908),
-  },
-  {
-    options: {
-      glider: DANIEL_WING,
-      pilot: { characterType: CharacterType.DANIEL },
-    },
-    // New to the Risco and sinking out: far up it, 10 km from takeoff, between Franz and
-    // Bernt, he scratches along the foot of the cliff face at 250-330 m, some 600 m under the
-    // edge, over the beach and at least 74 m clear of the face.
-    startProgress: 0.3,
-    pathOffset: new THREE.Vector3(0, 0, 0),
-    waypoints: [
-      new THREE.Vector3(10420, 330, -8600),
-      new THREE.Vector3(10660, 325, -8850),
-      new THREE.Vector3(10840, 320, -9100),
-      new THREE.Vector3(11200, 315, -9350),
-      new THREE.Vector3(11320, 305, -9600),
-      new THREE.Vector3(11210, 280, -9660),
-      new THREE.Vector3(11090, 260, -9380),
-      new THREE.Vector3(10760, 250, -9100),
-      new THREE.Vector3(10580, 255, -8850),
-      new THREE.Vector3(10340, 290, -8620),
-    ],
   },
   {
     options: {

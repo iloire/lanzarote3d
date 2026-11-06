@@ -2,6 +2,14 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-06 19:45 UTC
+
+### Changed
+
+- **Daniel nearer Famara and a little higher**: his beat at the foot of the cliff moves 1.3 km
+  down the Risco to 8 km up, right under Fabio, and up 100 m to 350-430 m, at least 101 m clear
+  of the face
+
 ## 2026-11-06 19:42 UTC
 
 ### Changed
