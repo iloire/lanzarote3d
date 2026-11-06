@@ -625,9 +625,9 @@ export const hanggliderConfig: HanggliderConfig = {
   // A quarter of the paragliders' 160 m: his wing is life-size, theirs voxel-big, so he reads
   // small from as far
   cameraDistance: 40,
-  // About one a minute: a 35 m-radius loop over 7 s, fast enough round to fly backwards over
-  // the top against his 30 m/s
-  loop: { duration: 7, radius: 35, rest: [50, 70] },
+  // About one a minute: a 30° dive of 70 m doubles his speed, which carries him round a 35 m
+  // loop and back up to the height he dived from, then he climbs back to his line. 21 s all told.
+  loop: { dive: 4, drop: 70, duration: 7, radius: 35, recover: 10, rest: [35, 45] },
 };
 
 export const cessnaConfig: CessnaConfig = {

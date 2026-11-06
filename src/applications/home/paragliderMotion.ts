@@ -42,15 +42,43 @@ export type TwistSettings = {
 };
 
 /**
- * A loop thrown now and then: the wing pulls up and round a full turn in the vertical plane,
- * `radius` metres across from the path, over `duration` seconds, and comes out where it went
- * in. Between loops it rests for a random time between `rest`, in seconds.
+ * A loop thrown now and then. The pilot first pushes out into a dive for `dive` seconds,
+ * dropping `drop` metres below the path to build speed, then pulls up and round a full turn of
+ * `radius` metres in the vertical plane over `duration` seconds, and climbs back to the path
+ * over `recover` seconds, trading the extra speed back for the height. Between loops he rests
+ * for a random time between `rest`, in seconds.
  */
 export type LoopSettings = {
+  dive: number;
+  drop: number;
   duration: number;
   radius: number;
+  recover: number;
   rest: [number, number];
 };
+
+/**
+ * The cubic from `from` at rate `fromRate` to `to` at rate `toRate` over `length` seconds, at
+ * `time`: joins two moves so that neither position nor speed jumps.
+ */
+function hermite(
+  time: number,
+  length: number,
+  from: number,
+  fromRate: number,
+  to: number,
+  toRate: number
+): number {
+  const t = time / length;
+  const t2 = t * t;
+  const t3 = t2 * t;
+  return (
+    (2 * t3 - 3 * t2 + 1) * from +
+    (t3 - 2 * t2 + t) * length * fromRate +
+    (-2 * t3 + 3 * t2) * to +
+    (t3 - t2) * length * toRate
+  );
+}
 
 const randomBetween = ([min, max]: [number, number]) => min + Math.random() * (max - min);
 
@@ -239,15 +267,16 @@ export class ParagliderMotion {
   }
 
   /**
-   * Where the loop puts the wing off the path and how far it is pitched round. Off the path it
-   * runs a circle, forward = radius·sin θ and up = radius·(1 − cos θ), with θ eased from 0 to a
-   * full turn; on top of the path's own speed that draws a loop over the ground. The nose
-   * follows the wing's real flight direction, so it points back along the path over the top.
+   * Where the loop puts the wing off the path and how far it is pitched round. The circle is
+   * flown at a steady rate ω, so off the path it runs forward = radius·sin θ and
+   * up = radius·(1 − cos θ) from the bottom of the dive, at radius·ω faster than the path at the
+   * bottom. The dive builds up exactly that speed on the way down, and the climb back bleeds it
+   * off. The nose follows the wing's real flight direction, so it points back over the top.
    */
   private flyLoop(deltaTime: number): { forward: number; up: number; pitch: number } {
     const still = { forward: 0, up: 0, pitch: 0 };
     if (!this.loop) return still;
-    const { duration, radius, rest } = this.loop;
+    const { dive, drop, duration, radius, recover, rest } = this.loop;
 
     if (this.loopTime === null) {
       this.loopRestLeft -= deltaTime;
@@ -257,15 +286,32 @@ export class ParagliderMotion {
       this.loopLast.forward = this.loopLast.up = 0;
     }
     this.loopTime += deltaTime;
-    if (this.loopTime >= duration) {
+    let time = this.loopTime;
+    if (time >= dive + duration + recover) {
       this.loopTime = null;
       this.loopRestLeft = randomBetween(rest);
       return still;
     }
 
-    const theta = Math.PI * 2 * THREE.MathUtils.smoothstep(this.loopTime, 0, duration);
-    const forward = radius * Math.sin(theta);
-    const up = radius * (1 - Math.cos(theta));
+    // The speed over the path's at the bottom of the loop, and how far ahead the dive puts him
+    const rate = (Math.PI * 2) / duration;
+    const extra = radius * rate;
+    const ahead = (extra * dive) / 2;
+    let forward: number;
+    let up: number;
+    if (time < dive) {
+      forward = hermite(time, dive, 0, 0, ahead, extra);
+      up = hermite(time, dive, 0, 0, -drop, 0);
+    } else if ((time -= dive) < duration) {
+      const theta = time * rate;
+      forward = ahead + radius * Math.sin(theta);
+      up = -drop + radius * (1 - Math.cos(theta));
+    } else {
+      time -= duration;
+      forward = hermite(time, recover, ahead, extra, 0, 0);
+      up = hermite(time, recover, -drop, 0, 0, 0);
+    }
+
     // The flight direction in the vertical plane, unwrapped so the pitch runs a whole turn
     const direction = Math.atan2(
       (up - this.loopLast.up) / deltaTime,
