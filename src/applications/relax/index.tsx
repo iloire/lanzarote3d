@@ -68,7 +68,9 @@ const definedOnly = <T extends object>(values: T | undefined): Partial<T> =>
  * | paris | giza | mont-saint-michel | hong-kong | venice) and watch a few gliders soar its ridge
  * while the camera drifts slowly from side to side, or, in a city or round the pyramids, chase
  * Abel's paramotor (in Hong Kong, at night; in Venice, down the Grand Canal); at Mont-Saint-Michel
- * the camera circles the Mount while the paramotors fly round it. Dragging takes over the camera.
+ * the camera circles the Mount while the paramotors fly round it. A place may open with an intro
+ * flight (Rio, from the Cristo to the gliders), handing over the camera when it lands. Dragging
+ * takes over the camera.
  */
 class RelaxApp extends TerrainBase {
   private animationId: number | undefined;
@@ -128,8 +130,8 @@ class RelaxApp extends TerrainBase {
           ...definedOnly({ color: look?.seaColor, shallowColor: look?.shallowColor }),
         },
       };
-      camera.position.copy(relax.camera.position);
-      camera.lookAt(relax.camera.target);
+      camera.position.copy(relax.intro?.positions[0] ?? relax.camera.position);
+      camera.lookAt(relax.intro?.targets[0] ?? relax.camera.target);
       await this.initializeEnvironment(options);
       // After the environment, which applies the default theme once its sky and pipeline exist
       await ThemeEngine.apply(options, theme);
@@ -144,7 +146,8 @@ class RelaxApp extends TerrainBase {
         applyNight(scene, renderer, options.sky, options.water, look.night);
       }
 
-      controls.enabled = true;
+      // An intro flight hands the camera over once it lands
+      controls.enabled = !relax.intro;
       controls.target.copy(relax.camera.target);
       this.limitControls(controls, relax);
       controls.update();
@@ -329,6 +332,15 @@ class RelaxApp extends TerrainBase {
       controls.target.copy(lead.position);
     }
 
+    // The intro flies both curves at the same pace, a key apiece, easing in and out of its ends;
+    // centripetal, so a short hop round the Cristo then a long leg doesn't swing wide
+    const intro = relax.intro && {
+      seconds: relax.intro.seconds,
+      path: new THREE.CatmullRomCurve3(relax.intro.positions, false, 'centripetal'),
+      gaze: new THREE.CatmullRomCurve3(relax.intro.targets, false, 'centripetal'),
+    };
+    const lookAt = new THREE.Vector3();
+
     let lastTime: number | null = null;
     let elapsed = 0;
     const animate = (now: number) => {
@@ -358,10 +370,17 @@ class RelaxApp extends TerrainBase {
             this.holdCamera(camera, controls, controls.target, Infinity, terrain);
           }
           lastLead.copy(lead.position);
+        } else if (intro && elapsed < intro.seconds) {
+          const t = THREE.MathUtils.smootherstep(elapsed, 0, intro.seconds);
+          intro.path.getPoint(t, camera.position);
+          camera.lookAt(intro.gaze.getPoint(t, lookAt));
         } else if (swaying) {
+          controls.enabled = true;
+          // From the end of the intro, so the sway starts where it landed
+          const since = elapsed - (intro?.seconds ?? 0);
           const angle = relax.orbit
-            ? (elapsed / relax.orbit) * Math.PI * 2
-            : SWAY_ANGLE * Math.sin((elapsed / SWAY_PERIOD) * Math.PI * 2);
+            ? (since / relax.orbit) * Math.PI * 2
+            : SWAY_ANGLE * Math.sin((since / SWAY_PERIOD) * Math.PI * 2);
           camera.position.copy(relax.camera.target).add(offset.clone().applyAxisAngle(up, angle));
           camera.lookAt(relax.camera.target);
         } else {

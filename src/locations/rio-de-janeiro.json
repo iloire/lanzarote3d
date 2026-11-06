@@ -48,7 +48,18 @@
   "camera": {
     "about": "High over the sea off São Conrado, looking down at the beach and Pedra Bonita with Pedra da Gávea on the left; [lat, lon, metres]",
     "at": [-23.022, -43.266, 750],
-    "lookAt": [-22.992, -43.276, 320]
+    "lookAt": [-22.992, -43.276, 320],
+    "intro": {
+      "about": "Opens on the Cristo's face (he stands on the model's top, at -22.9522, -43.2124), swings round his shoulder and flies down over Lagoa and Dois Irmãos to the gliders, ending where the camera starts; [lat, lon, metres]",
+      "seconds": 35,
+      "keys": [
+        { "at": [-22.95266, -43.21103, 662], "lookAt": [-22.9522, -43.2124, 655] },
+        { "at": [-22.95362, -43.21267, 672], "lookAt": [-22.9522, -43.2124, 650] },
+        { "at": [-22.95297, -43.21469, 690], "lookAt": [-22.988, -43.272, 450] },
+        { "at": [-22.9750, -43.2350, 650], "lookAt": [-22.990, -43.276, 450] },
+        { "at": [-23.0050, -43.2500, 650], "lookAt": [-22.992, -43.276, 400] }
+      ]
+    }
   },
   "clouds": [
     {

@@ -2,6 +2,15 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-06 21:53 UTC
+
+### Added
+
+- **Rio opens on the Cristo**: the relax scene starts face to face with the Cristo Redentor,
+  circles round him, and flies down over Lagoa and Dois Irmãos to the gliders over São Conrado.
+  Once it lands, the camera sways as before and the viewer can take it over. Any place can fly
+  an intro from `camera.intro` in its JSON
+
 ## 2026-11-06 21:33 UTC
 
 ### Fixed

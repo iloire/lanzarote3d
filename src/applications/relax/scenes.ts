@@ -34,6 +34,11 @@ export interface RelaxScene {
   /** The loop the gliders soar, closed */
   loop: THREE.Vector3[];
   camera: { position: THREE.Vector3; target: THREE.Vector3 };
+  /**
+   * A flight into the scene before the viewer gets the camera: through `positions`, looking
+   * at `targets`, over `seconds`; both end on `camera`
+   */
+  intro?: { seconds: number; positions: THREE.Vector3[]; targets: THREE.Vector3[] };
   /** Lanzarote's cumulus unless given */
   clouds?: CloudSite[];
   /** World height of the cloud base; the theme's (Lanzarote's) unless given */
@@ -103,7 +108,14 @@ export interface SceneLook {
 interface DemSceneConfig extends DemLocationConfig {
   region: string;
   soaringLoop: { waypoints: number[][] };
-  camera: { at: number[]; lookAt: number[]; zoomOut?: number; pan?: number; orbit?: number };
+  camera: {
+    at: number[];
+    lookAt: number[];
+    zoomOut?: number;
+    pan?: number;
+    orbit?: number;
+    intro?: { seconds: number; keys: { at: number[]; lookAt: number[] }[] };
+  };
   clouds: { at: number[]; kind: string; scale: number }[];
   /** Metres above sea level */
   cloudBase?: number;
@@ -153,6 +165,15 @@ function demScene(location: Location, config: DemSceneConfig, city?: string): Re
     camera: {
       position: demPoint(config, config.camera.at),
       target: demPoint(config, config.camera.lookAt),
+    },
+    intro: config.camera.intro && {
+      seconds: config.camera.intro.seconds,
+      positions: [...config.camera.intro.keys.map(key => key.at), config.camera.at].map(at =>
+        demPoint(config, at)
+      ),
+      targets: [...config.camera.intro.keys.map(key => key.lookAt), config.camera.lookAt].map(
+        at => demPoint(config, at)
+      ),
     },
     clouds: config.clouds.map(({ at, kind, scale }) => ({
       ...geoToWorld(at[0], at[1], anchor),
