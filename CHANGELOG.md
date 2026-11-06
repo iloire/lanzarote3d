@@ -2,6 +2,13 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-06 13:10 UTC
+
+### Changed
+
+- **Roos's black front container**: the bag holding her instrument panel is black with a
+  dark-grey band, no longer red, re-exported from 3d-characters
+
 ## 2026-11-06 13:09 UTC
 
 ### Added
