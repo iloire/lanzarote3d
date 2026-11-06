@@ -22,6 +22,13 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 
 - **Daniel's birthday**: 13 June, when he flies the birthday loop past Magne
 
+## 2026-11-06 21:25 UTC
+
+### Changed
+
+- **Relax scene stands alone**: no menu bar or title on `/relax.html` (or the relax site), and
+  the wind and music buttons move up into the corner
+
 ## 2026-11-06 21:05 UTC
 
 ### Added

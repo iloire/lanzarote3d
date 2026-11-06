@@ -116,6 +116,8 @@ const App: React.FC<AppProps> = ({
   // Get current app name for title display
   const currentAppConfig = initialStory ? getAppConfig(initialStory) : null;
   const appName = currentAppConfig?.name || 'Lanzarote 3D';
+  // The relax scene stands alone, with no menu or title, wherever it is served
+  const bare = currentAppConfig?.route === '/relax';
 
   const initThree = async () => {
     const renderer = createRenderer(SCENE_CONFIG.sizes);
@@ -226,9 +228,11 @@ const App: React.FC<AppProps> = ({
           <span className="progress">{loadingLabel(download)}</span>
         </div>
       )}
-      {showAppSelection && shouldShowSidebar(initialStory) && <Menu showPrivate={showPrivate} />}
+      {showAppSelection && !bare && shouldShowSidebar(initialStory) && (
+        <Menu showPrivate={showPrivate} />
+      )}
       {/* A page using the scene as its hero background has its own title */}
-      {new URLSearchParams(window.location.search).get('embed') !== 'hero' && (
+      {!bare && new URLSearchParams(window.location.search).get('embed') !== 'hero' && (
         <div className="app-title">{appName}</div>
       )}
       <canvas className="webgl" />

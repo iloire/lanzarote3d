@@ -1,8 +1,8 @@
-/* Wind and music toggles - top right under the title, in the place picker's pixel style */
+/* Wind and music toggles - top right, in the place picker's pixel style */
 
 .sound-controls {
   position: fixed;
-  top: 40px;
+  top: 20px;
   right: 20px;
   z-index: 1000;
   display: flex;
