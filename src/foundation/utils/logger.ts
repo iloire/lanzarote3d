@@ -15,11 +15,9 @@ class Logger {
   private level: LogLevel;
 
   constructor() {
-    // Set log level based on environment
-    this.level =
-      (typeof process !== 'undefined' && process.env?.['NODE_ENV']) === 'production'
-        ? LogLevel.WARN
-        : LogLevel.DEBUG;
+    // Warnings and errors only in production. Written out plainly so webpack replaces it at build
+    // time: there's no `process` in the browser, so any guarded form always read as development.
+    this.level = process.env.NODE_ENV === 'production' ? LogLevel.WARN : LogLevel.DEBUG;
   }
 
   debug(message: string, ...args: unknown[]): void {
