@@ -8,6 +8,7 @@ export enum CharacterType {
   ABEL = 'abel',
   ADRI = 'adri',
   BERNT = 'bernt',
+  DANIEL = 'daniel',
   DAVID = 'david',
   FABIO = 'fabio',
   FRANZ = 'franz',
@@ -135,6 +136,12 @@ export class CharacterRegistry {
         id: CharacterType.BERNT,
         name: 'Bernt',
         description: 'Blue Charly helmet, black top, dark green open harness with a lime line',
+      },
+      {
+        id: CharacterType.DANIEL,
+        name: 'Daniel',
+        description:
+          'Teal open helmet, dark sunglasses and beard, navy jacket, light grey open harness, jeans',
       },
       {
         id: CharacterType.DAVID,

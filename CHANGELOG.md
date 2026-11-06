@@ -2,6 +2,16 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-06 19:31 UTC
+
+### Added
+
+- **Daniel joins the home pilots**: his voxel model from 3d-characters (teal open helmet, beard,
+  navy jacket, light grey open harness, jeans) flies a sky-blue wing with a yellow-orange-red
+  leading edge and black flame teeth behind it. New and sinking out, he scratches along the foot
+  of the cliff far up the Risco, between Franz and Bernt, at 250-330 m, some 600 m under the
+  edge and at least 74 m clear of the face
+
 ## 2026-11-06 19:18 UTC
 
 ### Changed

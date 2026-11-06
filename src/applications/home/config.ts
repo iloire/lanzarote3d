@@ -363,6 +363,43 @@ export const ROOS_BLUE: GliderOptions = {
 };
 
 /**
+ * Daniel's wing: sky blue, with a leading edge that runs yellow in the middle through orange to
+ * red at the tips, edged behind by a black line that juts back into the blue in flame-like teeth.
+ * A pale underside.
+ */
+/** The black edge behind the colour, as (span, chord) points from the centre out */
+const DANIEL_TEETH: [number, number][] = [
+  [0, 0.24],
+  [0.1, 0.42],
+  [0.16, 0.24],
+  [0.34, 0.44],
+  [0.4, 0.24],
+  [0.58, 0.42],
+  [0.64, 0.24],
+  [0.82, 0.38],
+  [0.88, 0.22],
+  [1.1, 0.3],
+];
+export const DANIEL_WING: GliderOptions = {
+  wingColor1: '#5cc8ec',
+  wingColor2: '#5cc8ec',
+  undersideColor: '#e4f2f8',
+  inletsColor: '#2a2a2a',
+  patches: (
+    [
+      // The colour first, so the black teeth behind it only show on the blue
+      { color: '#f6d21c', from: [0, 0.1], to: [0.3, 0.1], width: 0.1 },
+      { color: '#f28a1c', from: [0.3, 0.1], to: [0.62, 0.1], width: 0.1 },
+      { color: '#e02a24', from: [0.62, 0.1], to: [1.1, 0.1], width: 0.1 },
+      ...DANIEL_TEETH.slice(1).map(
+        (to, i): GliderPatch => ({ color: '#161616', from: DANIEL_TEETH[i], to, width: 0.045 })
+      ),
+    ] satisfies GliderPatch[]
+  ).flatMap(mirrored),
+  numeroCajones: 30,
+};
+
+/**
  * Abel's paramotor wing: magenta with an orange leading edge, and an orange swoosh behind it that
  * dips back to a point a quarter of the way out on each half and again near the tips.
  */
@@ -392,7 +429,8 @@ export const LEAD_PILOT = CharacterType.ROOS;
  * at the south-west end, Ivan on the takeoff beat, then a pilot every ~1.4 km up the cliff
  * towards La Graciosa. Magne is the farthest and the highest, at the Mirador (1659-1753 m); Bernt
  * is second in both, 85% of the way there (1500-1562 m); the rest step up the cliff between
- * takeoff and Bernt at 875-1327 m, rising with the cliff and capped under him. Each loop sits on
+ * takeoff and Bernt at 875-1327 m, rising with the cliff and capped under him, bar Daniel, new
+ * and sinking out at the foot of the cliff before Bernt (250-330 m). Each loop sits on
  * the cliff edge where it flies, every one at least 153 m clear of the ground. They are listed in
  * that order, so the arrows step from takeoff up the Risco.
  */
@@ -493,6 +531,29 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
     // Seven-tenths of the way, 9.1 km up, the last before Bernt
     startProgress: 0.9,
     pathOffset: new THREE.Vector3(3851, 370, -7908),
+  },
+  {
+    options: {
+      glider: DANIEL_WING,
+      pilot: { characterType: CharacterType.DANIEL },
+    },
+    // New to the Risco and sinking out: far up it, 10 km from takeoff, between Franz and
+    // Bernt, he scratches along the foot of the cliff face at 250-330 m, some 600 m under the
+    // edge, over the beach and at least 74 m clear of the face.
+    startProgress: 0.3,
+    pathOffset: new THREE.Vector3(0, 0, 0),
+    waypoints: [
+      new THREE.Vector3(10420, 330, -8600),
+      new THREE.Vector3(10660, 325, -8850),
+      new THREE.Vector3(10840, 320, -9100),
+      new THREE.Vector3(11200, 315, -9350),
+      new THREE.Vector3(11320, 305, -9600),
+      new THREE.Vector3(11210, 280, -9660),
+      new THREE.Vector3(11090, 260, -9380),
+      new THREE.Vector3(10760, 250, -9100),
+      new THREE.Vector3(10580, 255, -8850),
+      new THREE.Vector3(10340, 290, -8620),
+    ],
   },
   {
     options: {
