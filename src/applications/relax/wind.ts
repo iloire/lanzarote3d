@@ -1,6 +1,6 @@
 // Soft wind made in the browser, no audio files: brown noise, a low layer for the air moving
 // and a band-passed layer for the breath of each gust, swelling and easing at random.
-const VOLUME = 0.35;
+const VOLUME = 0.25;
 const FADE_IN = 4;
 const FADE_OUT = 1.5;
 const NOISE_SECONDS = 6;

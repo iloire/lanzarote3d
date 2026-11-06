@@ -2,6 +2,12 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-06 21:20 UTC
+
+### Changed
+
+- **Quieter wind**: 0.35 → 0.25, so it sits under the music rather than over it
+
 ## 2026-11-06 21:15 UTC
 
 ### Changed
