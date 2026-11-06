@@ -2,6 +2,13 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-06 13:03 UTC
+
+### Changed
+
+- **Softer favicon**: the sunset tile is desaturated halfway to grey, a dusty orange-to-rose
+  sky and a pale sun behind the same black paraglider and volcano
+
 ## 2026-11-06 13:01 UTC
 
 ### Changed
