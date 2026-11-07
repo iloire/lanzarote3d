@@ -20,6 +20,7 @@ import { createCameraTargetUI } from '../../foundation/components/ui/CameraTarge
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { createIslandRoads } from '../../shared/env/roads';
 import type { RoadTraffic } from '../../shared/env/roadTraffic';
+import { WindFarm } from '../../shared/env/windFarm';
 import { createLandmarks } from '../../shared/env/landmarks';
 import { createFerryCrossing } from '../../shared/env/ferry';
 import { LevelOfDetail } from '../../foundation/types/lod';
@@ -46,6 +47,7 @@ class AnimationApp extends TerrainBase {
   private environment: Environment | undefined;
   private animationId: number | undefined;
   private traffic: RoadTraffic | undefined;
+  private windFarm: WindFarm | undefined;
   private paragliderMeshes: THREE.Object3D[] = [];
   private hanggliderMesh: THREE.Object3D | undefined;
   private cessnaMesh: THREE.Object3D | undefined;
@@ -182,6 +184,8 @@ class AnimationApp extends TerrainBase {
       roads.forEach(road => scene.add(road));
       scene.add(traffic.mesh);
       this.traffic = traffic;
+      this.windFarm = new WindFarm(terrain);
+      scene.add(this.windFarm.group);
       logger.info(`${roads.length} roads connecting the Famara towns, ${traffic.count} cars`);
 
       const landmarks = createLandmarks(terrain);
@@ -300,6 +304,7 @@ class AnimationApp extends TerrainBase {
         }
 
         this.traffic?.update(deltaTime);
+        this.windFarm?.update(deltaTime);
 
         // Apply floating motion (only if not using camera controller)
         if (!this.targetController) {
@@ -358,6 +363,8 @@ class AnimationApp extends TerrainBase {
 
     this.traffic?.dispose();
     this.traffic = undefined;
+    this.windFarm?.dispose();
+    this.windFarm = undefined;
 
     // Stop flying behavior
     if (this.flyingBehavior) {

@@ -88,3 +88,18 @@ coast round Punta Fariones rather than projected from OSM, which would cut the h
 speed in world units a second, the seconds it lies alongside at each end and its scale. It moves
 itself on the shared clock (`crossing()` gives where it is at a time), so nothing in the scene's
 loop drives it.
+
+## Cars, the wind farm and the villages round the takeoff
+
+- **Cars** (`cuteCars.ts`, `TRAFFIC` in `roads.ts`): toy cars, twice life size, on the
+  `roads.json` roads, one lane each way. `RoadTraffic` draws them as one instanced mesh with
+  fixed bounds over all its roads, so they cost one draw call and none when out of view.
+- **Wind farm** (`windFarm.ts`): the ten Los Valles turbines at their OpenStreetMap positions,
+  twice life size like the landmarks, rotors facing the trade wind. Two instanced meshes,
+  towers and rotors; only the ten rotor matrices change each frame.
+- **Villages** (`LANZAROTE_TOWNS` in `environment.ts`): Teguise, Nazaret, los Cabezos,
+  Teseguite, Los Valles and El Mojón at about half their OSM building count, in the
+  `INLAND_VILLAGE` style: white cubes and `bare: true`, so no plot, garden or pool. They are
+  only seen from 2-4 km off, and sharing La Graciosa's colours keeps them in the meshes the
+  merge already makes. With them the default view stays at ~800K triangles a frame and went
+  from 277 to 217 draw calls, since the old mixed Teguise brought extra materials.

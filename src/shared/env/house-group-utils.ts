@@ -261,14 +261,16 @@ export function generateMixedNeighborhood(count: number, style?: HouseStyle): Ho
     houses.push({
       ...selectedType,
       scale: baseScale,
-      includePool: Math.random() < variation.poolChance,
+      includePool: !style?.bare && Math.random() < variation.poolChance,
       rotation,
       colors: style
         ? pickColors(style.palette)
         : variation.colorVariation
           ? generateRandomColors()
           : undefined,
-      landPlot: generateLandPlot(selectedType.type, baseScale, style?.plot),
+      landPlot: style?.bare
+        ? undefined
+        : generateLandPlot(selectedType.type, baseScale, style?.plot),
     });
   }
 

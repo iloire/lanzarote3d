@@ -98,6 +98,11 @@ export const TOWN_LAS_LADERAS = town(29.08746, -13.56208);
 export const TOWN_FAMARA = town(29.11885, -13.56599); // Caleta de Famara
 export const TOWN_NORUEGOS = town(29.11441, -13.54721); // Urbanización Famara
 export const TOWN_TEGUISE = town(29.05925, -13.56022);
+export const TOWN_NAZARET = town(29.0379, -13.5608);
+export const TOWN_LOS_CABEZOS = town(29.0411, -13.5462);
+export const TOWN_TESEGUITE = town(29.0546, -13.5318);
+export const TOWN_LOS_VALLES = town(29.084, -13.5231);
+export const TOWN_EL_MOJON = town(29.0683, -13.5178);
 export const TOWN_SOO = town(29.09932, -13.62235);
 export const TOWN_CALETA_DE_SEBO = town(29.2311, -13.5035); // La Graciosa, where the ferry docks
 export const TOWN_PEDRO_BARBA = town(29.2437, -13.4747); // La Graciosa's east-end hamlet
@@ -136,6 +141,13 @@ const GRACIOSA_HOUSES: HouseStyle = {
 };
 
 /**
+ * Teguise and the villages round it: the same white cubes as La Graciosa, with nothing round
+ * them. From the takeoff, 2-4 km off, gardens and pools don't show; leaving them out keeps
+ * the hundreds of houses cheap, and the shared colours keep them in the same merged meshes.
+ */
+const INLAND_VILLAGE: HouseStyle = { ...GRACIOSA_HOUSES, bare: true };
+
+/**
  * Lanzarote island town configuration
  * Real locations of major settlements on the island
  */
@@ -144,12 +156,27 @@ export const LANZAROTE_TOWNS: TownConfig[] = [
   { position: TOWN_FAMARA, houseCount: 120, formation: 'rural', spacing: 2.0 },
   {
     position: TOWN_NORUEGOS,
-    houseCount: 80,
+    houseCount: 160,
     formation: 'grid',
     spacing: 0.5,
     style: FAMARA_BUNGALOWS,
   },
-  { position: TOWN_TEGUISE, houseCount: 51, formation: 'suburban' },
+  // Teguise and the villages round it that the pilots see from the takeoff: about half the
+  // buildings OpenStreetMap has (which counts every shed and garage), enough to read as towns
+  { position: TOWN_TEGUISE, houseCount: 180, formation: 'suburban', style: INLAND_VILLAGE },
+  {
+    position: TOWN_NAZARET,
+    houseCount: 120,
+    formation: 'suburban',
+    spacing: 1.5,
+    style: INLAND_VILLAGE,
+  },
+  ...[
+    { position: TOWN_LOS_CABEZOS, houseCount: 50, spacing: 2.0 },
+    { position: TOWN_TESEGUITE, houseCount: 50, spacing: 2.0 },
+    { position: TOWN_LOS_VALLES, houseCount: 40, spacing: 2.5 },
+    { position: TOWN_EL_MOJON, houseCount: 30, spacing: 2.5 },
+  ].map(village => ({ ...village, formation: 'rural' as const, style: INLAND_VILLAGE })),
   { position: TOWN_SOO, houseCount: 40, formation: 'rural' },
   {
     position: TOWN_CALETA_DE_SEBO,

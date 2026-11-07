@@ -2,6 +2,24 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-07 18:40 UTC
+
+### Added
+
+- **Los Valles wind farm**: ten turning turbines on the massif east of the takeoff, at their
+  OpenStreetMap positions, in two instanced meshes (`shared/env/windFarm.ts`)
+- **Villages round the takeoff**: Teguise from 51 to 180 houses; Nazaret, los Cabezos,
+  Teseguite, Los Valles and El Mojón added; Urbanización Famara from 80 to 160. The inland
+  ones are bare white cubes (new `bare` house style), so the default view keeps ~800K
+  triangles and drops from 277 to 217 draw calls
+- **Fields west of Teguise and round Teseguite**: two darker ground patches where OSM has the
+  vineyards and farmland
+
+### Changed
+
+- **Traffic culls itself**: `RoadTraffic` keeps fixed bounds over its roads instead of being
+  drawn every frame
+
 ## 2026-11-07 18:04 UTC
 
 ### Added

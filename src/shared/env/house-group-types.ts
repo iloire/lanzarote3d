@@ -43,6 +43,8 @@ export interface HouseStyle {
   palette: Record<string, string[]>;
   /** The plot under each house: its size against the default, and its colours */
   plot?: { scale: number; colors: string[] };
+  /** Houses only, no plot, garden or pool: for villages only ever seen from far off */
+  bare?: boolean;
 }
 
 /**

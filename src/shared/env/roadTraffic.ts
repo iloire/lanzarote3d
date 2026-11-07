@@ -193,7 +193,11 @@ export class RoadTraffic {
         colour.set(look.bodies[Math.floor(hash(i * 7.7) * look.bodies.length)]!)
       );
     });
-    this.mesh.frustumCulled = false;
+    // Bounds over every road, fixed, so the cars are culled when none of their roads is in view
+    // without recomputing bounds as they move
+    const box = new THREE.Box3().setFromPoints(this.lanes.flatMap(lane => lane.points));
+    this.mesh.boundingSphere = box.getBoundingSphere(new THREE.Sphere());
+    this.mesh.boundingSphere.radius += 30 * upm * look.size; // lanes off the middle, a car long
     this.update(0);
   }
 

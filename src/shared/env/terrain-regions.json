@@ -57,6 +57,22 @@
       "strength": 0.7
     },
     {
+      "name": "Vineyards and fields on black picón west of Teguise",
+      "kind": "volcanic",
+      "at": [29.057, -13.571],
+      "radius": 1600,
+      "color": "#2e2925",
+      "strength": 0.6
+    },
+    {
+      "name": "The fields and orchards round Teseguite",
+      "kind": "green",
+      "at": [29.051, -13.531],
+      "radius": 1300,
+      "color": "#3b3a2a",
+      "strength": 0.5
+    },
+    {
       "name": "The Teguise and San Bartolomé plains",
       "kind": "desert",
       "at": [29.03, -13.58],

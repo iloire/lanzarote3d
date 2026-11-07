@@ -19,6 +19,7 @@ import { createCameraTargetUI } from '../../foundation/components/ui/CameraTarge
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { createIslandRoads } from '../../shared/env/roads';
 import type { RoadTraffic } from '../../shared/env/roadTraffic';
+import { WindFarm } from '../../shared/env/windFarm';
 import { createLandmarks } from '../../shared/env/landmarks';
 import { createFerryCrossing } from '../../shared/env/ferry';
 import { LevelOfDetail } from '../../foundation/types/lod';
@@ -70,6 +71,7 @@ class HomeApp extends TerrainBase {
   private removeConfettiClick: (() => void) | null = null;
   private animationId: number | undefined;
   private traffic: RoadTraffic | undefined;
+  private windFarm: WindFarm | undefined;
   private paragliderMeshes: THREE.Object3D[] = [];
   private paragliderFlyingBehaviors: FlyingBehavior[] = [];
   private paragliderMotions: ParagliderMotion[] = [];
@@ -205,6 +207,8 @@ class HomeApp extends TerrainBase {
       roads.forEach(road => scene.add(road));
       scene.add(traffic.mesh);
       this.traffic = traffic;
+      this.windFarm = new WindFarm(terrain);
+      scene.add(this.windFarm.group);
       logger.info(`${roads.length} roads connecting the Famara towns, ${traffic.count} cars`);
 
       const landmarks = createLandmarks(terrain);
@@ -429,6 +433,7 @@ class HomeApp extends TerrainBase {
         }
 
         this.traffic?.update(deltaTime);
+        this.windFarm?.update(deltaTime);
 
         this.paragliderMotions.forEach(motion => motion.update(deltaTime));
         this.guirres.forEach(guirre => guirre.update(deltaTime));
@@ -527,6 +532,8 @@ class HomeApp extends TerrainBase {
 
     this.traffic?.dispose();
     this.traffic = undefined;
+    this.windFarm?.dispose();
+    this.windFarm = undefined;
 
     this.paragliderFlyingBehaviors.forEach(behavior => behavior.dispose());
     this.paragliderFlyingBehaviors.length = 0;
