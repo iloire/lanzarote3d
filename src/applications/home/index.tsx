@@ -18,6 +18,7 @@ import {
 import { createCameraTargetUI } from '../../foundation/components/ui/CameraTargetUI';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { createIslandRoads } from '../../shared/env/roads';
+import type { RoadTraffic } from '../../shared/env/roadTraffic';
 import { createLandmarks } from '../../shared/env/landmarks';
 import { createFerryCrossing } from '../../shared/env/ferry';
 import { LevelOfDetail } from '../../foundation/types/lod';
@@ -68,6 +69,7 @@ class HomeApp extends TerrainBase {
   private confetti: ConfettiBurst[] = [];
   private removeConfettiClick: (() => void) | null = null;
   private animationId: number | undefined;
+  private traffic: RoadTraffic | undefined;
   private paragliderMeshes: THREE.Object3D[] = [];
   private paragliderFlyingBehaviors: FlyingBehavior[] = [];
   private paragliderMotions: ParagliderMotion[] = [];
@@ -199,9 +201,11 @@ class HomeApp extends TerrainBase {
         LevelOfDetail.ULTRA_LOW
       );
 
-      const roads = await createIslandRoads(terrain);
+      const { roads, traffic } = await createIslandRoads(terrain);
       roads.forEach(road => scene.add(road));
-      logger.info(`${roads.length} roads connecting the Famara towns created`);
+      scene.add(traffic.mesh);
+      this.traffic = traffic;
+      logger.info(`${roads.length} roads connecting the Famara towns, ${traffic.count} cars`);
 
       const landmarks = createLandmarks(terrain);
       landmarks.forEach(landmark => scene.add(landmark));
@@ -424,6 +428,8 @@ class HomeApp extends TerrainBase {
           this.targetController.update(deltaTime);
         }
 
+        this.traffic?.update(deltaTime);
+
         this.paragliderMotions.forEach(motion => motion.update(deltaTime));
         this.guirres.forEach(guirre => guirre.update(deltaTime));
         this.confetti = this.confetti.filter(burst => {
@@ -518,6 +524,9 @@ class HomeApp extends TerrainBase {
       cancelAnimationFrame(this.animationId);
       this.animationId = undefined;
     }
+
+    this.traffic?.dispose();
+    this.traffic = undefined;
 
     this.paragliderFlyingBehaviors.forEach(behavior => behavior.dispose());
     this.paragliderFlyingBehaviors.length = 0;

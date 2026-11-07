@@ -19,6 +19,7 @@ import {
 import { createCameraTargetUI } from '../../foundation/components/ui/CameraTargetUI';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { createIslandRoads } from '../../shared/env/roads';
+import type { RoadTraffic } from '../../shared/env/roadTraffic';
 import { createLandmarks } from '../../shared/env/landmarks';
 import { createFerryCrossing } from '../../shared/env/ferry';
 import { LevelOfDetail } from '../../foundation/types/lod';
@@ -44,6 +45,7 @@ import { setupCameraAnimation, applyFloatingMotion } from './cameraAnimation';
 class AnimationApp extends TerrainBase {
   private environment: Environment | undefined;
   private animationId: number | undefined;
+  private traffic: RoadTraffic | undefined;
   private paragliderMeshes: THREE.Object3D[] = [];
   private hanggliderMesh: THREE.Object3D | undefined;
   private cessnaMesh: THREE.Object3D | undefined;
@@ -176,9 +178,11 @@ class AnimationApp extends TerrainBase {
 
       // Create individual roads connecting each pair of towns
       // Roads stop ~200 units before town centers to avoid passing through houses
-      const roads = await createIslandRoads(terrain);
+      const { roads, traffic } = await createIslandRoads(terrain);
       roads.forEach(road => scene.add(road));
-      logger.info(`${roads.length} roads connecting the Famara towns created`);
+      scene.add(traffic.mesh);
+      this.traffic = traffic;
+      logger.info(`${roads.length} roads connecting the Famara towns, ${traffic.count} cars`);
 
       const landmarks = createLandmarks(terrain);
       landmarks.forEach(landmark => scene.add(landmark));
@@ -295,6 +299,8 @@ class AnimationApp extends TerrainBase {
           this.targetController.update(deltaTime);
         }
 
+        this.traffic?.update(deltaTime);
+
         // Apply floating motion (only if not using camera controller)
         if (!this.targetController) {
           applyFloatingMotion(camera, startTime, this.isAnimating);
@@ -349,6 +355,9 @@ class AnimationApp extends TerrainBase {
       cancelAnimationFrame(this.animationId);
       this.animationId = undefined;
     }
+
+    this.traffic?.dispose();
+    this.traffic = undefined;
 
     // Stop flying behavior
     if (this.flyingBehavior) {

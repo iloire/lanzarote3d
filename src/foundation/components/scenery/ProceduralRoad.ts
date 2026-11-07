@@ -394,6 +394,11 @@ export class ProceduralRoad extends SimpleThreeComponent {
   /**
    * Calculate approximate road length
    */
+  /** The road's middle, laid on the terrain, end to end (empty until it has loaded) */
+  public get path(): readonly THREE.Vector3[] {
+    return this.pathPoints;
+  }
+
   private getRoadLength(): number {
     if (!this.curve) {
       return 0;

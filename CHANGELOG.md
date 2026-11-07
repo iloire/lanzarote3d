@@ -2,6 +2,15 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-07 18:04 UTC
+
+### Added
+
+- **Toy cars on the Famara roads**: 20 rounded pastel cars, twice life size so they read from
+  the air, drive the roads in the home and Famara scenes at 40-60 km/h, one lane each way.
+  They reuse `RoadTraffic` (one instanced mesh), which now takes a `look`; tuning is
+  `TRAFFIC` in `shared/env/roads.ts`
+
 ## 2026-11-06 22:30 UTC
 
 ### Added

@@ -18,6 +18,19 @@ export interface RoadTrafficSettings {
   laneWidth: number;
   /** Drive on the left (Hong Kong) or the right */
   keepLeft: boolean;
+  /** What the cars look like: night cars with their lights on, unless given */
+  look?: CarLook;
+}
+
+/** A car's shape (metres, length along +z, with an `emit` attribute) and its paint */
+export interface CarLook {
+  geometry: () => THREE.BufferGeometry;
+  /** Body colours, sRGB */
+  bodies: string[];
+  /** How many times life size */
+  size: number;
+  roughness: number;
+  metalness: number;
 }
 
 /** Dark bodies at night, taxis red and buses, er, also red (sRGB) */
@@ -66,6 +79,14 @@ export function carWithLights(): THREE.BufferGeometry {
   return geometry;
 }
 
+const NIGHT_CARS: CarLook = {
+  geometry: carWithLights,
+  bodies: BODIES,
+  size: 1,
+  roughness: 0.4,
+  metalness: 0.3,
+};
+
 const hash = (n: number) => {
   const x = Math.sin(n * 127.1 + 311.7) * 43758.5453;
   return x - Math.floor(x);
@@ -101,6 +122,7 @@ export class RoadTraffic {
 
   constructor(roads: Road[], settings: RoadTrafficSettings) {
     const upm = settings.unitsPerMetre;
+    const look = settings.look ?? NIGHT_CARS;
     roads.forEach((road, r) => {
       const lanes = Math.abs(road[0]!);
       const points: THREE.Vector3[] = [];
@@ -140,7 +162,12 @@ export class RoadTraffic {
       }
     });
 
-    const material = new THREE.MeshStandardMaterial({ roughness: 0.4, metalness: 0.3 });
+    const geometry = look.geometry();
+    const material = new THREE.MeshStandardMaterial({
+      roughness: look.roughness,
+      metalness: look.metalness,
+      vertexColors: geometry.hasAttribute('color'),
+    });
     material.onBeforeCompile = shader => {
       shader.vertexShader = shader.vertexShader
         .replace(
@@ -155,13 +182,16 @@ export class RoadTraffic {
           '#include <emissivemap_fragment>\ntotalEmissiveRadiance += vEmit;'
         );
     };
-    material.customProgramCacheKey = () => 'road-traffic';
-    this.mesh = new THREE.InstancedMesh(carWithLights(), material, this.cars.length);
+    material.customProgramCacheKey = () => `road-traffic-${material.vertexColors}`;
+    this.mesh = new THREE.InstancedMesh(geometry, material, this.cars.length);
     this.mesh.name = 'road-traffic';
-    this.scale = new THREE.Vector3(upm, upm, upm);
+    this.scale = new THREE.Vector3().setScalar(upm * look.size);
     const colour = new THREE.Color();
     this.cars.forEach((_, i) => {
-      this.mesh.setColorAt(i, colour.set(BODIES[Math.floor(hash(i * 7.7) * BODIES.length)]!));
+      this.mesh.setColorAt(
+        i,
+        colour.set(look.bodies[Math.floor(hash(i * 7.7) * look.bodies.length)]!)
+      );
     });
     this.mesh.frustumCulled = false;
     this.update(0);
