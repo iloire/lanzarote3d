@@ -2,6 +2,16 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-07 19:30 UTC
+
+### Fixed
+
+- **Smooth hand-over after the fly-in**: the camera no longer twitches when the intro lands
+  and control passes to the user. The follow spring takes over already moving at the lead
+  pilot's speed instead of from rest, the La Graciosa sway eases in over 5 s instead of
+  pulling at once, and the sway no longer locks onto the far-off start angle in the 100 ms
+  before the fly-in, which it used to snap back to on landing
+
 ## 2026-11-07 18:40 UTC
 
 ### Added

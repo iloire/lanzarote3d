@@ -35,17 +35,40 @@ export class CameraFollow {
   private readonly goal = new THREE.Vector3();
   private readonly step = new THREE.Vector3();
   private readonly before = new THREE.Vector3();
+  /** Whether lastLead holds a real position yet */
+  private observed = false;
 
   constructor(private readonly settings: CameraFollowSettings) {
     this.springTime = settings.smoothTime;
   }
 
-  /** Starts following from where the lead is now, at rest, so taking over doesn't jump */
+  /**
+   * Measures the lead's velocity without moving anything, while something else (the fly-in)
+   * carries the camera, so `reset` can take over at the lead's speed
+   */
+  observe(deltaTime: number, leadPosition: THREE.Vector3): void {
+    if (!this.observed) {
+      this.lastLead.copy(leadPosition);
+      this.observed = true;
+      return;
+    }
+    this.measure(deltaTime, leadPosition);
+  }
+
+  /**
+   * Starts following the lead at the speed `observe` measured (at rest if nothing was), with
+   * the spring already settled where it would trail at that speed. Only the anchor's moves
+   * reach the camera, so taking over neither jumps, brakes nor lurches ahead.
+   */
   reset(leadPosition: THREE.Vector3): void {
-    this.anchor.copy(leadPosition);
-    this.lastLead.copy(leadPosition);
-    this.anchorVelocity.set(0, 0, 0);
-    this.leadVelocity.set(0, 0, 0);
+    if (!this.observed) {
+      this.lastLead.copy(leadPosition);
+      this.leadVelocity.set(0, 0, 0);
+    }
+    this.observed = true;
+    const { lookAhead, smoothTime } = this.settings;
+    this.anchor.copy(leadPosition).addScaledVector(this.leadVelocity, lookAhead - smoothTime);
+    this.anchorVelocity.copy(this.leadVelocity);
     this.roll = 0;
     this.springTime = this.settings.smoothTime;
   }
@@ -64,15 +87,12 @@ export class CameraFollow {
   update(deltaTime: number, leadPosition: THREE.Vector3, leadBank: number, move: THREE.Vector3) {
     move.set(0, 0, 0);
     if (deltaTime <= 0) return;
-    const { smoothTime, lookAhead, velocityResponse, rollShare, rollResponse } = this.settings;
+    const { smoothTime, lookAhead, rollShare, rollResponse } = this.settings;
     // After a switch the spring tightens back to smoothTime as the glide arrives.
     this.springTime +=
       (smoothTime - this.springTime) * Math.min(1, deltaTime / this.settings.switchTime);
 
-    // FlyingBehavior steps on its own frames, so the measured velocity is smoothed.
-    this.step.subVectors(leadPosition, this.lastLead).divideScalar(deltaTime);
-    this.lastLead.copy(leadPosition);
-    this.leadVelocity.lerp(this.step, Math.min(1, deltaTime * velocityResponse));
+    this.measure(deltaTime, leadPosition);
     this.goal.copy(leadPosition).addScaledVector(this.leadVelocity, lookAhead);
 
     this.before.copy(this.anchor);
@@ -80,6 +100,14 @@ export class CameraFollow {
     move.subVectors(this.anchor, this.before);
 
     this.roll += (leadBank * rollShare - this.roll) * Math.min(1, deltaTime * rollResponse);
+  }
+
+  /** FlyingBehavior steps on its own frames, so the measured velocity is smoothed */
+  private measure(deltaTime: number, leadPosition: THREE.Vector3): void {
+    if (deltaTime <= 0) return;
+    this.step.subVectors(leadPosition, this.lastLead).divideScalar(deltaTime);
+    this.lastLead.copy(leadPosition);
+    this.leadVelocity.lerp(this.step, Math.min(1, deltaTime * this.settings.velocityResponse));
   }
 }
 
@@ -114,12 +142,14 @@ export type BackdropSwaySettings = {
   period: number;
   /** How fast the camera eases onto the swing, per second */
   response: number;
+  /** Seconds over which that pull builds from nothing, so the swing starts without a kick */
+  easeIn: number;
 };
 
 /**
  * Keeps a backdrop behind the subject: swings the camera round its target, at its current
  * distance and height, on the side away from `backdrop`, swaying gently either side of it.
- * It eases in from wherever the camera is, so taking over doesn't jump.
+ * It eases in from wherever the camera is, gently at first, so taking over doesn't jump.
  */
 export class BackdropSway {
   private theta: number | null = null;
@@ -135,8 +165,9 @@ export class BackdropSway {
   /** Advances by `deltaTime` seconds, moving `camera` round `target` */
   update(deltaTime: number, camera: THREE.Vector3, target: THREE.Vector3): void {
     if (deltaTime <= 0) return;
-    const { amplitude, bias, period, response } = this.settings;
+    const { amplitude, bias, period, response, easeIn } = this.settings;
     this.time += deltaTime;
+    const pull = response * THREE.MathUtils.smoothstep(this.time, 0, easeIn);
 
     this.offset.subVectors(camera, target);
     this.spherical.setFromVector3(this.offset);
@@ -147,7 +178,7 @@ export class BackdropSway {
     const goal = facing + bias + amplitude * Math.sin((this.time * 2 * Math.PI) / period);
     const turn =
       THREE.MathUtils.euclideanModulo(goal - this.theta + Math.PI, 2 * Math.PI) - Math.PI;
-    this.theta += turn * Math.min(1, deltaTime * response);
+    this.theta += turn * Math.min(1, deltaTime * pull);
 
     this.spherical.theta = this.theta;
     camera.copy(target).add(this.offset.setFromSpherical(this.spherical));

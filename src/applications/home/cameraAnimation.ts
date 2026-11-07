@@ -11,7 +11,6 @@ export interface CameraAnimationConfig {
   /** The lead pilot; it is flying, so the camera aims at where it is now, every frame */
   target: THREE.Object3D;
   animationDurationMs: number;
-  onAnimationStart?: () => void;
   onAnimationComplete?: () => void;
 }
 
@@ -57,10 +56,6 @@ export function setupCameraAnimation(
   );
 
   setTimeout(() => {
-    if (config.onAnimationStart) {
-      config.onAnimationStart();
-    }
-
     state.isAnimating = true;
     animator.animate(
       'camera-seamless',

@@ -319,14 +319,14 @@ class HomeApp extends TerrainBase {
       return;
     }
 
+    // Flagged before the first frame: the sway would otherwise lock onto the camera's far-off
+    // starting angle in the moment before the fly-in, and snap back to it when it lands
+    this.isAnimating = true;
     this.startAnimationLoop(renderer, scene, camera, controls);
 
     setupCameraAnimation(camera, controls, {
       target: lead,
       animationDurationMs: ANIMATION_DURATION_MS,
-      onAnimationStart: () => {
-        this.isAnimating = true;
-      },
       onAnimationComplete: () => {
         this.isAnimating = false;
         // A pilot who twists (Bernt) shows it off as the camera arrives, and again when picked
@@ -463,6 +463,9 @@ class HomeApp extends TerrainBase {
           if (swaying) sway.update(deltaTime, camera.position, controls.target);
           applyFloatingMotion(camera, startTime, this.isAnimating);
         }
+        // During the fly-in, learn the lead's speed so the follow takes over moving with them
+        else if (this.isAnimating)
+          follow.observe(deltaTime, this.pilots[this.leadIndex].mesh.position);
         wasFollowing = following;
 
         OrbitControlsHelper.update(controls);

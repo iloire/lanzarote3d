@@ -1,5 +1,10 @@
 import * as THREE from 'three';
-import { BackdropSway, CameraFollow, smoothDamp, ZoomIn } from '../../src/applications/home/cameraFollow';
+import {
+  BackdropSway,
+  CameraFollow,
+  smoothDamp,
+  ZoomIn,
+} from '../../src/applications/home/cameraFollow';
 
 const STEP = 1 / 60;
 const SETTINGS = {
@@ -58,6 +63,22 @@ describe('CameraFollow', () => {
     expect(move.length()).toBeLessThan(15 * STEP);
   });
 
+  it('takes over moving with a lead it observed, without braking or lurching', () => {
+    const lead = new THREE.Vector3(500, 900, -700);
+    const follow = new CameraFollow(SETTINGS);
+    for (let t = 0; t < 6; t += STEP) {
+      lead.z -= 15 * STEP;
+      follow.observe(STEP, lead);
+    }
+    follow.reset(lead);
+    const move = new THREE.Vector3();
+    for (let t = 0; t < 0.5; t += STEP) {
+      lead.z -= 15 * STEP;
+      follow.update(STEP, lead, 0, move);
+      expect(-move.z / STEP).toBeCloseTo(15, 0);
+    }
+  });
+
   it('settles (lookAhead - smoothTime) × speed ahead of a steady lead', () => {
     const lead = new THREE.Vector3();
     const follow = new CameraFollow(SETTINGS);
@@ -90,7 +111,7 @@ describe('CameraFollow', () => {
 });
 
 describe('BackdropSway', () => {
-  const SWAY = { amplitude: 0.4, bias: 0, period: 60, response: 0.3 };
+  const SWAY = { amplitude: 0.4, bias: 0, period: 60, response: 0.3, easeIn: 5 };
   // The backdrop lies due -Z of the target, so facing it puts the camera at +Z.
   const backdrop = new THREE.Vector3(0, 0, -10000);
   const azimuth = (camera: THREE.Vector3, target: THREE.Vector3) =>
@@ -102,6 +123,14 @@ describe('BackdropSway', () => {
     const sway = new BackdropSway(backdrop, SWAY);
     sway.update(STEP, camera, target);
     expect(azimuth(camera, target)).toBeCloseTo(Math.PI / 2, 1);
+  });
+
+  it('starts swinging gently, not with a kick', () => {
+    const target = new THREE.Vector3();
+    const camera = new THREE.Vector3(200, 50, 0);
+    const sway = new BackdropSway(backdrop, SWAY);
+    for (let t = 0; t < 0.5; t += STEP) sway.update(STEP, camera, target);
+    expect(azimuth(camera, target)).toBeCloseTo(Math.PI / 2, 2);
   });
 
   it('keeps the backdrop behind the target, within the sway, at the same range and height', () => {
