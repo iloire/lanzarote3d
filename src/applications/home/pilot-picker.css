@@ -1,9 +1,10 @@
-/* Pilot arrows - pick which pilot the camera follows, in the title's pixel style */
+/* Pilot arrows - pick which pilot the camera follows, in the title's pixel style, sitting on
+   top of the place picker's bar */
 
 .pilot-picker {
   position: fixed;
   left: 50%;
-  bottom: 20px;
+  bottom: 84px;
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -60,9 +61,6 @@
 
 @media (max-width: 500px) {
   .pilot-picker {
-    bottom: 16px;
-    left: auto;
-    right: 16px;
-    transform: none;
+    bottom: 80px;
   }
 }

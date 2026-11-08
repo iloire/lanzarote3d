@@ -15,7 +15,9 @@ import { getTerrainHeight } from '../../shared/env/mesh-utils';
 import { LevelOfDetail } from '../../foundation/types/lod';
 import { CharacterType } from '../../foundation/components/characters/CharacterRegistry';
 import Models from '../../foundation/utils/models';
-import { DEFAULT_SCENE, RELAX_SCENES, RelaxScene } from './scenes';
+import { DEFAULT_SCENE, RELAX_SCENES, RelaxScene, pickerPlaces } from './scenes';
+import { HOME_PLACE, placeHref } from './places';
+import { SITE } from '../../config/site';
 import { createLocationSwitcher } from './LocationSwitcher';
 import { createSoundControls } from './soundControls';
 import { PathTrail } from './pathTrail';
@@ -97,19 +99,14 @@ class RelaxApp extends TerrainBase {
       const { camera, scene, renderer, controls } = options;
       const asked = new URLSearchParams(window.location.search).get('location') ?? DEFAULT_SCENE;
       const id = asked in RELAX_SCENES ? asked : DEFAULT_SCENE;
+      // The Lanzarote site's home page is Lanzarote with all of the island, so it goes there
+      if (SITE === 'lanzarote' && id === HOME_PLACE) {
+        window.location.replace(placeHref(id));
+        return;
+      }
       const relax = RELAX_SCENES[id]!;
       this.location = relax.location;
-      this.removeSwitcher = createLocationSwitcher(
-        // An unlisted place shows only while it's the one open
-        Object.entries(RELAX_SCENES)
-          .filter(([key, scene]) => !scene.unlisted || key === id)
-          .map(([key, scene]) => ({
-            id: key,
-            name: scene.location.name,
-            region: scene.region,
-          })),
-        id
-      );
+      this.removeSwitcher = createLocationSwitcher(pickerPlaces(id), id);
       this.removeSound = createSoundControls(Boolean(relax.paramotor));
 
       const base = getDefaultTheme();

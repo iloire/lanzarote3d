@@ -82,9 +82,11 @@
   outline: none;
 }
 
-@media (max-width: 500px) {
+/* Too narrow to sit beside the place picker: up in the top left corner instead */
+@media (max-width: 720px) {
   .voxel-title-container {
     left: 16px;
-    bottom: 16px;
+    top: 16px;
+    bottom: auto;
   }
 }

@@ -59,6 +59,10 @@ import { CharacterType } from '../../foundation/components/characters/CharacterR
 import { birthdayPilots } from './birthdays';
 import { ConfettiBurst } from '../../foundation/components/effects/Confetti';
 import { HeroEmbed } from './heroEmbed';
+import { createLocationSwitcher } from '../relax/LocationSwitcher';
+import { createSoundControls } from '../relax/soundControls';
+import { pickerPlaces } from '../relax/scenes';
+import { HOME_PLACE } from '../relax/places';
 
 /**
  * Home App - Landing scene with the voxel title
@@ -87,6 +91,8 @@ class HomeApp extends TerrainBase {
   private targetController: CameraTargetController | null = null;
   private removeTitleOverlay: (() => void) | null = null;
   private removePilotPicker: (() => void) | null = null;
+  private removeSwitcher: (() => void) | undefined;
+  private removeSound: (() => void) | undefined;
   /** Everyone the camera can follow, paragliders then the hangglider, with how each banks */
   private pilots: { mesh: THREE.Object3D; motion?: ParagliderMotion; cameraDistance?: number }[] =
     [];
@@ -273,6 +279,9 @@ class HomeApp extends TerrainBase {
 
       if (!isEmbedded()) {
         this.removeTitleOverlay = createTitleOverlay();
+        // The home page is the relax site's Lanzarote: the same place picker, wind and music
+        this.removeSwitcher = createLocationSwitcher(pickerPlaces(HOME_PLACE), HOME_PLACE);
+        this.removeSound = createSoundControls();
       }
 
       this.setupCameraAnimation(camera, controls, renderer, scene);
@@ -517,6 +526,10 @@ class HomeApp extends TerrainBase {
       this.removeTitleOverlay();
       this.removeTitleOverlay = null;
     }
+    this.removeSwitcher?.();
+    this.removeSwitcher = undefined;
+    this.removeSound?.();
+    this.removeSound = undefined;
 
     this.hero?.dispose();
     this.hero = null;

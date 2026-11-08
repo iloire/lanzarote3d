@@ -25,6 +25,7 @@ import { geoToWorld } from '../../shared/geo';
 import { RIDGE_LOOP } from '../home/config';
 import { montSaintMichel } from './montSaintMichel';
 import type { SetPieceLoader } from './setPiece';
+import type { Place } from './places';
 
 /** One place to relax in: where the gliders soar and where the camera watches from */
 export interface RelaxScene {
@@ -284,3 +285,9 @@ export const RELAX_SCENES: Record<string, RelaxScene> = {
 };
 
 export const DEFAULT_SCENE = 'lanzarote';
+
+/** The places in the picker, in order; an unlisted one shows only while it's the one open */
+export const pickerPlaces = (current: string): Place[] =>
+  Object.entries(RELAX_SCENES)
+    .filter(([id, scene]) => !scene.unlisted || id === current)
+    .map(([id, scene]) => ({ id, name: scene.location.name, region: scene.region }));

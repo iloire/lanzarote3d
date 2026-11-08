@@ -2,6 +2,16 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-08 17:25 UTC
+
+### Changed
+
+- **The home page is relax's Lanzarote**: it carries the relax place picker and the wind and
+  music buttons, so the other places are one click away. On the Lanzarote site, relax's
+  Lanzarote (`/relax.html?location=lanzarote`, or no location) redirects to the home page instead
+  of showing a plainer copy of the same ridge. The pilot arrows sit above the place bar, and on
+  narrow screens the wordmark moves to the top left.
+
 ## 2026-11-08 16:55 UTC
 
 ### Changed

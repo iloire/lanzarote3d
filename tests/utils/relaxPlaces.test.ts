@@ -1,4 +1,4 @@
-import { groupByRegion, matchPlaces, neighbours } from '../../src/applications/relax/places';
+import { groupByRegion, matchPlaces, neighbours, placeHref } from '../../src/applications/relax/places';
 
 const places = [
   { id: 'lanzarote', name: 'Lanzarote', region: 'Canary Islands' },
@@ -32,4 +32,9 @@ test('previous and next wrap round the ends', () => {
   expect(neighbours(places, 'lanzarote').previous.id).toBe('rio-de-janeiro');
   expect(neighbours(places, 'rio-de-janeiro').next.id).toBe('lanzarote');
   expect(neighbours(places, 'tenerife')).toEqual({ previous: places[0], next: places[2] });
+});
+
+test('on the Lanzarote site Lanzarote is the home page and the others the relax page', () => {
+  expect(placeHref('lanzarote')).toBe('/');
+  expect(placeHref('el-hierro')).toBe('/relax.html?location=el-hierro');
 });

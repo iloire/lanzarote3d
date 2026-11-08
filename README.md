@@ -30,7 +30,8 @@ Hierro, Rio de Janeiro, Castejón de Sos) and watch a few gliders soar its ridge
 paramotors fly the street canyons of a voxel Midtown, Paris, where one laps the Eiffel Tower,
 Giza, where Abel flies his paramotor round the pyramids, built course by course, or Hong Kong at
 night, off the Peak and low over the harbour. It has its own build, and the Lanzarote site carries
-it too, unlinked, at `/relax.html?location=<id>`:
+it too, at `/relax.html?location=<id>`. There the home page is Lanzarote: it has the same place
+picker and the wind and music buttons, and relax's own Lanzarote redirects to it:
 
 ![Abel's paramotor between Menkaure and Khafre on the Giza plateau](docs/screenshots/giza.png)
 
