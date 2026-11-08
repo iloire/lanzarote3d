@@ -88,7 +88,7 @@ export function createSoundControls(paramotor = false): () => void {
         )
       : soundToggle(
           'WIND',
-          '🍃',
+          '🌬️',
           'relax-wind',
           () => new Wind(),
           () => {}

@@ -13,7 +13,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   narrow screens the wordmark moves to the top left.
 - **Quieter controls**: the place picker is one thin line (name and a `4/7` count) at 70%
   opacity, the pilot arrows match it, and the wind and music toggles are two small round emoji
-  buttons (🍃 or 🛵, 🎵) that bob gently while on and grey out with a slash when off. Relax now
+  buttons (🌬️ or 🛵, 🎵) on light bubbles that bob gently while on and grey out with a slash when off. Relax now
   loads the pixel font itself, and the home page no longer shows the faint app name in the corner
   the sound buttons use.
 
