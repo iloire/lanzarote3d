@@ -1,4 +1,6 @@
-/* Wind and music toggles - top right, in the place picker's pixel style */
+/* Wind and music - two little round buttons in the top right, in the place picker's pixel style */
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
 .sound-controls {
   position: fixed;
@@ -16,43 +18,111 @@
 
 @keyframes soundControlsFadeIn {
   to {
-    opacity: 0.9;
+    opacity: 0.7;
   }
 }
 
-.sound-controls__toggle {
-  min-width: 13ch;
-  padding: 8px 10px;
-  border: 2px solid #ffffff;
-  background: rgba(13, 31, 51, 0.45);
-  box-shadow: 2px 2px 0 #0d1f33;
-  color: #ffffff;
-  font: inherit;
-  font-size: 8px;
-  text-align: left;
-  text-shadow: 1px 1px 0 #0d1f33;
-  cursor: pointer;
-  transition:
-    color 0.15s,
-    border-color 0.15s;
+.sound-controls:hover,
+.sound-controls:focus-within {
+  opacity: 1;
+  transition: opacity 0.2s;
 }
 
-.sound-controls__toggle[aria-pressed='true'],
+.sound-controls__buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.sound-controls__toggle {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    transform 0.15s,
+    border-color 0.15s,
+    filter 0.2s,
+    opacity 0.2s;
+}
+
 .sound-controls__toggle:hover,
 .sound-controls__toggle:focus-visible {
-  color: #4aff9e;
-  border-color: #4aff9e;
+  background: rgba(74, 255, 158, 0.25);
+  transform: translateY(-2px) scale(1.08);
   outline: none;
+}
+
+/* On: the icon bobs gently, each button a little out of step with the other */
+.sound-controls__toggle[aria-pressed='true'] {
+  animation: soundBob 2.4s ease-in-out infinite;
+}
+
+.sound-controls__toggle[aria-pressed='true'] + .sound-controls__toggle[aria-pressed='true'] {
+  animation-delay: -1.2s;
+}
+
+@keyframes soundBob {
+  50% {
+    transform: translateY(-2px) rotate(-6deg);
+  }
+}
+
+.sound-controls__toggle:active {
+  transform: scale(0.92);
+}
+
+/* Off: greyed, with a slash through it */
+.sound-controls__toggle[aria-pressed='false'] {
+  filter: grayscale(1);
+  opacity: 0.45;
+}
+
+.sound-controls__toggle[aria-pressed='false']::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 2px;
+  border-radius: 1px;
+  background: #ffffff;
+  transform: rotate(-45deg);
 }
 
 .sound-controls__credit {
   color: #ffffff;
-  font-size: 6px;
+  font-size: 5px;
   text-decoration: none;
   text-shadow: 1px 1px 0 #0d1f33;
-  opacity: 0.75;
+  opacity: 0.6;
 }
 
 .sound-controls__credit:hover {
   opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sound-controls,
+  .sound-controls__toggle[aria-pressed='true'] {
+    animation: none;
+  }
+
+  .sound-controls {
+    opacity: 0.7;
+  }
+}
+
+@media (max-width: 500px) {
+  .sound-controls {
+    top: 16px;
+    right: 16px;
+  }
 }

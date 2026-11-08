@@ -11,6 +11,11 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   Lanzarote (`/relax.html?location=lanzarote`, or no location) redirects to the home page instead
   of showing a plainer copy of the same ridge. The pilot arrows sit above the place bar, and on
   narrow screens the wordmark moves to the top left.
+- **Quieter controls**: the place picker is one thin line (name and a `4/7` count) at 70%
+  opacity, the pilot arrows match it, and the wind and music toggles are two small round emoji
+  buttons (🍃 or 🛵, 🎵) that bob gently while on and grey out with a slash when off. Relax now
+  loads the pixel font itself, and the home page no longer shows the faint app name in the corner
+  the sound buttons use.
 
 ## 2026-11-08 16:55 UTC
 

@@ -231,10 +231,13 @@ const App: React.FC<AppProps> = ({
       {showAppSelection && !bare && shouldShowSidebar(initialStory) && (
         <Menu showPrivate={showPrivate} />
       )}
-      {/* A page using the scene as its hero background has its own title */}
-      {!bare && new URLSearchParams(window.location.search).get('embed') !== 'hero' && (
-        <div className="app-title">{appName}</div>
-      )}
+      {/* A page using the scene as its hero background has its own title, and the home page
+          its wordmark, with the sound buttons in this corner */}
+      {!bare &&
+        initialStory !== 'home' &&
+        new URLSearchParams(window.location.search).get('embed') !== 'hero' && (
+          <div className="app-title">{appName}</div>
+        )}
       <canvas className="webgl" />
     </div>
   );

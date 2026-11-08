@@ -1,10 +1,12 @@
 /* Place picker - pick where to relax, in the pilot picker's pixel style */
 
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
 .place-picker {
   --picker-ink: #ffffff;
   --picker-lit: #4aff9e;
   --picker-shade: #0d1f33;
-  --picker-glass: rgba(13, 31, 51, 0.45);
+  --picker-glass: rgba(13, 31, 51, 0.25);
   --picker-panel: rgba(13, 31, 51, 0.88);
   --picker-muted: #9fb6cc;
 
@@ -12,7 +14,7 @@
   left: 50%;
   bottom: 20px;
   z-index: 1000;
-  width: min(340px, calc(100vw - 32px));
+  width: min(280px, calc(100vw - 32px));
   transform: translateX(-50%);
   font-family: 'Press Start 2P', monospace;
   color: var(--picker-ink);
@@ -22,8 +24,15 @@
 
 @keyframes placePickerFadeIn {
   to {
-    opacity: 0.95;
+    opacity: 0.7;
   }
+}
+
+/* Quiet until wanted: it comes up to full strength under the pointer, keyboard or open list */
+.place-picker:hover,
+.place-picker:focus-within {
+  opacity: 1;
+  transition: opacity 0.2s;
 }
 
 /* The bar: < current place > */
@@ -35,12 +44,11 @@
 
 .place-picker__step,
 .place-picker__current {
-  border: 2px solid var(--picker-ink);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   background: var(--picker-glass);
   color: var(--picker-ink);
   font: inherit;
   text-shadow: 1px 1px 0 var(--picker-shade);
-  box-shadow: 2px 2px 0 var(--picker-shade);
   cursor: pointer;
   transition:
     color 0.15s,
@@ -50,35 +58,36 @@
 .place-picker__step {
   display: grid;
   place-items: center;
-  width: 40px;
+  width: 30px;
   flex: none;
-  font-size: 12px;
+  font-size: 9px;
   text-decoration: none;
 }
 
 .place-picker__current {
   display: flex;
   flex: 1;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 7px;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
   min-width: 0;
-  padding: 9px 12px;
+  padding: 8px 10px;
   text-align: left;
 }
 
 .place-picker__name {
   max-width: 100%;
   overflow: hidden;
-  font-size: 10px;
+  font-size: 8px;
   line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.place-picker__region {
+.place-picker__count {
+  flex: none;
   color: var(--picker-muted);
-  font-size: 7px;
+  font-size: 6px;
   line-height: 1;
 }
 
@@ -207,7 +216,7 @@
 @media (prefers-reduced-motion: reduce) {
   .place-picker {
     animation: none;
-    opacity: 0.95;
+    opacity: 0.7;
   }
 
   .place-picker__step,

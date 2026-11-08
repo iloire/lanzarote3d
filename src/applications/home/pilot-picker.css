@@ -4,11 +4,11 @@
 .pilot-picker {
   position: fixed;
   left: 50%;
-  bottom: 84px;
+  bottom: 58px;
   z-index: 1000;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   transform: translateX(-50%);
   font-family: 'Press Start 2P', monospace;
   animation: pilotPickerFadeIn 1s ease-out forwards;
@@ -17,22 +17,28 @@
 
 @keyframes pilotPickerFadeIn {
   to {
-    opacity: 0.9;
+    opacity: 0.7;
   }
 }
 
+/* Quiet like the place picker under it, up to full strength under the pointer */
+.pilot-picker:hover,
+.pilot-picker:focus-within {
+  opacity: 1;
+  transition: opacity 0.2s;
+}
+
 .pilot-picker button {
-  width: 40px;
-  height: 40px;
-  padding: 0 0 4px;
-  border: 2px solid #ffffff;
-  background: rgba(13, 31, 51, 0.45);
+  width: 30px;
+  height: 26px;
+  padding: 0 0 3px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(13, 31, 51, 0.25);
   color: #ffffff;
   font-family: inherit;
-  font-size: 20px;
+  font-size: 14px;
   line-height: 1;
   cursor: pointer;
-  box-shadow: 2px 2px 0 #0d1f33;
   transition:
     background 0.15s,
     color 0.15s,
@@ -47,13 +53,12 @@
 }
 
 .pilot-picker button:active {
-  transform: translate(2px, 2px);
-  box-shadow: none;
+  transform: translateY(1px);
 }
 
 .pilot-picker-count {
-  min-width: 48px;
-  font-size: 9px;
+  min-width: 40px;
+  font-size: 7px;
   text-align: center;
   color: #ffffff;
   text-shadow: 1px 1px 0 #0d1f33;
@@ -61,6 +66,6 @@
 
 @media (max-width: 500px) {
   .pilot-picker {
-    bottom: 80px;
+    bottom: 54px;
   }
 }

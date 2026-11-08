@@ -16,9 +16,10 @@ interface SoundToggle {
   close: () => void;
 }
 
-/** A button that turns a sound on and off and remembers which, on unless turned off before */
+/** A round button that turns a sound on and off and remembers which, on unless turned off before */
 function soundToggle(
   label: string,
+  icon: string,
   storageKey: string,
   create: () => Sound,
   changed: (on: boolean) => void
@@ -29,8 +30,11 @@ function soundToggle(
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'sound-controls__toggle';
+  button.textContent = icon;
   const show = () => {
-    button.textContent = `${label} ~ ${on ? 'ON' : 'OFF'}`;
+    const name = `${label[0]}${label.slice(1).toLowerCase()}`;
+    button.title = `${name} ${on ? 'on' : 'off'}`;
+    button.setAttribute('aria-label', name);
     button.setAttribute('aria-pressed', String(on));
     changed(on);
   };
@@ -57,7 +61,7 @@ function soundToggle(
 }
 
 /**
- * Wind and music buttons in the top right corner, with the music's credit. A paramotor place
+ * Round wind and music buttons in the top right corner, with the music's credit. A paramotor place
  * plays a soft engine instead of the wind. Both are on unless the viewer turned them off last
  * time, and fade in at the first click or key, since the browser blocks sound until then.
  * Returns a remover.
@@ -77,18 +81,21 @@ export function createSoundControls(paramotor = false): () => void {
     paramotor
       ? soundToggle(
           'ENGINE',
+          '🛵',
           'relax-engine',
           () => new Engine(),
           () => {}
         )
       : soundToggle(
           'WIND',
+          '🍃',
           'relax-wind',
           () => new Wind(),
           () => {}
         ),
     soundToggle(
       'MUSIC',
+      '🎵',
       'relax-music',
       () => new Music(),
       on => {
@@ -96,7 +103,10 @@ export function createSoundControls(paramotor = false): () => void {
       }
     ),
   ];
-  root.append(...toggles.map(({ button }) => button), credit);
+  const buttons = document.createElement('div');
+  buttons.className = 'sound-controls__buttons';
+  buttons.append(...toggles.map(({ button }) => button));
+  root.append(buttons, credit);
   document.body.appendChild(root);
 
   const stopWaiting = () => {

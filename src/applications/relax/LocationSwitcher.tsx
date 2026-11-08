@@ -91,8 +91,8 @@ const LocationSwitcher: React.FC<LocationSwitcherProps> = ({ places, current }) 
           onClick={() => setOpen(!open)}
         >
           <span className="place-picker__name">{here.name}</span>
-          <span className="place-picker__region">
-            {here.region} · {places.length} places
+          <span className="place-picker__count">
+            {places.indexOf(here) + 1}/{places.length}
           </span>
         </button>
         <a className="place-picker__step" href={placeHref(next.id)} title={next.name}>
