@@ -33,6 +33,7 @@
       "at": [-22.94949, -43.15616]
     }
   },
+  "pilots": ["ivan", "miguel"],
   "soaringLoop": {
     "about": "Ridge soaring the east face of Pedra Bonita in front of the launch, out over the valley towards São Conrado and back; [lat, lon, metres above sea level]",
     "waypoints": [

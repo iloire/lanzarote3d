@@ -216,7 +216,11 @@ class RelaxApp extends TerrainBase {
               .filter(({ options }) => options.pilot.characterType === PARAMOTOR_PILOT)
               .slice(0, 1)
               .map(({ options }) => ({ options: { ...options, paramotor: true } }))
-          : paraglidersVoxel.slice(0, PILOTS);
+          : relax.pilots
+            ? paraglidersVoxel.filter(({ options }) =>
+                relax.pilots!.includes(options.pilot.characterType)
+              )
+            : paraglidersVoxel.slice(0, PILOTS);
       this.gliders = await loadParagliders(
         scene,
         pilots.map(({ options }, i) => ({

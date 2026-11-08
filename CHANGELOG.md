@@ -2,6 +2,13 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-08 13:40 UTC
+
+### Changed
+
+- **Rio flies just Ivan and Miguel**: a location can now name its pilots with `pilots` in its
+  JSON; Rio lists `["ivan", "miguel"]` instead of the default first five.
+
 ## 2026-11-08 13:03 UTC
 
 ### Changed

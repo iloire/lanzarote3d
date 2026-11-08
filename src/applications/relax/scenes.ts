@@ -60,6 +60,8 @@ export interface RelaxScene {
   venetian?: { list: VenetianLandmark[]; anchor: GeoAnchor; ground: number; unitsPerMetre: number };
   /** Fly paramotors, which need no ridge, instead of paragliders */
   paramotor?: boolean;
+  /** The pilots who fly the ridge, by character id; the app's first few unless given */
+  pilots?: string[];
   /** How many times a wing's speed the paramotor flies; the app's own unless given */
   paramotorSpeed?: number;
   /** Share of the city's cars that are yellow cabs, New York's unless given */
@@ -132,6 +134,7 @@ interface DemSceneConfig extends DemLocationConfig {
   }[];
   landmarks?: { name: string; kind: string; at: number[]; heading?: number; top?: number }[];
   paramotor?: boolean;
+  pilots?: string[];
   paramotorSpeed?: number;
   /** Built by 3d/city-to-glb.py; `taxis` is the share of its cars that are yellow cabs */
   city?: { voxel: number; taxis?: number };
@@ -171,8 +174,8 @@ function demScene(location: Location, config: DemSceneConfig, city?: string): Re
       positions: [...config.camera.intro.keys.map(key => key.at), config.camera.at].map(at =>
         demPoint(config, at)
       ),
-      targets: [...config.camera.intro.keys.map(key => key.lookAt), config.camera.lookAt].map(
-        at => demPoint(config, at)
+      targets: [...config.camera.intro.keys.map(key => key.lookAt), config.camera.lookAt].map(at =>
+        demPoint(config, at)
       ),
     },
     clouds: config.clouds.map(({ at, kind, scale }) => ({
@@ -221,6 +224,7 @@ function demScene(location: Location, config: DemSceneConfig, city?: string): Re
       unitsPerMetre: config.unitsPerMetre,
     },
     paramotor: config.paramotor,
+    pilots: config.pilots,
     paramotorSpeed: config.paramotorSpeed,
     taxiShare: config.city?.taxis,
     // FogExp2 hides half where (density × distance)² = ln 2
