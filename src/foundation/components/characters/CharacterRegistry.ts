@@ -29,6 +29,11 @@ export interface CharacterAssets {
   thumbnailFile?: string;
   alternativeTextures?: string[];
   alternativeModels?: string[];
+  /**
+   * The joints of a model exported in moving parts (3d-characters vox-to-obj.mjs --parts):
+   * each part's parent and the point it hinges on, in the model's space
+   */
+  rigFile?: string;
 }
 
 /**
@@ -109,6 +114,7 @@ export class CharacterRegistry {
         objFile: '/assets/foundation/models/characters/ivan/ivan.obj',
         textureFile: '/assets/foundation/models/characters/ivan/ivan.png',
         thumbnailFile: '/assets/foundation/models/characters/ivan/ivan.png',
+        rigFile: '/assets/foundation/models/characters/ivan/ivan.rig.json',
       },
       defaultScale: 0.01,
       defaultMaterialOptions: {

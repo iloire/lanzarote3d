@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { PilotPose } from './pilotPose';
 
 const GRAVITY = 9.81;
 const MAX_BANK = THREE.MathUtils.degToRad(35);
@@ -138,6 +139,8 @@ export class ParagliderMotion {
   private loopRestLeft: number;
   private loopPitch = 0;
   private readonly loopLast = { forward: 0, up: 0 };
+  /** The pilot's arms and head, if the model is cut into parts */
+  private readonly pose?: PilotPose;
 
   constructor(
     private readonly rig: THREE.Object3D,
@@ -152,6 +155,7 @@ export class ParagliderMotion {
     body.rotation.order = 'YXZ';
     // The pilot twists round the hang line first, then swings on it
     if (pilotSwing) pilotSwing.rotation.order = 'XZY';
+    this.pose = pilotSwing && PilotPose.from(pilotSwing);
     // Somewhere into a rest, so the pilots don't start their wingovers together
     this.restLeft = wingover ? Math.random() * wingover.rest[1] : 0;
     this.twistRestLeft = twist ? Math.random() * twist.rest[1] : 0;
@@ -211,6 +215,8 @@ export class ParagliderMotion {
     this.body.position.z = -loop.forward;
 
     if (this.pilotSwing) this.swingPilot(this.pilotSwing, deltaTime, bankRate);
+    // The hands ask for the bank the turn calls for now; the wing gets there after them
+    this.pose?.update(deltaTime, targetBank + weave.bank, this.roll.angle);
   }
 
   /**

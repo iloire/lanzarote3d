@@ -12,6 +12,7 @@ export interface PilotVoxelOptions extends ComponentOptions {
   characterType?: CharacterType;
   objFile?: string;
   textureFile?: string;
+  rigFile?: string;
 
   // Material customization
   materialOptions?: {
@@ -33,6 +34,43 @@ export interface PilotVoxelOptions extends ComponentOptions {
   // Character-specific overrides
   useAlternativeTexture?: number; // Index of alternative texture to use
   useAlternativeModel?: number; // Index of alternative model to use
+}
+
+/** The joints of a pilot exported in parts: each part's parent and where it hinges on it */
+export interface PilotRig {
+  parts: Record<string, { parent: string; joint: [number, number, number] }>;
+}
+
+/**
+ * Hangs each part of `model` named in `rig` on a pivot at its joint, named after the part,
+ * inside its parent's pivot, so rotating a pivot turns the part, and the parts it carries,
+ * about its joint. The model looks the same until a pivot turns.
+ */
+function hingeParts(model: THREE.Object3D, rig: PilotRig): void {
+  const pivots = new Map<string, THREE.Object3D>([['body', model]]);
+  const jointOf = (name: string) => new THREE.Vector3(...(rig.parts[name]?.joint ?? [0, 0, 0]));
+  const pivotFor = (name: string): THREE.Object3D => {
+    const existing = pivots.get(name);
+    if (existing) return existing;
+    const part = rig.parts[name];
+    if (!part) throw new Error(`Rig has no part ${name}`);
+    const pivot = new THREE.Object3D();
+    pivot.name = name;
+    const parent = pivotFor(part.parent);
+    pivot.position
+      .copy(jointOf(name))
+      .sub(parent === model ? new THREE.Vector3() : jointOf(part.parent));
+    parent.add(pivot);
+    pivots.set(name, pivot);
+    return pivot;
+  };
+  [...model.children].forEach(mesh => {
+    if (!rig.parts[mesh.name]) return;
+    const pivot = pivotFor(mesh.name);
+    mesh.name = `${mesh.name}-mesh`;
+    mesh.position.copy(jointOf(pivot.name)).negate();
+    pivot.add(mesh);
+  });
 }
 
 /**
@@ -79,6 +117,8 @@ export class PilotVoxel extends SimpleThreeComponent {
         // Store paths
         objFile,
         textureFile,
+        // Only the character's own model is cut into parts
+        rigFile: options.useAlternativeModel === undefined ? character.assets.rigFile : undefined,
         materialOptions: {
           roughness: 0.8,
           metalness: 0.1,
@@ -111,10 +151,12 @@ export class PilotVoxel extends SimpleThreeComponent {
     const opts = this._options as PilotVoxelOptions;
 
     // Load model and texture in parallel
-    const [model, texture] = await Promise.all([
+    const [model, texture, rig] = await Promise.all([
       this.loadOBJ(opts.objFile!),
       this.loadTexture(opts.textureFile!),
+      opts.rigFile ? this.loadRig(opts.rigFile) : undefined,
     ]);
+    if (rig) hingeParts(model, rig);
 
     // Configure texture
     const texOpts = opts.textureOptions!;
@@ -174,6 +216,12 @@ export class PilotVoxel extends SimpleThreeComponent {
         }
       );
     });
+  }
+
+  private async loadRig(url: string): Promise<PilotRig> {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Failed to load rig from ${url}: ${response.status}`);
+    return (await response.json()) as PilotRig;
   }
 
   /**

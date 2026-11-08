@@ -87,11 +87,27 @@ export class ParagliderVoxel extends SimpleThreeComponent {
     hangPoint.add(this.pilotSwing);
     group.updateMatrixWorld(true);
     this.pilotSwing.attach(this.pilotMesh);
-    // The brake handles are in the pilot's fists; their lines follow them as the pilot swings
+    // The brake handles are in the pilot's fists; their lines follow them as the pilot swings.
+    // A pilot cut into parts holds each in the nearer forearm, so it moves with the hand.
+    const forearms = ['forearm-left', 'forearm-right']
+      .map(name => this.pilotMesh?.getObjectByName(name))
+      .filter((forearm): forearm is THREE.Object3D => forearm !== undefined);
+    const handlePosition = new THREE.Vector3();
+    const forearmPosition = new THREE.Vector3();
     wing
       .getObjectByName('brakes')
       ?.children.filter(child => child.name === 'brake-handle')
-      .forEach(handle => this.pilotSwing?.attach(handle));
+      .forEach(handle => {
+        handle.getWorldPosition(handlePosition);
+        const nearest = forearms.reduce<THREE.Object3D | undefined>((best, forearm) => {
+          const distance = handlePosition.distanceTo(forearm.getWorldPosition(forearmPosition));
+          const bestDistance = best
+            ? handlePosition.distanceTo(best.getWorldPosition(forearmPosition))
+            : Infinity;
+          return distance < bestDistance ? forearm : best;
+        }, undefined);
+        (nearest ?? this.pilotSwing)?.attach(handle);
+      });
 
     // Under the seat, so it swings with the pilot and streams back behind them
     if (options.pirateFlag) {
