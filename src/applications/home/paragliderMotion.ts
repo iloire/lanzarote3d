@@ -216,7 +216,12 @@ export class ParagliderMotion {
 
     if (this.pilotSwing) this.swingPilot(this.pilotSwing, deltaTime, bankRate);
     // The hands ask for the bank the turn calls for now; the wing gets there after them
-    this.pose?.update(deltaTime, targetBank + weave.bank, this.roll.angle);
+    this.pose?.update(
+      deltaTime,
+      targetBank + weave.bank,
+      this.roll.angle,
+      this.pilotSwing?.rotation.y ?? 0
+    );
   }
 
   /**

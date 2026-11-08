@@ -12,6 +12,14 @@ const HAND_RESPONSE = 4;
 /** At a full pull the upper arm drops this far at the shoulder and the forearm tips forward */
 const SHOULDER_DROP = deg(40);
 const FOREARM_TIP = deg(55);
+/**
+ * Twisted half round under the risers, the pilot still holds the brakes, which hang from the
+ * untwisted wing: the arms reach up and cross above the head. At a full half turn the upper arms
+ * rise this far, the forearms lean in this far from upright across the head, and one crosses in front of the other.
+ */
+const TWIST_ARM_RAISE = deg(70);
+const TWIST_FOREARM_LEAN = deg(45);
+const TWIST_FOREARM_CROSS = deg(12);
 /** How far the pilot looks into a turn at full brake, and how fast the head turns, per second */
 const LOOK_INTO_TURN = deg(45);
 const HEAD_RESPONSE = 2.5;
@@ -66,9 +74,13 @@ export class PilotPose {
 
   /**
    * `bank` is the bank the pilot is asking the wing for, positive to the left; `lean` is how
-   * far the pilot hangs over to the left, in radians.
+   * far the pilot hangs over to the left, and `twist` how far round the hang line he is turned,
+   * in radians.
    */
-  update(deltaTime: number, bank: number, lean: number): void {
+  update(deltaTime: number, bank: number, lean: number, twist = 0): void {
+    // 0 facing forward, 1 a full half turn round
+    const twisted = Math.min(1, Math.abs(twist) / Math.PI);
+    const crossing = Math.sign(twist) || 1;
     const turn = THREE.MathUtils.clamp(bank / FULL_BRAKE_BANK, -1, 1);
     const handStep = Math.min(1, deltaTime * HAND_RESPONSE);
     this.arms.forEach(arm => {
@@ -80,11 +92,15 @@ export class PilotPose {
       );
       arm.brake += (target - arm.brake) * handStep;
       // Positive Z turns the right arm (-X) down and the left one up
-      const drop = arm.brake * SHOULDER_DROP;
-      arm.shoulder.rotation.z = -arm.side * drop;
-      // The forearm stays upright as the upper arm drops, and tips forward to pull the brake
-      arm.elbow.rotation.z = arm.side * drop;
-      arm.elbow.rotation.x = arm.brake * FOREARM_TIP;
+      const drop = arm.brake * SHOULDER_DROP * (1 - twisted);
+      const raise = TWIST_ARM_RAISE * twisted;
+      arm.shoulder.rotation.z = arm.side * (raise - drop);
+      // The forearm stays upright as the upper arm drops, and tips forward to pull the brake;
+      // twisted, it leans in over the head, one in front of the other as they cross
+      arm.elbow.rotation.z = arm.side * (drop - raise + TWIST_FOREARM_LEAN * twisted);
+      arm.elbow.rotation.x =
+        arm.brake * FOREARM_TIP * (1 - twisted) +
+        arm.side * crossing * TWIST_FOREARM_CROSS * twisted;
     });
 
     if (!this.head) return;

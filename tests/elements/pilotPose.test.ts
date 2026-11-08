@@ -21,13 +21,14 @@ function setup() {
     return pivot(`hand-${name}`, forearm, 0, 2.3, 0);
   });
   const pose = PilotPose.from(pilot)!;
-  const fly = (bank: number, seconds = 3) => {
-    for (let t = 0; t < seconds; t += STEP) pose.update(STEP, bank, 0);
+  const fly = (bank: number, seconds = 3, twist = 0) => {
+    for (let t = 0; t < seconds; t += STEP) pose.update(STEP, bank, 0, twist);
     pilot.updateMatrixWorld(true);
   };
   const heightOf = (hand: THREE.Object3D) => hand.getWorldPosition(new THREE.Vector3()).y;
+  const across = (hand: THREE.Object3D) => hand.getWorldPosition(new THREE.Vector3()).x;
   const facing = () => new THREE.Vector3(0, 0, 1).applyQuaternion(head.quaternion);
-  return { pilot, pose, fly, left: hands[0]!, right: hands[1]!, heightOf, facing };
+  return { pilot, pose, fly, left: hands[0]!, right: hands[1]!, heightOf, across, facing };
 }
 
 describe('PilotPose', () => {
@@ -59,5 +60,16 @@ describe('PilotPose', () => {
     fly(THREE.MathUtils.degToRad(-35));
     expect(heightOf(right)).toBeLessThan(heightOf(left) - 0.5);
     expect(facing().x).toBeLessThan(-0.4);
+  });
+
+  it('crosses the arms above the head when twisted half round', () => {
+    const { fly, left, right, heightOf, across } = setup();
+    fly(0);
+    expect(across(left)).toBeGreaterThan(across(right));
+    fly(0, 0.1, Math.PI);
+    // The left hand reaches over to the right and the right to the left, above the helmet (7.9)
+    expect(across(left)).toBeLessThan(across(right));
+    expect(heightOf(left)).toBeGreaterThan(7.9);
+    expect(heightOf(right)).toBeGreaterThan(7.9);
   });
 });
