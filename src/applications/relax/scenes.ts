@@ -33,6 +33,8 @@ export interface RelaxScene {
   region: string;
   /** The loop the gliders soar, closed */
   loop: THREE.Vector3[];
+  /** How far round the loop (0-1) the first pilot starts; 0 unless given */
+  loopStart?: number;
   camera: { position: THREE.Vector3; target: THREE.Vector3 };
   /**
    * A flight into the scene before the viewer gets the camera: through `positions`, looking
@@ -109,7 +111,7 @@ export interface SceneLook {
 /** The relax fields of a location JSON (see src/locations/README.md) */
 interface DemSceneConfig extends DemLocationConfig {
   region: string;
-  soaringLoop: { waypoints: number[][] };
+  soaringLoop: { waypoints: number[][]; start?: number };
   camera: {
     at: number[];
     lookAt: number[];
@@ -165,6 +167,7 @@ function demScene(location: Location, config: DemSceneConfig, city?: string): Re
     location,
     region: config.region,
     loop: config.soaringLoop.waypoints.map(at => demPoint(config, at)),
+    loopStart: config.soaringLoop.start,
     camera: {
       position: demPoint(config, config.camera.at),
       target: demPoint(config, config.camera.lookAt),

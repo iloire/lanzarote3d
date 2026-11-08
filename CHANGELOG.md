@@ -2,6 +2,14 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-08 16:55 UTC
+
+### Changed
+
+- **New York opens on Central Park**: the paramotor starts on the leg along the bottom of the park
+  instead of down among the Midtown towers. A location can set where on its loop the pilots start
+  with `soaringLoop.start` (0-1); `?progress=` still overrides it.
+
 ## 2026-11-08 16:35 UTC
 
 ### Added

@@ -30,8 +30,10 @@ import { Canal, CityBoats } from '../../shared/env/cityBoats';
 import { venetianLandmarks } from '../../shared/env/venetianLandmarks';
 
 const PILOTS = 5;
-// ?progress=0.4 starts the first pilot that far round the loop, to share a moment of the flight
-const START_PROGRESS = Number(new URLSearchParams(window.location.search).get('progress')) || 0;
+// ?progress=0.4 starts the first pilot that far round the loop, to share a moment of the flight;
+// otherwise the place's own start, or the loop's first waypoint
+const progressParam = new URLSearchParams(window.location.search).get('progress');
+const START_PROGRESS = progressParam === null ? undefined : Number(progressParam) || 0;
 // Where there's no ridge Abel flies his paramotor alone, twice a wing's speed so the streets go
 // by (unless the place sets its own), and the camera chases him: CHASE_LAG seconds back along
 // his own path, which is clear of the buildings, CHASE_RISE units above it, easing in over
@@ -225,7 +227,7 @@ class RelaxApp extends TerrainBase {
         scene,
         pilots.map(({ options }, i) => ({
           options,
-          startProgress: (i / pilots.length + START_PROGRESS) % 1,
+          startProgress: (i / pilots.length + (START_PROGRESS ?? relax.loopStart ?? 0)) % 1,
           // Each a little higher and further out, so they don't fly through each other
           pathOffset: new THREE.Vector3(0, i * 25, 0),
           speedFactor: relax.paramotor ? (relax.paramotorSpeed ?? PARAMOTOR_SPEED) : 1,

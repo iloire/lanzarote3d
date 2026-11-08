@@ -62,7 +62,8 @@
     }
   },
   "soaringLoop": {
-    "about": "The paramotors fly the street canyons at 100 m, under the towers' tops: north up 5th Avenue, round over the bottom of Central Park, south down 6th Avenue, then east over Bryant Park and the Library back to 5th. Avenues are 27-30 m between buildings, wings about 14 m; city-to-glb.py checks the curve keeps 10 m either side clear. [lat, lon, metres above sea level]",
+    "about": "The paramotors fly the street canyons at 100 m, under the towers' tops: north up 5th Avenue, round over the bottom of Central Park, south down 6th Avenue, then east over Bryant Park and the Library back to 5th. Avenues are 27-30 m between buildings, wings about 14 m; city-to-glb.py checks the curve keeps 10 m either side clear. [lat, lon, metres above sea level]. `start` 0.273 (waypoint 6 of 22) opens on the leg along the bottom of Central Park rather than down among the Midtown towers; not on the short legs round Grand Army Plaza, where every leg taking the same time makes the paramotor crawl",
+    "start": 0.273,
     "waypoints": [
       [40.755954, -73.979091, 106],
       [40.758724, -73.977078, 106],
@@ -89,9 +90,9 @@
     ]
   },
   "camera": {
-    "about": "Over Bryant Park near 5th Avenue, just above the rooftops (78 m over the highest under its sway), looking north up the canyons of 5th and 6th Avenues; [lat, lon, metres]",
-    "at": [40.752654, -73.982568, 200.0],
-    "lookAt": [40.756107, -73.980464, 110.0],
+    "about": "Behind the paramotor's start at Grand Army Plaza, looking west along the bottom of Central Park, so the chase camera opens already on the park; [lat, lon, metres]",
+    "at": [40.76296, -73.96908, 200.0],
+    "lookAt": [40.764707, -73.973216, 110.0],
     "zoomOut": 2.5,
     "pan": 9000
   },
