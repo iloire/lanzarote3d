@@ -2,6 +2,13 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-08 18:12 UTC
+
+### Changed
+
+- **Daniel films with a GoPro**: his latest voxel model from 3d-characters 7eff2f1, with a
+  GoPro on a mount at the front of his helmet.
+
 ## 2026-11-08 18:05 UTC
 
 ### Added
