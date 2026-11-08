@@ -1,4 +1,9 @@
-import { groupByRegion, matchPlaces, neighbours, placeHref } from '../../src/applications/relax/places';
+import {
+  groupByRegion,
+  matchPlaces,
+  neighbours,
+  placeHref,
+} from '../../src/applications/relax/places';
 
 const places = [
   { id: 'lanzarote', name: 'Lanzarote', region: 'Canary Islands' },
