@@ -87,6 +87,7 @@ export class CharacterRegistry {
         objFile: '/assets/foundation/models/characters/adri/adri.obj',
         textureFile: '/assets/foundation/models/characters/adri/adri.png',
         thumbnailFile: '/assets/foundation/models/characters/adri/thumbnail.png',
+        rigFile: '/assets/foundation/models/characters/adri/adri.rig.json',
         alternativeTextures: [
           '/assets/foundation/models/characters/adri/adri_winter.png',
           '/assets/foundation/models/characters/adri/adri_summer.png',
@@ -203,6 +204,7 @@ export class CharacterRegistry {
         assets: {
           objFile: `/assets/foundation/models/characters/${id}/${file}.obj`,
           textureFile: `/assets/foundation/models/characters/${id}/${file}.png`,
+          rigFile: `/assets/foundation/models/characters/${id}/${file}.rig.json`,
         },
         defaultScale: 0.01,
         defaultMaterialOptions: {

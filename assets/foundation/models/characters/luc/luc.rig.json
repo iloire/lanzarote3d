@@ -1,0 +1,44 @@
+{
+  "parts": {
+    "forearm-right": {
+      "parent": "arm-right",
+      "joint": [
+        -2.85,
+        4.8,
+        -1.25
+      ]
+    },
+    "forearm-left": {
+      "parent": "arm-left",
+      "joint": [
+        2.85,
+        4.8,
+        -1.25
+      ]
+    },
+    "head": {
+      "parent": "body",
+      "joint": [
+        0,
+        5.1,
+        -0.8
+      ]
+    },
+    "arm-right": {
+      "parent": "body",
+      "joint": [
+        -0.9,
+        4.8,
+        -1.25
+      ]
+    },
+    "arm-left": {
+      "parent": "body",
+      "joint": [
+        0.9,
+        4.8,
+        -1.25
+      ]
+    }
+  }
+}
