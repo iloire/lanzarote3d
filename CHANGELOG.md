@@ -2,6 +2,13 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-08 22:53 UTC
+
+### Changed
+
+- **Ivan has shorter legs and hair**: his latest voxel model from 3d-characters f1c7969, with
+  the cocoon's leg section 10 voxels shorter and his sideburns stopping at the ears.
+
 ## 2026-11-08 18:15 UTC
 
 ### Changed
