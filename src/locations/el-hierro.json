@@ -54,9 +54,9 @@
     ]
   },
   "camera": {
-    "about": "High over El Golfo near the coast, looking south across Frontera to the cliff with the takeoffs on its rim; the whole island has sea all round, so the viewer may zoom out and pan across it; [lat, lon, metres]",
-    "at": [27.772, -18.03, 1500],
-    "lookAt": [27.743, -18.016, 1150],
+    "about": "High over the Sabinosa end of El Golfo, looking north-east up the bay past Frontera, with the cliff and its takeoffs to the right and the coast curving to the north tip; the whole island has sea all round, so the viewer may zoom out and pan across it; [lat, lon, metres]",
+    "at": [27.734, -18.058, 2850],
+    "lookAt": [27.765, -17.997, 300],
     "zoomOut": 8,
     "pan": 20000
   },
