@@ -33,7 +33,8 @@ function soundToggle(
   button.textContent = icon;
   const show = () => {
     const name = `${label[0]}${label.slice(1).toLowerCase()}`;
-    button.title = `${name} ${on ? 'on' : 'off'}`;
+    // Shown as a tooltip under the button by the stylesheet
+    button.dataset['tip'] = `${name} ${on ? 'on' : 'off'}`;
     button.setAttribute('aria-label', name);
     button.setAttribute('aria-pressed', String(on));
     changed(on);

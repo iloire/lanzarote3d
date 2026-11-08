@@ -109,6 +109,45 @@
   opacity: 1;
 }
 
+/* A tooltip under the button, on screens with a pointer that can hover */
+@media (hover: hover) {
+  .sound-controls__toggle::before {
+    content: attr(data-tip);
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    padding: 6px 8px;
+    background: rgba(13, 31, 51, 0.88);
+    color: #ffffff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    line-height: 1;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(-3px);
+    transition:
+      opacity 0.15s,
+      transform 0.15s;
+  }
+
+  .sound-controls__toggle:hover::before,
+  .sound-controls__toggle:focus-visible::before {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* The credit under the buttons steps aside for the tooltip */
+  .sound-controls__credit {
+    transition: opacity 0.15s;
+  }
+
+  .sound-controls:has(.sound-controls__toggle:hover) .sound-controls__credit,
+  .sound-controls:has(.sound-controls__toggle:focus-visible) .sound-controls__credit {
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .sound-controls,
   .sound-controls__toggle[aria-pressed='true'] {
