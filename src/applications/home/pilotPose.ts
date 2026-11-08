@@ -14,12 +14,15 @@ const SHOULDER_DROP = deg(40);
 const FOREARM_TIP = deg(55);
 /**
  * Twisted half round under the risers, the pilot still holds the brakes, which hang from the
- * untwisted wing: the arms reach up and cross above the head. At a full half turn the upper arms
- * rise this far, the forearms lean in this far from upright across the head, and one crosses in front of the other.
+ * untwisted wing: the arms reach up and cross behind the head, where the risers twist. At a full
+ * half turn the upper arms rise this far and swing back this far, the forearms lean in this far
+ * from upright and tip back this far, and one crosses in front of the other.
  */
 const TWIST_ARM_RAISE = deg(70);
-const TWIST_FOREARM_LEAN = deg(45);
-const TWIST_FOREARM_CROSS = deg(12);
+const TWIST_ARM_BACK = deg(15);
+const TWIST_FOREARM_LEAN = deg(60);
+const TWIST_FOREARM_BACK = deg(15);
+const TWIST_FOREARM_CROSS = deg(10);
 /** How far the pilot looks into a turn at full brake, and how fast the head turns, per second */
 const LOOK_INTO_TURN = deg(45);
 const HEAD_RESPONSE = 2.5;
@@ -95,12 +98,14 @@ export class PilotPose {
       const drop = arm.brake * SHOULDER_DROP * (1 - twisted);
       const raise = TWIST_ARM_RAISE * twisted;
       arm.shoulder.rotation.z = arm.side * (raise - drop);
+      // Positive X tips the arm forward
+      arm.shoulder.rotation.x = -TWIST_ARM_BACK * twisted;
       // The forearm stays upright as the upper arm drops, and tips forward to pull the brake;
-      // twisted, it leans in over the head, one in front of the other as they cross
+      // twisted, it leans in behind the head, one in front of the other as they cross
       arm.elbow.rotation.z = arm.side * (drop - raise + TWIST_FOREARM_LEAN * twisted);
       arm.elbow.rotation.x =
         arm.brake * FOREARM_TIP * (1 - twisted) +
-        arm.side * crossing * TWIST_FOREARM_CROSS * twisted;
+        (arm.side * crossing * TWIST_FOREARM_CROSS - TWIST_FOREARM_BACK) * twisted;
     });
 
     if (!this.head) return;
