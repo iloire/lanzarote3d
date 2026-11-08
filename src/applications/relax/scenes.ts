@@ -264,9 +264,9 @@ export const RELAX_SCENES: Record<string, RelaxScene> = {
     // The whole island, sea all round: nothing to hide, so look anywhere
     limits: { zoomOut: 8, pan: 20000 },
   },
-  tenerife: demScene(TENERIFE, TENERIFE_CONFIG),
+  tenerife: { ...demScene(TENERIFE, TENERIFE_CONFIG), unlisted: true },
   'el-hierro': demScene(EL_HIERRO, EL_HIERRO_CONFIG),
-  'castejon-de-sos': demScene(CASTEJON_DE_SOS, CASTEJON_DE_SOS_CONFIG),
+  'castejon-de-sos': { ...demScene(CASTEJON_DE_SOS, CASTEJON_DE_SOS_CONFIG), unlisted: true },
   'rio-de-janeiro': demScene(RIO_DE_JANEIRO, RIO_CONFIG),
   'new-york': demScene(NEW_YORK, NEW_YORK_CONFIG, NEW_YORK_CITY),
   giza: demScene(GIZA, GIZA_CONFIG, GIZA_MONUMENTS),

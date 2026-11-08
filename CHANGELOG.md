@@ -16,6 +16,14 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 - **Faster Rio intro**: the fly-in from the Cristo down to the gliders now takes 10 s
   instead of 25 s, so you can click and move the camera sooner.
 
+## 2026-11-08 10:00 UTC
+
+### Changed
+
+- **El Hierro opens over the Sabinosa end of El Golfo**, looking north-east up the bay past
+  Frontera, the cliff and its gliders to the right, instead of from the coast towards the cliff
+- **Tenerife and Castejón de Sos left out of the place picker**; `?location=` still opens them
+
 ## 2026-11-07 19:30 UTC
 
 ### Fixed
