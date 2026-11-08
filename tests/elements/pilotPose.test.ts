@@ -63,17 +63,18 @@ describe('PilotPose', () => {
     expect(facing().x).toBeLessThan(-0.4);
   });
 
-  it('crosses the arms behind the head when twisted half round', () => {
+  it('crosses the arms in front of the face when twisted half round', () => {
     const { fly, left, right, heightOf, across, ahead } = setup();
     fly(0);
     expect(across(left)).toBeGreaterThan(across(right));
     fly(0, 0.1, Math.PI);
-    // The left hand reaches over to the right and the right to the left, at head height
+    // The left hand reaches over to the right and the right to the left, at face height
     expect(across(left)).toBeLessThan(across(right));
-    expect(heightOf(left)).toBeGreaterThan(7);
-    expect(heightOf(right)).toBeGreaterThan(7);
-    // Behind the back of the helmet (z -1.4), where the risers twist
-    expect(ahead(left)).toBeLessThan(-1.6);
-    expect(ahead(right)).toBeLessThan(-1.6);
+    [left, right].forEach(hand => {
+      expect(heightOf(hand)).toBeGreaterThan(5.8);
+      expect(heightOf(hand)).toBeLessThan(7.6);
+      // In front of the face (z 0.5)
+      expect(ahead(hand)).toBeGreaterThan(0.9);
+    });
   });
 });

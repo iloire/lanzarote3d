@@ -10,7 +10,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   forearms) by 3d-characters' exporter, with a `.rig.json` of joints beside each model.
   `PilotVoxel` hinges the parts and `PilotPose` moves them: the inside brake is pulled just
   before the wing banks, the head looks into turns, stays level and glances round now and then,
-  and when Bernt twists half round under his risers his arms cross above his head on the
+  and when Bernt twists half round under his risers his arms cross in front of his face on the
   brakes. Fabio keeps filming with his right arm and brakes with his left.
 
 ## 2026-11-08 17:42 UTC
