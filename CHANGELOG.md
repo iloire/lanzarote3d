@@ -2,6 +2,14 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-08 16:35 UTC
+
+### Added
+
+- **A cute engine for the paramotors**: paramotor places (New York, Hong Kong, Venice,
+  Mont-Saint-Michel) play a soft putt-putt engine instead of the wind, made in the browser like
+  the wind. Its toggle reads ENGINE and remembers its own on/off.
+
 ## 2026-11-08 13:40 UTC
 
 ### Changed

@@ -1,3 +1,4 @@
+import { Engine } from './engine';
 import { Music } from './music';
 import { Wind } from './wind';
 import './sound-controls.css';
@@ -56,11 +57,12 @@ function soundToggle(
 }
 
 /**
- * Wind and music buttons in the top right corner, with the music's credit. Both are on unless
- * the viewer turned them off last time, and fade in at the first click or key, since the
- * browser blocks sound until then. Returns a remover.
+ * Wind and music buttons in the top right corner, with the music's credit. A paramotor place
+ * plays a soft engine instead of the wind. Both are on unless the viewer turned them off last
+ * time, and fade in at the first click or key, since the browser blocks sound until then.
+ * Returns a remover.
  */
-export function createSoundControls(): () => void {
+export function createSoundControls(paramotor = false): () => void {
   const root = document.createElement('div');
   root.className = 'sound-controls';
   const credit = document.createElement('a');
@@ -72,12 +74,19 @@ export function createSoundControls(): () => void {
   credit.textContent = 'MUSIC: KEVIN MACLEOD · CC BY 4.0';
 
   const toggles = [
-    soundToggle(
-      'WIND',
-      'relax-wind',
-      () => new Wind(),
-      () => {}
-    ),
+    paramotor
+      ? soundToggle(
+          'ENGINE',
+          'relax-engine',
+          () => new Engine(),
+          () => {}
+        )
+      : soundToggle(
+          'WIND',
+          'relax-wind',
+          () => new Wind(),
+          () => {}
+        ),
     soundToggle(
       'MUSIC',
       'relax-music',

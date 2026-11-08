@@ -108,7 +108,7 @@ class RelaxApp extends TerrainBase {
           })),
         id
       );
-      this.removeSound = createSoundControls();
+      this.removeSound = createSoundControls(Boolean(relax.paramotor));
 
       const base = getDefaultTheme();
       const { look } = relax;
