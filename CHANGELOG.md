@@ -2,6 +2,13 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-08 17:42 UTC
+
+### Changed
+
+- **Daniel a little higher off the beach**: his beat at the foot of the cliff under David rises
+  150 m to 500-580 m, still some 850 m under the edge and at least 200 m clear of the terrain
+
 ## 2026-11-08 17:25 UTC
 
 ### Changed
