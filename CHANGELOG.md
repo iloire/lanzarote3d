@@ -2,6 +2,12 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-08 18:15 UTC
+
+### Changed
+
+- **Daniel flies 300 m higher**: 800-880 m at the foot of the cliff, still under David.
+
 ## 2026-11-08 18:12 UTC
 
 ### Changed

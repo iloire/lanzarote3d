@@ -438,7 +438,7 @@ export const LEAD_PILOT = CharacterType.ROOS;
  * towards La Graciosa. Magne is the farthest and the highest, at the Mirador (1659-1753 m); Bernt
  * is second in both, 85% of the way there (1500-1562 m); the rest step up the cliff between
  * takeoff and Bernt at 875-1327 m, rising with the cliff and capped under him, bar Daniel, new
- * and sinking out at the foot of the cliff under David (500-580 m). Each loop sits on
+ * and sinking out at the foot of the cliff under David (800-880 m). Each loop sits on
  * the cliff edge where it flies, every one at least 153 m clear of the ground. They are listed in
  * that order, so the arrows step from takeoff up the Risco.
  */
@@ -507,23 +507,23 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
       pilot: { characterType: CharacterType.DANIEL },
     },
     // New to the Risco and sinking out: 3.9 km up it, right under David, he scratches along the
-    // foot of the cliff where it is highest, at 500-580 m, some 850 m under the edge, over the
-    // beach and at least 200 m clear of the terrain.
+    // foot of the cliff where it is highest, at 800-880 m, some 550 m under the edge, over the
+    // beach and at least 500 m clear of the terrain.
     startProgress: 0.3,
     pathOffset: new THREE.Vector3(0, 0, 0),
     waypoints: [
-      new THREE.Vector3(8380, 580, -3500),
-      new THREE.Vector3(8620, 575, -3750),
-      new THREE.Vector3(8890, 570, -4000),
-      new THREE.Vector3(9090, 565, -4250),
-      new THREE.Vector3(9190, 560, -4500),
-      new THREE.Vector3(9060, 535, -4620),
-      new THREE.Vector3(8930, 515, -4500),
-      new THREE.Vector3(8830, 515, -4250),
-      new THREE.Vector3(8630, 500, -4000),
-      new THREE.Vector3(8480, 505, -3750),
-      new THREE.Vector3(8180, 505, -3500),
-      new THREE.Vector3(8240, 540, -3420),
+      new THREE.Vector3(8380, 880, -3500),
+      new THREE.Vector3(8620, 875, -3750),
+      new THREE.Vector3(8890, 870, -4000),
+      new THREE.Vector3(9090, 865, -4250),
+      new THREE.Vector3(9190, 860, -4500),
+      new THREE.Vector3(9060, 835, -4620),
+      new THREE.Vector3(8930, 815, -4500),
+      new THREE.Vector3(8830, 815, -4250),
+      new THREE.Vector3(8630, 800, -4000),
+      new THREE.Vector3(8480, 805, -3750),
+      new THREE.Vector3(8180, 805, -3500),
+      new THREE.Vector3(8240, 840, -3420),
     ],
   },
   {
