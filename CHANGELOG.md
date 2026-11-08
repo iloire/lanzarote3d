@@ -2,6 +2,13 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-08 13:03 UTC
+
+### Changed
+
+- **Faster Rio intro**: the fly-in from the Cristo down to the gliders now takes 10 s
+  instead of 25 s, so you can click and move the camera sooner.
+
 ## 2026-11-07 19:30 UTC
 
 ### Fixed
