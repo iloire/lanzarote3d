@@ -29,34 +29,36 @@ type WingShape = {
 };
 
 /**
- * A standard wing is big and thick for lift, tapers to its tips and stays flat in the middle. A
+ * Sized as real 23 to 25 m² wings against the 1.15 m seated pilot: about 9 m projected span, the
+ * canopy about 0.8 of that above the carabiners, the tips dropping a quarter of it in a nearly
+ * even arc. A standard wing is big and thick for lift and tapers to its tips. A
  * roller (speed wing) is smaller, with fewer, fatter cells, shorter lines and a top that stays
  * almost flat before the tips fold down hard into ears; it flies 1.7 times as fast.
  */
 export const WING_SHAPES = {
   standard: {
-    halfSpan: 4300,
-    rootChord: 2100,
+    halfSpan: 5400,
+    rootChord: 2500,
     tipChord: 0.3,
     thickness: 0.15,
     camber: 0.045,
-    lineHeight: 4200,
-    tipArc: 1.15,
-    arcExponent: 1.6,
+    lineHeight: 7000,
+    tipArc: 1.2,
+    arcExponent: 1.4,
     cellBillow: 1.12,
     speedFactor: 1,
     breath: 0.6,
   },
   /** Ozone Rush: a touch more chord than the standard wing and a deeper arc */
   rush: {
-    halfSpan: 4300,
-    rootChord: 2300,
+    halfSpan: 5400,
+    rootChord: 2700,
     tipChord: 0.28,
     thickness: 0.14,
     camber: 0.045,
-    lineHeight: 4200,
-    tipArc: 1.2,
-    arcExponent: 1.5,
+    lineHeight: 7000,
+    tipArc: 1.25,
+    arcExponent: 1.35,
     cellBillow: 1.12,
     speedFactor: 1,
     breath: 0.6,

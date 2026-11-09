@@ -2,6 +2,15 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-09 00:01 UTC
+
+### Changed
+
+- **Paraglider wings at real size**: the standard and Rush wings grow from 7.3 m to about 9 m
+  projected span, with the canopy 7 m over the carabiners instead of 4.2, in a more even arc,
+  as on real 23 to 25 m² wings. The home camera aims halfway up the lines so the canopy stays in
+  frame.
+
 ## 2026-11-08 22:53 UTC
 
 ### Changed

@@ -5,7 +5,7 @@ import {
   ORBIT_CONTROLS_PRESETS,
 } from '../../foundation/utils/OrbitControlsHelper';
 import { animator, Easing } from '../../foundation/systems/animation/SimpleAnimator';
-import { CAMERA_ARRIVAL_OFFSET } from './config';
+import { CAMERA_AIM_OFFSET, CAMERA_ARRIVAL_OFFSET } from './config';
 
 export interface CameraAnimationConfig {
   /** The lead pilot; it is flying, so the camera aims at where it is now, every frame */
@@ -24,8 +24,11 @@ export function setupCameraAnimation(
   config: CameraAnimationConfig
 ): { isAnimating: boolean } {
   const state = { isAnimating: false };
-  const pgPos = config.target.position.clone();
+  /** Halfway up the lead's lines, where the camera looks */
+  const aimAt = (point: THREE.Vector3) => point.copy(config.target.position).add(CAMERA_AIM_OFFSET);
+  const pgPos = aimAt(new THREE.Vector3());
   const drift = new THREE.Vector3();
+  const aim = new THREE.Vector3();
 
   // Starting position - extremely far away on the other side of the island
   const initialCameraPosition = new THREE.Vector3(-2000, 2200, 5000);
@@ -61,10 +64,10 @@ export function setupCameraAnimation(
       'camera-seamless',
       config.animationDurationMs,
       progress => {
-        drift.subVectors(config.target.position, pgPos).multiplyScalar(progress);
+        drift.subVectors(aimAt(aim), pgPos).multiplyScalar(progress);
         camera.position.copy(path.getPointAt(progress)).add(drift);
         if (controls) {
-          controls.target.copy(config.target.position);
+          controls.target.copy(aim);
           controls.update();
         }
       },
@@ -72,18 +75,18 @@ export function setupCameraAnimation(
         // Animation complete
         if (controls) {
           // Ensure target is exactly on the pilot (animation might not have fully reached it)
-          controls.target.copy(config.target.position);
+          aimAt(controls.target);
           controls.update();
 
           controls.enabled = true;
 
           // Apply limits without changing target position
-          const limits = OrbitControlsHelper.createCenteredLimits(config.target.position, {
+          const limits = OrbitControlsHelper.createCenteredLimits(controls.target, {
             ...ORBIT_CONTROLS_PRESETS['closeSubject'],
             minDistance: 50,
             maxDistance: 3000,
             panBoundary: {
-              center: config.target.position.clone(),
+              center: controls.target.clone(),
               radius: 500,
               verticalScale: 0.5,
             },

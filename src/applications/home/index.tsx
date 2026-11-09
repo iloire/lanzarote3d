@@ -44,6 +44,7 @@ import {
   isEmbedded,
   isHeroEmbed,
   HERO,
+  CAMERA_AIM_OFFSET,
   CAMERA_ARRIVAL_OFFSET,
 } from './config';
 import { loadParagliders, loadHangglider, loadCessna, loadHercules } from './vehicleLoader';
@@ -321,8 +322,8 @@ class HomeApp extends TerrainBase {
     if (isHeroEmbed()) {
       // A background has no time for the fly-in: start beside the pilot, already following
       this.hero = new HeroEmbed(camera as THREE.PerspectiveCamera, HERO);
-      camera.position.copy(lead.position).add(CAMERA_ARRIVAL_OFFSET);
-      controls.target.copy(lead.position);
+      controls.target.copy(lead.position).add(CAMERA_AIM_OFFSET);
+      camera.position.copy(controls.target).add(CAMERA_ARRIVAL_OFFSET);
       controls.update();
       this.startAnimationLoop(renderer, scene, camera, controls);
       return;
