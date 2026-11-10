@@ -162,10 +162,22 @@ export class BackdropSway {
     private readonly settings: BackdropSwaySettings
   ) {}
 
+  /** The azimuth the swing is centred on for `target`: the camera opposite the backdrop */
+  centre(target: THREE.Vector3): number {
+    // Spherical's theta is the azimuth atan2(x, z)
+    return Math.atan2(target.x - this.backdrop.x, target.z - this.backdrop.z) + this.settings.bias;
+  }
+
+  /** Starts the swing over from wherever the camera is, at its centre */
+  restart(): void {
+    this.theta = null;
+    this.time = 0;
+  }
+
   /** Advances by `deltaTime` seconds, moving `camera` round `target` */
   update(deltaTime: number, camera: THREE.Vector3, target: THREE.Vector3): void {
     if (deltaTime <= 0) return;
-    const { amplitude, bias, period, response, easeIn } = this.settings;
+    const { amplitude, period, response, easeIn } = this.settings;
     this.time += deltaTime;
     const pull = response * THREE.MathUtils.smoothstep(this.time, 0, easeIn);
 
@@ -173,9 +185,7 @@ export class BackdropSway {
     this.spherical.setFromVector3(this.offset);
     if (this.theta === null) this.theta = this.spherical.theta;
 
-    // Spherical's theta is the azimuth atan2(x, z); the camera sits opposite the backdrop.
-    const facing = Math.atan2(target.x - this.backdrop.x, target.z - this.backdrop.z);
-    const goal = facing + bias + amplitude * Math.sin((this.time * 2 * Math.PI) / period);
+    const goal = this.centre(target) + amplitude * Math.sin((this.time * 2 * Math.PI) / period);
     const turn =
       THREE.MathUtils.euclideanModulo(goal - this.theta + Math.PI, 2 * Math.PI) - Math.PI;
     this.theta += turn * Math.min(1, deltaTime * pull);
@@ -185,29 +195,31 @@ export class BackdropSway {
   }
 }
 
-export type ZoomInSettings = {
-  /** How far from its target the camera ends up, in metres */
-  distance: number;
-  /** How fast the camera closes in, per second */
+export type ReframeSettings = {
+  /** How fast the camera eases onto its new framing, per second */
   response: number;
 };
 
 /**
- * Brings a zoomed-out camera back in to `distance` from its target, along its line of sight so
- * the angle is kept. Started on each pilot switch, closing in to the pilot's own distance when
- * they have one; a camera already closer is left alone.
+ * Brings the camera back to a set framing wherever the user left it: the orbit target eases to
+ * `aim` from the follow anchor, undoing any pan, and the camera swings round the target to
+ * `offset`, by angle and distance rather than in a straight line, so it never cuts through the
+ * pilot. Started on each pilot switch with that pilot's best view.
  */
-export class ZoomIn {
+export class Reframe {
   private active = false;
-  private distance: number;
+  private readonly aim = new THREE.Vector3();
+  private readonly goal = new THREE.Spherical();
+  private readonly current = new THREE.Spherical();
   private readonly offset = new THREE.Vector3();
+  private readonly aimPoint = new THREE.Vector3();
 
-  constructor(private readonly settings: ZoomInSettings) {
-    this.distance = settings.distance;
-  }
+  constructor(private readonly settings: ReframeSettings) {}
 
-  start(distance = this.settings.distance): void {
-    this.distance = distance;
+  /** Eases the target to `aim` from the anchor and the camera to `offset` from the target */
+  start(aim: THREE.Vector3, offset: THREE.Vector3): void {
+    this.aim.copy(aim);
+    this.goal.setFromVector3(offset);
     this.active = true;
   }
 
@@ -215,18 +227,42 @@ export class ZoomIn {
     this.active = false;
   }
 
-  /** Advances by `deltaTime` seconds, moving `camera` towards `target` */
-  update(deltaTime: number, camera: THREE.Vector3, target: THREE.Vector3): void {
-    if (!this.active || deltaTime <= 0) return;
-    const { distance } = this;
-    const { response } = this.settings;
+  get running(): boolean {
+    return this.active;
+  }
+
+  /**
+   * Advances by `deltaTime` seconds, moving `camera` and `target`; true on the frame it
+   * arrives
+   */
+  update(
+    deltaTime: number,
+    camera: THREE.Vector3,
+    target: THREE.Vector3,
+    anchor: THREE.Vector3
+  ): boolean {
+    if (!this.active || deltaTime <= 0) return false;
+    const ease = 1 - Math.exp(-deltaTime * this.settings.response);
+
     this.offset.subVectors(camera, target);
-    const current = this.offset.length();
-    if (current <= distance + 0.5) {
-      this.active = false;
-      return;
-    }
-    const next = distance + (current - distance) * Math.exp(-deltaTime * response);
-    camera.copy(target).addScaledVector(this.offset, next / current);
+    this.aimPoint.copy(anchor).add(this.aim);
+    target.lerp(this.aimPoint, ease);
+
+    const { current, goal } = this;
+    current.setFromVector3(this.offset);
+    const turn =
+      THREE.MathUtils.euclideanModulo(goal.theta - current.theta + Math.PI, 2 * Math.PI) - Math.PI;
+    current.theta += turn * ease;
+    current.phi += (goal.phi - current.phi) * ease;
+    current.radius += (goal.radius - current.radius) * ease;
+    camera.copy(target).add(this.offset.setFromSpherical(current));
+
+    const arrived =
+      target.distanceTo(this.aimPoint) < 0.5 &&
+      Math.abs(turn) < 0.002 &&
+      Math.abs(goal.phi - current.phi) < 0.002 &&
+      Math.abs(goal.radius - current.radius) < 0.5;
+    if (arrived) this.active = false;
+    return arrived;
   }
 }

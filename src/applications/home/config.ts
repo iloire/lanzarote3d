@@ -7,7 +7,7 @@ import type {
 } from '../../foundation/components/vehicles';
 import { CharacterType } from '../../foundation/components/characters/CharacterRegistry';
 import { FlightPattern } from '../../foundation/systems/behaviors/FlyingBehavior';
-import type { BackdropSwaySettings, CameraFollowSettings, ZoomInSettings } from './cameraFollow';
+import type { BackdropSwaySettings, CameraFollowSettings, ReframeSettings } from './cameraFollow';
 import type { LoopSettings, TwistSettings, WingoverSettings } from './paragliderMotion';
 import type { HeroSettings } from './heroEmbed';
 
@@ -733,11 +733,11 @@ export const CAMERA_AIM_OFFSET = new THREE.Vector3(0, 35, 0);
 export const CAMERA_ARRIVAL_OFFSET = new THREE.Vector3(-70, 35, 140);
 
 /**
- * Switching pilots with the arrows after zooming out brings the camera back in to the fly-in's
- * distance as it glides across, most of the way within about 0.75 s; zoomed in closer, it stays.
+ * Switching pilots with the arrows brings the camera back to that pilot's best view as it glides
+ * across, however it was orbited, panned or zoomed: aimed halfway up their lines, at the fly-in's
+ * height and their own distance, with La Graciosa behind; most of the way within about 0.75 s.
  */
-export const CAMERA_ZOOM_IN: ZoomInSettings = {
-  distance: CAMERA_ARRIVAL_OFFSET.length(),
+export const CAMERA_REFRAME: ReframeSettings = {
   response: 4,
 };
 

@@ -38,7 +38,7 @@ import {
   CAMERA_FOLLOW,
   LEAD_PILOT,
   CAMERA_SWAY,
-  CAMERA_ZOOM_IN,
+  CAMERA_REFRAME,
   LA_GRACIOSA,
   BIRTHDAY_FLIGHT,
   isEmbedded,
@@ -49,7 +49,7 @@ import {
 } from './config';
 import { loadParagliders, loadHangglider, loadCessna, loadHercules } from './vehicleLoader';
 import { setupCameraAnimation, applyFloatingMotion } from './cameraAnimation';
-import { BackdropSway, CameraFollow, ZoomIn } from './cameraFollow';
+import { BackdropSway, CameraFollow, Reframe } from './cameraFollow';
 import { createTitleOverlay } from './TitleOverlay';
 import { createPilotPicker } from './PilotPicker';
 import { pilotFromSearch, searchWithPilot } from './pilotParam';
@@ -404,12 +404,22 @@ class HomeApp extends TerrainBase {
     // Sways the camera with La Graciosa behind the pilots until someone takes the controls
     const sway = new BackdropSway(LA_GRACIOSA, CAMERA_SWAY);
     let swaying = true;
-    // Picking another pilot after zooming out closes back in, unless someone grabs the controls
-    const zoomIn = new ZoomIn(CAMERA_ZOOM_IN);
+    // Picking another pilot brings the camera back to that pilot's best view, however it was
+    // left, unless someone grabs the controls on the way
+    const reframe = new Reframe(CAMERA_REFRAME);
     controls.addEventListener('start', () => {
       swaying = false;
-      zoomIn.stop();
+      reframe.stop();
     });
+    const framing = new THREE.Spherical();
+    const frameOffset = new THREE.Vector3();
+    /** The fly-in's view of `pilot`, at their own distance, with La Graciosa behind them */
+    const bestView = (pilot: (typeof this.pilots)[number]) => {
+      framing.setFromVector3(CAMERA_ARRIVAL_OFFSET);
+      framing.radius = pilot.cameraDistance ?? framing.radius;
+      framing.theta = sway.centre(pilot.mesh.position);
+      return frameOffset.setFromSpherical(framing);
+    };
     const enginePos = new THREE.Vector3();
     const tail = new THREE.Vector3();
 
@@ -460,17 +470,28 @@ class HomeApp extends TerrainBase {
           if (!wasFollowing) {
             follow.reset(pilot.mesh.position);
             // The fly-in lands at the paragliders' distance; a pilot seen closer (Blay) closes in
-            if (pilot.cameraDistance) zoomIn.start(pilot.cameraDistance);
+            if (pilot.cameraDistance) {
+              frameOffset.subVectors(camera.position, controls.target);
+              reframe.start(
+                controls.target.clone().sub(follow.anchor),
+                frameOffset.setLength(pilot.cameraDistance)
+              );
+            }
           } else if (pilot !== followed) {
             follow.retarget(pilot.mesh.position);
-            zoomIn.start(pilot.cameraDistance);
+            // The sway takes over again from the centre of its swing once the camera is there
+            swaying = false;
+            reframe.start(CAMERA_AIM_OFFSET, bestView(pilot));
           }
           followed = pilot;
           follow.update(deltaTime, pilot.mesh.position, pilot.motion?.bankAngle ?? 0, cameraMove);
           camera.position.add(cameraMove);
           controls.target.add(cameraMove);
-          zoomIn.update(deltaTime, camera.position, controls.target);
-          if (swaying) sway.update(deltaTime, camera.position, controls.target);
+          if (reframe.update(deltaTime, camera.position, controls.target, follow.anchor)) {
+            sway.restart();
+            swaying = true;
+          }
+          if (swaying && !reframe.running) sway.update(deltaTime, camera.position, controls.target);
           applyFloatingMotion(camera, startTime, this.isAnimating);
         }
         // During the fly-in, learn the lead's speed so the follow takes over moving with them

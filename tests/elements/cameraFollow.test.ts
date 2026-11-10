@@ -2,8 +2,8 @@ import * as THREE from 'three';
 import {
   BackdropSway,
   CameraFollow,
+  Reframe,
   smoothDamp,
-  ZoomIn,
 } from '../../src/applications/home/cameraFollow';
 
 const STEP = 1 / 60;
@@ -133,6 +133,18 @@ describe('BackdropSway', () => {
     expect(azimuth(camera, target)).toBeCloseTo(Math.PI / 2, 2);
   });
 
+  it('centres on the camera opposite the backdrop, turned by the bias, and restarts there', () => {
+    const target = new THREE.Vector3(0, 900, 0);
+    expect(new BackdropSway(backdrop, { ...SWAY, bias: 0.1 }).centre(target)).toBeCloseTo(0.1, 6);
+    const sway = new BackdropSway(backdrop, SWAY);
+    const camera = new THREE.Vector3(0, 950, 200);
+    for (let t = 0; t < 20; t += STEP) sway.update(STEP, camera, target);
+    camera.set(0, 950, 200);
+    sway.restart();
+    sway.update(STEP, camera, target);
+    expect(azimuth(camera, target)).toBeCloseTo(0, 3);
+  });
+
   it('keeps the backdrop behind the target, within the sway, at the same range and height', () => {
     const target = new THREE.Vector3(100, 900, 0);
     const camera = new THREE.Vector3(300, 950, 0);
@@ -151,38 +163,58 @@ describe('BackdropSway', () => {
   });
 });
 
-describe('ZoomIn', () => {
-  const settings = { distance: 230, response: 2 };
+describe('Reframe', () => {
+  const settings = { response: 4 };
+  const settle = (
+    reframe: Reframe,
+    camera: THREE.Vector3,
+    target: THREE.Vector3,
+    anchor: THREE.Vector3
+  ) => {
+    let arrived = false;
+    for (let t = 0; t < 5 && !arrived; t += STEP)
+      arrived = reframe.update(STEP, camera, target, anchor);
+    return arrived;
+  };
 
-  it('brings a zoomed-out camera back to the distance, keeping its angle', () => {
-    const target = new THREE.Vector3(500, 900, -700);
-    const camera = target.clone().add(new THREE.Vector3(-1000, 500, 2000));
-    const direction = camera.clone().sub(target).normalize();
-    const zoom = new ZoomIn(settings);
-    zoom.start();
-    for (let t = 0; t < 5; t += STEP) zoom.update(STEP, camera, target);
-    expect(camera.distanceTo(target)).toBeCloseTo(230, 0);
-    expect(camera.clone().sub(target).normalize().dot(direction)).toBeCloseTo(1, 6);
+  it('undoes an orbit, pan and zoom, landing on the aim and offset', () => {
+    const anchor = new THREE.Vector3(500, 900, -700);
+    const target = anchor.clone().add(new THREE.Vector3(120, -40, 60)); // panned away
+    const camera = target.clone().add(new THREE.Vector3(-900, 300, -1500)); // orbited, zoomed out
+    const aim = new THREE.Vector3(0, 35, 0);
+    const offset = new THREE.Vector3(-70, 35, 140);
+    const reframe = new Reframe(settings);
+    reframe.start(aim, offset);
+    expect(settle(reframe, camera, target, anchor)).toBe(true);
+    expect(target.distanceTo(anchor.clone().add(aim))).toBeLessThan(0.5);
+    expect(camera.clone().sub(target).distanceTo(offset)).toBeLessThan(1);
+    expect(reframe.running).toBe(false);
   });
 
-  it('leaves a camera that is already closer alone', () => {
-    const target = new THREE.Vector3(0, 0, 0);
-    const camera = new THREE.Vector3(0, 50, 80);
-    const zoom = new ZoomIn(settings);
-    zoom.start();
-    zoom.update(STEP, camera, target);
-    expect(camera.toArray()).toEqual([0, 50, 80]);
+  it('swings round the target rather than cutting through it', () => {
+    const anchor = new THREE.Vector3();
+    const target = new THREE.Vector3();
+    const camera = new THREE.Vector3(0, 10, -160); // the far side
+    const reframe = new Reframe(settings);
+    reframe.start(new THREE.Vector3(), new THREE.Vector3(0, 10, 160));
+    let closest = Infinity;
+    for (let t = 0; t < 5; t += STEP) {
+      reframe.update(STEP, camera, target, anchor);
+      closest = Math.min(closest, camera.distanceTo(target));
+    }
+    expect(closest).toBeGreaterThan(150);
   });
 
   it('does nothing until started, or once stopped', () => {
-    const target = new THREE.Vector3(0, 0, 0);
+    const anchor = new THREE.Vector3();
+    const target = new THREE.Vector3();
     const camera = new THREE.Vector3(0, 0, 2000);
-    const zoom = new ZoomIn(settings);
-    zoom.update(STEP, camera, target);
+    const reframe = new Reframe(settings);
+    reframe.update(STEP, camera, target, anchor);
     expect(camera.z).toBe(2000);
-    zoom.start();
-    zoom.stop();
-    zoom.update(STEP, camera, target);
+    reframe.start(new THREE.Vector3(), new THREE.Vector3(0, 0, 100));
+    reframe.stop();
+    reframe.update(STEP, camera, target, anchor);
     expect(camera.z).toBe(2000);
   });
 });

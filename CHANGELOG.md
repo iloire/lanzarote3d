@@ -2,6 +2,15 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-10 17:59 UTC
+
+### Changed
+
+- **Switching pilots resets the view**: the arrows now bring the camera back to the new pilot's
+  best view however it was orbited, panned or zoomed: aimed halfway up their lines, at the
+  fly-in's height and their own distance, with La Graciosa behind. The sway then starts again
+  from there. Before, only the zoom was reset.
+
 ## 2026-11-09 00:01 UTC
 
 ### Changed
