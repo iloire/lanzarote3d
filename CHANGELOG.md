@@ -2,6 +2,13 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-10 19:53 UTC
+
+### Added
+
+- **Christmas lights**: at Christmas every town gets a tree with a star, half the houses get
+  fairy lights round their eaves, and lights wind up the wind turbines.
+
 ## 2026-11-10 19:48 UTC
 
 ### Added

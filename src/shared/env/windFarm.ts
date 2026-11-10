@@ -22,7 +22,7 @@ const TURBINES: [number, number][] = [
 ];
 
 // Metres, about an Enercon E-44: hub height, blade length
-const HUB = 45;
+export const HUB = 45;
 const BLADE = 21;
 // The rotors face the trade wind, from the north-north-east (compass degrees)
 const WIND_FROM = 20;
@@ -58,6 +58,8 @@ export class WindFarm {
   readonly group = new THREE.Group();
   private readonly rotors: THREE.InstancedMesh;
   private readonly hubs: THREE.Vector3[] = [];
+  /** The foot of each tower, on the ground */
+  readonly bases: THREE.Vector3[];
   private readonly facing: THREE.Quaternion;
   private readonly spin = new THREE.Quaternion();
   private readonly turn = new THREE.Quaternion();
@@ -73,10 +75,10 @@ export class WindFarm {
       new THREE.Vector3(0, 1, 0),
       THREE.MathUtils.degToRad(180 - WIND_FROM)
     );
-    const bases = TURBINES.map(([lat, lon]) => {
+    const bases = (this.bases = TURBINES.map(([lat, lon]) => {
       const { x, z } = geoToWorld(lat, lon, ISLAND_ANCHOR);
       return new THREE.Vector3(x, getTerrainHeight(x, z, terrain), z);
-    }).filter(base => !isNaN(base.y));
+    }).filter(base => !isNaN(base.y)));
 
     const towers = new THREE.InstancedMesh(tower(), material, bases.length);
     this.rotors = new THREE.InstancedMesh(rotor(), material, bases.length);

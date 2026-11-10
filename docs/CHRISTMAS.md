@@ -44,3 +44,9 @@ What changes:
   (`ParagliderMotion.looping`), he leaves a trail of gold, white, red and green sparkles that
   hang in the air, twinkle and fade over 4 s. They're lit past white so the bloom makes them
   glow; one draw call, a ring of points written as they're born.
+- **Town trees and fairy lights** (`src/shared/env/christmasLights.ts`): a low-poly fir with
+  baubles, a glowing gold star and a twinkling garland in the middle of every town (two instanced
+  meshes, four times life size so it stands over the houses); fairy lights round the eaves of
+  about half the houses; and lights wound up the ten Los Valles wind turbines. All the lights are
+  points twinkling on the shared clock in the shader, one draw call per set, nothing per frame on
+  the CPU, and never smaller than 2 px so a town still glimmers from the ridge.

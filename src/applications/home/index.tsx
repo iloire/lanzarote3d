@@ -19,7 +19,15 @@ import { createCameraTargetUI } from '../../foundation/components/ui/CameraTarge
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { createIslandRoads } from '../../shared/env/roads';
 import type { RoadTraffic } from '../../shared/env/roadTraffic';
-import { WindFarm } from '../../shared/env/windFarm';
+import { WindFarm, HUB } from '../../shared/env/windFarm';
+import {
+  disposeChristmas,
+  roofLights,
+  spiralLights,
+  townTrees,
+  twinkleLights,
+} from '../../shared/env/christmasLights';
+import { LANDMARK_SCALE } from '../../shared/env/landmarks';
 import { createLandmarks } from '../../shared/env/landmarks';
 import { createFerryCrossing } from '../../shared/env/ferry';
 import { LevelOfDetail } from '../../foundation/types/lod';
@@ -114,6 +122,8 @@ class HomeApp extends TerrainBase {
   /** Santa's rig at Christmas, and his bells once the sound is on */
   private santa: THREE.Object3D | undefined;
   private bells: SleighBells | undefined;
+  /** At Christmas the towns' trees and fairy lights, and the lights up the wind turbines */
+  private christmasLights: THREE.Group | undefined;
   /** At Christmas Blay's loops leave a trail of sparkles */
   private sparkles: { trail: SparkleTrail; motion: ParagliderMotion } | undefined;
   /** Set when the scene is a page's hero background */
@@ -229,7 +239,7 @@ class HomeApp extends TerrainBase {
       this.environment = new Environment(scene);
       await this.environment.addCloudsFromTheme(theme);
 
-      await this.environment.addTownsFromConfig(
+      const houses = await this.environment.addTownsFromConfig(
         LANZAROTE_TOWNS,
         terrain,
         true,
@@ -242,6 +252,25 @@ class HomeApp extends TerrainBase {
       this.traffic = traffic;
       this.windFarm = new WindFarm(terrain);
       scene.add(this.windFarm.group);
+      if (isChristmas()) {
+        // A tree in every town, lights round half the houses and wound up the wind turbines
+        const lights = townTrees(
+          LANZAROTE_TOWNS.map(town => town.position),
+          terrain
+        );
+        lights.add(twinkleLights(roofLights(houses), 0.9));
+        const tower = HUB * LANDMARK_SCALE;
+        lights.add(
+          twinkleLights(
+            this.windFarm.bases.flatMap(base =>
+              spiralLights(base, tower, [2.2 * LANDMARK_SCALE, 1.3 * LANDMARK_SCALE], 6, 60)
+            ),
+            1.6
+          )
+        );
+        scene.add(lights);
+        this.christmasLights = lights;
+      }
       logger.info(`${roads.length} roads connecting the Famara towns, ${traffic.count} cars`);
 
       const landmarks = createLandmarks(terrain);
@@ -624,6 +653,8 @@ class HomeApp extends TerrainBase {
     this.traffic = undefined;
     this.windFarm?.dispose();
     this.windFarm = undefined;
+    if (this.christmasLights) disposeChristmas(this.christmasLights);
+    this.christmasLights = undefined;
 
     this.paragliderFlyingBehaviors.forEach(behavior => behavior.dispose());
     this.paragliderFlyingBehaviors.length = 0;
