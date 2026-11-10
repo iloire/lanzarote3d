@@ -708,7 +708,7 @@ export const SHOW_HERCULES = true;
  * ground behind the cliff a few seconds after the fly-in lands, then runs round the island for
  * ever: over Peñas del Chache, down to Caleta and along Famara beach under the pilots, through
  * Timanfaya to Playa Blanca, back by Puerto del Carmen and Arrecife, and up through Haría.
- * It runs at about 570 m/s, a loop in about three minutes. The route is [lat, lon].
+ * It runs at about 1100 m/s, a loop in about a minute and a half. The route is [lat, lon].
  */
 export const ROBOT = {
   delaySeconds: 4,
@@ -716,7 +716,7 @@ export const ROBOT = {
   cameraDistance: 2600,
   settings: {
     height: 1200,
-    speed: 440,
+    speed: 880,
     riseSeconds: 10,
     route: (
       [

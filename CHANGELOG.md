@@ -9,7 +9,7 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 - **A giant robot**: 1200 units tall (about 1.5 km, taller than the Risco), it rises out of the
   ground behind the cliff a few seconds after the fly-in lands, then runs round the whole island:
   over Peñas del Chache, along Famara beach, through Timanfaya to Playa Blanca and back by
-  Arrecife and Haría, a lap in about three minutes. The last pilot arrow (or `?pilot=robot`)
+  Arrecife and Haría, a lap in about a minute and a half. The last pilot arrow (or `?pilot=robot`)
   follows it. Route, size and speed are `ROBOT` in the home config.
 
 ## 2026-11-10 17:59 UTC
