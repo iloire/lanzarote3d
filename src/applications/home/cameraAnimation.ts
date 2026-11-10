@@ -30,8 +30,8 @@ export function setupCameraAnimation(
   const drift = new THREE.Vector3();
   const aim = new THREE.Vector3();
 
-  // Starting position - extremely far away on the other side of the island
-  const initialCameraPosition = new THREE.Vector3(-2000, 2200, 5000);
+  // Starting position - inland, about 6 km from the pilots, so the fly-in isn't a long haul
+  const initialCameraPosition = new THREE.Vector3(2500, 2000, 3000);
 
   // Intermediate position - approaching the area quickly
   const intermediatePosition = new THREE.Vector3(4500, 1800, 1500);

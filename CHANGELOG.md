@@ -2,6 +2,13 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-10 20:07 UTC
+
+### Changed
+
+- **Shorter fly-in**: the opening camera flight starts about 6 km from the pilots instead of
+  10.6 km on the far side of the island, so it covers half the distance.
+
 ## 2026-11-10 19:55 UTC
 
 ### Added
