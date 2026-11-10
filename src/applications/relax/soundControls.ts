@@ -3,7 +3,7 @@ import { Music } from './music';
 import { Wind } from './wind';
 import './sound-controls.css';
 
-interface Sound {
+export interface Sound {
   play(): Promise<void>;
   stop(): void;
   close(): void;
@@ -61,13 +61,22 @@ function soundToggle(
   return { button, wake: apply, close: () => sound?.close() };
 }
 
+/** Several sounds played, stopped and closed as one */
+const together = (sounds: Sound[]): Sound => ({
+  play: async () => {
+    await Promise.all(sounds.map(sound => sound.play()));
+  },
+  stop: () => sounds.forEach(sound => sound.stop()),
+  close: () => sounds.forEach(sound => sound.close()),
+});
+
 /**
  * Round wind and music buttons in the top right corner, with the music's credit. A paramotor place
  * plays a soft engine instead of the wind. Both are on unless the viewer turned them off last
  * time, and fade in at the first click or key, since the browser blocks sound until then.
- * Returns a remover.
+ * `ambient` sounds (Santa's sleigh bells) come and go with the wind or engine. Returns a remover.
  */
-export function createSoundControls(paramotor = false): () => void {
+export function createSoundControls(paramotor = false, ambient: (() => Sound)[] = []): () => void {
   const root = document.createElement('div');
   root.className = 'sound-controls';
   const credit = document.createElement('a');
@@ -84,14 +93,14 @@ export function createSoundControls(paramotor = false): () => void {
           'ENGINE',
           '🛵',
           'relax-engine',
-          () => new Engine(),
+          () => together([new Engine(), ...ambient.map(create => create())]),
           () => {}
         )
       : soundToggle(
           'WIND',
           '🌬️',
           'relax-wind',
-          () => new Wind(),
+          () => together([new Wind(), ...ambient.map(create => create())]),
           () => {}
         ),
     soundToggle(

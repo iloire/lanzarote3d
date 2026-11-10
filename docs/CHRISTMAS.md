@@ -36,3 +36,7 @@ What changes:
   Abel's loop over the beach and the sea, 600 m further out and at 1000-1080 m, and is the last
   paraglider in the pilot picker; `?pilot=santa` flies the camera to him.
   `ParagliderVoxel`'s `santa` option swaps the pilot for him.
+- **Sleigh bells** (`src/applications/relax/sleighBells.ts`), made in the browser like the wind:
+  pairs of shakes at a trot, each a hiss and four small bells with inharmonic partials. They
+  play with the wind toggle (`createSoundControls`' `ambient` sounds) and fade with the camera's
+  distance from Santa: full within 250 m, silent past 1.8 km.

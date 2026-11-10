@@ -66,6 +66,7 @@ import { ConfettiBurst } from '../../foundation/components/effects/Confetti';
 import { HeroEmbed } from './heroEmbed';
 import { createLocationSwitcher } from '../relax/LocationSwitcher';
 import { createSoundControls } from '../relax/soundControls';
+import { SleighBells } from '../relax/sleighBells';
 import { pickerPlaces } from '../relax/scenes';
 import { HOME_PLACE } from '../relax/places';
 
@@ -109,6 +110,9 @@ class HomeApp extends TerrainBase {
   }[] = [];
   /** Which of `pilots` the camera follows */
   private leadIndex = 0;
+  /** Santa's rig at Christmas, and his bells once the sound is on */
+  private santa: THREE.Object3D | undefined;
+  private bells: SleighBells | undefined;
   /** Set when the scene is a page's hero background */
   private hero: HeroEmbed | null = null;
 
@@ -296,7 +300,12 @@ class HomeApp extends TerrainBase {
         this.removeTitleOverlay = createTitleOverlay();
         // The home page is the relax site's Lanzarote: the same place picker, wind and music
         this.removeSwitcher = createLocationSwitcher(pickerPlaces(HOME_PLACE), HOME_PLACE);
-        this.removeSound = createSoundControls();
+        // At Christmas Santa's sleigh bells ring with the wind, louder as the camera nears him
+        this.santa = scene.getObjectByName(`paraglider-${SANTA_FLIGHT.name}`);
+        this.removeSound = createSoundControls(
+          false,
+          this.santa ? [() => (this.bells = new SleighBells())] : []
+        );
       }
 
       this.setupCameraAnimation(camera, controls, renderer, scene);
@@ -475,6 +484,7 @@ class HomeApp extends TerrainBase {
         }
 
         this.traffic?.update(deltaTime);
+        if (this.santa) this.bells?.setDistance(camera.position.distanceTo(this.santa.position));
         this.windFarm?.update(deltaTime);
 
         this.paragliderMotions.forEach(motion => motion.update(deltaTime));
@@ -577,6 +587,8 @@ class HomeApp extends TerrainBase {
     this.removeSwitcher = undefined;
     this.removeSound?.();
     this.removeSound = undefined;
+    this.bells = undefined;
+    this.santa = undefined;
 
     this.hero?.dispose();
     this.hero = null;

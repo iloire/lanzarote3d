@@ -2,6 +2,13 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-10 19:46 UTC
+
+### Added
+
+- **Sleigh bells**: with the wind sound on, Santa's sleigh bells jingle, louder the closer the
+  camera is to him.
+
 ## 2026-11-10 19:45 UTC
 
 ### Added
