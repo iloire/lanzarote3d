@@ -168,6 +168,11 @@ export class ParagliderMotion {
     return this.bank;
   }
 
+  /** True while throwing a loop, from the dive until back on the line */
+  get looping(): boolean {
+    return this.loopTime !== null;
+  }
+
   /** Twists now, if this pilot twists and isn't already, instead of waiting out the rest */
   startTwist(): void {
     if (this.twistTime === null) this.twistRestLeft = 0;

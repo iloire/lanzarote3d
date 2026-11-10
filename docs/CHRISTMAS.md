@@ -40,3 +40,7 @@ What changes:
   pairs of shakes at a trot, each a hiss and four small bells with inharmonic partials. They
   play with the wind toggle (`createSoundControls`' `ambient` sounds) and fade with the camera's
   distance from Santa: full within 250 m, silent past 1.8 km.
+- **Blay's sparkles** (`src/foundation/components/effects/SparkleTrail.ts`): while he throws a loop
+  (`ParagliderMotion.looping`), he leaves a trail of gold, white, red and green sparkles that
+  hang in the air, twinkle and fade over 4 s. They're lit past white so the bloom makes them
+  glow; one draw call, a ring of points written as they're born.

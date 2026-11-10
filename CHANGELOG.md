@@ -2,6 +2,13 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-10 19:48 UTC
+
+### Added
+
+- **Blay's sparkles**: at Christmas Blay's loops leave a trail of twinkling gold, white, red
+  and green sparkles.
+
 ## 2026-11-10 19:46 UTC
 
 ### Added

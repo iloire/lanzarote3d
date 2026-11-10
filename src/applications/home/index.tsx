@@ -67,6 +67,7 @@ import { HeroEmbed } from './heroEmbed';
 import { createLocationSwitcher } from '../relax/LocationSwitcher';
 import { createSoundControls } from '../relax/soundControls';
 import { SleighBells } from '../relax/sleighBells';
+import { SparkleTrail } from '../../foundation/components/effects/SparkleTrail';
 import { pickerPlaces } from '../relax/scenes';
 import { HOME_PLACE } from '../relax/places';
 
@@ -113,6 +114,8 @@ class HomeApp extends TerrainBase {
   /** Santa's rig at Christmas, and his bells once the sound is on */
   private santa: THREE.Object3D | undefined;
   private bells: SleighBells | undefined;
+  /** At Christmas Blay's loops leave a trail of sparkles */
+  private sparkles: { trail: SparkleTrail; motion: ParagliderMotion } | undefined;
   /** Set when the scene is a page's hero background */
   private hero: HeroEmbed | null = null;
 
@@ -181,6 +184,11 @@ class HomeApp extends TerrainBase {
           this.hanggliderMesh = hanggliderResult.mesh;
           this.hanggliderFlyingBehavior = hanggliderResult.flyingBehavior;
           if (hanggliderResult.motion) this.paragliderMotions.push(hanggliderResult.motion);
+          if (hanggliderResult.motion && isChristmas()) {
+            const trail = new SparkleTrail({ size: 0.4, spread: 1.5 });
+            scene.add(trail.points);
+            this.sparkles = { trail, motion: hanggliderResult.motion };
+          }
           this.pilots.push({
             mesh: hanggliderResult.mesh,
             motion: hanggliderResult.motion,
@@ -451,6 +459,7 @@ class HomeApp extends TerrainBase {
       pilot.focus.updateWorldMatrix(true, false);
       return pilot.focus.getWorldPosition(focusPoint);
     };
+    const sparkleAt = new THREE.Vector3();
     const enginePos = new THREE.Vector3();
     const tail = new THREE.Vector3();
 
@@ -484,6 +493,10 @@ class HomeApp extends TerrainBase {
         }
 
         this.traffic?.update(deltaTime);
+        if (this.sparkles) {
+          const { trail, motion } = this.sparkles;
+          trail.update(deltaTime, motion.body.getWorldPosition(sparkleAt), motion.looping);
+        }
         if (this.santa) this.bells?.setDistance(camera.position.distanceTo(this.santa.position));
         this.windFarm?.update(deltaTime);
 
@@ -588,6 +601,8 @@ class HomeApp extends TerrainBase {
     this.removeSound?.();
     this.removeSound = undefined;
     this.bells = undefined;
+    this.sparkles?.trail.dispose();
+    this.sparkles = undefined;
     this.santa = undefined;
 
     this.hero?.dispose();
