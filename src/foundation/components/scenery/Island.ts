@@ -117,6 +117,9 @@ const createUnderlay = (
   material.userData['sandColor'] = { value: new THREE.Color() };
   material.userData['lineColor'] = { value: new THREE.Color() };
   material.userData['lineEmissive'] = { value: new THREE.Color() };
+  material.userData['snowColor'] = { value: new THREE.Color() };
+  // Where the snow starts and lies full, in world height; none while the third is 0
+  material.userData['snow'] = { value: new THREE.Vector3(0, 1, 0) };
   material.userData['facet'] = {
     value: new THREE.Vector2(DEFAULT_SLOPE_SHADE, DEFAULT_FACE_JITTER),
   };
@@ -126,6 +129,8 @@ const createUnderlay = (
     shader.uniforms['uLineColor'] = material.userData['lineColor'];
     shader.uniforms['uLineEmissive'] = material.userData['lineEmissive'];
     shader.uniforms['uFacet'] = material.userData['facet'];
+    shader.uniforms['uSnowColor'] = material.userData['snowColor'];
+    shader.uniforms['uSnow'] = material.userData['snow'];
     Object.assign(shader.uniforms, lineFade);
     shader.vertexShader = shader.vertexShader
       .replace(
@@ -156,6 +161,8 @@ const createUnderlay = (
         uniform vec3 uSandColor;
         uniform vec3 uLineColor;
         uniform vec3 uLineEmissive;
+        uniform vec3 uSnowColor;
+        uniform vec3 uSnow;
         uniform float uLineNear;
         uniform float uLineFar;`
       )
@@ -165,6 +172,11 @@ const createUnderlay = (
         lzGround = mix( lzGround, vLzRegion.rgb, vLzRegion.a );
         lzGround = mix( uSandColor, lzGround, smoothstep( 4.0, 30.0, vLzHeight ) );
         float lzSteep = 1.0 - smoothstep( 0.7, 0.98, vLzFace.x );
+        // Snow settles on the high faces that are level enough to hold it, its line ragged
+        // face by face; the cliffs stay bare rock
+        float lzSnow = uSnow.z * smoothstep( uSnow.x, uSnow.y, vLzHeight + vLzFace.y * ( uSnow.y - uSnow.x ) * 0.5 )
+          * smoothstep( 0.45, 0.75, vLzFace.x );
+        lzGround = mix( lzGround, uSnowColor, lzSnow );
         lzGround *= ( 1.0 + uFacet.x * ( 1.0 - 2.0 * lzSteep ) ) * ( 1.0 + uFacet.y * vLzFace.y );
         // Coverage of the nearest triangle edge, anti-aliased over one pixel.
         vec3 lzEdge = smoothstep( vec3( 0.0 ), fwidth( vLzBary ) * ${LINE_WIDTH_PX.toFixed(1)}, vLzBary );
@@ -320,6 +332,9 @@ class Island {
       underlay.slopeShade ?? DEFAULT_SLOPE_SHADE,
       underlay.faceJitter ?? DEFAULT_FACE_JITTER
     );
+    const { snow } = underlay;
+    material.userData['snowColor'].value.set(snow?.color ?? '#ffffff');
+    material.userData['snow'].value.set(snow?.from ?? 0, snow?.to ?? 1, snow ? 1 : 0);
     material.userData['lineColor'].value.copy(lines.color);
     material.userData['lineEmissive'].value
       .copy(lines.emissive)

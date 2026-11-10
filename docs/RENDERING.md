@@ -183,6 +183,7 @@ terrain: {
     color: '#34302d', peakColor: '#3f2f27', sandColor: '#b39668',
     lineOpacity: 0.45,       // wireframe near the camera
     farLineOpacity: 0.12,    // ...fading to this by 9 km
+    snow: { color: '#f2f6fa', from: 850, to: 1100 }, // Christmas only: snow on level faces
   },
 },
 atmosphere: {                // defaults: DEFAULT_ATMOSPHERE in RenderPipeline.ts

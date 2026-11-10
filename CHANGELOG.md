@@ -2,6 +2,15 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-10 19:33 UTC
+
+### Added
+
+- **Christmas mode**: from 1 December to Reyes (6 January), island time, snow lies on the
+  volcanoes: the top of the Risco, Peñas del Chache and the high cones turn white while the
+  cliffs and the coast stay bare. `?christmas` previews it out of season, `?christmas=0` turns
+  it off ([docs/CHRISTMAS.md](docs/CHRISTMAS.md)).
+
 ## 2026-11-10 19:30 UTC
 
 ### Fixed

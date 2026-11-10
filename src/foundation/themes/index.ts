@@ -1,4 +1,5 @@
 import { Theme } from '../types/Theme';
+import { isChristmas } from '../../shared/christmas';
 
 /**
  * The scenes' one look: sky, sea, fog, light and clouds. There used to be alternative presets
@@ -46,4 +47,23 @@ export const DEFAULT_THEME: Theme = {
   atmosphere: {},
 };
 
-export const getDefaultTheme = (): Theme => DEFAULT_THEME;
+/**
+ * The same look at Christmas, with snow on the volcanoes: on the level faces from about 390 m up
+ * (850 world units; the island's heights are drawn 2.2x), lying full by 500 m, so the top of
+ * the Risco, Peñas del Chache and the Timanfaya cones turn white while the coast stays warm.
+ */
+export const CHRISTMAS_THEME: Theme = {
+  ...DEFAULT_THEME,
+  id: 'christmas',
+  name: 'Christmas',
+  terrain: {
+    ...DEFAULT_THEME.terrain,
+    underlay: {
+      ...DEFAULT_THEME.terrain.underlay!,
+      snow: { color: '#f2f6fa', from: 850, to: 1100 },
+    },
+  },
+};
+
+/** The look for today: Christmas in season or with ?christmas, the default otherwise */
+export const getDefaultTheme = (): Theme => (isChristmas() ? CHRISTMAS_THEME : DEFAULT_THEME);

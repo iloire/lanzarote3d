@@ -49,7 +49,8 @@ New places are described in [`src/locations/README.md`](src/locations/README.md)
 has no deploy script of its own yet; it gets one with its domain.
 
 Scenes are picked with `?story=`: `home`, `famara-animation`, `boats-animation`, `famara`,
-`town` and `models`. Add `?fx=0` to render without post-processing, to
+`town` and `models`. `?christmas` previews the Christmas mode, which otherwise runs from 1
+December to 6 January ([docs/CHRISTMAS.md](docs/CHRISTMAS.md)). Add `?fx=0` to render without post-processing, to
 compare looks and frame times. Dev builds expose `window.__lz` for profiling (see RENDERING.md).
 
 ## Checking it

@@ -52,6 +52,8 @@ export interface TerrainTheme {
     faceJitter?: number; // Each face's tone varies at random by up to this fraction (default 0.12)
     lineOpacity?: number; // Wireframe opacity close to the camera (default 0.45)
     farLineOpacity?: number; // ...fading to this far away, where the mesh gets dense (default 0.12)
+    // Snow on the level faces from `from` up, lying full by `to` (world heights); none if omitted
+    snow?: { color: string; from: number; to: number };
   };
 }
 

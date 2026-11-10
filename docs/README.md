@@ -4,6 +4,8 @@
   theme fields that tune them.
 - **[SEA_SHADER_TUTORIAL.html](SEA_SHADER_TUTORIAL.html)**: a beginner's walkthrough of the ocean
   shader, layer by layer, with a live demo. Open it in a browser.
+- **[CHRISTMAS.md](CHRISTMAS.md)**: the Christmas mode, from 1 December to Reyes or with
+  `?christmas`, and everything it changes.
 - **[COMPONENT_COMPOSITION.md](COMPONENT_COMPOSITION.md)**: how the models are built, from the
   component base classes to the two ways of building a component.
 - **[HOME_ANIMATION_IDEAS.md](HOME_ANIMATION_IDEAS.md)**: ideas for a livelier home scene that stays
