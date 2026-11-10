@@ -6,31 +6,37 @@ const WHITE = 0xf6f6f2;
 
 /**
  * A Santa hat in voxels, its brim `width` by `depth` voxels, centred on the origin, sitting on
- * y = 0: a white fur band, then a red cone that narrows as it rises and flops back behind the
- * head (-Z, the pilot faces +Z), with a white bobble on the tip.
+ * y = 0: a white fur band, then a soft red cone that rises, bends over to the pilot's side and
+ * droops, with a white bobble hanging off the tip. It flops sideways rather than back so the
+ * droop shows from behind, where the camera follows.
  */
 function hatVoxels(width: number, depth: number): Voxels {
   const v: Voxels = new Map();
   const halfW = Math.ceil(width / 2);
   const halfD = Math.ceil(depth / 2);
   // The fur band, a voxel proud of the head all round
-  box(v, -halfW - 1, halfW, 0, 2, -halfD - 1, halfD, WHITE);
-  // The cone: as tall as the head is wide, narrowing as it rises and drifting back, then
-  // flopping over and down behind the head
-  const layers = Math.round(width * 1.4);
-  const rise = width * 0.9;
-  let tipY = 3;
-  let tipZ = 0;
+  box(v, -halfW - 1, halfW, 0, 3, -halfD - 1, halfD, WHITE);
+  // The cone, a layer a voxel: full and round low down, narrowing faster near the tip, rising to
+  // about the head's width and then curling over to one side and down
+  const layers = Math.round(width * 2);
+  const rise = width * 0.95;
+  let tipX = 0;
+  let tipY = 4;
   for (let i = 0; i <= layers; i++) {
     const t = i / layers;
-    const halfX = Math.max(1, Math.round(halfW * (1 - t)));
-    const halfZ = Math.max(1, Math.round(halfD * (1 - t)));
-    tipZ = -Math.round(t * t * depth * 1.1);
-    tipY = 3 + Math.round(rise * (t < 0.6 ? t / 0.6 : 1 - (t - 0.6) * 0.8));
-    box(v, -halfX, halfX - 1, tipY, tipY + 1, tipZ - halfZ, tipZ + halfZ - 1, RED);
+    const taper = Math.pow(1 - t, 0.8);
+    const halfX = Math.max(1, Math.round(halfW * taper));
+    const halfZ = Math.max(1, Math.round(halfD * taper));
+    tipX = Math.round(t * t * width * 0.9);
+    tipY =
+      4 +
+      Math.round(
+        rise * Math.sin(Math.min(t / 0.65, 1) * (Math.PI / 2)) - Math.max(0, t - 0.65) * rise * 1.4
+      );
+    box(v, tipX - halfX, tipX + halfX - 1, tipY, tipY, -halfZ, halfZ - 1, RED);
   }
   // The bobble, hanging off the tip
-  box(v, -2, 1, tipY - 3, tipY, tipZ - 4, tipZ - 1, WHITE);
+  box(v, tipX - 1, tipX + 2, tipY - 4, tipY - 1, -2, 1, WHITE);
   return v;
 }
 
@@ -56,8 +62,8 @@ export function addSantaHat(pilot: THREE.Object3D): void {
   const bounds = mesh.geometry.boundingBox!.clone().applyMatrix4(mesh.matrix);
   const size = bounds.getSize(new THREE.Vector3());
   const hat = santaHatMesh(Math.round(size.x / VOXEL), Math.round(size.z / VOXEL));
-  // Pulled down a little over the top of the head
+  // Pulled down over the top of the head, the band round the brow
   const centre = bounds.getCenter(new THREE.Vector3());
-  hat.position.set(centre.x, bounds.max.y - VOXEL * 2, centre.z);
+  hat.position.set(centre.x, bounds.max.y - VOXEL * 4, centre.z);
   head.add(hat);
 }
