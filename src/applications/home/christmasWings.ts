@@ -58,7 +58,7 @@ const CHRISTMAS_TREE: Partial<GliderOptions> = {
 };
 
 /** Santa's suit: red, white fur along the leading edge, a black belt with a gold buckle */
-const SANTA_SUIT: Partial<GliderOptions> = {
+export const SANTA_SUIT: GliderOptions = {
   wingColor1: RED,
   wingColor2: RED,
   undersideColor: WHITE,

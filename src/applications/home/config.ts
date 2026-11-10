@@ -18,6 +18,8 @@ import type { HeroSettings } from './heroEmbed';
 
 export type ParagliderVoxelConfig = {
   options: ParagliderVoxelOptions;
+  /** What ?pilot= picks them by, if not their character type */
+  name?: string;
   /** Where on the ridge loop this pilot starts, 0 to 1, so the pilots spread out */
   startProgress: number;
   /** Shifts this pilot's copy of the loop so the pilots don't fly through each other */

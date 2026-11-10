@@ -58,7 +58,7 @@ export async function loadParagliders(
         // FlyingBehavior owns the rig's rotation, so the paraglider keeps its own inside it,
         // and ParagliderMotion banks and sways the body between the two and swings the pilot.
         const rig = new THREE.Group();
-        rig.name = `paraglider-${p.options.pilot.characterType}`;
+        rig.name = `paraglider-${p.name ?? p.options.pilot.characterType}`;
         const body = new THREE.Group();
         body.add(mesh);
         rig.add(body);

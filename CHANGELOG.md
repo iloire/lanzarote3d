@@ -2,6 +2,14 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-10 19:45 UTC
+
+### Added
+
+- **Santa on a paramotor**: at Christmas Santa flies a paramotor over Famara beach and the sea,
+  towing his sleigh of presents. The pilot arrows reach him, and `?pilot=santa` flies straight
+  to him.
+
 ## 2026-11-10 19:42 UTC
 
 ### Added

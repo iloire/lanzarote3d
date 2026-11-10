@@ -34,6 +34,14 @@ function hatVoxels(width: number, depth: number): Voxels {
   return v;
 }
 
+/** A Santa hat `width` by `depth` voxels at the brim, centred on the origin, sitting on y = 0 */
+export function santaHatMesh(width: number, depth: number): THREE.Mesh {
+  const material = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.9 });
+  const hat = voxelMesh(hatVoxels(width, depth), material);
+  hat.name = 'santa-hat';
+  return hat;
+}
+
 /**
  * Puts a Santa hat on a voxel pilot cut into parts, on its head, so it turns with it. A pilot
  * without a head part goes bareheaded.
@@ -47,12 +55,7 @@ export function addSantaHat(pilot: THREE.Object3D): void {
   // The head in its pivot's frame, which is the model's, moved to the neck joint
   const bounds = mesh.geometry.boundingBox!.clone().applyMatrix4(mesh.matrix);
   const size = bounds.getSize(new THREE.Vector3());
-  const material = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.9 });
-  const hat = voxelMesh(
-    hatVoxels(Math.round(size.x / VOXEL), Math.round(size.z / VOXEL)),
-    material
-  );
-  hat.name = 'santa-hat';
+  const hat = santaHatMesh(Math.round(size.x / VOXEL), Math.round(size.z / VOXEL));
   // Pulled down a little over the top of the head
   const centre = bounds.getCenter(new THREE.Vector3());
   hat.position.set(centre.x, bounds.max.y - VOXEL * 2, centre.z);

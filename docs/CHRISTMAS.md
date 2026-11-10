@@ -30,3 +30,9 @@ What changes:
   cane (white with slanting red stripes) and a Christmas tree (green, a gold star on the nose, a
   garland and baubles), taken in turn down the pilot list; Magne always flies the tree. Each
   keeps its wing's kind and cell count, so it flies as it always does.
+- **Santa on a paramotor** (`src/applications/home/santa.ts`): a voxel Santa
+  (`src/foundation/components/characters/SantaVoxel.ts`) under the Santa-suit wing, a paramotor
+  on his back, towing his sleigh of presents on a rope that runs under the prop's cage. He flies
+  Abel's loop over the beach and the sea, 600 m further out and at 1000-1080 m, and is the last
+  paraglider in the pilot picker; `?pilot=santa` flies the camera to him.
+  `ParagliderVoxel`'s `santa` option swaps the pilot for him.

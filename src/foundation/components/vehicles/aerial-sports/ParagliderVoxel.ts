@@ -6,6 +6,7 @@ import Glider, { GliderOptions } from '../components/Glider';
 import { createPirateFlag } from '../components/PirateFlag';
 import { createParamotor } from '../components/Paramotor';
 import { addSantaHat } from '../../characters/SantaHat';
+import { createSantaVoxel, createSleigh } from '../../characters/SantaVoxel';
 import { isChristmas } from '../../../../shared/christmas';
 
 export interface ParagliderVoxelOptions extends SimpleComponentOptions {
@@ -17,6 +18,8 @@ export interface ParagliderVoxelOptions extends SimpleComponentOptions {
   paramotor?: boolean;
   /** Wear a Santa hat; at Christmas unless told otherwise */
   santaHat?: boolean;
+  /** Santa flies it instead of `pilot`, towing his sleigh */
+  santa?: boolean;
 }
 
 /**
@@ -66,9 +69,14 @@ export class ParagliderVoxel extends SimpleThreeComponent {
     wing.position.set(300, 100, 0);
     group.add(wing);
 
-    // Create voxel pilot
-    this.pilot = new PilotVoxel(options.pilot);
-    this.pilotMesh = await this.pilot.load();
+    // Create voxel pilot, or Santa with his sleigh in tow
+    if (options.santa) {
+      this.pilotMesh = createSantaVoxel();
+      this.pilotMesh.add(createSleigh());
+    } else {
+      this.pilot = new PilotVoxel(options.pilot);
+      this.pilotMesh = await this.pilot.load();
+    }
     this.pilotMesh.position.x = 350;
     this.pilotMesh.position.y = -600;
     this.pilotMesh.position.z = 0;
@@ -77,7 +85,7 @@ export class ParagliderVoxel extends SimpleThreeComponent {
     this.pilotMesh.rotation.y = Math.PI / 2; // Rotate pilot 90 degrees left
     // In the pilot model's own frame, so it sits on any pilot's back and swings with them
     if (options.paramotor) this.pilotMesh.add(createParamotor());
-    if (options.santaHat ?? isChristmas()) addSantaHat(this.pilotMesh);
+    if (!options.santa && (options.santaHat ?? isChristmas())) addSantaHat(this.pilotMesh);
     group.add(this.pilotMesh);
 
     // The pilot hangs from a pivot at the carabiners, the wing's origin, where wing and harness
