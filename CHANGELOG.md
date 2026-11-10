@@ -2,6 +2,13 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-10 19:55 UTC
+
+### Added
+
+- **Presents on the cars**: at Christmas the toy cars carry presents on their roofs, and one is
+  Santa red.
+
 ## 2026-11-10 19:53 UTC
 
 ### Added

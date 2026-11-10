@@ -3,7 +3,8 @@ import roadsData from './roads.json';
 import { ISLAND_ANCHOR, geoToWorld } from '../geo';
 import { ProceduralRoad } from '../../foundation/components/scenery';
 import { RoadTraffic } from './roadTraffic';
-import { CUTE_CARS } from './cuteCars';
+import { CHRISTMAS_CARS, CUTE_CARS, SANTA_RED } from './cuteCars';
+import { isChristmas } from '../christmas';
 
 interface RoadsData {
   roads: { name: string; points: [number, number][] }[];
@@ -65,6 +66,9 @@ export const createIslandRoads = async (
   const traffic = new RoadTraffic(lanes, {
     ...TRAFFIC,
     unitsPerMetre: ISLAND_ANCHOR.unitsPerMetre,
+    // At Christmas every car carries a present home on its roof, and Santa drives the first
+    ...(isChristmas() && { look: CHRISTMAS_CARS }),
   });
+  if (isChristmas()) traffic.paint(0, SANTA_RED);
   return { roads, traffic };
 };

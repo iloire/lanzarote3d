@@ -50,3 +50,7 @@ What changes:
   about half the houses; and lights wound up the ten Los Valles wind turbines. All the lights are
   points twinkling on the shared clock in the shader, one draw call per set, nothing per frame on
   the CPU, and never smaller than 2 px so a town still glimmers from the ridge.
+- **Presents on the cars** (`src/shared/env/cuteCars.ts`, `CHRISTMAS_CARS`): every toy car carries
+  a green present with a gold ribbon and bow on its roof, and the first car is painted Santa red
+  (`RoadTraffic.paint`). The present's colours go in the cars' `emit` attribute over a dark base,
+  so the instance paint that colours the car doesn't tint them.

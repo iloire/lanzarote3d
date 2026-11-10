@@ -201,6 +201,12 @@ export class RoadTraffic {
     this.update(0);
   }
 
+  /** Repaints car `i`, sRGB */
+  paint(i: number, colour: string): void {
+    this.mesh.setColorAt(i, new THREE.Color(colour));
+    if (this.mesh.instanceColor) this.mesh.instanceColor.needsUpdate = true;
+  }
+
   get count(): number {
     return this.cars.length;
   }
