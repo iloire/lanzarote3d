@@ -10,8 +10,6 @@ import { FlightPattern } from '../../foundation/systems/behaviors/FlyingBehavior
 import type { BackdropSwaySettings, CameraFollowSettings, ReframeSettings } from './cameraFollow';
 import type { LoopSettings, TwistSettings, WingoverSettings } from './paragliderMotion';
 import type { HeroSettings } from './heroEmbed';
-import type { GiantRobotSettings } from '../../foundation/components/characters/GiantRobot';
-import { ISLAND_ANCHOR, geoToWorld } from '../../shared/geo';
 
 export type ParagliderVoxelConfig = {
   options: ParagliderVoxelOptions;
@@ -702,42 +700,6 @@ export const herculesConfig: HerculesConfig = {
 export const SHOW_HANGGLIDER = true;
 export const SHOW_CESSNA = true;
 export const SHOW_HERCULES = true;
-
-/**
- * A giant robot, 1200 units tall (about 1.5 km, taller than the Risco), that rises out of the
- * ground behind the cliff a few seconds after the fly-in lands, then runs round the island for
- * ever: over Peñas del Chache, down to Caleta and along Famara beach under the pilots, through
- * Timanfaya to Playa Blanca, back by Puerto del Carmen and Arrecife, and up through Haría.
- * It runs at about 1100 m/s, a loop in about a minute and a half. The route is [lat, lon].
- */
-export const ROBOT = {
-  delaySeconds: 4,
-  /** How far back the follow camera sits when the arrows pick the robot */
-  cameraDistance: 2600,
-  settings: {
-    height: 1200,
-    speed: 880,
-    riseSeconds: 10,
-    route: (
-      [
-        [29.112, -13.505], // behind the Risco, above the valley of Haría
-        [29.11941, -13.52092], // Peñas del Chache
-        [29.115, -13.555], // Caleta de Famara
-        [29.095, -13.575], // Famara beach
-        [29.075, -13.63], // Soo
-        [29.06, -13.68], // Tinajo
-        [29.0, -13.78], // Timanfaya
-        [28.956, -13.766], // Yaiza
-        [28.865, -13.83], // Playa Blanca
-        [28.925, -13.665], // Puerto del Carmen
-        [28.963, -13.548], // Arrecife
-        [29.07, -13.48], // Guatiza
-        [29.135, -13.462], // Arrieta
-        [29.145, -13.5], // Haría
-      ] as const
-    ).map(([lat, lon]) => geoToWorld(lat, lon, ISLAND_ANCHOR)),
-  } satisfies GiantRobotSettings,
-};
 
 // Camera Target Controller
 export const SHOW_CAMERA_TARGET_UI = false;
