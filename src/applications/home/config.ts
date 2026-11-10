@@ -7,7 +7,12 @@ import type {
 } from '../../foundation/components/vehicles';
 import { CharacterType } from '../../foundation/components/characters/CharacterRegistry';
 import { FlightPattern } from '../../foundation/systems/behaviors/FlyingBehavior';
-import type { BackdropSwaySettings, CameraFollowSettings, ReframeSettings } from './cameraFollow';
+import type {
+  BackdropSwaySettings,
+  CameraFollowSettings,
+  FollowTuning,
+  ReframeSettings,
+} from './cameraFollow';
 import type { LoopSettings, TwistSettings, WingoverSettings } from './paragliderMotion';
 import type { HeroSettings } from './heroEmbed';
 
@@ -25,14 +30,24 @@ export type ParagliderVoxelConfig = {
   speedFactor?: number;
 };
 
+/** A pilot's own camera framing, for one whose wing doesn't sit 7 m over their head */
+export type PilotCamera = {
+  /** How far the camera sits from the aim, in metres */
+  distance: number;
+  /** Where the camera aims, relative to the pilot */
+  aim: THREE.Vector3;
+  /** The follow's spring and lead; a lookAhead equal to smoothTime keeps them centred */
+  follow: FollowTuning;
+};
+
 export type HanggliderConfig = {
   scale: number;
   speed: number;
   /** The loop it flies: the ridge loop raised and widened, so it soars above the paragliders */
   waypoints: THREE.Vector3[];
   waypointTension: number;
-  /** How close the camera comes in on him, in metres; nearer than the paragliders' fly-in */
-  cameraDistance: number;
+  /** How the camera frames him instead of the paragliders' framing */
+  camera: PilotCamera;
   /** The 360° loops he throws now and then */
   loop: LoopSettings;
 };
@@ -622,9 +637,16 @@ export const hanggliderConfig: HanggliderConfig = {
   speed: PARAGLIDER_SPEED * 2,
   waypoints: liftLoop(110, 1.25),
   waypointTension: RIDGE_LOOP_TENSION,
-  // A quarter of the paragliders' 160 m: his wing is life-size, theirs voxel-big, so he reads
-  // small from as far
-  cameraDistance: 40,
+  camera: {
+    // A sixth of the paragliders' 160 m: his wing is life-size, theirs voxel-big, so he reads
+    // small from as far
+    distance: 25,
+    // His wing sits just over him, so the camera aims at him, not up the lines
+    aim: new THREE.Vector3(0, 1, 0),
+    // A tighter spring than the paragliders', and no lead: at twice their speed a lead would
+    // leave him 24 m behind the aim, and a slack spring loses him in his loops
+    follow: { smoothTime: 0.5, lookAhead: 0.5 },
+  },
   // About one a minute: a 30° dive of 70 m doubles his speed, which carries him round a 35 m
   // loop and back up to the height he dived from, then he climbs back to his line. 21 s all told.
   loop: { dive: 4, drop: 70, duration: 7, radius: 35, recover: 10, rest: [35, 45] },

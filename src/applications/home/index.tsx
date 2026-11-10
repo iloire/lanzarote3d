@@ -47,6 +47,7 @@ import {
   CAMERA_AIM_OFFSET,
   CAMERA_ARRIVAL_OFFSET,
 } from './config';
+import type { PilotCamera } from './config';
 import { loadParagliders, loadHangglider, loadCessna, loadHercules } from './vehicleLoader';
 import { setupCameraAnimation, applyFloatingMotion } from './cameraAnimation';
 import { BackdropSway, CameraFollow, Reframe } from './cameraFollow';
@@ -95,8 +96,14 @@ class HomeApp extends TerrainBase {
   private removeSwitcher: (() => void) | undefined;
   private removeSound: (() => void) | undefined;
   /** Everyone the camera can follow, paragliders then the hangglider, with how each banks */
-  private pilots: { mesh: THREE.Object3D; motion?: ParagliderMotion; cameraDistance?: number }[] =
-    [];
+  private pilots: {
+    mesh: THREE.Object3D;
+    motion?: ParagliderMotion;
+    /** What the camera follows, if not the mesh's path: the hangglider's body, through his loops */
+    focus?: THREE.Object3D;
+    /** Framing of their own, if not the paragliders' */
+    camera?: PilotCamera;
+  }[] = [];
   /** Which of `pilots` the camera follows */
   private leadIndex = 0;
   /** Set when the scene is a page's hero background */
@@ -167,7 +174,8 @@ class HomeApp extends TerrainBase {
           this.pilots.push({
             mesh: hanggliderResult.mesh,
             motion: hanggliderResult.motion,
-            cameraDistance: hanggliderConfig.cameraDistance,
+            focus: hanggliderResult.motion?.body,
+            camera: hanggliderConfig.camera,
           });
         }
       }
@@ -416,9 +424,17 @@ class HomeApp extends TerrainBase {
     /** The fly-in's view of `pilot`, at their own distance, with La Graciosa behind them */
     const bestView = (pilot: (typeof this.pilots)[number]) => {
       framing.setFromVector3(CAMERA_ARRIVAL_OFFSET);
-      framing.radius = pilot.cameraDistance ?? framing.radius;
+      framing.radius = pilot.camera?.distance ?? framing.radius;
       framing.theta = sway.centre(pilot.mesh.position);
       return frameOffset.setFromSpherical(framing);
+    };
+    const focusPoint = new THREE.Vector3();
+    /** Where the camera follows `pilot`: their body if it leaves the path, else the path */
+    const focusOf = (pilot: (typeof this.pilots)[number]) => {
+      if (!pilot.focus) return pilot.mesh.position;
+      // This frame's flight and motion have moved it since the last render
+      pilot.focus.updateWorldMatrix(true, false);
+      return pilot.focus.getWorldPosition(focusPoint);
     };
     const enginePos = new THREE.Vector3();
     const tail = new THREE.Vector3();
@@ -468,23 +484,27 @@ class HomeApp extends TerrainBase {
         if (following) {
           const pilot = this.pilots[this.leadIndex];
           if (!wasFollowing) {
-            follow.reset(pilot.mesh.position);
-            // The fly-in lands at the paragliders' distance; a pilot seen closer (Blay) closes in
-            if (pilot.cameraDistance) {
+            follow.reset(focusOf(pilot), pilot.camera?.follow);
+            // The fly-in lands at the paragliders' framing; a pilot framed his own way (Blay)
+            // closes in on it
+            if (pilot.camera) {
               frameOffset.subVectors(camera.position, controls.target);
-              reframe.start(
-                controls.target.clone().sub(follow.anchor),
-                frameOffset.setLength(pilot.cameraDistance)
-              );
+              reframe.start(pilot.camera.aim, frameOffset.setLength(pilot.camera.distance));
             }
           } else if (pilot !== followed) {
-            follow.retarget(pilot.mesh.position);
+            follow.retarget(focusOf(pilot));
             // The sway takes over again from the centre of its swing once the camera is there
             swaying = false;
-            reframe.start(CAMERA_AIM_OFFSET, bestView(pilot));
+            reframe.start(pilot.camera?.aim ?? CAMERA_AIM_OFFSET, bestView(pilot));
           }
           followed = pilot;
-          follow.update(deltaTime, pilot.mesh.position, pilot.motion?.bankAngle ?? 0, cameraMove);
+          follow.update(
+            deltaTime,
+            focusOf(pilot),
+            pilot.motion?.bankAngle ?? 0,
+            cameraMove,
+            pilot.camera?.follow
+          );
           camera.position.add(cameraMove);
           controls.target.add(cameraMove);
           if (reframe.update(deltaTime, camera.position, controls.target, follow.anchor)) {
@@ -495,8 +515,7 @@ class HomeApp extends TerrainBase {
           applyFloatingMotion(camera, startTime, this.isAnimating);
         }
         // During the fly-in, learn the lead's speed so the follow takes over moving with them
-        else if (this.isAnimating)
-          follow.observe(deltaTime, this.pilots[this.leadIndex].mesh.position);
+        else if (this.isAnimating) follow.observe(deltaTime, focusOf(this.pilots[this.leadIndex]));
         wasFollowing = following;
 
         OrbitControlsHelper.update(controls);

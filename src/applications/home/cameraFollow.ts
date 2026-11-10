@@ -15,6 +15,9 @@ export type CameraFollowSettings = {
   rollResponse: number;
 };
 
+/** The spring and lead of one lead's follow, for a lead framed differently from the rest */
+export type FollowTuning = Pick<CameraFollowSettings, 'smoothTime' | 'lookAhead'>;
+
 /**
  * Follows the lead pilot on a critically damped spring instead of rigidly: it chases a point a
  * little ahead along the lead's flight, so the camera eases into the pilot's moves, swings
@@ -60,17 +63,17 @@ export class CameraFollow {
    * the spring already settled where it would trail at that speed. Only the anchor's moves
    * reach the camera, so taking over neither jumps, brakes nor lurches ahead.
    */
-  reset(leadPosition: THREE.Vector3): void {
+  reset(leadPosition: THREE.Vector3, tuning: FollowTuning = this.settings): void {
     if (!this.observed) {
       this.lastLead.copy(leadPosition);
       this.leadVelocity.set(0, 0, 0);
     }
     this.observed = true;
-    const { lookAhead, smoothTime } = this.settings;
+    const { lookAhead, smoothTime } = tuning;
     this.anchor.copy(leadPosition).addScaledVector(this.leadVelocity, lookAhead - smoothTime);
     this.anchorVelocity.copy(this.leadVelocity);
     this.roll = 0;
-    this.springTime = this.settings.smoothTime;
+    this.springTime = smoothTime;
   }
 
   /**
@@ -83,11 +86,21 @@ export class CameraFollow {
     this.springTime = this.settings.switchTime;
   }
 
-  /** Advances by `deltaTime` seconds and writes how far the anchor moved into `move` */
-  update(deltaTime: number, leadPosition: THREE.Vector3, leadBank: number, move: THREE.Vector3) {
+  /**
+   * Advances by `deltaTime` seconds and writes how far the anchor moved into `move`;
+   * `tuning` overrides the settings' spring and lead for a lead framed differently
+   */
+  update(
+    deltaTime: number,
+    leadPosition: THREE.Vector3,
+    leadBank: number,
+    move: THREE.Vector3,
+    tuning: FollowTuning = this.settings
+  ) {
     move.set(0, 0, 0);
     if (deltaTime <= 0) return;
-    const { smoothTime, lookAhead, rollShare, rollResponse } = this.settings;
+    const { smoothTime, lookAhead } = tuning;
+    const { rollShare, rollResponse } = this.settings;
     // After a switch the spring tightens back to smoothTime as the glide arrives.
     this.springTime +=
       (smoothTime - this.springTime) * Math.min(1, deltaTime / this.settings.switchTime);

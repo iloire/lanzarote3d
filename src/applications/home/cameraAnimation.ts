@@ -83,7 +83,8 @@ export function setupCameraAnimation(
           // Apply limits without changing target position
           const limits = OrbitControlsHelper.createCenteredLimits(controls.target, {
             ...ORBIT_CONTROLS_PRESETS['closeSubject'],
-            minDistance: 50,
+            // Under Blay's 25 m, or the controls hold the camera off him
+            minDistance: 20,
             maxDistance: 3000,
             panBoundary: {
               center: controls.target.clone(),

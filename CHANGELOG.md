@@ -2,6 +2,15 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-10 19:30 UTC
+
+### Fixed
+
+- **Following the hang glider**: the camera stays with Blay through his loops instead of losing
+  him, aims at him rather than 20 m above, keeps no lead at his speed, and sits 25 m off him.
+  It used to stay 50 m away whatever his 40 m setting said, because the orbit controls wouldn't
+  zoom in closer than that; they now allow 20 m.
+
 ## 2026-11-10 19:25 UTC
 
 ### Changed
