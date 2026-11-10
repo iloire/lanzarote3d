@@ -62,8 +62,8 @@ export function addSantaHat(pilot: THREE.Object3D): void {
   const bounds = mesh.geometry.boundingBox!.clone().applyMatrix4(mesh.matrix);
   const size = bounds.getSize(new THREE.Vector3());
   const hat = santaHatMesh(Math.round(size.x / VOXEL), Math.round(size.z / VOXEL));
-  // Pulled down over the top of the head, the band round the brow
+  // Pulled well down over the head (and the helmet), the band just above the eyes
   const centre = bounds.getCenter(new THREE.Vector3());
-  hat.position.set(centre.x, bounds.max.y - VOXEL * 4, centre.z);
+  hat.position.set(centre.x, bounds.max.y - size.y * 0.42, centre.z);
   head.add(hat);
 }
