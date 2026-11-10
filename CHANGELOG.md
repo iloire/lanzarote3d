@@ -2,6 +2,13 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-10 19:42 UTC
+
+### Added
+
+- **Christmas wings**: at Christmas the pilots fly festive wings: a Santa suit, a candy cane
+  and a Christmas tree with a gold star, which Magne flies.
+
 ## 2026-11-10 19:39 UTC
 
 ### Added

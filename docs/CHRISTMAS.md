@@ -25,3 +25,8 @@ What changes:
   it turns with the head; a pilot model without a head part goes bareheaded. `ParagliderVoxel`
   wears one at Christmas unless its `santaHat` option says otherwise. The voxel mesher it shares
   with the paramotor is in `src/foundation/utils/voxels.ts`.
+- **Christmas wings** on the home scene's paragliders (`src/applications/home/christmasWings.ts`):
+  a Santa suit (red, white fur on the leading edge, a black belt with a gold buckle), a candy
+  cane (white with slanting red stripes) and a Christmas tree (green, a gold star on the nose, a
+  garland and baubles), taken in turn down the pilot list; Magne always flies the tree. Each
+  keeps its wing's kind and cell count, so it flies as it always does.

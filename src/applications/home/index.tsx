@@ -59,6 +59,8 @@ import type { SmokeTrail } from '../../foundation/components/effects/SmokeTrail'
 import { GuirreVisitor } from '../../foundation/components/wildlife/GuirreVisitor';
 import { CharacterType } from '../../foundation/components/characters/CharacterRegistry';
 import { birthdayPilots } from './birthdays';
+import { withChristmasWings } from './christmasWings';
+import { isChristmas } from '../../shared/christmas';
 import { ConfettiBurst } from '../../foundation/components/effects/Confetti';
 import { HeroEmbed } from './heroEmbed';
 import { createLocationSwitcher } from '../relax/LocationSwitcher';
@@ -149,7 +151,7 @@ class HomeApp extends TerrainBase {
       const birthdays = birthdayPilots(new Date(), window.location.search);
       const paragliderResults = await loadParagliders(
         scene,
-        paraglidersVoxel.map(p =>
+        (isChristmas() ? withChristmasWings(paraglidersVoxel) : paraglidersVoxel).map(p =>
           birthdays.includes(p.options.pilot.characterType) ? { ...p, ...BIRTHDAY_FLIGHT } : p
         ),
         this.handleError.bind(this)
