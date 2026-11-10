@@ -5,6 +5,8 @@ import { PilotVoxel, PilotVoxelOptions } from '../../characters/PilotVoxel';
 import Glider, { GliderOptions } from '../components/Glider';
 import { createPirateFlag } from '../components/PirateFlag';
 import { createParamotor } from '../components/Paramotor';
+import { addSantaHat } from '../../characters/SantaHat';
+import { isChristmas } from '../../../../shared/christmas';
 
 export interface ParagliderVoxelOptions extends SimpleComponentOptions {
   glider: GliderOptions;
@@ -13,6 +15,8 @@ export interface ParagliderVoxelOptions extends SimpleComponentOptions {
   pirateFlag?: boolean;
   /** Wear a paramotor on the pilot's back, its prop spinning */
   paramotor?: boolean;
+  /** Wear a Santa hat; at Christmas unless told otherwise */
+  santaHat?: boolean;
 }
 
 /**
@@ -73,6 +77,7 @@ export class ParagliderVoxel extends SimpleThreeComponent {
     this.pilotMesh.rotation.y = Math.PI / 2; // Rotate pilot 90 degrees left
     // In the pilot model's own frame, so it sits on any pilot's back and swings with them
     if (options.paramotor) this.pilotMesh.add(createParamotor());
+    if (options.santaHat ?? isChristmas()) addSantaHat(this.pilotMesh);
     group.add(this.pilotMesh);
 
     // The pilot hangs from a pivot at the carabiners, the wing's origin, where wing and harness

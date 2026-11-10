@@ -2,6 +2,13 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-10 19:39 UTC
+
+### Added
+
+- **Santa hats**: at Christmas every voxel pilot wears a Santa hat that flops back behind
+  their head, with a white bobble on the tip.
+
 ## 2026-11-10 20:05 UTC
 
 ### Fixed

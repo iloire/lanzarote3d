@@ -20,3 +20,8 @@ What changes:
   vertex shader, so it costs one draw call and no CPU anywhere on the map. They fall at 1.6 m/s,
   sway, and drift with 60% of the shared wind on the shared clock, and fade within 12-24 m of the
   camera and towards the cube's edges.
+- **Santa hats** on every voxel pilot (`src/foundation/components/characters/SantaHat.ts`). The
+  hat is built in voxels in code, sized from the pilot's head and hung on its `head` pivot, so
+  it turns with the head; a pilot model without a head part goes bareheaded. `ParagliderVoxel`
+  wears one at Christmas unless its `santaHat` option says otherwise. The voxel mesher it shares
+  with the paramotor is in `src/foundation/utils/voxels.ts`.
