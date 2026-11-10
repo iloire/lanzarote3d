@@ -11,6 +11,8 @@ import { ThemeEngine } from '../foundation/systems/ThemeEngine';
 import { getDefaultTheme } from '../foundation/themes';
 import { LANZAROTE } from '../locations/lanzarote';
 import type { Location } from '../locations/types';
+import { Snowfall } from '../foundation/components/effects/Snowfall';
+import { isChristmas } from './christmas';
 
 /**
  * TerrainBase - Specialized base that injects terrain (island) environment
@@ -26,6 +28,7 @@ export abstract class TerrainBase extends AppBase {
   protected loadingManager?: THREE.LoadingManager;
   protected pipeline?: RenderPipeline;
   protected location: Location = LANZAROTE;
+  private snowfall?: Snowfall;
 
   /**
    * Load full environment for demos
@@ -81,6 +84,12 @@ export abstract class TerrainBase extends AppBase {
       skipComponents: ['environment'],
     });
 
+    // At Christmas a light snow falls round the camera, wherever it goes
+    if (isChristmas()) {
+      this.snowfall = new Snowfall();
+      scene.add(this.snowfall.points);
+    }
+
     if (process.env.NODE_ENV === 'development') {
       (window as unknown as { __lz: unknown }).__lz = { renderer, pipeline: this.pipeline };
     }
@@ -104,6 +113,8 @@ export abstract class TerrainBase extends AppBase {
   }
 
   override dispose(): void {
+    this.snowfall?.dispose();
+    this.snowfall = undefined;
     this.pipeline?.dispose();
     this.pipeline = undefined;
     super.dispose();

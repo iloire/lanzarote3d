@@ -2,6 +2,13 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-10 19:35 UTC
+
+### Added
+
+- **Christmas snowfall**: a light snow falls round the camera in every terrain scene at
+  Christmas, drifting with the wind.
+
 ## 2026-11-10 19:33 UTC
 
 ### Added

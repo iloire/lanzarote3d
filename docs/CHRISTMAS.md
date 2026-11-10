@@ -15,3 +15,8 @@ What changes:
   line is ragged face by face, and the steep faces stay rock, so the Famara cliff keeps its
   colour under a white top. It's three uniforms in the ground shader (`Island.ts`), no extra
   draw call.
+- **Light snowfall** (`src/foundation/components/effects/Snowfall.ts`), added by `TerrainBase`
+  to every terrain scene: 10,000 flakes in a 500 m cube that wraps round the camera in the
+  vertex shader, so it costs one draw call and no CPU anywhere on the map. They fall at 1.6 m/s,
+  sway, and drift with 60% of the shared wind on the shared clock, and fade within 12-24 m of the
+  camera and towards the cube's edges.
