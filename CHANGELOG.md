@@ -2,6 +2,14 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-10 20:05 UTC
+
+### Fixed
+
+- **Hang glider no longer shakes when followed**: the flying aircraft stepped by the time their
+  own frame callback ran rather than the frame's timestamp, so each step varied with how long the
+  render before it took. Close up on Blay that showed as shake; they now step with the scene.
+
 ## 2026-11-10 19:35 UTC
 
 ### Added

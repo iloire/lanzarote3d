@@ -82,7 +82,8 @@ export class FlyingBehavior {
 
   // Internal state
   private time = 0;
-  private lastUpdate = 0;
+  /** The last frame's timestamp, null until the first frame */
+  private lastUpdate: number | null = null;
   private debugLogCounter = 0; // For throttled debug logging
 
   // Waypoint pattern state
@@ -210,8 +211,8 @@ export class FlyingBehavior {
     if (!this.mesh || this.isFlying) return;
 
     this.isFlying = true;
-    this.lastUpdate = performance.now();
-    this.animate();
+    this.lastUpdate = null;
+    this.animationId = requestAnimationFrame(now => this.animate(now));
   }
 
   /**
@@ -230,19 +231,19 @@ export class FlyingBehavior {
   /**
    * Main animation loop
    */
-  private animate(): void {
+  private animate(now: number): void {
     if (!this.isFlying || !this.mesh) return;
 
-    const now = performance.now();
-    let deltaTime = (now - this.lastUpdate) / 1000;
-    // Clamp deltaTime to prevent huge jumps during frame drops or window blur
-    deltaTime = Math.min(deltaTime, 0.1); // Max 100ms (10 FPS minimum)
+    // The frame's own timestamp, as the scene's loop steps by, not the time this callback ran:
+    // that varies with how long the frames before it took, and a camera following closely
+    // shows the difference as shake. Capped so returning to the tab doesn't jump.
+    const deltaTime = this.lastUpdate === null ? 0 : Math.min((now - this.lastUpdate) / 1000, 0.1);
     this.lastUpdate = now;
     this.time += deltaTime;
 
     this.updateFlight(deltaTime);
 
-    this.animationId = requestAnimationFrame(() => this.animate());
+    this.animationId = requestAnimationFrame(next => this.animate(next));
   }
 
   /**
