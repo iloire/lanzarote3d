@@ -46,7 +46,9 @@ import {
   HERO,
   CAMERA_AIM_OFFSET,
   CAMERA_ARRIVAL_OFFSET,
+  ROBOT,
 } from './config';
+import { GiantRobot } from '../../foundation/components/characters/GiantRobot';
 import { loadParagliders, loadHangglider, loadCessna, loadHercules } from './vehicleLoader';
 import { setupCameraAnimation, applyFloatingMotion } from './cameraAnimation';
 import { BackdropSway, CameraFollow, Reframe } from './cameraFollow';
@@ -72,6 +74,7 @@ import { HOME_PLACE } from '../relax/places';
 class HomeApp extends TerrainBase {
   private environment: Environment | undefined;
   private guirres: GuirreVisitor[] = [];
+  private robot: GiantRobot | undefined;
   private confetti: ConfettiBurst[] = [];
   private removeConfettiClick: (() => void) | null = null;
   private animationId: number | undefined;
@@ -222,6 +225,10 @@ class HomeApp extends TerrainBase {
       landmarks.forEach(landmark => scene.add(landmark));
       scene.add(createFerryCrossing());
 
+      this.robot = new GiantRobot(terrain, ROBOT.settings);
+      scene.add(this.robot.mesh, this.robot.focus);
+      this.pilots.push({ mesh: this.robot.focus, cameraDistance: ROBOT.cameraDistance });
+
       this.environment.addRandomBoats(water);
 
       options.environment = this.environment;
@@ -326,6 +333,7 @@ class HomeApp extends TerrainBase {
       camera.position.copy(controls.target).add(CAMERA_ARRIVAL_OFFSET);
       controls.update();
       this.startAnimationLoop(renderer, scene, camera, controls);
+      this.robot?.wake(ROBOT.delaySeconds);
       return;
     }
 
@@ -339,6 +347,7 @@ class HomeApp extends TerrainBase {
       animationDurationMs: ANIMATION_DURATION_MS,
       onAnimationComplete: () => {
         this.isAnimating = false;
+        this.robot?.wake(ROBOT.delaySeconds);
         // A pilot who twists (Bernt) shows it off as the camera arrives, and again when picked
         this.pilots[this.leadIndex]?.motion?.startTwist();
         // The arrows only steer the follow camera, so they appear once the intro has landed
@@ -457,6 +466,7 @@ class HomeApp extends TerrainBase {
 
         this.paragliderMotions.forEach(motion => motion.update(deltaTime));
         this.guirres.forEach(guirre => guirre.update(deltaTime));
+        this.robot?.update(deltaTime);
         this.confetti = this.confetti.filter(burst => {
           if (burst.update(deltaTime)) return true;
           burst.dispose();
@@ -577,6 +587,8 @@ class HomeApp extends TerrainBase {
     this.paragliderFlyingBehaviors.length = 0;
     this.paragliderMotions.length = 0;
 
+    this.robot?.dispose();
+    this.robot = undefined;
     this.guirres.forEach(guirre => guirre.dispose());
     this.guirres.length = 0;
     this.removeConfettiClick?.();
