@@ -2,6 +2,13 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-10 19:25 UTC
+
+### Changed
+
+- **Camera framed on the pilot**: the home camera aims 20 m up the lines instead of 35, and sits
+  lower, so the pilot is near the middle of the frame with the whole wing still above them.
+
 ## 2026-11-10 17:59 UTC
 
 ### Changed

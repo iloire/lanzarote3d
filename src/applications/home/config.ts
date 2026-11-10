@@ -724,18 +724,19 @@ export const CAMERA_FOLLOW: CameraFollowSettings = {
 };
 
 /**
- * Where the camera aims, relative to the lead pilot: halfway up the lines, so the canopy 7 m
- * overhead stays in frame with the pilot
+ * Where the camera aims, relative to the lead pilot: a little way up the lines, so the pilot sits
+ * near the middle of the frame with the canopy 7 m overhead still in it
  */
-export const CAMERA_AIM_OFFSET = new THREE.Vector3(0, 35, 0);
+export const CAMERA_AIM_OFFSET = new THREE.Vector3(0, 20, 0);
 
-/** Where the fly-in leaves the camera, relative to its aim: about 160 m behind and above */
-export const CAMERA_ARRIVAL_OFFSET = new THREE.Vector3(-70, 35, 140);
+/** Where the fly-in leaves the camera, relative to its aim: about 160 m behind, a little above */
+export const CAMERA_ARRIVAL_OFFSET = new THREE.Vector3(-70, 18, 140);
 
 /**
  * Switching pilots with the arrows brings the camera back to that pilot's best view as it glides
- * across, however it was orbited, panned or zoomed: aimed halfway up their lines, at the fly-in's
- * height and their own distance, with La Graciosa behind; most of the way within about 0.75 s.
+ * across, however it was orbited, panned or zoomed: aimed a little way up their lines, at the
+ * fly-in's height and their own distance, with La Graciosa behind; most of the way within about
+ * 0.75 s.
  */
 export const CAMERA_REFRAME: ReframeSettings = {
   response: 4,
