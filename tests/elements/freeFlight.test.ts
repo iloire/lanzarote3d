@@ -1,9 +1,5 @@
 import * as THREE from 'three';
-import {
-  FreeFlight,
-  FreeFlightSettings,
-  PathFlight,
-} from '../../src/applications/home/freeFlight';
+import { FreeFlight, FreeFlightSettings, PathFlight } from '../../src/applications/home/freeFlight';
 
 const STEP = 1 / 60;
 const SPEED = 15;
