@@ -2,6 +2,17 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-11 10:56 UTC
+
+### Added
+
+- **Fly the pilot yourself**: on the home scene the arrow keys fly the pilot the camera follows.
+  ← → turn gently, ↑ is the speed bar (faster, sinking), ↓ the brakes (slower, climbing in the
+  lift), and the lift keeps them clear of the ground. The camera swings round behind them.
+  Switch to another pilot and the one you flew heads back to the ridge loop and rejoins it.
+  The arrows no longer pan the camera there. Settings: `FREE_FLIGHT` and `CAMERA_CHASE` in
+  `src/applications/home/config.ts`.
+
 ## 2026-11-10 20:07 UTC
 
 ### Changed

@@ -204,6 +204,16 @@ export class FlyingBehavior {
     this.mesh.quaternion.copy(this.getTargetQuaternion(tangent));
   }
 
+  /** The curve a waypoint flight follows, if it has one */
+  public get waypointPath(): THREE.CatmullRomCurve3 | null {
+    return this.waypointCurve;
+  }
+
+  /** Where the next waypoint flight step starts from, 0 to 1 along the curve */
+  public setWaypointProgress(progress: number): void {
+    this.waypointProgress = THREE.MathUtils.euclideanModulo(progress, 1);
+  }
+
   /**
    * Start the flying animation
    */

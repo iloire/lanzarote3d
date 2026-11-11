@@ -146,7 +146,8 @@ export class ParagliderMotion {
     private readonly rig: THREE.Object3D,
     /** The wing and pilot, moved off the rig's path by wingovers and loops */
     readonly body: THREE.Object3D,
-    private readonly speed: number,
+    /** The speed the rig flies its path at, in m/s */
+    readonly speed: number,
     private readonly pilotSwing?: THREE.Object3D,
     private readonly wingover?: WingoverSettings,
     private readonly twist?: TwistSettings,

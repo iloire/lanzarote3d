@@ -15,6 +15,7 @@ import type {
 } from './cameraFollow';
 import type { LoopSettings, TwistSettings, WingoverSettings } from './paragliderMotion';
 import type { HeroSettings } from './heroEmbed';
+import type { FreeFlightSettings } from './freeFlight';
 
 export type ParagliderVoxelConfig = {
   options: ParagliderVoxelOptions;
@@ -793,6 +794,40 @@ export const CAMERA_SWAY: BackdropSwaySettings = {
   period: 60,
   response: 0.3,
   easeIn: 5,
+};
+
+/**
+ * Flying a pilot with the arrows: ← → turn at up to 15°/s, a full circle in 24 s, rolling in
+ * over a second or so; ↑ is the speed bar, 30% faster sinking 2 m/s, ↓ the brakes, 25% slower
+ * climbing 1 m/s in the lift. The lift keeps the pilot 60 m over the ground or sea and under
+ * 2000 m. Let go for another pilot, they fly back to their loop a little faster than they fly it.
+ */
+export const FREE_FLIGHT: FreeFlightSettings = {
+  turnRate: THREE.MathUtils.degToRad(15),
+  turnResponse: 1.2,
+  speedBar: 1.3,
+  brakes: 0.75,
+  speedResponse: 0.8,
+  sink: 2,
+  climb: 1,
+  verticalResponse: 0.8,
+  clearance: 60,
+  ceiling: 2000,
+  groundInterval: 0.25,
+  returnSpeed: 1.3,
+  handBack: 2,
+};
+
+/**
+ * While someone flies a pilot the camera swings round behind them, so the arrows steer the way
+ * the screen faces, at its distance and height; most of the way within a couple of seconds
+ */
+export const CAMERA_CHASE: BackdropSwaySettings = {
+  amplitude: 0,
+  bias: 0,
+  period: 60,
+  response: 1,
+  easeIn: 1.5,
 };
 
 /**

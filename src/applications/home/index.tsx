@@ -54,11 +54,16 @@ import {
   HERO,
   CAMERA_AIM_OFFSET,
   CAMERA_ARRIVAL_OFFSET,
+  FREE_FLIGHT,
+  CAMERA_CHASE,
+  PARAGLIDER_SPEED,
 } from './config';
 import type { PilotCamera } from './config';
 import { loadParagliders, loadHangglider, loadCessna, loadHercules } from './vehicleLoader';
 import { setupCameraAnimation, applyFloatingMotion } from './cameraAnimation';
 import { BackdropSway, CameraFollow, Reframe } from './cameraFollow';
+import { FreeFlight } from './freeFlight';
+import { getTerrainHeight } from '../../shared/env/mesh-utils';
 import { createTitleOverlay } from './TitleOverlay';
 import { createPilotPicker } from './PilotPicker';
 import { pilotFromSearch, searchWithPilot } from './pilotParam';
@@ -116,9 +121,15 @@ class HomeApp extends TerrainBase {
     focus?: THREE.Object3D;
     /** Framing of their own, if not the paragliders' */
     camera?: PilotCamera;
+    /** The loop they fly, and their own flight while someone flies them with the arrows */
+    path?: FlyingBehavior;
+    flight?: FreeFlight;
   }[] = [];
   /** Which of `pilots` the camera follows */
   private leadIndex = 0;
+  /** The arrows held down, which fly the pilot the camera follows */
+  private readonly arrows = new Set<string>();
+  private removeArrowKeys: (() => void) | null = null;
   /** Santa's rig at Christmas, and his bells once the sound is on */
   private santa: THREE.Object3D | undefined;
   private bells: SleighBells | undefined;
@@ -182,7 +193,11 @@ class HomeApp extends TerrainBase {
         r.flyingBehavior ? [r.flyingBehavior] : []
       );
       this.paragliderMotions = paragliderResults.flatMap(r => (r.motion ? [r.motion] : []));
-      this.pilots = paragliderResults.map(({ mesh, motion }) => ({ mesh, motion }));
+      this.pilots = paragliderResults.map(({ mesh, motion, flyingBehavior }) => ({
+        mesh,
+        motion,
+        path: flyingBehavior,
+      }));
 
       if (SHOW_HANGGLIDER) {
         const hanggliderResult = await loadHangglider(
@@ -204,6 +219,7 @@ class HomeApp extends TerrainBase {
             motion: hanggliderResult.motion,
             focus: hanggliderResult.motion?.body,
             camera: hanggliderConfig.camera,
+            path: hanggliderResult.flyingBehavior,
           });
         }
       }
@@ -345,7 +361,8 @@ class HomeApp extends TerrainBase {
         );
       }
 
-      this.setupCameraAnimation(camera, controls, renderer, scene);
+      if (!isEmbedded() && !this.targetController) this.listenForArrows(controls);
+      this.setupCameraAnimation(camera, controls, renderer, scene, terrain);
 
       canvas.style.opacity = originalOpacity || '1';
 
@@ -365,7 +382,8 @@ class HomeApp extends TerrainBase {
     camera: THREE.Camera,
     controls: OrbitControls,
     renderer: THREE.WebGLRenderer,
-    scene: THREE.Scene
+    scene: THREE.Scene,
+    terrain: THREE.Mesh | undefined
   ): void {
     // ?pilot= picks who the fly-in lands on, by number or by the rig's name (e.g. bernt, blay)
     const names = this.pilots.map(({ mesh }) => mesh.name.replace(/^paraglider-/, ''));
@@ -385,14 +403,14 @@ class HomeApp extends TerrainBase {
       controls.target.copy(lead.position).add(CAMERA_AIM_OFFSET);
       camera.position.copy(controls.target).add(CAMERA_ARRIVAL_OFFSET);
       controls.update();
-      this.startAnimationLoop(renderer, scene, camera, controls);
+      this.startAnimationLoop(renderer, scene, camera, controls, terrain);
       return;
     }
 
     // Flagged before the first frame: the sway would otherwise lock onto the camera's far-off
     // starting angle in the moment before the fly-in, and snap back to it when it lands
     this.isAnimating = true;
-    this.startAnimationLoop(renderer, scene, camera, controls);
+    this.startAnimationLoop(renderer, scene, camera, controls, terrain);
 
     setupCameraAnimation(camera, controls, {
       target: lead,
@@ -404,6 +422,8 @@ class HomeApp extends TerrainBase {
         // The arrows only steer the follow camera, so they appear once the intro has landed
         if (!isEmbedded() && !this.targetController && this.pilots.length > 1) {
           this.removePilotPicker = createPilotPicker(this.pilots.length, this.leadIndex, index => {
+            // Whoever was being flown flies back to their loop on their own
+            this.pilots[this.leadIndex]?.flight?.release();
             this.leadIndex = index;
             this.pilots[index]?.motion?.startTwist();
             // Keeps the address on the pilot in view, so it can be shared
@@ -412,6 +432,40 @@ class HomeApp extends TerrainBase {
         }
       },
     });
+  }
+
+  /**
+   * The arrows fly the pilot the camera follows, so they no longer pan the camera. Ignored while
+   * typing, e.g. in the place picker's search.
+   */
+  private listenForArrows(controls: OrbitControls): void {
+    controls.stopListenToKeyEvents();
+    const isArrow = (key: string) => key.startsWith('Arrow');
+    const onDown = (e: KeyboardEvent) => {
+      const target = e.target;
+      const typing =
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target instanceof HTMLSelectElement ||
+        (target instanceof HTMLElement && target.isContentEditable);
+      if (!isArrow(e.key) || typing || e.metaKey || e.ctrlKey || e.altKey) return;
+      e.preventDefault();
+      this.arrows.add(e.key);
+    };
+    const onUp = (e: KeyboardEvent) => {
+      if (isArrow(e.key)) this.arrows.delete(e.key);
+    };
+    const onBlur = () => this.arrows.clear();
+    window.addEventListener('keydown', onDown);
+    window.addEventListener('keyup', onUp);
+    window.addEventListener('blur', onBlur);
+    this.removeArrowKeys = () => {
+      window.removeEventListener('keydown', onDown);
+      window.removeEventListener('keyup', onUp);
+      window.removeEventListener('blur', onBlur);
+      this.arrows.clear();
+      controls.listenToKeyEvents(window);
+    };
   }
 
   /**
@@ -452,7 +506,8 @@ class HomeApp extends TerrainBase {
     renderer: THREE.WebGLRenderer,
     scene: THREE.Scene,
     camera: THREE.Camera,
-    controls: OrbitControls
+    controls: OrbitControls,
+    terrain: THREE.Mesh | undefined
   ): void {
     const startTime = Date.now();
     let lastTime: number | null = null;
@@ -467,10 +522,39 @@ class HomeApp extends TerrainBase {
     // Picking another pilot brings the camera back to that pilot's best view, however it was
     // left, unless someone grabs the controls on the way
     const reframe = new Reframe(CAMERA_REFRAME);
+    // While someone flies the lead, the camera swings round behind them, off a point ahead
+    const chaseAhead = new THREE.Vector3();
+    const chase = new BackdropSway(chaseAhead, CAMERA_CHASE);
+    let chasing = false;
+    const heading = new THREE.Vector3();
+    const groundHeight = (x: number, z: number) =>
+      terrain ? getTerrainHeight(x, z, terrain) : NaN;
     controls.addEventListener('start', () => {
       swaying = false;
+      chasing = false;
       reframe.stop();
     });
+    /** Flies the lead after the arrows, taking them off their loop on the first press */
+    const flyLead = () => {
+      const pilot = this.pilots[this.leadIndex];
+      if (!pilot?.path || this.arrows.size === 0) {
+        if (pilot?.flight) pilot.flight.input.turn = pilot.flight.input.pitch = 0;
+        return;
+      }
+      if (!pilot.flight) {
+        const speed = pilot.motion?.speed ?? PARAGLIDER_SPEED;
+        pilot.flight = new FreeFlight(pilot.mesh, pilot.path, speed, FREE_FLIGHT, groundHeight);
+        window.gtag?.('event', 'pilot_fly', { pilot: this.leadIndex + 1 });
+      } else if (pilot.flight.returning) pilot.flight.steer();
+      const held = (key: string) => (this.arrows.has(key) ? 1 : 0);
+      pilot.flight.input.turn = held('ArrowLeft') - held('ArrowRight');
+      pilot.flight.input.pitch = held('ArrowUp') - held('ArrowDown');
+      if (!chasing && !reframe.running) {
+        chasing = true;
+        swaying = false;
+        chase.restart();
+      }
+    };
     const framing = new THREE.Spherical();
     const frameOffset = new THREE.Vector3();
     /** The fly-in's view of `pilot`, at their own distance, with La Graciosa behind them */
@@ -529,6 +613,11 @@ class HomeApp extends TerrainBase {
         if (this.santa) this.bells?.setDistance(camera.position.distanceTo(this.santa.position));
         this.windFarm?.update(deltaTime);
 
+        // Free flights move their rigs before the motions read how they turned
+        if (!this.isAnimating) flyLead();
+        this.pilots.forEach(pilot => {
+          if (pilot.flight && !pilot.flight.update(deltaTime)) pilot.flight = undefined;
+        });
         this.paragliderMotions.forEach(motion => motion.update(deltaTime));
         this.guirres.forEach(guirre => guirre.update(deltaTime));
         this.confetti = this.confetti.filter(burst => {
@@ -553,6 +642,7 @@ class HomeApp extends TerrainBase {
             follow.retarget(focusOf(pilot));
             // The sway takes over again from the centre of its swing once the camera is there
             swaying = false;
+            chasing = false;
             reframe.start(pilot.camera?.aim ?? CAMERA_AIM_OFFSET, bestView(pilot));
           }
           followed = pilot;
@@ -569,7 +659,13 @@ class HomeApp extends TerrainBase {
             sway.restart();
             swaying = true;
           }
-          if (swaying && !reframe.running) sway.update(deltaTime, camera.position, controls.target);
+          if (chasing && !reframe.running) {
+            heading.set(0, 0, -1).applyQuaternion(pilot.mesh.quaternion).setY(0);
+            chaseAhead.copy(pilot.mesh.position).addScaledVector(heading.normalize(), 10000);
+            chase.update(deltaTime, camera.position, controls.target);
+          } else if (swaying && !reframe.running) {
+            sway.update(deltaTime, camera.position, controls.target);
+          }
           applyFloatingMotion(camera, startTime, this.isAnimating);
         }
         // During the fly-in, learn the lead's speed so the follow takes over moving with them
@@ -641,6 +737,8 @@ class HomeApp extends TerrainBase {
       this.removePilotPicker();
       this.removePilotPicker = null;
     }
+    this.removeArrowKeys?.();
+    this.removeArrowKeys = null;
     this.pilots.length = 0;
     this.leadIndex = 0;
 

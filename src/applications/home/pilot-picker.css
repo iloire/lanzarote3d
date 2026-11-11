@@ -64,6 +64,26 @@
   text-shadow: 1px 1px 0 #0d1f33;
 }
 
+/* Over the arrows, saying the keyboard arrows fly the pilot; touch screens have none */
+.pilot-picker-hint {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  margin-bottom: 8px;
+  transform: translateX(-50%);
+  font-size: 6px;
+  white-space: nowrap;
+  color: #ffffff;
+  text-shadow: 1px 1px 0 #0d1f33;
+  pointer-events: none;
+}
+
+@media (hover: none) {
+  .pilot-picker-hint {
+    display: none;
+  }
+}
+
 @media (max-width: 500px) {
   .pilot-picker {
     bottom: 54px;

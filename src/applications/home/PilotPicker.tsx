@@ -32,6 +32,7 @@ const PilotPicker: React.FC<PilotPickerProps> = ({ count, initial, onChange }) =
       <button type="button" aria-label="Next pilot" onClick={() => step(1)}>
         ›
       </button>
+      <span className="pilot-picker-hint">fly with the arrow keys</span>
     </nav>
   );
 };
