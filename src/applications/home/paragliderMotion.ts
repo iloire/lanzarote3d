@@ -16,14 +16,17 @@ const MAX_SWING = THREE.MathUtils.degToRad(25);
 const SPEED_SMOOTHING = 3;
 /**
  * A tip collapse: the tip folds under in `fold` seconds, stays shut until `reopen` and is fully
- * open again at `end`. Meanwhile the wing banks and turns up to `bank` and `yaw` towards it.
+ * open again at `end`, banking the wing up to `bank` towards it. The wing turns off its line
+ * towards the collapsed side, heading up to `turn` away from it, and the pilot steers back onto
+ * the line, `swerve` seconds after the collapse.
  */
 const COLLAPSE = {
   fold: 0.3,
   reopen: 1.1,
   end: 2,
-  bank: THREE.MathUtils.degToRad(18),
-  yaw: THREE.MathUtils.degToRad(20),
+  bank: THREE.MathUtils.degToRad(25),
+  turn: THREE.MathUtils.degToRad(50),
+  swerve: 7,
 };
 
 /**
@@ -255,7 +258,7 @@ export class ParagliderMotion {
     this.body.rotation.z = this.bank + Math.sin(this.time * 0.9) * 0.03;
     this.body.rotation.x = weave.pitch + loop.pitch + Math.sin(this.time * 0.6) * 0.04;
     this.body.rotation.y = weave.yaw + collapse.yaw;
-    this.body.position.x = weave.x;
+    this.body.position.x = weave.x + collapse.x;
     this.body.position.y =
       weave.y + loop.up + Math.sin(this.time * 0.35) * 1.5 + Math.sin(this.time * 0.9) * 0.4;
     this.body.position.z = -loop.forward;
@@ -271,24 +274,37 @@ export class ParagliderMotion {
   }
 
   /**
-   * Folds the collapsing tip and reopens it, and how far that banks and turns the wing: towards
-   * the collapsed side, which flies on with less wing. Right is a negative bank and yaw.
+   * Folds the collapsing tip and reopens it, and where that takes the wing: it swerves off its
+   * line towards the collapsed side, x = drift·sin²(πt / swerve), so it turns away hardest a
+   * quarter of the way in, just after the tip reopens, and is back on the line, heading along
+   * it, at the end. Right is a positive x and a negative bank and yaw.
    */
-  private collapse(deltaTime: number): { bank: number; yaw: number } {
-    if (this.collapseTime === null || !this.collapseAmount) return { bank: 0, yaw: 0 };
+  private collapse(deltaTime: number): { bank: number; yaw: number; x: number } {
+    if (this.collapseTime === null || !this.collapseAmount) return { bank: 0, yaw: 0, x: 0 };
     this.collapseTime += deltaTime;
     const time = this.collapseTime;
-    const { fold, reopen, end, bank, yaw } = COLLAPSE;
-    const amount =
-      THREE.MathUtils.smoothstep(time, 0, fold) *
-      (1 - THREE.MathUtils.smoothstep(time, reopen, end));
-    if (time >= end) this.collapseTime = null;
-    const shut = this.collapseTime === null ? 0 : amount;
+    const { fold, reopen, end, bank, turn, swerve } = COLLAPSE;
+    const side = this.collapsing.rig;
+    const shut =
+      time >= end
+        ? 0
+        : THREE.MathUtils.smoothstep(time, 0, fold) *
+          (1 - THREE.MathUtils.smoothstep(time, reopen, end));
     this.collapseAmount.set(
       this.collapsing.span < 0 ? shut : 0,
       this.collapsing.span > 0 ? shut : 0
     );
-    return { bank: -this.collapsing.rig * bank * shut, yaw: -this.collapsing.rig * yaw * shut };
+    if (time >= swerve) {
+      this.collapseTime = null;
+      return { bank: 0, yaw: 0, x: 0 };
+    }
+
+    // The drift that turns the heading by `turn` at its steepest
+    const drift = (this.speed * swerve * Math.tan(turn)) / Math.PI;
+    const phase = (Math.PI * time) / swerve;
+    const x = side * drift * Math.sin(phase) ** 2;
+    const vx = ((side * drift * Math.PI) / swerve) * Math.sin(phase * 2);
+    return { bank: -side * bank * shut, yaw: -Math.atan(vx / this.speed), x };
   }
 
   /**

@@ -260,7 +260,7 @@ const ribOutline = (rib: Rib, billow: number): THREE.Vector3[] => {
 };
 
 /** A collapsed tip folds from this span fraction out, by up to this angle at the tip */
-const FOLD_FROM = 0.5;
+const FOLD_FROM = 0.7;
 const FOLD_ANGLE = 2;
 
 /**
@@ -295,9 +295,9 @@ const CANOPY_BEGIN_VERTEX = /* glsl */ `
   // tighter towards the tip. The nose goes from further in than the tail, as the fold of a real
   // asymmetric collapse runs diagonally across the cells.
   float side = sign(t);
-  float hinge = ${FOLD_FROM.toFixed(2)} + 0.2 * aStation.z;
+  float hinge = ${FOLD_FROM.toFixed(2)} + 0.1 * aStation.z;
   float fold = side * (side > 0.0 ? uCollapse.y : uCollapse.x) * ${FOLD_ANGLE.toFixed(2)} *
-    smoothstep(hinge, hinge + 0.3, span);
+    smoothstep(hinge, hinge + 0.2, span);
   vec2 pivot = vec2(uFoldPivot.x, side * uFoldPivot.y);
   vec2 arm = transformed.yz - pivot;
   transformed.yz = pivot + vec2(arm.x * cos(fold) - arm.y * sin(fold), arm.x * sin(fold) + arm.y * cos(fold));

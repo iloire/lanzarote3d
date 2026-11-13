@@ -187,7 +187,7 @@ test('startTwist twists straight away instead of waiting out the rest', () => {
   expect(Math.abs(swing.rotation.y)).toBeCloseTo(Math.PI, 5);
 });
 
-test('a clicked tip folds under, turns the wing towards it and reopens', async () => {
+test('a clicked tip folds under and reopens, the wing swerving towards it and back', async () => {
   const wing = await new Glider({}).load();
   const canopy = wing.getObjectByName('canopy')!;
   const rig = new THREE.Object3D();
@@ -210,7 +210,15 @@ test('a clicked tip folds under, turns the wing towards it and reopens', async (
   expect(motion.bankAngle).toBeLessThan(THREE.MathUtils.degToRad(-10));
   expect(body.rotation.y).toBeLessThan(THREE.MathUtils.degToRad(-10));
 
-  step(2);
+  expect(body.position.x).toBeGreaterThan(0);
+
+  // Open again and well off the line, still turned away towards the collapsed side
+  step(1.5);
   expect(collapse.y).toBe(0);
+  expect(body.rotation.y).toBeLessThan(THREE.MathUtils.degToRad(-30));
+
+  // Steered back onto the line
+  step(6);
+  expect(Math.abs(body.position.x)).toBeLessThan(1e-6);
   expect(Math.abs(body.rotation.y)).toBeLessThan(1e-6);
 });

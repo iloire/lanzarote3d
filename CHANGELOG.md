@@ -12,6 +12,15 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   and angles in `LEGS_REST`, `CROSS_HOLD`, `STRETCH_HOLD`, `CROSS_IN` and `STRETCH`
   (`src/applications/home/pilotPose.ts`).
 
+## 2026-11-13 12:05 UTC
+
+### Changed
+
+- **Smaller collapse, real turn**: a clicked tip folds from 70% of the half span instead of half,
+  and the wing now really leaves its line: it turns up to 50° towards the collapsed side and
+  drifts off, then the pilot steers back onto the path over about 7 s (`COLLAPSE.turn`,
+  `COLLAPSE.swerve`).
+
 ## 2026-11-13 11:36 UTC
 
 ### Added
