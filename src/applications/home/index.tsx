@@ -83,6 +83,7 @@ import { SleighBells } from '../relax/sleighBells';
 import { SparkleTrail } from '../../foundation/components/effects/SparkleTrail';
 import { pickerPlaces } from '../relax/scenes';
 import { HOME_PLACE } from '../relax/places';
+import { listenForClicks, listenForWingClicks } from './wingClicks';
 
 /**
  * Home App - Landing scene with the voxel title
@@ -93,6 +94,7 @@ class HomeApp extends TerrainBase {
   private guirres: GuirreVisitor[] = [];
   private confetti: ConfettiBurst[] = [];
   private removeConfettiClick: (() => void) | null = null;
+  private removeWingClicks: (() => void) | null = null;
   private animationId: number | undefined;
   private traffic: RoadTraffic | undefined;
   private windFarm: WindFarm | undefined;
@@ -316,6 +318,7 @@ class HomeApp extends TerrainBase {
         this.guirres.forEach(guirre => scene.add(guirre.mesh));
       }
       if (birthdayRigs.length) this.listenForConfetti(renderer.domElement, birthdayRigs);
+      this.removeWingClicks = listenForWingClicks(renderer.domElement, camera, this.pilots);
 
       if (SHOW_CAMERA_TARGET_UI) {
         this.targetController = new CameraTargetController(
@@ -473,18 +476,9 @@ class HomeApp extends TerrainBase {
    * the camera is following, as long as it's their birthday; anyone else, nothing happens.
    */
   private listenForConfetti(canvas: HTMLCanvasElement, birthdayRigs: THREE.Object3D[]): void {
-    let down: { x: number; y: number; time: number } | null = null;
-    const onDown = (e: PointerEvent) => {
-      down = { x: e.clientX, y: e.clientY, time: e.timeStamp };
-    };
-    const onUp = (e: PointerEvent) => {
-      const click =
-        down &&
-        Math.hypot(e.clientX - down.x, e.clientY - down.y) < 6 &&
-        e.timeStamp - down.time < 400;
-      down = null;
+    this.removeConfettiClick = listenForClicks(canvas, () => {
       const rig = this.pilots[this.leadIndex]?.mesh;
-      if (!click || this.isAnimating || !rig || !birthdayRigs.includes(rig)) return;
+      if (this.isAnimating || !rig || !birthdayRigs.includes(rig)) return;
       // From the carabiners, between pilot and wing, sized from the wing (~11 m at life size)
       const origin = new THREE.Vector3();
       rig.getObjectByName('pilot-swing')?.getWorldPosition(origin);
@@ -493,13 +487,7 @@ class HomeApp extends TerrainBase {
       rig.add(burst.mesh);
       this.confetti.push(burst);
       window.gtag?.('event', 'birthday_confetti', {});
-    };
-    canvas.addEventListener('pointerdown', onDown);
-    canvas.addEventListener('pointerup', onUp);
-    this.removeConfettiClick = () => {
-      canvas.removeEventListener('pointerdown', onDown);
-      canvas.removeEventListener('pointerup', onUp);
-    };
+    });
   }
 
   private startAnimationLoop(
@@ -762,6 +750,8 @@ class HomeApp extends TerrainBase {
     this.guirres.length = 0;
     this.removeConfettiClick?.();
     this.removeConfettiClick = null;
+    this.removeWingClicks?.();
+    this.removeWingClicks = null;
     this.confetti.forEach(burst => burst.dispose());
     this.confetti.length = 0;
 

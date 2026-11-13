@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { PilotPose } from './pilotPose';
+import { canopyCollapse } from '../../foundation/components/vehicles/components/Glider';
 
 const GRAVITY = 9.81;
 const MAX_BANK = THREE.MathUtils.degToRad(35);
@@ -13,6 +14,17 @@ const SWING_DAMPING = 0.22;
 const MAX_SWING = THREE.MathUtils.degToRad(25);
 /** How fast the measured speed and acceleration are smoothed, per second */
 const SPEED_SMOOTHING = 3;
+/**
+ * A tip collapse: the tip folds under in `fold` seconds, stays shut until `reopen` and is fully
+ * open again at `end`. Meanwhile the wing banks and turns up to `bank` and `yaw` towards it.
+ */
+const COLLAPSE = {
+  fold: 0.3,
+  reopen: 1.1,
+  end: 2,
+  bank: THREE.MathUtils.degToRad(18),
+  yaw: THREE.MathUtils.degToRad(20),
+};
 
 /**
  * Wingovers flown on top of the path, now and then: the wing weaves `sway` to each side once a
@@ -141,6 +153,13 @@ export class ParagliderMotion {
   private readonly loopLast = { forward: 0, up: 0 };
   /** The pilot's arms and head, if the model is cut into parts */
   private readonly pose?: PilotPose;
+  /** The canopy, if it can collapse, and how far each of its tips is folded */
+  private readonly canopy?: THREE.Object3D;
+  private readonly collapseAmount?: THREE.Vector2;
+  /** Seconds into the current tip collapse, or null while the wing is open */
+  private collapseTime: number | null = null;
+  /** The collapsing tip: on the canopy's span (-1, 1) and on the rig (1 its right) */
+  private readonly collapsing = { span: 1, rig: 1 };
 
   constructor(
     private readonly rig: THREE.Object3D,
@@ -158,6 +177,8 @@ export class ParagliderMotion {
     // The pilot twists round the hang line first, then swings on it
     if (pilotSwing) pilotSwing.rotation.order = 'XZY';
     this.pose = pilotSwing && PilotPose.from(pilotSwing);
+    this.canopy = body.getObjectByName('canopy');
+    this.collapseAmount = this.canopy && canopyCollapse(this.canopy);
     // Somewhere into a rest, so the pilots don't start their wingovers together
     this.restLeft = wingover ? Math.random() * wingover.rest[1] : 0;
     this.twistRestLeft = twist ? Math.random() * twist.rest[1] : 0;
@@ -177,6 +198,23 @@ export class ParagliderMotion {
   /** Twists now, if this pilot twists and isn't already, instead of waiting out the rest */
   startTwist(): void {
     if (this.twistTime === null) this.twistRestLeft = 0;
+  }
+
+  /** True if the wing can be collapsed with `collapseAt` */
+  get collapsible(): boolean {
+    return this.collapseAmount !== undefined;
+  }
+
+  /**
+   * Collapses the tip on the side of the wing that `point`, in world space, is on, then lets it
+   * reopen, unless a tip is already collapsed.
+   */
+  collapseAt(point: THREE.Vector3): void {
+    if (!this.canopy || this.collapseTime !== null) return;
+    this.collapseTime = 0;
+    const local = new THREE.Vector3();
+    this.collapsing.span = Math.sign(this.canopy.worldToLocal(local.copy(point)).z) || 1;
+    this.collapsing.rig = Math.sign(this.rig.worldToLocal(local.copy(point)).x) || 1;
   }
 
   update(deltaTime: number): void {
@@ -204,9 +242,10 @@ export class ParagliderMotion {
     this.pathBank += (targetBank - this.pathBank) * Math.min(1, deltaTime * BANK_RESPONSE);
     const weave = this.flyWingover(deltaTime);
     const loop = this.flyLoop(deltaTime);
+    const collapse = this.collapse(deltaTime);
     const lastBank = this.bank;
     this.bank = THREE.MathUtils.clamp(
-      this.pathBank + weave.bank,
+      this.pathBank + weave.bank + collapse.bank,
       -MAX_WINGOVER_BANK,
       MAX_WINGOVER_BANK
     );
@@ -215,7 +254,7 @@ export class ParagliderMotion {
     // Positive roll about the rig's Z lowers the left wing, which is a left turn here.
     this.body.rotation.z = this.bank + Math.sin(this.time * 0.9) * 0.03;
     this.body.rotation.x = weave.pitch + loop.pitch + Math.sin(this.time * 0.6) * 0.04;
-    this.body.rotation.y = weave.yaw;
+    this.body.rotation.y = weave.yaw + collapse.yaw;
     this.body.position.x = weave.x;
     this.body.position.y =
       weave.y + loop.up + Math.sin(this.time * 0.35) * 1.5 + Math.sin(this.time * 0.9) * 0.4;
@@ -229,6 +268,27 @@ export class ParagliderMotion {
       this.roll.angle,
       this.pilotSwing?.rotation.y ?? 0
     );
+  }
+
+  /**
+   * Folds the collapsing tip and reopens it, and how far that banks and turns the wing: towards
+   * the collapsed side, which flies on with less wing. Right is a negative bank and yaw.
+   */
+  private collapse(deltaTime: number): { bank: number; yaw: number } {
+    if (this.collapseTime === null || !this.collapseAmount) return { bank: 0, yaw: 0 };
+    this.collapseTime += deltaTime;
+    const time = this.collapseTime;
+    const { fold, reopen, end, bank, yaw } = COLLAPSE;
+    const amount =
+      THREE.MathUtils.smoothstep(time, 0, fold) *
+      (1 - THREE.MathUtils.smoothstep(time, reopen, end));
+    if (time >= end) this.collapseTime = null;
+    const shut = this.collapseTime === null ? 0 : amount;
+    this.collapseAmount.set(
+      this.collapsing.span < 0 ? shut : 0,
+      this.collapsing.span > 0 ? shut : 0
+    );
+    return { bank: -this.collapsing.rig * bank * shut, yaw: -this.collapsing.rig * yaw * shut };
   }
 
   /**

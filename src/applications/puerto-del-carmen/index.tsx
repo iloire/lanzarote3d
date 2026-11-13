@@ -16,6 +16,7 @@ import { FlyingBehavior } from '../../foundation/systems/behaviors/FlyingBehavio
 import { mooredBerths } from '../../shared/env/boat-group-utils';
 import { loadParagliders } from '../home/vehicleLoader';
 import { ParagliderMotion } from '../home/paragliderMotion';
+import { listenForWingClicks } from '../home/wingClicks';
 import { HARBOUR_FEATURES, NORTH_QUAY, PONTOONS } from './harbour';
 import { CameraShot } from './cameraShot';
 import {
@@ -48,6 +49,7 @@ class PuertoDelCarmenApp extends TerrainBase {
   /** The opening shot while it runs, and how to end it early */
   private intro: { shot: CameraShot; time: number; pilot: THREE.Object3D } | undefined;
   private endIntro: (() => void) | undefined;
+  private removeWingClicks: (() => void) | undefined;
 
   constructor() {
     const appConfig = getAppConfig('puertodelcarmen');
@@ -111,6 +113,7 @@ class PuertoDelCarmenApp extends TerrainBase {
       );
       this.flyingBehaviors = pilots.flatMap(p => (p.flyingBehavior ? [p.flyingBehavior] : []));
       this.paragliderMotions = pilots.flatMap(p => (p.motion ? [p.motion] : []));
+      this.removeWingClicks = listenForWingClicks(canvas, camera, pilots);
 
       // ?intro=0 opens on the harbour without the opening shot
       const pilot = pilots[0]?.mesh;
@@ -228,6 +231,8 @@ class PuertoDelCarmenApp extends TerrainBase {
       this.animationId = undefined;
     }
     this.endIntro?.();
+    this.removeWingClicks?.();
+    this.removeWingClicks = undefined;
     this.flyingBehaviors.forEach(behavior => behavior.dispose());
     this.flyingBehaviors = [];
     this.paragliderMotions = [];

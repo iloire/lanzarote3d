@@ -2,6 +2,16 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-13 11:36 UTC
+
+### Added
+
+- **Collapse a wingtip**: click a paraglider's wing and the tip on that side folds under, the
+  wing banks and turns towards it, and after about a second the tip pops back open. On the home
+  scene, the relax places and Puerto del Carmen. Timing and turn in `COLLAPSE`
+  (`src/applications/home/paragliderMotion.ts`), fold size in `FOLD_FROM`/`FOLD_ANGLE`
+  (`Glider.ts`).
+
 ## 2026-11-11 10:56 UTC
 
 ### Added

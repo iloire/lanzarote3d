@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { ParagliderMotion } from '../../src/applications/home/paragliderMotion';
+import Glider, { canopyCollapse } from '../../src/foundation/components/vehicles/components/Glider';
 
 const STEP = 1 / 60;
 const SPEED = 15;
@@ -184,4 +185,32 @@ test('startTwist twists straight away instead of waiting out the rest', () => {
   motion.startTwist();
   fly(2);
   expect(Math.abs(swing.rotation.y)).toBeCloseTo(Math.PI, 5);
+});
+
+test('a clicked tip folds under, turns the wing towards it and reopens', async () => {
+  const wing = await new Glider({}).load();
+  const canopy = wing.getObjectByName('canopy')!;
+  const rig = new THREE.Object3D();
+  const body = new THREE.Object3D();
+  body.add(wing);
+  rig.add(body);
+  rig.updateMatrixWorld(true);
+  const motion = new ParagliderMotion(rig, body, SPEED);
+  const collapse = canopyCollapse(canopy)!;
+  const step = (seconds: number) => {
+    for (let t = 0; t < seconds; t += STEP) motion.update(STEP);
+  };
+
+  // The canopy's +Z tip, which is on the rig's right here as nothing is turned
+  motion.collapseAt(canopy.localToWorld(new THREE.Vector3(0, 0, 4000)));
+  step(0.6);
+  expect(collapse.x).toBe(0);
+  expect(collapse.y).toBeGreaterThan(0.9);
+  // Turning right is a negative bank and yaw
+  expect(motion.bankAngle).toBeLessThan(THREE.MathUtils.degToRad(-10));
+  expect(body.rotation.y).toBeLessThan(THREE.MathUtils.degToRad(-10));
+
+  step(2);
+  expect(collapse.y).toBe(0);
+  expect(Math.abs(body.rotation.y)).toBeLessThan(1e-6);
 });

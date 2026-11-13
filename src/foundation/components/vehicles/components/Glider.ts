@@ -259,6 +259,10 @@ const ribOutline = (rib: Rib, billow: number): THREE.Vector3[] => {
   return [...top, ...bottom];
 };
 
+/** A collapsed tip folds from this span fraction out, by up to this angle at the tip */
+const FOLD_FROM = 0.5;
+const FOLD_ANGLE = 2;
+
 /**
  * The canopy breathes: the cells swell and ease off in a slow ripple running out along the span,
  * the tips flex in and out along the arc, and the trailing edge flutters. All on the GPU, in
@@ -269,6 +273,8 @@ const CANOPY_VERTEX_PARS = /* glsl */ `
   uniform float uTime;
   uniform float uPhase;
   uniform float uBreath;
+  uniform vec2 uCollapse; // how far each tip is folded under, 0..1: left (t < 0), right
+  uniform vec2 uFoldPivot; // the arc at FOLD_FROM: height, and distance out along the span
   attribute vec3 aLift; // chord line to this point, so scaling it swells the profile
   attribute vec3 aUp; // canopy normal at the rib, rolled outwards towards the tips
   attribute vec3 aStation; // span -1..1, 1 midway between ribs, chord 0 (nose)..1 (tail)
@@ -285,11 +291,29 @@ const CANOPY_BEGIN_VERTEX = /* glsl */ `
   transformed += aUp * pow(span, 3.0) * 110.0 * uBreath * flex;
   float flutter = sin(uTime * 7.0 + uPhase + t * 14.0);
   transformed += aUp * pow(aStation.z, 4.0) * (10.0 + 25.0 * span) * uBreath * flutter;
+  // A collapsed tip folds down and under the wing about the chord line at FOLD_FROM, curling
+  // tighter towards the tip. The nose goes from further in than the tail, as the fold of a real
+  // asymmetric collapse runs diagonally across the cells.
+  float side = sign(t);
+  float hinge = ${FOLD_FROM.toFixed(2)} + 0.2 * aStation.z;
+  float fold = side * (side > 0.0 ? uCollapse.y : uCollapse.x) * ${FOLD_ANGLE.toFixed(2)} *
+    smoothstep(hinge, hinge + 0.3, span);
+  vec2 pivot = vec2(uFoldPivot.x, side * uFoldPivot.y);
+  vec2 arm = transformed.yz - pivot;
+  transformed.yz = pivot + vec2(arm.x * cos(fold) - arm.y * sin(fold), arm.x * sin(fold) + arm.y * cos(fold));
 `;
+
+/** How far each tip of a canopy is folded under: x the left (span < 0), y the right, 0 to 1 */
+const collapses = new WeakMap<THREE.Object3D, THREE.Vector2>();
+
+/** The collapse of a canopy made here, to set; undefined for anything else */
+export const canopyCollapse = (canopy: THREE.Object3D): THREE.Vector2 | undefined =>
+  collapses.get(canopy);
 
 const createCanopyMaterial = (
   shape: WingShape,
   phase: { value: number },
+  fold: { collapse: { value: THREE.Vector2 }; pivot: { value: THREE.Vector2 } },
   map: THREE.Texture | null = null
 ): THREE.MeshLambertMaterial => {
   const material = new THREE.MeshLambertMaterial({
@@ -302,6 +326,8 @@ const createCanopyMaterial = (
     shader.uniforms['uTime'] = sharedUniforms.uTime;
     shader.uniforms['uPhase'] = phase;
     shader.uniforms['uBreath'] = { value: shape.breath };
+    shader.uniforms['uCollapse'] = fold.collapse;
+    shader.uniforms['uFoldPivot'] = fold.pivot;
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', `#include <common>\n${CANOPY_VERTEX_PARS}`)
       .replace('#include <begin_vertex>', CANOPY_BEGIN_VERTEX);
@@ -486,11 +512,19 @@ const createCanopy = (
   // Each wing breathes out of step with the others, both its materials together
   const shape = ribs[0]!.shape;
   const phase = { value: Math.random() * Math.PI * 2 };
+  const hinge = ribs.reduce((best, rib) =>
+    Math.abs(rib.t - FOLD_FROM) < Math.abs(best.t - FOLD_FROM) ? rib : best
+  ).origin;
+  const fold = {
+    collapse: { value: new THREE.Vector2() },
+    pivot: { value: new THREE.Vector2(hinge.y, Math.abs(hinge.z)) },
+  };
   const canopy = new THREE.Mesh(geometry, [
-    createCanopyMaterial(shape, phase),
-    createCanopyMaterial(shape, phase, advert),
+    createCanopyMaterial(shape, phase, fold),
+    createCanopyMaterial(shape, phase, fold, advert),
   ]);
   canopy.name = 'canopy';
+  collapses.set(canopy, fold.collapse.value);
   canopy.castShadow = true;
   return canopy;
 };

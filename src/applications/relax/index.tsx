@@ -8,6 +8,7 @@ import { TerrainBase } from '../../shared/TerrainBase';
 import { OrbitControlsHelper } from '../../foundation/utils/OrbitControlsHelper';
 import { getAppConfig } from '../../config/app-registry';
 import { loadParagliders, VehicleLoadResult } from '../home/vehicleLoader';
+import { listenForWingClicks } from '../home/wingClicks';
 import { paraglidersVoxel, RIDGE_LOOP_TENSION } from '../home/config';
 import { addScatter } from '../../shared/env/scatter';
 import { placeLandmarks } from '../../shared/env/landmarks';
@@ -81,6 +82,7 @@ class RelaxApp extends TerrainBase {
   private gliders: VehicleLoadResult[] = [];
   private removeSwitcher: (() => void) | undefined;
   private removeSound: (() => void) | undefined;
+  private removeWingClicks: (() => void) | undefined;
   private traffic: CityTraffic | undefined;
   private setPiece: SetPiece | undefined;
   private nightCity: NightCity | undefined;
@@ -232,6 +234,7 @@ class RelaxApp extends TerrainBase {
         (error, context) => this.handleError(error, context),
         { waypoints: relax.loop, tension: RIDGE_LOOP_TENSION }
       );
+      this.removeWingClicks = listenForWingClicks(renderer.domElement, camera, this.gliders);
 
       const { terrain } = options;
       if (terrain && (relax.towns || relax.scatter || relax.landmarks)) {
@@ -409,6 +412,8 @@ class RelaxApp extends TerrainBase {
     this.removeSwitcher = undefined;
     this.removeSound?.();
     this.removeSound = undefined;
+    this.removeWingClicks?.();
+    this.removeWingClicks = undefined;
     this.gliders.forEach(g => g.flyingBehavior?.dispose());
     this.gliders = [];
     this.traffic?.dispose();
