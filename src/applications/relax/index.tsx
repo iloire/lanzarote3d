@@ -69,7 +69,7 @@ const definedOnly = <T extends object>(values: T | undefined): Partial<T> =>
   ) as Partial<T>;
 
 /**
- * Pick a place (?location=lanzarote | tenerife | el-hierro | castejon-de-sos | rio-de-janeiro | new-york
+ * Pick a place (?location=lanzarote | el-cuchillo | tenerife | el-hierro | castejon-de-sos | rio-de-janeiro | new-york
  * | paris | giza | mont-saint-michel | hong-kong | venice) and watch a few gliders soar its ridge
  * while the camera drifts slowly from side to side, or, in a city or round the pyramids, chase
  * Abel's paramotor (in Hong Kong, at night; in Venice, down the Grand Canal); at Mont-Saint-Michel

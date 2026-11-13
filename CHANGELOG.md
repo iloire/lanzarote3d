@@ -2,6 +2,14 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-13 20:02 UTC
+
+### Added
+
+- **El Cuchillo**: Franz and Daniel fly high over the Caldera del Cuchillo by Tinajo, just under
+  the cumulus bases, watched from below so the clouds read as a ceiling. Unlisted: only at
+  `relax.html?location=el-cuchillo`.
+
 ## 2026-11-13 12:56 UTC
 
 ### Added

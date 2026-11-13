@@ -268,6 +268,40 @@ export const RELAX_SCENES: Record<string, RelaxScene> = {
     // The whole island, sea all round: nothing to hide, so look anywhere
     limits: { zoomOut: 8, pan: 20000 },
   },
+  // Franz and Daniel high over the Caldera del Cuchillo by Tinajo, just under the cumulus: the
+  // island model has the bowl about 100 units up, opening north, with its rim at ~300. The
+  // clouds' flat bases line up on the horizon when seen from their own height, so the camera
+  // stays well under them, looking up at the pilots against the cloud ceiling.
+  'el-cuchillo': {
+    location: { ...LANZAROTE, id: 'el-cuchillo', name: 'El Cuchillo' },
+    region: 'Canary Islands',
+    loop: [
+      new THREE.Vector3(-1200, 1410, -1300),
+      new THREE.Vector3(-400, 1400, -1400),
+      new THREE.Vector3(400, 1405, -1380),
+      new THREE.Vector3(1100, 1420, -1250),
+      new THREE.Vector3(1150, 1400, -1600),
+      new THREE.Vector3(400, 1380, -1750),
+      new THREE.Vector3(-400, 1375, -1750),
+      new THREE.Vector3(-1250, 1390, -1600),
+    ],
+    pilots: ['franz', 'daniel'],
+    // Lower than the theme's 1750, so the bases sit some 100-400 units over the loop
+    cloudBase: 1550,
+    clouds: [
+      { x: -600, z: -1500, kind: 'puff', scale: 1 },
+      { x: 900, z: -1900, kind: 'puff', scale: 1 },
+      { x: -200, z: -3000, kind: 'tower', scale: 1.4 },
+      { x: 2200, z: -800, kind: 'puff', scale: 1.2 },
+      { x: -2400, z: -900, kind: 'puff', scale: 1.2 },
+    ],
+    camera: {
+      position: new THREE.Vector3(-200, 1050, 100),
+      target: new THREE.Vector3(-100, 1200, -1550),
+    },
+    limits: { zoomOut: 8, pan: 20000 },
+    unlisted: true,
+  },
   tenerife: { ...demScene(TENERIFE, TENERIFE_CONFIG), unlisted: true },
   'el-hierro': demScene(EL_HIERRO, EL_HIERRO_CONFIG),
   'castejon-de-sos': { ...demScene(CASTEJON_DE_SOS, CASTEJON_DE_SOS_CONFIG), unlisted: true },
