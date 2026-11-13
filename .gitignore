@@ -17,3 +17,7 @@ coverage/
 3d/osm-cache/
 # Bytecode from the 3d scripts importing each other
 3d/__pycache__/
+
+# Herdr agent team setup, local to this machine
+.herdr/
+.claude/agents/
