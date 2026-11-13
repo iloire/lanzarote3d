@@ -2,6 +2,14 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-13 20:30 UTC
+
+### Fixed
+
+- **Clouds seen from above or afar**: the cloud shader didn't write logarithmic depth like the
+  rest of the scene, so the terrain and sea won the depth test from a distance. Clouds vanished
+  when the camera zoomed out over them and looked cut flat along the horizon.
+
 ## 2026-11-13 20:02 UTC
 
 ### Added

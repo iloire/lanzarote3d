@@ -30,6 +30,8 @@ const uniforms = {
  * flat underside darker still (how dark varies from cloud to cloud), and a silver edge
  * when the camera looks towards the sun.
  * The lobes breathe and the cloud bobs in the vertex shader, so clouds cost no CPU per frame.
+ * It writes logarithmic depth like the built-in materials (the renderer's logarithmicDepthBuffer);
+ * without it the terrain and sea won the depth test from afar and cut the clouds away.
  */
 export const cloudMaterial = new THREE.ShaderMaterial({
   uniforms: { ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog), ...uniforms },
@@ -46,6 +48,7 @@ export const cloudMaterial = new THREE.ShaderMaterial({
     varying float vDark;
     #include <common>
     #include <fog_pars_vertex>
+    #include <logdepthbuf_pars_vertex>
     void main() {
       float t = uTime + aCloud.x;
       vec3 p = aLobe.xyz + (position - aLobe.xyz) * (1.0 + 0.05 * sin(t * 0.7 + aLobe.w));
@@ -57,6 +60,7 @@ export const cloudMaterial = new THREE.ShaderMaterial({
       vDark = aCloud.z;
       vec4 mvPosition = viewMatrix * worldPosition;
       gl_Position = projectionMatrix * mvPosition;
+      #include <logdepthbuf_vertex>
       #include <fog_vertex>
     }
   `,
@@ -73,7 +77,9 @@ export const cloudMaterial = new THREE.ShaderMaterial({
     varying float vDark;
     #include <common>
     #include <fog_pars_fragment>
+    #include <logdepthbuf_pars_fragment>
     void main() {
+      #include <logdepthbuf_fragment>
       vec3 n = normalize(vNormal);
       vec3 v = normalize(cameraPosition - vWorldPosition);
       float lit = smoothstep(-0.35, 0.9, dot(n, uSunDirection));
