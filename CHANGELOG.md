@@ -2,6 +2,16 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-13 12:56 UTC
+
+### Added
+
+- **Franz crosses and stretches his legs**: every so often he crosses his shins at the ankles
+  for a while, or stretches his legs out straight for a few seconds. His model now has the shins
+  as separate parts hinged at the knees (3d-characters `tools/pilots/parts/franz.json`). Timing
+  and angles in `LEGS_REST`, `CROSS_HOLD`, `STRETCH_HOLD`, `CROSS_IN` and `STRETCH`
+  (`src/applications/home/pilotPose.ts`).
+
 ## 2026-11-13 11:36 UTC
 
 ### Added
