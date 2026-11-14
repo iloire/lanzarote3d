@@ -99,9 +99,40 @@ const riscoCloudSites = (): CloudSite[] => [
 /** A cumulonimbus out at sea, about 7 km northwest of La Graciosa, beyond the Risco's north end */
 const CUMULONIMBUS_SITE = { x: 6500, z: -21000 };
 
+/** How many towering and plain clusters grow round the storm, and how far out (world units) */
+const STORM_TOWERS = [4, 6] as const;
+const STORM_PUFFS = [6, 9] as const;
+const STORM_FIELD = [4500, 11000] as const;
+
+/** A cluster somewhere in the ring round the storm */
+const nearStorm = (kind: CloudKind, scale: number): CloudSite => {
+  const angle = rndBetween(0, Math.PI * 2);
+  const distance = rndBetween(...STORM_FIELD);
+  return {
+    x: CUMULONIMBUS_SITE.x + Math.cos(angle) * distance,
+    z: CUMULONIMBUS_SITE.z + Math.sin(angle) * distance,
+    kind,
+    scale,
+  };
+};
+
+/**
+ * A storm doesn't stand alone: the cumulonimbus grows out of a field of towering cumulus
+ * and lesser clusters, scattered afresh on every load.
+ */
+const stormCloudSites = (): CloudSite[] => [
+  { ...CUMULONIMBUS_SITE, kind: 'cb', scale: 1 },
+  ...Array.from({ length: rndIntBetween(...STORM_TOWERS) }, () =>
+    nearStorm('tower', rndBetween(1.2, 2))
+  ),
+  ...Array.from({ length: rndIntBetween(...STORM_PUFFS) }, () =>
+    nearStorm('puff', rndBetween(1, 1.6))
+  ),
+];
+
 /**
  * A cluster over each thermal site, a towering one over the super thermal, a few clusters in
- * between, the Risco de Famara's own cloud and a cumulonimbus far off to the north.
+ * between, the Risco de Famara's own cloud and a storm far off to the north.
  */
 const lanzaroteCloudSites = (): CloudSite[] => [
   ...THERMAL_SITES.map(({ x, z }) => ({ x, z, kind: 'puff' as const, scale: 1 })),
@@ -112,7 +143,7 @@ const lanzaroteCloudSites = (): CloudSite[] => [
     { x: -3600, z: 8042 },
   ].map(({ x, z }) => ({ x, z, kind: 'puff' as const, scale: 1 })),
   ...riscoCloudSites(),
-  { ...CUMULONIMBUS_SITE, kind: 'cb', scale: 1 },
+  ...stormCloudSites(),
 ];
 
 /** Houses whose ground is lower than this are in the sea and are left out */
