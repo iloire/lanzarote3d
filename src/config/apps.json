@@ -9,15 +9,6 @@
       "visibility": "public",
       "priority": 0
     },
-    "famara": {
-      "name": "Famara static",
-      "description": "Natural beauty of Famara beach area without paragliders - pure landscape focus",
-      "route": "/famara",
-      "category": "demo",
-      "requiresWebGL": true,
-      "visibility": "private",
-      "priority": 3
-    },
     "town": {
       "name": "Town",
       "description": "Neighborhood generation showcase with various residential formations and house types",
