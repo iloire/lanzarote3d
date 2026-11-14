@@ -11,8 +11,8 @@ map, with a living sea, gulls, towns, boats and planes.
 | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | ![The low-poly Hercules on the model viewer's turntable](docs/screenshots/hercules.png) | ![Famara cliffs and the northern islands with no pilots](docs/screenshots/famara-static.png) |
 | **Hercules:** one of the planes crossing the sky                                        | **Famara static:** the landscape on its own                                                  |
-| ![A generated town of low-poly houses seen from above](docs/screenshots/town.png)       | ![The fishing boat on the model viewer's turntable](docs/screenshots/models.png)             |
-| **Town:** a generated town up close                                                     | **Models:** every model on a turntable                                                       |
+| ![The fishing boat on the model viewer's turntable](docs/screenshots/models.png)        |                                                                                              |
+| **Models:** every model on a turntable                                                  |                                                                                              |
 
 Built with three.js, React and webpack. How a frame is drawn (the filmic pipeline, the sea, the
 shaded wireframe, adaptive quality) is in [docs/RENDERING.md](docs/RENDERING.md); the rest of the
@@ -48,8 +48,8 @@ Mont-Saint-Michel) is left out of the place picker but still opens by its `?loca
 New places are described in [`src/locations/README.md`](src/locations/README.md). The relax site
 has no deploy script of its own yet; it gets one with its domain.
 
-Scenes are picked with `?story=`: `home`, `puerto-del-carmen`,
-`town` and `models`. `?christmas` previews the Christmas mode, which otherwise runs from 1
+Scenes are picked with `?story=`: `home`, `puerto-del-carmen`
+and `models`. `?christmas` previews the Christmas mode, which otherwise runs from 1
 December to 6 January ([docs/CHRISTMAS.md](docs/CHRISTMAS.md)). Add `?fx=0` to render without post-processing, to
 compare looks and frame times. Dev builds expose `window.__lz` for profiling (see RENDERING.md).
 
@@ -106,7 +106,7 @@ before deploying.
 ### Dev mode: every scene in the menu
 
 Production menus list only the public scenes, and the home scene hides its sidebar. Dev mode lists
-the private scenes too (`puerto-del-carmen`, `town`, `models`) and shows the sidebar everywhere.
+the private scenes too (`puerto-del-carmen`, `models`) and shows the sidebar everywhere.
 
 - **Turn on:** open any page with `?dev=1`, e.g. `https://3d.lanzaroteparagliding.com/?dev=1`
 - **Turn off:** `?dev=0`
@@ -129,7 +129,7 @@ localStorage.removeItem('lanzarote_show_menu');
 ```
 
 At `localhost` the private scenes are always listed; home still hides its sidebar unless `?dev=1`.
-Private scenes also open directly without dev mode: `?story=town`, `?story=models`.
+Private scenes also open directly without dev mode: `?story=puerto-del-carmen`, `?story=models`.
 
 ### Model viewer
 

@@ -9,15 +9,6 @@
       "visibility": "public",
       "priority": 0
     },
-    "town": {
-      "name": "Town",
-      "description": "Neighborhood generation showcase with various residential formations and house types",
-      "route": "/town",
-      "category": "demo",
-      "requiresWebGL": true,
-      "visibility": "private",
-      "priority": 19
-    },
     "models": {
       "name": "Models",
       "description": "Every model of the scenes on a turntable, one at a time, with its size and triangle count",
