@@ -2,6 +2,14 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-14 10:25 UTC
+
+### Changed
+
+- **Favicon of the Risco de Famara**: the cliff seen from the beach, its face in bands of rust,
+  ochre and brown rock above the sand and a teal sea, with an orange wing over the edge on a
+  warm sky. It replaces the dusky sunset tile, whose thin lines blurred at 16 px
+
 ## 2026-11-14 10:07 UTC
 
 ### Changed
