@@ -6,6 +6,7 @@
  */
 
 import { logger } from '../../utils/logger';
+import { requestFrame, cancelFrame } from './frame';
 
 export type AnimationFunction = (progress: number, deltaTime: number) => void;
 export type AnimationCompleteCallback = () => void;
@@ -68,7 +69,7 @@ export class SimpleAnimator {
    */
   stop(): void {
     if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
+      cancelFrame(this.animationId);
       this.animationId = null;
     }
     this.isRunning = false;
@@ -153,7 +154,7 @@ export class SimpleAnimator {
     if (this.animations.size === 0) {
       this.stop();
     } else {
-      this.animationId = requestAnimationFrame(this.loop);
+      this.animationId = requestFrame(this.loop);
     }
 
     this.lastTime = currentTime;

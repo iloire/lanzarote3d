@@ -31,6 +31,7 @@ import { applyNight } from '../../foundation/rendering/nightSky';
 import { addNightCity, NightCity } from './nightCity';
 import { Canal, CityBoats } from '../../shared/env/cityBoats';
 import { venetianLandmarks } from '../../shared/env/venetianLandmarks';
+import { requestFrame, cancelFrame } from '../../foundation/systems/animation/frame';
 
 const PILOTS = 5;
 // ?progress=0.4 starts the first pilot that far round the loop, to share a moment of the flight;
@@ -395,17 +396,17 @@ class RelaxApp extends TerrainBase {
         }
 
         this.renderFrame(renderer, scene, camera);
-        this.animationId = requestAnimationFrame(animate);
+        this.animationId = requestFrame(animate);
       } catch (error) {
         this.handleError(error as Error, 'animation loop');
       }
     };
-    this.animationId = requestAnimationFrame(animate);
+    this.animationId = requestFrame(animate);
   }
 
   public override dispose(): void {
     if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
+      cancelFrame(this.animationId);
       this.animationId = undefined;
     }
     this.removeSwitcher?.();

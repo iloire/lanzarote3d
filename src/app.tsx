@@ -11,6 +11,7 @@ import { getAppConfig } from './config/app-registry';
 import { isDevFlagSet } from './devMode';
 import { logger } from './foundation/utils/logger';
 import Models, { DownloadProgress } from './foundation/utils/models';
+import { requestFrame } from './foundation/systems/animation/frame';
 
 const gui = new GUI();
 gui.hide();
@@ -179,7 +180,7 @@ const App: React.FC<AppProps> = ({
     // Ticks the FPS panel; production has no panel, so no loop either
     if (process.env.NODE_ENV === 'development') {
       const animate = () => {
-        requestAnimationFrame(animate);
+        requestFrame(animate);
         stats.update();
       };
       animate();

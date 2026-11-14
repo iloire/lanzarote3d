@@ -8,6 +8,7 @@ import { PerformanceUI, PerformanceSettings, PolygonBreakdown } from './performa
 import { disposeObjects } from './disposal-utils';
 import { GUI } from 'lil-gui';
 import { logger } from '../../foundation/utils/logger';
+import { cancelFrame } from '../../foundation/systems/animation/frame';
 
 /**
  * Town Workshop - Showcase of neighborhood generation using HouseGroupCreator
@@ -440,7 +441,7 @@ class TownWorkshop extends WorkshopDemoBase {
 
     // Cancel animation loop
     if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
+      cancelFrame(this.animationId);
       this.animationId = 0;
     }
 

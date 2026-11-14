@@ -38,6 +38,7 @@ import {
 } from './config';
 import { loadParagliders, loadHangglider, loadCessna, loadHercules } from './vehicleLoader';
 import { setupCameraAnimation, applyFloatingMotion } from './cameraAnimation';
+import { requestFrame, cancelFrame } from '../../foundation/systems/animation/frame';
 
 /**
  * Animation Demo - Restored original animation with voxel paraglider
@@ -344,7 +345,7 @@ class AnimationApp extends TerrainBase {
         const renderCamera =
           this.isAnimating || !this.targetController ? camera : this.targetController;
         this.renderFrame(renderer, scene, renderCamera);
-        this.animationId = requestAnimationFrame(animate);
+        this.animationId = requestFrame(animate);
       } catch (error) {
         this.handleError(error as Error, 'animation loop');
       }
@@ -357,7 +358,7 @@ class AnimationApp extends TerrainBase {
 
     // Cancel animation loop
     if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
+      cancelFrame(this.animationId);
       this.animationId = undefined;
     }
 

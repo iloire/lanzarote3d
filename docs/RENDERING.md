@@ -7,6 +7,13 @@ tunes it.
 
 ## The frame
 
+Every loop (the scenes, the flying and moving behaviours, the animator) schedules through
+`requestFrame` in `foundation/systems/animation/frame.ts` rather than `requestAnimationFrame`.
+It caps them at 60 fps: on a 120 Hz screen it passes over every other vsync, deciding once per
+vsync timestamp so all the loops step on the same frames. On an M3 Pro's ProMotion display the
+home scene went from ~100 uneven frames a second to a steady 60, and Chrome's CPU from ~73 % to
+~40 %. The adaptive quality below is tuned for 60 fps frames.
+
 `RenderPipeline.render(camera)` is called once per frame through `TerrainBase.renderFrame()`:
 
 1. **Scene pass, MSAA, half float** (`MsaaScenePass`). This is the only multisampled

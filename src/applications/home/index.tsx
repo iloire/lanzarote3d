@@ -84,6 +84,7 @@ import { SparkleTrail } from '../../foundation/components/effects/SparkleTrail';
 import { pickerPlaces } from '../relax/scenes';
 import { HOME_PLACE } from '../relax/places';
 import { listenForClicks, listenForWingClicks } from './wingClicks';
+import { requestFrame, cancelFrame } from '../../foundation/systems/animation/frame';
 
 /**
  * Home App - Landing scene with the voxel title
@@ -585,7 +586,7 @@ class HomeApp extends TerrainBase {
         lastTime = now;
 
         if (this.hero?.paused) {
-          this.animationId = requestAnimationFrame(animate);
+          this.animationId = requestFrame(animate);
           return;
         }
 
@@ -694,12 +695,12 @@ class HomeApp extends TerrainBase {
           heroShown = true;
           this.hero.ready();
         }
-        this.animationId = requestAnimationFrame(animate);
+        this.animationId = requestFrame(animate);
       } catch (error) {
         this.handleError(error as Error, 'animation loop');
       }
     };
-    this.animationId = requestAnimationFrame(animate);
+    this.animationId = requestFrame(animate);
   }
 
   public override dispose(): void {
@@ -731,7 +732,7 @@ class HomeApp extends TerrainBase {
     this.leadIndex = 0;
 
     if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
+      cancelFrame(this.animationId);
       this.animationId = undefined;
     }
 

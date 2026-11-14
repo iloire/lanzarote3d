@@ -4,6 +4,7 @@ import Helpers from '../foundation/utils/helpers';
 import { AppBase, AppConfig } from './AppBase';
 import { StoryOptions } from './types';
 import Sky from '../foundation/components/environment/Sky';
+import { requestFrame, cancelFrame } from '../foundation/systems/animation/frame';
 
 export interface WorkshopDemoConfig extends AppConfig {
   ground?: {
@@ -134,7 +135,7 @@ export abstract class WorkshopDemoBase extends AppBase {
         controls.update();
 
         renderer.render(scene, camera);
-        this.animationId = requestAnimationFrame(animate);
+        this.animationId = requestFrame(animate);
       } catch (error) {
         this.handleError(error as Error, 'animation loop');
       }
@@ -150,7 +151,7 @@ export abstract class WorkshopDemoBase extends AppBase {
 
     // Cancel animation loop
     if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
+      cancelFrame(this.animationId);
       this.animationId = undefined;
     }
 

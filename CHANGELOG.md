@@ -2,6 +2,15 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-14 09:25 UTC
+
+### Changed
+
+- **Frames capped at 60 fps**: every animation loop now schedules through `requestFrame`,
+  which skips every other vsync on a 120 Hz screen. On an M3 Pro's ProMotion display the home
+  scene went from ~100 uneven frames a second to a steady 60, and Chrome's CPU from ~73 % to
+  ~40 %.
+
 ## 2026-11-13 20:30 UTC
 
 ### Fixed

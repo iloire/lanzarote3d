@@ -13,6 +13,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { Cessna } from '../../foundation/components/vehicles';
 import { EngineFlyingBehavior } from '../../foundation/systems/behaviors/EngineFlyingBehavior';
 import { LevelOfDetail } from '../../foundation/types/lod';
+import { requestFrame, cancelFrame } from '../../foundation/systems/animation/frame';
 
 /**
  * Famara Demo - Based on PhotoBooth but without paragliders
@@ -171,7 +172,7 @@ class FamaraApp extends TerrainBase {
         OrbitControlsHelper.update(controls);
 
         renderer.render(scene, camera);
-        this.animationId = requestAnimationFrame(animate);
+        this.animationId = requestFrame(animate);
       } catch (error) {
         this.handleError(error as Error, 'animation loop');
       }
@@ -184,7 +185,7 @@ class FamaraApp extends TerrainBase {
 
     // Cancel animation loop
     if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
+      cancelFrame(this.animationId);
       this.animationId = undefined;
     }
 

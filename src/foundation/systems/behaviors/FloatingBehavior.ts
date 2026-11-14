@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { requestFrame, cancelFrame } from '../animation/frame';
 
 export interface FloatingBehaviorOptions {
   scaleMultiplier?: number;
@@ -49,7 +50,7 @@ export class FloatingBehavior {
   public stop(): void {
     this.isFloating = false;
     if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
+      cancelFrame(this.animationId);
       this.animationId = null;
     }
   }
@@ -97,6 +98,6 @@ export class FloatingBehavior {
     this.mesh.rotation.y =
       originalY + Math.sin(time * 0.7 + this.floatingOffset * 0.4) * 0.01 * this.scaleMultiplier;
 
-    this.animationId = requestAnimationFrame(this.animate);
+    this.animationId = requestFrame(this.animate);
   };
 }

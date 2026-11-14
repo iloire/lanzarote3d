@@ -34,6 +34,7 @@ import {
   QUAY_BOATS,
   TOWN,
 } from './config';
+import { requestFrame, cancelFrame } from '../../foundation/systems/animation/frame';
 
 /**
  * Puerto del Carmen, on the south-east coast: the white town along the seafront and up the
@@ -217,17 +218,17 @@ class PuertoDelCarmenApp extends TerrainBase {
         }
 
         this.renderFrame(renderer, scene, camera);
-        this.animationId = requestAnimationFrame(animate);
+        this.animationId = requestFrame(animate);
       } catch (error) {
         this.handleError(error as Error, 'animation loop');
       }
     };
-    this.animationId = requestAnimationFrame(animate);
+    this.animationId = requestFrame(animate);
   }
 
   public override dispose(): void {
     if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
+      cancelFrame(this.animationId);
       this.animationId = undefined;
     }
     this.endIntro?.();

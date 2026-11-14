@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { logger } from '../../utils/logger';
+import { requestFrame, cancelFrame } from '../animation/frame';
 
 export enum FlightPattern {
   FREE_ROAM = 'free_roam',
@@ -222,7 +223,7 @@ export class FlyingBehavior {
 
     this.isFlying = true;
     this.lastUpdate = null;
-    this.animationId = requestAnimationFrame(now => this.animate(now));
+    this.animationId = requestFrame(now => this.animate(now));
   }
 
   /**
@@ -233,7 +234,7 @@ export class FlyingBehavior {
 
     this.isFlying = false;
     if (this.animationId !== null) {
-      cancelAnimationFrame(this.animationId);
+      cancelFrame(this.animationId);
       this.animationId = null;
     }
   }
@@ -253,7 +254,7 @@ export class FlyingBehavior {
 
     this.updateFlight(deltaTime);
 
-    this.animationId = requestAnimationFrame(next => this.animate(next));
+    this.animationId = requestFrame(next => this.animate(next));
   }
 
   /**

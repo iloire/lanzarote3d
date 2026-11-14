@@ -13,6 +13,7 @@ import { EngineFlyingBehavior } from '../../foundation/systems/behaviors/EngineF
 import { ANIMATION_CONFIG, paraglidersVoxel, cessnaConfig, SHOW_CESSNA } from './config';
 import { loadParagliders } from './vehicleLoader';
 import { setupStaticCamera, setupAnimatedCamera, applyFloatingMotion } from './cameraAnimation';
+import { requestFrame, cancelFrame } from '../../foundation/systems/animation/frame';
 
 /**
  * Boats Animation Demo - Based on original animation but with camera starting near boats
@@ -222,7 +223,7 @@ class BoatsAnimationApp extends TerrainBase {
 
         OrbitControlsHelper.update(controls);
         this.renderFrame(renderer, scene, camera);
-        this.animationId = requestAnimationFrame(animate);
+        this.animationId = requestFrame(animate);
       } catch (error) {
         this.handleError(error as Error, 'animation loop');
       }
@@ -234,7 +235,7 @@ class BoatsAnimationApp extends TerrainBase {
     logger.debug(`🧹 Disposing ${this.config.name}`);
 
     if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
+      cancelFrame(this.animationId);
       this.animationId = undefined;
     }
 

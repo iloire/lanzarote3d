@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { requestFrame, cancelFrame } from '../animation/frame';
 
 export enum MovementPattern {
   CIRCULAR = 'circular',
@@ -96,7 +97,7 @@ export class MovingBehavior {
   public stop(): void {
     this.isMoving = false;
     if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
+      cancelFrame(this.animationId);
       this.animationId = null;
     }
   }
@@ -196,7 +197,7 @@ export class MovingBehavior {
     this.mesh.position.x = newPosition.x;
     this.mesh.position.z = newPosition.z;
 
-    this.animationId = requestAnimationFrame(this.animate);
+    this.animationId = requestFrame(this.animate);
   };
 
   private calculateCircularMovement(position: THREE.Vector3): void {
