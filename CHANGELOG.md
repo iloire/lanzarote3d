@@ -2,6 +2,15 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-14 10:07 UTC
+
+### Changed
+
+- **Model viewer selector**: the pilots have their own group, a three-column grid of names
+  sorted alphabetically, instead of one "Paraglider (name)" row each. A search box at the top
+  (`/` to focus, Enter opens the first match, Esc clears) filters every group, and group
+  headings fold away with a click.
+
 ## 2026-11-14 09:25 UTC
 
 ### Changed

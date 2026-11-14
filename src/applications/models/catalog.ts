@@ -72,13 +72,18 @@ const landmark = (create: () => THREE.Object3D) => (): Loadable => ({
   load: async () => create(),
 });
 
-const pilots: ModelEntry[] = paraglidersVoxel.map(p => ({
-  id: `paraglider-${p.options.pilot.characterType}`,
-  name: `Paraglider (${p.options.pilot.characterType})`,
-  group: 'Aerial',
-  scale: 0.01,
-  create: () => new ParagliderVoxel(p.options),
-}));
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+/** One per pilot, alphabetical, in their own group the viewer lays out as a grid of names */
+const pilots: ModelEntry[] = paraglidersVoxel
+  .map(({ options }) => ({
+    id: `paraglider-${options.pilot.characterType}`,
+    name: capitalize(String(options.pilot.characterType)),
+    group: 'Pilots',
+    scale: 0.01,
+    create: () => new ParagliderVoxel(options),
+  }))
+  .sort((a, b) => a.name.localeCompare(b.name));
 
 /** The standard wing, the Rush and the roller in a row at the same scale, to compare their size */
 const wingsSideBySide = (): Loadable => ({

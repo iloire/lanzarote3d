@@ -6,6 +6,8 @@ import { MODEL_CATALOG, ModelEntry } from './catalog';
 import './models.css';
 
 const PARAM = 'model';
+/** Groups of short names (the pilots), laid out as a grid instead of one per row */
+const GRID_GROUPS = new Set(['Pilots']);
 
 /**
  * Model viewer - shows one scene model at a time on a turntable, framed to its size, with its
@@ -17,6 +19,7 @@ class ModelsViewer extends WorkshopDemoBase {
   private current?: { entry: ModelEntry; object: THREE.Object3D; dispose?: () => void };
   private grid?: THREE.GridHelper;
   private panel?: HTMLDivElement;
+  private search?: HTMLInputElement;
   private info?: HTMLDivElement;
   private loadToken = 0;
 
@@ -120,6 +123,12 @@ class ModelsViewer extends WorkshopDemoBase {
   }
 
   private onKeyDown = (event: KeyboardEvent): void => {
+    if (event.target === this.search) return;
+    if (event.key === '/') {
+      event.preventDefault();
+      this.search?.focus();
+      return;
+    }
     if (event.key === 'ArrowRight') this.step(1);
     if (event.key === 'ArrowLeft') this.step(-1);
     if (event.key === ' ') this.options.controls.autoRotate = !this.options.controls.autoRotate;
@@ -129,24 +138,55 @@ class ModelsViewer extends WorkshopDemoBase {
     const panel = document.createElement('div');
     panel.className = 'models-panel';
 
+    const search = document.createElement('input');
+    search.type = 'search';
+    search.placeholder = 'Search models  /';
+    search.className = 'models-search';
+    search.addEventListener('input', () => this.filter(search.value));
+    search.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        search.value = '';
+        this.filter('');
+        search.blur();
+      }
+      // Enter shows the first model still listed
+      if (event.key === 'Enter') {
+        const first = panel.querySelector<HTMLButtonElement>('.models-list button:not([hidden])');
+        first?.click();
+      }
+    });
+    panel.appendChild(search);
+
     const groups = new Map<string, ModelEntry[]>();
     MODEL_CATALOG.forEach(m => groups.set(m.group, [...(groups.get(m.group) ?? []), m]));
     groups.forEach((entries, group) => {
-      const heading = document.createElement('h3');
-      heading.textContent = group;
-      panel.appendChild(heading);
+      const section = document.createElement('section');
+      section.className = 'models-group';
+
+      const heading = document.createElement('button');
+      heading.className = 'models-heading';
+      heading.textContent = `${group} · ${entries.length}`;
+      heading.addEventListener('click', () => section.classList.toggle('collapsed'));
+      section.appendChild(heading);
+
+      const list = document.createElement('div');
+      list.className = GRID_GROUPS.has(group) ? 'models-list grid' : 'models-list';
       entries.forEach(entry => {
         const button = document.createElement('button');
         button.textContent = entry.name;
+        button.title = entry.name;
         button.dataset['id'] = entry.id;
+        button.dataset['search'] = `${entry.name} ${entry.group} ${entry.id}`.toLowerCase();
         button.addEventListener('click', () => void this.show(entry));
-        panel.appendChild(button);
+        list.appendChild(button);
       });
+      section.appendChild(list);
+      panel.appendChild(section);
     });
 
     const hint = document.createElement('p');
     hint.className = 'models-hint';
-    hint.textContent = '← → step · space spins';
+    hint.textContent = '/ search · ← → step · space spins';
     panel.appendChild(hint);
 
     const info = document.createElement('div');
@@ -154,16 +194,35 @@ class ModelsViewer extends WorkshopDemoBase {
     document.body.appendChild(info);
     document.body.appendChild(panel);
     this.panel = panel;
+    this.search = search;
     this.info = info;
   }
 
+  /** Hide the models that don't match every word typed, and the groups left empty */
+  private filter(query: string): void {
+    const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+    this.panel?.querySelectorAll<HTMLElement>('.models-group').forEach(section => {
+      let shown = 0;
+      section.querySelectorAll<HTMLButtonElement>('.models-list button').forEach(b => {
+        const match = words.every(w => b.dataset['search']?.includes(w));
+        b.hidden = !match;
+        if (match) shown++;
+      });
+      section.hidden = shown === 0;
+      // Searching opens every group so a match is never tucked away in a collapsed one
+      section.classList.toggle('searching', words.length > 0);
+    });
+  }
+
   private updatePanel(entry: ModelEntry, size: THREE.Vector3, triangles: number): void {
-    this.panel?.querySelectorAll('button').forEach(b => {
-      b.classList.toggle('selected', b.dataset['id'] === entry.id);
+    this.panel?.querySelectorAll<HTMLButtonElement>('.models-list button').forEach(b => {
+      const selected = b.dataset['id'] === entry.id;
+      b.classList.toggle('selected', selected);
+      if (selected) b.scrollIntoView({ block: 'nearest' });
     });
     if (this.info) {
       const dims = [size.x, size.y, size.z].map(v => v.toFixed(1)).join(' × ');
-      this.info.innerHTML = `<strong>${entry.name}</strong><span>${dims} units · ${triangles.toLocaleString()} triangles</span>`;
+      this.info.innerHTML = `<small>${entry.group}</small><strong>${entry.name}</strong><span>${dims} units · ${triangles.toLocaleString()} triangles</span>`;
     }
   }
 
