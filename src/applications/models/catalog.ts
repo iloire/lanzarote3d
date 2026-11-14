@@ -303,4 +303,10 @@ export const MODEL_CATALOG: ModelEntry[] = [
     group: 'Nature',
     create: () => new Cloud({ kind: 'tower' }),
   },
+  {
+    id: 'cloud-cb',
+    name: 'Cloud (cumulonimbus)',
+    group: 'Nature',
+    create: () => new Cloud({ kind: 'cb' }),
+  },
 ];

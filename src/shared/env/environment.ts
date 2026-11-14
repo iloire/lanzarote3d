@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { Clouds } from '../../foundation/components/environment';
+import type { CloudKind } from '../../foundation/components/environment/Cloud';
 import Tree from '../../foundation/components/scenery/trees/Tree';
 import { logger } from '../../foundation/utils/logger';
 import { Gulls, GullFlock, GUIRRE, RAVEN } from '../../foundation/components/wildlife/Gulls';
@@ -43,7 +44,7 @@ const SUPER_THERMAL_SITE = { x: 15027, z: -12555 };
 export interface CloudSite {
   x: number;
   z: number;
-  kind: 'puff' | 'tower';
+  kind: CloudKind;
   scale: number;
 }
 
@@ -95,9 +96,12 @@ const riscoCloudSites = (): CloudSite[] => [
   ),
 ];
 
+/** A cumulonimbus out at sea, about 7 km northwest of La Graciosa, beyond the Risco's north end */
+const CUMULONIMBUS_SITE = { x: 6500, z: -21000 };
+
 /**
  * A cluster over each thermal site, a towering one over the super thermal, a few clusters in
- * between, and the Risco de Famara's own cloud.
+ * between, the Risco de Famara's own cloud and a cumulonimbus far off to the north.
  */
 const lanzaroteCloudSites = (): CloudSite[] => [
   ...THERMAL_SITES.map(({ x, z }) => ({ x, z, kind: 'puff' as const, scale: 1 })),
@@ -108,6 +112,7 @@ const lanzaroteCloudSites = (): CloudSite[] => [
     { x: -3600, z: 8042 },
   ].map(({ x, z }) => ({ x, z, kind: 'puff' as const, scale: 1 })),
   ...riscoCloudSites(),
+  { ...CUMULONIMBUS_SITE, kind: 'cb', scale: 1 },
 ];
 
 /** Houses whose ground is lower than this are in the sea and are left out */

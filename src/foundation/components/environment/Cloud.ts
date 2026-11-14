@@ -2,20 +2,43 @@ import * as THREE from 'three';
 import { rndBetween, rndIntBetween } from '../../utils/math';
 import { cloudMaterial } from '../../rendering/cloudMaterial';
 
-export type CloudKind = 'puff' | 'tower';
+export type CloudKind = 'puff' | 'tower' | 'cb';
 
 /**
  * How each kind stacks its lobes: the footprint's width, how many layers rise from the
  * flat base, how much narrower each layer is than the one below and how far above it
- * sits, in radii
+ * sits, in radii, and how many lobes make each layer above the first. A cumulus lines its
+ * lobes up across its width; a cumulonimbus rings them round a round column, and spreads
+ * an anvil over its top, `anvil` times as wide as its base.
  */
 const SHAPES: Record<
   CloudKind,
-  { width: [number, number]; layers: [number, number]; narrow: number; rise: number }
+  {
+    width: [number, number];
+    layers: [number, number];
+    narrow: number;
+    rise: number;
+    perLayer?: [number, number];
+    round?: boolean;
+    anvil?: number;
+  }
 > = {
   puff: { width: [450, 850], layers: [2, 3], narrow: 0.65, rise: 0.85 },
   tower: { width: [700, 1000], layers: [6, 7], narrow: 0.85, rise: 0.9 },
+  cb: {
+    width: [2000, 2400],
+    layers: [11, 13],
+    narrow: 0.97,
+    rise: 0.8,
+    perLayer: [4, 6],
+    round: true,
+    anvil: 2.4,
+  },
 };
+
+/** How flat the anvil's lobes are, and how far downwind it leans, in base widths */
+const ANVIL_FLATTEN = 0.3;
+const ANVIL_LEAN = 0.35;
 
 /** Lobes bigger than this get the finer icosahedron (80 faces instead of 20) */
 const FINE_LOBE_RADIUS = 150;
@@ -23,32 +46,59 @@ const FINE_LOBE_RADIUS = 150;
 /** How much of a lobe's depth below the base survives: a shallow belly, not a cut-off plate */
 const BELLY = 0.3;
 
-type Lobe = { centre: THREE.Vector3; radius: number };
+/** `flatten` squashes a lobe's height: 1 is round */
+type Lobe = { centre: THREE.Vector3; radius: number; flatten?: number };
+
+/** The anvil: a flat, wide slab of lobes over the column's top `y`, leaning downwind (+x) */
+const anvilLobes = (y: number, baseWidth: number, spread: number): Lobe[] => {
+  const width = baseWidth * spread;
+  const radius = baseWidth * 0.4;
+  return Array.from({ length: rndIntBetween(20, 24) }, () => ({
+    centre: new THREE.Vector3(
+      rndBetween(-0.5, 0.5) * (width - radius) + ANVIL_LEAN * baseWidth,
+      y + radius * rndBetween(0.1, 0.35),
+      rndBetween(-0.5, 0.5) * width * 0.8
+    ),
+    radius: radius * rndBetween(0.85, 1.15),
+    flatten: ANVIL_FLATTEN,
+  }));
+};
+
+/** A lobe `across` (-0.5 to 0.5) a layer of cumulus `width` wide, jittered front and back */
+const inLine = (across: number, width: number, radius: number) =>
+  new THREE.Vector3(
+    across * (width - radius) + rndBetween(-0.1, 0.1) * radius,
+    0,
+    rndBetween(-0.3, 0.3) * width * 0.5
+  );
+
+/** A lobe round the ring of a column, `angle` round it */
+const onRing = (angle: number, ring: number) =>
+  new THREE.Vector3(Math.cos(angle) * ring, 0, Math.sin(angle) * ring);
 
 const stackLobes = (kind: CloudKind): Lobe[] => {
   const shape = SHAPES[kind];
   const lobes: Lobe[] = [];
-  let width = rndBetween(...shape.width);
+  const baseWidth = rndBetween(...shape.width);
+  let width = baseWidth;
   const layers = rndIntBetween(...shape.layers);
   let y = 0;
   for (let layer = 0; layer < layers; layer++) {
     const radius = width * rndBetween(0.22, 0.28);
-    const count = layer === 0 ? rndIntBetween(3, 5) : rndIntBetween(2, 3);
+    const count = layer === 0 ? rndIntBetween(3, 5) : rndIntBetween(...(shape.perLayer ?? [2, 3]));
     // The bottom layer sinks below the base, which then squashes it into a shallow belly
     y += radius * (layer === 0 ? 0.3 : shape.rise);
+    const turn = rndBetween(0, Math.PI * 2);
     for (let i = 0; i < count; i++) {
-      const across = count === 1 ? 0 : i / (count - 1) - 0.5;
-      lobes.push({
-        centre: new THREE.Vector3(
-          across * (width - radius) + rndBetween(-0.1, 0.1) * radius,
-          y + rndBetween(-0.15, 0.15) * radius,
-          rndBetween(-0.3, 0.3) * width * 0.5
-        ),
-        radius: radius * rndBetween(0.85, 1.15),
-      });
+      const centre = shape.round
+        ? onRing(turn + (i / count) * Math.PI * 2, (width - radius) * 0.5)
+        : inLine(count === 1 ? 0 : i / (count - 1) - 0.5, width, radius);
+      centre.y = y + rndBetween(-0.15, 0.15) * radius;
+      lobes.push({ centre, radius: radius * rndBetween(0.85, 1.15) });
     }
     width *= shape.narrow;
   }
+  if (shape.anvil) lobes.push(...anvilLobes(y, baseWidth, shape.anvil));
   return lobes;
 };
 
@@ -70,15 +120,20 @@ export const buildCloudGeometry = (
   const lobeAttr: number[] = [];
   const v = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
 
-  for (const { centre, radius } of stackLobes(kind)) {
+  for (const { centre, radius, flatten = 1 } of stackLobes(kind)) {
     const lobe = new THREE.IcosahedronGeometry(1, radius > FINE_LOBE_RADIUS ? 1 : 0);
     lobe.applyMatrix4(
       new THREE.Matrix4().compose(
         centre,
         new THREE.Quaternion().setFromEuler(
-          new THREE.Euler(rndBetween(0, Math.PI), rndBetween(0, Math.PI), 0)
+          // A flattened lobe only turns about the vertical, so it stays a flat slab
+          new THREE.Euler(flatten < 1 ? 0 : rndBetween(0, Math.PI), rndBetween(0, Math.PI), 0)
         ),
-        new THREE.Vector3(radius * rndBetween(1, 1.2), radius * rndBetween(0.9, 1.1), radius)
+        new THREE.Vector3(
+          radius * rndBetween(1, 1.2),
+          radius * rndBetween(0.9, 1.1) * flatten,
+          radius
+        )
       )
     );
     const placedCentre = centre.clone().applyMatrix4(turn);
