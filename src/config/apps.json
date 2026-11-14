@@ -9,24 +9,6 @@
       "visibility": "public",
       "priority": 0
     },
-    "animation": {
-      "name": "Famara animation",
-      "description": "Dramatic camera animation showcasing voxel paragliders with golden hour lighting",
-      "route": "/famara-animation",
-      "category": "demo",
-      "requiresWebGL": true,
-      "visibility": "public",
-      "priority": 1
-    },
-    "boatsanimation": {
-      "name": "Boats Animation",
-      "description": "Cinematic animation starting near boats and transitioning to focus on paragliders and clouds",
-      "route": "/boats-animation",
-      "category": "demo",
-      "requiresWebGL": true,
-      "visibility": "public",
-      "priority": 4
-    },
     "famara": {
       "name": "Famara static",
       "description": "Natural beauty of Famara beach area without paragliders - pure landscape focus",

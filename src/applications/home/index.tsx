@@ -88,7 +88,6 @@ import { requestFrame, cancelFrame } from '../../foundation/systems/animation/fr
 
 /**
  * Home App - Landing scene with the voxel title
- * Based on famara-animation with a title overlay
  */
 class HomeApp extends TerrainBase {
   private environment: Environment | undefined;

@@ -12,8 +12,8 @@ THREE.Cache.enabled = true;
 
 /**
  * Extract story name from URL
- * - From query parameter: ?story=boats-animation
- * - From HTML path: /boats-animation.html -> boats-animation
+ * - From query parameter: ?story=puerto-del-carmen
+ * - From HTML path: /puerto-del-carmen.html -> puerto-del-carmen
  * - Anything else (/, /index.html): the site's home (home, or relax on the relax site)
  */
 function getStoryName(): string {

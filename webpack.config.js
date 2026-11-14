@@ -9,7 +9,7 @@ const Dotenv = require('dotenv-webpack');
  *
  * Simple rules:
  * - All apps except "hidden" are built
- * - HTML filename comes from route (e.g., /boats-animation → boats-animation.html)
+ * - HTML filename comes from route (e.g., /puerto-del-carmen → puerto-del-carmen.html)
  * - Every page loads the same main bundle (./src/index.tsx), which picks the story from the URL
  *   and lazy-loads that app's chunk
  * - Apps are sorted by priority field

@@ -20,7 +20,7 @@ interface AppModule {
  * Load an app by key using the app registry
  *
  * Convention: Apps are located at ./applications/{folder-name}/index.tsx
- * The folder name is derived from the route (e.g., /famara-animation -> famara-animation)
+ * The folder name is derived from the route (e.g., /puerto-del-carmen -> puerto-del-carmen)
  */
 export async function loadApp(appKey: string, options: StoryOptions): Promise<void> {
   // Handle route aliases (e.g., 'flier' -> 'flier-pg')

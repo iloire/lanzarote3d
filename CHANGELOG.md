@@ -11,6 +11,14 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
   (`/` to focus, Enter opens the first match, Esc clears) filters every group, and group
   headings fold away with a click.
 
+## 2026-11-14 10:05 UTC
+
+### Removed
+
+- **famara-animation and boats-animation scenes**: home grew out of famara-animation and
+  replaced it, and the harbour boats now live in puerto-del-carmen. Both were older copies that
+  every new feature had to be wired into twice. Gone from the menu, `apps.json` and the sitemap.
+
 ## 2026-11-14 09:25 UTC
 
 ### Changed
