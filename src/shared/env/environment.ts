@@ -263,10 +263,10 @@ export const RISCO_RAVEN_FLOCKS: GullFlock[] = [
 /**
  * A single pair of guirres, the Canary Egyptian vulture: rare on Lanzarote, so just the two,
  * circling off the Mirador del Río a little above Magne, over the middle of his loop (home
- * config: 1659-1753 m, centred near x 12953, z -12028).
+ * config: 1509-1603 m, centred near x 12953, z -12028).
  */
 export const RISCO_GUIRRE_FLOCKS: GullFlock[] = [
-  { center: new THREE.Vector3(12953, 1770, -12028), count: 2 },
+  { center: new THREE.Vector3(12953, 1620, -12028), count: 2 },
 ];
 
 class Environment {

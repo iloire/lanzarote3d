@@ -453,7 +453,7 @@ export const LEAD_PILOT = CharacterType.ROOS;
 /**
  * They spread out along the whole Risco, from takeoff to the Mirador del Río: Roos low by takeoff
  * at the south-west end, Ivan on the takeoff beat, then a pilot every ~1.4 km up the cliff
- * towards La Graciosa. Magne is the farthest and the highest, at the Mirador (1659-1753 m); Bernt
+ * towards La Graciosa. Magne is the farthest and the highest, at the Mirador (1509-1603 m, just under the cloud base); Bernt
  * is second in both, 85% of the way there (1500-1562 m); the rest step up the cliff between
  * takeoff and Bernt at 875-1327 m, rising with the cliff and capped under him, bar Daniel, new
  * and sinking out at the foot of the cliff under David (800-880 m). Each loop sits on
@@ -607,7 +607,7 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
     },
     startProgress: 0.2,
     pathOffset: MIRADOR_OFFSET,
-    waypoints: liftLoop(800, 1.5),
+    waypoints: liftLoop(650, 1.5),
   },
   {
     // Abel flies a paramotor, so he needs no ridge: he leaves it below takeoff and flies a
@@ -706,7 +706,7 @@ export const herculesConfig: HerculesConfig = {
   maxHeight: 1600,
   obstacleAvoidanceDistance: 250,
   forwardAxis: 'x',
-  // 2000-2200 m: high over everyone, Magne included (he tops out at ~1687 m)
+  // 2000-2200 m: high over everyone, Magne included (he tops out at ~1603 m)
   waypoints: [
     new THREE.Vector3(5200, 2100, 2000),
     new THREE.Vector3(7500, 2200, 1500),
@@ -772,7 +772,7 @@ export const LA_GRACIOSA = new THREE.Vector3(10100, 0, -14800);
 
 /**
  * On their birthday a pilot flies what nobody could: out past Magne, halfway from the Mirador
- * to La Graciosa over El Río, 2 km off the cliff, and higher than anyone, at 1875-1935 m, 200 m
+ * to La Graciosa over El Río, 2 km off the cliff, and higher than anyone, at 1875-1935 m, 350 m
  * over Magne and still under the Hercules. His loop, widened the same, keeping their own start.
  */
 export const BIRTHDAY_FLIGHT: Pick<ParagliderVoxelConfig, 'pathOffset' | 'waypoints'> = {
