@@ -9,7 +9,7 @@ import { Theme } from '../../foundation/types/Theme';
 import { IThreeComponent } from '../../foundation/components/base/IThreeComponent';
 import { ComponentRegistry } from '../../foundation/systems/ComponentRegistry';
 import { LevelOfDetail } from '../../foundation/types/lod';
-import { rndIntBetween } from '../../foundation/utils/math';
+import { rndBetween, rndIntBetween } from '../../foundation/utils/math';
 import { ISLAND_ANCHOR, geoToWorld } from '../geo';
 
 interface MovableComponent extends IThreeComponent {
@@ -47,12 +47,59 @@ export interface CloudSite {
   scale: number;
 }
 
+/** The crest of the Risco de Famara, from above the takeoff to just short of the Mirador del Río */
+const RISCO_CREST = [
+  { x: 7800, z: -1300 },
+  { x: 9300, z: -2700 },
+  { x: 10200, z: -4300 },
+  { x: 11200, z: -6200 },
+  { x: 12000, z: -8200 },
+  { x: 12700, z: -10200 },
+  { x: 13600, z: -11400 },
+];
+
+/** A point `t` (0-1) of the way along the crest, and the unit vector across it */
+const alongCrest = (t: number) => {
+  const segment = Math.min(Math.floor(t * (RISCO_CREST.length - 1)), RISCO_CREST.length - 2);
+  const local = t * (RISCO_CREST.length - 1) - segment;
+  const a = RISCO_CREST[segment];
+  const b = RISCO_CREST[segment + 1];
+  const dx = b.x - a.x;
+  const dz = b.z - a.z;
+  const length = Math.hypot(dx, dz);
+  return { x: a.x + dx * local, z: a.z + dz * local, acrossX: -dz / length, acrossZ: dx / length };
+};
+
+/** A cluster at `t` along the crest, pushed up to `across` metres either side of it */
+const crestCloud = (t: number, across: number, scale: number): CloudSite => {
+  const { x, z, acrossX, acrossZ } = alongCrest(t);
+  const offset = rndBetween(-across, across);
+  return { x: x + acrossX * offset, z: z + acrossZ * offset, kind: 'puff', scale };
+};
+
+/** How many clusters always cover the crest, and how many more may pile up at its north end */
+const CREST_CLOUDS = 8;
+const EXTRA_NORTH_CLOUDS = [3, 7] as const;
+
+/**
+ * The trade wind piles cloud up on the Risco, so its crest is never clear: a cluster in every
+ * stretch of it, each placed at random within its stretch. The north end, in front of La
+ * Graciosa, gets a random handful more. Rolled afresh on every load.
+ */
+const riscoCloudSites = (): CloudSite[] => [
+  ...Array.from({ length: CREST_CLOUDS }, (_, i) =>
+    crestCloud((i + rndBetween(0.1, 0.9)) / CREST_CLOUDS, 400, rndBetween(1, 1.4))
+  ),
+  ...Array.from({ length: rndIntBetween(...EXTRA_NORTH_CLOUDS) }, () =>
+    crestCloud(rndBetween(0.65, 1), 700, rndBetween(0.9, 1.5))
+  ),
+];
+
 /**
  * A cluster over each thermal site, a towering one over the super thermal, a few clusters in
- * between, and the trade wind piling cloud up on the Risco de Famara, so its crest from the
- * takeoff to the Mirador del Río is rarely clear.
+ * between, and the Risco de Famara's own cloud.
  */
-const LANZAROTE_CLOUD_SITES: CloudSite[] = [
+const lanzaroteCloudSites = (): CloudSite[] => [
   ...THERMAL_SITES.map(({ x, z }) => ({ x, z, kind: 'puff' as const, scale: 1 })),
   { ...SUPER_THERMAL_SITE, kind: 'tower', scale: 1.6 },
   ...[
@@ -60,14 +107,7 @@ const LANZAROTE_CLOUD_SITES: CloudSite[] = [
     { x: 2600, z: 842 },
     { x: -3600, z: 8042 },
   ].map(({ x, z }) => ({ x, z, kind: 'puff' as const, scale: 1 })),
-  ...[
-    { x: 7800, z: -1300 },
-    { x: 9300, z: -2700 },
-    { x: 10200, z: -4300 },
-    { x: 11200, z: -6200 },
-    { x: 12000, z: -8200 },
-    { x: 12700, z: -10200 },
-  ].map(({ x, z }) => ({ x, z, kind: 'puff' as const, scale: 1.2 })),
+  ...riscoCloudSites(),
 ];
 
 /** Houses whose ground is lower than this are in the sea and are left out */
@@ -531,7 +571,7 @@ class Environment {
    */
   async addClouds(
     lclLevel: number,
-    cloudSites: CloudSite[] = LANZAROTE_CLOUD_SITES
+    cloudSites: CloudSite[] = lanzaroteCloudSites()
   ): Promise<THREE.Object3D[]> {
     this.cloudInstances.forEach(c => c.dispose());
     this.cloudInstances = [];
