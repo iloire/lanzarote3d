@@ -329,8 +329,12 @@ class RelaxApp extends TerrainBase {
       }
       swaying = false;
     });
-    // A lone paramotor is chased along its path, and orbited once the viewer takes over
-    const lead = relax.paramotor && relax.orbit === undefined ? this.gliders[0]?.mesh : undefined;
+    // A lone paramotor, or a place's one pilot, is chased along its path, and orbited once the
+    // viewer takes over
+    const lead =
+      (relax.paramotor && relax.orbit === undefined) || relax.chase
+        ? this.gliders[0]?.mesh
+        : undefined;
     const trail = new PathTrail(CHASE_LAG * 2);
     const chaseAt = new THREE.Vector3();
     const lastLead = new THREE.Vector3();

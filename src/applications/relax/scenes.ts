@@ -89,6 +89,8 @@ export interface RelaxScene {
   lasers?: LaserSite[];
   /** Left out of the place picker: reached only by its ?location= URL */
   unlisted?: boolean;
+  /** Chase the first pilot along the loop, as a lone paramotor is, instead of watching the loop */
+  chase?: boolean;
 }
 
 /** How a place is lit, where it differs from the theme */
@@ -121,6 +123,7 @@ interface DemSceneConfig extends DemLocationConfig {
     zoomOut?: number;
     pan?: number;
     orbit?: number;
+    chase?: boolean;
     intro?: { seconds: number; keys: { at: number[]; lookAt: number[] }[] };
   };
   clouds: { at: number[]; kind: string; scale: number }[];
@@ -241,6 +244,7 @@ function demScene(location: Location, config: DemSceneConfig, city?: string): Re
       height: config.plain.height * config.unitsPerMetre * config.verticalExaggeration,
     },
     orbit: config.camera.orbit,
+    chase: config.camera.chase,
     harbour: config.harbour && {
       ferries: config.harbour.ferries.map(({ from, to, count }) => ({
         from: xz(from),

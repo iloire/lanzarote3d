@@ -2,6 +2,14 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-15 14:40 UTC
+
+### Changed
+
+- **The camera chases Armando at Los Giles**, a few seconds behind him along his loop, as it
+  chases Abel's paramotor, instead of watching the whole cliff from out at sea where he was
+  hard to make out. A place turns it on with `camera.chase`.
+
 ## 2026-11-15 14:10 UTC
 
 ### Added

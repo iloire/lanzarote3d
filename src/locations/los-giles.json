@@ -44,11 +44,12 @@
     ]
   },
   "camera": {
-    "about": "Out over the sea to the north-west at the gliders' height, looking south-east at the cliff with Las Palmas and La Isleta off to the left; [lat, lon, metres]",
+    "about": "Where the camera starts, out over the sea to the north-west looking south-east at the cliff, before it chases Armando along the loop; [lat, lon, metres]",
     "at": [28.146, -15.497, 420],
     "lookAt": [28.13, -15.478, 280],
     "zoomOut": 4,
-    "pan": 8000
+    "pan": 8000,
+    "chase": true
   },
   "pilots": ["armando"],
   "cloudBase": 1200,
