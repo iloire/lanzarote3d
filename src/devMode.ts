@@ -1,5 +1,6 @@
 /**
- * Dev mode: lists the private scenes and shows the sidebar on every scene, home included.
+ * Dev mode: lists the private scenes and shows the sidebar on every scene, home included. The
+ * relax app's place picker lists its unlisted places too (flying zones, Los Giles, …).
  *
  * - Always on at localhost (private scenes only; home keeps its clean, menu-less look)
  * - Anywhere else, open any page with ?dev=1 to turn it on for this browser, ?dev=0 to turn it off

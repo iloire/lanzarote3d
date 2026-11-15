@@ -9,6 +9,7 @@ import { RIO_CONFIG, RIO_DE_JANEIRO } from '../../locations/rio-de-janeiro';
 import { TENERIFE, TENERIFE_CONFIG } from '../../locations/tenerife';
 import { CASTEJON_DE_SOS, CASTEJON_DE_SOS_CONFIG } from '../../locations/castejon-de-sos';
 import { EL_HIERRO, EL_HIERRO_CONFIG } from '../../locations/el-hierro';
+import { LOS_GILES, LOS_GILES_CONFIG } from '../../locations/los-giles';
 import { NEW_YORK, NEW_YORK_CITY, NEW_YORK_CONFIG } from '../../locations/new-york';
 import { GIZA, GIZA_CONFIG, GIZA_MONUMENTS } from '../../locations/giza';
 import { PARIS, PARIS_CITY, PARIS_CONFIG } from '../../locations/paris';
@@ -26,6 +27,7 @@ import { RIDGE_LOOP } from '../home/config';
 import { montSaintMichel } from './montSaintMichel';
 import type { SetPieceLoader } from './setPiece';
 import type { Place } from './places';
+import { isDevModeEnabled } from '../../devMode';
 
 /** One place to relax in: where the gliders soar and where the camera watches from */
 export interface RelaxScene {
@@ -304,6 +306,7 @@ export const RELAX_SCENES: Record<string, RelaxScene> = {
   },
   tenerife: { ...demScene(TENERIFE, TENERIFE_CONFIG), unlisted: true },
   'el-hierro': demScene(EL_HIERRO, EL_HIERRO_CONFIG),
+  'los-giles': { ...demScene(LOS_GILES, LOS_GILES_CONFIG), unlisted: true },
   'castejon-de-sos': { ...demScene(CASTEJON_DE_SOS, CASTEJON_DE_SOS_CONFIG), unlisted: true },
   'rio-de-janeiro': demScene(RIO_DE_JANEIRO, RIO_CONFIG),
   'new-york': demScene(NEW_YORK, NEW_YORK_CONFIG, NEW_YORK_CITY),
@@ -320,8 +323,11 @@ export const RELAX_SCENES: Record<string, RelaxScene> = {
 
 export const DEFAULT_SCENE = 'lanzarote';
 
-/** The places in the picker, in order; an unlisted one shows only while it's the one open */
-export const pickerPlaces = (current: string): Place[] =>
+/**
+ * The places in the picker, in order; an unlisted one shows only while it's the one open, or
+ * always in dev mode
+ */
+export const pickerPlaces = (current: string, dev = isDevModeEnabled()): Place[] =>
   Object.entries(RELAX_SCENES)
-    .filter(([id, scene]) => !scene.unlisted || id === current)
+    .filter(([id, scene]) => dev || !scene.unlisted || id === current)
     .map(([id, scene]) => ({ id, name: scene.location.name, region: scene.region }));

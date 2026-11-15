@@ -1,0 +1,173 @@
+{
+  "id": "los-giles",
+  "name": "Los Giles",
+  "region": "Canary Islands",
+  "about": "The north coast of Gran Canaria round Las Palmas: the Los Giles takeoff on the cliff above El Rincón, Las Canteras and La Isleta to the east, the island's ravines and peaks rising to the south",
+  "bbox": {
+    "south": 28.04,
+    "north": 28.19,
+    "west": -15.56,
+    "east": -15.39
+  },
+  "spacing": 75,
+  "unitsPerMetre": 0.772,
+  "verticalExaggeration": 2,
+  "places": {
+    "launch": {
+      "name": "Los Giles takeoff, on the cliff edge by the windsocks (175 m)",
+      "at": [28.12735, -15.47575]
+    },
+    "mirador": {
+      "name": "Mirador de Los Giles, the meeting point",
+      "at": [28.1144, -15.47572]
+    },
+    "landing": {
+      "name": "Las Canteras beach by the Alfredo Kraus auditorium",
+      "at": [28.1307, -15.4484]
+    },
+    "laIsleta": {
+      "name": "La Isleta",
+      "at": [28.17, -15.42]
+    }
+  },
+  "soaringLoop": {
+    "about": "Ridge soaring along the north-facing cliff from El Rincón to the takeoff in the trade wind, out in front of the edge and back over it; [lat, lon, metres above sea level]",
+    "waypoints": [
+      [28.1335, -15.462, 300],
+      [28.1345, -15.472, 310],
+      [28.136, -15.484, 320],
+      [28.137, -15.496, 330],
+      [28.132, -15.497, 350],
+      [28.1305, -15.485, 340],
+      [28.129, -15.474, 340],
+      [28.127, -15.463, 320]
+    ]
+  },
+  "camera": {
+    "about": "Out over the sea to the north-west at the gliders' height, looking south-east at the cliff with Las Palmas and La Isleta off to the left; [lat, lon, metres]",
+    "at": [28.146, -15.497, 420],
+    "lookAt": [28.13, -15.478, 280],
+    "zoomOut": 4,
+    "pan": 8000
+  },
+  "cloudBase": 1200,
+  "clouds": [
+    {
+      "about": "The trade-wind cloud on the hills inland",
+      "at": [28.08, -15.5],
+      "kind": "puff",
+      "scale": 1.2
+    },
+    {
+      "at": [28.07, -15.46],
+      "kind": "puff",
+      "scale": 1
+    },
+    {
+      "at": [28.09, -15.54],
+      "kind": "puff",
+      "scale": 1
+    },
+    {
+      "about": "Over the peaks to the south",
+      "at": [28.05, -15.52],
+      "kind": "tower",
+      "scale": 1.3
+    }
+  ],
+  "regions": [
+    {
+      "name": "Dry scrub on the coastal plateau",
+      "at": [28.12, -15.49],
+      "radius": 3000,
+      "color": "#8a7a58",
+      "strength": 0.5
+    },
+    {
+      "name": "Greener farmland up the northern slopes",
+      "at": [28.07, -15.5],
+      "radius": 4000,
+      "color": "#5f6e3f",
+      "strength": 0.5
+    },
+    {
+      "name": "Las Palmas",
+      "at": [28.115, -15.43],
+      "radius": 3000,
+      "color": "#a89c8c",
+      "strength": 0.5
+    },
+    {
+      "name": "The volcanic cones of La Isleta",
+      "at": [28.17, -15.42],
+      "radius": 1800,
+      "color": "#6a3f2c",
+      "strength": 0.6
+    }
+  ],
+  "towns": [
+    {
+      "name": "Los Giles",
+      "at": [28.115, -15.478],
+      "houseCount": 60,
+      "formation": "suburban"
+    },
+    {
+      "name": "Tamaraceite",
+      "at": [28.098, -15.468],
+      "houseCount": 80,
+      "formation": "suburban"
+    },
+    {
+      "name": "Tenoya",
+      "at": [28.106, -15.497],
+      "houseCount": 30,
+      "formation": "rural",
+      "spacing": 1.5
+    },
+    {
+      "name": "La Isleta",
+      "at": [28.152, -15.423],
+      "houseCount": 80,
+      "formation": "grid",
+      "spacing": 0.6
+    }
+  ],
+  "scatter": [
+    {
+      "kind": "tower",
+      "about": "Las Palmas along Las Canteras and down to the port",
+      "at": [28.125, -15.435],
+      "radius": 2200,
+      "count": 450,
+      "maxAltitude": 80,
+      "heading": 20
+    },
+    {
+      "kind": "favela",
+      "about": "The barrios on the hills above the city",
+      "at": [28.11, -15.445],
+      "radius": 2000,
+      "count": 300,
+      "minAltitude": 60,
+      "maxAltitude": 250
+    },
+    {
+      "kind": "cardon",
+      "about": "Tabaibas and cardones on the cliffs and ravine sides",
+      "at": [28.125, -15.49],
+      "radius": 3000,
+      "count": 300,
+      "maxAltitude": 300
+    },
+    {
+      "kind": "rock",
+      "about": "The cliff from El Rincón to the takeoff",
+      "at": [28.13, -15.48],
+      "radius": 2000,
+      "count": 200,
+      "minAltitude": 30,
+      "maxAltitude": 250
+    }
+  ]
+}

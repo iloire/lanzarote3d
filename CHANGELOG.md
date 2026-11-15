@@ -2,6 +2,15 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-15 13:25 UTC
+
+### Added
+
+- **Los Giles, Gran Canaria**: ridge soaring on the north-facing cliff above El Rincón, from
+  elevation data, with Las Palmas, Las Canteras and La Isleta to the east. Unlisted for now:
+  `relax.html?location=los-giles`, or the place picker in dev mode.
+- **Dev mode lists every unlisted place** in the relax app's place picker (localhost, or `?dev=1`).
+
 ## 2026-11-14 10:25 UTC
 
 ### Changed

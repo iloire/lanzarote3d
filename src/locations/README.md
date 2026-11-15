@@ -7,7 +7,9 @@ longitude map onto it (`types.ts`). `TerrainBase` loads Lanzarote unless an app 
   by hand (`shared/geo.ts`) and its regions live in `shared/env/terrain-regions.json`.
 - **Rio de Janeiro** (`rio-de-janeiro.json` + `.ts`), **Tenerife** (`tenerife.json` + `.ts`,
   Adeje: Taucho takeoff to La Caleta, El Teide behind), **El Hierro** (`el-hierro.json` + `.ts`,
-  the whole island: ridge soaring on the cliff of El Golfo above Frontera) and **Castejón de Sos**
+  the whole island: ridge soaring on the cliff of El Golfo above Frontera), **Los Giles**
+  (`los-giles.json` + `.ts`, Gran Canaria's north coast: the cliff above El Rincón, Las Palmas
+  and La Isleta to the east) and **Castejón de Sos**
   (`castejon-de-sos.json` + `.ts`, the Ésera valley in the Pyrenees: the Liri takeoff under
   Gallinero, El Turbón to the south) are built from elevation data, below. **New York**
   (`new-york.json` + `.ts`, Midtown) and **Paris** (`paris.json` + `.ts`, round the Eiffel
