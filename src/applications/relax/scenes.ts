@@ -50,9 +50,10 @@ export interface RelaxScene {
   cloudBase?: number;
   /**
    * How far the viewer may take the camera, so a terrain's edges never show: how many times the
-   * starting distance it may zoom out (1.5) and how far, in world units, it may pan (3000)
+   * starting distance it may zoom out (1.5) and how far, in world units, it may pan (3000); and
+   * how close, in world units, it may zoom in (150)
    */
-  limits?: { zoomOut?: number; pan?: number };
+  limits?: { zoomOut?: number; pan?: number; zoomIn?: number };
   towns?: TownConfig[];
   scatter?: ScatterArea[];
   landmarks?: { list: Landmark[]; anchor: GeoAnchor };
@@ -121,6 +122,7 @@ interface DemSceneConfig extends DemLocationConfig {
     at: number[];
     lookAt: number[];
     zoomOut?: number;
+    zoomIn?: number;
     pan?: number;
     orbit?: number;
     chase?: boolean;
@@ -195,6 +197,7 @@ function demScene(location: Location, config: DemSceneConfig, city?: string): Re
     cloudBase: toHeight(config.cloudBase),
     limits: {
       zoomOut: config.camera.zoomOut,
+      zoomIn: config.camera.zoomIn,
       pan: config.camera.pan,
     },
     // Houses settle onto the terrain, so the town centre's height doesn't matter

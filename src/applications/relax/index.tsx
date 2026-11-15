@@ -56,7 +56,7 @@ const SWAY_PERIOD = 90;
 // How far the viewer may take the camera unless the place says otherwise: a generated terrain
 // ends at its box, so zooming out or panning far would show its edges. Orbiting is always free.
 const DEFAULT_LIMITS = { zoomOut: 1.5, pan: 3000 };
-const MIN_DISTANCE = 150;
+const DEFAULT_ZOOM_IN = 150;
 const LOWEST_VIEW = THREE.MathUtils.degToRad(85);
 // The camera never goes nearer the ground than this
 const GROUND_CLEARANCE = 40;
@@ -277,10 +277,13 @@ class RelaxApp extends TerrainBase {
   /** Keep the viewer near the gliders: a little zoom, all the way round, panning held below */
   private limitControls(controls: OrbitControls, relax: RelaxScene): void {
     const offset = relax.camera.position.clone().sub(relax.camera.target);
-    const { zoomOut } = { ...DEFAULT_LIMITS, ...definedOnly(relax.limits) };
+    const { zoomOut, zoomIn = DEFAULT_ZOOM_IN } = {
+      ...DEFAULT_LIMITS,
+      ...definedOnly(relax.limits),
+    };
     // Pan over the ground like a map, not up and down the screen into the hills
     controls.screenSpacePanning = false;
-    controls.minDistance = MIN_DISTANCE;
+    controls.minDistance = zoomIn;
     controls.maxDistance = offset.length() * zoomOut;
     controls.maxPolarAngle = LOWEST_VIEW;
   }

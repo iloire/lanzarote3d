@@ -2,6 +2,14 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-15 15:00 UTC
+
+### Changed
+
+- **Zoom in close to Armando**: at Los Giles the camera may come within 20 units of him, to
+  see his wing and him in detail; elsewhere the closest is still 150. A place sets it with
+  `camera.zoomIn`.
+
 ## 2026-11-15 14:45 UTC
 
 ### Added
