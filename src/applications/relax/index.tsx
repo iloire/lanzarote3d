@@ -225,8 +225,10 @@ class RelaxApp extends TerrainBase {
             : paraglidersVoxel.slice(0, PILOTS);
       this.gliders = await loadParagliders(
         scene,
-        pilots.map(({ options }, i) => ({
-          options,
+        pilots.map((pilot, i) => ({
+          options: pilot.options,
+          // A pilot's own habit with his legs comes along (Armando's)
+          legs: 'legs' in pilot ? pilot.legs : undefined,
           startProgress: (i / pilots.length + (START_PROGRESS ?? relax.loopStart ?? 0)) % 1,
           // Each a little higher and further out, so they don't fly through each other
           pathOffset: new THREE.Vector3(0, i * 25, 0),

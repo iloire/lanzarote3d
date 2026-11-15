@@ -88,7 +88,9 @@ export async function loadParagliders(
             speed,
             paraglider.getPilotSwing(),
             roller ? ROLLER_FLIGHT.wingover : undefined,
-            p.twist
+            p.twist,
+            undefined,
+            p.legs
           ),
         };
       } catch (error) {

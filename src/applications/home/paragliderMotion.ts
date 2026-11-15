@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { PilotPose } from './pilotPose';
+import { LegRoutine, PilotPose } from './pilotPose';
 import { canopyCollapse } from '../../foundation/components/vehicles/components/Glider';
 
 const GRAVITY = 9.81;
@@ -173,13 +173,14 @@ export class ParagliderMotion {
     private readonly pilotSwing?: THREE.Object3D,
     private readonly wingover?: WingoverSettings,
     private readonly twist?: TwistSettings,
-    private readonly loop?: LoopSettings
+    private readonly loop?: LoopSettings,
+    legs?: LegRoutine
   ) {
     // Yaw before banking and pitching, as a wing weaving across its path does
     body.rotation.order = 'YXZ';
     // The pilot twists round the hang line first, then swings on it
     if (pilotSwing) pilotSwing.rotation.order = 'XZY';
-    this.pose = pilotSwing && PilotPose.from(pilotSwing);
+    this.pose = pilotSwing && PilotPose.from(pilotSwing, legs);
     this.canopy = body.getObjectByName('canopy');
     this.collapseAmount = this.canopy && canopyCollapse(this.canopy);
     // Somewhere into a rest, so the pilots don't start their wingovers together

@@ -14,6 +14,7 @@ import type {
   ReframeSettings,
 } from './cameraFollow';
 import type { LoopSettings, TwistSettings, WingoverSettings } from './paragliderMotion';
+import type { LegRoutine } from './pilotPose';
 import type { HeroSettings } from './heroEmbed';
 import type { FreeFlightSettings } from './freeFlight';
 
@@ -29,6 +30,8 @@ export type ParagliderVoxelConfig = {
   waypoints?: THREE.Vector3[];
   /** Twists thrown now and then, spinning round to fly looking backwards */
   twist?: TwistSettings;
+  /** The pilot's own habit with his legs, instead of a cross or a stretch now and then */
+  legs?: LegRoutine;
   /** Times the wing's own speed it flies at */
   speedFactor?: number;
 };
@@ -666,6 +669,8 @@ export const relaxOnlyPilots: ParagliderVoxelConfig[] = [
     },
     startProgress: 0,
     pathOffset: new THREE.Vector3(0, 0, 0),
+    // He opens his legs, stretches them out and crosses them, again and again
+    legs: { hold: [3, 7], rest: [2, 6] },
   },
 ];
 

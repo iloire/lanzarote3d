@@ -51,6 +51,19 @@ const CROSS_IN = deg(20);
 const CROSS_FRONT = deg(14);
 const CROSS_BACK = deg(4);
 const STRETCH = deg(65);
+/** Opened, each shin swings out this far at the knee, the feet wide apart */
+const OPEN = deg(18);
+
+/**
+ * A pilot's own habit with his legs (Armando's): he opens them, stretches them out, crosses
+ * them at the ankles still stretched, and lets them hang again, holding each for a random
+ * time between `hold` and resting for one between `rest`, in seconds.
+ */
+export type LegRoutine = {
+  hold: [number, number];
+  rest: [number, number];
+};
+const ROUTINE: LegMove[] = ['open', 'stretch', 'stretch-cross'];
 
 const randomBetween = ([min, max]: [number, number]) => min + Math.random() * (max - min);
 
@@ -58,7 +71,7 @@ const randomBetween = ([min, max]: [number, number]) => min + Math.random() * (m
 type Arm = { side: 1 | -1; shoulder: THREE.Object3D; elbow: THREE.Object3D; brake: number };
 /** One side's shin, hinged at the knee */
 type Shin = { side: 1 | -1; knee: THREE.Object3D };
-type LegMove = 'rest' | 'cross' | 'stretch';
+type LegMove = 'rest' | 'cross' | 'stretch' | 'open' | 'stretch-cross';
 
 /**
  * Moves a pilot cut into parts (3d-characters vox-to-obj.mjs --parts, hinged by PilotVoxel):
@@ -80,19 +93,25 @@ export class PilotPose {
   private restLeft = randomBetween(GLANCE_EVERY);
   private readonly shins: Shin[] = [];
   private legMove: LegMove = 'rest';
-  private legTimeLeft = randomBetween(LEGS_REST);
-  /** How far into a cross and a stretch the legs are, 0 to 1 */
-  private readonly legs = { cross: 0, stretch: 0 };
+  private legTimeLeft: number;
+  /** Where in the routine the legs are, if the pilot has one */
+  private routineStep = -1;
+  /** How far into an opening, a cross and a stretch the legs are, 0 to 1 */
+  private readonly legs = { open: 0, cross: 0, stretch: 0 };
 
-  static from(pilot: THREE.Object3D): PilotPose | undefined {
+  static from(pilot: THREE.Object3D, routine?: LegRoutine): PilotPose | undefined {
     return pilot.getObjectByName('head') ||
       pilot.getObjectByName('arm-left') ||
       pilot.getObjectByName('shin-left')
-      ? new PilotPose(pilot)
+      ? new PilotPose(pilot, routine)
       : undefined;
   }
 
-  private constructor(pilot: THREE.Object3D) {
+  private constructor(
+    pilot: THREE.Object3D,
+    private readonly routine?: LegRoutine
+  ) {
+    this.legTimeLeft = randomBetween(routine?.rest ?? LEGS_REST);
     this.head = pilot.getObjectByName('head');
     (['left', 'right'] as const).forEach(name => {
       const shoulder = pilot.getObjectByName(`arm-${name}`);
@@ -159,11 +178,20 @@ export class PilotPose {
     this.head.rotation.set(this.headPitch, this.headYaw, lean * HEAD_LEVELLING, 'YXZ');
   }
 
-  /** Rests, then crosses or stretches the legs for a while, easing between the poses */
+  /**
+   * Rests, then crosses or stretches the legs for a while, or runs through the pilot's own
+   * routine, easing between the poses
+   */
   private moveLegs(deltaTime: number): void {
     if (!this.shins.length) return;
     if ((this.legTimeLeft -= deltaTime) <= 0) {
-      if (this.legMove === 'rest') {
+      if (this.routine) {
+        this.routineStep = (this.routineStep + 1) % (ROUTINE.length + 1);
+        this.legMove = ROUTINE[this.routineStep] ?? 'rest';
+        this.legTimeLeft = randomBetween(
+          this.legMove === 'rest' ? this.routine.rest : this.routine.hold
+        );
+      } else if (this.legMove === 'rest') {
         this.legMove = Math.random() < 0.6 ? 'cross' : 'stretch';
         this.legTimeLeft = randomBetween(this.legMove === 'cross' ? CROSS_HOLD : STRETCH_HOLD);
       } else {
@@ -172,13 +200,20 @@ export class PilotPose {
       }
     }
     const step = Math.min(1, deltaTime * LEG_RESPONSE);
-    this.legs.cross += ((this.legMove === 'cross' ? 1 : 0) - this.legs.cross) * step;
-    this.legs.stretch += ((this.legMove === 'stretch' ? 1 : 0) - this.legs.stretch) * step;
-    const { cross, stretch } = this.legs;
+    const move = this.legMove;
+    const target = {
+      open: move === 'open' ? 1 : 0,
+      cross: move === 'cross' || move === 'stretch-cross' ? 1 : 0,
+      stretch: move === 'stretch' || move === 'stretch-cross' ? 1 : 0,
+    };
+    this.legs.open += (target.open - this.legs.open) * step;
+    this.legs.cross += (target.cross - this.legs.cross) * step;
+    this.legs.stretch += (target.stretch - this.legs.stretch) * step;
+    const { open, cross, stretch } = this.legs;
     this.shins.forEach(({ side, knee }) => {
       // Negative X swings the foot forward, positive Z swings it to the pilot's left
       knee.rotation.x = -stretch * STRETCH - cross * (side < 0 ? CROSS_FRONT : -CROSS_BACK);
-      knee.rotation.z = -side * cross * CROSS_IN;
+      knee.rotation.z = side * (open * OPEN - cross * CROSS_IN);
     });
   }
 }

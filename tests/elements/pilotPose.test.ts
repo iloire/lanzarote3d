@@ -78,3 +78,39 @@ describe('PilotPose', () => {
     });
   });
 });
+
+describe('PilotPose leg routine', () => {
+  // Each step of the routine lasts four seconds, long enough for the legs to settle
+  beforeEach(() => jest.spyOn(Math, 'random').mockReturnValue(0));
+  afterEach(() => jest.restoreAllMocks());
+
+  it('opens the legs, stretches them, crosses them stretched, then lets them hang', () => {
+    const pilot = new THREE.Object3D();
+    const shins = (['left', 'right'] as const).map(name => {
+      const knee = new THREE.Object3D();
+      knee.name = `shin-${name}`;
+      pilot.add(knee);
+      return knee;
+    });
+    const [left] = shins as [THREE.Object3D, THREE.Object3D];
+    const pose = PilotPose.from(pilot, { hold: [4, 4], rest: [4, 4] })!;
+    const fly = (seconds: number) => {
+      for (let t = 0; t < seconds; t += STEP) pose.update(STEP, 0, 0);
+    };
+    // To three seconds into a step, then on to three seconds into the next
+    const step = () => fly(4);
+    fly(3); // rest
+    expect(left.rotation.z).toBeCloseTo(0, 2);
+    step(); // open: the left foot swings out to the left
+    expect(left.rotation.z).toBeGreaterThan(0.2);
+    expect(left.rotation.x).toBeCloseTo(0, 1);
+    step(); // stretch: forward, no longer apart
+    expect(left.rotation.x).toBeLessThan(-0.8);
+    expect(Math.abs(left.rotation.z)).toBeLessThan(0.1);
+    step(); // stretched and crossed: still forward, the left foot swung in to the right
+    expect(left.rotation.x).toBeLessThan(-0.8);
+    expect(left.rotation.z).toBeLessThan(-0.2);
+    step(); // rest again
+    expect(Math.abs(left.rotation.x)).toBeLessThan(0.3);
+  });
+});

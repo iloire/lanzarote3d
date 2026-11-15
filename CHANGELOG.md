@@ -2,6 +2,14 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-15 14:45 UTC
+
+### Added
+
+- **Armando's legs**: again and again he opens them, stretches them out and crosses them at
+  the ankles still stretched, the way he flies, instead of the others' cross or stretch now
+  and then. A pilot takes a habit like it with `legs: { hold, rest }`.
+
 ## 2026-11-15 14:40 UTC
 
 ### Changed
