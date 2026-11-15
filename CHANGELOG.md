@@ -2,6 +2,15 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-15 21:09 UTC
+
+### Added
+
+- **Links back to lanzaroteparagliding.com**: every page of the Lanzarote site shows
+  "Lanzarote Paragliding" and "Tandem flights" in the bottom-right corner (above the place
+  picker on a phone). They are in the page template, so search engines see them without
+  running the scene. The relax site does not get them (`backLinks` in `webpack.config.js`).
+
 ## 2026-11-15 15:00 UTC
 
 ### Changed

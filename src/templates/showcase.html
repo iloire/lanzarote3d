@@ -64,6 +64,40 @@
   <div id="legend-points"></div>
   <div id="stats"></div>
   <div id="daytime"></div>
+  <% if (htmlWebpackPlugin.options.backLinks) { %>
+  <!-- Static so crawlers see it without running the scene; bottom-right is the one corner no overlay uses -->
+  <nav class="site-links" aria-label="Lanzarote Paragliding">
+    <a href="https://lanzaroteparagliding.com">Lanzarote Paragliding</a>
+    <a href="https://lanzaroteparagliding.com/tandem-paragliding-lanzarote">Tandem flights</a>
+  </nav>
+  <style>
+    .site-links {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 1000;
+      display: flex;
+      gap: 14px;
+      font: 12px 'Ubuntu Mono', monospace;
+    }
+    .site-links a {
+      color: rgba(255, 255, 255, 0.75);
+      text-decoration: none;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    }
+    /* On a phone the place picker spans the bottom edge: sit just above it */
+    @media (max-width: 600px) {
+      .site-links {
+        bottom: 60px;
+      }
+    }
+    .site-links a:hover,
+    .site-links a:focus-visible {
+      color: #fff;
+      text-decoration: underline;
+    }
+  </style>
+  <% } %>
 </body>
 
 </html>
