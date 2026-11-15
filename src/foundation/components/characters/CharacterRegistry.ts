@@ -6,6 +6,7 @@ import { logger } from '../../utils/logger';
  */
 export enum CharacterType {
   ABEL = 'abel',
+  ARMANDO = 'armando',
   ADRI = 'adri',
   BERNT = 'bernt',
   DANIEL = 'daniel',
@@ -138,6 +139,12 @@ export class CharacterRegistry {
           'Paramotor pilot - black helmet with ear cups, gold jet visor and intercom mic, blue T-shirt, shorts, legs crossed at the ankles, open harness',
         // v2 crosses his legs, the way he flies; abel.obj is v1, legs hanging straight
         model: 'v2',
+      },
+      {
+        id: CharacterType.ARMANDO,
+        name: 'Armando',
+        description:
+          'Orange-yellow open helmet with a blue, purple and pink pattern, black sunglasses, grey goatee, red quilted vest, navy open harness',
       },
       {
         id: CharacterType.BERNT,

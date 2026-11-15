@@ -9,7 +9,7 @@ import { OrbitControlsHelper } from '../../foundation/utils/OrbitControlsHelper'
 import { getAppConfig } from '../../config/app-registry';
 import { loadParagliders, VehicleLoadResult } from '../home/vehicleLoader';
 import { listenForWingClicks } from '../home/wingClicks';
-import { paraglidersVoxel, RIDGE_LOOP_TENSION } from '../home/config';
+import { paraglidersVoxel, relaxOnlyPilots, RIDGE_LOOP_TENSION } from '../home/config';
 import { addScatter } from '../../shared/env/scatter';
 import { placeLandmarks } from '../../shared/env/landmarks';
 import { getTerrainHeight } from '../../shared/env/mesh-utils';
@@ -219,7 +219,7 @@ class RelaxApp extends TerrainBase {
               .slice(0, 1)
               .map(({ options }) => ({ options: { ...options, paramotor: true } }))
           : relax.pilots
-            ? paraglidersVoxel.filter(({ options }) =>
+            ? [...paraglidersVoxel, ...relaxOnlyPilots].filter(({ options }) =>
                 relax.pilots!.includes(options.pilot.characterType)
               )
             : paraglidersVoxel.slice(0, PILOTS);

@@ -50,6 +50,7 @@
     "zoomOut": 4,
     "pan": 8000
   },
+  "pilots": ["armando"],
   "cloudBase": 1200,
   "clouds": [
     {

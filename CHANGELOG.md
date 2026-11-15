@@ -2,6 +2,14 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-15 14:10 UTC
+
+### Added
+
+- **Armando flies Los Giles**, alone, under his cyan Ozone with a lime band across the middle
+  and magenta stripes towards the tips. He is the first pilot who flies only at a relax place
+  of his own (`relaxOnlyPilots`), never on the Risco.
+
 ## 2026-11-15 13:25 UTC
 
 ### Added

@@ -268,6 +268,28 @@ export const FRANZ_BUZZ: GliderOptions = {
 };
 
 /**
+ * Armando's Ozone: cyan blue, a soft lime band across the middle of the chord, and two magenta
+ * stripes slanting back from the leading edge towards each tip.
+ */
+const ARMANDO_PINK = '#e0448e';
+export const ARMANDO_WING: GliderOptions = {
+  wingColor1: '#2aa6d6',
+  wingColor2: '#2aa6d6',
+  undersideColor: '#2aa6d6',
+  inletsColor: '#1a78a8',
+  patches: [
+    { color: '#86c84a', from: [-0.5, 0.45], to: [0.5, 0.45], width: 0.18 },
+    ...(
+      [
+        { color: ARMANDO_PINK, from: [0.6, 0], to: [0.66, 0.35], width: 0.05 },
+        { color: ARMANDO_PINK, from: [0.7, 0], to: [0.76, 0.3], width: 0.05 },
+      ] satisfies GliderPatch[]
+    ).flatMap(mirrored),
+  ],
+  numeroCajones: 30,
+};
+
+/**
  * The Niviuk Roller's design, on the top surface: the front half of the right tip in the tip
  * colour, an accent line just behind it out to the tip, stepping forward to the nose left of
  * centre, and the underside in the base colour.
@@ -631,6 +653,19 @@ export const paraglidersVoxel: ParagliderVoxelConfig[] = [
       new THREE.Vector3(7600, 560, -3000),
       new THREE.Vector3(7200, 620, -1900),
     ],
+  },
+];
+
+/** Pilots who fly only at a relax place of their own (its `pilots`), never on the Risco */
+export const relaxOnlyPilots: ParagliderVoxelConfig[] = [
+  {
+    // Los Giles, Gran Canaria
+    options: {
+      glider: ARMANDO_WING,
+      pilot: { characterType: CharacterType.ARMANDO },
+    },
+    startProgress: 0,
+    pathOffset: new THREE.Vector3(0, 0, 0),
   },
 ];
 

@@ -34,6 +34,7 @@ import { Gulls } from '../../foundation/components/wildlife/Gulls';
 import { LevelOfDetail } from '../../foundation/types/lod';
 import {
   paraglidersVoxel,
+  relaxOnlyPilots,
   cessnaConfig,
   herculesConfig,
   GREEN_ROLLER,
@@ -75,7 +76,7 @@ const landmark = (create: () => THREE.Object3D) => (): Loadable => ({
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 /** One per pilot, alphabetical, in their own group the viewer lays out as a grid of names */
-const pilots: ModelEntry[] = paraglidersVoxel
+const pilots: ModelEntry[] = [...paraglidersVoxel, ...relaxOnlyPilots]
   .map(({ options }) => ({
     id: `paraglider-${options.pilot.characterType}`,
     name: capitalize(String(options.pilot.characterType)),
