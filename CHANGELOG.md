@@ -2,6 +2,13 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-16 10:45 UTC
+
+### Removed
+
+- **Links back to lanzaroteparagliding.com**: the corner links did not fit the 3D scene and
+  overlapped the controls on a phone, so they are gone from the page template.
+
 ## 2026-11-15 21:09 UTC
 
 ### Added

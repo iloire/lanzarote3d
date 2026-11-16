@@ -30,15 +30,12 @@ const SITES = {
       'Experience paragliding in Lanzarote with all your senses!. Tandem flights, pilot guides, real time wind conditions and more!',
     // Search engines only know the Lanzarote site
     extras: ['robots.txt', 'sitemap.xml'],
-    // Links back to lanzaroteparagliding.com, which this subdomain belongs to
-    backLinks: true,
   },
   relax: {
     dist: 'dist-relax',
     open: 'index.html',
     title: 'Relax - paragliding in 3D',
     description: appsConfig.apps.relax.description,
-    backLinks: false,
     extras: [],
   },
 };
@@ -141,7 +138,6 @@ module.exports = (env, argv) => ({
           filename: app.filename,
           title: app.title,
           description: app.description,
-          backLinks: site.backLinks,
           inject: 'body',
           minify: false,
         })
@@ -153,7 +149,6 @@ module.exports = (env, argv) => ({
       filename: 'index.html',
       title: site.title,
       description: site.description,
-      backLinks: site.backLinks,
       inject: 'body',
       minify: false,
     }),
