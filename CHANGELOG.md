@@ -4,6 +4,14 @@ All notable changes to the Lanzarote 3D project will be documented in this file.
 
 ## 2026-11-17 12:04 UTC
 
+### Changed
+
+- **Fewer draw calls per paraglider**: each brake handle, both risers, and the brake fan with
+  its two lines are now one object each instead of nine in all. The Tenésar scene went from
+  175 to 140 draw calls a frame.
+
+## 2026-11-17 12:04 UTC
+
 ### Added
 
 - **Flying zones map** (`/flying-zones`, private): Lanzarote from above with a pin on each of

@@ -582,25 +582,41 @@ const createLines = (
   return lines;
 };
 
+/** Boxes of one size or another, placed in one geometry so they draw in one call. */
+const boxes = (parts: { size: THREE.Vector3; at: THREE.Vector3 }[]): THREE.BufferGeometry => {
+  const position: number[] = [];
+  const normal: number[] = [];
+  parts.forEach(({ size, at }) => {
+    const box = new THREE.BoxGeometry(size.x, size.y, size.z)
+      .translate(at.x, at.y, at.z)
+      .toNonIndexed();
+    position.push(...box.attributes['position']!.array);
+    normal.push(...box.attributes['normal']!.array);
+  });
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(position, 3));
+  geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normal, 3));
+  return geometry;
+};
+
 /**
  * The brakes fan from the outer trailing edge to one junction and down to a handle in each of
- * the pilot's fists. The handles are named `brake-handle` and the lines from the junctions
- * `brake-line`: each line follows its handle (by index) every frame, so a parent can move the
- * handles with a swinging pilot and the lines stay in the pilot's hands.
+ * the pilot's fists. The handles are named `brake-handle`; the line from each junction follows
+ * its handle every frame, so a parent can move the handles with a swinging pilot and the lines
+ * stay in the pilot's hands. The fan and both lines are one set of segments, one draw call.
  */
 const createBrakes = (ribs: Rib[], cellsPerHalf: number, options: GliderOptions): THREE.Group => {
   const brakes = new THREE.Group();
   brakes.name = 'brakes';
-  const fan: THREE.Vector3[] = [];
-  const lineMaterial = new THREE.LineBasicMaterial({
-    color: options.brakeColor,
-    transparent: true,
-    opacity: 0.35,
-  });
-  const gripGeometry = new THREE.BoxGeometry(BRAKE_GRIP.x, BRAKE_GRIP.y, BRAKE_GRIP.z);
-  const swivelGeometry = new THREE.BoxGeometry(BRAKE_SWIVEL.x, BRAKE_SWIVEL.y, BRAKE_SWIVEL.z);
+  const points: THREE.Vector3[] = [];
+  const handleGeometry = boxes([
+    { size: BRAKE_GRIP, at: new THREE.Vector3(0, -BRAKE_GRIP_DROP, 0) },
+    { size: BRAKE_SWIVEL, at: new THREE.Vector3(0, BRAKE_SWIVEL.y / 2, 0) },
+  ]);
   const handleMaterial = new THREE.MeshLambertMaterial({ color: options.brakeColor });
   const handleTop = new THREE.Vector3(0, BRAKE_SWIVEL.y, 0);
+  // Each handle and the index of the point at its end of the line
+  const ends: { handle: THREE.Object3D; index: number }[] = [];
 
   [-1, 1].forEach(side => {
     const trailingEdges = attachedRibs(ribs, cellsPerHalf, side)
@@ -610,59 +626,52 @@ const createBrakes = (ribs: Rib[], cellsPerHalf: number, options: GliderOptions)
       .reduce((sum, p) => sum.add(p), new THREE.Vector3())
       .divideScalar(Math.max(1, trailingEdges.length));
 
-    const handle = new THREE.Group();
+    const handle = new THREE.Mesh(handleGeometry, handleMaterial);
     handle.name = 'brake-handle';
     handle.position.copy(HANDS).setZ(side * HANDS.z);
-    const grip = new THREE.Mesh(gripGeometry, handleMaterial);
-    grip.position.y = -BRAKE_GRIP_DROP;
-    const swivel = new THREE.Mesh(swivelGeometry, handleMaterial);
-    swivel.position.y = BRAKE_SWIVEL.y / 2;
-    [grip, swivel].forEach(part => {
-      part.castShadow = true;
-      handle.add(part);
-    });
+    handle.castShadow = true;
     brakes.add(handle);
 
     const hand = handle.position.clone().add(handleTop);
     const junction = hand.clone().lerp(mean, 0.6);
-    trailingEdges.forEach(p => fan.push(p, junction));
-
-    const line = new THREE.Line(
-      new THREE.BufferGeometry().setFromPoints([junction, hand]),
-      lineMaterial
-    );
-    line.name = 'brake-line';
-    const end = new THREE.Vector3();
-    line.onBeforeRender = () => {
-      // The handle may hang from another parent (the swinging pilot): follow it there
-      handle.localToWorld(end.copy(handleTop));
-      line.worldToLocal(end);
-      const position = line.geometry.attributes['position'] as THREE.BufferAttribute;
-      position.setXYZ(1, end.x, end.y, end.z);
-      position.needsUpdate = true;
-    };
-    brakes.add(line);
+    trailingEdges.forEach(p => points.push(p, junction));
+    points.push(junction, hand);
+    ends.push({ handle, index: points.length - 1 });
   });
 
-  const fanLines = new THREE.LineSegments(
-    new THREE.BufferGeometry().setFromPoints(fan),
-    lineMaterial
+  const lines = new THREE.LineSegments(
+    new THREE.BufferGeometry().setFromPoints(points),
+    new THREE.LineBasicMaterial({ color: options.brakeColor, transparent: true, opacity: 0.35 })
   );
-  fanLines.name = 'brake-fan';
-  brakes.add(fanLines);
+  lines.name = 'brake-lines';
+  const end = new THREE.Vector3();
+  lines.onBeforeRender = () => {
+    // The handles may hang from another parent (the swinging pilot): follow them there
+    const position = lines.geometry.attributes['position'] as THREE.BufferAttribute;
+    ends.forEach(({ handle, index }) => {
+      handle.localToWorld(end.copy(handleTop));
+      lines.worldToLocal(end);
+      position.setXYZ(index, end.x, end.y, end.z);
+    });
+    position.needsUpdate = true;
+  };
+  brakes.add(lines);
   return brakes;
 };
 
-const createRisers = (): THREE.Group => {
-  const risers = new THREE.Group();
+/** Both risers in one mesh */
+const createRisers = (): THREE.Mesh => {
+  const size = new THREE.Vector3(30, RISER_LENGTH, 12);
+  const risers = new THREE.Mesh(
+    boxes(
+      [-1, 1].map(side => ({
+        size,
+        at: new THREE.Vector3(0, RISER_LENGTH / 2, side * CARABINER_HALF_GAP),
+      }))
+    ),
+    new THREE.MeshLambertMaterial({ color: '#222222' })
+  );
   risers.name = 'risers';
-  const material = new THREE.MeshLambertMaterial({ color: '#222222' });
-  const geometry = new THREE.BoxGeometry(30, RISER_LENGTH, 12);
-  [-1, 1].forEach(side => {
-    const riser = new THREE.Mesh(geometry, material);
-    riser.position.set(0, RISER_LENGTH / 2, side * CARABINER_HALF_GAP);
-    risers.add(riser);
-  });
   return risers;
 };
 
