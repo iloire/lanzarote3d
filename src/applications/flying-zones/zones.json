@@ -1,0 +1,86 @@
+{
+  "zones": [
+    {
+      "id": "tenesar",
+      "name": "Tenésar",
+      "lat": 29.0808,
+      "lon": -13.7159,
+      "wind": "N",
+      "altitude": "10-80 m",
+      "color": "#f5c800"
+    },
+    {
+      "id": "el-cuchillo",
+      "name": "El Cuchillo",
+      "lat": 29.085695,
+      "lon": -13.654401,
+      "wind": "N",
+      "altitude": "350 m",
+      "color": "#ff7a1a"
+    },
+    {
+      "id": "famara",
+      "name": "Famara",
+      "lat": 29.062068,
+      "lon": -13.578855,
+      "wind": "Variable",
+      "altitude": "200 m",
+      "color": "#f01e12",
+      "scene": "lanzarote"
+    },
+    {
+      "id": "las-nieves",
+      "name": "Las Nieves",
+      "lat": 29.106861,
+      "lon": -13.530278,
+      "wind": "N-NW",
+      "altitude": "600 m",
+      "color": "#2b4a66"
+    },
+    {
+      "id": "mala",
+      "name": "Mala",
+      "lat": 29.109617,
+      "lon": -13.476962,
+      "wind": "NE-E",
+      "altitude": "250 m",
+      "color": "#18a594"
+    },
+    {
+      "id": "mirador",
+      "name": "Mirador",
+      "lat": 29.227905,
+      "lon": -13.471474,
+      "wind": "NE",
+      "altitude": "400 m",
+      "color": "#e8458b"
+    },
+    {
+      "id": "orzola",
+      "name": "Órzola",
+      "lat": 29.223295,
+      "lon": -13.463532,
+      "wind": "NE",
+      "altitude": "150 m",
+      "color": "#7b4fd6"
+    },
+    {
+      "id": "macher",
+      "name": "Macher",
+      "lat": 28.95272,
+      "lon": -13.712167,
+      "wind": "S-SE",
+      "altitude": "450 m",
+      "color": "#3c8dde"
+    },
+    {
+      "id": "playa-quemada",
+      "name": "Playa Quemada",
+      "lat": 28.906624,
+      "lon": -13.737511,
+      "wind": "NE-E",
+      "altitude": "45 m",
+      "color": "#6fbf3a"
+    }
+  ]
+}

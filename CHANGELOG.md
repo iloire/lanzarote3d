@@ -2,6 +2,15 @@
 
 All notable changes to the Lanzarote 3D project will be documented in this file.
 
+## 2026-11-17 12:04 UTC
+
+### Added
+
+- **Flying zones map** (`/flying-zones`, private): Lanzarote from above with a pin on each of
+  the 9 flying zones (`src/applications/flying-zones/zones.json`). Picking one opens it in the
+  relax scene, where the gliders' loop and the camera are worked out from the terrain around
+  the takeoff and the wind it works in (`relax/ridgeLoop.ts`).
+
 ## 2026-11-16 10:45 UTC
 
 ### Removed

@@ -28,6 +28,7 @@ import { montSaintMichel } from './montSaintMichel';
 import type { SetPieceLoader } from './setPiece';
 import type { Place } from './places';
 import { isDevModeEnabled } from '../../devMode';
+import { FLYING_ZONES, windBearing, zoneTakeoff } from '../flying-zones/zones';
 
 /** One place to relax in: where the gliders soar and where the camera watches from */
 export interface RelaxScene {
@@ -92,6 +93,11 @@ export interface RelaxScene {
   unlisted?: boolean;
   /** Chase the first pilot along the loop, as a lone paramotor is, instead of watching the loop */
   chase?: boolean;
+  /**
+   * A Lanzarote flying zone's takeoff, world x, z, and the way its slope faces (degrees from
+   * north): `loop` and `camera` are worked out from the ground once the terrain is in (ridgeLoop.ts)
+   */
+  takeoff?: { x: number; z: number; faces: number };
 }
 
 /** How a place is lit, where it differs from the theme */
@@ -264,6 +270,38 @@ function demScene(location: Location, config: DemSceneConfig, city?: string): Re
   };
 }
 
+/**
+ * A flying zone with no hand-built scene, on the island: the gliders soar in front of its
+ * takeoff, the slope facing the wind it works in. Its loop and camera wait for the terrain.
+ */
+function flyingZoneScene(
+  id: string,
+  name: string,
+  takeoff: NonNullable<RelaxScene['takeoff']>
+): RelaxScene {
+  const { x, z } = takeoff;
+  const spot = new THREE.Vector3(x, 0, z);
+  return {
+    location: { ...LANZAROTE, id, name },
+    region: 'Canary Islands',
+    loop: [],
+    camera: { position: spot.clone().setY(3000), target: spot },
+    takeoff,
+    limits: { zoomOut: 4, pan: 8000 },
+    unlisted: true,
+  };
+}
+
+const FLYING_ZONE_SCENES: Record<string, RelaxScene> = Object.fromEntries(
+  FLYING_ZONES.filter(zone => !zone.scene).map(zone => [
+    zone.id,
+    flyingZoneScene(zone.id, zone.name, {
+      ...zoneTakeoff(zone),
+      faces: windBearing(zone.wind) ?? 0,
+    }),
+  ])
+);
+
 export const RELAX_SCENES: Record<string, RelaxScene> = {
   lanzarote: {
     location: LANZAROTE,
@@ -311,6 +349,7 @@ export const RELAX_SCENES: Record<string, RelaxScene> = {
     limits: { zoomOut: 8, pan: 20000 },
     unlisted: true,
   },
+  ...FLYING_ZONE_SCENES,
   tenerife: { ...demScene(TENERIFE, TENERIFE_CONFIG), unlisted: true },
   'el-hierro': demScene(EL_HIERRO, EL_HIERRO_CONFIG),
   'los-giles': { ...demScene(LOS_GILES, LOS_GILES_CONFIG), unlisted: true },

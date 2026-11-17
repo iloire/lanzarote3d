@@ -1,0 +1,305 @@
+/* The flying zones map: paraglider pins over the island and a small card naming the page */
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;600&display=swap');
+
+:root {
+  --zones-ink: #0e2233;
+  --zones-paper: #fff8ec;
+  --zones-muted: #4f6476;
+  --zones-shadow: 0 6px 20px rgba(14, 34, 51, 0.22);
+}
+
+.zones-card {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1001;
+  max-width: 300px;
+  padding: 16px 18px 14px;
+  border-radius: 14px;
+  background: var(--zones-paper);
+  color: var(--zones-ink);
+  box-shadow: var(--zones-shadow);
+  font-family: 'Rubik', system-ui, sans-serif;
+  animation: zones-card-in 0.8s ease-out both;
+}
+
+.zones-card__place {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--zones-muted);
+}
+
+.zones-card h1 {
+  margin: 0 0 10px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.zones-card p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+@keyframes zones-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+/* Each pin sits at its takeoff; the float (stem, wing and label) can lean off it sideways */
+.zone-pins {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+  font-family: 'Rubik', system-ui, sans-serif;
+}
+
+.zone-pin {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: var(--zones-ink);
+  text-decoration: none;
+  pointer-events: auto;
+  will-change: transform;
+}
+
+.zone-pin[hidden] {
+  display: none;
+}
+
+/* Where the takeoff is: a dot with a ring that breathes out */
+.zone-pin__spot {
+  position: absolute;
+  left: -5px;
+  top: -5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--wing);
+  box-shadow: 0 0 0 2px #fff;
+}
+
+.zone-pin__spot::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  opacity: 0;
+  animation: zone-spot 2.6s ease-out infinite;
+  animation-delay: calc(var(--i) * 0.3s);
+}
+
+@keyframes zone-spot {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+.zone-pin__float {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  transform: translateX(var(--shift, 0));
+  animation: zone-land 0.7s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+  animation-delay: calc(0.3s + var(--i) * 0.12s);
+}
+
+/* The pins float down onto the island one after another, west to east */
+@keyframes zone-land {
+  from {
+    opacity: 0;
+    transform: translate(var(--shift, 0), -40px);
+  }
+}
+
+.zone-pin__stem {
+  position: absolute;
+  left: -1px;
+  bottom: 0;
+  width: 2px;
+  height: var(--reach, 26px);
+  background: repeating-linear-gradient(#fff 0 4px, transparent 4px 7px);
+  transform-origin: bottom center;
+  /* From the takeoff, leaning out to the float when it has been pushed aside */
+  transform: translateX(calc(var(--shift, 0) * -1)) rotate(var(--lean, 0rad));
+}
+
+/* The wing sways gently from its lines, like one hanging in the breeze */
+.zone-pin__bob {
+  position: absolute;
+  left: -28px;
+  bottom: var(--stem, 26px);
+  width: 56px;
+  height: 44px;
+  transform-origin: 50% 80%;
+  animation: zone-sway 3.4s ease-in-out infinite alternate;
+  animation-delay: calc(var(--i) * -0.7s);
+  transition: scale 0.2s ease;
+  filter: drop-shadow(0 3px 3px rgba(14, 34, 51, 0.3));
+}
+
+.zone-pin__wing {
+  display: block;
+  width: 100%;
+  height: 100%;
+  color: var(--zones-ink);
+}
+
+@keyframes zone-sway {
+  from {
+    transform: translateY(0) rotate(-5deg);
+  }
+  to {
+    transform: translateY(-4px) rotate(5deg);
+  }
+}
+
+.zone-pin__label {
+  position: absolute;
+  left: 30px;
+  bottom: calc(var(--stem, 26px) + 10px);
+  display: flex;
+  flex-direction: column;
+  padding: 5px 10px 5px 9px;
+  border-radius: 10px;
+  border-left: 4px solid var(--wing);
+  background: var(--zones-paper);
+  box-shadow: var(--zones-shadow);
+  white-space: nowrap;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.zone-pin--left .zone-pin__label {
+  left: auto;
+  right: 30px;
+  border-left: 0;
+  border-right: 4px solid var(--wing);
+  padding: 5px 9px 5px 10px;
+}
+
+.zone-pin__name {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.zone-pin__meta {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 9px;
+  border-radius: 8px;
+  background: var(--zones-ink);
+  color: var(--zones-paper);
+  font-size: 12px;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
+  pointer-events: none;
+}
+
+.zone-pin--left .zone-pin__meta {
+  left: auto;
+  right: 0;
+}
+
+/* The wind and the takeoff's height show on the pin you point at */
+.zone-pin:hover .zone-pin__meta,
+.zone-pin:focus-visible .zone-pin__meta {
+  opacity: 1;
+  transform: none;
+}
+
+/* Down the screen is south: turned by the wind's bearing, and the map's own turn */
+.zone-pin__arrow {
+  display: inline-block;
+  font-weight: 600;
+  transform: rotate(calc(var(--wind, 0deg) + var(--heading, 0deg)));
+}
+
+.zone-pin:hover .zone-pin__bob,
+.zone-pin:focus-visible .zone-pin__bob {
+  scale: 1.18;
+}
+
+.zone-pin:hover .zone-pin__label,
+.zone-pin:focus-visible .zone-pin__label {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 26px rgba(14, 34, 51, 0.32);
+}
+
+.zone-pin:hover,
+.zone-pin:focus-visible {
+  z-index: 1;
+}
+
+.zone-pin:focus-visible {
+  outline: none;
+}
+
+.zone-pin:focus-visible .zone-pin__label {
+  outline: 3px solid var(--wing);
+  outline-offset: 2px;
+}
+
+@media (max-width: 600px) {
+  .zones-card {
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    max-width: none;
+    padding: 12px 14px;
+  }
+
+  .zones-card h1 {
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+
+  .zones-card p {
+    font-size: 13px;
+  }
+
+  .zone-pin__label {
+    padding: 3px 8px 3px 7px;
+  }
+
+  .zone-pin--left .zone-pin__label {
+    padding: 3px 7px 3px 8px;
+  }
+
+  .zone-pin__name {
+    font-size: 12.5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zones-card,
+  .zone-pin__float,
+  .zone-pin__bob,
+  .zone-pin__spot::after {
+    animation: none;
+  }
+}

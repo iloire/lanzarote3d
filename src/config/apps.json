@@ -18,6 +18,15 @@
       "visibility": "private",
       "priority": 20
     },
+    "flyingzones": {
+      "name": "Flying zones",
+      "description": "Lanzarote from above with a pin on every flying zone; pick one to watch the gliders soar it",
+      "route": "/flying-zones",
+      "category": "experience",
+      "requiresWebGL": true,
+      "visibility": "private",
+      "priority": 4
+    },
     "puertodelcarmen": {
       "name": "Puerto del Carmen",
       "description": "The white town on the south-east coast, its real harbour with boats at the pontoons, and a paraglider over Playa Quemada",

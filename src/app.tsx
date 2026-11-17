@@ -117,8 +117,8 @@ const App: React.FC<AppProps> = ({
   // Get current app name for title display
   const currentAppConfig = initialStory ? getAppConfig(initialStory) : null;
   const appName = currentAppConfig?.name || 'Lanzarote 3D';
-  // The relax scene stands alone, with no menu or title, wherever it is served
-  const bare = currentAppConfig?.route === '/relax';
+  // The relax scene and the flying zones map stand alone, with no menu or title, wherever served
+  const bare = ['/relax', '/flying-zones'].includes(currentAppConfig?.route ?? '');
 
   const initThree = async () => {
     const renderer = createRenderer(SCENE_CONFIG.sizes);

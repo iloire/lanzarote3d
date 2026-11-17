@@ -17,6 +17,7 @@ import { LevelOfDetail } from '../../foundation/types/lod';
 import { CharacterType } from '../../foundation/components/characters/CharacterRegistry';
 import Models from '../../foundation/utils/models';
 import { DEFAULT_SCENE, RELAX_SCENES, RelaxScene, pickerPlaces } from './scenes';
+import { ridgeLoop } from './ridgeLoop';
 import { HOME_PLACE, placeHref } from './places';
 import { SITE } from '../../config/site';
 import { createLocationSwitcher } from './LocationSwitcher';
@@ -70,7 +71,8 @@ const definedOnly = <T extends object>(values: T | undefined): Partial<T> =>
   ) as Partial<T>;
 
 /**
- * Pick a place (?location=lanzarote | el-cuchillo | tenerife | el-hierro | castejon-de-sos | rio-de-janeiro | new-york
+ * Pick a place (?location=lanzarote | el-cuchillo | any flying zone of
+ * ../flying-zones/zones.json | tenerife | el-hierro | castejon-de-sos | rio-de-janeiro | new-york
  * | paris | giza | mont-saint-michel | hong-kong | venice) and watch a few gliders soar its ridge
  * while the camera drifts slowly from side to side, or, in a city or round the pyramids, chase
  * Abel's paramotor (in Hong Kong, at night; in Venice, down the Grand Canal); at Mont-Saint-Michel
@@ -107,7 +109,7 @@ class RelaxApp extends TerrainBase {
         window.location.replace(placeHref(id));
         return;
       }
-      const relax = RELAX_SCENES[id]!;
+      let relax = RELAX_SCENES[id]!;
       this.location = relax.location;
       this.removeSwitcher = createLocationSwitcher(pickerPlaces(id), id);
       this.removeSound = createSoundControls(Boolean(relax.paramotor));
@@ -135,6 +137,19 @@ class RelaxApp extends TerrainBase {
       camera.position.copy(relax.intro?.positions[0] ?? relax.camera.position);
       camera.lookAt(relax.intro?.targets[0] ?? relax.camera.target);
       await this.initializeEnvironment(options);
+      // A flying zone's loop and camera come from the ground round its takeoff
+      const ground = options.terrain;
+      if (relax.takeoff && ground) {
+        ground.updateMatrixWorld(true);
+        relax = {
+          ...relax,
+          ...ridgeLoop(relax.takeoff, relax.takeoff.faces, (x, z) =>
+            getTerrainHeight(x, z, ground)
+          ),
+        };
+        camera.position.copy(relax.camera.position);
+        camera.lookAt(relax.camera.target);
+      }
       // After the environment, which applies the default theme once its sky and pipeline exist
       await ThemeEngine.apply(options, theme);
       if (look?.ambient !== undefined && options.sky) {
